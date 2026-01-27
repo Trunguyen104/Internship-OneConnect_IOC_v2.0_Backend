@@ -14,7 +14,7 @@ namespace IOC.Application.AdminFeatures.Commands.CreateAdminAccountCommands
         public string FullName { get; set; }
         public string Email { get; set; }
         public AdminRole Role { get; set; }
-        public Guid? OrganizationId { get; set; }
+        public Guid? OrganizationId { get; set; } = Guid.Empty;
         public string Code { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }

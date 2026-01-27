@@ -1,7 +1,9 @@
 ﻿using IOC.API.Middlewares;
 using IOC.Application;
 using IOC.Infrastructure;
+using IOC.Infrastructure.Persistences.DbContexts;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 namespace IOC.API
@@ -38,25 +40,30 @@ namespace IOC.API
 
                 // 🔒 Áp dụng Bearer cho toàn bộ API
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
 
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplicationServices();
 
             var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -66,7 +73,7 @@ namespace IOC.API
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             // Enable authentication middleware (validate JWT on incoming requests)

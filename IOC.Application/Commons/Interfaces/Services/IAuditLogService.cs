@@ -9,6 +9,7 @@ namespace IOC.Application.Commons.Interfaces.Services
     public interface IAuditLogService
     {
         Task LogAsync(
+            Guid ActorId,
             string action,
             Guid targetId,
             string description,

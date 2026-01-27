@@ -20,15 +20,18 @@ namespace IOC.Application.AdminFeatures.Commands.CreateAdminAccountCommands
         private readonly IAdminAccountRepository _repository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IAuditLogService _auditLog;
+        private readonly ICurrentUserService _currentUser;
 
         public CreateAdminAccountCommandHandler(
             IAdminAccountRepository repository,
             IPasswordHasher passwordHasher,
-            IAuditLogService auditLog)
+            IAuditLogService auditLog,
+            ICurrentUserService currentUser)
         {
             _repository = repository;
             _passwordHasher = passwordHasher;
             _auditLog = auditLog;
+            _currentUser = currentUser;
         }
 
         public async Task<Guid> Handle(
@@ -39,13 +42,16 @@ namespace IOC.Application.AdminFeatures.Commands.CreateAdminAccountCommands
             {
                 var validator = new CreateAdminAccountValidator();
                 validator.Validate(request);
+                if (_currentUser.Role != Domain.Enums.AdminRole.Master && request.Role == Domain.Enums.AdminRole.Master)
+                    throw new DomainException("Only MASTER administrators can create new MASTER accounts.");
             }
             catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message);
             }
 
-            if (await _repository.ExistsByEmailAsync(request.Email)) ;
+            if (await _repository.ExistsByEmailAsync(request.Email))
+                throw new DomainException("Email is already in use.");
 
             var passwordHash = _passwordHasher.Hash(request.Password);
 
@@ -61,6 +67,7 @@ namespace IOC.Application.AdminFeatures.Commands.CreateAdminAccountCommands
             await _repository.AddAsync(account);
 
             await _auditLog.LogAsync(
+                _currentUser.UserId,
                 "CREATE_ADMIN_ACCOUNT",
                 account.Id,
                 $"Create an administrative account: {account.Email}"

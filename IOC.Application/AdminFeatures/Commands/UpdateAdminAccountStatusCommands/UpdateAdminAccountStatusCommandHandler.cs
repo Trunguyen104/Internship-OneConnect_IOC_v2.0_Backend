@@ -1,4 +1,5 @@
 using IOC.Application.Commons.Interfaces.Repositories;
+using IOC.Application.Commons.Interfaces.Services;
 using IOC.Domain.Entities;
 using IOC.Domain.Enums;
 using IOC.Domain.Exceptions;
@@ -12,10 +13,12 @@ namespace IOC.Application.AdminFeatures.Commands.UpdateAdminAccountStatusCommand
     public class UpdateAdminAccountStatusCommandHandler : IRequestHandler<UpdateAdminAccountStatusCommand, Guid>
     {
         private readonly IAdminAccountRepository _repository;
+        private readonly ICurrentUserService _currentUser;
 
-        public UpdateAdminAccountStatusCommandHandler(IAdminAccountRepository repository)
+        public UpdateAdminAccountStatusCommandHandler(IAdminAccountRepository repository,ICurrentUserService currentUser)
         {
             _repository = repository;
+            _currentUser = currentUser;
         }
 
         public async Task<Guid> Handle(UpdateAdminAccountStatusCommand request, CancellationToken cancellationToken)
@@ -26,6 +29,9 @@ namespace IOC.Application.AdminFeatures.Commands.UpdateAdminAccountStatusCommand
             var account = await _repository.GetByIdAsync(request.Id);
             if (account == null)
                 throw new DomainException("Admin account not found.");
+
+            if (_currentUser.Role != AdminRole.Master)
+                throw new DomainException("Only MASTER administrators can update admin account status.");
 
             // If disabling, ensure at least one master remains
             if (request.TargetStatus == AccountStatus.Inactive && account.Role == AdminRole.Master)

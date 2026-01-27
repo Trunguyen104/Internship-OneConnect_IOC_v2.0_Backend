@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using IOC.Application.Commons.Interfaces.Services;
 using IOC.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -10,12 +11,14 @@ public sealed class ExceptionHandlingMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
+
     public ExceptionHandlingMiddleware(
         RequestDelegate next,
         ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
         _logger = logger;
+
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -31,6 +34,7 @@ public sealed class ExceptionHandlingMiddleware
                 HttpStatusCode.BadRequest,
                 "DOMAIN_ERROR",
                 ex.Message);
+
         }
         catch (ArgumentException ex) {
             await WriteErrorAsync(

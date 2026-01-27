@@ -19,12 +19,14 @@ namespace IOC.Infrastructure.Services
         }
 
         public async Task LogAsync(
+            Guid actorId,
             string action,
             Guid targetId,
             string description,
             CancellationToken ct = default)
         {
             var log = AuditLog.Create(
+                actorId,
                 action,
                 targetId,
                 description);

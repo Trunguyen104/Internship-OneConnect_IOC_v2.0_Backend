@@ -64,6 +64,8 @@ namespace IOC.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("OrganizationId");
+
                     b.ToTable("admin_accounts", (string)null);
                 });
 
@@ -78,6 +80,9 @@ namespace IOC.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -90,6 +95,8 @@ namespace IOC.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ActorId");
 
                     b.HasIndex("TargetId");
 
@@ -113,6 +120,15 @@ namespace IOC.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Organizations", (string)null);
+                });
+
+            modelBuilder.Entity("IOC.Domain.Entities.AdminAccount", b =>
+                {
+                    b.HasOne("IOC.Domain.Entities.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId");
+
+                    b.Navigation("Organization");
                 });
 #pragma warning restore 612, 618
         }

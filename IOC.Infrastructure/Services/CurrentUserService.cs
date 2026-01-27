@@ -11,8 +11,8 @@ namespace IOC.Infrastructure.Services
     // Reads current user info from HttpContext.User claims (scoped)
     public class CurrentUserService : ICurrentUserService
     {
-        public Guid? UserId { get; }
-        public AdminRole? Role { get; }
+        public Guid UserId { get; }
+        public AdminRole Role { get; }
         public Guid? OrganizationId { get; }
 
         public CurrentUserService(IHttpContextAccessor httpContextAccessor)

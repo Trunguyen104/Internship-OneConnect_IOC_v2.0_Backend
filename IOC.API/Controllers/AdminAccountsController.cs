@@ -24,7 +24,6 @@ namespace IOC.API.Controllers
             _mediator = mediator;
         }
 
-        [Authorize]
         [HttpGet("GetListAdminAccount")]
         public async Task<IActionResult> GetList([FromQuery] GetAdminAccountListQuery query)
         {
@@ -32,6 +31,7 @@ namespace IOC.API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost("CreateAdminAccount")]
         public async Task<IActionResult> Create(
             CreateAdminAccountCommand command)
@@ -40,6 +40,7 @@ namespace IOC.API.Controllers
                 return Ok(new { id });
         }
 
+        [Authorize]
         [HttpPut("UpdateAdminAccount")]
         public async Task<IActionResult> Update(UpdateAdminAccountCommand command)
         {
@@ -47,13 +48,15 @@ namespace IOC.API.Controllers
             return Ok(new { id });
         }
 
+        [Authorize]
         [HttpDelete("DeleteAdminAccount")]
         public async Task<IActionResult> Delete(DeleteAdminAccountCommand command)
         {
             var id = await _mediator.Send(command);
             return Ok(new { id });
         }
-
+        
+        [Authorize]
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> UpdateStatus([FromRoute] Guid id, [FromQuery] IOC.Domain.Enums.AccountStatus status)
         {
@@ -62,6 +65,7 @@ namespace IOC.API.Controllers
             return Ok(new { id = idResult });
         }
 
+        [Authorize]
         [HttpPost("{id}/reset-password")]
         public async Task<IActionResult> ResetPassword([FromRoute] Guid id)
         {
@@ -70,6 +74,7 @@ namespace IOC.API.Controllers
             return Ok(new { id = idResult });
         }
 
+        [Authorize]
         [HttpPost("{id}/change-role")]
         public async Task<IActionResult> ChangeRole([FromRoute] Guid id, [FromQuery] IOC.Domain.Enums.AdminRole role, [FromQuery] Guid? organizationId)
         {

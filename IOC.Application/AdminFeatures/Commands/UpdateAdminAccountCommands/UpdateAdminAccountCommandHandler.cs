@@ -16,13 +16,16 @@ namespace IOC.Application.AdminFeatures.Commands.UpdateAdminAccountCommands
     {
         private readonly IAdminAccountRepository _repository;
         private readonly IAuditLogService _auditLog;
+        private readonly ICurrentUserService _currentUser;
 
         public UpdateAdminAccountCommandHandler(
             IAdminAccountRepository repository,
-            IAuditLogService auditLog)
+            IAuditLogService auditLog,
+            ICurrentUserService currentUser)
         {
             _repository = repository;
             _auditLog = auditLog;
+            _currentUser = currentUser;
         }
 
         public async Task<Guid> Handle(UpdateAdminAccountCommand request, CancellationToken cancellationToken)
@@ -41,6 +44,11 @@ namespace IOC.Application.AdminFeatures.Commands.UpdateAdminAccountCommands
             if (account == null)
                 throw new DomainException("Admin account not found.");
 
+            if (request.Role == AdminRole.Master && _currentUser.Role != AdminRole.Master)
+                throw new DomainException("Only MASTER administrators can assign the MASTER role.");
+
+
+
             AdminAccount.Update(
                 account,
                 request.FullName,
@@ -52,6 +60,7 @@ namespace IOC.Application.AdminFeatures.Commands.UpdateAdminAccountCommands
             await _repository.UpdateAsync(account);
 
             await _auditLog.LogAsync(
+                _currentUser.UserId,
                 "UPDATE_ADMIN_ACCOUNT",
                 account.Id,
                 $"Updated administrative account: {account.Email}",

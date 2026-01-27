@@ -19,6 +19,8 @@ namespace IOC.Infrastructure.Persistences.Configurations
 
             builder.HasKey(x => x.Id);
 
+            builder.HasIndex(x => x.ActorId);
+
             builder.Property(x => x.Action)
                 .IsRequired()
                 .HasMaxLength(100);
