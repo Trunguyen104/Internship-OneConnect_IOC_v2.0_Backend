@@ -22,7 +22,7 @@ namespace IOCv2.Application.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Messages {
+    internal class Messages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,10 +36,10 @@ namespace IOCv2.Application.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FoodHub.Application.Resources.Messages", typeof(Messages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IOCv2.Application.Resources.Messages", typeof(Messages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace IOCv2.Application.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,151 +63,79 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mã: {0}, Mật khẩu: {1}.
         /// </summary>
-        public static string AccountCreatedButEmailFailed {
+        internal static string AccountCreatedButEmailFailed {
             get {
                 return ResourceManager.GetString("AccountCreatedButEmailFailed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mã: {0}, Mật khẩu: {1}.
-        /// </summary>
-        public static string AccountCreatedButEmailFailed1 {
-            get {
-                return ResourceManager.GetString("AccountCreatedButEmailFailed1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Tài khoản đã được tạo thành công.
         /// </summary>
-        public static string AccountCreatedSuccessfully {
+        internal static string AccountCreatedSuccessfully {
             get {
                 return ResourceManager.GetString("AccountCreatedSuccessfully", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tài khoản đã được tạo thành công.
-        /// </summary>
-        public static string AccountCreatedSuccessfully1 {
-            get {
-                return ResourceManager.GetString("AccountCreatedSuccessfully1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Đăng nhập thành công.
         /// </summary>
-        public static string Auth_LoginSuccess {
+        internal static string Auth_LoginSuccess {
             get {
                 return ResourceManager.GetString("Auth.LoginSuccess", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Đăng nhập thành công.
-        /// </summary>
-        public static string Auth_LoginSuccess1 {
-            get {
-                return ResourceManager.GetString("Auth.LoginSuccess1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Đăng xuất thành công.
         /// </summary>
-        public static string Auth_LogoutSuccess {
+        internal static string Auth_LogoutSuccess {
             get {
                 return ResourceManager.GetString("Auth.LogoutSuccess", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Đăng xuất thành công.
-        /// </summary>
-        public static string Auth_LogoutSuccess1 {
-            get {
-                return ResourceManager.GetString("Auth.LogoutSuccess1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Mật khẩu đã được thay đổi thành công..
         /// </summary>
-        public static string Auth_PasswordChangedSuccess {
+        internal static string Auth_PasswordChangedSuccess {
             get {
                 return ResourceManager.GetString("Auth.PasswordChangedSuccess", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mật khẩu đã được thay đổi thành công..
-        /// </summary>
-        public static string Auth_PasswordChangedSuccess1 {
-            get {
-                return ResourceManager.GetString("Auth.PasswordChangedSuccess1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Nếu tài khoản hợp lệ, hệ thống sẽ gửi link reset mật khẩu qua email..
         /// </summary>
-        public static string Auth_PasswordResetGenericMessage {
+        internal static string Auth_PasswordResetGenericMessage {
             get {
                 return ResourceManager.GetString("Auth.PasswordResetGenericMessage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nếu tài khoản hợp lệ, hệ thống sẽ gửi link reset mật khẩu qua email..
-        /// </summary>
-        public static string Auth_PasswordResetGenericMessage1 {
-            get {
-                return ResourceManager.GetString("Auth.PasswordResetGenericMessage1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Link reset mật khẩu đã được gửi vào email của bạn..
         /// </summary>
-        public static string Auth_PasswordResetLinkSent {
+        internal static string Auth_PasswordResetLinkSent {
             get {
                 return ResourceManager.GetString("Auth.PasswordResetLinkSent", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Link reset mật khẩu đã được gửi vào email của bạn..
-        /// </summary>
-        public static string Auth_PasswordResetLinkSent1 {
-            get {
-                return ResourceManager.GetString("Auth.PasswordResetLinkSent1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Mật khẩu đã được reset thành công..
         /// </summary>
-        public static string Auth_PasswordResetSuccess {
+        internal static string Auth_PasswordResetSuccess {
             get {
                 return ResourceManager.GetString("Auth.PasswordResetSuccess", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mật khẩu đã được reset thành công..
-        /// </summary>
-        public static string Auth_PasswordResetSuccess1 {
-            get {
-                return ResourceManager.GetString("Auth.PasswordResetSuccess1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Không xác định được người thực hiện thao tác..
         /// </summary>
-        public static string CannotIdentifyUser {
+        internal static string CannotIdentifyUser {
             get {
                 return ResourceManager.GetString("CannotIdentifyUser", resourceCulture);
             }
@@ -216,7 +144,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Bạn không thể cho người khác thành quản lí.
         /// </summary>
-        public static string CannotPromoteToManager {
+        internal static string CannotPromoteToManager {
             get {
                 return ResourceManager.GetString("CannotPromoteToManager", resourceCulture);
             }
@@ -225,7 +153,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Nhân viên hiện tại không còn hoạt động..
         /// </summary>
-        public static string EmployeeNotActive {
+        internal static string EmployeeNotActive {
             get {
                 return ResourceManager.GetString("EmployeeNotActive", resourceCulture);
             }
@@ -234,7 +162,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Không tìm thấy nhân viên với mã và role hiện tại..
         /// </summary>
-        public static string EmployeeNotFound {
+        internal static string EmployeeNotFound {
             get {
                 return ResourceManager.GetString("EmployeeNotFound", resourceCulture);
             }
@@ -243,7 +171,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Vị trí mới phải khác vị trí hiện tại.
         /// </summary>
-        public static string NewRoleMustBeDifferent {
+        internal static string NewRoleMustBeDifferent {
             get {
                 return ResourceManager.GetString("NewRoleMustBeDifferent", resourceCulture);
             }
@@ -252,7 +180,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Cập nhật thông tin thành công..
         /// </summary>
-        public static string Profile_UpdateSuccess {
+        internal static string Profile_UpdateSuccess {
             get {
                 return ResourceManager.GetString("Profile.UpdateSuccess", resourceCulture);
             }
@@ -261,7 +189,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mật khẩu mới: {0}.
         /// </summary>
-        public static string ResetPassword_SuccessNoEmail {
+        internal static string ResetPassword_SuccessNoEmail {
             get {
                 return ResourceManager.GetString("ResetPassword.SuccessNoEmail", resourceCulture);
             }
@@ -270,7 +198,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Mật khẩu đã được reset thành công. Email thông báo đã được gửi tới {0}.
         /// </summary>
-        public static string ResetPassword_SuccessWithEmail {
+        internal static string ResetPassword_SuccessWithEmail {
             get {
                 return ResourceManager.GetString("ResetPassword.SuccessWithEmail", resourceCulture);
             }
@@ -279,7 +207,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên..
         /// </summary>
-        public static string ResetStatusNoEmail {
+        internal static string ResetStatusNoEmail {
             get {
                 return ResourceManager.GetString("ResetStatusNoEmail", resourceCulture);
             }
@@ -288,7 +216,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Role đã được thay đổi thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên về mã nhân viên mới: {0}.
         /// </summary>
-        public static string RoleChangedButEmailFailed {
+        internal static string RoleChangedButEmailFailed {
             get {
                 return ResourceManager.GetString("RoleChangedButEmailFailed", resourceCulture);
             }
@@ -297,7 +225,7 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Role đã được thay đổi thành công.
         /// </summary>
-        public static string RoleChangedSuccessfully {
+        internal static string RoleChangedSuccessfully {
             get {
                 return ResourceManager.GetString("RoleChangedSuccessfully", resourceCulture);
             }
