@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- Employee Messages -->
+  <data name="CannotPromoteToManager" xml:space="preserve">
+    <value>Bạn không thể cho người khác thành quản lí</value>
+  </data>
+  <data name="NewRoleMustBeDifferent" xml:space="preserve">
+    <value>Vị trí mới phải khác vị trí hiện tại</value>
+  </data>
+  <data name="EmployeeNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhân viên với mã và role hiện tại.</value>
+  </data>
+  <data name="EmployeeNotActive" xml:space="preserve">
+    <value>Nhân viên hiện tại không còn hoạt động.</value>
+  </data>
+  <data name="CannotIdentifyUser" xml:space="preserve">
+    <value>Không xác định được người thực hiện thao tác.</value>
+  </data>
+  <data name="RoleChangedSuccessfully" xml:space="preserve">
+    <value>Role đã được thay đổi thành công</value>
+  </data>
+  <data name="RoleChangedButEmailFailed" xml:space="preserve">
+    <value>Role đã được thay đổi thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên về mã nhân viên mới: {0}</value>
+  </data>
+  <data name="AccountCreatedSuccessfully" xml:space="preserve">
+    <value>Tài khoản đã được tạo thành công</value>
+  </data>
+  <data name="AccountCreatedButEmailFailed" xml:space="preserve">
+    <value>Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mã: {0}, Mật khẩu: {1}</value>
+  </data>
+  <data name="ResetPassword.SuccessWithEmail" xml:space="preserve">
+    <value>Mật khẩu đã được reset thành công. Email thông báo đã được gửi tới {0}</value>
+  </data>
+  <data name="ResetPassword.SuccessNoEmail" xml:space="preserve">
+    <value>Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mật khẩu mới: {0}</value>
+  </data>
+  <data name="ResetStatusNoEmail" xml:space="preserve">
+    <value>Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên.</value>
+  </data>
+  <!-- Authentication -->
+  <data name="Auth.LoginSuccess" xml:space="preserve">
+    <value>Đăng nhập thành công</value>
+  </data>
+  <data name="Auth.LogoutSuccess" xml:space="preserve">
+    <value>Đăng xuất thành công</value>
+  </data>
+  <data name="Auth.PasswordResetLinkSent" xml:space="preserve">
+    <value>Link reset mật khẩu đã được gửi vào email của bạn.</value>
+  </data>
+  <data name="Auth.PasswordChangedSuccess" xml:space="preserve">
+    <value>Mật khẩu đã được thay đổi thành công.</value>
+  </data>
+  <data name="Auth.PasswordResetSuccess" xml:space="preserve">
+    <value>Mật khẩu đã được reset thành công.</value>
+  </data>
+  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <value>Nếu tài khoản hợp lệ, hệ thống sẽ gửi link reset mật khẩu qua email.</value>
+  </data>
+  <!-- Profile -->
+  <data name="Profile.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật thông tin thành công.</value>
+  </data>
+</root>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Common Errors -->
+  <data name="DatabaseConflict" xml:space="preserve">
+    <value>The record already exists in the system.</value>
+  </data>
+  <data name="OperationCancelled" xml:space="preserve">
+    <value>The operation was cancelled.</value>
+  </data>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>You are not authorized to perform this action.</value>
+  </data>
+
+  <!-- Password Validation -->
+  <data name="Password.MinLength" xml:space="preserve">
+    <value>Password must be at least 8 characters long.</value>
+  </data>
+  <data name="Password.RequireUppercase" xml:space="preserve">
+    <value>Password must contain at least one uppercase letter.</value>
+  </data>
+  <data name="Password.RequireLowercase" xml:space="preserve">
+    <value>Password must contain at least one lowercase letter.</value>
+  </data>
+  <data name="Password.RequireDigit" xml:space="preserve">
+    <value>Password must contain at least one digit.</value>
+  </data>
+  <data name="Password.RequireSpecial" xml:space="preserve">
+    <value>Password must contain at least one special character.</value>
+  </data>
+  <data name="Password.NotEmpty" xml:space="preserve">
+    <value>Password cannot be empty.</value>
+  </data>
+  <data name="Password.ConfirmationMismatch" xml:space="preserve">
+    <value>Password confirmation does not match.</value>
+  </data>
+  <data name="Password.MustBeDifferent" xml:space="preserve">
+    <value>New password must be different from current password.</value>
+  </data>
+  <data name="Password.IncorrectCurrent" xml:space="preserve">
+    <value>Current password is incorrect.</value>
+  </data>
+
+  <!-- Reset Password Errors -->
+  <data name="CannotIdentifyManager" xml:space="preserve">
+    <value>Cannot identify the manager performing the reset.</value>
+  </data>
+  <data name="OnlyManagerCanReset" xml:space="preserve">
+    <value>Only managers are allowed to reset passwords.</value>
+  </data>
+  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Password can only be reset for active accounts.</value>
+  </data>
+  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
+    <value>Employee ID is required.</value>
+  </data>
+  <data name="ResetPassword.ReasonRequired" xml:space="preserve">
+    <value>Password reset reason is required.</value>
+  </data>
+  <data name="ResetPassword.ReasonMinLength" xml:space="preserve">
+    <value>Reason must be at least 10 characters long.</value>
+  </data>
+  <data name="ResetPassword.ReasonMaxLength" xml:space="preserve">
+    <value>Reason cannot exceed 500 characters.</value>
+  </data>
+  <data name="ResetStatusNoEmail" xml:space="preserve">
+    <value>Password reset successful. However, the email could not be sent.</value>
+  </data>
+
+  <!-- Authentication Errors -->
+  <data name="Auth.InvalidCredentials" xml:space="preserve">
+    <value>Invalid email or password.</value>
+  </data>
+  <data name="Auth.AccountInactive" xml:space="preserve">
+    <value>Account is currently locked or inactive.</value>
+  </data>
+  <data name="Auth.AccountBlocked" xml:space="preserve">
+    <value>Account temporarily blocked due to too many failed attempts. Please try again later.</value>
+  </data>
+  <data name="Auth.InvalidToken" xml:space="preserve">
+    <value>Invalid or expired token.</value>
+  </data>
+  <data name="Auth.RefreshTokenNotFound" xml:space="preserve">
+    <value>Refresh token not found.</value>
+  </data>
+  <data name="Auth.RefreshTokenExpired" xml:space="preserve">
+    <value>Refresh token has expired.</value>
+  </data>
+  <data name="Auth.RefreshTokenRevoked" xml:space="preserve">
+    <value>Refresh token has been revoked.</value>
+  </data>
+  <data name="Auth.AccountCreationEmailFailed" xml:space="preserve">
+    <value>Account creation failed: Unable to send notification email. Please check the email address.</value>
+  </data>
+  <data name="Auth.ResetRequestLimit" xml:space="preserve">
+    <value>Too many password reset requests. Please try again later.</value>
+  </data>
+  <data name="Auth.InvalidResetLink" xml:space="preserve">
+    <value>The reset link is invalid or has expired.</value>
+  </data>
+  <data name="Auth.UserNotLoggedIn" xml:space="preserve">
+    <value>User is not logged in.</value>
+  </data>
+  <data name="Auth.InvalidAction" xml:space="preserve">
+    <value>Invalid action.</value>
+  </data>
+  <data name="Auth.TooManyAttempts" xml:space="preserve">
+    <value>Too many attempts. Please try again later.</value>
+  </data>
+
+  <!-- Profile/Employee Errors -->
+  <data name="Profile.PhoneExists" xml:space="preserve">
+     <value>Phone number is already in use by another user.</value>
+   </data>
+   <data name="Profile.EmailExists" xml:space="preserve">
+     <value>Email is already in use by another user.</value>
+   </data>
+   <data name="Employee.CannotUpdateInactive" xml:space="preserve">
+     <value>Cannot update information for inactive employees.</value>
+   </data>
+   <data name="Profile.EmployeeIdRequired" xml:space="preserve">
+     <value>EmployeeId cannot be empty.</value>
+   </data>
+   <data name="Profile.FullNameRequired" xml:space="preserve">
+     <value>Full name cannot be empty.</value>
+   </data>
+   <data name="Profile.FullNameMaxLength" xml:space="preserve">
+     <value>Full name cannot exceed 100 characters.</value>
+   </data>
+   <data name="Profile.EmailRequired" xml:space="preserve">
+     <value>Email cannot be empty.</value>
+   </data>
+   <data name="Profile.EmailInvalid" xml:space="preserve">
+     <value>Invalid email format.</value>
+   </data>
+   <data name="Profile.PhoneRequired" xml:space="preserve">
+     <value>Phone number cannot be empty.</value>
+   </data>
+   <data name="Profile.PhoneInvalid" xml:space="preserve">
+     <value>Invalid phone number format.</value>
+   </data>
+  <data name="Employee.CodeInvalidFormat" xml:space="preserve">
+    <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
+  </data>
+  <data name="Auth.TokenRequired" xml:space="preserve">
+    <value>Token is required.</value>
+  </data>
+  <data name="Auth.NewPasswordRequired" xml:space="preserve">
+    <value>New password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
+    <value>Confirm password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
+    <value>Confirm password does not match new password.</value>
+  </data>
+  <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
+    <value>Employee code is required.</value>
+  </data>
+  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <value>If an account exists for that employee code, a reset email has been sent.</value>
+  </data>
+  <data name="EmployeeNotActive" xml:space="preserve">
+    <value>Employee is not active.</value>
+  </data>
+  <data name="CannotPromoteToManager" xml:space="preserve">
+    <value>Cannot promote to Manager directly.</value>
+  </data>
+  <data name="NewRoleMustBeDifferent" xml:space="preserve">
+    <value>New role must be different from current role.</value>
+  </data>
+  <data name="DatabaseUpdateError" xml:space="preserve">
+    <value>An error occurred while updating the database.</value>
+  </data>
+  <data name="RoleChangedButEmailFailed" xml:space="preserve">
+     <value>Role changed successfully for {0}, but notification email failed to send.</value>
+   </data>
+ </root>

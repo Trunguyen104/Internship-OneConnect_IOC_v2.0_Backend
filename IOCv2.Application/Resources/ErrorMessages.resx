@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- Database Errors -->
+  <data name="DatabaseConflict" xml:space="preserve">
+    <value>Có xung đột dữ liệu trong hệ thống. Vui lòng thử lại sau vài giây.</value>
+  </data>
+  <data name="DatabaseUpdateError" xml:space="preserve">
+    <value>Có lỗi xảy ra khi cập nhật dữ liệu. Vui lòng thử lại.</value>
+  </data>
+  <data name="OperationCancelled" xml:space="preserve">
+    <value>Thao tác bị hủy do timeout. Vui lòng thử lại.</value>
+  </data>
+  
+  <!-- Validation Errors -->
+  <data name="InvalidUserId" xml:space="preserve">
+    <value>Current user identity is missing or invalid.</value>
+  </data>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>Bạn không có quyền thực hiện thao tác này.</value>
+  </data>
+  <data name="CannotIdentifyManager" xml:space="preserve">
+    <value>Không thể xác định Manager thực hiện thao tác</value>
+  </data>
+  <data name="OnlyManagerCanReset" xml:space="preserve">
+    <value>Chỉ Manager mới có quyền reset password</value>
+  </data>
+  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Chỉ có thể reset password cho tài khoản đang hoạt động</value>
+  </data>
+  <!-- Password Validation -->
+  <data name="Password.MinLength" xml:space="preserve">
+    <value>Mật khẩu phải có ít nhất 8 ký tự</value>
+  </data>
+  <data name="Password.RequireUppercase" xml:space="preserve">
+    <value>Mật khẩu phải có ít nhất 1 chữ hoa</value>
+  </data>
+  <data name="Password.RequireLowercase" xml:space="preserve">
+    <value>Mật khẩu phải có ít nhất 1 chữ thường</value>
+  </data>
+  <data name="Password.RequireDigit" xml:space="preserve">
+    <value>Mật khẩu phải có ít nhất 1 số</value>
+  </data>
+  <data name="Password.RequireSpecial" xml:space="preserve">
+    <value>Mật khẩu phải có ít nhất 1 ký tự đặc biệt</value>
+  </data>
+  <!-- Reset Password Validation -->
+  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
+    <value>EmployeeId không được để trống</value>
+  </data>
+  <data name="ResetPassword.ReasonRequired" xml:space="preserve">
+    <value>Lý do reset password là bắt buộc</value>
+  </data>
+  <data name="ResetPassword.ReasonMinLength" xml:space="preserve">
+    <value>Lý do reset phải có ít nhất 10 ký tự</value>
+  </data>
+  <data name="ResetPassword.ReasonMaxLength" xml:space="preserve">
+    <value>Lý do reset không được quá 500 ký tự</value>
+  </data>
+  <!-- Authentication Errors -->
+  <data name="Auth.InvalidCredentials" xml:space="preserve">
+    <value>Email hoặc mật khẩu không chính xác.</value>
+  </data>
+  <data name="Auth.AccountInactive" xml:space="preserve">
+    <value>Tài khoản hiện đang bị khóa hoặc chưa kích hoạt.</value>
+  </data>
+  <data name="Auth.AccountBlocked" xml:space="preserve">
+    <value>Tài khoản bị tạm khóa do nhập sai quá nhiều lần. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Auth.InvalidToken" xml:space="preserve">
+    <value>Token không hợp lệ hoặc đã hết hạn.</value>
+  </data>
+  <data name="Auth.RefreshTokenNotFound" xml:space="preserve">
+    <value>Refresh token không tồn tại.</value>
+  </data>
+  <data name="Auth.RefreshTokenExpired" xml:space="preserve">
+    <value>Refresh token đã hết hạn.</value>
+  </data>
+  <data name="Auth.RefreshTokenRevoked" xml:space="preserve">
+    <value>Token làm mới đã bị thu hồi.</value>
+  </data>
+  <data name="Auth.AccountCreationEmailFailed" xml:space="preserve">
+    <value>Tạo tài khoản thất bại: Không thể gửi email thông báo. Vui lòng kiểm tra lại địa chỉ email.</value>
+  </data>
+  <data name="Auth.ResetRequestLimit" xml:space="preserve">
+    <value>Quá nhiều yêu cầu reset mật khẩu. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Auth.InvalidResetLink" xml:space="preserve">
+    <value>Link không hợp lệ hoặc đã hết hạn.</value>
+  </data>
+  <data name="Auth.UserNotLoggedIn" xml:space="preserve">
+    <value>Người dùng chưa đăng nhập.</value>
+  </data>
+  <data name="Auth.InvalidAction" xml:space="preserve">
+    <value>Thao tác không hợp lệ.</value>
+  </data>
+  <data name="Auth.TooManyAttempts" xml:space="preserve">
+    <value>Quá nhiều lần thử sai. Vui lòng thử lại sau.</value>
+  </data>
+  <!-- Password Errors -->
+  <data name="Password.ConfirmationMismatch" xml:space="preserve">
+    <value>Mật khẩu xác nhận không khớp.</value>
+  </data>
+  <data name="Password.MustBeDifferent" xml:space="preserve">
+    <value>Mật khẩu mới phải khác mật khẩu hiện tại.</value>
+  </data>
+  <data name="Password.IncorrectCurrent" xml:space="preserve">
+    <value>Mật khẩu hiện tại không chính xác.</value>
+  </data>
+  <!-- Profile/Employee Errors -->
+  <data name="Profile.PhoneExists" xml:space="preserve">
+    <value>Số điện thoại đã được sử dụng bởi người khác.</value>
+  </data>
+  <data name="Profile.EmailExists" xml:space="preserve">
+    <value>Email đã được sử dụng bởi người khác.</value>
+  </data>
+  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
+    <value>Không thể cập nhật thông tin cho nhân viên đang ngừng hoạt động.</value>
+  </data>
+</root>
