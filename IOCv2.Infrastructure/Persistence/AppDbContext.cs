@@ -14,6 +14,7 @@ namespace IOCv2.Infrastructure.Persistence
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<AuditLog> AuditLogs { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
