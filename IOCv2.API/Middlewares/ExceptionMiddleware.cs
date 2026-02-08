@@ -3,7 +3,7 @@ using IOCv2.Application.Common.Exceptions;
 using IOCv2.Application.Common.Models;
 using System.Net;
 
-namespace IOCv2.API
+namespace IOCv2.API.Middlewares
 {
     public class ExceptionMiddleware
     {

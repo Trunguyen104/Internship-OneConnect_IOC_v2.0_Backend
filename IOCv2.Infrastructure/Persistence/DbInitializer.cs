@@ -20,12 +20,6 @@ namespace IOCv2.Infrastructure.Persistence
 
         public void Initialize()
         {
-            // Auto Migrate
-       
-            if (_context.Database.GetPendingMigrations().Any())
-            {
-                _context.Database.Migrate();
-            }
 
             // Seed Data
             if (_context.Users.Any())

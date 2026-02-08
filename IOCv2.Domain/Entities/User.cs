@@ -17,5 +17,7 @@ namespace IOCv2.Domain.Entities
 
         public UserRole Role { get; set; }
 
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
     }
 }
