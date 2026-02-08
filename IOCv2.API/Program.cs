@@ -1,41 +1,65 @@
+﻿using IOCv2.API.Configurations;
+using IOCv2.API.Middlewares;
+using IOCv2.Application;
+using IOCv2.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Load Environment Variables
+builder.LoadEnvironmentVariables();
+
+// Add Core Services
+builder.Services.AddControllerConfig();
+
+// Add Infrastructure & Application Layers
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// Add API Configurations
+builder.Services.AddSwaggerConfig();
+builder.Services.AddCorsPolicy(builder.Configuration);
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddRedisConfig(builder.Configuration);
+builder.Services.AddForwardedHeadersConfig();
+builder.Services.AddLocalizationConfig();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure Middleware Pipeline
+app.UseLocalizationConfig();
+app.UseForwardedHeaders();
+
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<RateLimitingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwaggerConfig();
+
+    // Database Migration & Seeding
+    await DatabaseConfig.ApplyMigrations(app);
+}
+// redirect / → /swagger
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/swagger");
+        return;
+    }
+
+    await next();
+});
+app.UseCors("AllowReact");
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

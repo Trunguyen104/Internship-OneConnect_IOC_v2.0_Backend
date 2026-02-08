@@ -9,12 +9,13 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
             builder.HasKey(rt => rt.Id);
-            builder.Property(rt => rt.Token)
+            // Token là chuỗi Unique và rất quan trọng để tìm kiếm
+            builder.Property(x => x.Token)
                    .IsRequired()
-                   .HasMaxLength(200);
+                   .HasMaxLength(200); // Base64 32 bytes ~ 44 chars, nhưng cứ cho dư giả
 
-            builder.Property(rt => rt.Token)
-                   .IsRequired();
+            builder.HasIndex(x => x.Token)
+                   .IsUnique();
 
             builder.Property(rt => rt.Expires)
                    .IsRequired();
@@ -22,15 +23,16 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(rt => rt.IsRevoked)
                    .HasDefaultValue(false);
 
-            builder.Property(rt => rt.CreatedAt)
-                   .HasDefaultValue("now()");
+            builder.Property(x => x.CreatedAt)
+                  .HasDefaultValueSql("now()");
 
+            // Quan hệ với User
             builder.HasOne(rt => rt.User)
                    .WithMany(u => u.RefreshTokens)
-                   .HasForeignKey(rt => rt.EmployeeId)
+                   .HasForeignKey(rt => rt.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(rt => rt.User.Id);
+            builder.HasIndex(rt => rt.UserId);
         }
     }
 }
