@@ -1,4 +1,4 @@
-using IOCv2.API.Configurations;
+﻿using IOCv2.API.Configurations;
 using IOCv2.API.Middlewares;
 using IOCv2.Application;
 using IOCv2.Infrastructure;
@@ -39,7 +39,17 @@ if (app.Environment.IsDevelopment())
     // Database Migration & Seeding
     await DatabaseConfig.ApplyMigrations(app);
 }
+// redirect / → /swagger
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/swagger");
+        return;
+    }
 
+    await next();
+});
 app.UseCors("AllowReact");
 
 if (!app.Environment.IsDevelopment())
