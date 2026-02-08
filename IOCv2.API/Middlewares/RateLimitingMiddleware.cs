@@ -1,7 +1,7 @@
 using IOCv2.Application.Interfaces;
 using System.Net;
 
-namespace IOCv2.API
+namespace IOCv2.API.Middlewares
 {
     public class RateLimitingMiddleware
     {
@@ -18,19 +18,19 @@ namespace IOCv2.API
         {
             // Lấy IP của client (đã xử lý qua Forwarded Headers nếu có Proxy)
             var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            
+
             // Kiểm tra IP có đang bị block không
             if (await rateLimiter.IsBlockedAsync(ipAddress, context.RequestAborted))
             {
                 _logger.LogWarning("IP {IP} is blocked due to rate limiting.", ipAddress);
-                
+
                 context.Response.StatusCode = (int)HttpStatusCode.TooManyRequests;
                 context.Response.ContentType = "application/json";
-                
-                await context.Response.WriteAsJsonAsync(new 
-                { 
+
+                await context.Response.WriteAsJsonAsync(new
+                {
                     status = (int)HttpStatusCode.TooManyRequests,
-                    message = "Tài khoản hoặc IP của bạn đang bị tạm khóa do nhập sai nhiều lần. Vui lòng thử lại sau." 
+                    message = "Tài khoản hoặc IP của bạn đang bị tạm khóa do nhập sai nhiều lần. Vui lòng thử lại sau."
                 });
                 return;
             }
