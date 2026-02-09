@@ -40,8 +40,6 @@ namespace IOCv2.Infrastructure.Persistence
 
         private Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? _currentTransaction;
 
-        public IGenericRepository<User> Users => throw new NotImplementedException();
-
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (_currentTransaction != null) return;

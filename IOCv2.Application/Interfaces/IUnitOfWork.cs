@@ -9,8 +9,8 @@ namespace IOCv2.Application.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IGenericRepository<User> Users { get; }
-
+        IGenericRepository<T> Repository<T>() where T : class;
+        
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);

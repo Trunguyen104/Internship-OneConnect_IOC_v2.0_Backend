@@ -175,4 +175,27 @@
   <data name="Employee.CannotUpdateInactive" xml:space="preserve">
     <value>Không thể cập nhật thông tin cho nhân viên đang ngừng hoạt động.</value>
   </data>
+  
+  <!-- Epic Validation Errors -->
+  <data name="Epic.ProjectIdRequired" xml:space="preserve">
+    <value>ID dự án không được để trống.</value>
+  </data>
+  <data name="Epic.NameRequired" xml:space="preserve">
+    <value>Tên Epic không được để trống.</value>
+  </data>
+  <data name="Epic.NameMaxLength" xml:space="preserve">
+    <value>Tên Epic không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="Epic.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả không được vượt quá 2000 ký tự.</value>
+  </data>
+  <data name="Epic.NotFound" xml:space="preserve">
+    <value>Không tìm thấy Epic.</value>
+  </data>
+  <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
+    <value>Không thể xóa Epic khi còn Story/Task con. Vui lòng xóa hoặc di chuyển tất cả item con trước.</value>
+  </data>
+  <data name="Epic.ProjectNotFound" xml:space="preserve">
+    <value>Không tìm thấy dự án.</value>
+  </data>
 </root>

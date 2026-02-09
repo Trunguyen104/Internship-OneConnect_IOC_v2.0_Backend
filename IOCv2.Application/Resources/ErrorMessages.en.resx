@@ -233,4 +233,27 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
      <value>Role changed successfully for {0}, but notification email failed to send.</value>
    </data>
+   
+   <!-- Epic Validation Errors -->
+   <data name="Epic.ProjectIdRequired" xml:space="preserve">
+     <value>Project ID is required.</value>
+   </data>
+   <data name="Epic.NameRequired" xml:space="preserve">
+     <value>Epic name is required.</value>
+   </data>
+   <data name="Epic.NameMaxLength" xml:space="preserve">
+     <value>Epic name must not exceed 255 characters.</value>
+   </data>
+   <data name="Epic.DescriptionMaxLength" xml:space="preserve">
+     <value>Description must not exceed 2000 characters.</value>
+   </data>
+   <data name="Epic.NotFound" xml:space="preserve">
+     <value>Epic not found.</value>
+   </data>
+   <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
+     <value>Cannot delete Epic with existing children. Please remove or reassign all children first.</value>
+   </data>
+   <data name="Epic.ProjectNotFound" xml:space="preserve">
+     <value>Project not found.</value>
+   </data>
  </root>

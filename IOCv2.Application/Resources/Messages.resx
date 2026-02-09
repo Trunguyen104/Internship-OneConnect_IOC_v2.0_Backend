@@ -119,4 +119,15 @@
   <data name="Profile.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật thông tin thành công.</value>
   </data>
+  
+  <!-- Epic Messages -->
+  <data name="Epic.CreatedSuccess" xml:space="preserve">
+    <value>Tạo Epic thành công.</value>
+  </data>
+  <data name="Epic.UpdatedSuccess" xml:space="preserve">
+    <value>Cập nhật Epic thành công.</value>
+  </data>
+  <data name="Epic.DeletedSuccess" xml:space="preserve">
+    <value>Xóa Epic thành công.</value>
+  </data>
 </root>

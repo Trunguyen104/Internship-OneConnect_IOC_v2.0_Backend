@@ -87,4 +87,15 @@
   <data name="AccountCreatedButEmailFailed" xml:space="preserve">
     <value>Account created successfully but email notification failed. Please notify the employee directly. Code: {0}, Password: {1}</value>
   </data>
+  
+  <!-- Epic Messages -->
+  <data name="Epic.CreatedSuccess" xml:space="preserve">
+    <value>Epic created successfully.</value>
+  </data>
+  <data name="Epic.UpdatedSuccess" xml:space="preserve">
+    <value>Epic updated successfully.</value>
+  </data>
+  <data name="Epic.DeletedSuccess" xml:space="preserve">
+    <value>Epic deleted successfully.</value>
+  </data>
 </root>
