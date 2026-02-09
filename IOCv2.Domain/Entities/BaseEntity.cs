@@ -10,8 +10,9 @@ namespace IOCv2.Domain.Entities
     {
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+        public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public string? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; } // database xu ly datatime nhanh hon boolean
     }
 }
