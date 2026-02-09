@@ -5,12 +5,6 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.Application.Features.Authentication.Commands.Login
 {
