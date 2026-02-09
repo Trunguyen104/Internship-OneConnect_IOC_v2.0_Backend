@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Authentication.Commands.Login
 {
-    public record LoginCommand(string Username, string Password, bool RememberMe) : IRequest<Result<LoginResponse>>;
+    public record LoginCommand(string Email, string Password, bool RememberMe) : IRequest<Result<LoginResponse>>;
 }

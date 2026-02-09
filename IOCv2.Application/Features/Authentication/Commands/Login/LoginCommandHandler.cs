@@ -34,7 +34,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
         public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             // Each user has own key counting invalid turn
-            var rateLimitKey = $"login_attempt:{request.Username}";
+            var rateLimitKey = $"login_attempt:{request.Email}";
 
             if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
             {
@@ -43,7 +43,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
 
             var user = await _unitOfWork.Repository<User>()
                 .Query()
-                .FirstOrDefaultAsync(e => e.Username == request.Username, cancellationToken);
+                .FirstOrDefaultAsync(e => e.Email == request.Email, cancellationToken);
 
             if (user == null)
             {
@@ -90,7 +90,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
                 Token = refreshToken,
                 Expires = expirationDate,
 
-                EmployeeId = user.Id
+                UserId = user.Id
             };
 
             // Attach refresh token with user

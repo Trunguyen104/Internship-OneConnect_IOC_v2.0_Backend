@@ -20,7 +20,5 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public virtual ICollection<AuditLog> PeformedLogs { get; set; } = new List<AuditLog>();
 
-        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
-
     }
 }

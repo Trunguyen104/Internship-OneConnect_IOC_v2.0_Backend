@@ -76,7 +76,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             //Revoke existing refresh tokens
             var refreshTokens = await _unitOfWork.Repository<Domain.Entities.RefreshToken>()
                 .Query()
-                .Where(rt => rt.EmployeeId == user.Id && !rt.IsRevoked)
+                .Where(rt => rt.UserId == user.Id && !rt.IsRevoked)
                 .ToListAsync(cancellationToken);
 
             foreach (var token in refreshTokens)

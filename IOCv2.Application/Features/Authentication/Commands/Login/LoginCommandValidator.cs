@@ -11,7 +11,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
     {
         public LoginCommandValidator()
         {
-            RuleFor(x => x.Username)
+            RuleFor(x => x.Email)
                 .NotEmpty();
             RuleFor(x => x.Password)
                 .NotEmpty()

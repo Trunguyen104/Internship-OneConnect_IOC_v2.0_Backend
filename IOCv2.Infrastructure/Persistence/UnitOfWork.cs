@@ -33,9 +33,9 @@ namespace IOCv2.Infrastructure.Persistence
             return (IGenericRepository<T>)_repositories[type];
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellation = default)
+        public async Task<int> SaveChangeAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync(cancellationToken);
         }
 
         private Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? _currentTransaction;

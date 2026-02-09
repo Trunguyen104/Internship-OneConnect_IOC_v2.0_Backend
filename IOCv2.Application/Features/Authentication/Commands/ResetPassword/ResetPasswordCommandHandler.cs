@@ -4,12 +4,8 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
 {
@@ -21,8 +17,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
         public ResetPasswordCommandHandler(IUnitOfWork unitOfWork, IMessageService messageService, IPasswordService passwordService)
         {
             _unitOfWork = unitOfWork;
-            _passwordService= passwordService;
-            _messageService= messageService;
+            _passwordService = passwordService;
+            _messageService = messageService;
         }
         public async Task<Result<string>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
@@ -73,8 +69,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
             // Invalidate all other active tokens for this employee (security measure)
             var otherActiveTokens = await _unitOfWork.Repository<PasswordResetToken>()
                 .Query()
-                .Where(t => t.EmployeeId == user.Id
-                         && t.TokenId != resetToken.TokenId
+                .Where(t => t.UserId == user.Id
+                         && t.Id != resetToken.Id
                          && t.UsedAt == null)
                 .ToListAsync(cancellationToken);
 
