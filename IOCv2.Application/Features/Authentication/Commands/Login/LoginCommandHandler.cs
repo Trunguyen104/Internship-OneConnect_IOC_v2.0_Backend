@@ -36,7 +36,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
             // Each user has own key counting invalid turn
             var rateLimitKey = $"login_attempt:{request.Username}";
 
-            if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken)) ;
+            if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
             {
                 return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.AccountBlocked));
             }
