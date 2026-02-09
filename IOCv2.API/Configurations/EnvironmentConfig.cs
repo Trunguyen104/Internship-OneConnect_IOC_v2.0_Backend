@@ -1,5 +1,6 @@
 ﻿
 using DotNetEnv;
+using Serilog;
 
 namespace IOCv2.API.Configurations;
 
@@ -13,6 +14,11 @@ public static class EnvironmentConfig
             Env.Load(envPath);
         }
 
+        // Logging 
+        builder.Host.UseSerilog((context, services, configuration) =>
+        {
+            configuration.ReadFrom.Configuration(context.Configuration);
+        });
         // Map JWT
         var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
         if (!string.IsNullOrEmpty(jwtSecret))
