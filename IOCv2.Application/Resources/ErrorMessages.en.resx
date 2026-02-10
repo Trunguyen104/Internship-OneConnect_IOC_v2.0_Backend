@@ -233,4 +233,48 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
      <value>Role changed successfully for {0}, but notification email failed to send.</value>
    </data>
+  <!-- Stakeholder Errors -->
+  <data name="Stakeholder.NotFound" xml:space="preserve">
+    <value>Stakeholder not found.</value>
+  </data>
+  <data name="Stakeholder.EmailExists" xml:space="preserve">
+    <value>Email already exists in this project.</value>
+  </data>
+  <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
+    <value>Project not found.</value>
+  </data>
+  <data name="Stakeholder.IdMismatch" xml:space="preserve">
+    <value>ID mismatch between route and body.</value>
+  </data>
+  <!-- Validation Errors -->
+  <data name="Validation.ProjectIdRequired" xml:space="preserve">
+    <value>ProjectId is required.</value>
+  </data>
+  <data name="Validation.NameRequired" xml:space="preserve">
+    <value>Name is required.</value>
+  </data>
+  <data name="Validation.NameMaxLength" xml:space="preserve">
+    <value>Name must not exceed 200 characters.</value>
+  </data>
+  <data name="Validation.EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="Validation.EmailInvalid" xml:space="preserve">
+    <value>Invalid email format.</value>
+  </data>
+  <data name="Validation.EmailMaxLength" xml:space="preserve">
+    <value>Email must not exceed 150 characters.</value>
+  </data>
+  <data name="Validation.RoleMaxLength" xml:space="preserve">
+    <value>Role must not exceed 100 characters.</value>
+  </data>
+  <data name="Validation.DescriptionMaxLength" xml:space="preserve">
+    <value>Description must not exceed 500 characters.</value>
+  </data>
+  <data name="Validation.PhoneNumberMaxLength" xml:space="preserve">
+    <value>Phone number must not exceed 15 characters.</value>
+  </data>
+  <data name="Validation.IdRequired" xml:space="preserve">
+    <value>Id is required.</value>
+  </data>
  </root>

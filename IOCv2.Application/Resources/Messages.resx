@@ -119,4 +119,14 @@
   <data name="Profile.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật thông tin thành công.</value>
   </data>
+  <!-- Stakeholder Messages -->
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật bên liên quan thành công.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Xóa bên liên quan thành công.</value>
+  </data>
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Tạo mới bên liên quan thành công.</value>
+  </data>
 </root>

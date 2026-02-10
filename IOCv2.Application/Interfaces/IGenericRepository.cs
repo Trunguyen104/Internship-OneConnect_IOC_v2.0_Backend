@@ -1,9 +1,10 @@
-﻿using System.Linq.Expressions;
+﻿﻿using System.Linq.Expressions;
 
 namespace IOCv2.Application.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {
+        IQueryable<T> Query();
         Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);

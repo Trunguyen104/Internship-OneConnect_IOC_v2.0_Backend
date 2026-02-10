@@ -3,6 +3,7 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210053320_AddProjectAndStakeholderTables")]
+    partial class AddProjectAndStakeholderTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -263,8 +266,7 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("ProjectId", "Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_stakeholders_project_email_unique")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_stakeholders_project_email_unique");
 
                     b.ToTable("stakeholders", (string)null);
                 });

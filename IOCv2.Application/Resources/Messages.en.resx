@@ -87,4 +87,14 @@
   <data name="AccountCreatedButEmailFailed" xml:space="preserve">
     <value>Account created successfully but email notification failed. Please notify the employee directly. Code: {0}, Password: {1}</value>
   </data>
+  <!-- Stakeholder Messages -->
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Stakeholder updated successfully.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Stakeholder deleted successfully.</value>
+  </data>
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Stakeholder created successfully.</value>
+  </data>
 </root>

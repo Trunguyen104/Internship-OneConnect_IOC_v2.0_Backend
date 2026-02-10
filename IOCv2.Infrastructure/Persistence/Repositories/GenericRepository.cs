@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+﻿﻿using IOCv2.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -13,6 +13,11 @@ namespace IOCv2.Infrastructure.Persistence.Repositories
         {
             _context = context;
             _dbSet = context.Set<T>();
+        }
+
+        public virtual IQueryable<T> Query()
+        {
+            return _dbSet.AsQueryable();
         }
 
         public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

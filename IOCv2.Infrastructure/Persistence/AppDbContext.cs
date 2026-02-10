@@ -1,4 +1,4 @@
-﻿using IOCv2.Domain.Entities;
+﻿﻿using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,9 @@ namespace IOCv2.Infrastructure.Persistence
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
+        public DbSet<Project> Projects { get; set; } = null!;
+        public DbSet<Stakeholder> Stakeholders { get; set; } = null!;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
