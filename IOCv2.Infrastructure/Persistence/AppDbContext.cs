@@ -18,6 +18,7 @@ namespace IOCv2.Infrastructure.Persistence
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
         public DbSet<Project> Projects { get; set; } = null!;
         public DbSet<Stakeholder> Stakeholders { get; set; } = null!;
+        public DbSet<StakeholderIssue> StakeholderIssues { get; set; } = null!;
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

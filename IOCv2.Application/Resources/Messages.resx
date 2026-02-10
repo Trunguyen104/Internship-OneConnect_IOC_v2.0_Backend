@@ -129,4 +129,14 @@
   <data name="Stakeholder.CreateSuccess" xml:space="preserve">
     <value>Tạo mới bên liên quan thành công.</value>
   </data>
+  <!-- Stakeholder Issue Messages -->
+  <data name="Issue.CreateSuccess" xml:space="preserve">
+    <value>Ghi nhận vấn đề thành công.</value>
+  </data>
+  <data name="Issue.UpdateStatusSuccess" xml:space="preserve">
+    <value>Cập nhật trạng thái vấn đề thành công.</value>
+  </data>
+  <data name="Issue.DeleteSuccess" xml:space="preserve">
+    <value>Xóa vấn đề thành công.</value>
+  </data>
 </root>

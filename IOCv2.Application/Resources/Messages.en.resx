@@ -97,4 +97,14 @@
   <data name="Stakeholder.CreateSuccess" xml:space="preserve">
     <value>Stakeholder created successfully.</value>
   </data>
+  <!-- Stakeholder Issue Messages -->
+  <data name="Issue.CreateSuccess" xml:space="preserve">
+    <value>Issue recorded successfully.</value>
+  </data>
+  <data name="Issue.UpdateStatusSuccess" xml:space="preserve">
+    <value>Issue status updated successfully.</value>
+  </data>
+  <data name="Issue.DeleteSuccess" xml:space="preserve">
+    <value>Issue deleted successfully.</value>
+  </data>
 </root>

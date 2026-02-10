@@ -14,5 +14,6 @@ public class Stakeholder : BaseEntity
     
     // Navigation properties
     public virtual Project Project { get; set; } = null!;
+    public virtual ICollection<StakeholderIssue> Issues { get; set; } = new List<StakeholderIssue>();
 }
 

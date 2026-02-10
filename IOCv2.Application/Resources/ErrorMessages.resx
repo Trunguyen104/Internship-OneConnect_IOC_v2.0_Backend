@@ -219,4 +219,32 @@
   <data name="Validation.IdRequired" xml:space="preserve">
     <value>Id là bắt buộc.</value>
   </data>
+  <!-- Stakeholder Issue Errors -->
+  <data name="Issue.NotFound" xml:space="preserve">
+    <value>Không tìm thấy vấn đề.</value>
+  </data>
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <value>Không tìm thấy bên liên quan cho vấn đề này.</value>
+  </data>
+  <data name="Issue.CreateFailed" xml:space="preserve">
+    <value>Có lỗi xảy ra khi tạo vấn đề.</value>
+  </data>
+  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <value>Có lỗi xảy ra khi cập nhật vấn đề.</value>
+  </data>
+  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <value>Có lỗi xảy ra khi xóa vấn đề.</value>
+  </data>
+  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <value>Trạng thái vấn đề không hợp lệ.</value>
+  </data>
+  <data name="Issue.TitleRequired" xml:space="preserve">
+    <value>Tiêu đề vấn đề là bắt buộc.</value>
+  </data>
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <value>Mô tả vấn đề là bắt buộc.</value>
+  </data>
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <value>Cần chọn một bên liên quan.</value>
+  </data>
 </root>

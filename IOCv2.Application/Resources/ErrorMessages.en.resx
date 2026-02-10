@@ -277,4 +277,32 @@
   <data name="Validation.IdRequired" xml:space="preserve">
     <value>Id is required.</value>
   </data>
+  <!-- Stakeholder Issue Errors -->
+  <data name="Issue.NotFound" xml:space="preserve">
+    <value>Issue not found.</value>
+  </data>
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <value>Stakeholder not found for this issue.</value>
+  </data>
+  <data name="Issue.CreateFailed" xml:space="preserve">
+    <value>An error occurred while creating the issue.</value>
+  </data>
+  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <value>An error occurred while updating the issue.</value>
+  </data>
+  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <value>An error occurred while deleting the issue.</value>
+  </data>
+  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <value>Invalid issue status.</value>
+  </data>
+  <data name="Issue.TitleRequired" xml:space="preserve">
+    <value>Issue title is required.</value>
+  </data>
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <value>Issue description is required.</value>
+  </data>
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <value>A stakeholder must be selected.</value>
+  </data>
  </root>
