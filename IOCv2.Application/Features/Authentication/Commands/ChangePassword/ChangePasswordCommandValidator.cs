@@ -5,7 +5,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 {
     public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCommand>
     {
-        public ChangePasswordCommandValidator(Interfaces.IMessageService messageService) 
+        public ChangePasswordCommandValidator(Interfaces.IMessageService messageService)
         {
             RuleFor(v => v.CurrentPassword)
                 .NotEmpty()
@@ -16,7 +16,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
                 .MinimumLength(8).WithMessage(messageService.GetMessage(MessageKeys.Password.MinLength))
                 .Matches(@"[A-Z]").WithMessage(messageService.GetMessage(MessageKeys.Password.RequireUppercase))
                 .Matches(@"[a-z]").WithMessage(messageService.GetMessage(MessageKeys.Password.RequireLowercase))
-                .Matches(@"0-9").WithMessage(messageService.GetMessage(MessageKeys.Password.RequireDigit))
+                .Matches(@"[0-9]").WithMessage(messageService.GetMessage(MessageKeys.Password.RequireDigit))
                 .Matches(@"[\W_]").WithMessage(messageService.GetMessage(MessageKeys.Password.RequireSpecial))
                 .NotEqual(x => x.CurrentPassword).WithMessage(messageService.GetMessage(MessageKeys.Password.MustBeDifferent));
 

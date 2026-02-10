@@ -83,7 +83,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             {
                 token.IsRevoked = true;
                 token.UpdatedAt = DateTime.UtcNow;
-                _unitOfWork.Repository<Domain.Entities.RefreshToken>().UpdateAsync(token);
+                await _unitOfWork.Repository<Domain.Entities.RefreshToken>().UpdateAsync(token, cancellationToken);
             }
 
             //Log password reset

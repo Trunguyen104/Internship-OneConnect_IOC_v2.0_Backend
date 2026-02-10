@@ -1,10 +1,5 @@
 ﻿using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.Infrastructure.Persistence

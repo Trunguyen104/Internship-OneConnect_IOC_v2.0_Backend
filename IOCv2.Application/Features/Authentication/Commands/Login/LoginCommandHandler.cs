@@ -88,7 +88,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
             };
 
             // Attach refresh token with user
-            await _unitOfWork.Repository<RefreshToken>().AddAsync(refreshTokenEntity);
+            await _unitOfWork.Repository<RefreshToken>().AddAsync(refreshTokenEntity, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
 
             // Response Client

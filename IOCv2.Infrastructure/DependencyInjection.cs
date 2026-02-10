@@ -45,6 +45,7 @@ namespace IOCv2.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<IBackgroundEmailSender, BackgroundEmailChannel>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<DbInitializer>();
