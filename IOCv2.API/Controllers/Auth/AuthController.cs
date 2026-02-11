@@ -5,6 +5,7 @@ using IOCv2.Application.Features.Authentication.Commands.RefreshTokens;
 using IOCv2.Application.Features.Authentication.Commands.RequestPasswordReset;
 using IOCv2.Application.Features.Authentication.Commands.ResetPassword;
 using IOCv2.Application.Features.Authentication.Commands.RevokeToken;
+using IOCv2.Application.Features.Users.Queries.GetMyProfile;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -122,19 +123,19 @@ namespace IOCv2.API.Controllers.Auth
             return HandleResult(result);
         }
 
-        //[HttpGet("me")]
-        //[Authorize]
-        //public async Task<IActionResult> GetCurrentUserInfo()
-        //{
-        //    var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        //    if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-        //    {
-        //        return Unauthorized(new { message = "Invalid token claims." });
-        //    }
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUserInfo()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid token claims." });
+            }
 
-        //    var result = await _mediator.Send(new Application.Features.Employees.Queries.GetMyProfile.Query(userId));
-        //    return HandleResult(result);
-        //}
+            var result = await _mediator.Send(new GetMyProfileQuery(userId));
+            return HandleResult(result);
+        }
 
         private void SetTokenCookies(LoginResponse response)
         {
