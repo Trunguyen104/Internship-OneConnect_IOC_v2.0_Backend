@@ -1,9 +1,6 @@
 ﻿using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
-
-using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.Infrastructure.Persistence
 {
@@ -68,6 +65,7 @@ namespace IOCv2.Infrastructure.Persistence
                 };
                 _context.Users.Add(enterpriseUser);
             }
+
             // Kiểm tra và tạo Student
             if (!_context.Users.Any(u => u.Role == UserRole.Student))
             {

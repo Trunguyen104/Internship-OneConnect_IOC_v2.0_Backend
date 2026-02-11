@@ -9,12 +9,12 @@ using System.Text;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
 {
-    public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, Result<string>>
+    public class ResetPasswordHandler : IRequestHandler<ResetPasswordCommand, Result<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordService _passwordService;
         private readonly IMessageService _messageService;
-        public ResetPasswordCommandHandler(IUnitOfWork unitOfWork, IMessageService messageService, IPasswordService passwordService)
+        public ResetPasswordHandler(IUnitOfWork unitOfWork, IMessageService messageService, IPasswordService passwordService)
         {
             _unitOfWork = unitOfWork;
             _passwordService = passwordService;

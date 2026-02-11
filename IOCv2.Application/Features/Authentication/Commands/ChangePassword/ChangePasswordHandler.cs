@@ -9,7 +9,7 @@ using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 {
-    public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, Result<string>>
+    public class ChangePasswordHandler : IRequestHandler<ChangePasswordCommand, Result<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordService _passwordService;
@@ -17,7 +17,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
         private readonly IRateLimiter _rateLimiter;
         private readonly IMessageService _messageService;
 
-        public ChangePasswordCommandHandler(
+        public ChangePasswordHandler(
             IUnitOfWork unitOfWork,
             IPasswordService passwordService,
             ICurrentUserService currentUserService,

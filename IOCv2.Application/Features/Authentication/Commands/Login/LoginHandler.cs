@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Authentication.Commands.Login
 {
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
+    public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordService _passwordService;
@@ -16,7 +16,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
         private readonly IRateLimiter _rateLimiter;
         private readonly IMessageService _messageService;
 
-        public LoginCommandHandler(IUnitOfWork unitOfWork, IPasswordService passwordService, ITokenService tokenService, IRateLimiter rateLimiter, IMessageService messageService)
+        public LoginHandler(IUnitOfWork unitOfWork, IPasswordService passwordService, ITokenService tokenService, IRateLimiter rateLimiter, IMessageService messageService)
         {
             _unitOfWork = unitOfWork;
             _passwordService = passwordService;

@@ -3,9 +3,9 @@ using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 {
-    public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCommand>
+    public class ChangePasswordValidator : AbstractValidator<ChangePasswordCommand>
     {
-        public ChangePasswordCommandValidator(Interfaces.IMessageService messageService)
+        public ChangePasswordValidator(Interfaces.IMessageService messageService)
         {
             RuleFor(v => v.CurrentPassword)
                 .NotEmpty()

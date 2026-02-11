@@ -12,8 +12,7 @@
 
         ValueTask EnqueueAccountCreationEmailAsync(
             string email,
-            string employeeName,
-            string employeeCode,
+            string username,
             string role,
             string password,
             Guid? auditTargetId = null,
@@ -22,9 +21,8 @@
 
         ValueTask EnqueueRoleChangeEmailAsync(
             string email,
-            string employeeName,
-            string oldEmployeeCode,
-            string newEmployeeCode,
+            string oldUsername,
+            string newUsername,
             string oldRole,
             string newRole,
             Guid? auditTargetId = null,
@@ -33,8 +31,7 @@
 
         ValueTask EnqueuePasswordResetByManagerEmailAsync(
             string email,
-            string employeeName,
-            string employeeCode,
+            string username,
             string newPassword,
             string managerName,
             Guid? auditTargetId = null,
@@ -44,7 +41,7 @@
         ValueTask EnqueuePasswordResetEmailAsync(
        string email,
        string resetLink,
-       string employeeName,
+       string username,
        Guid? auditTargetId = null,
        Guid? performedByEmployeeId = null,
        CancellationToken cancellationToken = default);

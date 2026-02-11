@@ -12,7 +12,7 @@ using System.Text;
 
 namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordReset
 {
-    internal class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswordResetCommand, Result<string>>
+    internal class RequestPasswordResetHandler : IRequestHandler<RequestPasswordResetCommand, Result<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBackgroundEmailSender _emailSender;
@@ -21,7 +21,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMessageService _messageService;
 
-        public RequestPasswordResetCommandHandler(IUnitOfWork unitOfWork, IBackgroundEmailSender emailSender,
+        public RequestPasswordResetHandler(IUnitOfWork unitOfWork, IBackgroundEmailSender emailSender,
             IRateLimiter rateLimiter, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMessageService messageService)
         {
             _unitOfWork = unitOfWork;

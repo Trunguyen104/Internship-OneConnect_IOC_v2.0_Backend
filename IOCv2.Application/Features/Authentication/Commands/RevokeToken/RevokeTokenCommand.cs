@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.Authentication.Commands.Logout
+namespace IOCv2.Application.Features.Authentication.Commands.RevokeToken
 {
     public class RevokeTokenCommand : IRequest<Result<bool>>
     {

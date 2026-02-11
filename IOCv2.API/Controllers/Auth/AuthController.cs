@@ -1,10 +1,10 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Authentication.Commands.ChangePassword;
 using IOCv2.Application.Features.Authentication.Commands.Login;
-using IOCv2.Application.Features.Authentication.Commands.Logout;
 using IOCv2.Application.Features.Authentication.Commands.RefreshTokens;
 using IOCv2.Application.Features.Authentication.Commands.RequestPasswordReset;
 using IOCv2.Application.Features.Authentication.Commands.ResetPassword;
+using IOCv2.Application.Features.Authentication.Commands.RevokeToken;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

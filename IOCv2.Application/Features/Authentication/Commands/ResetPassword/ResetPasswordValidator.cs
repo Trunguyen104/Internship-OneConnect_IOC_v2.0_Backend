@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
 {
-    public class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordCommand>
+    public class ResetPasswordValidator : AbstractValidator<ResetPasswordCommand>
     {
-        public ResetPasswordCommandValidator(IMessageService messageService) 
+        public ResetPasswordValidator(IMessageService messageService) 
         {
             RuleFor(x => x.Token)
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.Auth.TokenRequired));
