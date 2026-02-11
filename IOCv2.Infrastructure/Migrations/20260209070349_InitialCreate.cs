@@ -26,12 +26,49 @@ namespace IOCv2.Infrastructure.Migrations
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
                     role = table.Column<short>(type: "smallint", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<string>(type: "text", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "now()"),
+                    updated_by = table.Column<string>(type: "text", nullable: true),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_users", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "audit_logs",
+                columns: table => new
+                {
+                    log_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    action = table.Column<short>(type: "smallint", nullable: false),
+                    target_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    performed_user_by_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    reason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    metadata = table.Column<string>(type: "jsonb", nullable: true),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_audit_logs", x => x.log_id);
+                    table.ForeignKey(
+                        name: "fk_audit_logs_users_performed_user_by_id",
+                        column: x => x.performed_user_by_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_audit_logs_users_target_id",
+                        column: x => x.target_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_audit_logs_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
@@ -44,7 +81,9 @@ namespace IOCv2.Infrastructure.Migrations
                     expires_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     used_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<string>(type: "text", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<string>(type: "text", nullable: true),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -68,7 +107,9 @@ namespace IOCv2.Infrastructure.Migrations
                     is_revoked = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<string>(type: "text", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<string>(type: "text", nullable: true),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -81,6 +122,21 @@ namespace IOCv2.Infrastructure.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_audit_logs_performed_user_by_id",
+                table: "audit_logs",
+                column: "performed_user_by_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_audit_logs_target_id",
+                table: "audit_logs",
+                column: "target_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_audit_logs_user_id",
+                table: "audit_logs",
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_password_reset_tokens_user_id",
@@ -130,6 +186,9 @@ namespace IOCv2.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "audit_logs");
+
             migrationBuilder.DropTable(
                 name: "password_reset_tokens");
 

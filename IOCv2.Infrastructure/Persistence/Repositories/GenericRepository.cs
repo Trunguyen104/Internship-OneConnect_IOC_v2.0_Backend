@@ -65,5 +65,10 @@ namespace IOCv2.Infrastructure.Persistence.Repositories
                 ? await _dbSet.CountAsync(cancellationToken)
                 : await _dbSet.CountAsync(predicate, cancellationToken);
         }
+
+        public IQueryable<T> Query()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

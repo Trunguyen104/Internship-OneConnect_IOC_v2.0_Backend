@@ -59,18 +59,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   
-  <!-- Employee Messages -->
+  <!-- User Messages -->
   <data name="CannotPromoteToManager" xml:space="preserve">
     <value>Bạn không thể cho người khác thành quản lí</value>
   </data>
   <data name="NewRoleMustBeDifferent" xml:space="preserve">
     <value>Vị trí mới phải khác vị trí hiện tại</value>
   </data>
-  <data name="EmployeeNotFound" xml:space="preserve">
-    <value>Không tìm thấy nhân viên với mã và role hiện tại.</value>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>Không tìm thấy người dùng với mã và role hiện tại.</value>
   </data>
-  <data name="EmployeeNotActive" xml:space="preserve">
-    <value>Nhân viên hiện tại không còn hoạt động.</value>
+  <data name="UserNotActive" xml:space="preserve">
+    <value>Tài khoản người dùng hiện tại không còn hoạt động.</value>
   </data>
   <data name="CannotIdentifyUser" xml:space="preserve">
     <value>Không xác định được người thực hiện thao tác.</value>
@@ -79,22 +79,22 @@
     <value>Role đã được thay đổi thành công</value>
   </data>
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
-    <value>Role đã được thay đổi thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên về mã nhân viên mới: {0}</value>
+    <value>Role đã được thay đổi thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng về mã nhân viên mới: {0}</value>
   </data>
   <data name="AccountCreatedSuccessfully" xml:space="preserve">
     <value>Tài khoản đã được tạo thành công</value>
   </data>
   <data name="AccountCreatedButEmailFailed" xml:space="preserve">
-    <value>Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mã: {0}, Mật khẩu: {1}</value>
+    <value>Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mã: {0}, Mật khẩu: {1}</value>
   </data>
   <data name="ResetPassword.SuccessWithEmail" xml:space="preserve">
     <value>Mật khẩu đã được reset thành công. Email thông báo đã được gửi tới {0}</value>
   </data>
   <data name="ResetPassword.SuccessNoEmail" xml:space="preserve">
-    <value>Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mật khẩu mới: {0}</value>
+    <value>Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}</value>
   </data>
   <data name="ResetStatusNoEmail" xml:space="preserve">
-    <value>Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên.</value>
+    <value>Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng.</value>
   </data>
   <!-- Authentication -->
   <data name="Auth.LoginSuccess" xml:space="preserve">
