@@ -74,7 +74,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.RefreshTokens
             {
                 Token = newRefreshToken,
                 Expires = DateTime.UtcNow.AddDays(newDurationDays),
-                UserId = user.Id,
+                UserId = user.UserId,
             };
 
             await _unitOfWork.Repository<Domain.Entities.RefreshToken>().AddAsync(newRefreshTokenEntity);

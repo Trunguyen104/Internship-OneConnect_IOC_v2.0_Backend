@@ -84,7 +84,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
                 Token = refreshToken,
                 Expires = expirationDate,
 
-                UserId = user.Id
+                UserId = user.UserId
             };
 
             // Attach refresh token with user

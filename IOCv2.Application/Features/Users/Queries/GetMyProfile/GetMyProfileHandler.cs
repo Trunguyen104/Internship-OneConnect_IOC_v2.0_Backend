@@ -5,7 +5,6 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
 {
@@ -29,7 +28,7 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         {
             var user = await _unitOfWork.Repository<User>()
                 .Query()
-                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
 
             if (user == null)
             {

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260209070349_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260212091326_InitCreate")]
+    partial class InitCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,10 +57,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("target_id");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
                     b.HasKey("LogId")
                         .HasName("pk_audit_logs");
 
@@ -70,32 +66,19 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("TargetId")
                         .HasDatabaseName("ix_audit_logs_target_id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_audit_logs_user_id");
-
                     b.ToTable("audit_logs", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.PasswordResetToken", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("PasswordResetTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("token_id");
+                        .HasColumnName("password_reset_token_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
@@ -107,14 +90,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(64)")
                         .HasColumnName("token_hash");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
                     b.Property<DateTimeOffset?>("UsedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("used_at");
@@ -123,8 +98,15 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id")
+                    b.HasKey("PasswordResetTokenId")
                         .HasName("pk_password_reset_tokens");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("ix_password_reset_tokens_expires_at");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_password_reset_tokens_token_hash");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_password_reset_tokens_user_id");
@@ -134,24 +116,14 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.RefreshToken", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("RefreshTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("refresh_token_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTime>("Expires")
                         .HasColumnType("timestamp with time zone")
@@ -173,15 +145,11 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id")
+                    b.HasKey("RefreshTokenId")
                         .HasName("pk_refresh_tokens");
 
                     b.HasIndex("Token")
@@ -196,10 +164,10 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("user_id");
 
                     b.Property<string>("AvatarUrl")
                         .HasMaxLength(255)
@@ -207,10 +175,8 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("avatar_url");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text")
@@ -236,6 +202,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("full_name");
 
+                    b.Property<short>("Gender")
+                        .HasColumnType("smallint")
+                        .HasColumnName("gender");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text")
@@ -257,14 +227,18 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnName("updated_at");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text")
                         .HasColumnName("updated_by");
+
+                    b.Property<string>("UserCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("user_code");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -272,8 +246,11 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("username");
 
-                    b.HasKey("Id")
+                    b.HasKey("UserId")
                         .HasName("pk_users");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_users_created_at");
 
                     b.HasIndex("Email")
                         .IsUnique()
@@ -287,11 +264,22 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasDatabaseName("ix_users_role");
 
                     b.HasIndex("Status")
-                        .HasDatabaseName("ix_users_status");
+                        .HasDatabaseName("ix_users_status")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.HasIndex("UserCode")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_user_code");
 
                     b.HasIndex("Username")
                         .IsUnique()
                         .HasDatabaseName("ix_users_username");
+
+                    b.HasIndex("Role", "Status")
+                        .HasDatabaseName("ix_users_role_status");
+
+                    b.HasIndex("Status", "Role")
+                        .HasDatabaseName("ix_users_status_role");
 
                     b.ToTable("users", (string)null);
                 });
@@ -299,23 +287,18 @@ namespace IOCv2.Infrastructure.Migrations
             modelBuilder.Entity("IOCv2.Domain.Entities.AuditLog", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "PerformedBy")
-                        .WithMany("PeformedLogs")
+                        .WithMany("PerformedLogs")
                         .HasForeignKey("PerformedUserById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_audit_logs_users_performed_user_by_id");
 
                     b.HasOne("IOCv2.Domain.Entities.User", "Target")
-                        .WithMany()
+                        .WithMany("TargetLogs")
                         .HasForeignKey("TargetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_audit_logs_users_target_id");
-
-                    b.HasOne("IOCv2.Domain.Entities.User", null)
-                        .WithMany("TargetLogs")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_audit_logs_users_user_id");
 
                     b.Navigation("PerformedBy");
 
@@ -348,7 +331,7 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.User", b =>
                 {
-                    b.Navigation("PeformedLogs");
+                    b.Navigation("PerformedLogs");
 
                     b.Navigation("RefreshTokens");
 

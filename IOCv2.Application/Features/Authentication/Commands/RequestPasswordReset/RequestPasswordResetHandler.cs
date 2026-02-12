@@ -80,8 +80,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
 
             var resetToken = new PasswordResetToken
             {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
+                PasswordResetTokenId = Guid.NewGuid(),
+                UserId = user.UserId,
                 TokenHash = tokenHash,
                 ExpiresAt = expiresAt,
                 CreatedAt = DateTime.UtcNow
@@ -99,7 +99,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
                 user.Email,
                 resetLink,
                 user.FullName,
-                user.Id,
+                user.UserId,
                 null, // No PerformedBy info for seft-service
                 cancellationToken);
 

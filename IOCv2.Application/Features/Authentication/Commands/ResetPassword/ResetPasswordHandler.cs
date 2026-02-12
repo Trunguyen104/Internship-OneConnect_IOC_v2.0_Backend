@@ -66,11 +66,11 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
             // Mark this token as used
             resetToken.UsedAt = DateTimeOffset.UtcNow;
 
-            // Invalidate all other active tokens for this employee (security measure)
+            // Invalidate all other active tokens for this user (security measure)
             var otherActiveTokens = await _unitOfWork.Repository<PasswordResetToken>()
                 .Query()
-                .Where(t => t.UserId == user.Id
-                         && t.Id != resetToken.Id
+                .Where(t => t.UserId == user.UserId
+                         && t.PasswordResetTokenId != resetToken.PasswordResetTokenId
                          && t.UsedAt == null)
                 .ToListAsync(cancellationToken);
 
@@ -84,8 +84,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
             {
                 LogId = Guid.NewGuid(),
                 Action = IOCv2.Domain.Enums.AuditAction.ResetPassword,
-                TargetId = user.Id,
-                PerformedUserById = user.Id, // User reset their own password
+                TargetId = user.UserId,
+                PerformedUserById = user.UserId, // User reset their own password
                 Reason = "ForgotPassword flow",
                 CreatedAt = DateTimeOffset.UtcNow,
                 Metadata = "{\"info\": \"Password reset via email token\"}"
