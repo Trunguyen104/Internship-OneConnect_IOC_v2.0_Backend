@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,8 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "users",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     password_hash = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
@@ -23,17 +24,18 @@ namespace IOCv2.Infrastructure.Migrations
                     phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
                     avatar_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     date_of_birth = table.Column<DateOnly>(type: "date", nullable: true),
+                    gender = table.Column<short>(type: "smallint", nullable: false),
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
                     role = table.Column<short>(type: "smallint", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<string>(type: "text", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "now()"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_by = table.Column<string>(type: "text", nullable: true),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_users", x => x.id);
+                    table.PrimaryKey("pk_users", x => x.user_id);
                 });
 
             migrationBuilder.CreateTable(
@@ -46,8 +48,7 @@ namespace IOCv2.Infrastructure.Migrations
                     performed_user_by_id = table.Column<Guid>(type: "uuid", nullable: false),
                     reason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     metadata = table.Column<string>(type: "jsonb", nullable: true),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,44 +57,35 @@ namespace IOCv2.Infrastructure.Migrations
                         name: "fk_audit_logs_users_performed_user_by_id",
                         column: x => x.performed_user_by_id,
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "fk_audit_logs_users_target_id",
                         column: x => x.target_id,
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_audit_logs_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "password_reset_tokens",
                 columns: table => new
                 {
-                    token_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    password_reset_token_id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     token_hash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     expires_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     used_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    created_by = table.Column<string>(type: "text", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_by = table.Column<string>(type: "text", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_password_reset_tokens", x => x.token_id);
+                    table.PrimaryKey("pk_password_reset_tokens", x => x.password_reset_token_id);
                     table.ForeignKey(
                         name: "fk_password_reset_tokens_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -101,25 +93,22 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "refresh_tokens",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    refresh_token_id = table.Column<Guid>(type: "uuid", nullable: false),
                     token = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     is_revoked = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    created_by = table.Column<string>(type: "text", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_by = table.Column<string>(type: "text", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_refresh_tokens", x => x.id);
+                    table.PrimaryKey("pk_refresh_tokens", x => x.refresh_token_id);
                     table.ForeignKey(
                         name: "fk_refresh_tokens_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
-                        principalColumn: "id",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -134,9 +123,15 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "target_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_audit_logs_user_id",
-                table: "audit_logs",
-                column: "user_id");
+                name: "ix_password_reset_tokens_expires_at",
+                table: "password_reset_tokens",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_password_reset_tokens_token_hash",
+                table: "password_reset_tokens",
+                column: "token_hash",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_password_reset_tokens_user_id",
@@ -153,6 +148,11 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_refresh_tokens_user_id",
                 table: "refresh_tokens",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_created_at",
+                table: "users",
+                column: "created_at");
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_email",
@@ -172,9 +172,26 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "role");
 
             migrationBuilder.CreateIndex(
+                name: "ix_users_role_status",
+                table: "users",
+                columns: new[] { "role", "status" });
+
+            migrationBuilder.CreateIndex(
                 name: "ix_users_status",
                 table: "users",
-                column: "status");
+                column: "status",
+                filter: "deleted_at IS NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_status_role",
+                table: "users",
+                columns: new[] { "status", "role" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_user_code",
+                table: "users",
+                column: "user_code",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_username",

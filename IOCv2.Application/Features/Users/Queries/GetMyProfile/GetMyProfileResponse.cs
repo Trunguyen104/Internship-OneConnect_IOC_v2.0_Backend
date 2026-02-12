@@ -6,7 +6,8 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
 {
     public class GetMyProfileResponse : IMapFrom<User>
     {
-        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+        public string UserCode { get; set; } = null!;
         public string Username { get; set; } = null!;
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;
