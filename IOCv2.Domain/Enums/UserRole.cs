@@ -5,8 +5,8 @@
         SuperAdmin = 1,
         SchoolAdmin = 2,
         EnterpriseAdmin = 3,
-        Student = 4,
-        HR = 5,
-        Mentor = 6
+        HR = 4,
+        Mentor = 5,
+        Student = 6
     }
 }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Interfaces
 {
     public interface IUserServices
     {
+        public Task<string> GenerateUserCodeAsync(UserRole role);
     }
 }
