@@ -41,7 +41,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 
             var user = await _unitOfWork.Repository<User>()
                 .Query()
-                .FirstOrDefaultAsync(u => u.Id.ToString() == userId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.UserId.ToString() == userId, cancellationToken);
 
             if (user == null)
             {
@@ -76,7 +76,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             //Revoke existing refresh tokens
             var refreshTokens = await _unitOfWork.Repository<Domain.Entities.RefreshToken>()
                 .Query()
-                .Where(rt => rt.UserId == user.Id && !rt.IsRevoked)
+                .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
                 .ToListAsync(cancellationToken);
 
             foreach (var token in refreshTokens)
@@ -90,8 +90,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             await _unitOfWork.Repository<AuditLog>().AddAsync(new AuditLog
             {
                 LogId = Guid.NewGuid(),
-                TargetId = user.Id,
-                PerformedUserById = user.Id, // self-change
+                TargetId = user.UserId,
+                PerformedUserById = user.UserId, // self-change
                 Reason = "SelfChange",
                 CreatedAt = DateTimeOffset.UtcNow
             });

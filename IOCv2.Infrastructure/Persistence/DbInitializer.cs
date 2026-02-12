@@ -1,6 +1,7 @@
 ﻿using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
+using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.Infrastructure.Persistence
 {
@@ -22,7 +23,7 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 var adminUser = new User
                 {
-                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
                     Username = "admin",
                     PasswordHash = _passwordService.HashPassword("Admin@123"), // Mật khẩu mạnh hơn
                     FullName = "Super Administrator",
@@ -38,7 +39,7 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 var schoolUser = new User
                 {
-                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
                     Username = "fpt_admin",
                     PasswordHash = _passwordService.HashPassword("School@123"),
                     FullName = "FPT University Admin",
@@ -52,22 +53,26 @@ namespace IOCv2.Infrastructure.Persistence
             // Kiểm tra và tạo Enterprise Admin (Doanh nghiệp)
             if (!_context.Users.Any(u => u.Role == UserRole.EnterpriseAdmin))
             {
-                UserId = Guid.NewGuid(),
-                Username = "admin",
-                PasswordHash = _passwordService.HashPassword("admin123"),
-                FullName = "System Administrator",
-                Email = "admin@iocv2.com",
-                Role = UserRole.SuperAdmin,
-                Status = UserStatus.Active,
-                CreatedAt = DateTime.UtcNow
-            };
+                var entAdmin = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    Username = "admin",
+                    PasswordHash = _passwordService.HashPassword("admin123"),
+                    FullName = "System Administrator",
+                    Email = "admin@iocv2.com",
+                    Role = UserRole.SuperAdmin,
+                    Status = UserStatus.Active,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Users.Add(entAdmin);
+            }
 
             // Kiểm tra và tạo Student
             if (!_context.Users.Any(u => u.Role == UserRole.Student))
             {
                 var studentUser = new User
                 {
-                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
                     Username = "trunguyen",
                     PasswordHash = _passwordService.HashPassword("Tn@123456"),
                     FullName = "Trung Nguyen",

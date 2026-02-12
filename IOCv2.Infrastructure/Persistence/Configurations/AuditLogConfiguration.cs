@@ -34,7 +34,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             builder.HasOne(x => x.PerformedBy)
                 .WithMany(e => e.PerformedLogs)
-                .HasForeignKey(x => x.PerformedByEmployeeId)
+                .HasForeignKey(x => x.PerformedUserById)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
