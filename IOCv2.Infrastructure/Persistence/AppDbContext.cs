@@ -1,22 +1,78 @@
-﻿using IOCv2.Domain.Entities;
+﻿using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.Infrastructure.Persistence
 {
     public partial class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        private readonly ICurrentUserService _currentUserService;
+
+        public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService) : base(options) 
+        {
+            _currentUserService = currentUserService;
+        }
 
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<AuditLog> AuditLogs { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var now = DateTime.UtcNow;
+            var userId = _currentUserService.UserId ?? "SYSTEM";
+
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedAt = now;
+                        entry.Entity.CreatedBy = userId;
+                        entry.Entity.UpdatedAt = now;
+                        entry.Entity.UpdatedBy = userId;
+                        break;
+
+                    case EntityState.Modified:
+                        entry.Entity.UpdatedAt = now;
+                        entry.Entity.UpdatedBy = userId;
+                        break;
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
+}
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
             OnModelCreatingPartial(modelBuilder);
+
+            ApplyGlobalFilters(modelBuilder);
         }
+
+        private void ApplyGlobalFilters(ModelBuilder modelBuilder)
+        {
+            // Global Query Filter for Soft Delete (DeletedAt == null)
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    var parameter = Expression.Parameter(entityType.ClrType, "e");
+                    var property = Expression.Property(parameter, nameof(BaseEntity.DeletedAt));
+                    var nullValue = Expression.Constant(null, typeof(DateTime?));
+                    var equalExpression = Expression.Equal(property, nullValue);
+                    var lambda = Expression.Lambda(equalExpression, parameter);
+
+                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+                }
+            }
+        }
+
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
