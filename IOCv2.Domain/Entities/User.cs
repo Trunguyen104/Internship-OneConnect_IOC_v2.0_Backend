@@ -17,6 +17,8 @@ namespace IOCv2.Domain.Entities
         public UserStatus Status { get; set; } = UserStatus.Active;
         public UserRole Role { get; set; }
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
-
+        public virtual ICollection<AuditLog> TargetLogs { get; set; } = new List<AuditLog>();
+        public virtual ICollection<AuditLog> PerformedLogs { get; set; } = new List<AuditLog>();
+        public User() { }
     }
 }

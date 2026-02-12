@@ -1,9 +1,6 @@
 ﻿using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
-
-using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.Infrastructure.Persistence
 {
@@ -29,7 +26,7 @@ namespace IOCv2.Infrastructure.Persistence
 
             var adminUser = new User
             {
-                Id = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
                 Username = "admin",
                 PasswordHash = _passwordService.HashPassword("admin123"),
                 FullName = "System Administrator",
