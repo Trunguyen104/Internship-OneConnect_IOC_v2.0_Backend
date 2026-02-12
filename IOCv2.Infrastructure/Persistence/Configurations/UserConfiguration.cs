@@ -52,10 +52,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(u => u.CreatedBy).HasColumnName("created_by");
             builder.Property(u => u.UpdatedBy).HasColumnName("updated_by");
 
-            // Global Query Filter: Hide soft-deleted employees
-            builder.HasQueryFilter(u => u.DeletedAt == null);
-
-
             builder.HasIndex(u => u.Role);
             builder.HasIndex(u => u.Status);
             builder.HasIndex(u => u.CreatedAt);

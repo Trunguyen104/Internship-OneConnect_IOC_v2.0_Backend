@@ -1,6 +1,7 @@
 ﻿using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Infrastructure.Persistence
 {
@@ -15,10 +16,10 @@ namespace IOCv2.Infrastructure.Persistence
             _passwordService = passwordService;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
             // Kiểm tra và tạo Super Admin
-            if (!_context.Users.Any(u => u.Role == UserRole.SuperAdmin))
+            if (!await _context.Users.AnyAsync(u => u.Role == UserRole.SuperAdmin))
             {
                 var superAdmin = new User
                 {
@@ -30,7 +31,7 @@ namespace IOCv2.Infrastructure.Persistence
                     Email = "admin@iocv2.com",
                     Role = UserRole.SuperAdmin,
                     Status = UserStatus.Active,
-                    CreatedAt = DateTime.UtcNow
+                    // CreatedAt will be set by SaveChangesAsync
                 };
                 _context.Users.Add(superAdmin);
             }
@@ -38,7 +39,7 @@ namespace IOCv2.Infrastructure.Persistence
             // Lưu thay đổi (nếu có)
             if (_context.ChangeTracker.HasChanges())
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }
