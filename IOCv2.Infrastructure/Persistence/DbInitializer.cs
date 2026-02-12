@@ -52,19 +52,15 @@ namespace IOCv2.Infrastructure.Persistence
             // Kiểm tra và tạo Enterprise Admin (Doanh nghiệp)
             if (!_context.Users.Any(u => u.Role == UserRole.EnterpriseAdmin))
             {
-                var enterpriseUser = new User
-                {
-                    Id = Guid.NewGuid(),
-                    Username = "rikkei_admin",
-                    PasswordHash = _passwordService.HashPassword("Enterprise@123"),
-                    FullName = "RikkeiSoft HR",
-                    Email = "hr@rikkeisoft.com",
-                    Role = UserRole.EnterpriseAdmin, // Hoặc EnterpriseAdmin
-                    Status = UserStatus.Active,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Users.Add(enterpriseUser);
-            }
+                UserId = Guid.NewGuid(),
+                Username = "admin",
+                PasswordHash = _passwordService.HashPassword("admin123"),
+                FullName = "System Administrator",
+                Email = "admin@iocv2.com",
+                Role = UserRole.SuperAdmin,
+                Status = UserStatus.Active,
+                CreatedAt = DateTime.UtcNow
+            };
 
             // Kiểm tra và tạo Student
             if (!_context.Users.Any(u => u.Role == UserRole.Student))

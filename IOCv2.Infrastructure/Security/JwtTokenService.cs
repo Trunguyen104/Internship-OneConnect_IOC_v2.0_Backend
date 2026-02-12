@@ -21,8 +21,8 @@ namespace IOCv2.Infrastructure.Security
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+                new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new(ClaimTypes.Name, user.FullName),
                 new(ClaimTypes.Email, user.Email),
                 new(ClaimTypes.Role, user.Role.ToString()),
