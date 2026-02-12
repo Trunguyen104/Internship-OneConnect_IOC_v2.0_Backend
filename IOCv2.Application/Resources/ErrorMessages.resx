@@ -103,8 +103,8 @@
     <value>Mật khẩu phải có ít nhất 1 ký tự đặc biệt</value>
   </data>
   <!-- Reset Password Validation -->
-  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
-    <value>EmployeeId không được để trống</value>
+  <data name="ResetPassword.UserIdRequired" xml:space="preserve">
+    <value>Id người dùng không được để trống</value>
   </data>
   <data name="ResetPassword.ReasonRequired" xml:space="preserve">
     <value>Lý do reset password là bắt buộc</value>
@@ -165,14 +165,14 @@
   <data name="Password.IncorrectCurrent" xml:space="preserve">
     <value>Mật khẩu hiện tại không chính xác.</value>
   </data>
-  <!-- Profile/Employee Errors -->
+  <!-- Profile/User Errors -->
   <data name="Profile.PhoneExists" xml:space="preserve">
     <value>Số điện thoại đã được sử dụng bởi người khác.</value>
   </data>
   <data name="Profile.EmailExists" xml:space="preserve">
     <value>Email đã được sử dụng bởi người khác.</value>
   </data>
-  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
-    <value>Không thể cập nhật thông tin cho nhân viên đang ngừng hoạt động.</value>
+  <data name="User.CannotUpdateInactive" xml:space="preserve">
+    <value>Không thể cập nhật thông tin cho tài khoản đang ngừng hoạt động.</value>
   </data>
 </root>

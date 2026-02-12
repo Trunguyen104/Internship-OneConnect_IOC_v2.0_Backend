@@ -43,7 +43,10 @@ public static class SwaggerConfig
     public static WebApplication UseSwaggerConfig(this WebApplication app)
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "IOCv2 API v1");
+        });
         return app;
     }
 }

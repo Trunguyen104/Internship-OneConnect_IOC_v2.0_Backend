@@ -57,20 +57,21 @@
             public const string NewPasswordRequired = "Auth.NewPasswordRequired";
             public const string ConfirmPasswordRequired = "Auth.ConfirmPasswordRequired";
             public const string ConfirmPasswordMismatch = "Auth.ConfirmPasswordMismatch";
-            public const string EmployeeCodeRequired = "Auth.EmployeeCodeRequired";
+            public const string EmailRequired = "Auth.EmailRequired";
+            public const string EmailInvalidFormat = "Auth.EmailInvalidFormat";
         }
         // mẫu
-        public static class Employee
+        public static class Users
         {
-            public const string NotFound = "EmployeeNotFound";
-            public const string NotActive = "EmployeeNotActive";
-            public const string CannotUpdateInactive = "Employee.CannotUpdateInactive";
+            public const string NotFound = "UserNotFound";
+            public const string NotActive = "UserNotActive";
+            public const string CannotUpdateInactive = "User.CannotUpdateInactive";
             public const string CannotIdentifyUser = "CannotIdentifyUser";
             public const string CannotIdentifyManager = "CannotIdentifyManager";
             public const string CannotPromoteToManager = "CannotPromoteToManager";
             public const string NewRoleMustBeDifferent = "NewRoleMustBeDifferent";
             public const string RoleChangedButEmailFailed = "RoleChangedButEmailFailed";
-            public const string CodeInvalidFormat = "Employee.CodeInvalidFormat";
+            public const string CodeInvalidFormat = "User.CodeInvalidFormat";
         }
 
         public static class Profile
@@ -78,7 +79,7 @@
             public const string UsernameExists = "Profile.UsernameExists";
             public const string PhoneExists = "Profile.PhoneExists";
             public const string EmailExists = "Profile.EmailExists";
-            public const string EmployeeIdRequired = "Profile.EmployeeIdRequired";
+            public const string UserIdRequired = "Profile.UserIdRequired";
             public const string FullNameRequired = "Profile.FullNameRequired";
             public const string FullNameMaxLength = "Profile.FullNameMaxLength";
             public const string EmailRequired = "Profile.EmailRequired";

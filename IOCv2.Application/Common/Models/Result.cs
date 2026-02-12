@@ -26,7 +26,7 @@ namespace IOCv2.Application.Common.Models
     public class Result
     {
         public bool IsSuccess { get; }
-        public List<string> Errors { get; }
+        public IReadOnlyList<string> Errors { get; }
         public ResultErrorType ErrorType { get; }
 
         protected Result(
@@ -57,6 +57,11 @@ namespace IOCv2.Application.Common.Models
 
         public static Result NotFound(string error)
             => new(false, new List<string> { error }, ResultErrorType.NotFound);
+        public static Result Unauthorized(string error)
+            => new(false, new List<string> { error }, ResultErrorType.Unauthorized);
+
+        public static Result Forbidden(string error)
+            => new(false, new List<string> { error }, ResultErrorType.Forbidden);
 
         public static Result Conflict(string error)
             => new(false, new List<string> { error }, ResultErrorType.Conflict);
@@ -82,12 +87,12 @@ namespace IOCv2.Application.Common.Models
         public static Result<T> Success(T data)
             => new(true, data, null, ResultErrorType.None);
 
-        public static new Result<T> Failure(
+        public static Result<T> Failure(
             string error,
             ResultErrorType errorType = ResultErrorType.BadRequest)
             => new(false, default, new List<string> { error }, errorType);
 
-        public static new Result<T> Failure(
+        public static Result<T> Failure(
             List<string> errors,
             ResultErrorType errorType = ResultErrorType.BadRequest)
             => new(false, default, errors, errorType);

@@ -45,6 +45,13 @@ namespace IOCv2.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IPasswordService, PasswordService>();
+            // Register Background Email Channel as Singleton (must be shared)
+            services.AddSingleton<BackgroundEmailChannel>();
+            services.AddSingleton<IBackgroundEmailSender>(sp => sp.GetRequiredService<BackgroundEmailChannel>());
+
+            // Register Hosted Service to process emails
+            services.AddHostedService<EmailHostedService>();
+
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<DbInitializer>();

@@ -13,5 +13,6 @@ namespace IOCv2.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
         public string? UpdatedBy { get; set; }
         public DateTime? DeletedAt { get; set; } // database xu ly datatime nhanh hon boolean
+
     }
 }
