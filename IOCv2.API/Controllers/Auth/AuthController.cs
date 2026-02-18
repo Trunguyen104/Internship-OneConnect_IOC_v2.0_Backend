@@ -1,4 +1,5 @@
-﻿using IOCv2.Application.Common.Models;
+﻿using IOCv2.API.Attributes;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Authentication.Commands.ChangePassword;
 using IOCv2.Application.Features.Authentication.Commands.Login;
 using IOCv2.Application.Features.Authentication.Commands.RefreshTokens;
@@ -8,15 +9,12 @@ using IOCv2.Application.Features.Authentication.Commands.RevokeToken;
 using IOCv2.Application.Features.Users.Queries.GetMyProfile;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.Auth
 {
-    [Route("api/[controller]")]
-    [ApiController]
     [Tags("Auth")]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiControllerBase
     {
         private readonly IMediator _mediator;
         private readonly IWebHostEnvironment _env;
@@ -27,23 +25,10 @@ namespace IOCv2.API.Controllers.Auth
             _env = env;
         }
 
-        private IActionResult HandleResult<T>(Result<T> result)
-        {
-            if (result.IsSuccess)
-            {
-                return Ok(result.Data);
-            }
-
-            return result.ErrorType switch
-            {
-                ResultErrorType.NotFound => NotFound(new { message = result.Errors }),
-                ResultErrorType.Unauthorized => Unauthorized(new { message = result.Errors }),
-                ResultErrorType.Forbidden => Forbid(),
-                _ => BadRequest(new { message = result.Errors }),
-            };
-        }
-
         [HttpPost("login")]
+        [RateLimit(maxRequests: 5, windowMinutes: 10, blockMinutes: 5)]
+        [ProducesResponseType(typeof(Result<LoginResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginCommand command)
         {
             var result = await _mediator.Send(command);
@@ -57,6 +42,8 @@ namespace IOCv2.API.Controllers.Auth
         }
 
         [HttpPost("refresh-token")]
+        [ProducesResponseType(typeof(Result<LoginResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
@@ -78,6 +65,7 @@ namespace IOCv2.API.Controllers.Auth
         }
 
         [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Logout([FromBody] RevokeTokenCommand command)
         {
             // Try to get token from Body or Cookie
@@ -103,6 +91,8 @@ namespace IOCv2.API.Controllers.Auth
 
         [HttpPost("change-password")]
         [Authorize]
+        [ProducesResponseType(typeof(Result<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
         {
             var result = await _mediator.Send(command);
@@ -110,6 +100,8 @@ namespace IOCv2.API.Controllers.Auth
         }
 
         [HttpPost("request-password-reset")]
+        [RateLimit(maxRequests: 3, windowMinutes: 10, blockMinutes: 10)]
+        [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
         public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetCommand command)
         {
             var result = await _mediator.Send(command);
@@ -117,6 +109,7 @@ namespace IOCv2.API.Controllers.Auth
         }
 
         [HttpPost("reset-password")]
+        [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
         {
             var result = await _mediator.Send(command);
@@ -125,6 +118,8 @@ namespace IOCv2.API.Controllers.Auth
 
         [HttpGet("me")]
         [Authorize]
+        [ProducesResponseType(typeof(Result<GetMyProfileResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetCurrentUserInfo()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
