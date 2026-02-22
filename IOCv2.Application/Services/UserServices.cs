@@ -14,7 +14,7 @@ namespace IOCv2.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<string> GenerateUserCodeAsync(UserRole role)
+        public async Task<string> GenerateUserCodeAsync(UserRole role, CancellationToken cancellationToken)
         {
             string prefix = role switch
             {

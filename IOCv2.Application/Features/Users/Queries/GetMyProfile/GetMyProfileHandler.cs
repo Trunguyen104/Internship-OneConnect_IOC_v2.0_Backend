@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -28,6 +29,8 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         {
             var user = await _unitOfWork.Repository<User>()
                 .Query()
+                .AsNoTracking()
+                .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
 
             if (user == null)
@@ -35,8 +38,7 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
                 return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
             }
 
-            var response = _mapper.Map<GetMyProfileResponse>(user);
-            return Result<GetMyProfileResponse>.Success(response);
+            return Result<GetMyProfileResponse>.Success(user);
         }
     }
 }

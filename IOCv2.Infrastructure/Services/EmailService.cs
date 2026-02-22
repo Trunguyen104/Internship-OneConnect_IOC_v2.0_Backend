@@ -41,7 +41,7 @@ namespace IOCv2.Infrastructure.Services
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                     Subject = "Password Reset - Internship OneConnect",
-                    Body = GetPasswordResetTemplate(employeeName, resetLink),
+                    Body = EmailTemplates.GetPasswordResetTemplate(employeeName, resetLink),
                     IsBodyHtml = true
                 };
 
@@ -106,8 +106,8 @@ namespace IOCv2.Infrastructure.Services
 
         public async Task<bool> SendAccountCreationEmailAsync(
             string email,
-            string employeeName,
-            string employeeCode,
+            string fullName,
+            string userCode,
             string role,
             string password,
             CancellationToken cancellationToken = default)
@@ -129,7 +129,7 @@ namespace IOCv2.Infrastructure.Services
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                     Subject = "Chào mừng đến Internship OneConnect - Thông tin tài khoản",
-                    Body = GetAccountCreationTemplate(employeeName, employeeCode, role, password),
+                    Body = EmailTemplates.GetAccountCreationTemplate(fullName, userCode, role, password),
                     IsBodyHtml = true
                 };
 
@@ -149,8 +149,8 @@ namespace IOCv2.Infrastructure.Services
         public async Task<bool> SendRoleChangeConfirmationEmailAsync(
             string email,
             string employeeName,
-            string oldEmployeeCode,
-            string newEmployeeCode,
+            string oldUserCode,
+            string newUserCode,
             string oldRole,
             string newRole,
             CancellationToken cancellationToken = default)
@@ -172,7 +172,7 @@ namespace IOCv2.Infrastructure.Services
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                     Subject = "Thông báo thay đổi vai trò - Internship OneConnect",
-                    Body = GetRoleChangeTemplate(employeeName, oldEmployeeCode, newEmployeeCode, oldRole, newRole),
+                    Body = EmailTemplates.GetRoleChangeTemplate(employeeName, oldUserCode, newUserCode, oldRole, newRole),
                     IsBodyHtml = true
                 };
 
@@ -255,7 +255,7 @@ namespace IOCv2.Infrastructure.Services
 </html>";
         }
 
-        private string GetAccountCreationTemplate(string employeeName, string username, string role, string password)
+        private string GetAccountCreationTemplate(string employeeName, string email, string role, string password)
         {
             return @"
 <!DOCTYPE html>
@@ -288,7 +288,7 @@ namespace IOCv2.Infrastructure.Services
             <div class='info-box'>
                 <div class='info-row'>
                     <div class='info-label'>Tên đăng nhập (Username):</div>
-                    <div class='info-value'>" + username + @"</div>
+                    <div class='info-value'>" + email + @"</div>
                 </div>
                 <div class='info-row'>
                     <div class='info-label'>Vai trò (Role):</div>
@@ -305,7 +305,7 @@ namespace IOCv2.Infrastructure.Services
                 <ul>
                     <li>Vui lòng <strong>đổi mật khẩu ngay</strong> khi đăng nhập lần đầu tiên</li>
                     <li>Không chia sẻ thông tin đăng nhập với bất kỳ ai</li>
-                    <li>Sử dụng <strong>tên đăng nhập</strong> (" + username + @") để đăng nhập, không phải email</li>
+                    <li>Sử dụng <strong>Email</strong> (" + email + @") để đăng nhập</li>
                 </ul>
             </div>
             
@@ -322,7 +322,7 @@ namespace IOCv2.Infrastructure.Services
 </html>";
         }
 
-        private string GetRoleChangeTemplate(string employeeName, string oldUsername, string newUsername, string oldRole, string newRole)
+        private string GetRoleChangeTemplate(string employeeName, string oldUserCode, string newUserCode, string oldRole, string newRole)
         {
             return @"
 <!DOCTYPE html>
@@ -360,7 +360,7 @@ namespace IOCv2.Infrastructure.Services
                     <h3 style='margin-top: 0; color: #f44336;'>❌ Thông tin cũ (đã vô hiệu hóa)</h3>
                     <div class='info-row'>
                         <div class='info-label'>Tên đăng nhập cũ:</div>
-                        <div class='info-value strikethrough'>" + oldUsername + @"</div>
+                        <div class='info-value strikethrough'>" + oldUserCode + @"</div>
                     </div>
                     <div class='info-row'>
                         <div class='info-label'>Vai trò cũ:</div>
@@ -372,7 +372,7 @@ namespace IOCv2.Infrastructure.Services
                     <h3 style='margin-top: 0; color: #4caf50;'>✅ Thông tin mới (đang hoạt động)</h3>
                     <div class='info-row'>
                         <div class='info-label'>Tên đăng nhập mới:</div>
-                        <div class='info-value'>" + newUsername + @"</div>
+                        <div class='info-value'>" + newUserCode + @"</div>
                     </div>
                     <div class='info-row'>
                         <div class='info-label'>Vai trò mới:</div>
@@ -384,9 +384,9 @@ namespace IOCv2.Infrastructure.Services
             <div class='important'>
                 <strong>⚠️ Lưu ý quan trọng:</strong>
                 <ul>
-                    <li>Vui lòng sử dụng <strong>tên đăng nhập mới</strong> (" + newUsername + @") để đăng nhập</li>
+                    <li>Vui lòng sử dụng <strong>mã nhân viên mới</strong> (" + newUserCode + @") để đăng nhập</li>
                     <li><strong>Mật khẩu của bạn giữ nguyên</strong> - không thay đổi</li>
-                    <li>Tài khoản cũ (" + oldUsername + @") đã bị vô hiệu hóa và không thể đăng nhập</li>
+                    <li>Tài khoản cũ (" + oldUserCode + @") đã bị vô hiệu hóa và không thể đăng nhập</li>
                     <li>Quyền truy cập của bạn đã được cập nhật theo vai trò mới</li>
                 </ul>
             </div>
@@ -405,8 +405,8 @@ namespace IOCv2.Infrastructure.Services
         }
         public async Task<bool> SendPasswordResetByManagerEmailAsync(
     string email,
-    string employeeName,
-    string username,
+    string fullName,
+    string userCode,
     string newPassword,
     string managerName,
     CancellationToken cancellationToken = default)
@@ -427,7 +427,7 @@ namespace IOCv2.Infrastructure.Services
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                     Subject = "Mật khẩu của bạn đã được reset - Internship OneConnect",
-                    Body = GetPasswordResetByManagerTemplate(employeeName, username, newPassword, managerName),
+                    Body = EmailTemplates.GetPasswordResetByManagerTemplate(fullName, userCode, newPassword, managerName),
                     IsBodyHtml = true
                 };
                 mailMessage.To.Add(email);
@@ -441,7 +441,7 @@ namespace IOCv2.Infrastructure.Services
                 return false;
             }
         }
-        private string GetPasswordResetByManagerTemplate(string employeeName, string username, string newPassword, string managerName)
+        private string GetPasswordResetByManagerTemplate(string fullName, string userCode, string newPassword, string managerName)
         {
             return @"
 <!DOCTYPE html>
@@ -467,14 +467,14 @@ namespace IOCv2.Infrastructure.Services
             <h1>🔐 Mật khẩu đã được reset</h1>
         </div>
         <div class='content'>
-            <p>Xin chào <strong>" + employeeName + @"</strong>,</p>
+            <p>Xin chào <strong>" + fullName + @"</strong>,</p>
             
             <p>Mật khẩu của bạn đã được Manager <strong>" + managerName + @"</strong> reset trong hệ thống IOC.</p>
             
             <div class='info-box'>
                 <div class='info-row'>
                     <div class='info-label'>Tên đăng nhập (Username):</div>
-                    <div class='info-value'>" + username + @"</div>
+                    <div class='info-value'>" + userCode + @"</div>
                 </div>
                 <div class='info-row'>
                     <div class='info-label'>Mật khẩu mới:</div>
@@ -487,7 +487,7 @@ namespace IOCv2.Infrastructure.Services
                 <ul>
                     <li><strong>BẮT BUỘC phải đổi mật khẩu</strong> ngay khi đăng nhập lần đầu tiên</li>
                     <li>Không chia sẻ mật khẩu này với bất kỳ ai</li>
-                    <li>Sử dụng tên đăng nhập (" + username + @") để đăng nhập</li>
+                    <li>Sử dụng tên đăng nhập (" + userCode + @") để đăng nhập</li>
                     <li>Chọn một mật khẩu mạnh mà chỉ bạn biết</li>
                 </ul>
             </div>

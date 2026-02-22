@@ -5,7 +5,6 @@ using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using IOCv2.Domain.Enums;
-using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 {
@@ -89,11 +88,12 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             //Log password reset
             await _unitOfWork.Repository<AuditLog>().AddAsync(new AuditLog
             {
-                LogId = Guid.NewGuid(),
-                TargetId = user.UserId,
-                PerformedUserById = user.UserId, // self-change
+                AuditLogId = Guid.NewGuid(),
+                Action = AuditAction.Update,
+                EntityType = nameof(User),
+                EntityId = user.UserId,
+                PerformedById = user.UserId, // self-change
                 Reason = "SelfChange",
-                CreatedAt = DateTimeOffset.UtcNow
             });
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);

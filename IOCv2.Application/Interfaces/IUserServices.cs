@@ -4,6 +4,6 @@ namespace IOCv2.Application.Interfaces
 {
     public interface IUserServices
     {
-        public Task<string> GenerateUserCodeAsync(UserRole role);
+        public Task<string> GenerateUserCodeAsync(UserRole role, CancellationToken cancellation);
     }
 }

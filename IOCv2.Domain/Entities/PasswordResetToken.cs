@@ -8,7 +8,7 @@ namespace IOCv2.Domain.Entities
 {
     public class PasswordResetToken
     {
-        public Guid PasswordResetTokenId { get; set; }
+        public Guid TokenId { get; set; }
         public Guid UserId { get; set; }              // user_id
         public string TokenHash { get; set; } = default!; // token_hash (64)
         public DateTimeOffset ExpiresAt { get; set; }     // expires_at

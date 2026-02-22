@@ -13,11 +13,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.ToTable("users");
             builder.HasKey(u => u.UserId);
 
-            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(10);
+            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(20);
             builder.HasIndex(u => u.UserCode).IsUnique();
 
-            builder.Property(u => u.Username).IsRequired().HasMaxLength(50);
-            builder.HasIndex(u => u.Username).IsUnique();
 
             builder.Property(u => u.PasswordHash).IsRequired();
 
@@ -65,6 +63,18 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .HasFilter("deleted_at IS NULL");
 
 
+            // Relationships
+            builder.HasOne(u => u.Student)
+                .WithOne(s => s.User)
+                .HasForeignKey<Student>(s => s.UserId);
+
+            builder.HasOne(u => u.UniversityUser)
+                .WithOne(uu => uu.User)
+                .HasForeignKey<UniversityUser>(uu => uu.UserId);
+
+            builder.HasOne(u => u.EnterpriseUser)
+                .WithOne(eu => eu.User)
+                .HasForeignKey<EnterpriseUser>(eu => eu.UserId);
         }
     }
 }

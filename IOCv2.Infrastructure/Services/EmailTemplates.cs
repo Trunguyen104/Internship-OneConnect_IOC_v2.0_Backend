@@ -2,7 +2,7 @@
 {
     public static class EmailTemplates
     {
-        public static string GetPasswordResetTemplate(string username, string resetLink)
+        public static string GetPasswordResetTemplate(string fullName, string resetLink)
         {
             return @"
 <!DOCTYPE html>
@@ -14,7 +14,7 @@
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #ab1f24 0%, #8a1820 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
         .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-        .button { display: inline-block; padding: 12px 30px; background: #ab1f24; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
         .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
         .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin: 20px 0; }
     </style>
@@ -25,7 +25,7 @@
             <h1>🔐 Reset Your Password</h1>
         </div>
         <div class='content'>
-            <p>Hello <strong>" + username + @"</strong>,</p>
+            <p>Hello <strong>" + fullName + @"</strong>,</p>
             
             <p>We received a request to reset the password for your Internship OneConnect account.</p>
             
@@ -55,7 +55,7 @@
 </html>";
         }
 
-        public static string GetAccountCreationTemplate(string username, string role, string password)
+        public static string GetAccountCreationTemplate(string fullName, string email, string role, string password)
         {
             return @"
 <!DOCTYPE html>
@@ -81,14 +81,14 @@
             <h1>🎉 Chào mừng đến với Internship OneConnect</h1>
         </div>
         <div class='content'>
-            <p>Xin chào <strong>" + username + @"</strong>,</p>
+            <p>Xin chào <strong>" + fullName + @"</strong>,</p>
             
             <p>Tài khoản của bạn đã được tạo thành công trong hệ thống IOC. Dưới đây là thông tin đăng nhập của bạn:</p>
             
             <div class='info-box'>
                 <div class='info-row'>
-                    <div class='info-label'>Tên đăng nhập (Username):</div>
-                    <div class='info-value'>" + username + @"</div>
+                    <div class='info-label'>Email đăng nhập:</div>
+                    <div class='info-value'>" + email + @"</div>
                 </div>
                 <div class='info-row'>
                     <div class='info-label'>Vai trò (Role):</div>
@@ -105,7 +105,7 @@
                 <ul>
                     <li>Vui lòng <strong>đổi mật khẩu ngay</strong> khi đăng nhập lần đầu tiên</li>
                     <li>Không chia sẻ thông tin đăng nhập với bất kỳ ai</li>
-                    <li>Sử dụng <strong>tên đăng nhập</strong> (" + username + @") để đăng nhập, không phải email</li>
+                    <li>Sử dụng <strong>Email</strong> (" + email + @") để đăng nhập</li>
                 </ul>
             </div>
             
@@ -122,7 +122,7 @@
 </html>";
         }
 
-        public static string GetRoleChangeTemplate(string oldEmployeeCode, string newEmployeeCode, string oldRole, string newRole)
+        public static string GetRoleChangeTemplate(string fullName, string oldUserCode, string newUserCode, string oldRole, string newRole)
         {
             return @"
 <!DOCTYPE html>
@@ -151,16 +151,16 @@
             <h1>🔄 Thông báo thay đổi vai trò</h1>
         </div>
         <div class='content'>
-            <p>Xin chào <strong> </strong>,</p>
+            <p>Xin chào <strong>" + fullName + @"</strong>,</p>
             
-            <p>Vai trò của bạn trong hệ thống FoodHub đã được thay đổi. Vui lòng xem thông tin chi tiết bên dưới:</p>
+            <p>Vai trò của bạn trong hệ thống IOC đã được thay đổi. Vui lòng xem thông tin chi tiết bên dưới:</p>
             
             <div class='change-box'>
                 <div class='old-info'>
                     <h3 style='margin-top: 0; color: #f44336;'>❌ Thông tin cũ (đã vô hiệu hóa)</h3>
                     <div class='info-row'>
                         <div class='info-label'>Mã nhân viên cũ:</div>
-                        <div class='info-value strikethrough'>" + oldEmployeeCode + @"</div>
+                        <div class='info-value strikethrough'>" + oldUserCode + @"</div>
                     </div>
                     <div class='info-row'>
                         <div class='info-label'>Vai trò cũ:</div>
@@ -172,7 +172,7 @@
                     <h3 style='margin-top: 0; color: #4caf50;'>✅ Thông tin mới (đang hoạt động)</h3>
                     <div class='info-row'>
                         <div class='info-label'>Mã nhân viên mới:</div>
-                        <div class='info-value'>" + newEmployeeCode + @"</div>
+                        <div class='info-value'>" + newUserCode + @"</div>
                     </div>
                     <div class='info-row'>
                         <div class='info-label'>Vai trò mới:</div>
@@ -184,16 +184,16 @@
             <div class='important'>
                 <strong>⚠️ Lưu ý quan trọng:</strong>
                 <ul>
-                    <li>Vui lòng sử dụng <strong>mã nhân viên mới</strong> (" + newEmployeeCode + @") để đăng nhập</li>
+                    <li>Vui lòng sử dụng <strong>mã nhân viên mới</strong> (" + newUserCode + @") để đăng nhập</li>
                     <li><strong>Mật khẩu của bạn giữ nguyên</strong> - không thay đổi</li>
-                    <li>Tài khoản cũ (" + oldEmployeeCode + @") đã bị vô hiệu hóa và không thể đăng nhập</li>
+                    <li>Tài khoản cũ (" + oldUserCode + @") đã bị vô hiệu hóa và không thể đăng nhập</li>
                     <li>Quyền truy cập của bạn đã được cập nhật theo vai trò mới</li>
                 </ul>
             </div>
             
             <p>Nếu bạn có bất kỳ thắc mắc nào về việc thay đổi này, vui lòng liên hệ với quản lý của bạn.</p>
             
-            <p>Trân trọng,<br><strong>FoodHub System</strong></p>
+            <p>Trân trọng,<br><strong>IOC System</strong></p>
         </div>
         <div class='footer'>
             <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
@@ -204,7 +204,7 @@
 </html>";
         }
 
-        public static string GetPasswordResetByManagerTemplate(string username, string newPassword, string managerName)
+        public static string GetPasswordResetByManagerTemplate(string fullName, string email, string newPassword, string managerName)
         {
             return @"
 <!DOCTYPE html>
@@ -230,14 +230,14 @@
             <h1>🔐 Mật khẩu đã được reset</h1>
         </div>
         <div class='content'>
-            <p>Xin chào <strong>" + username + @"</strong>,</p>
+            <p>Xin chào <strong>" + fullName + @"</strong>,</p>
             
-            <p>Mật khẩu của bạn đã được Manager <strong>" + managerName + @"</strong> reset trong hệ thống FoodHub.</p>
+            <p>Mật khẩu của bạn đã được Manager <strong>" + managerName + @"</strong> reset trong hệ thống IOC.</p>
             
             <div class='info-box'>
                 <div class='info-row'>
-                    <div class='info-label'>Mã nhân viên (Employee Code):</div>
-                    <div class='info-value'>" + username + @"</div>
+                    <div class='info-label'>Email đăng nhập:</div>
+                    <div class='info-value'>" + email + @"</div>
                 </div>
                 <div class='info-row'>
                     <div class='info-label'>Mật khẩu mới:</div>
@@ -256,7 +256,7 @@
             
             <p>Nếu bạn không yêu cầu reset mật khẩu, vui lòng liên hệ với Manager ngay lập tức.</p>
             
-            <p>Trân trọng,<br><strong>FoodHub System</strong></p>
+            <p>Trân trọng,<br><strong>IOC System</strong></p>
         </div>
         <div class='footer'>
             <p>Đây là email tự động. Vui lòng không trả lời email này.</p>

@@ -3,5 +3,8 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
 {
-    public record GetMyProfileQuery(Guid UserId) : IRequest<Result<GetMyProfileResponse>>;
+    public record GetMyProfileQuery : IRequest<Result<GetMyProfileResponse>>
+    {
+        public Guid UserId { get; init; }
+    }
 }

@@ -10,7 +10,7 @@ namespace IOCv2.Infrastructure.Persistence
     {
         private readonly ICurrentUserService _currentUserService;
 
-        public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService) : base(options) 
+        public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService) : base(options)
         {
             _currentUserService = currentUserService;
         }
@@ -19,11 +19,20 @@ namespace IOCv2.Infrastructure.Persistence
         public DbSet<AuditLog> AuditLogs { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
+        public DbSet<Student> Students { get; set; } = null!;
+        public DbSet<Domain.Entities.University> Universities { get; set; } = null!;
+        public DbSet<UniversityUser> UniversityUsers { get; set; } = null!;
+        public DbSet<Domain.Entities.Enterprise> Enterprises { get; set; } = null!;
+        public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var now = DateTime.UtcNow;
-            var userId = _currentUserService.UserId ?? "SYSTEM";
+            Guid? currentUserId = null;
+            if (Guid.TryParse(_currentUserService.UserId, out var parsedId))
+            {
+                currentUserId = parsedId;
+            }
 
             foreach (var entry in ChangeTracker.Entries<BaseEntity>())
             {
@@ -31,20 +40,20 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     case EntityState.Added:
                         entry.Entity.CreatedAt = now;
-                        entry.Entity.CreatedBy = userId;
+                        entry.Entity.CreatedBy = currentUserId;
                         entry.Entity.UpdatedAt = now;
-                        entry.Entity.UpdatedBy = userId;
+                        entry.Entity.UpdatedBy = currentUserId;
                         break;
 
                     case EntityState.Modified:
                         entry.Entity.UpdatedAt = now;
-                        entry.Entity.UpdatedBy = userId;
+                        entry.Entity.UpdatedBy = currentUserId;
                         break;
                 }
             }
 
             return await base.SaveChangesAsync(cancellationToken);
-}
+        }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

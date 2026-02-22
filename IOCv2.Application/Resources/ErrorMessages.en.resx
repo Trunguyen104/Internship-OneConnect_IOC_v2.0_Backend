@@ -60,13 +60,13 @@
   </resheader>
 
   <!-- Common Errors -->
-  <data name="DatabaseConflict" xml:space="preserve">
+  <data name="Common.DatabaseConflict" xml:space="preserve">
     <value>The record already exists in the system.</value>
   </data>
-  <data name="OperationCancelled" xml:space="preserve">
+  <data name="Common.OperationCancelled" xml:space="preserve">
     <value>The operation was cancelled.</value>
   </data>
-  <data name="Unauthorized" xml:space="preserve">
+  <data name="Common.Unauthorized" xml:space="preserve">
     <value>You are not authorized to perform this action.</value>
   </data>
 

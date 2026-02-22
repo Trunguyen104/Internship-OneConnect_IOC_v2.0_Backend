@@ -1,4 +1,5 @@
 ﻿using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -50,7 +51,19 @@ namespace IOCv2.Infrastructure.Persistence.Repositories
 
         public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
         {
-            _dbSet.Remove(entity);
+            // Soft-delete when entity derives from BaseEntity
+            if (entity is BaseEntity baseEntity)
+            {
+                baseEntity.DeletedAt = DateTime.UtcNow;
+                // mark as modified so SaveChangesAsync will persist DeletedAt and UpdatedAt/UpdatedBy will be applied
+                _dbSet.Update(entity);
+            }
+            else
+            {
+                // fallback to hard delete
+                _dbSet.Remove(entity);
+            }
+
             return Task.CompletedTask;
         }
 

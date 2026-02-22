@@ -8,7 +8,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PasswordResetToken> builder)
         {
-            builder.HasKey(t => t.PasswordResetTokenId);
+            builder.ToTable("password_reset_tokens");
+            builder.HasKey(t => t.TokenId);
+            builder.Property(t => t.TokenId).HasColumnName("token_id");
 
             builder.Property(t => t.TokenHash).IsRequired().HasMaxLength(64); // SHA256 hex string is 64 chars
             builder.HasIndex(t => t.TokenHash).IsUnique();
@@ -18,7 +20,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             builder.Property(t => t.UsedAt);
 
-            builder.Property(t => t.CreatedAt).HasColumnName("created_at");
+            builder.Property(t => t.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
 
             // Foreign key relationship
             builder.HasOne(t => t.User)
