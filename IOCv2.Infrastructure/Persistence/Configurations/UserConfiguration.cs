@@ -50,15 +50,13 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(u => u.CreatedBy).HasColumnName("created_by");
             builder.Property(u => u.UpdatedBy).HasColumnName("updated_by");
 
-            builder.HasIndex(u => u.Role);
-            builder.HasIndex(u => u.Status);
             builder.HasIndex(u => u.CreatedAt);
 
-            // Composite indexes for common queries
-            builder.HasIndex(u => new { u.Status, u.Role });
+            // Tối ưu hoá Indexed: Composite indexes bắt đầu bằng Role sẽ cover cho HasIndex(u => u.Role) ở trên.
+            // Chỉ giữ lại một cặp Left-most Prefix tốt nhất hỗ trợ tìm kiếm thường dùng
             builder.HasIndex(u => new { u.Role, u.Status });
 
-            // Filtered index for active employees
+            // Filtered index cho UserStatus để optimize việc tìm kiếm (deleted_at IS NULL)
             builder.HasIndex(u => u.Status)
                 .HasFilter("deleted_at IS NULL");
 

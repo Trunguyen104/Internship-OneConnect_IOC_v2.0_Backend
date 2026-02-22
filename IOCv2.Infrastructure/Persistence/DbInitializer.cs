@@ -93,6 +93,7 @@ namespace IOCv2.Infrastructure.Persistence
             var passHash = _passwordService.HashPassword("Admin@123");
             var universityList = await _context.Universities.ToListAsync();
             var enterpriseList = await _context.Enterprises.ToListAsync();
+            var existingEmails = await _context.Users.Select(u => u.Email).ToHashSetAsync();
 
             // 1. Super Admin
             if (!await _context.Users.AnyAsync(u => u.Role == UserRole.SuperAdmin))
@@ -132,7 +133,7 @@ namespace IOCv2.Infrastructure.Persistence
             foreach (var uni in universityList)
             {
                 var email = $"admin@{uni.Code.ToLower()}.edu.vn";
-                if (!await _context.Users.AnyAsync(u => u.Email == email))
+                if (!existingEmails.Contains(email))
                 {
                     var user = new User
                     {
@@ -153,7 +154,7 @@ namespace IOCv2.Infrastructure.Persistence
             foreach (var ent in enterpriseList)
             {
                 var email = $"admin@{ent.Name.Replace(" ", "").ToLower()}.com";
-                if (!await _context.Users.AnyAsync(u => u.Email == email))
+                if (!existingEmails.Contains(email))
                 {
                     var user = new User
                     {
@@ -175,7 +176,7 @@ namespace IOCv2.Infrastructure.Persistence
             if (fpt != null)
             {
                 // HR
-                if (!await _context.Users.AnyAsync(u => u.Email == "hr.fpt@iocv2.com"))
+                if (!existingEmails.Contains("hr.fpt@iocv2.com"))
                 {
                     var hr = new User
                     {
@@ -192,7 +193,7 @@ namespace IOCv2.Infrastructure.Persistence
                 }
 
                 // Mentor
-                if (!await _context.Users.AnyAsync(u => u.Email == "mentor.fpt@iocv2.com"))
+                if (!existingEmails.Contains("mentor.fpt@iocv2.com"))
                 {
                     var mentor = new User
                     {
@@ -216,7 +217,7 @@ namespace IOCv2.Infrastructure.Persistence
                 for (int i = 1; i <= count; i++)
                 {
                     var email = $"student{i}@{uni.Code.ToLower()}.edu.vn";
-                    if (!await _context.Users.AnyAsync(u => u.Email == email))
+                    if (!existingEmails.Contains(email))
                     {
                         var user = new User
                         {
@@ -244,7 +245,7 @@ namespace IOCv2.Infrastructure.Persistence
 
             // 7. Test Student Account
             var fptu = universityList.FirstOrDefault(u => u.Code == "FPTU");
-            if (fptu != null && !await _context.Users.AnyAsync(u => u.Email == "trunguyen.104@gmail.com"))
+            if (fptu != null && !existingEmails.Contains("trunguyen.104@gmail.com"))
             {
                 var testUser = new User
                 {

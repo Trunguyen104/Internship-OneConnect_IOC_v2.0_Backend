@@ -49,6 +49,8 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
             if (user.Status != UserStatus.Active)
                 return Result<ResetUserPasswordResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.NotActive));
 
+            // Chú ý: Vì sử dụng ExecuteUpdateAsync (thực thi cập nhật trực tiếp thẳng xuống DB trước khi gọi SaveChangeAsync), 
+            // chúng ta vẫn cần phải sử dụng và giữ lại explicit transaction ở đây để đảm bảo toàn vẹn dữ liệu (ACID).
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
@@ -59,17 +61,14 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
                 user.PasswordHash = _passwordService.HashPassword(newPassword);
                 await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
 
-                // Revoke refresh tokens
-                var refreshTokens = await _unitOfWork.Repository<RefreshToken>()
-                  .Query()
-                  .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
-                  .ToListAsync(cancellationToken);
-
-                foreach (var token in refreshTokens)
-                {
-                    token.IsRevoked = true;
-                    token.UpdatedAt = DateTime.UtcNow;
-                }
+                // Revoke refresh tokens (Bulk update)
+                await _unitOfWork.Repository<RefreshToken>()
+                    .Query()
+                    .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(rt => rt.IsRevoked, true)
+                        .SetProperty(rt => rt.UpdatedAt, DateTime.UtcNow), 
+                        cancellationToken);
 
                 var auditLog = new AuditLog
                 {
