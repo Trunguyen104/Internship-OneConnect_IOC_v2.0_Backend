@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260222181211_IncreaseUserCodeLength")]
-    partial class IncreaseUserCodeLength
+    [Migration("20260223035400_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -577,9 +577,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_users_phone_number");
 
-                    b.HasIndex("Role")
-                        .HasDatabaseName("ix_users_role");
-
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_users_status")
                         .HasFilter("deleted_at IS NULL");
@@ -590,9 +587,6 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("Role", "Status")
                         .HasDatabaseName("ix_users_role_status");
-
-                    b.HasIndex("Status", "Role")
-                        .HasDatabaseName("ix_users_status_role");
 
                     b.ToTable("users", (string)null);
                 });

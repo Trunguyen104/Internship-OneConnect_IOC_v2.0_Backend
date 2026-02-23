@@ -574,9 +574,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_users_phone_number");
 
-                    b.HasIndex("Role")
-                        .HasDatabaseName("ix_users_role");
-
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_users_status")
                         .HasFilter("deleted_at IS NULL");
@@ -587,9 +584,6 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("Role", "Status")
                         .HasDatabaseName("ix_users_role_status");
-
-                    b.HasIndex("Status", "Role")
-                        .HasDatabaseName("ix_users_status_role");
 
                     b.ToTable("users", (string)null);
                 });

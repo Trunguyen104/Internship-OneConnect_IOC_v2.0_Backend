@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDatabase : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,7 +63,7 @@ namespace IOCv2.Infrastructure.Migrations
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    user_code = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     password_hash = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     full_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
@@ -338,11 +338,6 @@ namespace IOCv2.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_users_role",
-                table: "users",
-                column: "role");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_users_role_status",
                 table: "users",
                 columns: new[] { "role", "status" });
@@ -352,11 +347,6 @@ namespace IOCv2.Infrastructure.Migrations
                 table: "users",
                 column: "status",
                 filter: "deleted_at IS NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_users_status_role",
-                table: "users",
-                columns: new[] { "status", "role" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_user_code",

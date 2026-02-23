@@ -51,6 +51,7 @@ namespace IOCv2.Infrastructure.Persistence
                         Status = 1
                     }
                 };
+                Console.WriteLine($"Seeded University IDs: {string.Join(", ", universities.Select(u => u.UniversityId))}");
                 await _context.Universities.AddRangeAsync(universities);
                 await _context.SaveChangesAsync();
             }
@@ -231,10 +232,10 @@ namespace IOCv2.Infrastructure.Persistence
                         };
                         _context.Users.Add(user);
                         _context.UniversityUsers.Add(new UniversityUser { UserId = user.UserId, UniversityId = uni.UniversityId });
-                        _context.Students.Add(new Student 
-                        { 
-                            StudentId = Guid.NewGuid(), 
-                            UserId = user.UserId, 
+                        _context.Students.Add(new Student
+                        {
+                            StudentId = Guid.NewGuid(),
+                            UserId = user.UserId,
                             Status = StudentStatus.NO_INTERNSHIP,
                             Major = uni.Code == "FPTU" ? "Computer Science" : "Business Administration",
                             Class = $"{uni.Code}_K{65 + i}"

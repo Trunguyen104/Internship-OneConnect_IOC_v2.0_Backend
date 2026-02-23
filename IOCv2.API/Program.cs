@@ -10,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Load Environment Variables
 builder.LoadEnvironmentVariables();
 
+// Configure Serilog
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+});
+
 // Add Core Services
 builder.Services.AddControllerConfig();
 
