@@ -1,7 +1,7 @@
 ﻿using IOCv2.Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers.Auth
+namespace IOCv2.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

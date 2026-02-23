@@ -80,7 +80,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
 
             var resetToken = new PasswordResetToken
             {
-                PasswordResetTokenId = Guid.NewGuid(),
+                TokenId = Guid.NewGuid(),
                 UserId = user.UserId,
                 TokenHash = tokenHash,
                 ExpiresAt = expiresAt,

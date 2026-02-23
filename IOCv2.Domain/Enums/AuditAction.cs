@@ -10,10 +10,12 @@ namespace IOCv2.Domain.Enums
     {
         Create = 1,
         Update = 2,
-        Deactivate = 3,
-        Activate = 4,
-        ResetPassword = 5,
-        ChangeRole = 6,
-        EmailFailure = 7
+        Delete = 3,
+        Approve = 4,
+        Deactivate = 5,
+        Activate = 6,
+        ResetPassword = 7,
+        ChangeRole = 8,
+        EmailFailure = 9
     }
 }

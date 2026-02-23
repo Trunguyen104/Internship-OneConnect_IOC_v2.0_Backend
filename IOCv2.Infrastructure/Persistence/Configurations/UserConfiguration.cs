@@ -13,11 +13,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.ToTable("users");
             builder.HasKey(u => u.UserId);
 
-            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(10);
+            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(20);
             builder.HasIndex(u => u.UserCode).IsUnique();
 
-            builder.Property(u => u.Username).IsRequired().HasMaxLength(50);
-            builder.HasIndex(u => u.Username).IsUnique();
 
             builder.Property(u => u.PasswordHash).IsRequired();
 
@@ -52,19 +50,29 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(u => u.CreatedBy).HasColumnName("created_by");
             builder.Property(u => u.UpdatedBy).HasColumnName("updated_by");
 
-            builder.HasIndex(u => u.Role);
-            builder.HasIndex(u => u.Status);
             builder.HasIndex(u => u.CreatedAt);
 
-            // Composite indexes for common queries
-            builder.HasIndex(u => new { u.Status, u.Role });
+            // Tối ưu hoá Indexed: Composite indexes bắt đầu bằng Role sẽ cover cho HasIndex(u => u.Role) ở trên.
+            // Chỉ giữ lại một cặp Left-most Prefix tốt nhất hỗ trợ tìm kiếm thường dùng
             builder.HasIndex(u => new { u.Role, u.Status });
 
-            // Filtered index for active employees
+            // Filtered index cho UserStatus để optimize việc tìm kiếm (deleted_at IS NULL)
             builder.HasIndex(u => u.Status)
                 .HasFilter("deleted_at IS NULL");
 
 
+            // Relationships
+            builder.HasOne(u => u.Student)
+                .WithOne(s => s.User)
+                .HasForeignKey<Student>(s => s.UserId);
+
+            builder.HasOne(u => u.UniversityUser)
+                .WithOne(uu => uu.User)
+                .HasForeignKey<UniversityUser>(uu => uu.UserId);
+
+            builder.HasOne(u => u.EnterpriseUser)
+                .WithOne(eu => eu.User)
+                .HasForeignKey<EnterpriseUser>(eu => eu.UserId);
         }
     }
 }

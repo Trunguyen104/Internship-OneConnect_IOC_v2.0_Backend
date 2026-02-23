@@ -66,13 +66,13 @@
   <data name="NewRoleMustBeDifferent" xml:space="preserve">
     <value>Vị trí mới phải khác vị trí hiện tại</value>
   </data>
-  <data name="UserNotFound" xml:space="preserve">
+  <data name="Users.NotFound" xml:space="preserve">
     <value>Không tìm thấy người dùng với mã và role hiện tại.</value>
   </data>
-  <data name="UserNotActive" xml:space="preserve">
+  <data name="Users.NotActive" xml:space="preserve">
     <value>Tài khoản người dùng hiện tại không còn hoạt động.</value>
   </data>
-  <data name="CannotIdentifyUser" xml:space="preserve">
+  <data name="Users.InvalidAuditor" xml:space="preserve">
     <value>Không xác định được người thực hiện thao tác.</value>
   </data>
   <data name="RoleChangedSuccessfully" xml:space="preserve">
@@ -93,7 +93,7 @@
   <data name="ResetPassword.SuccessNoEmail" xml:space="preserve">
     <value>Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}</value>
   </data>
-  <data name="ResetStatusNoEmail" xml:space="preserve">
+  <data name="ResetPassword.StatusNoEmail" xml:space="preserve">
     <value>Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng.</value>
   </data>
   <!-- Authentication -->

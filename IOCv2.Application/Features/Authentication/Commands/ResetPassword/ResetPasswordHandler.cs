@@ -2,6 +2,7 @@
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -70,7 +71,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
             var otherActiveTokens = await _unitOfWork.Repository<PasswordResetToken>()
                 .Query()
                 .Where(t => t.UserId == user.UserId
-                         && t.PasswordResetTokenId != resetToken.PasswordResetTokenId
+                         && t.TokenId != resetToken.TokenId
                          && t.UsedAt == null)
                 .ToListAsync(cancellationToken);
 
@@ -82,12 +83,13 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
             // Log the password reset using the standardized AuditLog
             await _unitOfWork.Repository<AuditLog>().AddAsync(new AuditLog
             {
-                LogId = Guid.NewGuid(),
-                Action = IOCv2.Domain.Enums.AuditAction.ResetPassword,
-                TargetId = user.UserId,
-                PerformedUserById = user.UserId, // User reset their own password
+                AuditLogId = Guid.NewGuid(),
+                Action = AuditAction.ResetPassword,
+                EntityType = nameof(User),
+                EntityId = user.UserId,
+                PerformedById = user.UserId, // User reset their own password
                 Reason = "ForgotPassword flow",
-                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = DateTime.UtcNow,
                 Metadata = "{\"info\": \"Password reset via email token\"}"
             });
 

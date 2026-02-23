@@ -8,7 +8,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
+            builder.ToTable("refresh_tokens");
             builder.HasKey(rt => rt.RefreshTokenId);
+            builder.Property(rt => rt.RefreshTokenId).HasColumnName("id");
             // Token là chuỗi Unique và rất quan trọng để tìm kiếm
             builder.Property(rt => rt.Token)
                    .IsRequired()
@@ -20,7 +22,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             builder.Property(rt => rt.IsRevoked).HasDefaultValue(false);
 
-            builder.Property(rt => rt.CreatedAt).HasColumnName("created_at");
+            builder.Property(rt => rt.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
             builder.Property(rt => rt.UpdatedAt).HasColumnName("updated_at");
 
             // Quan hệ với User

@@ -28,9 +28,9 @@ namespace IOCv2.Infrastructure.Security
                 new(ClaimTypes.Role, user.Role.ToString()),
             };
 
-            if (!string.IsNullOrEmpty(user.Username))
+            if (!string.IsNullOrEmpty(user.UserCode))
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.UniqueName, user.Username));
+                claims.Add(new Claim(JwtRegisteredClaimNames.UniqueName, user.UserCode));
             }
 
             var key = new SymmetricSecurityKey(

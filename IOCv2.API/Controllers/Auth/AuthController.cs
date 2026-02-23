@@ -128,7 +128,7 @@ namespace IOCv2.API.Controllers.Auth
                 return Unauthorized(new { message = "Invalid token claims." });
             }
 
-            var result = await _mediator.Send(new GetMyProfileQuery(userId));
+            var result = await _mediator.Send(new GetMyProfileQuery { UserId = userId });
             return HandleResult(result);
         }
 

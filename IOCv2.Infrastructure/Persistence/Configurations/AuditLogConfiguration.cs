@@ -10,32 +10,35 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
         {
             builder.ToTable("audit_logs");
 
-            builder.HasKey(x => x.LogId);
+            builder.HasKey(x => x.AuditLogId);
 
             builder.Property(x => x.Action)
                 .IsRequired();
 
-            builder.Property(x => x.TargetId)
+            builder.Property(x => x.EntityType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(x => x.EntityId)
                 .IsRequired();
 
             builder.Property(x => x.Reason)
                 .HasMaxLength(500);
 
             builder.Property(x => x.Metadata)
-                .HasColumnType("jsonb"); // PostgreSQL jsonb for flexible metadata
+                .HasColumnType("jsonb");
 
             builder.Property(x => x.CreatedAt)
-                .IsRequired();
-
-            builder.HasOne(x => x.Target)
-                .WithMany(e => e.TargetLogs)
-                .HasForeignKey(x => x.TargetId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .IsRequired()
+                .HasDefaultValueSql("now()");
 
             builder.HasOne(x => x.PerformedBy)
                 .WithMany(e => e.PerformedLogs)
-                .HasForeignKey(x => x.PerformedUserById)
+                .HasForeignKey(x => x.PerformedById)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => new { x.EntityType, x.EntityId });
+            builder.HasIndex(x => x.PerformedById);
         }
     }
 }

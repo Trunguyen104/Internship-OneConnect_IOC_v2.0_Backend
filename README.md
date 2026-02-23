@@ -27,9 +27,9 @@ docker compose up -d --build
 ## 🔐 Tài khoản mặc định (Seeded Data)
 Dữ liệu mẫu sẽ tự động được khởi tạo (Seed) khi hệ thống khởi chạy lần đầu:
 
-| Role | Username | Password |
+| Role | Email | Password |
 | :--- | :--- | :--- |
-| 🛡️ **SuperAdmin** | `admin` | `admin123` |
+| 🛡️ **SuperAdmin** | `admin@iocv2.com` | `Admin@123` |
 
 ---
 
