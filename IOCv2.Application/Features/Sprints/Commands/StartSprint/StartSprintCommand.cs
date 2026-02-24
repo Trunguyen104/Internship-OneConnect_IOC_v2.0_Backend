@@ -3,4 +3,4 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Sprints.Commands.StartSprint;
 
-public record StartSprintCommand(Guid SprintId) : IRequest<Result>;
+public record StartSprintCommand(Guid SprintId) : IRequest<Result<bool>>;

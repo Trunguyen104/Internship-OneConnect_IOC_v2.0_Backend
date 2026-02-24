@@ -1,11 +1,7 @@
 ﻿using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static IOCv2.Application.Constants.MessageKeys;
+using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Services
 {
@@ -18,24 +14,43 @@ namespace IOCv2.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        //public async Task<string> GenerateUserCodeAsync(UserRole role)
-        //{
-        //    //char prefix = role switch
-        //    //{
-        //    //    UserRole.SuperAdmin => 'SA',
-        //    //    UserRole.Mentor => 'C',
-        //    //    UserRole.SchoolAdmin => 'W',
-        //    //    UserRole.Student => 'B',
-        //    //    _ => 'U'
-        //    //};
+        public async Task<string> GenerateUserCodeAsync(UserRole role, CancellationToken cancellationToken)
+        {
+            string prefix = role switch
+            {
+                UserRole.SuperAdmin => "SU",
+                UserRole.SchoolAdmin => "SC",
+                UserRole.EnterpriseAdmin => "EN",
+                UserRole.HR => "HR",
+                UserRole.Mentor => "ME",
+                UserRole.Student => "ST",
+                _ => "US"
+            };
 
-        //    //var currentCount = await _unitOfWork.Repository<Employee>()
-        //    //    .Query()
-        //    //    .CountAsync(e => e.Role == role);
-        //    //int nextNumber = currentCount + 1;
+            var repo = _unitOfWork.Repository<UserCodeSequence>();
 
-        //    //// Format "D6" sẽ biến số 1 thành "000001"
-        //    //return $"{prefix}{nextNumber.ToString("D6")}";
-        //}
+            var sequence = await repo.Query()
+                .FirstOrDefaultAsync(x => x.Role == role);
+
+            if (sequence == null)
+            {
+                sequence = new UserCodeSequence
+                {
+                    Role = role,
+                    CurrentNumber = 1
+                };
+                await repo.AddAsync(sequence);
+            }
+            else
+            {
+                sequence.CurrentNumber++;
+                await repo.UpdateAsync(sequence);
+            }
+
+            await _unitOfWork.SaveChangeAsync();
+
+            return $"{prefix}{sequence.CurrentNumber:D6}";
+        }
+
     }
 }

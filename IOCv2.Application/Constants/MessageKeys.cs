@@ -4,10 +4,16 @@
     {
         public static class Common
         {
-            public const string DatabaseConflict = "DatabaseConflict";
-            public const string DatabaseUpdateError = "DatabaseUpdateError";
-            public const string OperationCancelled = "OperationCancelled";
-            public const string Unauthorized = "Unauthorized";
+            public const string DatabaseConflict = "Common.DatabaseConflict";
+            public const string DatabaseUpdateError = "Common.DatabaseUpdateError";
+            public const string OperationCancelled = "Common.OperationCancelled";
+            public const string Unauthorized = "Common.Unauthorized";
+            public const string Forbidden = "Common.Forbidden";
+            public const string AccessDenied = "Common.AccessDenied";
+            public const string NotFound = "Common.NotFound";
+            public const string RecordNotFound = "Common.RecordNotFound";
+            public const string InvalidRequest = "Common.InvalidRequest";
+            public const string InternalError = "Common.InternalError";
         }
 
         public static class Password
@@ -25,14 +31,14 @@
 
         public static class ResetPassword
         {
-            public const string OnlyManagerCanReset = "OnlyManagerCanReset";
-            public const string OnlyActiveEmployeeCanReset = "OnlyActiveEmployeeCanReset";
+            public const string OnlyManagerCanReset = "ResetPassword.OnlyManagerCanReset";
+            public const string OnlyActiveEmployeeCanReset = "ResetPassword.OnlyActiveEmployeeCanReset";
             public const string ReasonRequired = "ResetPassword.ReasonRequired";
             public const string ReasonMinLength = "ResetPassword.ReasonMinLength";
             public const string ReasonMaxLength = "ResetPassword.ReasonMaxLength";
             public const string SuccessWithEmail = "ResetPassword.SuccessWithEmail";
             public const string SuccessNoEmail = "ResetPassword.SuccessNoEmail";
-            public const string StatusNoEmail = "ResetStatusNoEmail";
+            public const string StatusNoEmail = "ResetPassword.StatusNoEmail";
         }
 
         public static class Auth
@@ -57,28 +63,44 @@
             public const string NewPasswordRequired = "Auth.NewPasswordRequired";
             public const string ConfirmPasswordRequired = "Auth.ConfirmPasswordRequired";
             public const string ConfirmPasswordMismatch = "Auth.ConfirmPasswordMismatch";
-            public const string EmployeeCodeRequired = "Auth.EmployeeCodeRequired";
+            public const string EmailRequired = "Auth.EmailRequired";
+            public const string EmailInvalidFormat = "Auth.EmailInvalidFormat";
         }
-        // mẫu
-        public static class Employee
+
+        public static class Users
         {
-            public const string NotFound = "EmployeeNotFound";
-            public const string NotActive = "EmployeeNotActive";
-            public const string CannotUpdateInactive = "Employee.CannotUpdateInactive";
-            public const string CannotIdentifyUser = "CannotIdentifyUser";
-            public const string CannotIdentifyManager = "CannotIdentifyManager";
-            public const string CannotPromoteToManager = "CannotPromoteToManager";
-            public const string NewRoleMustBeDifferent = "NewRoleMustBeDifferent";
-            public const string RoleChangedButEmailFailed = "RoleChangedButEmailFailed";
-            public const string CodeInvalidFormat = "Employee.CodeInvalidFormat";
+            public const string NotFound = "Users.NotFound";
+            public const string EmailConflict = "Users.EmailConflict";
+            public const string CodeConflict = "Users.CodeConflict";
+            public const string NotActive = "Users.NotActive";
+            public const string CannotUpdateInactive = "Users.CannotUpdateInactive";
+            public const string InvalidAuditor = "Users.InvalidAuditor";
+            public const string RoleMismatch = "Users.RoleMismatch";
+            public const string NewRoleMustBeDifferent = "Users.NewRoleMustBeDifferent";
+            public const string RoleChangedButEmailFailed = "Users.RoleChangedButEmailFailed";
+            public const string CodeInvalidFormat = "Users.CodeInvalidFormat";
+        }
+
+        public static class University
+        {
+            public const string NotFound = "University.NotFound";
+            public const string DuplicateCode = "University.DuplicateCode";
+            public const string Inactive = "University.Inactive";
+        }
+
+        public static class Enterprise
+        {
+            public const string NotFound = "Enterprise.NotFound";
+            public const string DuplicateTaxCode = "Enterprise.DuplicateTaxCode";
+            public const string Unverified = "Enterprise.Unverified";
+            public const string Inactive = "Enterprise.Inactive";
         }
 
         public static class Profile
         {
-            public const string UsernameExists = "Profile.UsernameExists";
             public const string PhoneExists = "Profile.PhoneExists";
             public const string EmailExists = "Profile.EmailExists";
-            public const string EmployeeIdRequired = "Profile.EmployeeIdRequired";
+            public const string UserIdRequired = "Profile.UserIdRequired";
             public const string FullNameRequired = "Profile.FullNameRequired";
             public const string FullNameMaxLength = "Profile.FullNameMaxLength";
             public const string EmailRequired = "Profile.EmailRequired";

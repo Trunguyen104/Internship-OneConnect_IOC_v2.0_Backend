@@ -1,5 +1,6 @@
 ﻿
 using DotNetEnv;
+using Serilog;
 
 namespace IOCv2.API.Configurations;
 

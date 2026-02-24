@@ -22,9 +22,206 @@ namespace IOCv2.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("AuditLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("audit_log_id");
+
+                    b.Property<short>("Action")
+                        .HasColumnType("smallint")
+                        .HasColumnName("action");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("entity_type");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("metadata");
+
+                    b.Property<Guid>("PerformedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("performed_by_id");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("reason");
+
+                    b.HasKey("AuditLogId")
+                        .HasName("pk_audit_logs");
+
+                    b.HasIndex("PerformedById")
+                        .HasDatabaseName("ix_audit_logs_performed_by_id");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("ix_audit_logs_entity_type_entity_id");
+
+                    b.ToTable("audit_logs", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.Enterprise", b =>
+                {
+                    b.Property<Guid>("EnterpriseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("BackgroundUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("background_url");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Industry")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("industry");
+
+                    b.Property<bool>("IsVerified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_verified");
+
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("logo_url");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.Property<short>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)1)
+                        .HasColumnName("status");
+
+                    b.Property<string>("TaxCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("tax_code");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("website");
+
+                    b.HasKey("EnterpriseId")
+                        .HasName("pk_enterprises");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("ix_enterprises_name");
+
+                    b.HasIndex("TaxCode")
+                        .IsUnique()
+                        .HasDatabaseName("ix_enterprises_tax_code");
+
+                    b.ToTable("enterprises", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.EnterpriseUser", b =>
+                {
+                    b.Property<Guid>("EnterpriseUserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_user_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("EnterpriseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<string>("Position")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("position");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("EnterpriseUserId")
+                        .HasName("pk_enterprise_users");
+
+                    b.HasIndex("EnterpriseId")
+                        .HasDatabaseName("ix_enterprise_users_enterprise_id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_enterprise_users_user_id");
+
+                    b.ToTable("enterprise_users", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.PasswordResetToken", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("TokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("token_id");
@@ -34,14 +231,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
@@ -53,14 +242,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(64)")
                         .HasColumnName("token_hash");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
                     b.Property<DateTimeOffset?>("UsedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("used_at");
@@ -69,8 +250,15 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id")
+                    b.HasKey("TokenId")
                         .HasName("pk_password_reset_tokens");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("ix_password_reset_tokens_expires_at");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_password_reset_tokens_token_hash");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_password_reset_tokens_user_id");
@@ -80,7 +268,7 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.RefreshToken", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("RefreshTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
@@ -90,14 +278,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
 
                     b.Property<DateTime>("Expires")
                         .HasColumnType("timestamp with time zone")
@@ -119,15 +299,11 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id")
+                    b.HasKey("RefreshTokenId")
                         .HasName("pk_refresh_tokens");
 
                     b.HasIndex("Token")
@@ -140,146 +316,144 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("refresh_tokens", (string)null);
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
+            modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
                 {
-                    b.Property<Guid>("SprintId")
+                    b.Property<Guid>("StudentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("sprint_id");
+                        .HasColumnName("student_id");
+
+                    b.Property<string>("Class")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("class");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
+                    b.Property<decimal?>("Gpa")
+                        .HasPrecision(3, 2)
+                        .HasColumnType("numeric(3,2)")
+                        .HasColumnName("gpa");
 
-                    b.Property<string>("Goal")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("goal");
+                    b.Property<string>("HighestDegree")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("highest_degree");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                    b.Property<string>("Major")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("major");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("name");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<short>("Status")
-                        .HasColumnType("smallint")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
-                    b.HasKey("SprintId")
-                        .HasName("pk_sprints");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
 
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_sprints_project_id");
+                    b.HasKey("StudentId")
+                        .HasName("pk_students");
 
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_sprints_status");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_students_user_id");
 
-                    b.ToTable("sprints", (string)null);
+                    b.ToTable("students", (string)null);
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.SprintWorkItem", b =>
+            modelBuilder.Entity("IOCv2.Domain.Entities.University", b =>
                 {
-                    b.Property<Guid>("SprintWorkItemId")
+                    b.Property<Guid>("UniversityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("sprint_work_item_id");
+                        .HasColumnName("uni_id");
 
-                    b.Property<int>("BoardOrder")
-                        .HasColumnType("integer")
-                        .HasColumnName("board_order");
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("code");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("logo_url");
 
-                    b.Property<Guid>("SprintId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sprint_id");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.Property<short>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)1)
+                        .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
-                    b.Property<Guid>("WorkItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("work_item_id");
+                    b.HasKey("UniversityId")
+                        .HasName("pk_universities");
 
-                    b.HasKey("SprintWorkItemId")
-                        .HasName("pk_sprint_work_items");
-
-                    b.HasIndex("WorkItemId")
-                        .HasDatabaseName("ix_sprint_work_items_work_item_id");
-
-                    b.HasIndex("SprintId", "BoardOrder")
-                        .HasDatabaseName("ix_sprint_work_items_board_order");
-
-                    b.HasIndex("SprintId", "WorkItemId")
+                    b.HasIndex("Code")
                         .IsUnique()
-                        .HasDatabaseName("ix_sprint_work_items_unique");
+                        .HasDatabaseName("ix_universities_code");
 
-                    b.ToTable("sprint_work_items", (string)null);
+                    b.ToTable("universities", (string)null);
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.User", b =>
+            modelBuilder.Entity("IOCv2.Domain.Entities.UniversityUser", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UniversityUserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("AvatarUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("avatar_url");
+                        .HasColumnName("uni_user_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -287,8 +461,45 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
+                    b.Property<Guid>("UniversityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("uni_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("UniversityUserId")
+                        .HasName("pk_university_users");
+
+                    b.HasIndex("UniversityId")
+                        .HasDatabaseName("ix_university_users_university_id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_university_users_user_id");
+
+                    b.ToTable("university_users", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("avatar_url");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
                     b.Property<DateOnly?>("DateOfBirth")
@@ -311,6 +522,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("full_name");
 
+                    b.Property<short>("Gender")
+                        .HasColumnType("smallint")
+                        .HasColumnName("gender");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text")
@@ -332,23 +547,24 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnName("updated_at");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("username");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("user_code");
 
-                    b.HasKey("Id")
+                    b.HasKey("UserId")
                         .HasName("pk_users");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_users_created_at");
 
                     b.HasIndex("Email")
                         .IsUnique()
@@ -358,133 +574,67 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_users_phone_number");
 
-                    b.HasIndex("Role")
-                        .HasDatabaseName("ix_users_role");
-
                     b.HasIndex("Status")
-                        .HasDatabaseName("ix_users_status");
+                        .HasDatabaseName("ix_users_status")
+                        .HasFilter("deleted_at IS NULL");
 
-                    b.HasIndex("Username")
+                    b.HasIndex("UserCode")
                         .IsUnique()
-                        .HasDatabaseName("ix_users_username");
+                        .HasDatabaseName("ix_users_user_code");
+
+                    b.HasIndex("Role", "Status")
+                        .HasDatabaseName("ix_users_role_status");
 
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.WorkItem", b =>
+            modelBuilder.Entity("IOCv2.Domain.Entities.UserCodeSequence", b =>
                 {
-                    b.Property<Guid>("WorkItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("work_item_id");
-
-                    b.Property<int?>("AssigneeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("assignee_id");
-
-                    b.Property<float>("BacklogOrder")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("real")
-                        .HasDefaultValue(0f)
-                        .HasColumnName("backlog_order");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("due_date");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<float?>("OriginalEstimate")
-                        .HasColumnType("real")
-                        .HasColumnName("original_estimate");
-
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_id");
-
-                    b.Property<short?>("Priority")
+                    b.Property<short>("Role")
                         .HasColumnType("smallint")
-                        .HasColumnName("priority");
+                        .HasColumnName("role");
 
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
-
-                    b.Property<float?>("RemainingWork")
-                        .HasColumnType("real")
-                        .HasColumnName("remaining_work");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<short?>("Status")
-                        .HasColumnType("smallint")
-                        .HasColumnName("status");
-
-                    b.Property<int?>("StoryPoint")
+                    b.Property<int>("CurrentNumber")
                         .HasColumnType("integer")
-                        .HasColumnName("story_point");
+                        .HasColumnName("current_number");
 
-                    b.Property<string>("Title")
+                    b.HasKey("Role")
+                        .HasName("pk_user_code_sequences");
+
+                    b.ToTable("user_code_sequences", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.AuditLog", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.User", "PerformedBy")
+                        .WithMany("PerformedLogs")
+                        .HasForeignKey("PerformedById")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("title");
+                        .HasConstraintName("fk_audit_logs_users_performed_by_id");
 
-                    b.Property<short>("Type")
-                        .HasColumnType("smallint")
-                        .HasColumnName("type");
+                    b.Navigation("PerformedBy");
+                });
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+            modelBuilder.Entity("IOCv2.Domain.Entities.EnterpriseUser", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
+                        .WithMany("EnterpriseUsers")
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_enterprise_users_enterprises_enterprise_id");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("updated_by");
+                    b.HasOne("IOCv2.Domain.Entities.User", "User")
+                        .WithOne("EnterpriseUser")
+                        .HasForeignKey("IOCv2.Domain.Entities.EnterpriseUser", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_enterprise_users_users_user_id");
 
-                    b.HasKey("WorkItemId")
-                        .HasName("pk_work_items");
+                    b.Navigation("Enterprise");
 
-                    b.HasIndex("BacklogOrder")
-                        .HasDatabaseName("ix_work_items_backlog_order");
-
-                    b.HasIndex("ParentId")
-                        .HasDatabaseName("ix_work_items_parent_id");
-
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_work_items_project_id");
-
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_work_items_status");
-
-                    b.HasIndex("Type")
-                        .HasDatabaseName("ix_work_items_type");
-
-                    b.ToTable("work_items", (string)null);
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.PasswordResetToken", b =>
@@ -511,51 +661,60 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.SprintWorkItem", b =>
+            modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.Sprint", "Sprint")
-                        .WithMany("SprintWorkItems")
-                        .HasForeignKey("SprintId")
+                    b.HasOne("IOCv2.Domain.Entities.User", "User")
+                        .WithOne("Student")
+                        .HasForeignKey("IOCv2.Domain.Entities.Student", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_sprint_work_items_sprints_sprint_id");
+                        .HasConstraintName("fk_students_users_user_id");
 
-                    b.HasOne("IOCv2.Domain.Entities.WorkItem", "WorkItem")
-                        .WithMany()
-                        .HasForeignKey("WorkItemId")
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.UniversityUser", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.University", "University")
+                        .WithMany("UniversityUsers")
+                        .HasForeignKey("UniversityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_sprint_work_items_work_items_work_item_id");
+                        .HasConstraintName("fk_university_users_universities_university_id");
 
-                    b.Navigation("Sprint");
+                    b.HasOne("IOCv2.Domain.Entities.User", "User")
+                        .WithOne("UniversityUser")
+                        .HasForeignKey("IOCv2.Domain.Entities.UniversityUser", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_university_users_users_user_id");
 
-                    b.Navigation("WorkItem");
+                    b.Navigation("University");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.WorkItem", b =>
+            modelBuilder.Entity("IOCv2.Domain.Entities.Enterprise", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.WorkItem", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_work_items_work_items_parent_id");
-
-                    b.Navigation("Parent");
+                    b.Navigation("EnterpriseUsers");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
+            modelBuilder.Entity("IOCv2.Domain.Entities.University", b =>
                 {
-                    b.Navigation("SprintWorkItems");
+                    b.Navigation("UniversityUsers");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.User", b =>
                 {
-                    b.Navigation("RefreshTokens");
-                });
+                    b.Navigation("EnterpriseUser");
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.WorkItem", b =>
-                {
-                    b.Navigation("Children");
+                    b.Navigation("PerformedLogs");
+
+                    b.Navigation("RefreshTokens");
+
+                    b.Navigation("Student");
+
+                    b.Navigation("UniversityUser");
                 });
 #pragma warning restore 612, 618
         }

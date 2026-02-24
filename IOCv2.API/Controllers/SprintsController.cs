@@ -133,7 +133,7 @@ public class SprintsController : ControllerBase
         return HandleResult(result);
     }
     
-    // Helper methods to handle Result pattern - FIXED to match Epic format
+    // Helper method to handle Result pattern
     private IActionResult HandleResult<T>(Result<T> result)
     {
         if (result.IsSuccess)
@@ -143,28 +143,10 @@ public class SprintsController : ControllerBase
         
         return result.ErrorType switch
         {
-            ResultErrorType.NotFound => NotFound(new { errors = result.Errors }),
-            ResultErrorType.Unauthorized => Unauthorized(new { errors = result.Errors }),
-            ResultErrorType.Conflict => Conflict(new { errors = result.Errors }),
-            ResultErrorType.Validation => BadRequest(new { errors = result.Errors }),
-            _ => BadRequest(new { errors = result.Errors })
-        };
-    }
-    
-    private IActionResult HandleResult(Result result)
-    {
-        if (result.IsSuccess)
-        {
-            return Ok(new { message = "Operation completed successfully" });
-        }
-        
-        return result.ErrorType switch
-        {
-            ResultErrorType.NotFound => NotFound(new { errors = result.Errors }),
-            ResultErrorType.Unauthorized => Unauthorized(new { errors = result.Errors }),
-            ResultErrorType.Conflict => Conflict(new { errors = result.Errors }),
-            ResultErrorType.Validation => BadRequest(new { errors = result.Errors }),
-            _ => BadRequest(new { errors = result.Errors })
+            ResultErrorType.NotFound => NotFound(new { message = result.Error }),
+            ResultErrorType.Unauthorized => Unauthorized(new { message = result.Error }),
+            ResultErrorType.Conflict => Conflict(new { message = result.Error }),
+            _ => BadRequest(new { message = result.Error })
         };
     }
 }

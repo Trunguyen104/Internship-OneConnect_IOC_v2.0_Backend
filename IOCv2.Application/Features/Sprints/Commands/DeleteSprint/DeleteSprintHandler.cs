@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Sprints.Commands.DeleteSprint;
 
-public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result>
+public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result<bool>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICacheService _cacheService;
@@ -30,7 +30,7 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result>
         _logger = logger;
     }
     
-    public async Task<Result> Handle(DeleteSprintCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(DeleteSprintCommand request, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         
@@ -43,7 +43,7 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result>
         {
             stopwatch.Stop();
             _logger.LogWarning("Sprint not found for delete: {SprintId}", request.SprintId);
-            return Result.NotFound(_errorLocalizer["Sprint.NotFound"]);
+            return Result<bool>.NotFound(_errorLocalizer["Sprint.NotFound"]);
         }
         
         // Business rule: Cannot delete Active or Completed sprints
@@ -53,7 +53,7 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result>
             _logger.LogWarning(
                 "Cannot delete Sprint {SprintId} with status {Status}",
                 request.SprintId, sprint.Status);
-            return Result.Failure(
+            return Result<bool>.Failure(
                 _errorLocalizer["Sprint.CannotDeleteActiveSprint"], 
                 ResultErrorType.BadRequest);
         }
@@ -68,7 +68,7 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result>
             _logger.LogWarning(
                 "Cannot delete Sprint {SprintId}: has {Count} work items",
                 request.SprintId, sprintWorkItems.Count());
-            return Result.Failure(
+            return Result<bool>.Failure(
                 _errorLocalizer["Sprint.CannotDeleteWithWorkItems"], 
                 ResultErrorType.BadRequest);
         }
@@ -100,6 +100,6 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result>
             "Sprint deleted: {SprintId} in Project {ProjectId} (Duration: {Duration}ms)",
             request.SprintId, sprint.ProjectId, stopwatch.ElapsedMilliseconds);
         
-        return Result.Success();
+        return Result<bool>.Success(true);
     }
 }

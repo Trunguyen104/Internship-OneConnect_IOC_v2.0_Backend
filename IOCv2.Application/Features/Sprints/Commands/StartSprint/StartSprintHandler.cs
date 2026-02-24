@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Sprints.Commands.StartSprint;
 
-public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result>
+public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<bool>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICacheService _cacheService;
@@ -30,7 +30,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result>
         _logger = logger;
     }
     
-    public async Task<Result> Handle(StartSprintCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(StartSprintCommand request, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         
@@ -43,7 +43,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result>
         {
             stopwatch.Stop();
             _logger.LogWarning("Sprint not found for start: {SprintId}", request.SprintId);
-            return Result.NotFound(_errorLocalizer["Sprint.NotFound"]);
+            return Result<bool>.NotFound(_errorLocalizer["Sprint.NotFound"]);
         }
         
         // Business rule: Only Planned sprints can be started
@@ -53,7 +53,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result>
             _logger.LogWarning(
                 "Cannot start Sprint {SprintId} with status {Status}",
                 request.SprintId, sprint.Status);
-            return Result.Failure(_errorLocalizer["Sprint.NotPlanned"], ResultErrorType.BadRequest);
+            return Result<bool>.Failure(_errorLocalizer["Sprint.NotPlanned"], ResultErrorType.BadRequest);
         }
         
         // Business rule: Only 1 active sprint per project
@@ -66,7 +66,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result>
             _logger.LogWarning(
                 "Cannot start Sprint {SprintId}: Project {ProjectId} already has an active sprint",
                 request.SprintId, sprint.ProjectId);
-            return Result.Failure(_errorLocalizer["Sprint.ActiveSprintExists"], ResultErrorType.BadRequest);
+            return Result<bool>.Failure(_errorLocalizer["Sprint.ActiveSprintExists"], ResultErrorType.BadRequest);
         }
         
         // Get work item count for logging
@@ -104,6 +104,6 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result>
             "Sprint started: {SprintId} in Project {ProjectId} with {WorkItemCount} items (Duration: {Duration}ms)",
             request.SprintId, sprint.ProjectId, workItemCount, stopwatch.ElapsedMilliseconds);
         
-        return Result.Success();
+        return Result<bool>.Success(true);
     }
 }

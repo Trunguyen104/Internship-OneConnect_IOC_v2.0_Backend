@@ -9,34 +9,26 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<PasswordResetToken> builder)
         {
             builder.ToTable("password_reset_tokens");
+            builder.HasKey(t => t.TokenId);
+            builder.Property(t => t.TokenId).HasColumnName("token_id");
 
-            builder.HasKey(e => e.Id)
-                   .HasName("pk_password_reset_tokens");
+            builder.Property(t => t.TokenHash).IsRequired().HasMaxLength(64); // SHA256 hex string is 64 chars
+            builder.HasIndex(t => t.TokenHash).IsUnique();
 
-            builder.Property(e => e.Id)
-                   .HasColumnName("token_id")
-                   .IsRequired();
-            builder.Property(e => e.UserId)
-                   .HasColumnName("user_id")
-                   .IsRequired();
-            builder.Property(e => e.TokenHash)
-                   .HasColumnName("token_hash")
-                   .HasMaxLength(64)
-                   .IsRequired();
-            builder.Property(e => e.ExpiresAt)
-                   .HasColumnName("expires_at")
-                   .IsRequired();
-            builder.Property(e => e.UsedAt)
-                   .HasColumnName("used_at");
-            builder.Property(e => e.CreatedAt)
-                   .HasColumnName("created_at")
-                   .HasDefaultValueSql("now()")
-                   .IsRequired();
-            builder.HasOne(e => e.User)
+            builder.Property(t => t.ExpiresAt).IsRequired();
+            builder.HasIndex(t => t.ExpiresAt);
+
+            builder.Property(t => t.UsedAt);
+
+            builder.Property(t => t.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+
+            // Foreign key relationship
+            builder.HasOne(t => t.User)
                    .WithMany()
-                   .HasForeignKey(e => e.UserId)
-                   .HasConstraintName("fk_password_reset_tokens_users_user_id")
+                   .HasForeignKey(t => t.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(t => t.UserId);
         }
     }
 }

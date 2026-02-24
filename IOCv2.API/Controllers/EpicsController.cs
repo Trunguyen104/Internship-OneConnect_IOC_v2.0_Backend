@@ -105,28 +105,10 @@ public class EpicsController : ControllerBase
         
         return result.ErrorType switch
         {
-            ResultErrorType.NotFound => NotFound(new { errors = result.Errors }),
-            ResultErrorType.Unauthorized => Unauthorized(new { errors = result.Errors }),
-            ResultErrorType.Conflict => Conflict(new { errors = result.Errors }),
-            ResultErrorType.Validation => BadRequest(new { errors = result.Errors }),
-            _ => BadRequest(new { errors = result.Errors })
-        };
-    }
-    
-    private IActionResult HandleResult(Result result)
-    {
-        if (result.IsSuccess)
-        {
-            return Ok(new { message = "Operation completed successfully" });
-        }
-        
-        return result.ErrorType switch
-        {
-            ResultErrorType.NotFound => NotFound(new { errors = result.Errors }),
-            ResultErrorType.Unauthorized => Unauthorized(new { errors = result.Errors }),
-            ResultErrorType.Conflict => Conflict(new { errors = result.Errors }),
-            ResultErrorType.Validation => BadRequest(new { errors = result.Errors }),
-            _ => BadRequest(new { errors = result.Errors })
+            ResultErrorType.NotFound => NotFound(new { message = result.Error }),
+            ResultErrorType.Unauthorized => Unauthorized(new { message = result.Error }),
+            ResultErrorType.Conflict => Conflict(new { message = result.Error }),
+            _ => BadRequest(new { message = result.Error })
         };
     }
 }

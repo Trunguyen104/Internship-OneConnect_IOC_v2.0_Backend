@@ -66,13 +66,13 @@
   <data name="NewRoleMustBeDifferent" xml:space="preserve">
     <value>New role must be different from current role</value>
   </data>
-  <data name="EmployeeNotFound" xml:space="preserve">
-    <value>Employee not found with the specified code and current role.</value>
+  <data name="Users.NotFound" xml:space="preserve">
+    <value>User not found with the specified code and current role.</value>
   </data>
-  <data name="EmployeeNotActive" xml:space="preserve">
-    <value>Employee is not currently active.</value>
+  <data name="Users.NotActive" xml:space="preserve">
+    <value>User is not currently active.</value>
   </data>
-  <data name="CannotIdentifyUser" xml:space="preserve">
+  <data name="Users.InvalidAuditor" xml:space="preserve">
     <value>Cannot identify the user performing this operation.</value>
   </data>
   <data name="RoleChangedSuccessfully" xml:space="preserve">

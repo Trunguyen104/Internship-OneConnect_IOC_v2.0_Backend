@@ -60,13 +60,13 @@
   </resheader>
   
   <!-- Database Errors -->
-  <data name="DatabaseConflict" xml:space="preserve">
+  <data name="Common.DatabaseConflict" xml:space="preserve">
     <value>Có xung đột dữ liệu trong hệ thống. Vui lòng thử lại sau vài giây.</value>
   </data>
-  <data name="DatabaseUpdateError" xml:space="preserve">
+  <data name="Common.DatabaseUpdateError" xml:space="preserve">
     <value>Có lỗi xảy ra khi cập nhật dữ liệu. Vui lòng thử lại.</value>
   </data>
-  <data name="OperationCancelled" xml:space="preserve">
+  <data name="Common.OperationCancelled" xml:space="preserve">
     <value>Thao tác bị hủy do timeout. Vui lòng thử lại.</value>
   </data>
   
@@ -74,16 +74,16 @@
   <data name="InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid.</value>
   </data>
-  <data name="Unauthorized" xml:space="preserve">
+  <data name="Common.Unauthorized" xml:space="preserve">
     <value>Bạn không có quyền thực hiện thao tác này.</value>
   </data>
-  <data name="CannotIdentifyManager" xml:space="preserve">
+  <data name="Users.InvalidAuditor" xml:space="preserve">
     <value>Không thể xác định Manager thực hiện thao tác</value>
   </data>
-  <data name="OnlyManagerCanReset" xml:space="preserve">
+  <data name="ResetPassword.OnlyManagerCanReset" xml:space="preserve">
     <value>Chỉ Manager mới có quyền reset password</value>
   </data>
-  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+  <data name="ResetPassword.OnlyActiveEmployeeCanReset" xml:space="preserve">
     <value>Chỉ có thể reset password cho tài khoản đang hoạt động</value>
   </data>
   <!-- Password Validation -->
@@ -103,8 +103,8 @@
     <value>Mật khẩu phải có ít nhất 1 ký tự đặc biệt</value>
   </data>
   <!-- Reset Password Validation -->
-  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
-    <value>EmployeeId không được để trống</value>
+  <data name="ResetPassword.UserIdRequired" xml:space="preserve">
+    <value>Id người dùng không được để trống</value>
   </data>
   <data name="ResetPassword.ReasonRequired" xml:space="preserve">
     <value>Lý do reset password là bắt buộc</value>
@@ -165,15 +165,36 @@
   <data name="Password.IncorrectCurrent" xml:space="preserve">
     <value>Mật khẩu hiện tại không chính xác.</value>
   </data>
-  <!-- Profile/Employee Errors -->
+  <!-- Profile/User Errors -->
   <data name="Profile.PhoneExists" xml:space="preserve">
     <value>Số điện thoại đã được sử dụng bởi người khác.</value>
   </data>
   <data name="Profile.EmailExists" xml:space="preserve">
     <value>Email đã được sử dụng bởi người khác.</value>
   </data>
-  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
-    <value>Không thể cập nhật thông tin cho nhân viên đang ngừng hoạt động.</value>
+  <data name="Users.CannotUpdateInactive" xml:space="preserve">
+    <value>Không thể cập nhật thông tin cho tài khoản đang ngừng hoạt động.</value>
+  </data>
+  <data name="Users.EmailConflict" xml:space="preserve">
+    <value>Email này đã tồn tại trong hệ thống.</value>
+  </data>
+  <data name="Users.NotFound" xml:space="preserve">
+    <value>Không tìm thấy người dùng.</value>
+  </data>
+  <data name="University.NotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin trường học.</value>
+  </data>
+  <data name="Enterprise.NotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin doanh nghiệp.</value>
+  </data>
+  <data name="Common.Forbidden" xml:space="preserve">
+    <value>Bạn không có quyền thực hiện hành động này.</value>
+  </data>
+  <data name="Common.AccessDenied" xml:space="preserve">
+    <value>Truy cập bị từ chối.</value>
+  </data>
+  <data name="Common.NotFound" xml:space="preserve">
+    <value>Không tìm thấy bản ghi tương ứng.</value>
   </data>
   
   <!-- Epic Validation Errors -->

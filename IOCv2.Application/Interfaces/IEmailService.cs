@@ -23,7 +23,7 @@
         /// </summary>
         /// <param name="email">Recipient email address</param>
         /// <param name="employeeName">Full name of the employee</param>
-        /// <param name="employeeCode">Employee code for login</param>
+        /// <param name="email">Email for login</param>
         /// <param name="role">Employee role</param>
         /// <param name="password">Temporary password</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -31,7 +31,7 @@
         Task<bool> SendAccountCreationEmailAsync(
             string email,
             string employeeName,
-            string employeeCode,
+            string loginEmail,
             string role,
             string password,
             CancellationToken cancellationToken = default);
@@ -49,9 +49,9 @@
         /// <returns>True if email sent successfully, false otherwise</returns>
         Task<bool> SendRoleChangeConfirmationEmailAsync(
             string email,
-            string employeeName,
-            string oldEmployeeCode,
-            string newEmployeeCode,
+            string fullName,
+            string oldUserCode,
+            string newUserCode,
             string oldRole,
             string newRole,
             CancellationToken cancellationToken = default);
@@ -61,7 +61,7 @@
         /// </summary>
         /// <param name="email"></param>
         /// <param name="employeeName"></param>
-        /// <param name="employeeCode"></param>
+        /// <param name="loginEmail"></param>
         /// <param name="newPassword"></param>
         /// <param name="managerName"></param>
         /// <param name="cancellationToken"></param>
@@ -69,7 +69,7 @@
         Task<bool> SendPasswordResetByManagerEmailAsync(
             string email,
             string employeeName,
-            string employeeCode,
+            string loginEmail,
             string newPassword,
             string managerName,
             CancellationToken cancellationToken = default);

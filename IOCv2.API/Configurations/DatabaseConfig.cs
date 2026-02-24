@@ -29,7 +29,7 @@ public static class DatabaseConfig
                         await context.Database.MigrateAsync();
                     }
                     
-                    initializer.Initialize();
+                    await initializer.InitializeAsync();
                     
                     break; 
                 }

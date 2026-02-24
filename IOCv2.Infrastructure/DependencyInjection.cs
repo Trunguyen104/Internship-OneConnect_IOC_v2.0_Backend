@@ -18,7 +18,7 @@ namespace IOCv2.Infrastructure
             services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
-            services.AddDbContext<AppDbContext>(options =>
+            services.AddDbContextPool<AppDbContext>(options =>
             {
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection"),
@@ -30,7 +30,7 @@ namespace IOCv2.Infrastructure
             });
             services.AddHttpContextAccessor();
 
-            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddSingleton<ICurrentUserService, CurrentUserService>();
 
             // Register Redis Connection
             services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -45,6 +45,13 @@ namespace IOCv2.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IPasswordService, PasswordService>();
+            // Register Background Email Channel as Singleton (must be shared)
+            services.AddSingleton<BackgroundEmailChannel>();
+            services.AddSingleton<IBackgroundEmailSender>(sp => sp.GetRequiredService<BackgroundEmailChannel>());
+
+            // Register Hosted Service to process emails
+            services.AddHostedService<EmailHostedService>();
+
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<DbInitializer>();

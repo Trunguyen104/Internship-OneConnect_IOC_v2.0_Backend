@@ -3,10 +3,11 @@
     public enum UserRole : short
     {
         SuperAdmin = 1,
-        SchoolAdmin = 2,
-        EnterpriseAdmin = 3,
-        Student = 4,
+        Moderator = 2,
+        SchoolAdmin = 3,
+        EnterpriseAdmin = 4,
         HR = 5,
-        Mentor = 6
+        Mentor = 6,
+        Student = 7
     }
 }

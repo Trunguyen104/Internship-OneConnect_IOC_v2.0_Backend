@@ -2,11 +2,19 @@
 using IOCv2.API.Middlewares;
 using IOCv2.Application;
 using IOCv2.Infrastructure;
+using IOCv2.Infrastructure.Services.Logging;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Load Environment Variables
 builder.LoadEnvironmentVariables();
+
+// Configure Serilog
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+});
 
 // Add Core Services
 builder.Services.AddControllerConfig();
@@ -31,6 +39,7 @@ app.UseForwardedHeaders();
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseMiddleware<RateLimitingMiddleware>();
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -59,6 +68,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<SerilogUserEnricherMiddleware>();
+app.UseSerilogRequestLogging();
 
 app.MapControllers();
 

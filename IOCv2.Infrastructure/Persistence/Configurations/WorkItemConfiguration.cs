@@ -86,9 +86,6 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
                .IsRequired(false);
         
         // Base Entity fields from BaseEntity
-        builder.Property(w => w.Id)
-               .HasColumnName("id");
-        
         builder.Property(w => w.CreatedAt)
                .HasColumnName("created_at")
                .HasDefaultValueSql("now()")

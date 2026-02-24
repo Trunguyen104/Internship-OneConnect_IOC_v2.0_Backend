@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Epics.Commands.DeleteEpic;
 
-public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result>
+public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result<bool>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IStringLocalizer<ErrorMessages> _localizer;
@@ -30,7 +30,7 @@ public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result>
         _logger = logger;
     }
     
-    public async Task<Result> Handle(DeleteEpicCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(DeleteEpicCommand request, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         
@@ -47,7 +47,7 @@ public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result>
                 "Epic not found for deletion: {EpicId} (Duration: {Duration}ms)",
                 request.EpicId, stopwatch.ElapsedMilliseconds);
             
-            return Result.NotFound(_localizer["Epic.NotFound"]);
+            return Result<bool>.NotFound(_localizer["Epic.NotFound"]);
         }
         
         var projectId = epicEntity.ProjectId;
@@ -63,7 +63,7 @@ public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result>
                 "Cannot delete Epic {EpicId} with {ChildrenCount} children (Duration: {Duration}ms)",
                 request.EpicId, childrenCount, stopwatch.ElapsedMilliseconds);
             
-            return Result.Failure(
+            return Result<bool>.Failure(
                 _localizer["Epic.CannotDeleteWithChildren"],
                 ResultErrorType.BadRequest
             );
@@ -100,6 +100,6 @@ public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result>
             "Epic deleted: {EpicId} from Project {ProjectId} (Duration: {Duration}ms)",
             request.EpicId, projectId, stopwatch.ElapsedMilliseconds);
         
-        return Result.Success();
+        return Result<bool>.Success(true);
     }
 }
