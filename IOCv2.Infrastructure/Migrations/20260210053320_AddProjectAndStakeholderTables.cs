@@ -52,8 +52,13 @@ namespace IOCv2.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    internship_id = table.Column<int>(type: "integer", nullable: false),
+                    mentor_id = table.Column<int>(type: "integer", nullable: true),
+                    project_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    start_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    end_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

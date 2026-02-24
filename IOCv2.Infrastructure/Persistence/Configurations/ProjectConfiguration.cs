@@ -1,4 +1,5 @@
 ﻿using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,12 +13,24 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
         
         builder.HasKey(p => p.Id);
         
-        builder.Property(p => p.Name)
+        builder.Property(p => p.InternshipId)
+            .IsRequired();
+        
+        builder.Property(p => p.MentorId);
+        
+        builder.Property(p => p.ProjectName)
             .IsRequired()
             .HasMaxLength(200);
         
-        builder.Property(p => p.Description)
-            .HasMaxLength(1000);
+        builder.Property(p => p.Description);
+        
+        builder.Property(p => p.StartDate);
+        
+        builder.Property(p => p.EndDate);
+        
+        builder.Property(p => p.Status)
+            .IsRequired()
+            .HasDefaultValue(ProjectStatus.Planning);
         
         builder.Property(p => p.CreatedAt)
             .IsRequired();
