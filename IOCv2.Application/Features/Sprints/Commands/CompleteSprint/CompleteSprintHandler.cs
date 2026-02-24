@@ -171,7 +171,7 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
         sprint.UpdatedAt = DateTime.UtcNow;
         
         await _unitOfWork.Repository<Sprint>().UpdateAsync(sprint, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
         
         // Invalidate cache
         try

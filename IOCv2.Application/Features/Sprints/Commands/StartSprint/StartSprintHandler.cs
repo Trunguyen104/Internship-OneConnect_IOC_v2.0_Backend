@@ -79,7 +79,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<boo
         sprint.UpdatedAt = DateTime.UtcNow;
         
         await _unitOfWork.Repository<Sprint>().UpdateAsync(sprint, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
         
         // Invalidate cache
         try

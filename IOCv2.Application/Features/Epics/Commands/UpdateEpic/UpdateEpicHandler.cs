@@ -62,7 +62,7 @@ public class UpdateEpicHandler : IRequestHandler<UpdateEpicCommand, Result<Updat
         epicEntity.UpdatedAt = DateTime.UtcNow;
         
         await _unitOfWork.Repository<WorkItem>().UpdateAsync(epicEntity, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
         
         // Invalidate caches
         try

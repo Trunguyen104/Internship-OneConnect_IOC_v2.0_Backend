@@ -52,7 +52,7 @@ public class CreateSprintHandler : IRequestHandler<CreateSprintCommand, Result<C
         };
         
         await _unitOfWork.Repository<Sprint>().AddAsync(sprint, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
         
         // Invalidate cache
         try

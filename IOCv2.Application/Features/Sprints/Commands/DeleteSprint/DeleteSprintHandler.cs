@@ -75,7 +75,7 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result<b
         
         // Delete sprint (soft delete handled by EF Core if configured)
         await _unitOfWork.Repository<Sprint>().DeleteAsync(sprint, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
         
         // Invalidate cache
         try

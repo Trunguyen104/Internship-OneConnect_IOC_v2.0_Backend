@@ -55,7 +55,7 @@ public class CreateEpicHandler : IRequestHandler<CreateEpicCommand, Result<Creat
         };
         
         await _unitOfWork.Repository<WorkItem>().AddAsync(epic, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
         
         // Invalidate project epic list cache
         try

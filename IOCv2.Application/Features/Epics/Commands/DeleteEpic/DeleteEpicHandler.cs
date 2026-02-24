@@ -73,7 +73,7 @@ public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result<bool>
         epicEntity.DeletedAt = DateTime.UtcNow;
         
         await _unitOfWork.Repository<WorkItem>().UpdateAsync(epicEntity, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
         
         // Invalidate caches
         try
