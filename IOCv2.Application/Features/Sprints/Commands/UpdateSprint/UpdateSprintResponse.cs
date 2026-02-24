@@ -9,8 +9,8 @@ public class UpdateSprintResponse : IMapFrom<Sprint>
     public Guid SprintId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Goal { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
     public SprintStatus Status { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

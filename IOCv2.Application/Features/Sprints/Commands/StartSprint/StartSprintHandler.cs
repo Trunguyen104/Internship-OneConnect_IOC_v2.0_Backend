@@ -74,7 +74,9 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<boo
             .FindAsync(swi => swi.SprintId == request.SprintId, cancellationToken);
         var workItemCount = workItems.Count();
         
-        // Update sprint status
+        // Set StartDate/EndDate from request and update status
+        sprint.StartDate = request.StartDate;
+        sprint.EndDate = request.EndDate;
         sprint.Status = SprintStatus.Active;
         sprint.UpdatedAt = DateTime.UtcNow;
         

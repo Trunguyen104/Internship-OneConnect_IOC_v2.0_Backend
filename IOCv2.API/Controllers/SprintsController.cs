@@ -109,9 +109,10 @@ public class SprintsController : ControllerBase
     [HttpPost("{sprintId:guid}/start")]
     public async Task<IActionResult> StartSprint(
         [FromRoute] Guid projectId,
-        [FromRoute] Guid sprintId)
+        [FromRoute] Guid sprintId,
+        [FromBody] StartSprintRequest request)
     {
-        var command = new StartSprintCommand(sprintId);
+        var command = new StartSprintCommand(sprintId, request.StartDate, request.EndDate);
         var result = await _mediator.Send(command);
         return HandleResult(result);
     }
@@ -123,11 +124,13 @@ public class SprintsController : ControllerBase
     public async Task<IActionResult> CompleteSprint(
         [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
-        [FromBody] CompleteSprintCommand command)
+        [FromBody] CompleteSprintRequest request)
     {
-        // Ensure sprintId from route matches
-        if (command.SprintId != sprintId)
-            return BadRequest(new { errors = new[] { "SprintId mismatch" } });
+        var command = new CompleteSprintCommand(
+            sprintId,
+            request.IncompleteItemsOption,
+            request.TargetSprintId,
+            request.NewSprintName);
         
         var result = await _mediator.Send(command);
         return HandleResult(result);

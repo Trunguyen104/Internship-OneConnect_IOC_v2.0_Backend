@@ -281,4 +281,10 @@
   <data name="Sprint.CannotDeleteWithWorkItems" xml:space="preserve">
     <value>Không thể xóa Sprint đang chứa Work Items. Vui lòng di chuyển hoặc xóa các Work Items trước</value>
   </data>
+  <data name="Sprint.DatesRequiredToStart" xml:space="preserve">
+    <value>Sprint phải có Ngày bắt đầu và Ngày kết thúc trước khi bắt đầu. Vui lòng cập nhật Sprint trước.</value>
+  </data>
+  <data name="Sprint.TargetSprintNotFound" xml:space="preserve">
+    <value>Không tìm thấy Sprint đích được chỉ định.</value>
+  </data>
 </root>

@@ -7,26 +7,23 @@ public class WorkItem : BaseEntity
     public Guid WorkItemId { get; set; }
     public Guid ProjectId { get; set; }
     public Guid? ParentId { get; set; }
-    
+
     public WorkItemType Type { get; set; }
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
-    
-    public Priority? Priority { get; set; }
-    public WorkItemStatus? Status { get; set; }
-    
+
     public int? StoryPoint { get; set; }
-    public DateTime? StartDate { get; set; }
-    public DateTime? DueDate { get; set; }
-    
-    public int? AssigneeId { get; set; }  // Student assigned to this work item
-    
+    public Priority? Priority { get; set; }
+
+    public Guid? AssigneeId { get; set; }  // FK to students.student_id
+
     public float BacklogOrder { get; set; }
-    
-    public float? OriginalEstimate { get; set; }
-    public float? RemainingWork { get; set; }
-    
+    public DateOnly? DueDate { get; set; }
+
+    public WorkItemStatus? Status { get; set; }
+
     // Navigation properties
     public virtual WorkItem? Parent { get; set; }
     public virtual ICollection<WorkItem> Children { get; set; } = new List<WorkItem>();
+    public virtual Student? Assignee { get; set; }
 }

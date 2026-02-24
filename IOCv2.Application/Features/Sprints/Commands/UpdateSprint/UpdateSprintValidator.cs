@@ -30,14 +30,16 @@ public class UpdateSprintValidator : AbstractValidator<UpdateSprintCommand>
         RuleFor(x => x.EndDate)
             .NotEmpty()
             .WithMessage(localizer["Sprint.EndDateRequired"])
-            .GreaterThan(x => x.StartDate)
+            .Must((cmd, endDate) => !cmd.StartDate.HasValue || !endDate.HasValue || endDate.Value > cmd.StartDate.Value)
             .WithMessage(localizer["Sprint.EndDateMustBeAfterStart"]);
         
-        // Sprint duration validation (1-4 weeks)
+        // Sprint duration validation (1-4 weeks): use DayNumber since DateOnly doesn't support subtraction
         RuleFor(x => x)
-            .Must(x => (x.EndDate - x.StartDate).TotalDays >= 7)
+            .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue ||
+                       x.EndDate.Value.DayNumber - x.StartDate.Value.DayNumber >= 7)
             .WithMessage(localizer["Sprint.DurationTooShort"])
-            .Must(x => (x.EndDate - x.StartDate).TotalDays <= 28)
+            .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue ||
+                       x.EndDate.Value.DayNumber - x.StartDate.Value.DayNumber <= 28)
             .WithMessage(localizer["Sprint.DurationTooLong"]);
     }
 }

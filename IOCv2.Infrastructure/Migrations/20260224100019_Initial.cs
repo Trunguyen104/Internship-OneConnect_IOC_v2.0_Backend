@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,6 +38,28 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "sprints",
+                columns: table => new
+                {
+                    sprint_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    goal = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    start_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    end_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_sprints", x => x.sprint_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "universities",
                 columns: table => new
                 {
@@ -56,6 +78,18 @@ namespace IOCv2.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_universities", x => x.uni_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "user_code_sequences",
+                columns: table => new
+                {
+                    role = table.Column<short>(type: "smallint", nullable: false),
+                    current_number = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_user_code_sequences", x => x.role);
                 });
 
             migrationBuilder.CreateTable(
@@ -238,6 +272,70 @@ namespace IOCv2.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "work_items",
+                columns: table => new
+                {
+                    work_item_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    parent_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    type = table.Column<short>(type: "smallint", nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    story_point = table.Column<int>(type: "integer", nullable: true),
+                    priority = table.Column<short>(type: "smallint", nullable: true),
+                    assignee_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    backlog_order = table.Column<float>(type: "real", nullable: false, defaultValue: 0f),
+                    due_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_work_items", x => x.work_item_id);
+                    table.ForeignKey(
+                        name: "fk_work_items_students_assignee_id",
+                        column: x => x.assignee_id,
+                        principalTable: "students",
+                        principalColumn: "student_id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_work_items_work_items_parent_id",
+                        column: x => x.parent_id,
+                        principalTable: "work_items",
+                        principalColumn: "work_item_id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "sprint_work_items",
+                columns: table => new
+                {
+                    sprint_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    work_item_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    board_order = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_sprint_work_items", x => new { x.sprint_id, x.work_item_id });
+                    table.ForeignKey(
+                        name: "fk_sprint_work_items_sprints_sprint_id",
+                        column: x => x.sprint_id,
+                        principalTable: "sprints",
+                        principalColumn: "sprint_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_sprint_work_items_work_items_work_item_id",
+                        column: x => x.work_item_id,
+                        principalTable: "work_items",
+                        principalColumn: "work_item_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "ix_audit_logs_entity_type_entity_id",
                 table: "audit_logs",
@@ -298,6 +396,26 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_sprint_work_items_board_order",
+                table: "sprint_work_items",
+                columns: new[] { "sprint_id", "board_order" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sprint_work_items_work_item_id",
+                table: "sprint_work_items",
+                column: "work_item_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sprints_project_id",
+                table: "sprints",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sprints_status",
+                table: "sprints",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_students_user_id",
                 table: "students",
                 column: "user_id",
@@ -353,6 +471,31 @@ namespace IOCv2.Infrastructure.Migrations
                 table: "users",
                 column: "user_code",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_work_items_assignee_id",
+                table: "work_items",
+                column: "assignee_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_work_items_parent_id",
+                table: "work_items",
+                column: "parent_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_work_items_project_id",
+                table: "work_items",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_work_items_status",
+                table: "work_items",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_work_items_type",
+                table: "work_items",
+                column: "type");
         }
 
         /// <inheritdoc />
@@ -371,16 +514,28 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "refresh_tokens");
 
             migrationBuilder.DropTable(
-                name: "students");
+                name: "sprint_work_items");
 
             migrationBuilder.DropTable(
                 name: "university_users");
 
             migrationBuilder.DropTable(
+                name: "user_code_sequences");
+
+            migrationBuilder.DropTable(
                 name: "enterprises");
 
             migrationBuilder.DropTable(
+                name: "sprints");
+
+            migrationBuilder.DropTable(
+                name: "work_items");
+
+            migrationBuilder.DropTable(
                 name: "universities");
+
+            migrationBuilder.DropTable(
+                name: "students");
 
             migrationBuilder.DropTable(
                 name: "users");

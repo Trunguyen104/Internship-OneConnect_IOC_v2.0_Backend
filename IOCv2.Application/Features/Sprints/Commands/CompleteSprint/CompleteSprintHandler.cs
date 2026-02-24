@@ -103,12 +103,29 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                     break;
                 
                 case MoveIncompleteItemsOption.ToNextPlannedSprint:
-                    // Find next planned sprint
-                    var allProjectSprints = await _unitOfWork.Repository<Sprint>()
-                        .FindAsync(s => s.ProjectId == sprint.ProjectId && s.Status == SprintStatus.Planned, cancellationToken);
-                    var nextSprint = allProjectSprints
-                        .OrderBy(s => s.StartDate)
-                        .FirstOrDefault();
+                    // Dùng targetSprintId nếu được chỉ định, ngược lại tự tìm sprint kế tiếp
+                    Sprint? nextSprint = null;
+                    
+                    if (request.TargetSprintId.HasValue)
+                    {
+                        var targetSprints = await _unitOfWork.Repository<Sprint>()
+                            .FindAsync(s => s.SprintId == request.TargetSprintId.Value, cancellationToken);
+                        nextSprint = targetSprints.FirstOrDefault();
+                        
+                        if (nextSprint == null)
+                        {
+                            return Result<CompleteSprintResponse>.NotFound(
+                                _errorLocalizer["Sprint.TargetSprintNotFound"]);
+                        }
+                    }
+                    else
+                    {
+                        var allProjectSprints = await _unitOfWork.Repository<Sprint>()
+                            .FindAsync(s => s.ProjectId == sprint.ProjectId && s.Status == SprintStatus.Planned, cancellationToken);
+                        nextSprint = allProjectSprints
+                            .OrderBy(s => s.StartDate)
+                            .FirstOrDefault();
+                    }
                     
                     if (nextSprint != null)
                     {
@@ -119,36 +136,40 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         }
                         movedCount = incompleteItems.Count;
                         _logger.LogInformation(
-                            "Moved {Count} incomplete items to next Sprint {NextSprintId}",
+                            "Moved {Count} incomplete items to Sprint {NextSprintId}",
                             movedCount, nextSprint.SprintId);
                     }
                     else
                     {
-                        // No next sprint, move to backlog
+                        // Không có sprint nào, chuyển về backlog
                         foreach (var item in incompleteSprintWorkItems)
                         {
                             await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
                         }
                         movedCount = incompleteItems.Count;
                         _logger.LogWarning(
-                            "No next planned sprint found. Moved {Count} items to backlog",
+                            "No target sprint found. Moved {Count} items to backlog",
                             movedCount);
                     }
                     break;
                 
                 case MoveIncompleteItemsOption.CreateNewSprint:
-                    // Create new sprint
+                    // Dùng NewSprintName nếu được chỉ định, ngược lại tự tạo tên
+                    var sprintName = !string.IsNullOrWhiteSpace(request.NewSprintName)
+                        ? request.NewSprintName
+                        : $"{sprint.Name} (Continued)";
+                    
                     var newSprint = new Sprint
-                {
-                    SprintId = Guid.NewGuid(),
-                    ProjectId = sprint.ProjectId,
-                    Name = $"{sprint.Name} (Continued)",
-                    Goal = "Incomplete items from previous sprint",
-                    StartDate = sprint.EndDate?.AddDays(1) ?? DateTime.UtcNow,
-                    EndDate = sprint.EndDate?.AddDays(15) ?? DateTime.UtcNow.AddDays(14),
-                    Status = SprintStatus.Planned,
-                    CreatedAt = DateTime.UtcNow
-                };
+                    {
+                        SprintId = Guid.NewGuid(),
+                        ProjectId = sprint.ProjectId,
+                        Name = sprintName,
+                        Goal = "Incomplete items from previous sprint",
+                        StartDate = sprint.EndDate.HasValue ? sprint.EndDate.Value.AddDays(1) : DateOnly.FromDateTime(DateTime.UtcNow),
+                        EndDate = sprint.EndDate.HasValue ? sprint.EndDate.Value.AddDays(15) : DateOnly.FromDateTime(DateTime.UtcNow.AddDays(14)),
+                        Status = SprintStatus.Planned,
+                        CreatedAt = DateTime.UtcNow
+                    };
                     
                     await _unitOfWork.Repository<Sprint>().AddAsync(newSprint, cancellationToken);
                     
@@ -160,8 +181,8 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                     }
                     movedCount = incompleteItems.Count;
                     _logger.LogInformation(
-                        "Created new Sprint {NewSprintId} and moved {Count} incomplete items",
-                        newSprint.SprintId, movedCount);
+                        "Created new Sprint '{SprintName}' ({NewSprintId}) and moved {Count} incomplete items",
+                        sprintName, newSprint.SprintId, movedCount);
                     break;
             }
         }

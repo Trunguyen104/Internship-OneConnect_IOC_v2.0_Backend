@@ -9,58 +9,36 @@ public class SprintWorkItemConfiguration : IEntityTypeConfiguration<SprintWorkIt
     public void Configure(EntityTypeBuilder<SprintWorkItem> builder)
     {
         builder.ToTable("sprint_work_items");
-        
-        builder.HasKey(swi => swi.SprintWorkItemId);
-        
-        builder.Property(swi => swi.SprintWorkItemId)
-            .HasColumnName("sprint_work_item_id")
-            .IsRequired();
-        
+
+        // Composite Primary Key
+        builder.HasKey(swi => new { swi.SprintId, swi.WorkItemId });
+
         builder.Property(swi => swi.SprintId)
             .HasColumnName("sprint_id")
             .IsRequired();
-        
+
         builder.Property(swi => swi.WorkItemId)
             .HasColumnName("work_item_id")
             .IsRequired();
-        
+
         builder.Property(swi => swi.BoardOrder)
             .HasColumnName("board_order")
+            .HasColumnType("real")
             .IsRequired();
-        
-        // Base entity properties
-        builder.Property(swi => swi.CreatedAt)
-            .HasColumnName("created_at")
-            .IsRequired();
-        
-        builder.Property(swi => swi.UpdatedAt)
-            .HasColumnName("updated_at");
-        
-        builder.Property(swi => swi.DeletedAt)
-            .HasColumnName("deleted_at");
-        
-        builder.Property(swi => swi.CreatedBy)
-            .HasColumnName("created_by");
-        
-        builder.Property(swi => swi.UpdatedBy)
-            .HasColumnName("updated_by");
-        
+
         // Relationships
         builder.HasOne(swi => swi.Sprint)
             .WithMany(s => s.SprintWorkItems)
             .HasForeignKey(swi => swi.SprintId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("fk_sprint_work_items_sprints_sprint_id");
+
         builder.HasOne(swi => swi.WorkItem)
             .WithMany()
             .HasForeignKey(swi => swi.WorkItemId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        // Unique constraint: One WorkItem can only be in a Sprint once
-        builder.HasIndex(swi => new { swi.SprintId, swi.WorkItemId })
-            .IsUnique()
-            .HasDatabaseName("ix_sprint_work_items_unique");
-        
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("fk_sprint_work_items_work_items_work_item_id");
+
         // Index for board ordering
         builder.HasIndex(swi => new { swi.SprintId, swi.BoardOrder })
             .HasDatabaseName("ix_sprint_work_items_board_order");

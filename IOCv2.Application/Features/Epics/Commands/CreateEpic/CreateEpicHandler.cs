@@ -48,10 +48,7 @@ public class CreateEpicHandler : IRequestHandler<CreateEpicCommand, Result<Creat
             Status = null,
             BacklogOrder = 0,
             StoryPoint = null,
-            StartDate = null,
-            DueDate = null,
-            OriginalEstimate = null,
-            RemainingWork = null
+            DueDate = null
         };
         
         await _unitOfWork.Repository<WorkItem>().AddAsync(epic, cancellationToken);

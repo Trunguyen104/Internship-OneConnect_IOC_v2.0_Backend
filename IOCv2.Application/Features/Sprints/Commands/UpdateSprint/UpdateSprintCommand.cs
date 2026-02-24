@@ -7,6 +7,6 @@ public record UpdateSprintCommand(
     Guid SprintId,
     string Name,
     string? Goal,
-    DateTime StartDate,
-    DateTime EndDate
+    DateOnly? StartDate,
+    DateOnly? EndDate
 ) : IRequest<Result<UpdateSprintResponse>>;
