@@ -1,4 +1,4 @@
-﻿﻿using AutoMapper;
+﻿﻿﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -34,6 +34,18 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
                     _messageService.GetMessage(MessageKeys.Stakeholder.NotFound));
             }
 
+            // Parse Type string to enum if provided
+            if (!string.IsNullOrWhiteSpace(request.Type))
+            {
+                if (!Enum.TryParse<Domain.Enums.StakeholderType>(request.Type, true, out var stakeholderType))
+                {
+                    return Result<UpdateStakeholderResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Stakeholder.InvalidType),
+                        ResultErrorType.BadRequest);
+                }
+                stakeholder.Type = stakeholderType;
+            }
+
             // Check email duplicate when email is being changed
             if (!string.IsNullOrWhiteSpace(request.Email))
             {
@@ -60,8 +72,6 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
             if (!string.IsNullOrWhiteSpace(request.Name))
                 stakeholder.Name = request.Name.Trim();
 
-            if (request.Type.HasValue)
-                stakeholder.Type = request.Type.Value;
 
             if (request.Role != null)
                 stakeholder.Role = string.IsNullOrWhiteSpace(request.Role) ? null : request.Role.Trim();

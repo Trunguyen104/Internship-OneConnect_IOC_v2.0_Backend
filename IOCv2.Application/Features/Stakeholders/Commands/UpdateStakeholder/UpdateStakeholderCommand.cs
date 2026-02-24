@@ -1,5 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
-using IOCv2.Domain.Enums;
+﻿﻿using IOCv2.Application.Common.Models;
 using MediatR;
 
 namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
@@ -8,7 +7,7 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
     {
         public Guid Id { get; init; }
         public string? Name { get; init; }
-        public StakeholderType? Type { get; init; }
+        public string? Type { get; init; }
         public string? Role { get; init; }
         public string? Description { get; init; }
         public string? Email { get; init; }

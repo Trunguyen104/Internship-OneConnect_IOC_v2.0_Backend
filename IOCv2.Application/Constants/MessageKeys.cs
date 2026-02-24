@@ -131,6 +131,15 @@
             public const string DescriptionMaxLength = "Stakeholder.DescriptionMaxLength";
             public const string PhoneNumberInvalid = "Stakeholder.PhoneNumberInvalid";
             public const string PhoneNumberMaxLength = "Stakeholder.PhoneNumberMaxLength";
+            public const string InvalidType = "Stakeholder.InvalidType";
+        }
+
+
+        public static class Validation
+        {
+            public const string NameMaxLength = "Validation.NameMaxLength";
+            public const string DescriptionMaxLength = "Validation.DescriptionMaxLength";
+            public const string IdRequired = "Validation.IdRequired";
         }
     }
 }

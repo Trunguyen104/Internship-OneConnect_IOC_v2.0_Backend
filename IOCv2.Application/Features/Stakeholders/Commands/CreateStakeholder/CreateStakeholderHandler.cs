@@ -1,4 +1,4 @@
-﻿﻿using AutoMapper;
+﻿﻿﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -31,6 +31,14 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
                 return Result<CreateStakeholderResponse>.NotFound(
                     _messageService.GetMessage(MessageKeys.Stakeholder.ProjectNotFound));
 
+            // Parse Type string to enum
+            if (!Enum.TryParse<Domain.Enums.StakeholderType>(request.Type, true, out var stakeholderType))
+            {
+                return Result<CreateStakeholderResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Stakeholder.InvalidType),
+                    ResultErrorType.BadRequest);
+            }
+
             // Check email duplicate within same project (case-insensitive)
             var trimmedEmail = request.Email.Trim().ToLower();
             var emailExists = await _unitOfWork.Repository<Stakeholder>()
@@ -49,7 +57,7 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
                 Id          = Guid.NewGuid(),
                 ProjectId   = request.ProjectId,
                 Name        = request.Name.Trim(),
-                Type        = request.Type,
+                Type        = stakeholderType,
                 Role        = string.IsNullOrWhiteSpace(request.Role) ? null : request.Role.Trim(),
                 Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
                 Email       = request.Email.Trim(),

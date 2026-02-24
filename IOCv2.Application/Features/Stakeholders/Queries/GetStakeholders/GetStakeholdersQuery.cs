@@ -1,10 +1,9 @@
 ﻿using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.Stakeholders.DTOs;
 using MediatR;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
 {
-    public record GetStakeholdersQuery : IRequest<Result<PaginatedResult<StakeholderDto>>>
+    public record GetStakeholdersQuery : IRequest<Result<PaginatedResult<GetStakeholdersResponse>>>
     {
         public Guid ProjectId { get; init; }
         public string? SearchTerm { get; init; }

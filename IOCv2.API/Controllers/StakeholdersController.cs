@@ -1,8 +1,7 @@
-﻿using IOCv2.Application.Common.Models;
+﻿﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder;
 using IOCv2.Application.Features.Stakeholders.Commands.DeleteStakeholder;
 using IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder;
-using IOCv2.Application.Features.Stakeholders.DTOs;
 using IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById;
 using IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders;
 using MediatR;
@@ -30,7 +29,7 @@ namespace IOCv2.API.Controllers
         /// </summary>
         [HttpGet]
         [Route("project/{projectId:guid}")]
-        [ProducesResponseType(typeof(Result<PaginatedResult<StakeholderDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<PaginatedResult<GetStakeholdersResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetStakeholders(Guid projectId, [FromQuery] GetStakeholdersQuery query)
         {
@@ -43,7 +42,7 @@ namespace IOCv2.API.Controllers
         /// Get a single stakeholder by ID.
         /// </summary>
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(typeof(Result<StakeholderDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<GetStakeholderByIdResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetStakeholderById(Guid id)
         {

@@ -67,6 +67,12 @@ namespace IOCv2.Infrastructure.Persistence.Repositories
             return Task.CompletedTask;
         }
 
+        public virtual Task HardDeleteAsync(T entity, CancellationToken cancellationToken = default)
+        {
+            _dbSet.Remove(entity);
+            return Task.CompletedTask;
+        }
+
         public virtual async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _dbSet.AnyAsync(predicate, cancellationToken);

@@ -2,9 +2,9 @@
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
 
-namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
+namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
 {
-    public class CreateStakeholderResponse : IMapFrom<Stakeholder>
+    public class GetStakeholderByIdResponse : IMapFrom<Stakeholder>
     {
         public Guid Id { get; set; }
         public Guid ProjectId { get; set; }
@@ -15,11 +15,13 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Stakeholder, CreateStakeholderResponse>()
+            profile.CreateMap<Stakeholder, GetStakeholderByIdResponse>()
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
         }
     }
 }
+

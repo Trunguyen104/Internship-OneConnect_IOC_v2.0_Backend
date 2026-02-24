@@ -1,8 +1,7 @@
-﻿using AutoMapper;
+﻿﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Features.Stakeholders.DTOs;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -10,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
 {
-    public class GetStakeholdersHandler : IRequestHandler<GetStakeholdersQuery, Result<PaginatedResult<StakeholderDto>>>
+    public class GetStakeholdersHandler : IRequestHandler<GetStakeholdersQuery, Result<PaginatedResult<GetStakeholdersResponse>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -23,14 +22,14 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
             _messageService = messageService;
         }
 
-        public async Task<Result<PaginatedResult<StakeholderDto>>> Handle(GetStakeholdersQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedResult<GetStakeholdersResponse>>> Handle(GetStakeholdersQuery request, CancellationToken cancellationToken)
         {
             // Check project exists
             var projectExists = await _unitOfWork.Repository<Project>()
                 .ExistsAsync(p => p.Id == request.ProjectId, cancellationToken);
 
             if (!projectExists)
-                return Result<PaginatedResult<StakeholderDto>>.NotFound(
+                return Result<PaginatedResult<GetStakeholdersResponse>>.NotFound(
                     _messageService.GetMessage(MessageKeys.Stakeholder.ProjectNotFound));
 
             // Build base query
@@ -66,11 +65,11 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
             var items = await query
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .ProjectTo<StakeholderDto>(_mapper.ConfigurationProvider)
+                .ProjectTo<GetStakeholdersResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 
-            var result = PaginatedResult<StakeholderDto>.Create(items, totalCount, request.PageNumber, request.PageSize);
-            return Result<PaginatedResult<StakeholderDto>>.Success(result);
+            var result = PaginatedResult<GetStakeholdersResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
+            return Result<PaginatedResult<GetStakeholdersResponse>>.Success(result);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
 {
@@ -8,17 +9,17 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
         {
             RuleFor(x => x.ProjectId)
                 .NotEmpty()
-                .WithMessage("Project ID is required.");
+                .WithMessage(MessageKeys.Stakeholder.ProjectIdRequired);
 
             RuleFor(x => x.PageNumber)
                 .GreaterThanOrEqualTo(1)
-                .WithMessage("Page number must be at least 1.");
+                .WithMessage(MessageKeys.Common.PageNumberInvalid);
 
             RuleFor(x => x.PageSize)
                 .GreaterThanOrEqualTo(1)
-                .WithMessage("Page size must be at least 1.")
+                .WithMessage(MessageKeys.Common.PageSizeInvalid)
                 .LessThanOrEqualTo(100)
-                .WithMessage("Page size cannot exceed 100.");
+                .WithMessage(MessageKeys.Common.PageSizeTooLarge);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
 {
@@ -8,7 +9,7 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
         {
             RuleFor(x => x.Id)
                 .NotEmpty()
-                .WithMessage("Stakeholder ID is required.");
+                .WithMessage(MessageKeys.Stakeholder.IdRequired);
         }
     }
 }

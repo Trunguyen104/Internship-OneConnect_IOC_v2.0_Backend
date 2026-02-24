@@ -2,7 +2,6 @@
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Features.Stakeholders.DTOs;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -10,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
 {
-    public class GetStakeholderByIdHandler : IRequestHandler<GetStakeholderByIdQuery, Result<StakeholderDto>>
+    public class GetStakeholderByIdHandler : IRequestHandler<GetStakeholderByIdQuery, Result<GetStakeholderByIdResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -23,19 +22,19 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
             _messageService = messageService;
         }
 
-        public async Task<Result<StakeholderDto>> Handle(GetStakeholderByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<GetStakeholderByIdResponse>> Handle(GetStakeholderByIdQuery request, CancellationToken cancellationToken)
         {
             var stakeholder = await _unitOfWork.Repository<Stakeholder>()
                 .Query()
                 .AsNoTracking()
-                .ProjectTo<StakeholderDto>(_mapper.ConfigurationProvider)
+                .ProjectTo<GetStakeholderByIdResponse>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
 
             if (stakeholder == null)
-                return Result<StakeholderDto>.NotFound(
+                return Result<GetStakeholderByIdResponse>.NotFound(
                     _messageService.GetMessage(MessageKeys.Stakeholder.NotFound));
 
-            return Result<StakeholderDto>.Success(stakeholder);
+            return Result<GetStakeholderByIdResponse>.Success(stakeholder);
         }
     }
 }
