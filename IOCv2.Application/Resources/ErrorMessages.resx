@@ -69,6 +69,15 @@
   <data name="Common.OperationCancelled" xml:space="preserve">
     <value>Thao tác bị hủy do timeout. Vui lòng thử lại.</value>
   </data>
+  <data name="Common.PageNumberInvalid" xml:space="preserve">
+    <value>Số trang phải lớn hơn 0.</value>
+  </data>
+  <data name="Common.PageSizeInvalid" xml:space="preserve">
+    <value>Kích thước trang phải lớn hơn 0.</value>
+  </data>
+  <data name="Common.PageSizeTooLarge" xml:space="preserve">
+    <value>Kích thước trang không được vượt quá 100.</value>
+  </data>
   
   <!-- Validation Errors -->
   <data name="InvalidUserId" xml:space="preserve">
@@ -195,5 +204,57 @@
   </data>
   <data name="Common.NotFound" xml:space="preserve">
     <value>Không tìm thấy bản ghi tương ứng.</value>
+  </data>
+  <!-- Stakeholder Errors -->
+  <data name="Stakeholder.NotFound" xml:space="preserve">
+    <value>Không tìm thấy stakeholder.</value>
+  </data>
+  <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
+    <value>Không tìm thấy dự án tương ứng.</value>
+  </data>
+  <data name="Stakeholder.EmailExists" xml:space="preserve">
+    <value>Email này đã tồn tại trong dự án.</value>
+  </data>
+  <data name="Stakeholder.IdRequired" xml:space="preserve">
+    <value>Id stakeholder không được để trống.</value>
+  </data>
+  <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
+    <value>Id dự án không được để trống.</value>
+  </data>
+  <data name="Stakeholder.NameRequired" xml:space="preserve">
+    <value>Tên stakeholder không được để trống.</value>
+  </data>
+  <data name="Stakeholder.NameMaxLength" xml:space="preserve">
+    <value>Tên stakeholder không được vượt quá 200 ký tự.</value>
+  </data>
+  <data name="Stakeholder.EmailRequired" xml:space="preserve">
+    <value>Email không được để trống.</value>
+  </data>
+  <data name="Stakeholder.EmailInvalid" xml:space="preserve">
+    <value>Email không đúng định dạng.</value>
+  </data>
+  <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
+    <value>Email không được vượt quá 150 ký tự.</value>
+  </data>
+  <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
+    <value>Vai trò không được vượt quá 100 ký tự.</value>
+  </data>
+  <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả không được vượt quá 500 ký tự.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
+    <value>Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại đúng định dạng.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
+    <value>Số điện thoại không được vượt quá 15 ký tự.</value>
+  </data>
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Tạo stakeholder thành công.</value>
+  </data>
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật stakeholder thành công.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Xóa stakeholder thành công.</value>
   </data>
 </root>

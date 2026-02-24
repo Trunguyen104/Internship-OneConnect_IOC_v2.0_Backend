@@ -14,6 +14,9 @@
             public const string RecordNotFound = "Common.RecordNotFound";
             public const string InvalidRequest = "Common.InvalidRequest";
             public const string InternalError = "Common.InternalError";
+            public const string PageNumberInvalid = "Common.PageNumberInvalid";
+            public const string PageSizeInvalid = "Common.PageSizeInvalid";
+            public const string PageSizeTooLarge = "Common.PageSizeTooLarge";
         }
 
         public static class Password
@@ -107,6 +110,27 @@
             public const string EmailInvalid = "Profile.EmailInvalid";
             public const string PhoneRequired = "Profile.PhoneRequired";
             public const string PhoneInvalid = "Profile.PhoneInvalid";
+        }
+
+        public static class Stakeholder
+        {
+            public const string NotFound = "Stakeholder.NotFound";
+            public const string ProjectNotFound = "Stakeholder.ProjectNotFound";
+            public const string EmailExists = "Stakeholder.EmailExists";
+            public const string CreateSuccess = "Stakeholder.CreateSuccess";
+            public const string UpdateSuccess = "Stakeholder.UpdateSuccess";
+            public const string DeleteSuccess = "Stakeholder.DeleteSuccess";
+            public const string IdRequired = "Stakeholder.IdRequired";
+            public const string ProjectIdRequired = "Stakeholder.ProjectIdRequired";
+            public const string NameRequired = "Stakeholder.NameRequired";
+            public const string NameMaxLength = "Stakeholder.NameMaxLength";
+            public const string EmailRequired = "Stakeholder.EmailRequired";
+            public const string EmailInvalid = "Stakeholder.EmailInvalid";
+            public const string EmailMaxLength = "Stakeholder.EmailMaxLength";
+            public const string RoleMaxLength = "Stakeholder.RoleMaxLength";
+            public const string DescriptionMaxLength = "Stakeholder.DescriptionMaxLength";
+            public const string PhoneNumberInvalid = "Stakeholder.PhoneNumberInvalid";
+            public const string PhoneNumberMaxLength = "Stakeholder.PhoneNumberMaxLength";
         }
     }
 }
