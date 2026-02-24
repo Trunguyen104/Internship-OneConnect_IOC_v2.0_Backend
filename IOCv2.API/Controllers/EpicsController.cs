@@ -11,7 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace IOCv2.API.Controllers;
 
 [ApiController]
-[Route("api/projects/{projectId}/epics")]
+[Route("api/projects/{projectId:guid}/epics")]
+// [Authorize]  // Disabled for testing
 public class EpicsController : ControllerBase
 {
     private readonly IMediator _mediator;

@@ -3,6 +3,7 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210071038_UpdateWorkItemSchema_AddAssigneeAndNewStatus")]
+    partial class UpdateWorkItemSchema_AddAssigneeAndNewStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,135 +141,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasDatabaseName("ix_refresh_tokens_user_id");
 
                     b.ToTable("refresh_tokens", (string)null);
-                });
-
-            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
-                {
-                    b.Property<Guid>("SprintId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("sprint_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
-
-                    b.Property<string>("Goal")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("goal");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("name");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<short>("Status")
-                        .HasColumnType("smallint")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("SprintId")
-                        .HasName("pk_sprints");
-
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_sprints_project_id");
-
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_sprints_status");
-
-                    b.ToTable("sprints", (string)null);
-                });
-
-            modelBuilder.Entity("IOCv2.Domain.Entities.SprintWorkItem", b =>
-                {
-                    b.Property<Guid>("SprintWorkItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("sprint_work_item_id");
-
-                    b.Property<int>("BoardOrder")
-                        .HasColumnType("integer")
-                        .HasColumnName("board_order");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("SprintId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sprint_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.Property<Guid>("WorkItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("work_item_id");
-
-                    b.HasKey("SprintWorkItemId")
-                        .HasName("pk_sprint_work_items");
-
-                    b.HasIndex("WorkItemId")
-                        .HasDatabaseName("ix_sprint_work_items_work_item_id");
-
-                    b.HasIndex("SprintId", "BoardOrder")
-                        .HasDatabaseName("ix_sprint_work_items_board_order");
-
-                    b.HasIndex("SprintId", "WorkItemId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_sprint_work_items_unique");
-
-                    b.ToTable("sprint_work_items", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.User", b =>
@@ -511,27 +385,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.SprintWorkItem", b =>
-                {
-                    b.HasOne("IOCv2.Domain.Entities.Sprint", "Sprint")
-                        .WithMany("SprintWorkItems")
-                        .HasForeignKey("SprintId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sprint_work_items_sprints_sprint_id");
-
-                    b.HasOne("IOCv2.Domain.Entities.WorkItem", "WorkItem")
-                        .WithMany()
-                        .HasForeignKey("WorkItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sprint_work_items_work_items_work_item_id");
-
-                    b.Navigation("Sprint");
-
-                    b.Navigation("WorkItem");
-                });
-
             modelBuilder.Entity("IOCv2.Domain.Entities.WorkItem", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.WorkItem", "Parent")
@@ -541,11 +394,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasConstraintName("fk_work_items_work_items_parent_id");
 
                     b.Navigation("Parent");
-                });
-
-            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
-                {
-                    b.Navigation("SprintWorkItems");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.User", b =>

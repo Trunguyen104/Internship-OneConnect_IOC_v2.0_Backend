@@ -130,4 +130,21 @@
   <data name="Epic.DeletedSuccess" xml:space="preserve">
     <value>Xóa Epic thành công.</value>
   </data>
+  
+  <!-- Sprint Success Messages -->
+  <data name="Sprint.CreatedSuccess" xml:space="preserve">
+    <value>Tạo Sprint thành công.</value>
+  </data>
+  <data name="Sprint.UpdatedSuccess" xml:space="preserve">
+    <value>Cập nhật Sprint thành công.</value>
+  </data>
+  <data name="Sprint.DeletedSuccess" xml:space="preserve">
+    <value>Xóa Sprint thành công.</value>
+  </data>
+  <data name="Sprint.StartedSuccess" xml:space="preserve">
+    <value>Bắt đầu Sprint thành công.</value>
+  </data>
+  <data name="Sprint.CompletedSuccess" xml:space="preserve">
+    <value>Sprint đã được hoàn thành thành công. {0} item đã hoàn thành, {1} item đã được di chuyển.</value>
+  </data>
 </root>

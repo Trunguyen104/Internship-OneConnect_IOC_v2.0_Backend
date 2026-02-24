@@ -1,12 +1,13 @@
+using System.Diagnostics;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Extensions.Pagination;
+using IOCv2.Application.Features.Epics.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Epics.Queries.GetEpics;
 
@@ -14,15 +15,57 @@ public class GetEpicsHandler : IRequestHandler<GetEpicsQuery, Result<PagedResult
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly ICacheService _cacheService;
+    private readonly ILogger<GetEpicsHandler> _logger;
     
-    public GetEpicsHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public GetEpicsHandler(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ICacheService cacheService,
+        ILogger<GetEpicsHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _cacheService = cacheService;
+        _logger = logger;
     }
     
     public async Task<Result<PagedResult<GetEpicsResponse>>> Handle(GetEpicsQuery request, CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
+        var cacheKey = EpicCacheKeys.EpicList(
+            request.ProjectId,
+            request.Pagination.PageIndex,
+            request.Pagination.PageSize,
+            request.Pagination.Search,
+            request.Pagination.OrderBy);
+        
+        try
+        {
+            // Try get from cache
+            var cachedResult = await _cacheService.GetAsync<PagedResult<GetEpicsResponse>>(cacheKey, cancellationToken);
+            
+            if (cachedResult != null)
+            {
+                stopwatch.Stop();
+                _logger.LogDebug(
+                    "Epic list cache hit for Project {ProjectId}, Page {Page} (Duration: {Duration}ms)",
+                    request.ProjectId, request.Pagination.PageIndex, stopwatch.ElapsedMilliseconds);
+                
+                return Result<PagedResult<GetEpicsResponse>>.Success(cachedResult);
+            }
+            
+            _logger.LogDebug(
+                "Epic list cache miss for Project {ProjectId}, Page {Page}",
+                request.ProjectId, request.Pagination.PageIndex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, 
+                "Cache get failed for Epic list in Project {ProjectId}, falling back to DB", 
+                request.ProjectId);
+        }
+        
         // Query Epics for specific project
         var query = _unitOfWork.Repository<WorkItem>()
             .FindAsync(w => w.ProjectId == request.ProjectId && w.Type == WorkItemType.Epic, cancellationToken)
@@ -68,6 +111,27 @@ public class GetEpicsHandler : IRequestHandler<GetEpicsQuery, Result<PagedResult
             request.Pagination,
             totalCount
         );
+        
+        // Cache the result
+        try
+        {
+            await _cacheService.SetAsync(
+                cacheKey,
+                pagedResult,
+                EpicCacheKeys.Expiration.EpicList,
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, 
+                "Failed to cache Epic list for Project {ProjectId}", 
+                request.ProjectId);
+        }
+        
+        stopwatch.Stop();
+        _logger.LogInformation(
+            "Epic list retrieved from DB for Project {ProjectId}: {Count} items, Page {Page}/{TotalPages} (Duration: {Duration}ms)",
+            request.ProjectId, mappedItems.Count, pagedResult.PageIndex, pagedResult.TotalPages, stopwatch.ElapsedMilliseconds);
         
         return Result<PagedResult<GetEpicsResponse>>.Success(pagedResult);
     }

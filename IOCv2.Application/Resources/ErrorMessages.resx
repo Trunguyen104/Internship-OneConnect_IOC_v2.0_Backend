@@ -198,4 +198,66 @@
   <data name="Epic.ProjectNotFound" xml:space="preserve">
     <value>Không tìm thấy dự án.</value>
   </data>
+  
+  <!-- Sprint Validation Errors -->
+  <data name="Sprint.ProjectIdRequired" xml:space="preserve">
+    <value>ID dự án không được để trống.</value>
+  </data>
+  <data name="Sprint.NameRequired" xml:space="preserve">
+    <value>Tên Sprint không được để trống.</value>
+  </data>
+  <data name="Sprint.NameMaxLength" xml:space="preserve">
+    <value>Tên Sprint không được vượt quá 200 ký tự.</value>
+  </data>
+  <data name="Sprint.GoalMaxLength" xml:space="preserve">
+    <value>Mục tiêu Sprint không được vượt quá 1000 ký tự.</value>
+  </data>
+  <data name="Sprint.StartDateRequired" xml:space="preserve">
+    <value>Ngày bắt đầu không được để trống.</value>
+  </data>
+  <data name="Sprint.EndDateRequired" xml:space="preserve">
+    <value>Ngày kết thúc không được để trống.</value>
+  </data>
+  <data name="Sprint.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="Sprint.DurationTooShort" xml:space="preserve">
+    <value>Sprint phải kéo dài ít nhất 7 ngày (1 tuần).</value>
+  </data>
+  <data name="Sprint.DurationTooLong" xml:space="preserve">
+    <value>Sprint không được vượt quá 28 ngày (4 tuần).</value>
+  </data>
+  <data name="Sprint.NotFound" xml:space="preserve">
+    <value>Không tìm thấy Sprint.</value>
+  </data>
+  <data name="Sprint.CannotDeleteActive" xml:space="preserve">
+    <value>Không thể xóa Sprint đang hoạt động hoặc đã hoàn thành.</value>
+  </data>
+  <data name="Sprint.CannotDeleteWithItems" xml:space="preserve">
+    <value>Không thể xóa Sprint khi còn WorkItem. Vui lòng di chuyển tất cả item trước.</value>
+  </data>
+  <data name="Sprint.AlreadyActive" xml:space="preserve">
+    <value>Sprint đã được bắt đầu.</value>
+  </data>
+  <data name="Sprint.NotPlanned" xml:space="preserve">
+    <value>Sprint phải ở trạng thái Planned mới có thể bắt đầu</value>
+  </data>
+  <data name="Sprint.ActiveSprintExists" xml:space="preserve">
+    <value>Dự án đã có một Sprint đang Active. Chỉ được phép một Sprint Active tại một thời điểm</value>
+  </data>
+  <data name="Sprint.NotActive" xml:space="preserve">
+    <value>Sprint phải ở trạng thái Active mới có thể hoàn thành</value>
+  </data>
+  <data name="Sprint.CannotEditCompleted" xml:space="preserve">
+    <value>Không thể chỉnh sửa Sprint đã hoàn thành</value>
+  </data>
+  <data name="Sprint.IdRequired" xml:space="preserve">
+    <value>Sprint ID là bắt buộc</value>
+  </data>
+  <data name="Sprint.CannotDeleteActiveSprint" xml:space="preserve">
+    <value>Không thể xóa Sprint đang Active hoặc đã Completed. Chỉ có thể xóa Sprint ở trạng thái Planned</value>
+  </data>
+  <data name="Sprint.CannotDeleteWithWorkItems" xml:space="preserve">
+    <value>Không thể xóa Sprint đang chứa Work Items. Vui lòng di chuyển hoặc xóa các Work Items trước</value>
+  </data>
 </root>

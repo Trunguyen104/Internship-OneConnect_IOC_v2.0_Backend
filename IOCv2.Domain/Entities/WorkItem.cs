@@ -19,6 +19,8 @@ public class WorkItem : BaseEntity
     public DateTime? StartDate { get; set; }
     public DateTime? DueDate { get; set; }
     
+    public int? AssigneeId { get; set; }  // Student assigned to this work item
+    
     public float BacklogOrder { get; set; }
     
     public float? OriginalEstimate { get; set; }
