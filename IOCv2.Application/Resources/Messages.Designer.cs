@@ -61,7 +61,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mã: {0}, Mật khẩu: {1}.
+        ///   Looks up a localized string similar to Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mã: {0}, Mật khẩu: {1}.
         /// </summary>
         internal static string AccountCreatedButEmailFailed {
             get {
@@ -133,38 +133,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Không xác định được người thực hiện thao tác..
-        /// </summary>
-        internal static string CannotIdentifyUser {
-            get {
-                return ResourceManager.GetString("CannotIdentifyUser", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Bạn không thể cho người khác thành quản lí.
         /// </summary>
         internal static string CannotPromoteToManager {
             get {
                 return ResourceManager.GetString("CannotPromoteToManager", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Nhân viên hiện tại không còn hoạt động..
-        /// </summary>
-        internal static string EmployeeNotActive {
-            get {
-                return ResourceManager.GetString("EmployeeNotActive", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Không tìm thấy nhân viên với mã và role hiện tại..
-        /// </summary>
-        internal static string EmployeeNotFound {
-            get {
-                return ResourceManager.GetString("EmployeeNotFound", resourceCulture);
             }
         }
         
@@ -178,6 +151,33 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Page number must be greater than or equal to 1.
+        /// </summary>
+        internal static string PageNumber_MinValue {
+            get {
+                return ResourceManager.GetString("PageNumber.MinValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page size must not exceed 100.
+        /// </summary>
+        internal static string PageSize_MaxValue {
+            get {
+                return ResourceManager.GetString("PageSize.MaxValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page size must be greater than or equal to 1.
+        /// </summary>
+        internal static string PageSize_MinValue {
+            get {
+                return ResourceManager.GetString("PageSize.MinValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cập nhật thông tin thành công..
         /// </summary>
         internal static string Profile_UpdateSuccess {
@@ -187,7 +187,16 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên. Mật khẩu mới: {0}.
+        ///   Looks up a localized string similar to Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng..
+        /// </summary>
+        internal static string ResetPassword_StatusNoEmail {
+            get {
+                return ResourceManager.GetString("ResetPassword.StatusNoEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}.
         /// </summary>
         internal static string ResetPassword_SuccessNoEmail {
             get {
@@ -205,16 +214,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên..
-        /// </summary>
-        internal static string ResetStatusNoEmail {
-            get {
-                return ResourceManager.GetString("ResetStatusNoEmail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Role đã được thay đổi thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho nhân viên về mã nhân viên mới: {0}.
+        ///   Looks up a localized string similar to Role đã được thay đổi thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng về mã nhân viên mới: {0}.
         /// </summary>
         internal static string RoleChangedButEmailFailed {
             get {
@@ -228,6 +228,60 @@ namespace IOCv2.Application.Resources {
         internal static string RoleChangedSuccessfully {
             get {
                 return ResourceManager.GetString("RoleChangedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search term cannot exceed 200 characters.
+        /// </summary>
+        internal static string SearchTerm_MaxLength {
+            get {
+                return ResourceManager.GetString("SearchTerm.MaxLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort column must be one of: projectname, startdate, enddate, status, createdat.
+        /// </summary>
+        internal static string SortColumn_AllowedValues {
+            get {
+                return ResourceManager.GetString("SortColumn.AllowedValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort order must be either &apos;asc&apos; or &apos;desc&apos;.
+        /// </summary>
+        internal static string SortOrder_AllowedValues {
+            get {
+                return ResourceManager.GetString("SortOrder.AllowedValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không xác định được người thực hiện thao tác..
+        /// </summary>
+        internal static string Users_InvalidAuditor {
+            get {
+                return ResourceManager.GetString("Users.InvalidAuditor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tài khoản người dùng hiện tại không còn hoạt động..
+        /// </summary>
+        internal static string Users_NotActive {
+            get {
+                return ResourceManager.GetString("Users.NotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy người dùng với mã và role hiện tại..
+        /// </summary>
+        internal static string Users_NotFound {
+            get {
+                return ResourceManager.GetString("Users.NotFound", resourceCulture);
             }
         }
     }
