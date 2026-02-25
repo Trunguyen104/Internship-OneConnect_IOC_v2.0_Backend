@@ -1,4 +1,4 @@
-﻿namespace IOCv2.Application.Constants
+﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -14,6 +14,9 @@
             public const string RecordNotFound = "Common.RecordNotFound";
             public const string InvalidRequest = "Common.InvalidRequest";
             public const string InternalError = "Common.InternalError";
+            public const string PageNumberInvalid = "Common.PageNumberInvalid";
+            public const string PageSizeInvalid = "Common.PageSizeInvalid";
+            public const string PageSizeTooLarge = "Common.PageSizeTooLarge";
         }
 
         public static class Password
@@ -107,6 +110,52 @@
             public const string EmailInvalid = "Profile.EmailInvalid";
             public const string PhoneRequired = "Profile.PhoneRequired";
             public const string PhoneInvalid = "Profile.PhoneInvalid";
+        }
+
+        public static class Stakeholder
+        {
+            public const string NotFound = "Stakeholder.NotFound";
+            public const string ProjectNotFound = "Stakeholder.ProjectNotFound";
+            public const string EmailExists = "Stakeholder.EmailExists";
+            public const string CreateSuccess = "Stakeholder.CreateSuccess";
+            public const string UpdateSuccess = "Stakeholder.UpdateSuccess";
+            public const string DeleteSuccess = "Stakeholder.DeleteSuccess";
+            public const string IdRequired = "Stakeholder.IdRequired";
+            public const string ProjectIdRequired = "Stakeholder.ProjectIdRequired";
+            public const string NameRequired = "Stakeholder.NameRequired";
+            public const string NameMaxLength = "Stakeholder.NameMaxLength";
+            public const string EmailRequired = "Stakeholder.EmailRequired";
+            public const string EmailInvalid = "Stakeholder.EmailInvalid";
+            public const string EmailMaxLength = "Stakeholder.EmailMaxLength";
+            public const string RoleMaxLength = "Stakeholder.RoleMaxLength";
+            public const string DescriptionMaxLength = "Stakeholder.DescriptionMaxLength";
+            public const string PhoneNumberInvalid = "Stakeholder.PhoneNumberInvalid";
+            public const string PhoneNumberMaxLength = "Stakeholder.PhoneNumberMaxLength";
+            public const string InvalidType = "Stakeholder.InvalidType";
+        }
+
+        public static class Issue
+        {
+            public const string NotFound = "Issue.NotFound";
+            public const string StakeholderNotFound = "Issue.StakeholderNotFound";
+            public const string TitleRequired = "Issue.TitleRequired";
+            public const string DescriptionRequired = "Issue.DescriptionRequired";
+            public const string StakeholderIdRequired = "Issue.StakeholderIdRequired";
+            public const string InvalidStatus = "Issue.InvalidStatus";
+            public const string CreateSuccess = "Issue.CreateSuccess";
+            public const string CreateFailed = "Issue.CreateFailed";
+            public const string UpdateStatusSuccess = "Issue.UpdateStatusSuccess";
+            public const string UpdateFailed = "Issue.UpdateFailed";
+            public const string DeleteSuccess = "Issue.DeleteSuccess";
+            public const string DeleteFailed = "Issue.DeleteFailed";
+        }
+
+
+        public static class Validation
+        {
+            public const string NameMaxLength = "Validation.NameMaxLength";
+            public const string DescriptionMaxLength = "Validation.DescriptionMaxLength";
+            public const string IdRequired = "Validation.IdRequired";
         }
     }
 }

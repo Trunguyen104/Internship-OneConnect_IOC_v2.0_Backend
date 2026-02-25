@@ -3,6 +3,7 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260224120000_AddProjectsAndStakeholders")]
+    partial class AddProjectsAndStakeholders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,6 +176,18 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_user_id");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_id");
@@ -181,6 +196,14 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("position");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -448,74 +471,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("stakeholders", (string)null);
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.StakeholderIssue", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("uuid")
-                        .HasColumnName("created_by");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("description");
-
-                    b.Property<DateTime?>("ResolvedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("resolved_at");
-
-                    b.Property<Guid>("StakeholderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("stakeholder_id");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("title");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("uuid")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_stakeholder_issues");
-
-                    b.HasIndex("StakeholderId")
-                        .HasDatabaseName("ix_stakeholder_issues_stakeholder_id");
-
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_stakeholder_issues_status");
-
-                    b.ToTable("stakeholder_issues", (string)null);
-                });
-
             modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
                 {
                     b.Property<Guid>("StudentId")
@@ -527,6 +482,18 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("class");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
 
                     b.Property<decimal?>("Gpa")
                         .HasPrecision(3, 2)
@@ -548,6 +515,14 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -853,18 +828,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.StakeholderIssue", b =>
-                {
-                    b.HasOne("IOCv2.Domain.Entities.Stakeholder", "Stakeholder")
-                        .WithMany("Issues")
-                        .HasForeignKey("StakeholderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_stakeholder_issues_stakeholders");
-
-                    b.Navigation("Stakeholder");
-                });
-
             modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "User")
@@ -908,11 +871,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Stakeholders");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
-                {
-                    b.Navigation("Issues");
-                });
-
             modelBuilder.Entity("IOCv2.Domain.Entities.University", b =>
                 {
                     b.Navigation("UniversityUsers");
@@ -934,3 +892,4 @@ namespace IOCv2.Infrastructure.Migrations
         }
     }
 }
+

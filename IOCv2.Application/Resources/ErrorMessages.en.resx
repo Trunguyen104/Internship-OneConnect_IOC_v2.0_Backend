@@ -69,6 +69,15 @@
   <data name="Common.Unauthorized" xml:space="preserve">
     <value>You are not authorized to perform this action.</value>
   </data>
+  <data name="Common.PageNumberInvalid" xml:space="preserve">
+    <value>Page number must be greater than 0.</value>
+  </data>
+  <data name="Common.PageSizeInvalid" xml:space="preserve">
+    <value>Page size must be greater than 0.</value>
+  </data>
+  <data name="Common.PageSizeTooLarge" xml:space="preserve">
+    <value>Page size cannot exceed 100.</value>
+  </data>
 
   <!-- Password Validation -->
   <data name="Password.MinLength" xml:space="preserve">
@@ -233,4 +242,83 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
      <value>Role changed successfully for {0}, but notification email failed to send.</value>
    </data>
+  <data name="Stakeholder.NotFound" xml:space="preserve">
+    <value>Stakeholder not found.</value>
+  </data>
+  <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
+    <value>Project not found.</value>
+  </data>
+  <data name="Stakeholder.EmailExists" xml:space="preserve">
+    <value>Email already exists in this project.</value>
+  </data>
+  <data name="Stakeholder.IdRequired" xml:space="preserve">
+    <value>Stakeholder ID is required.</value>
+  </data>
+  <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
+    <value>Project ID is required.</value>
+  </data>
+  <data name="Stakeholder.NameRequired" xml:space="preserve">
+    <value>Name is required.</value>
+  </data>
+  <data name="Stakeholder.NameMaxLength" xml:space="preserve">
+    <value>Name cannot exceed 200 characters.</value>
+  </data>
+  <data name="Stakeholder.EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="Stakeholder.EmailInvalid" xml:space="preserve">
+    <value>Email format is invalid.</value>
+  </data>
+  <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
+    <value>Email cannot exceed 150 characters.</value>
+  </data>
+  <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
+    <value>Role cannot exceed 100 characters.</value>
+  </data>
+  <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
+    <value>Description cannot exceed 500 characters.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
+    <value>Phone number is invalid. Please enter a valid phone number format.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
+    <value>Phone number cannot exceed 15 characters.</value>
+  </data>
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Stakeholder created successfully.</value>
+  </data>
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Stakeholder updated successfully.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Stakeholder deleted successfully.</value>
+  </data>
+  <!-- Issue -->
+  <data name="Issue.NotFound" xml:space="preserve">
+    <value>Issue not found.</value>
+  </data>
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <value>Stakeholder not found.</value>
+  </data>
+  <data name="Issue.TitleRequired" xml:space="preserve">
+    <value>Title is required.</value>
+  </data>
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <value>Description is required.</value>
+  </data>
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <value>Stakeholder ID is required.</value>
+  </data>
+  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <value>Invalid status. Please select: Open, InProgress, Resolved, or Closed.</value>
+  </data>
+  <data name="Issue.CreateFailed" xml:space="preserve">
+    <value>Failed to create issue.</value>
+  </data>
+  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <value>Failed to update issue.</value>
+  </data>
+  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <value>Failed to delete issue.</value>
+  </data>
  </root>
