@@ -1,10 +1,11 @@
-namespace IOCv2.Domain.Enums;
-
-public enum InternshipStatus : short
+namespace IOCv2.Domain.Enums
 {
-    REGISTERED = 0,
-    IN_PROGRESS = 1,
-    FAILED = 2,
-    PASSED = 3,
-    CANCELED = 4
+    public enum InternshipStatus : short
+    {
+        Registered = 0,
+        Onboarded = 1,
+        InProgress = 2,
+        Completed = 3,
+        Failed = 4
+    }
 }

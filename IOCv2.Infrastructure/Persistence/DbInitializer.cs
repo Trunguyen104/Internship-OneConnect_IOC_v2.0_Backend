@@ -21,7 +21,7 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedUniversities();
             await SeedEnterprises();
             await SeedUsers();
-            await SeedProjectsMockData();
+            await SeedInternshipGroups();
 
             if (_context.ChangeTracker.HasChanges())
             {
@@ -278,100 +278,62 @@ namespace IOCv2.Infrastructure.Persistence
             }
         }
 
-        private async Task SeedProjectsMockData()
+
+
+        private async Task SeedInternshipGroups()
         {
-            if (!await _context.Projects.AnyAsync())
+            if (!await _context.InternshipGroups.AnyAsync())
             {
-                var fptu = await _context.Universities.FirstOrDefaultAsync(u => u.Code == "FPTU");
-                var fptSoft = await _context.Enterprises.FirstOrDefaultAsync(e => e.Name.Contains("FPT"));
-                var mainStudent = await _context.Users.Include(u => u.Student).FirstOrDefaultAsync(u => u.Email == "trunguyen.104@gmail.com");
-                var mentor = await _context.EnterpriseUsers.FirstOrDefaultAsync(eu => eu.User.Email == "mentor.fpt@iocv2.com");
+                var fpt = await _context.Enterprises.FirstOrDefaultAsync(e => e.Name.Contains("FPT"));
+                var mentorUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor.fpt@iocv2.com");
+                var mentor = await _context.EnterpriseUsers.FirstOrDefaultAsync(eu => mentorUser != null && eu.UserId == mentorUser.UserId);
 
-                if (fptu != null && fptSoft != null && mainStudent?.Student != null && mentor != null)
+                var student1User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "trunguyen.104@gmail.com");
+                var student1 = await _context.Students.FirstOrDefaultAsync(s => student1User != null && s.UserId == student1User.UserId);
+
+                var student2User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "student1@fptu.edu.vn");
+                var student2 = await _context.Students.FirstOrDefaultAsync(s => student2User != null && s.UserId == student2User.UserId);
+
+                if (fpt != null && mentor != null && student1 != null && student2 != null)
                 {
-                    // 1. Tạo Term
-                    var term = new Term
-                    {
-                        TermId = Guid.NewGuid(),
-                        UniversityId = fptu.UniversityId,
-                        Name = "Spring 2026",
-                        StartDate = DateTime.UtcNow.AddMonths(-1),
-                        EndDate = DateTime.UtcNow.AddMonths(3),
-                        Status = 1
-                    };
-                    _context.Terms.Add(term);
-
-                    // 2. Tạo Job
-                    var job = new Job
-                    {
-                        JobId = Guid.NewGuid(),
-                        EnterpriseId = fptSoft.EnterpriseId,
-                        Title = "Backend .NET Developer Intern",
-                        Description = "Join FPT Software as a backend intern building enterprise apps.",
-                        Location = "Hoa Lac Hi-Tech Park",
-                        InternshipDuration = 3,
-                        Status = JobStatus.OPEN
-                    };
-                    _context.Jobs.Add(job);
-
-                    // 3. Tạo Internship (hồ sơ thực tập của sinh viên Trung Nguyen)
-                    var internship = new Internship
+                    var group = new InternshipGroup
                     {
                         InternshipId = Guid.NewGuid(),
-                        TermId = term.TermId,
-                        StudentId = mainStudent.Student.StudentId,
-                        JobId = job.JobId,
+                        TermId = Guid.NewGuid(),
+                        GroupName = "Nhóm .NET Tiềm Năng 2026",
+                        EnterpriseId = fpt.EnterpriseId,
                         MentorId = mentor.EnterpriseUserId,
-                        StartDate = DateTime.UtcNow,
-                        EndDate = DateTime.UtcNow.AddMonths(3),
-                        Status = InternshipStatus.IN_PROGRESS
-                    };
-                    _context.Internships.Add(internship);
-
-                    // 4. Tạo Project mẫu
-                    var project = new Project
-                    {
-                        ProjectId = Guid.NewGuid(),
-                        InternshipId = internship.InternshipId,
-                        MentorId = mentor.EnterpriseUserId,
-                        ProjectName = "Internship OneConnect v2.0",
-                        Field = "Web Application (Backend/.NET)",
-                        Description = "Hệ thống quản lý thực tập sinh version 2.0 dành cho Đại học và Doanh nghiệp.",
-                        Tags = "csharp, dotnet, postgresql",
-                        ViewCount = 104,
                         StartDate = DateTime.UtcNow,
                         EndDate = DateTime.UtcNow.AddMonths(2),
-                        Status = ProjectStatus.IN_PROGRESS
+                        Status = InternshipStatus.InProgress
                     };
-                    _context.Projects.Add(project);
 
-                    // 5. Thêm Members vào Project
-                    var leaderMember = new ProjectMember
+                    _context.InternshipGroups.Add(group);
+
+                    var member1 = new InternshipStudent
                     {
-                        ProjectMemberId = Guid.NewGuid(),
-                        ProjectId = project.ProjectId,
-                        StudentId = mainStudent.Student.StudentId, // Trung
-                        Role = ProjectMemberRole.LEADER,
-                        Status = MemberStatus.ACTIVE
+                        InternshipId = group.InternshipId,
+                        StudentId = student1.StudentId,
+                        Role = InternshipRole.Leader,
+                        Status = InternshipStatus.InProgress,
+                        JoinedAt = DateTime.UtcNow
                     };
-                    _context.ProjectMembers.Add(leaderMember);
 
-                    // Thêm 1 sinh viên nữa vào nhóm (Student 1 FPTU)
-                    var stu1 = await _context.Users.Include(u => u.Student).FirstOrDefaultAsync(u => u.Email == "student1@fptu.edu.vn");
-                    if (stu1?.Student != null)
+                    var member2 = new InternshipStudent
                     {
-                        var normalMember = new ProjectMember
-                        {
-                            ProjectMemberId = Guid.NewGuid(),
-                            ProjectId = project.ProjectId,
-                            StudentId = stu1.Student.StudentId,
-                            Role = ProjectMemberRole.MEMBER,
-                            Status = MemberStatus.ACTIVE
-                        };
-                        _context.ProjectMembers.Add(normalMember);
+                        InternshipId = group.InternshipId,
+                        StudentId = student2.StudentId,
+                        Role = InternshipRole.Member,
+                        Status = InternshipStatus.InProgress,
+                        JoinedAt = DateTime.UtcNow
+                    };
+
+                    _context.InternshipStudents.AddRange(member1, member2);
+
+                    if (_context.ChangeTracker.HasChanges())
+                    {
+                        await _context.SaveChangesAsync();
                     }
-
-                    await _context.SaveChangesAsync();
                 }
             }
         }

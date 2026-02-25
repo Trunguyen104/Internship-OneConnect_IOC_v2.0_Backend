@@ -24,12 +24,9 @@ namespace IOCv2.Infrastructure.Persistence
         public DbSet<UniversityUser> UniversityUsers { get; set; } = null!;
         public DbSet<Domain.Entities.Enterprise> Enterprises { get; set; } = null!;
         public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
-        public DbSet<Term> Terms { get; set; } = null!;
-        public DbSet<Job> Jobs { get; set; } = null!;
-        public DbSet<Internship> Internships { get; set; } = null!;
-        public DbSet<Project> Projects { get; set; } = null!;
-        public DbSet<ProjectMember> ProjectMembers { get; set; } = null!;
-        public DbSet<WorkItem> WorkItems { get; set; } = null!;
+        public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
+        public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
+
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
