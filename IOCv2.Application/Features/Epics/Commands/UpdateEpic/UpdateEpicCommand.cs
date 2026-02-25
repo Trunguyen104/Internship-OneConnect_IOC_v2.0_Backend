@@ -3,8 +3,9 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Epics.Commands.UpdateEpic;
 
-public record UpdateEpicCommand(
-    Guid EpicId,
-    string Name,
-    string? Description
-) : IRequest<Result<UpdateEpicResponse>>;
+public record UpdateEpicCommand : IRequest<Result<UpdateEpicResponse>>
+{
+    public Guid EpicId { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string? Description { get; init; }
+}

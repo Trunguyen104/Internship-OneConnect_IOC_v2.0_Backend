@@ -287,4 +287,10 @@
   <data name="Sprint.TargetSprintNotFound" xml:space="preserve">
     <value>Không tìm thấy Sprint đích được chỉ định.</value>
   </data>
+  <data name="Sprint.InvalidIncompleteItemsOption" xml:space="preserve">
+    <value>Tùy chọn xử lý các item chưa hoàn thành không hợp lệ.</value>
+  </data>
+  <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
+    <value>Sprint đích là bắt buộc khi chọn chuyển sang Sprint có sẵn.</value>
+  </data>
 </root>

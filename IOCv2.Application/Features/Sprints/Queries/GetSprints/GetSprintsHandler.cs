@@ -37,7 +37,7 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<PagedRe
             request.ProjectId,
             request.Pagination.PageIndex,
             request.Pagination.PageSize,
-            request.StatusFilter?.ToString(),
+            request.StatusFilter,
             request.Pagination.Search,
             request.Pagination.OrderBy);
         
@@ -67,10 +67,17 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<PagedRe
         
         var query = allSprints.AsQueryable();
         
-        // Apply status filter
-        if (request.StatusFilter.HasValue)
+        // Apply status filter — parse string to enum
+        SprintStatus? statusFilter = null;
+        if (!string.IsNullOrEmpty(request.StatusFilter) &&
+            Enum.TryParse<SprintStatus>(request.StatusFilter, ignoreCase: true, out var parsed))
         {
-            query = query.Where(s => s.Status == request.StatusFilter.Value);
+            statusFilter = parsed;
+        }
+        
+        if (statusFilter.HasValue)
+        {
+            query = query.Where(s => s.Status == statusFilter.Value);
         }
         
         // Apply search

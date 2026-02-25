@@ -79,6 +79,13 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
             .Where(wi => wi.Status != WorkItemStatus.Done)
             .ToList();
         
+        // Parse string option to enum
+        if (!Enum.TryParse<MoveIncompleteItemsOption>(request.IncompleteItemsOption, ignoreCase: true, out var incompleteOption))
+        {
+            return Result<CompleteSprintResponse>.Failure(
+                _errorLocalizer["Sprint.InvalidIncompleteItemsOption"], ResultErrorType.BadRequest);
+        }
+        
         int movedCount = 0;
         
         // Handle incomplete items based on option
@@ -88,7 +95,7 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                 .Where(swi => incompleteItems.Any(wi => wi.WorkItemId == swi.WorkItemId))
                 .ToList();
             
-            switch (request.IncompleteItemsOption)
+            switch (incompleteOption)
             {
                 case MoveIncompleteItemsOption.ToBacklog:
                     // Remove from sprint (moves to Product Backlog)

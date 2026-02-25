@@ -3,8 +3,9 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Sprints.Commands.CreateSprint;
 
-public record CreateSprintCommand(
-    Guid ProjectId,
-    string Name,
-    string? Goal
-) : IRequest<Result<CreateSprintResponse>>;
+public record CreateSprintCommand : IRequest<Result<CreateSprintResponse>>
+{
+    public Guid ProjectId { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string? Goal { get; init; }
+}

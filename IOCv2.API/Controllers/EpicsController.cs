@@ -28,7 +28,7 @@ public class EpicsController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<GetEpicsResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEpics(
-        Guid projectId,
+        [FromRoute] Guid projectId,
         [FromQuery] PaginationParams pagination)
     {
         var query = new GetEpicsQuery(projectId, pagination);
@@ -42,7 +42,7 @@ public class EpicsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(GetEpicByIdResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEpicById(Guid projectId, Guid id)
+    public async Task<IActionResult> GetEpicById([FromRoute] Guid projectId, [FromRoute] Guid id)
     {
         var query = new GetEpicByIdQuery(id);
         var result = await _mediator.Send(query);
@@ -56,11 +56,10 @@ public class EpicsController : ControllerBase
     [ProducesResponseType(typeof(CreateEpicResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateEpic(
-        Guid projectId,
-        [FromBody] CreateEpicRequest request)
+        [FromRoute] Guid projectId,
+        [FromBody] CreateEpicCommand command)
     {
-        var command = new CreateEpicCommand(projectId, request.Name, request.Description);
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { ProjectId = projectId });
         return HandleResult(result);
     }
     
@@ -72,12 +71,11 @@ public class EpicsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateEpic(
-        Guid projectId,
-        Guid id,
-        [FromBody] UpdateEpicRequest request)
+        [FromRoute] Guid projectId,
+        [FromRoute] Guid id,
+        [FromBody] UpdateEpicCommand command)
     {
-        var command = new UpdateEpicCommand(id, request.Name, request.Description);
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { EpicId = id });
         return HandleResult(result);
     }
     
@@ -88,7 +86,7 @@ public class EpicsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DeleteEpic(Guid projectId, Guid id)
+    public async Task<IActionResult> DeleteEpic([FromRoute] Guid projectId, [FromRoute] Guid id)
     {
         var command = new DeleteEpicCommand(id);
         var result = await _mediator.Send(command);

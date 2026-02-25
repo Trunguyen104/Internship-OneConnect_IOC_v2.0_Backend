@@ -3,10 +3,11 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Sprints.Commands.UpdateSprint;
 
-public record UpdateSprintCommand(
-    Guid SprintId,
-    string Name,
-    string? Goal,
-    DateOnly? StartDate,
-    DateOnly? EndDate
-) : IRequest<Result<UpdateSprintResponse>>;
+public record UpdateSprintCommand : IRequest<Result<UpdateSprintResponse>>
+{
+    public Guid SprintId { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string? Goal { get; init; }
+    public DateOnly? StartDate { get; init; }
+    public DateOnly? EndDate { get; init; }
+}

@@ -7,7 +7,6 @@ using IOCv2.Application.Features.Sprints.Commands.StartSprint;
 using IOCv2.Application.Features.Sprints.Commands.UpdateSprint;
 using IOCv2.Application.Features.Sprints.Queries.GetSprintById;
 using IOCv2.Application.Features.Sprints.Queries.GetSprints;
-using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +31,7 @@ public class SprintsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSprints(
         [FromRoute] Guid projectId,
-        [FromQuery] SprintStatus? status,
+        [FromQuery] string? status,
         [FromQuery] PaginationParams pagination)
     {
         var query = new GetSprintsQuery(projectId, status, pagination);
@@ -59,14 +58,9 @@ public class SprintsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateSprint(
         [FromRoute] Guid projectId,
-        [FromBody] CreateSprintRequest request)
+        [FromBody] CreateSprintCommand command)
     {
-        var command = new CreateSprintCommand(
-            projectId,
-            request.Name,
-            request.Goal);
-        
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { ProjectId = projectId });
         return HandleResult(result);
     }
     
@@ -77,16 +71,9 @@ public class SprintsController : ControllerBase
     public async Task<IActionResult> UpdateSprint(
         [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
-        [FromBody] UpdateSprintRequest request)
+        [FromBody] UpdateSprintCommand command)
     {
-        var command = new UpdateSprintCommand(
-            sprintId,
-            request.Name,
-            request.Goal,
-            request.StartDate,
-            request.EndDate);
-        
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { SprintId = sprintId });
         return HandleResult(result);
     }
     
@@ -110,10 +97,9 @@ public class SprintsController : ControllerBase
     public async Task<IActionResult> StartSprint(
         [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
-        [FromBody] StartSprintRequest request)
+        [FromBody] StartSprintCommand command)
     {
-        var command = new StartSprintCommand(sprintId, request.StartDate, request.EndDate);
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { SprintId = sprintId });
         return HandleResult(result);
     }
     
@@ -124,15 +110,9 @@ public class SprintsController : ControllerBase
     public async Task<IActionResult> CompleteSprint(
         [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
-        [FromBody] CompleteSprintRequest request)
+        [FromBody] CompleteSprintCommand command)
     {
-        var command = new CompleteSprintCommand(
-            sprintId,
-            request.IncompleteItemsOption,
-            request.TargetSprintId,
-            request.NewSprintName);
-        
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { SprintId = sprintId });
         return HandleResult(result);
     }
     

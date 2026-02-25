@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Sprints.Common;
 using IOCv2.Application.Interfaces;
@@ -11,26 +12,29 @@ using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Sprints.Commands.StartSprint;
 
-public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<bool>>
+public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<StartSprintResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
     private readonly IStringLocalizer<ErrorMessages> _errorLocalizer;
     private readonly ILogger<StartSprintHandler> _logger;
     
     public StartSprintHandler(
         IUnitOfWork unitOfWork,
+        IMapper mapper,
         ICacheService cacheService,
         IStringLocalizer<ErrorMessages> errorLocalizer,
         ILogger<StartSprintHandler> logger)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
         _cacheService = cacheService;
         _errorLocalizer = errorLocalizer;
         _logger = logger;
     }
     
-    public async Task<Result<bool>> Handle(StartSprintCommand request, CancellationToken cancellationToken)
+    public async Task<Result<StartSprintResponse>> Handle(StartSprintCommand request, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
         
@@ -43,7 +47,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<boo
         {
             stopwatch.Stop();
             _logger.LogWarning("Sprint not found for start: {SprintId}", request.SprintId);
-            return Result<bool>.NotFound(_errorLocalizer["Sprint.NotFound"]);
+            return Result<StartSprintResponse>.NotFound(_errorLocalizer["Sprint.NotFound"]);
         }
         
         // Business rule: Only Planned sprints can be started
@@ -53,7 +57,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<boo
             _logger.LogWarning(
                 "Cannot start Sprint {SprintId} with status {Status}",
                 request.SprintId, sprint.Status);
-            return Result<bool>.Failure(_errorLocalizer["Sprint.NotPlanned"], ResultErrorType.BadRequest);
+            return Result<StartSprintResponse>.Failure(_errorLocalizer["Sprint.NotPlanned"], ResultErrorType.BadRequest);
         }
         
         // Business rule: Only 1 active sprint per project
@@ -66,7 +70,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<boo
             _logger.LogWarning(
                 "Cannot start Sprint {SprintId}: Project {ProjectId} already has an active sprint",
                 request.SprintId, sprint.ProjectId);
-            return Result<bool>.Failure(_errorLocalizer["Sprint.ActiveSprintExists"], ResultErrorType.BadRequest);
+            return Result<StartSprintResponse>.Failure(_errorLocalizer["Sprint.ActiveSprintExists"], ResultErrorType.BadRequest);
         }
         
         // Get work item count for logging
@@ -106,6 +110,6 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<boo
             "Sprint started: {SprintId} in Project {ProjectId} with {WorkItemCount} items (Duration: {Duration}ms)",
             request.SprintId, sprint.ProjectId, workItemCount, stopwatch.ElapsedMilliseconds);
         
-        return Result<bool>.Success(true);
+        return Result<StartSprintResponse>.Success(_mapper.Map<StartSprintResponse>(sprint));
     }
 }

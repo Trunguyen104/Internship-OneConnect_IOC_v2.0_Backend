@@ -3,4 +3,4 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Sprints.Commands.DeleteSprint;
 
-public record DeleteSprintCommand(Guid SprintId) : IRequest<Result<bool>>;
+public record DeleteSprintCommand(Guid SprintId) : IRequest<Result<DeleteSprintResponse>>;
