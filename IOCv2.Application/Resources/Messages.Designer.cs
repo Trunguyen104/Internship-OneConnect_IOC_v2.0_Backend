@@ -141,6 +141,33 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tạo issue thành công..
+        /// </summary>
+        internal static string Issue_CreateSuccess {
+            get {
+                return ResourceManager.GetString("Issue.CreateSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xóa issue thành công..
+        /// </summary>
+        internal static string Issue_DeleteSuccess {
+            get {
+                return ResourceManager.GetString("Issue.DeleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cập nhật trạng thái issue thành công..
+        /// </summary>
+        internal static string Issue_UpdateStatusSuccess {
+            get {
+                return ResourceManager.GetString("Issue.UpdateStatusSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Vị trí mới phải khác vị trí hiện tại.
         /// </summary>
         internal static string NewRoleMustBeDifferent {

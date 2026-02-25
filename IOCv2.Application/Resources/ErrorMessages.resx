@@ -257,4 +257,32 @@
   <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Xóa stakeholder thành công.</value>
   </data>
+  <!-- Issue -->
+  <data name="Issue.NotFound" xml:space="preserve">
+    <value>Không tìm thấy issue.</value>
+  </data>
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <value>Không tìm thấy stakeholder.</value>
+  </data>
+  <data name="Issue.TitleRequired" xml:space="preserve">
+    <value>Tiêu đề là bắt buộc.</value>
+  </data>
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <value>Mô tả là bắt buộc.</value>
+  </data>
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <value>Stakeholder ID là bắt buộc.</value>
+  </data>
+  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <value>Trạng thái không hợp lệ. Vui lòng chọn: Open, InProgress, Resolved, hoặc Closed.</value>
+  </data>
+  <data name="Issue.CreateFailed" xml:space="preserve">
+    <value>Tạo issue thất bại.</value>
+  </data>
+  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <value>Cập nhật issue thất bại.</value>
+  </data>
+  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <value>Xóa issue thất bại.</value>
+  </data>
 </root>

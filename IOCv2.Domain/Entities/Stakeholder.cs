@@ -1,4 +1,4 @@
-﻿using IOCv2.Domain.Enums;
+﻿﻿using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
 {
@@ -14,5 +14,6 @@ namespace IOCv2.Domain.Entities
         public string? PhoneNumber { get; set; }
 
         public virtual Project Project { get; set; } = null!;
+        public virtual ICollection<StakeholderIssue> Issues { get; set; } = new List<StakeholderIssue>();
     }
 }

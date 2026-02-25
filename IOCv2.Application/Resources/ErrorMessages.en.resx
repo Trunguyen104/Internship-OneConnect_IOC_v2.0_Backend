@@ -293,4 +293,32 @@
   <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Stakeholder deleted successfully.</value>
   </data>
+  <!-- Issue -->
+  <data name="Issue.NotFound" xml:space="preserve">
+    <value>Issue not found.</value>
+  </data>
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <value>Stakeholder not found.</value>
+  </data>
+  <data name="Issue.TitleRequired" xml:space="preserve">
+    <value>Title is required.</value>
+  </data>
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <value>Description is required.</value>
+  </data>
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <value>Stakeholder ID is required.</value>
+  </data>
+  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <value>Invalid status. Please select: Open, InProgress, Resolved, or Closed.</value>
+  </data>
+  <data name="Issue.CreateFailed" xml:space="preserve">
+    <value>Failed to create issue.</value>
+  </data>
+  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <value>Failed to update issue.</value>
+  </data>
+  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <value>Failed to delete issue.</value>
+  </data>
  </root>
