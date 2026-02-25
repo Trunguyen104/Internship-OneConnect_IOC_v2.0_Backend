@@ -1,14 +1,12 @@
-using System.Diagnostics;
 using AutoMapper;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Sprints.Common;
 using IOCv2.Application.Interfaces;
-using IOCv2.Application.Resources;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Sprints.Commands.DeleteSprint;
 
@@ -17,93 +15,48 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result<D
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
-    private readonly IStringLocalizer<ErrorMessages> _errorLocalizer;
-    private readonly ILogger<DeleteSprintHandler> _logger;
-    
+    private readonly IMessageService _messageService;
+
     public DeleteSprintHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         ICacheService cacheService,
-        IStringLocalizer<ErrorMessages> errorLocalizer,
-        ILogger<DeleteSprintHandler> logger)
+        IMessageService messageService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _cacheService = cacheService;
-        _errorLocalizer = errorLocalizer;
-        _logger = logger;
+        _messageService = messageService;
     }
-    
-    public async Task<Result<DeleteSprintResponse>> Handle(DeleteSprintCommand request, CancellationToken cancellationToken)
+
+    public async Task<Result<DeleteSprintResponse>> Handle(
+        DeleteSprintCommand request, CancellationToken cancellationToken)
     {
-        var stopwatch = Stopwatch.StartNew();
-        
-        // Find sprint
-        var sprints = await _unitOfWork.Repository<Sprint>()
-            .FindAsync(s => s.SprintId == request.SprintId, cancellationToken);
-        var sprint = sprints.FirstOrDefault();
-        
-        if (sprint == null)
-        {
-            stopwatch.Stop();
-            _logger.LogWarning("Sprint not found for delete: {SprintId}", request.SprintId);
-            return Result<DeleteSprintResponse>.NotFound(_errorLocalizer["Sprint.NotFound"]);
-        }
-        
-        // Business rule: Cannot delete Active or Completed sprints
+        var sprint = await _unitOfWork.Repository<Sprint>().Query()
+            .FirstOrDefaultAsync(s => s.SprintId == request.SprintId, cancellationToken);
+
+        if (sprint is null)
+            return Result<DeleteSprintResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
+
         if (sprint.Status != SprintStatus.Planned)
-        {
-            stopwatch.Stop();
-            _logger.LogWarning(
-                "Cannot delete Sprint {SprintId} with status {Status}",
-                request.SprintId, sprint.Status);
             return Result<DeleteSprintResponse>.Failure(
-                _errorLocalizer["Sprint.CannotDeleteActiveSprint"], 
-                ResultErrorType.BadRequest);
-        }
-        
-        // Check if sprint has work items
-        var sprintWorkItems = await _unitOfWork.Repository<SprintWorkItem>()
-            .FindAsync(swi => swi.SprintId == request.SprintId, cancellationToken);
-        
-        if (sprintWorkItems.Any())
-        {
-            stopwatch.Stop();
-            _logger.LogWarning(
-                "Cannot delete Sprint {SprintId}: has {Count} work items",
-                request.SprintId, sprintWorkItems.Count());
+                _messageService.GetMessage(MessageKeys.Sprint.CannotDeleteActiveSprint), ResultErrorType.BadRequest);
+
+        var hasWorkItems = await _unitOfWork.Repository<SprintWorkItem>().Query()
+            .AnyAsync(swi => swi.SprintId == request.SprintId, cancellationToken);
+
+        if (hasWorkItems)
             return Result<DeleteSprintResponse>.Failure(
-                _errorLocalizer["Sprint.CannotDeleteWithWorkItems"], 
-                ResultErrorType.BadRequest);
-        }
-        
-        // Delete sprint (soft delete handled by EF Core if configured)
+                _messageService.GetMessage(MessageKeys.Sprint.CannotDeleteWithWorkItems), ResultErrorType.BadRequest);
+
         await _unitOfWork.Repository<Sprint>().DeleteAsync(sprint, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
-        
-        // Invalidate cache
-        try
-        {
-            var sprintCacheKey = SprintCacheKeys.Sprint(request.SprintId);
-            await _cacheService.RemoveAsync(sprintCacheKey, cancellationToken);
-            
-            var listCachePattern = SprintCacheKeys.SprintListPattern(sprint.ProjectId);
-            await _cacheService.RemoveByPatternAsync(listCachePattern, cancellationToken);
-            
-            _logger.LogDebug(
-                "Invalidated Sprint cache for {SprintId} and list for Project {ProjectId}",
-                request.SprintId, sprint.ProjectId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to invalidate cache after Sprint deletion");
-        }
-        
-        stopwatch.Stop();
-        _logger.LogInformation(
-            "Sprint deleted: {SprintId} in Project {ProjectId} (Duration: {Duration}ms)",
-            request.SprintId, sprint.ProjectId, stopwatch.ElapsedMilliseconds);
-        
+
+        await _cacheService.RemoveAsync(SprintCacheKeys.Sprint(request.SprintId), cancellationToken);
+        await _cacheService.RemoveByPatternAsync(
+            SprintCacheKeys.SprintListPattern(sprint.ProjectId), cancellationToken);
+
         return Result<DeleteSprintResponse>.Success(_mapper.Map<DeleteSprintResponse>(sprint));
     }
 }

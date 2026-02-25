@@ -293,4 +293,31 @@
   <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
     <value>Sprint đích là bắt buộc khi chọn chuyển sang Sprint có sẵn.</value>
   </data>
+
+  <!-- WorkItem Validation Errors -->
+  <data name="WorkItem.TitleRequired" xml:space="preserve">
+    <value>Tiêu đề công việc không được để trống.</value>
+  </data>
+  <data name="WorkItem.TitleMaxLength" xml:space="preserve">
+    <value>Tiêu đề không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="WorkItem.TypeRequired" xml:space="preserve">
+    <value>Loại công việc không được để trống.</value>
+  </data>
+  <data name="WorkItem.TypeInvalid" xml:space="preserve">
+    <value>Loại công việc không hợp lệ. Giá trị hợp lệ: Epic, UserStory, Task, Subtask.</value>
+  </data>
+  <data name="WorkItem.PriorityInvalid" xml:space="preserve">
+    <value>Độ ưu tiên không hợp lệ. Giá trị hợp lệ: Low, Medium, High, Critical.</value>
+  </data>
+  <data name="WorkItem.StatusInvalid" xml:space="preserve">
+    <value>Trạng thái không hợp lệ. Giá trị hợp lệ: Todo, InProgress, Review, Done, Cancelled.</value>
+  </data>
+  <data name="WorkItem.StoryPointInvalid" xml:space="preserve">
+    <value>Story Point phải lớn hơn hoặc bằng 0.</value>
+  </data>
+  <data name="WorkItem.NotFound" xml:space="preserve">
+    <value>Không tìm thấy công việc.</value>
+  </data>
 </root>
+

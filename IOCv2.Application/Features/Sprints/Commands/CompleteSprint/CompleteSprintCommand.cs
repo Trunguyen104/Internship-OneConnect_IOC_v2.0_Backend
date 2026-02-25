@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using IOCv2.Application.Common.Models;
 using MediatR;
 
@@ -5,6 +6,7 @@ namespace IOCv2.Application.Features.Sprints.Commands.CompleteSprint;
 
 public record CompleteSprintCommand : IRequest<Result<CompleteSprintResponse>>
 {
+    [JsonIgnore]
     public Guid SprintId { get; init; }
     
     /// <summary>FE gửi string: "ToBacklog" | "ToNextPlannedSprint" | "CreateNewSprint"</summary>

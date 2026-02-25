@@ -1,26 +1,22 @@
 using FluentValidation;
-using IOCv2.Application.Resources;
-using Microsoft.Extensions.Localization;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Epics.Commands.UpdateEpic;
 
 public class UpdateEpicValidator : AbstractValidator<UpdateEpicCommand>
 {
-    public UpdateEpicValidator(IStringLocalizer<ErrorMessages> localizer)
+    public UpdateEpicValidator(IMessageService messageService)
     {
-        RuleFor(x => x.EpicId)
-            .NotEmpty()
-            .WithMessage(localizer["Epic.ProjectIdRequired"]);
-        
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage(localizer["Epic.NameRequired"])
+            .WithMessage(messageService.GetMessage(MessageKeys.Epic.NameRequired))
             .MaximumLength(255)
-            .WithMessage(localizer["Epic.NameMaxLength"]);
-        
+            .WithMessage(messageService.GetMessage(MessageKeys.Epic.NameMaxLength));
+
         RuleFor(x => x.Description)
             .MaximumLength(2000)
-            .WithMessage(localizer["Epic.DescriptionMaxLength"])
-            .When(x => !string.IsNullOrEmpty(x.Description));
+            .When(x => !string.IsNullOrEmpty(x.Description))
+            .WithMessage(messageService.GetMessage(MessageKeys.Epic.DescriptionMaxLength));
     }
 }

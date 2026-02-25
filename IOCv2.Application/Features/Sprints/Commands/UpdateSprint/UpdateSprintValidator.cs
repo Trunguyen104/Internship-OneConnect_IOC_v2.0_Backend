@@ -1,45 +1,40 @@
 using FluentValidation;
-using IOCv2.Application.Resources;
-using Microsoft.Extensions.Localization;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Sprints.Commands.UpdateSprint;
 
 public class UpdateSprintValidator : AbstractValidator<UpdateSprintCommand>
 {
-    public UpdateSprintValidator(IStringLocalizer<ErrorMessages> localizer)
+    public UpdateSprintValidator(IMessageService messageService)
     {
-        RuleFor(x => x.SprintId)
-            .NotEmpty()
-            .WithMessage(localizer["Sprint.ProjectIdRequired"]);
-        
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage(localizer["Sprint.NameRequired"])
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.NameRequired))
             .MaximumLength(200)
-            .WithMessage(localizer["Sprint.NameMaxLength"]);
-        
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.NameMaxLength));
+
         RuleFor(x => x.Goal)
             .MaximumLength(1000)
-            .WithMessage(localizer["Sprint.GoalMaxLength"])
-            .When(x => !string.IsNullOrEmpty(x.Goal));
-        
+            .When(x => !string.IsNullOrEmpty(x.Goal))
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.GoalMaxLength));
+
         RuleFor(x => x.StartDate)
             .NotEmpty()
-            .WithMessage(localizer["Sprint.StartDateRequired"]);
-        
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.StartDateRequired));
+
         RuleFor(x => x.EndDate)
             .NotEmpty()
-            .WithMessage(localizer["Sprint.EndDateRequired"])
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.EndDateRequired))
             .Must((cmd, endDate) => !cmd.StartDate.HasValue || !endDate.HasValue || endDate.Value > cmd.StartDate.Value)
-            .WithMessage(localizer["Sprint.EndDateMustBeAfterStart"]);
-        
-        // Sprint duration validation (1-4 weeks): use DayNumber since DateOnly doesn't support subtraction
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.EndDateMustBeAfterStart));
+
         RuleFor(x => x)
             .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue ||
                        x.EndDate.Value.DayNumber - x.StartDate.Value.DayNumber >= 7)
-            .WithMessage(localizer["Sprint.DurationTooShort"])
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.DurationTooShort))
             .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue ||
                        x.EndDate.Value.DayNumber - x.StartDate.Value.DayNumber <= 28)
-            .WithMessage(localizer["Sprint.DurationTooLong"]);
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.DurationTooLong));
     }
 }

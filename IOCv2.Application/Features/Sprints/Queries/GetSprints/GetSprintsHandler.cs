@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Extensions.Pagination;
@@ -7,7 +6,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Sprints.Queries.GetSprints;
 
@@ -16,23 +15,17 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<PagedRe
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
-    private readonly ILogger<GetSprintsHandler> _logger;
-    
-    public GetSprintsHandler(
-        IUnitOfWork unitOfWork,
-        IMapper mapper,
-        ICacheService cacheService,
-        ILogger<GetSprintsHandler> logger)
+
+    public GetSprintsHandler(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _cacheService = cacheService;
-        _logger = logger;
     }
-    
-    public async Task<Result<PagedResult<GetSprintsResponse>>> Handle(GetSprintsQuery request, CancellationToken cancellationToken)
+
+    public async Task<Result<PagedResult<GetSprintsResponse>>> Handle(
+        GetSprintsQuery request, CancellationToken cancellationToken)
     {
-        var stopwatch = Stopwatch.StartNew();
         var cacheKey = SprintCacheKeys.SprintList(
             request.ProjectId,
             request.Pagination.PageIndex,
@@ -40,98 +33,50 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<PagedRe
             request.StatusFilter,
             request.Pagination.Search,
             request.Pagination.OrderBy);
-        
-        // Try cache first
-        try
-        {
-            var cachedResult = await _cacheService.GetAsync<PagedResult<GetSprintsResponse>>(cacheKey, cancellationToken);
-            if (cachedResult != null)
-            {
-                stopwatch.Stop();
-                _logger.LogDebug(
-                    "Sprint list cache hit for Project {ProjectId} (Duration: {Duration}ms)",
-                    request.ProjectId, stopwatch.ElapsedMilliseconds);
-                return Result<PagedResult<GetSprintsResponse>>.Success(cachedResult);
-            }
-            
-            _logger.LogDebug("Sprint list cache miss for Project {ProjectId}", request.ProjectId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Cache get failed for Sprint list, falling back to DB");
-        }
-        
-        // Query from database using FindAsync
-        var allSprints = await _unitOfWork.Repository<Sprint>()
-            .FindAsync(s => s.ProjectId == request.ProjectId, cancellationToken);
-        
-        var query = allSprints.AsQueryable();
-        
-        // Apply status filter — parse string to enum
-        SprintStatus? statusFilter = null;
+
+        var cachedResult = await _cacheService.GetAsync<PagedResult<GetSprintsResponse>>(cacheKey, cancellationToken);
+        if (cachedResult is not null)
+            return Result<PagedResult<GetSprintsResponse>>.Success(cachedResult);
+
+        // Build IQueryable — filter at DB level
+        var query = _unitOfWork.Repository<Sprint>().Query()
+            .AsNoTracking()
+            .Where(s => s.ProjectId == request.ProjectId);
+
         if (!string.IsNullOrEmpty(request.StatusFilter) &&
-            Enum.TryParse<SprintStatus>(request.StatusFilter, ignoreCase: true, out var parsed))
+            Enum.TryParse<SprintStatus>(request.StatusFilter, ignoreCase: true, out var statusFilter))
         {
-            statusFilter = parsed;
+            query = query.Where(s => s.Status == statusFilter);
         }
-        
-        if (statusFilter.HasValue)
-        {
-            query = query.Where(s => s.Status == statusFilter.Value);
-        }
-        
-        // Apply search
+
         if (!string.IsNullOrWhiteSpace(request.Pagination.Search))
         {
             var search = request.Pagination.Search.ToLower();
-            query = query.Where(s => 
+            query = query.Where(s =>
                 (s.Name != null && s.Name.ToLower().Contains(search)) ||
                 (s.Goal != null && s.Goal.ToLower().Contains(search)));
         }
-        
-        // Apply sorting
-        query = string.IsNullOrWhiteSpace(request.Pagination.OrderBy) || request.Pagination.OrderBy.ToLower().StartsWith("startdate")
+
+        query = string.IsNullOrWhiteSpace(request.Pagination.OrderBy) ||
+                request.Pagination.OrderBy.ToLower().StartsWith("startdate")
             ? query.OrderBy(s => s.StartDate)
             : request.Pagination.OrderBy.ToLower().StartsWith("enddate")
                 ? query.OrderBy(s => s.EndDate)
                 : request.Pagination.OrderBy.ToLower().StartsWith("name")
                     ? query.OrderBy(s => s.Name)
                     : query.OrderBy(s => s.StartDate);
-        
-        // Manual pagination
-        var totalCount = query.Count();
-        var items = query
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var entities = await query
             .Skip((request.Pagination.PageIndex - 1) * request.Pagination.PageSize)
             .Take(request.Pagination.PageSize)
-            .Select(s => _mapper.Map<GetSprintsResponse>(s))
-            .ToList();
-        
-        var result = new PagedResult<GetSprintsResponse>(
-            items,
-            request.Pagination,
-            totalCount);
-        
-        // Cache the result
-        try
-        {
-            await _cacheService.SetAsync(
-                cacheKey,
-                result,
-                SprintCacheKeys.Expiration.SprintList,
-                cancellationToken);
-            
-            _logger.LogDebug("Cached Sprint list for Project {ProjectId}", request.ProjectId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to cache Sprint list");
-        }
-        
-        stopwatch.Stop();
-        _logger.LogInformation(
-            "Sprint list retrieved for Project {ProjectId}: {Count} results (Duration: {Duration}ms)",
-            request.ProjectId, result.TotalCount, stopwatch.ElapsedMilliseconds);
-        
+            .ToListAsync(cancellationToken);
+
+        var items = _mapper.Map<List<GetSprintsResponse>>(entities);
+        var result = new PagedResult<GetSprintsResponse>(items, request.Pagination, totalCount);
+
+        await _cacheService.SetAsync(cacheKey, result, SprintCacheKeys.Expiration.SprintList, cancellationToken);
+
         return Result<PagedResult<GetSprintsResponse>>.Success(result);
     }
 }

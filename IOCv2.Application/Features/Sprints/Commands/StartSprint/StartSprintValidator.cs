@@ -1,32 +1,27 @@
 using FluentValidation;
-using IOCv2.Application.Resources;
-using Microsoft.Extensions.Localization;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Sprints.Commands.StartSprint;
 
 public class StartSprintValidator : AbstractValidator<StartSprintCommand>
 {
-    public StartSprintValidator(IStringLocalizer<ErrorMessages> localizer)
+    public StartSprintValidator(IMessageService messageService)
     {
-        RuleFor(x => x.SprintId)
-            .NotEmpty()
-            .WithMessage(localizer["Sprint.ProjectIdRequired"]);
-
         RuleFor(x => x.StartDate)
             .NotEmpty()
-            .WithMessage(localizer["Sprint.StartDateRequired"]);
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.StartDateRequired));
 
         RuleFor(x => x.EndDate)
             .NotEmpty()
-            .WithMessage(localizer["Sprint.EndDateRequired"])
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.EndDateRequired))
             .Must((cmd, endDate) => endDate > cmd.StartDate)
-            .WithMessage(localizer["Sprint.EndDateMustBeAfterStart"]);
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.EndDateMustBeAfterStart));
 
-        // Sprint duration: 7-28 ngày
         RuleFor(x => x)
             .Must(x => x.EndDate.DayNumber - x.StartDate.DayNumber >= 7)
-            .WithMessage(localizer["Sprint.DurationTooShort"])
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.DurationTooShort))
             .Must(x => x.EndDate.DayNumber - x.StartDate.DayNumber <= 28)
-            .WithMessage(localizer["Sprint.DurationTooLong"]);
+            .WithMessage(messageService.GetMessage(MessageKeys.Sprint.DurationTooLong));
     }
 }
