@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260224031346_AddUserCodeSequence")]
-    partial class AddUserCodeSequence
+    [Migration("20260224100019_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -319,6 +319,100 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("refresh_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
+                {
+                    b.Property<Guid>("SprintId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("sprint_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("end_date");
+
+                    b.Property<string>("Goal")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("goal");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("start_date");
+
+                    b.Property<short>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("SprintId")
+                        .HasName("pk_sprints");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_sprints_project_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_sprints_status");
+
+                    b.ToTable("sprints", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.SprintWorkItem", b =>
+                {
+                    b.Property<Guid>("SprintId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sprint_id");
+
+                    b.Property<Guid>("WorkItemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("work_item_id");
+
+                    b.Property<float>("BoardOrder")
+                        .HasColumnType("real")
+                        .HasColumnName("board_order");
+
+                    b.HasKey("SprintId", "WorkItemId")
+                        .HasName("pk_sprint_work_items");
+
+                    b.HasIndex("WorkItemId")
+                        .HasDatabaseName("ix_sprint_work_items_work_item_id");
+
+                    b.HasIndex("SprintId", "BoardOrder")
+                        .HasDatabaseName("ix_sprint_work_items_board_order");
+
+                    b.ToTable("sprint_work_items", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
                 {
                     b.Property<Guid>("StudentId")
@@ -607,6 +701,104 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("user_code_sequences", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.WorkItem", b =>
+                {
+                    b.Property<Guid>("WorkItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("work_item_id");
+
+                    b.Property<Guid?>("AssigneeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assignee_id");
+
+                    b.Property<float>("BacklogOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("real")
+                        .HasDefaultValue(0f)
+                        .HasColumnName("backlog_order");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<DateOnly?>("DueDate")
+                        .HasColumnType("date")
+                        .HasColumnName("due_date");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
+
+                    b.Property<short?>("Priority")
+                        .HasColumnType("smallint")
+                        .HasColumnName("priority");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
+
+                    b.Property<short?>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<int?>("StoryPoint")
+                        .HasColumnType("integer")
+                        .HasColumnName("story_point");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("title");
+
+                    b.Property<short>("Type")
+                        .HasColumnType("smallint")
+                        .HasColumnName("type");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("WorkItemId")
+                        .HasName("pk_work_items");
+
+                    b.HasIndex("AssigneeId")
+                        .HasDatabaseName("ix_work_items_assignee_id");
+
+                    b.HasIndex("ParentId")
+                        .HasDatabaseName("ix_work_items_parent_id");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_work_items_project_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_work_items_status");
+
+                    b.HasIndex("Type")
+                        .HasDatabaseName("ix_work_items_type");
+
+                    b.ToTable("work_items", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.AuditLog", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "PerformedBy")
@@ -664,6 +856,27 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.SprintWorkItem", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.Sprint", "Sprint")
+                        .WithMany("SprintWorkItems")
+                        .HasForeignKey("SprintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sprint_work_items_sprints_sprint_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.WorkItem", "WorkItem")
+                        .WithMany()
+                        .HasForeignKey("WorkItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sprint_work_items_work_items_work_item_id");
+
+                    b.Navigation("Sprint");
+
+                    b.Navigation("WorkItem");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "User")
@@ -697,9 +910,33 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.WorkItem", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.Student", "Assignee")
+                        .WithMany()
+                        .HasForeignKey("AssigneeId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_work_items_students_assignee_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.WorkItem", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_work_items_work_items_parent_id");
+
+                    b.Navigation("Assignee");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Enterprise", b =>
                 {
                     b.Navigation("EnterpriseUsers");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
+                {
+                    b.Navigation("SprintWorkItems");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.University", b =>
@@ -718,6 +955,11 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Student");
 
                     b.Navigation("UniversityUser");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.WorkItem", b =>
+                {
+                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }
