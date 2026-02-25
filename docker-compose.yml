@@ -34,9 +34,9 @@ services:
       - Redis__InstanceName=IOCv2Cache
       - EMAIL_SMTP_HOST=smtp.gmail.com
       - EMAIL_SMTP_PORT=587
-      - EMAIL_SENDER_EMAIL=iocv2.noreply@gmail.com
+      - EMAIL_SENDER_EMAIL=trunguyen.104@gmail.com
       - EMAIL_SENDER_NAME=IOCv2
-      - EMAIL_APP_PASSWORD=zdmtalaxyyyaodib
+      - EMAIL_APP_PASSWORD=rawm ucss dvnt kymn
       - JWT_ACCESS_TOKEN_EXPIRES_IN_MINUTE=60
       - JWT_REFRESH_TOKEN_EXPIRES_IN_DAYS=7
     ports:
