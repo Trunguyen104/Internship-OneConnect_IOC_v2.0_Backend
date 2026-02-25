@@ -1,4 +1,4 @@
-﻿﻿using IOCv2.Application.Common.Models;
+﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder;
 using IOCv2.Application.Features.Stakeholders.Commands.DeleteStakeholder;
 using IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder;
@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers
+namespace IOCv2.API.Controllers.StakeholdersController
 {
     /// <summary>
     /// Stakeholder Management — manage stakeholders for a project.
