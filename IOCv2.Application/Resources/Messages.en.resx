@@ -97,6 +97,7 @@
   </data>
   <data name="Epic.DeletedSuccess" xml:space="preserve">
     <value>Epic deleted successfully.</value>
+  </data>
   <!-- Issue -->
   <data name="Issue.CreateSuccess" xml:space="preserve">
     <value>Issue created successfully.</value>

@@ -458,7 +458,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("sprint_work_items", (string)null);
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1053,6 +1052,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Sprint");
 
                     b.Navigation("WorkItem");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.Project", "Project")
@@ -1137,6 +1138,8 @@ namespace IOCv2.Infrastructure.Migrations
             modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
                 {
                     b.Navigation("SprintWorkItems");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
                 {
                     b.Navigation("Stakeholders");

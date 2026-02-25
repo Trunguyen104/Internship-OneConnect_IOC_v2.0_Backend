@@ -158,6 +158,8 @@
             public const string StatusInvalid = "WorkItem.StatusInvalid";
             public const string StoryPointInvalid = "WorkItem.StoryPointInvalid";
             public const string NotFound = "WorkItem.NotFound";
+        }
+
         public static class Stakeholder
         {
             public const string NotFound = "Stakeholder.NotFound";
