@@ -9,11 +9,13 @@ namespace IOCv2.Infrastructure.Persistence
     {
         private readonly AppDbContext _context;
         private readonly IPasswordService _passwordService;
+        private readonly IUserServices _userService;
 
-        public DbInitializer(AppDbContext context, IPasswordService passwordService)
+        public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
         {
             _context = context;
             _passwordService = passwordService;
+            _userService = userService;
         }
 
         public async Task InitializeAsync()
@@ -95,14 +97,14 @@ namespace IOCv2.Infrastructure.Persistence
             var universityList = await _context.Universities.ToListAsync();
             var enterpriseList = await _context.Enterprises.ToListAsync();
             var existingEmails = await _context.Users.Select(u => u.Email).ToHashSetAsync();
-
+            CancellationToken cancellationToken = default;
             // 1. Super Admin
             if (!await _context.Users.AnyAsync(u => u.Role == UserRole.SuperAdmin))
             {
                 var superAdmin = new User
                 {
                     UserId = Guid.NewGuid(),
-                    UserCode = "SU000001",
+                    UserCode = await _userService.GenerateUserCodeAsync(UserRole.SuperAdmin, cancellationToken),
                     PasswordHash = passHash,
                     FullName = "Super Administrator",
                     Email = "admin@iocv2.com",
@@ -119,7 +121,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var moderator = new User
                 {
                     UserId = Guid.NewGuid(),
-                    UserCode = "MO000001",
+                    UserCode = await _userService.GenerateUserCodeAsync(UserRole.Moderator, cancellationToken),
                     PasswordHash = passHash,
                     FullName = "System Moderator",
                     Email = "moderator@iocv2.com",
@@ -139,7 +141,7 @@ namespace IOCv2.Infrastructure.Persistence
                     var user = new User
                     {
                         UserId = Guid.NewGuid(),
-                        UserCode = $"SC_{uni.Code}_01",
+                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.SchoolAdmin, cancellationToken),
                         PasswordHash = passHash,
                         FullName = $"{uni.Code} Administrator",
                         Email = email,
@@ -160,7 +162,7 @@ namespace IOCv2.Infrastructure.Persistence
                     var user = new User
                     {
                         UserId = Guid.NewGuid(),
-                        UserCode = $"EN_{ent.Name.Substring(0, 3).ToUpper()}_01",
+                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.EnterpriseAdmin, cancellationToken),
                         PasswordHash = passHash,
                         FullName = $"{ent.Name} Admin",
                         Email = email,
@@ -182,7 +184,7 @@ namespace IOCv2.Infrastructure.Persistence
                     var hr = new User
                     {
                         UserId = Guid.NewGuid(),
-                        UserCode = "HR000001",
+                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.HR, cancellationToken),
                         PasswordHash = passHash,
                         FullName = "FPT HR Manager",
                         Email = "hr.fpt@iocv2.com",
@@ -199,7 +201,7 @@ namespace IOCv2.Infrastructure.Persistence
                     var mentor = new User
                     {
                         UserId = Guid.NewGuid(),
-                        UserCode = "ME000001",
+                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken),
                         PasswordHash = passHash,
                         FullName = "FPT Senior Mentor",
                         Email = "mentor.fpt@iocv2.com",
@@ -223,7 +225,7 @@ namespace IOCv2.Infrastructure.Persistence
                         var user = new User
                         {
                             UserId = Guid.NewGuid(),
-                            UserCode = $"ST_{uni.Code}_{i:D3}",
+                            UserCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken),
                             PasswordHash = passHash,
                             FullName = $"Student {i} of {uni.Code}",
                             Email = email,
@@ -251,7 +253,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var testUser = new User
                 {
                     UserId = Guid.NewGuid(),
-                    UserCode = "ST_TRUNG_01",
+                    UserCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken),
                     PasswordHash = passHash,
                     FullName = "Trung Nguyen",
                     Email = "trunguyen.104@gmail.com",

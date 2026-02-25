@@ -19,12 +19,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasIndex(eu => eu.EnterpriseId);
             builder.HasIndex(eu => eu.UserId).IsUnique();
 
-            builder.Property(eu => eu.CreatedAt).HasColumnName("created_at");
-            builder.Property(eu => eu.CreatedBy).HasColumnName("created_by");
-            builder.Property(eu => eu.UpdatedAt).HasColumnName("updated_at");
-            builder.Property(eu => eu.UpdatedBy).HasColumnName("updated_by");
-            builder.Property(eu => eu.DeletedAt).HasColumnName("deleted_at");
-
             builder.HasOne(eu => eu.Enterprise)
                 .WithMany(e => e.EnterpriseUsers)
                 .HasForeignKey(eu => eu.EnterpriseId)

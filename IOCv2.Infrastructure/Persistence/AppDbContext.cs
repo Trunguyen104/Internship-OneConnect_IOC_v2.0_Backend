@@ -44,6 +44,21 @@ public partial class AppDbContext : DbContext
         }
 
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<AuditLog> AuditLogs { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
+        public DbSet<Student> Students { get; set; } = null!;
+        public DbSet<Domain.Entities.University> Universities { get; set; } = null!;
+        public DbSet<UniversityUser> UniversityUsers { get; set; } = null!;
+        public DbSet<Domain.Entities.Enterprise> Enterprises { get; set; } = null!;
+        public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
+        public DbSet<UserCodeSequence> UserCodeSequences { get; set; } = null!;
+        public DbSet<Project> Projects { get; set; } = null!;
+        public DbSet<Domain.Entities.Stakeholder> Stakeholders { get; set; } = null!;
+        public DbSet<StakeholderIssue> StakeholderIssues { get; set; } = null!;
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             switch (entry.State)
             {
