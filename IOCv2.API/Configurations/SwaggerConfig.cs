@@ -1,5 +1,4 @@
-﻿6
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 
 namespace IOCv2.API.Configurations;
 
