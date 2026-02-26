@@ -108,5 +108,15 @@
             public const string PhoneRequired = "Profile.PhoneRequired";
             public const string PhoneInvalid = "Profile.PhoneInvalid";
         }
+
+        public static class InternshipGroups
+        {
+            public const string NameRequired = "InternshipGroup.NameRequired";
+            public const string NameMaxLength = "InternshipGroup.NameMaxLength";
+            public const string TermIdRequired = "InternshipGroup.TermIdRequired";
+            public const string StartDateBeforeEndDate = "InternshipGroup.StartDateBeforeEndDate";
+            public const string StudentListRequired = "InternshipGroup.StudentListRequired";
+            public const string StudentListToRemoveRequired = "InternshipGroup.StudentListToRemoveRequired";
+        }
     }
 }
