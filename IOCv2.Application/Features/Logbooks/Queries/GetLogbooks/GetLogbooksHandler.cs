@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,27 +25,42 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
             _mapper = mapper;
         }
 
-        public Task<Result<PaginatedResult<GetLogbooksResponse>>> Handle(GetLogbooksQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedResult<GetLogbooksResponse>>> Handle(GetLogbooksQuery request, CancellationToken cancellationToken)
         {
-            var query = _unitOfWork.Repository<Logbook>().Query()
-            .Include(x => x.Internship).ThenInclude(x => x.Student);
+            var query = _unitOfWork.Repository<Logbook>()
+                        .Query()
+                        .Include(x => x.Student)
+                            .ThenInclude(s => s.User)
+                        .Include(x => x.InternshipGroup)
+                        .AsQueryable();
+
+            //Get Student name
+            var student = await _unitOfWork.Repository<Student>()
+                .Query()
+                .Where(s => s.StudentId == query.Select(x=>x.StudentId).FirstOrDefault())
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var userName = await _unitOfWork.Repository<User>()
+                .Query()
+                .Where(u => u.UserId == student.UserId)
+                .Select(u => u.FullName)
+                .FirstOrDefaultAsync(cancellationToken);
 
             // Filter by status
-            if (!string.IsNullOrWhiteSpace(request.Status) && Enum.TryParse<LogbookStatus>(request.Status, true, out var parsedStatus))
+            if (!string.IsNullOrWhiteSpace(request.Status) &&
+                Enum.TryParse<LogbookStatus>(request.Status, true, out var parsedStatus))
             {
-                query = query.Where(u => u.Status == parsedStatus);
+                query = query.Where(x => x.Status == parsedStatus);
             }
 
             // Sorting
             query = (request.SortColumn?.ToLower(), request.SortOrder?.ToLower()) switch
             {
-                ("studentname", "desc") => query.OrderByDescending(x => x.Internship.Student.FullName),
-                ("studentname", _) => query.OrderBy(x => x.Internship.Student.FullName),
-                ("internshipid", "desc") => query.OrderByDescending(x => x.InternshipId),
-                ("internshipid", _) => query.OrderBy(x => x.InternshipId),
-                ("createdat", "desc") => query.OrderByDescending(u => u.CreatedAt),
-                ("createdat", _) => query.OrderBy(u => u.CreatedAt),
-                _ => query.OrderByDescending(u => u.CreatedAt)
+                ("studentname", "desc") => query.OrderByDescending(x => x.Student.User.FullName),
+                ("studentname", _) => query.OrderBy(x => x.Student.User.FullName),
+                ("createdat", "desc") => query.OrderByDescending(x => x.CreatedAt),
+                ("createdat", _) => query.OrderBy(x => x.CreatedAt),
+                _ => query.OrderByDescending(x => x.CreatedAt)
             };
 
             var totalCount = await query.CountAsync(cancellationToken);
@@ -51,6 +70,8 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
                 .Take(request.PageSize)
                 .ProjectTo<GetLogbooksResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
+
+            logbooks.ForEach(lb => lb.StudentName = userName);
 
             var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
             return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);

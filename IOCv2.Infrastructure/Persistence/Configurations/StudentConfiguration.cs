@@ -35,6 +35,11 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .WithOne(u => u.Student)
                 .HasForeignKey<Student>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(s => s.Logbooks)
+                .WithOne(l => l.Student)
+                .HasForeignKey(l => l.StudentId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

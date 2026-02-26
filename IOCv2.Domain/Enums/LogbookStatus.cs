@@ -2,8 +2,7 @@
 {
     public enum LogbookStatus
     {
-        SUBMITTED = 1,
-        APPROVED = 2,
-        NEEDS_REVISION = 3
+        PUNCTUAL = 1,
+        LATE = 2
     }
 }

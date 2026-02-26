@@ -25,6 +25,7 @@ namespace IOCv2.Infrastructure.Persistence
         public DbSet<Domain.Entities.Enterprise> Enterprises { get; set; } = null!;
         public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
         public DbSet<UserCodeSequence> UserCodeSequences { get; set; } = null!;
+        public DbSet<Domain.Entities.Logbook> Logbooks { get; set; } = null!;
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
