@@ -134,6 +134,8 @@
             public const string DescriptionMaxLength = "Projects.DescriptionMaxLength";
             public const string StartDateInvalidRange = "Projects.StartDateInvalidRange";
             public const string EndDateInvalidRange = "Projects.EndDateInvalidRange";
+            public const string LogGetByInternshipIdSuccess = "Projects.LogGetByInternshipIdSuccess";
+            public const string LogGetByInternshipIdErr = "Projects.LogGetByInternshipIdErr";
         }
 
         public static class ProjectResourcesKey
@@ -155,6 +157,12 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
+        }
+
+        public static class Internships
+        {
+            public const string NotFound = "Internships.NotFound";
+            public const string InternshipIdRequired = "Internships.InternshipIdRequired";  
         }
 
         public static class Page {

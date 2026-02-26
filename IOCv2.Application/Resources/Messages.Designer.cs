@@ -142,6 +142,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internship not found: {InternshipId}.
+        /// </summary>
+        internal static string Internships_NotFound {
+            get {
+                return ResourceManager.GetString("Internships.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Vị trí mới phải khác vị trí hiện tại.
         /// </summary>
         internal static string NewRoleMustBeDifferent {
@@ -237,6 +246,15 @@ namespace IOCv2.Application.Resources {
         internal static string Projects_LogDelete {
             get {
                 return ResourceManager.GetString("Projects.LogDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully retrieved {Count} projects for internship ID: {InternshipId}.
+        /// </summary>
+        internal static string Projects_LogGetByInternshipIdSuccess {
+            get {
+                return ResourceManager.GetString("Projects.LogGetByInternshipIdSuccess", resourceCulture);
             }
         }
         

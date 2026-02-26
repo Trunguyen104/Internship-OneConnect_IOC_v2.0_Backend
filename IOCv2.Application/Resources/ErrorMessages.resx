@@ -327,4 +327,10 @@
   <data name="Projects.GetByStudentIdError" xml:space="preserve">
     <value>Error getting projects for student {StudentId}</value>
   </data>
+  <data name="Projects.LogGetByInternshipIdErr" xml:space="preserve">
+    <value>Error occurred while getting projects by {internshipId}</value>
+  </data>
+  <data name="Internships.InternshipIdRequired" xml:space="preserve">
+    <value>Internship ID is required.</value>
+  </data>
 </root>

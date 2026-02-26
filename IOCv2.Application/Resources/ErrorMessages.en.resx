@@ -204,84 +204,6 @@
   <data name="Profile.EmailExists" xml:space="preserve">
     <value>Email is already in use by another user.</value>
   </data>
-  <data name="Password.NotEmpty" xml:space="preserve">
-    <value>Password cannot be empty.</value>
-  </data>
-  <data name="CannotIdentifyManager" xml:space="preserve">
-    <value>Cannot identify the manager performing the reset.</value>
-  </data>
-  <data name="OnlyManagerCanReset" xml:space="preserve">
-    <value>Only managers are allowed to reset passwords.</value>
-  </data>
-  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
-    <value>Password can only be reset for active accounts.</value>
-  </data>
-  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
-    <value>Employee ID is required.</value>
-  </data>
-  <data name="ResetStatusNoEmail" xml:space="preserve">
-    <value>Password reset successful. However, the email could not be sent.</value>
-  </data>
-  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
-    <value>Cannot update information for inactive employees.</value>
-  </data>
-  <data name="Profile.EmployeeIdRequired" xml:space="preserve">
-    <value>EmployeeId cannot be empty.</value>
-  </data>
-  <data name="Profile.FullNameRequired" xml:space="preserve">
-    <value>Full name cannot be empty.</value>
-  </data>
-  <data name="Profile.FullNameMaxLength" xml:space="preserve">
-    <value>Full name cannot exceed 100 characters.</value>
-  </data>
-  <data name="Profile.EmailRequired" xml:space="preserve">
-    <value>Email cannot be empty.</value>
-  </data>
-  <data name="Profile.EmailInvalid" xml:space="preserve">
-    <value>Invalid email format.</value>
-  </data>
-  <data name="Profile.PhoneRequired" xml:space="preserve">
-    <value>Phone number cannot be empty.</value>
-  </data>
-  <data name="Profile.PhoneInvalid" xml:space="preserve">
-    <value>Invalid phone number format.</value>
-  </data>
-  <data name="Employee.CodeInvalidFormat" xml:space="preserve">
-    <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
-  </data>
-  <data name="Auth.TokenRequired" xml:space="preserve">
-    <value>Token is required.</value>
-  </data>
-  <data name="Auth.NewPasswordRequired" xml:space="preserve">
-    <value>New password is required.</value>
-  </data>
-  <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
-    <value>Confirm password is required.</value>
-  </data>
-  <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
-    <value>Confirm password does not match new password.</value>
-  </data>
-  <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
-    <value>Employee code is required.</value>
-  </data>
-  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
-    <value>If an account exists for that employee code, a reset email has been sent.</value>
-  </data>
-  <data name="EmployeeNotActive" xml:space="preserve">
-    <value>Employee is not active.</value>
-  </data>
-  <data name="CannotPromoteToManager" xml:space="preserve">
-    <value>Cannot promote to Manager directly.</value>
-  </data>
-  <data name="NewRoleMustBeDifferent" xml:space="preserve">
-    <value>New role must be different from current role.</value>
-  </data>
-  <data name="DatabaseUpdateError" xml:space="preserve">
-    <value>An error occurred while updating the database.</value>
-  </data>
-  <data name="RoleChangedButEmailFailed" xml:space="preserve">
-    <value>Role changed successfully for {0}, but notification email failed to send.</value>
-  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Projects.LogDeleteError" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
@@ -362,6 +284,90 @@
     <value />
   </data>
   <data name="Projects.GetByStudentIdError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Password.NotEmpty" xml:space="preserve">
+    <value>Password cannot be empty.</value>
+  </data>
+  <data name="CannotIdentifyManager" xml:space="preserve">
+    <value>Cannot identify the manager performing the reset.</value>
+  </data>
+  <data name="OnlyManagerCanReset" xml:space="preserve">
+    <value>Only managers are allowed to reset passwords.</value>
+  </data>
+  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Password can only be reset for active accounts.</value>
+  </data>
+  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
+    <value>Employee ID is required.</value>
+  </data>
+  <data name="ResetStatusNoEmail" xml:space="preserve">
+    <value>Password reset successful. However, the email could not be sent.</value>
+  </data>
+  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
+    <value>Cannot update information for inactive employees.</value>
+  </data>
+  <data name="Profile.EmployeeIdRequired" xml:space="preserve">
+    <value>EmployeeId cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameRequired" xml:space="preserve">
+    <value>Full name cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameMaxLength" xml:space="preserve">
+    <value>Full name cannot exceed 100 characters.</value>
+  </data>
+  <data name="Profile.EmailRequired" xml:space="preserve">
+    <value>Email cannot be empty.</value>
+  </data>
+  <data name="Profile.EmailInvalid" xml:space="preserve">
+    <value>Invalid email format.</value>
+  </data>
+  <data name="Profile.PhoneRequired" xml:space="preserve">
+    <value>Phone number cannot be empty.</value>
+  </data>
+  <data name="Profile.PhoneInvalid" xml:space="preserve">
+    <value>Invalid phone number format.</value>
+  </data>
+  <data name="Employee.CodeInvalidFormat" xml:space="preserve">
+    <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
+  </data>
+  <data name="Auth.TokenRequired" xml:space="preserve">
+    <value>Token is required.</value>
+  </data>
+  <data name="Auth.NewPasswordRequired" xml:space="preserve">
+    <value>New password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
+    <value>Confirm password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
+    <value>Confirm password does not match new password.</value>
+  </data>
+  <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
+    <value>Employee code is required.</value>
+  </data>
+  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <value>If an account exists for that employee code, a reset email has been sent.</value>
+  </data>
+  <data name="EmployeeNotActive" xml:space="preserve">
+    <value>Employee is not active.</value>
+  </data>
+  <data name="CannotPromoteToManager" xml:space="preserve">
+    <value>Cannot promote to Manager directly.</value>
+  </data>
+  <data name="NewRoleMustBeDifferent" xml:space="preserve">
+    <value>New role must be different from current role.</value>
+  </data>
+  <data name="DatabaseUpdateError" xml:space="preserve">
+    <value>An error occurred while updating the database.</value>
+  </data>
+  <data name="RoleChangedButEmailFailed" xml:space="preserve">
+    <value>Role changed successfully for {0}, but notification email failed to send.</value>
+  </data>
+  <data name="Projects.LogGetByInternshipIdErr" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Internships.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
 </root>
