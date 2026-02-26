@@ -19,5 +19,6 @@ namespace IOCv2.Domain.Entities
         public DateTime EndDate { get; set; }
         public short Status { get; set; }
 
+        public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
     }
 }

@@ -34,18 +34,6 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
                         .Include(x => x.InternshipGroup)
                         .AsQueryable();
 
-            //Get Student name
-            var student = await _unitOfWork.Repository<Student>()
-                .Query()
-                .Where(s => s.StudentId == query.Select(x=>x.StudentId).FirstOrDefault())
-                .FirstOrDefaultAsync(cancellationToken);
-
-            var userName = await _unitOfWork.Repository<User>()
-                .Query()
-                .Where(u => u.UserId == student.UserId)
-                .Select(u => u.FullName)
-                .FirstOrDefaultAsync(cancellationToken);
-
             // Filter by status
             if (!string.IsNullOrWhiteSpace(request.Status) &&
                 Enum.TryParse<LogbookStatus>(request.Status, true, out var parsedStatus))
@@ -70,8 +58,6 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
                 .Take(request.PageSize)
                 .ProjectTo<GetLogbooksResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
-
-            logbooks.ForEach(lb => lb.StudentName = userName);
 
             var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
             return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);

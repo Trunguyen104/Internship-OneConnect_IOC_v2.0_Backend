@@ -1,10 +1,10 @@
-using AutoMapper;
+﻿using AutoMapper;
 using IOCv2.Application.Extensions.Mappings;
-using IOCv2.Application.Features.Logbooks.Queries.GetLogbooks;
+using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 
-namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
+namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
     public class UpdateLogbookResponse : IMapFrom<Logbook>
     {
@@ -19,7 +19,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Logbook, UpdateLogbookResponse>()
+            profile.CreateMap<Logbook, CreateLogbook.UpdateLogbookResponse>()
                 .ForMember(dest => dest.StudentId,
                     opt => opt.MapFrom(src => src.StudentId));
         }

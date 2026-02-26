@@ -15,16 +15,23 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
     {
         public Guid LogbookId { get; set; }
         public Guid InternshipId { get; set; }
-        public String StudentName { get; set; }
-        public required string Content { get; set; }
+        public required String StudentName { get; set; }
+        public required string Summary { get; set; }
         public string? Issue { get; set; }
         public LogbookStatus Status { get; set; }
+        public required string Plan { get; set; }
+
+        public ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
 
         public void Mapping(Profile profile)
         {
             profile.CreateMap<Logbook, GetLogbookByIdResponse>()
-                   .ForMember(dest => dest.Status,
-                              opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.StudentName,
+                    opt => opt.MapFrom(src => src.Student.User.FullName))
+                .ForMember(dest => dest.WorkItems,
+                    opt => opt.MapFrom(src => src.WorkItem))
+                .ForMember(dest => dest.Status,
+                    opt => opt.MapFrom(src => src.Status));
         }
     }
 }

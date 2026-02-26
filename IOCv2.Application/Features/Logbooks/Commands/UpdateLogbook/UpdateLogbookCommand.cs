@@ -1,5 +1,5 @@
 ﻿using IOCv2.Application.Common.Models;
-using IOCv2.Domain.Entities;
+using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
 using IOCv2.Domain.Enums;
 using MediatR;
 using System;
@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
+namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
-    public class CreateLogbookCommand : IRequest<Result<UpdateLogbookResponse>>
+    public class UpdateLogbookCommand : IRequest<Result<UpdateLogbookResponse>>
     {
         public Guid InternshipId { get; set; }
         public Guid StudentId { get; set; }

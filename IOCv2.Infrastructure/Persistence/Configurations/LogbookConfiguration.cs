@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,14 +26,19 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasColumnName("student_id");
 
-            builder.Property(lb => lb.Content)
+            builder.Property(lb => lb.Summary)
                 .IsRequired()
                 .HasMaxLength(200)
-                .HasColumnName("content");
+                .HasColumnName("summary");
 
             builder.Property(lb => lb.Issue)
                 .HasMaxLength(200)
                 .HasColumnName("issue");
+
+            builder.Property(lb => lb.Plan)
+                .HasMaxLength(200)
+                .IsRequired()
+                .HasColumnName("plan");
 
             builder.Property(lb => lb.DateReport)
                 .IsRequired()
@@ -51,10 +57,14 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .HasForeignKey(lb => lb.StudentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //builder.HasOne(lb => lb.InternshipId)
-            //    .WithMany(i => i.Logbooks)
-            //    .HasForeignKey(lb => lb.InternshipId)
-            //    .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(lb => lb.WorkItem)
+                .WithMany(wi => wi.Logbook)
+                .UsingEntity(j => j.ToTable("logbook_work_items"));
+
+            builder.HasOne(lb => lb.InternshipGroup)
+                .WithMany(i => i.Logbooks)
+                .HasForeignKey(lb => lb.InternshipId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

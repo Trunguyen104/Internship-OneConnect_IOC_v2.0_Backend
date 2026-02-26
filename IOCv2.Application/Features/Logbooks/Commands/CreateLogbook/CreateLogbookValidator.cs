@@ -11,14 +11,22 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
             RuleFor(x => x.InternshipId)
                 .NotEmpty()
                 .WithMessage("InternshipId is required.");
+
             RuleFor(x => x.StudentId)
                 .NotEmpty()
                 .WithMessage("StudentId is required.");
-            RuleFor(x => x.Content)
+
+            RuleFor(x => x.Summary)
                 .NotEmpty()
                 .MaximumLength(200);
+
             RuleFor(x => x.Issue)
                 .MaximumLength(200);
+
+            RuleFor(x => x.Plan)
+                .NotEmpty()
+                .MaximumLength(200);
+
             RuleFor(x => x.DateReport)
                 .NotEmpty()
                 .LessThanOrEqualTo(DateTime.UtcNow)
