@@ -2,7 +2,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
 {
-    public class Student : BaseEntity
+    public class Student
     {
         public Guid StudentId { get; set; }
         public Guid UserId { get; set; }

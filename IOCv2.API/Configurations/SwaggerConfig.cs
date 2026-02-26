@@ -1,5 +1,4 @@
-﻿
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 
 namespace IOCv2.API.Configurations;
 
@@ -50,3 +49,4 @@ public static class SwaggerConfig
         return app;
     }
 }
+

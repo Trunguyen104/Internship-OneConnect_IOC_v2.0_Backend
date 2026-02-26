@@ -69,6 +69,15 @@
   <data name="Common.OperationCancelled" xml:space="preserve">
     <value>Thao tác bị hủy do timeout. Vui lòng thử lại.</value>
   </data>
+  <data name="Common.PageNumberInvalid" xml:space="preserve">
+    <value>Số trang phải lớn hơn 0.</value>
+  </data>
+  <data name="Common.PageSizeInvalid" xml:space="preserve">
+    <value>Kích thước trang phải lớn hơn 0.</value>
+  </data>
+  <data name="Common.PageSizeTooLarge" xml:space="preserve">
+    <value>Kích thước trang không được vượt quá 100.</value>
+  </data>
   
   <!-- Validation Errors -->
   <data name="InvalidUserId" xml:space="preserve">
@@ -196,4 +205,208 @@
   <data name="Common.NotFound" xml:space="preserve">
     <value>Không tìm thấy bản ghi tương ứng.</value>
   </data>
+  
+  <!-- Epic Validation Errors -->
+  <data name="Epic.ProjectIdRequired" xml:space="preserve">
+    <value>ID dự án không được để trống.</value>
+  </data>
+  <data name="Epic.NameRequired" xml:space="preserve">
+    <value>Tên Epic không được để trống.</value>
+  </data>
+  <data name="Epic.NameMaxLength" xml:space="preserve">
+    <value>Tên Epic không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="Epic.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả không được vượt quá 2000 ký tự.</value>
+  </data>
+  <data name="Epic.NotFound" xml:space="preserve">
+    <value>Không tìm thấy Epic.</value>
+  </data>
+  <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
+    <value>Không thể xóa Epic khi còn Story/Task con. Vui lòng xóa hoặc di chuyển tất cả item con trước.</value>
+  </data>
+  <data name="Epic.ProjectNotFound" xml:space="preserve">
+    <value>Không tìm thấy dự án.</value>
+  </data>
+  
+  <!-- Sprint Validation Errors -->
+  <data name="Sprint.ProjectIdRequired" xml:space="preserve">
+    <value>ID dự án không được để trống.</value>
+  </data>
+  <data name="Sprint.NameRequired" xml:space="preserve">
+    <value>Tên Sprint không được để trống.</value>
+  </data>
+  <data name="Sprint.NameMaxLength" xml:space="preserve">
+    <value>Tên Sprint không được vượt quá 200 ký tự.</value>
+  </data>
+  <data name="Sprint.GoalMaxLength" xml:space="preserve">
+    <value>Mục tiêu Sprint không được vượt quá 1000 ký tự.</value>
+  </data>
+  <data name="Sprint.StartDateRequired" xml:space="preserve">
+    <value>Ngày bắt đầu không được để trống.</value>
+  </data>
+  <data name="Sprint.EndDateRequired" xml:space="preserve">
+    <value>Ngày kết thúc không được để trống.</value>
+  </data>
+  <data name="Sprint.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="Sprint.DurationTooShort" xml:space="preserve">
+    <value>Sprint phải kéo dài ít nhất 7 ngày (1 tuần).</value>
+  </data>
+  <data name="Sprint.DurationTooLong" xml:space="preserve">
+    <value>Sprint không được vượt quá 28 ngày (4 tuần).</value>
+  </data>
+  <data name="Sprint.NotFound" xml:space="preserve">
+    <value>Không tìm thấy Sprint.</value>
+  </data>
+  <data name="Sprint.CannotDeleteActive" xml:space="preserve">
+    <value>Không thể xóa Sprint đang hoạt động hoặc đã hoàn thành.</value>
+  </data>
+  <data name="Sprint.CannotDeleteWithItems" xml:space="preserve">
+    <value>Không thể xóa Sprint khi còn WorkItem. Vui lòng di chuyển tất cả item trước.</value>
+  </data>
+  <data name="Sprint.AlreadyActive" xml:space="preserve">
+    <value>Sprint đã được bắt đầu.</value>
+  </data>
+  <data name="Sprint.NotPlanned" xml:space="preserve">
+    <value>Sprint phải ở trạng thái Planned mới có thể bắt đầu</value>
+  </data>
+  <data name="Sprint.ActiveSprintExists" xml:space="preserve">
+    <value>Dự án đã có một Sprint đang Active. Chỉ được phép một Sprint Active tại một thời điểm</value>
+  </data>
+  <data name="Sprint.NotActive" xml:space="preserve">
+    <value>Sprint phải ở trạng thái Active mới có thể hoàn thành</value>
+  </data>
+  <data name="Sprint.CannotEditCompleted" xml:space="preserve">
+    <value>Không thể chỉnh sửa Sprint đã hoàn thành</value>
+  </data>
+  <data name="Sprint.IdRequired" xml:space="preserve">
+    <value>Sprint ID là bắt buộc</value>
+  </data>
+  <data name="Sprint.CannotDeleteActiveSprint" xml:space="preserve">
+    <value>Không thể xóa Sprint đang Active hoặc đã Completed. Chỉ có thể xóa Sprint ở trạng thái Planned</value>
+  </data>
+  <data name="Sprint.CannotDeleteWithWorkItems" xml:space="preserve">
+    <value>Không thể xóa Sprint đang chứa Work Items. Vui lòng di chuyển hoặc xóa các Work Items trước</value>
+  </data>
+  <data name="Sprint.DatesRequiredToStart" xml:space="preserve">
+    <value>Sprint phải có Ngày bắt đầu và Ngày kết thúc trước khi bắt đầu. Vui lòng cập nhật Sprint trước.</value>
+  </data>
+  <data name="Sprint.TargetSprintNotFound" xml:space="preserve">
+    <value>Không tìm thấy Sprint đích được chỉ định.</value>
+  </data>
+  <data name="Sprint.InvalidIncompleteItemsOption" xml:space="preserve">
+    <value>Tùy chọn xử lý các item chưa hoàn thành không hợp lệ.</value>
+  </data>
+  <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
+    <value>Sprint đích là bắt buộc khi chọn chuyển sang Sprint có sẵn.</value>
+  </data>
+
+  <!-- WorkItem Validation Errors -->
+  <data name="WorkItem.TitleRequired" xml:space="preserve">
+    <value>Tiêu đề công việc không được để trống.</value>
+  </data>
+  <data name="WorkItem.TitleMaxLength" xml:space="preserve">
+    <value>Tiêu đề không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="WorkItem.TypeRequired" xml:space="preserve">
+    <value>Loại công việc không được để trống.</value>
+  </data>
+  <data name="WorkItem.TypeInvalid" xml:space="preserve">
+    <value>Loại công việc không hợp lệ. Giá trị hợp lệ: Epic, UserStory, Task, Subtask.</value>
+  </data>
+  <data name="WorkItem.PriorityInvalid" xml:space="preserve">
+    <value>Độ ưu tiên không hợp lệ. Giá trị hợp lệ: Low, Medium, High, Critical.</value>
+  </data>
+  <data name="WorkItem.StatusInvalid" xml:space="preserve">
+    <value>Trạng thái không hợp lệ. Giá trị hợp lệ: Todo, InProgress, Review, Done, Cancelled.</value>
+  </data>
+  <data name="WorkItem.StoryPointInvalid" xml:space="preserve">
+    <value>Story Point phải lớn hơn hoặc bằng 0.</value>
+  </data>
+  <data name="WorkItem.NotFound" xml:space="preserve">
+    <value>Không tìm thấy công việc.</value>
+  </data>
+  <!-- Stakeholder Errors -->
+  <data name="Stakeholder.NotFound" xml:space="preserve">
+    <value>Không tìm thấy stakeholder.</value>
+  </data>
+  <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
+    <value>Không tìm thấy dự án tương ứng.</value>
+  </data>
+  <data name="Stakeholder.EmailExists" xml:space="preserve">
+    <value>Email này đã tồn tại trong dự án.</value>
+  </data>
+  <data name="Stakeholder.IdRequired" xml:space="preserve">
+    <value>Id stakeholder không được để trống.</value>
+  </data>
+  <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
+    <value>Id dự án không được để trống.</value>
+  </data>
+  <data name="Stakeholder.NameRequired" xml:space="preserve">
+    <value>Tên stakeholder không được để trống.</value>
+  </data>
+  <data name="Stakeholder.NameMaxLength" xml:space="preserve">
+    <value>Tên stakeholder không được vượt quá 200 ký tự.</value>
+  </data>
+  <data name="Stakeholder.EmailRequired" xml:space="preserve">
+    <value>Email không được để trống.</value>
+  </data>
+  <data name="Stakeholder.EmailInvalid" xml:space="preserve">
+    <value>Email không đúng định dạng.</value>
+  </data>
+  <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
+    <value>Email không được vượt quá 150 ký tự.</value>
+  </data>
+  <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
+    <value>Vai trò không được vượt quá 100 ký tự.</value>
+  </data>
+  <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả không được vượt quá 500 ký tự.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
+    <value>Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại đúng định dạng.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
+    <value>Số điện thoại không được vượt quá 15 ký tự.</value>
+  </data>
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Tạo stakeholder thành công.</value>
+  </data>
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật stakeholder thành công.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Xóa stakeholder thành công.</value>
+  </data>
+  <!-- Issue -->
+  <data name="Issue.NotFound" xml:space="preserve">
+    <value>Không tìm thấy issue.</value>
+  </data>
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <value>Không tìm thấy stakeholder.</value>
+  </data>
+  <data name="Issue.TitleRequired" xml:space="preserve">
+    <value>Tiêu đề là bắt buộc.</value>
+  </data>
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <value>Mô tả là bắt buộc.</value>
+  </data>
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <value>Stakeholder ID là bắt buộc.</value>
+  </data>
+  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <value>Trạng thái không hợp lệ. Vui lòng chọn: Open, InProgress, Resolved, hoặc Closed.</value>
+  </data>
+  <data name="Issue.CreateFailed" xml:space="preserve">
+    <value>Tạo issue thất bại.</value>
+  </data>
+  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <value>Cập nhật issue thất bại.</value>
+  </data>
+  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <value>Xóa issue thất bại.</value>
+  </data>
 </root>
+

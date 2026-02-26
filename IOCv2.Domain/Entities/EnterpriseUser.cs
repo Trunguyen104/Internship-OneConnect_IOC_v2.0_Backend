@@ -1,6 +1,6 @@
 namespace IOCv2.Domain.Entities
 {
-    public class EnterpriseUser : BaseEntity
+    public class EnterpriseUser
     {
         public Guid EnterpriseUserId { get; set; }
 
