@@ -63,6 +63,12 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(x => x.UpdatedBy)
                 .HasColumnName("updated_by");
 
+            // FK
+            builder.HasOne(p => p.InternshipGroup)
+                .WithMany()
+                .HasForeignKey(p => p.InternshipId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Indexes
             builder.HasIndex(x => x.InternshipId)
                 .HasDatabaseName("ix_projects_internship_id");

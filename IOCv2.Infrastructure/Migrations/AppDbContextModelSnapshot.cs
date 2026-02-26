@@ -219,6 +219,116 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("enterprise_users", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
+                {
+                    b.Property<Guid>("InternshipId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<Guid?>("EnterpriseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<Guid>("MentorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("mentor_id");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<short>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("TermId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("term_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("InternshipId")
+                        .HasName("pk_internship_groups");
+
+                    b.HasIndex("EnterpriseId")
+                        .HasDatabaseName("ix_internship_groups_enterprise_id");
+
+                    b.HasIndex("InternshipId")
+                        .HasDatabaseName("ix_internship_groups_internship_id");
+
+                    b.HasIndex("MentorId")
+                        .HasDatabaseName("ix_internship_groups_mentor_id");
+
+                    b.HasIndex("TermId")
+                        .HasDatabaseName("ix_internship_groups_term_id");
+
+                    b.ToTable("internship_groups", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipStudents", b =>
+                {
+                    b.Property<Guid>("InternshipId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_id");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("student_id");
+
+                    b.Property<Guid>("InternshipGroupInternshipId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_group_internship_id");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("joined_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<short>("Role")
+                        .HasColumnType("smallint")
+                        .HasColumnName("role");
+
+                    b.Property<short>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.HasKey("InternshipId", "StudentId")
+                        .HasName("pk_internship_students");
+
+                    b.HasIndex("InternshipGroupInternshipId")
+                        .HasDatabaseName("ix_internship_students_internship_group_internship_id");
+
+                    b.HasIndex("InternshipId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_internship_students_internship_id");
+
+                    b.ToTable("internship_students", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.Property<Guid>("TokenId")
@@ -365,6 +475,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("project_id");
 
                     b.Property<string>("ResourceName")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("resource_name");
@@ -517,28 +628,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasDatabaseName("ix_students_user_id");
 
                     b.ToTable("students", (string)null);
-                });
-
-            modelBuilder.Entity("IOCv2.Domain.Entities.StudentProject", b =>
-                {
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("student_id");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
-
-                    b.HasKey("StudentId", "ProjectId")
-                        .HasName("pk_student_project");
-
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_student_project_project_id");
-
-                    b.HasIndex("StudentId")
-                        .HasDatabaseName("ix_student_project_student_id");
-
-                    b.ToTable("student_project", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.University", b =>
@@ -795,6 +884,25 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipStudents", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
+                        .WithMany()
+                        .HasForeignKey("InternshipGroupInternshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_students_internship_groups_internship_group_inte");
+
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", null)
+                        .WithOne("InternshipStudents")
+                        .HasForeignKey("IOCv2.Domain.Entities.InternshipStudents", "InternshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_students_internship_groups_internship_id");
+
+                    b.Navigation("InternshipGroup");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "User")
@@ -805,6 +913,18 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasConstraintName("fk_password_reset_tokens_users_user_id");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
+                        .WithMany()
+                        .HasForeignKey("InternshipId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_projects_internship_groups_internship_id");
+
+                    b.Navigation("InternshipGroup");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.ProjectResources", b =>
@@ -843,27 +963,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.StudentProject", b =>
-                {
-                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
-                        .WithMany("StudentProjects")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_student_project_projects_project_id");
-
-                    b.HasOne("IOCv2.Domain.Entities.Student", "Student")
-                        .WithMany("StudentProjects")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_student_project_students_student_id");
-
-                    b.Navigation("Project");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("IOCv2.Domain.Entities.UniversityUser", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.University", "University")
@@ -890,16 +989,15 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("EnterpriseUsers");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
+                {
+                    b.Navigation("InternshipStudents")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
                 {
                     b.Navigation("ProjectResources");
-
-                    b.Navigation("StudentProjects");
-                });
-
-            modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
-                {
-                    b.Navigation("StudentProjects");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.University", b =>

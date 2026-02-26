@@ -27,7 +27,6 @@ namespace IOCv2.Infrastructure.Persistence
         public DbSet<UserCodeSequence> UserCodeSequences { get; set; } = null!;
         public DbSet<Project> Projects { get; set; } = null!;
         public DbSet<ProjectResources> ProjectResources { get; set; } = null!;
-        public DbSet<StudentProject> StudentProjects { get; set; } = null!;
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

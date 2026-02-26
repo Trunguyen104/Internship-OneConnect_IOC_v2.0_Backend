@@ -43,14 +43,14 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         {
             var userId = Guid.Parse(_currentUserService.UserId);
             var studentId = await _unitOfWork.Repository<Student>().Query().Where(s => s.UserId == userId).Select(s => s.StudentId).FirstOrDefaultAsync(cancellationToken);
+            var studentIdTest = studentId;
             try
             {
                 // 1. Build base query
-                var query = _unitOfWork.Repository<StudentProject>().Query()
-                    .Where(sp => sp.StudentId == studentId)
-                    .Select(sp => sp.Project)
-                    .AsNoTracking();
-                    
+                var query = _unitOfWork.Repository<Project>().Query()
+                    .Where(i => i.InternshipGroup.InternshipStudents.StudentId == studentId)
+                    .Select(p => p).AsNoTracking();
+
 
                 // 2. Apply status filter
                 if (request.Status.HasValue)

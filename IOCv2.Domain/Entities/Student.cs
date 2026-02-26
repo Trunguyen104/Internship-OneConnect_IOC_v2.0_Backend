@@ -15,6 +15,5 @@ namespace IOCv2.Domain.Entities
 
         public StudentStatus Status { get; set; }
         //Navigate
-        public ICollection<StudentProject> StudentProjects { get; set; } = new List<StudentProject>();
     }
 }
