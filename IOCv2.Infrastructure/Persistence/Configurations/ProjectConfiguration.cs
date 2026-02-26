@@ -73,12 +73,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasIndex(x => x.CreatedAt)
                 .HasDatabaseName("ix_projects_created_at");
 
-            // Relationships
-            builder.HasOne(x => x.Internship)
-                .WithMany(i => i.Projects)
-                .HasForeignKey(x => x.InternshipId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.HasMany(x => x.ProjectResources)
                 .WithOne(pr => pr.Project)
                 .HasForeignKey(pr => pr.ProjectId)

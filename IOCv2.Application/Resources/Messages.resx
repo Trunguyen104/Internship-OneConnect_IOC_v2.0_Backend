@@ -192,4 +192,28 @@
   <data name="SortOrder.AllowedValues" xml:space="preserve">
     <value>Sort order must be either 'asc' or 'desc'</value>
   </data>
+  <data name="Projects.NotFound" xml:space="preserve">
+    <value>Dự án không tìm thấy</value>
+  </data>
+  <data name="Projects.DeleteSuccess" xml:space="preserve">
+    <value>Xóa dự án thành công</value>
+  </data>
+  <data name="Projects.LogDelete" xml:space="preserve">
+    <value>Dự án đã bị xóa {ProjectId}</value>
+  </data>
+  <data name="ProjectResources.LogUploadSuccess" xml:space="preserve">
+    <value>Đã tải tệp {FileName} lên dự án {ProjectId}</value>
+  </data>
+  <data name="ProjectResources.GetAllSuccess" xml:space="preserve">
+    <value>Đã truy xuất thành công {Count} tài nguyên dự án</value>
+  </data>
+  <data name="ProjectResources.GetByIdSuccess" xml:space="preserve">
+    <value>Đã truy xuất thành công tài nguyên dự án: {ResourceId}</value>
+  </data>
+  <data name="Projects.LogCreateSuccess" xml:space="preserve">
+    <value>Đã tạo dự án {ProjectId} cho chương trình thực tập {InternshipId}.</value>
+  </data>
+  <data name="Projects.UpdateSuccess" xml:space="preserve">
+    <value>Dự án đã được cập nhật {ProjectId}</value>
+  </data>
 </root>

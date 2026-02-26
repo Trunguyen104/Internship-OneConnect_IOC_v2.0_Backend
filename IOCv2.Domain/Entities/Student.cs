@@ -14,5 +14,7 @@ namespace IOCv2.Domain.Entities
         public string? HighestDegree { get; set; }
 
         public StudentStatus Status { get; set; }
+        //Navigate
+        public ICollection<StudentProject> StudentProjects { get; set; } = new List<StudentProject>();
     }
 }

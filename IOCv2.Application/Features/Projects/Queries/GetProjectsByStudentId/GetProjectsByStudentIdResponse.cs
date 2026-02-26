@@ -22,7 +22,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         public DateTime? UpdatedAt { get; set; }
         public Guid? CreatedBy { get; set; }
         public Guid? UpdatedBy { get; set; }
-        public List<ProjectResources> ProjectResources { get; set; } = new();
+        public List<Domain.Entities.ProjectResources> ProjectResources { get; set; } = new();
         public void Mapping(MappingProfile profile)
         {
             profile.CreateMap<Project, GetProjectsByStudentIdResponse>();

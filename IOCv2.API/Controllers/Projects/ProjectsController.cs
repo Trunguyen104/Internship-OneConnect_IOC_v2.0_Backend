@@ -1,4 +1,8 @@
 ﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Projects.Commands.CreateProject;
+using IOCv2.Application.Features.Projects.Commands.DeleteProject;
+using IOCv2.Application.Features.Projects.Commands.UpdateProject;
+using IOCv2.Application.Features.Projects.Queries.GetAProjects;
 using IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +17,59 @@ namespace IOCv2.API.Controllers.Projects
     {
         private readonly IMediator _mediator;
         public ProjectsController(IMediator mediator) => _mediator = mediator;
+
+        [HttpPost("create")]
+        [ProducesResponseType(typeof(Result<CreateProjectResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CreateProject(
+        [FromBody] CreateProjectCommand command,
+        CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpPut("update")]
+        [ProducesResponseType(typeof(Result<UpdateProjectResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> UpdateProject(
+        [FromBody] UpdateProjectCommand command,
+        CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpDelete("delete")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteProject([FromBody] DeleteProjectCommand command, CancellationToken cancellationToken) {
+            var result = await _mediator.Send<Result<string>>(command, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpGet("projects")]
+        [ProducesResponseType(typeof(Result<PaginatedResult<GetAllProjectsResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetAllProjects(
+        [FromQuery] GetAllProjectsQuery query,
+        CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(query, cancellationToken);
+            return HandleResult(result);
+        }
 
         [Authorize(Roles = "Student")]
         [HttpGet("student")]

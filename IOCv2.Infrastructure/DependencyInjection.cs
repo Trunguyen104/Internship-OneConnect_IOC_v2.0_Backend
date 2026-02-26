@@ -62,6 +62,9 @@ namespace IOCv2.Infrastructure
             // Cache Service
             services.AddScoped<ICacheService, RedisCacheService>();
 
+            // File
+            services.AddScoped<IFileStorageService, LocalFileStorageService>();
+
             return services;
         }
     }

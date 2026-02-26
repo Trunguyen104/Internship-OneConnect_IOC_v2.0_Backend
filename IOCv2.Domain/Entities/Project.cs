@@ -18,37 +18,15 @@ namespace IOCv2.Domain.Entities
         public ProjectStatus? Status { get; set; }
 
         // Navigation Properties
-        public virtual Internship Internship { get; set; } = null!;
         public List<ProjectResources> ProjectResources { get; set; } = new();
-        public Project(Guid internshipId, string projectName, string description, Guid? createdBy)
+        public ICollection<StudentProject> StudentProjects { get; set; } = new List<StudentProject>();
+        public Project(Guid internshipId, string projectName, string description)
         {
             ProjectId = Guid.NewGuid();
             InternshipId = internshipId;
             ProjectName = projectName;
             Description = description;
             Status = ProjectStatus.Planning;
-
-            CreatedAt = DateTime.UtcNow;
-            CreatedBy = createdBy;
         }
-
-        public void Update(string projectName, string description, DateTime? startDate, DateTime? endDate, Guid? updatedBy)
-        {
-            ProjectName = projectName;
-            Description = description;
-            StartDate = startDate;
-            EndDate = endDate;
-            UpdatedAt = DateTime.UtcNow;
-            UpdatedBy = updatedBy;
-        }
-
-        public void ChangeStatus(ProjectStatus status, Guid? updatedBy)
-        {
-            Status = status;
-            UpdatedAt = DateTime.UtcNow;
-            UpdatedBy = updatedBy;
-        }
-
-
     }
 }

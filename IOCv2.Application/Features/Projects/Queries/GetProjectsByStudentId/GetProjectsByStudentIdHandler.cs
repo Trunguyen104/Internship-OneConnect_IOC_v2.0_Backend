@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -20,17 +21,20 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         private readonly IMapper _mapper;
         private readonly ILogger<GetProjectsByStudentIdHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IMessageService _messageService;
 
         public GetProjectsByStudentIdHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<GetProjectsByStudentIdHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IMessageService messageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _currentUserService = currentUserService;
+            _messageService = messageService;
         }
 
         public async Task<Result<PaginatedResult<GetProjectsByStudentIdResponse>>> Handle(
@@ -42,10 +46,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             try
             {
                 // 1. Build base query
-                var query = _unitOfWork.Repository<Project>().Query()
-                    .Include(p => p.Internship)
-                    .Where(p => p.Internship.StudentId == studentId)
+                var query = _unitOfWork.Repository<StudentProject>().Query()
+                    .Where(sp => sp.StudentId == studentId)
+                    .Select(sp => sp.Project)
                     .AsNoTracking();
+                    
 
                 // 2. Apply status filter
                 if (request.Status.HasValue)
@@ -83,7 +88,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting projects for student {StudentId}", studentId);
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.GetByStuIdEr), studentId);
                 throw;
             }
         }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Application.Services;
 using System;
@@ -17,27 +18,27 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             _messageService = messageService;
             // PageNumber must be greater than 0
             RuleFor(x => x.PageNumber)
-                .GreaterThanOrEqualTo(1).WithMessage(_ => _messageService.GetMessage("PageNumber.MinValue"));
+                .GreaterThanOrEqualTo(1).WithMessage(_ => _messageService.GetMessage(MessageKeys.Page.PageNumberMinValue));
 
             // PageSize must be between 1 and 100
             RuleFor(x => x.PageSize)
-                .GreaterThanOrEqualTo(1).WithMessage(_ => _messageService.GetMessage("PageSize.MinValue"))
-                .LessThanOrEqualTo(100).WithMessage(_ => _messageService.GetMessage("PageSize.MaxValue"));
+                .GreaterThanOrEqualTo(1).WithMessage(_ => _messageService.GetMessage(MessageKeys.Page.PageSizeMinValue))
+                .LessThanOrEqualTo(100).WithMessage(_ => _messageService.GetMessage(MessageKeys.Page.PageSizeMaxValue));
 
             // SearchTerm maximum length
             RuleFor(x => x.SearchTerm)
-                .MaximumLength(200).WithMessage(_ => _messageService.GetMessage("SearchTerm.MaxLength"))
+                .MaximumLength(200).WithMessage(_ => _messageService.GetMessage(MessageKeys.Page.SearchTermMaxLength))
                 .When(x => !string.IsNullOrWhiteSpace(x.SearchTerm));
 
             // SortColumn must be valid if provided
             RuleFor(x => x.SortColumn)
-                .Must(BeAValidSortColumn).WithMessage(_ => _messageService.GetMessage("SortColumn.AllowedValues"))
+                .Must(BeAValidSortColumn).WithMessage(_ => _messageService.GetMessage(MessageKeys.Page.SortColumnAllowedValues))
                 .When(x => !string.IsNullOrWhiteSpace(x.SortColumn));
 
             // SortOrder must be 'asc' or 'desc' if provided
             RuleFor(x => x.SortOrder)
                 .Must(order => order?.ToLower() == "asc" || order?.ToLower() == "desc")
-                .WithMessage(_ => _messageService.GetMessage("SortOrder.AllowedValues"))
+                .WithMessage(_ => _messageService.GetMessage(MessageKeys.Page.SortOrderAllowedValues))
                 .When(x => !string.IsNullOrWhiteSpace(x.SortOrder));
         }
 

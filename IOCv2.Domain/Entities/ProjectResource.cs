@@ -11,21 +11,19 @@ namespace IOCv2.Domain.Entities
     {
         public Guid ProjectResourceId { get; set; }
         public Guid ProjectId { get; set; }
-        public string? ResourceName { get; set; }
+        public string ResourceName { get; set; }
         public FileType ResourceType { get; set; }
         public string ResourceUrl { get; set; }
         public virtual Project Project { get; set; } = null!;
         private ProjectResources()
         { }
-        public ProjectResources (Guid projectId, string resourceName, FileType resourceType, string resourceUrl, Guid userID)
+        public ProjectResources (Guid projectId, string resourceName, FileType resourceType, string resourceUrl)
         {
             ProjectResourceId = Guid.NewGuid();
             ProjectId = projectId;
             ResourceName = resourceName;
             ResourceType = resourceType;
             ResourceUrl = resourceUrl;
-            CreatedAt = DateTime.UtcNow;
-            CreatedBy = userID;
         }
     }
 }

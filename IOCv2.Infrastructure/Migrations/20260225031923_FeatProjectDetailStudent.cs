@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class FeatProjectDetailStudent : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,6 +38,28 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "projects",
+                columns: table => new
+                {
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    project_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_projects", x => x.project_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "universities",
                 columns: table => new
                 {
@@ -56,6 +78,18 @@ namespace IOCv2.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_universities", x => x.uni_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "user_code_sequences",
+                columns: table => new
+                {
+                    role = table.Column<short>(type: "smallint", nullable: false),
+                    current_number = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_user_code_sequences", x => x.role);
                 });
 
             migrationBuilder.CreateTable(
@@ -82,6 +116,32 @@ namespace IOCv2.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_users", x => x.user_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "project_resources",
+                columns: table => new
+                {
+                    project_resource_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    resource_name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    resource_type = table.Column<short>(type: "smallint", nullable: false),
+                    resource_url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_project_resources", x => x.project_resource_id);
+                    table.ForeignKey(
+                        name: "fk_project_resources_projects_project_id",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "project_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -238,6 +298,30 @@ namespace IOCv2.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "student_project",
+                columns: table => new
+                {
+                    student_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_student_project", x => new { x.student_id, x.project_id });
+                    table.ForeignKey(
+                        name: "fk_student_project_projects_project_id",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "project_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_student_project_students_student_id",
+                        column: x => x.student_id,
+                        principalTable: "students",
+                        principalColumn: "student_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "ix_audit_logs_entity_type_entity_id",
                 table: "audit_logs",
@@ -287,6 +371,36 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_project_resources_created_at",
+                table: "project_resources",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_project_resources_project_id",
+                table: "project_resources",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_project_resources_resource_type",
+                table: "project_resources",
+                column: "resource_type");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_projects_created_at",
+                table: "projects",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_projects_internship_id",
+                table: "projects",
+                column: "internship_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_projects_status",
+                table: "projects",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_refresh_tokens_token",
                 table: "refresh_tokens",
                 column: "token",
@@ -296,6 +410,16 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_refresh_tokens_user_id",
                 table: "refresh_tokens",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_student_project_project_id",
+                table: "student_project",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_student_project_student_id",
+                table: "student_project",
+                column: "student_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_students_user_id",
@@ -368,16 +492,28 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "password_reset_tokens");
 
             migrationBuilder.DropTable(
+                name: "project_resources");
+
+            migrationBuilder.DropTable(
                 name: "refresh_tokens");
 
             migrationBuilder.DropTable(
-                name: "students");
+                name: "student_project");
 
             migrationBuilder.DropTable(
                 name: "university_users");
 
             migrationBuilder.DropTable(
+                name: "user_code_sequences");
+
+            migrationBuilder.DropTable(
                 name: "enterprises");
+
+            migrationBuilder.DropTable(
+                name: "projects");
+
+            migrationBuilder.DropTable(
+                name: "students");
 
             migrationBuilder.DropTable(
                 name: "universities");

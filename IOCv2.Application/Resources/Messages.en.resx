@@ -163,4 +163,28 @@
   <data name="SortOrder.AllowedValues" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Projects.NotFound" xml:space="preserve">
+    <value>Project Not Found</value>
+  </data>
+  <data name="Projects.DeleteSuccess" xml:space="preserve">
+    <value>Project Delete successful</value>
+  </data>
+  <data name="Projects.LogDelete" xml:space="preserve">
+    <value>Deleted project {ProjectId}</value>
+  </data>
+  <data name="ProjectResources.LogUploadSuccess" xml:space="preserve">
+    <value>Uploaded file {FileName} to project {ProjectId}</value>
+  </data>
+  <data name="ProjectResources.GetAllSuccess" xml:space="preserve">
+    <value>Successfully retrieved {Count} project resources</value>
+  </data>
+  <data name="ProjectResources.GetByIdSuccess" xml:space="preserve">
+    <value>Successfully retrieved project resource: {ResourceId}</value>
+  </data>
+  <data name="Projects.LogCreateSuccess" xml:space="preserve">
+    <value>Created project {ProjectId} for internship {InternshipId}</value>
+  </data>
+  <data name="Projects.UpdateSuccess" xml:space="preserve">
+    <value>Updated project {ProjectId}</value>
+  </data>
 </root>
