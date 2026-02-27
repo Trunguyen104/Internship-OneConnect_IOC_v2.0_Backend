@@ -197,3 +197,34 @@
     <value />
   </data>
 </root>
+  
+  <!-- Epic Messages -->
+  <data name="Epic.CreatedSuccess" xml:space="preserve">
+    <value>Epic created successfully.</value>
+  </data>
+  <data name="Epic.UpdatedSuccess" xml:space="preserve">
+    <value>Epic updated successfully.</value>
+  </data>
+  <data name="Epic.DeletedSuccess" xml:space="preserve">
+    <value>Epic deleted successfully.</value>
+  </data>
+  <!-- Issue -->
+  <data name="Issue.CreateSuccess" xml:space="preserve">
+    <value>Issue created successfully.</value>
+  </data>
+  <data name="Issue.UpdateStatusSuccess" xml:space="preserve">
+    <value>Issue status updated successfully.</value>
+  </data>
+  <data name="Issue.DeleteSuccess" xml:space="preserve">
+    <value>Issue deleted successfully.</value>
+  </data>
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Stakeholder created successfully.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Stakeholder deleted successfully.</value>
+  </data>
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Stakeholder updated successfully.</value>
+  </data>
+</root>

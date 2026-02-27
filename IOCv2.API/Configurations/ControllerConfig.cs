@@ -1,4 +1,3 @@
-
 namespace IOCv2.API.Configurations;
 
 public static class ControllerConfig

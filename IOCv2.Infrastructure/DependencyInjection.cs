@@ -26,7 +26,8 @@ namespace IOCv2.Infrastructure
                     {
                         npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
                     })
-                .UseSnakeCaseNamingConvention();
+                .UseSnakeCaseNamingConvention()
+                .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
             });
             services.AddHttpContextAccessor();
 
