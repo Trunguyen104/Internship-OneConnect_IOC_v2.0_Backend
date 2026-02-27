@@ -146,6 +146,7 @@
   </data>
   <data name="Sprint.CompletedSuccess" xml:space="preserve">
     <value>Sprint đã được hoàn thành thành công. {0} item đã hoàn thành, {1} item đã được di chuyển.</value>
+  </data>
   <!-- Stakeholder -->
   <data name="Stakeholder.CreateSuccess" xml:space="preserve">
     <value>Tạo stakeholder thành công.</value>

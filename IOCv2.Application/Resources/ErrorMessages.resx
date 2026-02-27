@@ -327,6 +327,7 @@
   </data>
   <data name="WorkItem.NotFound" xml:space="preserve">
     <value>Không tìm thấy công việc.</value>
+  </data>
   <!-- Stakeholder Errors -->
   <data name="Stakeholder.NotFound" xml:space="preserve">
     <value>Không tìm thấy stakeholder.</value>

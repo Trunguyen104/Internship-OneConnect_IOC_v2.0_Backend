@@ -38,6 +38,29 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "projects",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    mentor_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    project_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    start_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    end_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_projects", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "sprints",
                 columns: table => new
                 {
@@ -119,6 +142,35 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "stakeholders",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    type = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)0),
+                    role = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_stakeholders", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_stakeholders_projects",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "audit_logs",
                 columns: table => new
                 {
@@ -149,12 +201,7 @@ namespace IOCv2.Infrastructure.Migrations
                     enterprise_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     enterprise_id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    position = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    position = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -228,12 +275,7 @@ namespace IOCv2.Infrastructure.Migrations
                     major = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     gpa = table.Column<decimal>(type: "numeric(3,2)", precision: 3, scale: 2, nullable: true),
                     highest_degree = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -269,6 +311,33 @@ namespace IOCv2.Infrastructure.Migrations
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "user_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "stakeholder_issues",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    stakeholder_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    resolved_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_stakeholder_issues", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_stakeholder_issues_stakeholders",
+                        column: x => x.stakeholder_id,
+                        principalTable: "stakeholders",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -416,6 +485,33 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "status");
 
             migrationBuilder.CreateIndex(
+                name: "ix_stakeholder_issues_stakeholder_id",
+                table: "stakeholder_issues",
+                column: "stakeholder_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_stakeholder_issues_status",
+                table: "stakeholder_issues",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_stakeholders_email",
+                table: "stakeholders",
+                column: "email");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_stakeholders_project_email_unique",
+                table: "stakeholders",
+                columns: new[] { "project_id", "email" },
+                unique: true,
+                filter: "deleted_at IS NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_stakeholders_project_id",
+                table: "stakeholders",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_students_user_id",
                 table: "students",
                 column: "user_id",
@@ -517,6 +613,9 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "sprint_work_items");
 
             migrationBuilder.DropTable(
+                name: "stakeholder_issues");
+
+            migrationBuilder.DropTable(
                 name: "university_users");
 
             migrationBuilder.DropTable(
@@ -532,10 +631,16 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "work_items");
 
             migrationBuilder.DropTable(
+                name: "stakeholders");
+
+            migrationBuilder.DropTable(
                 name: "universities");
 
             migrationBuilder.DropTable(
                 name: "students");
+
+            migrationBuilder.DropTable(
+                name: "projects");
 
             migrationBuilder.DropTable(
                 name: "users");

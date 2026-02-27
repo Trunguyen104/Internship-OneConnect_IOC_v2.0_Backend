@@ -458,7 +458,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("sprint_work_items", (string)null);
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.Student", b =>
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
                 {
                     b.Property<Guid>("Id")
@@ -558,7 +557,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasDefaultValueSql("now()");
 
                     b.Property<Guid?>("CreatedBy")
-                        .HasMaxLength(100)
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
@@ -595,7 +593,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("updated_at");
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasMaxLength(100)
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
@@ -1053,6 +1050,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Sprint");
 
                     b.Navigation("WorkItem");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.Project", "Project")
@@ -1134,12 +1133,14 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("EnterpriseUsers");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
-                {
-                    b.Navigation("SprintWorkItems");
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
                 {
                     b.Navigation("Stakeholders");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
+                {
+                    b.Navigation("SprintWorkItems");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
