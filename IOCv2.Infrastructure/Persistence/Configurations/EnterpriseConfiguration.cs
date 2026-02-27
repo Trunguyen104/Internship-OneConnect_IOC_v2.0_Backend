@@ -33,16 +33,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             builder.Property(e => e.UpdatedBy).HasColumnName("updated_by");
             builder.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-
-            builder.HasMany(e => e.EnterpriseUsers)
-                   .WithOne(eu => eu.Enterprise)
-                   .HasForeignKey(eu => eu.EnterpriseId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(e => e.InternshipGroups)
-                .WithOne(ig => ig.Enterprise)
-                .HasForeignKey(ig => ig.EnterpriseId)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
