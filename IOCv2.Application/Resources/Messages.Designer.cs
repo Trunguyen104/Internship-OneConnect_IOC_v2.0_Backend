@@ -141,6 +141,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internship not found: {0}.
+        /// </summary>
+        internal static string Internships_NotFound {
+            get {
+                return ResourceManager.GetString("Internships.NotFound", resourceCulture);
         ///   Looks up a localized string similar to Tạo issue thành công..
         /// </summary>
         internal static string Issue_CreateSuccess {
@@ -150,6 +155,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Vị trí mới phải khác vị trí hiện tại.
+        /// </summary>
+        internal static string NewRoleMustBeDifferent {
+            get {
+                return ResourceManager.GetString("NewRoleMustBeDifferent", resourceCulture);
         ///   Looks up a localized string similar to Xóa issue thành công..
         /// </summary>
         internal static string Issue_DeleteSuccess {
@@ -159,6 +169,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Page number must be greater than or equal to 1.
+        /// </summary>
+        internal static string PageNumber_MinValue {
+            get {
+                return ResourceManager.GetString("PageNumber.MinValue", resourceCulture);
         ///   Looks up a localized string similar to Cập nhật trạng thái issue thành công..
         /// </summary>
         internal static string Issue_UpdateStatusSuccess {
@@ -168,11 +183,20 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Vị trí mới phải khác vị trí hiện tại.
+        ///   Looks up a localized string similar to Page size must not exceed 100.
         /// </summary>
-        internal static string NewRoleMustBeDifferent {
+        internal static string PageSize_MaxValue {
             get {
-                return ResourceManager.GetString("NewRoleMustBeDifferent", resourceCulture);
+                return ResourceManager.GetString("PageSize.MaxValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page size must be greater than or equal to 1.
+        /// </summary>
+        internal static string PageSize_MinValue {
+            get {
+                return ResourceManager.GetString("PageSize.MinValue", resourceCulture);
             }
         }
         
@@ -186,6 +210,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đã truy xuất thành công {Count} tài nguyên dự án.
+        /// </summary>
+        internal static string ProjectResources_GetAllSuccess {
+            get {
+                return ResourceManager.GetString("ProjectResources.GetAllSuccess", resourceCulture);
         ///   Looks up a localized string similar to Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng..
         /// </summary>
         internal static string ResetPassword_StatusNoEmail {
@@ -195,6 +224,100 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đã truy xuất thành công tài nguyên dự án: {ResourceId}.
+        /// </summary>
+        internal static string ProjectResources_GetByIdSuccess {
+            get {
+                return ResourceManager.GetString("ProjectResources.GetByIdSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project resource with ID {ResourceId} deleted successfully..
+        /// </summary>
+        internal static string ProjectResources_LogDeleteSuccess {
+            get {
+                return ResourceManager.GetString("ProjectResources.LogDeleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã tải tệp {FileName} lên dự án {ProjectId}.
+        /// </summary>
+        internal static string ProjectResources_LogUploadSuccess {
+            get {
+                return ResourceManager.GetString("ProjectResources.LogUploadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xóa dự án thành công.
+        /// </summary>
+        internal static string Projects_DeleteSuccess {
+            get {
+                return ResourceManager.GetString("Projects.DeleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã tạo dự án {ProjectId} cho chương trình thực tập {InternshipId}..
+        /// </summary>
+        internal static string Projects_LogCreateSuccess {
+            get {
+                return ResourceManager.GetString("Projects.LogCreateSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dự án đã bị xóa {ProjectId}.
+        /// </summary>
+        internal static string Projects_LogDelete {
+            get {
+                return ResourceManager.GetString("Projects.LogDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully retrieved {Count} projects for internship ID: {InternshipId}.
+        /// </summary>
+        internal static string Projects_LogGetByInternshipIdSuccess {
+            get {
+                return ResourceManager.GetString("Projects.LogGetByInternshipIdSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dự án không tìm thấy.
+        /// </summary>
+        internal static string Projects_NotFound {
+            get {
+                return ResourceManager.GetString("Projects.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dự án đã được cập nhật {ProjectId}.
+        /// </summary>
+        internal static string Projects_UpdateSuccess {
+            get {
+                return ResourceManager.GetString("Projects.UpdateSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng..
+        /// </summary>
+        internal static string ResetPassword_StatusNoEmail {
+            get {
+                return ResourceManager.GetString("ResetPassword.StatusNoEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}.
+        /// </summary>
+        internal static string ResetPassword_SuccessNoEmail {
+            get {
         ///   Looks up a localized string similar to Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}.
         /// </summary>
         internal static string ResetPassword_SuccessNoEmail {
@@ -231,6 +354,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search term cannot exceed 200 characters.
+        /// </summary>
+        internal static string SearchTerm_MaxLength {
+            get {
+                return ResourceManager.GetString("SearchTerm.MaxLength", resourceCulture);
         ///   Looks up a localized string similar to Tạo stakeholder thành công..
         /// </summary>
         internal static string Stakeholder_CreateSuccess {
@@ -240,6 +368,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sort column must be one of: projectname, startdate, enddate, status, createdat.
+        /// </summary>
+        internal static string SortColumn_AllowedValues {
+            get {
+                return ResourceManager.GetString("SortColumn.AllowedValues", resourceCulture);
         ///   Looks up a localized string similar to Xóa stakeholder thành công..
         /// </summary>
         internal static string Stakeholder_DeleteSuccess {
@@ -249,6 +382,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sort order must be either &apos;asc&apos; or &apos;desc&apos;.
+        /// </summary>
+        internal static string SortOrder_AllowedValues {
+            get {
+                return ResourceManager.GetString("SortOrder.AllowedValues", resourceCulture);
         ///   Looks up a localized string similar to Cập nhật stakeholder thành công..
         /// </summary>
         internal static string Stakeholder_UpdateSuccess {
