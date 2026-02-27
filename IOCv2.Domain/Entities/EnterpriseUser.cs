@@ -11,5 +11,7 @@ namespace IOCv2.Domain.Entities
         public virtual User User { get; set; } = null!;
 
         public string? Position { get; set; }
+
+        public virtual ICollection<InternshipGroup> InternshipGroups { get; set; } = new List<InternshipGroup>();
     }
 }
