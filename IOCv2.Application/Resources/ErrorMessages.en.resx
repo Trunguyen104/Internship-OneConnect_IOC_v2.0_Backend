@@ -216,87 +216,7 @@
     <value>Email is already in use by another user.</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Projects.LogDeleteError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.ProjectIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.ResourceNameMaxLength" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.ProjectIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.LogNotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.NotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.LogNotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.NotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.LogUpdateError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.UpdateError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.LogUploadError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.FileRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.InvalidFileType" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.FileSizeExceeded" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.GetAllError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.GetByIdError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.ProjectNameExistsInternship" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.LogCreateError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.ProjectNameRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.ProjectNameMaxLength" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.DescriptionMaxLength" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.StartDateInvalidRange" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.EndDateInvalidRange" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.UpdateError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.GetAllError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.GetByStudentIdError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
+
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -381,10 +301,7 @@
   <data name="Internships.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-</root>
-     <value>Role changed successfully for {0}, but notification email failed to send.</value>
-   </data>
-   
+
    <!-- Epic Validation Errors -->
    <data name="Epic.ProjectIdRequired" xml:space="preserve">
      <value>Project ID is required.</value>

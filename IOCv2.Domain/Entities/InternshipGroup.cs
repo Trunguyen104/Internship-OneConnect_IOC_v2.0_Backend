@@ -16,7 +16,7 @@ namespace IOCv2.Domain.Entities
         public DateTime? StartDate { get; private set; }
         public DateTime? EndDate { get; private set; }
         public InternshipGroupStatus Status { get; private set; }
-        public virtual InternshipStudents InternshipStudents { get; private set; }
+        public virtual InternshipStudents InternshipStudents { get; private set; } = null!;
         public InternshipGroup(Guid internshipId, Guid termId, Guid? enterpriseId, Guid mentorId, DateTime? startDate, DateTime? endDate, InternshipGroupStatus status)
         {
             InternshipId = internshipId;

@@ -13,7 +13,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
     {
         public Guid ProjectResourceId { get; set; }
         public Guid ProjectId { get; set; }
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = string.Empty;
         public FileType ResourceType { get; set; }
     }
 }

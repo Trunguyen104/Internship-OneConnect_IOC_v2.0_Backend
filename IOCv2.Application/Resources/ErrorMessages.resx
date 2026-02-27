@@ -344,7 +344,6 @@
   <data name="Internships.InternshipIdRequired" xml:space="preserve">
     <value>Internship ID is required.</value>
   </data>
-</root>
   
   <!-- Epic Validation Errors -->
   <data name="Epic.ProjectIdRequired" xml:space="preserve">
@@ -442,7 +441,7 @@
   <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
     <value>Sprint đích là bắt buộc khi chọn chuyển sang Sprint có sẵn.</value>
   </data>
-
+  
   <!-- WorkItem Validation Errors -->
   <data name="WorkItem.TitleRequired" xml:space="preserve">
     <value>Tiêu đề công việc không được để trống.</value>

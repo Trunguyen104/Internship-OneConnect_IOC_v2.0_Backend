@@ -12,9 +12,9 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
     {
         public Guid ProjectResourceId { get; set; }
         public Guid ProjectId { get; set; }
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = string.Empty;
         public FileType ResourceType { get; set; }
-        public string ResourceUrl { get; set; }
+        public string ResourceUrl { get; set; } = string.Empty;
         public void Mapping(MappingProfile profile)
         {
             profile.CreateMap<Domain.Entities.ProjectResources, GetAllProjectResourcesResponse>()

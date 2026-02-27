@@ -225,7 +225,6 @@
   <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
     <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
-</root>
   
   <!-- Epic Messages -->
   <data name="Epic.CreatedSuccess" xml:space="preserve">

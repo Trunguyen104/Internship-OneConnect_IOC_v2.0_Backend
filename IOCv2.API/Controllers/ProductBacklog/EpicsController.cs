@@ -8,7 +8,7 @@ using IOCv2.Application.Common.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers;
+namespace IOCv2.API.Controllers.ProductBacklog;
 
 [ApiController]
 [Route("api/projects/{projectId:guid}/epics")]

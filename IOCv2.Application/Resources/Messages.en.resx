@@ -145,24 +145,11 @@
     <value>Account created successfully but email notification failed. Please notify the employee directly. Code: {0}, Password: {1}</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="PageNumber.MinValue" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="PageSize.MinValue" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="PageSize.MaxValue" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
+
   <data name="SearchTerm.MaxLength" xml:space="preserve">
     <value>Search term cannot exceed 200 characters</value>
   </data>
-  <data name="SortColumn.AllowedValues" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="SortOrder.AllowedValues" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
+
   <data name="Projects.NotFound" xml:space="preserve">
     <value>Project Not Found</value>
   </data>
@@ -187,16 +174,7 @@
   <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Updated project {ProjectId}</value>
   </data>
-  <data name="Internships.NotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Projects.LogGetByInternshipIdSuccess" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ProjectResources.LogDeleteSuccess" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-</root>
+
   
   <!-- Epic Messages -->
   <data name="Epic.CreatedSuccess" xml:space="preserve">

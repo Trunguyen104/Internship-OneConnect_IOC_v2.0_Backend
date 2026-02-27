@@ -14,8 +14,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
     public class UploadProjectResourceCommand : IRequest<Result<UploadProjectResourceResponse>>
     {
         public Guid ProjectId { get; set; }
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = string.Empty;
         public FileType ResourceType { get; set; }
-        public IFormFile File { get; set; }
+        public IFormFile File { get; set; } = null!;
     }
 }

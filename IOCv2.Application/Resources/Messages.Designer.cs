@@ -145,7 +145,7 @@ namespace IOCv2.Application.Resources {
         /// </summary>
         internal static string Internships_NotFound {
             get {
-                return ResourceManager.GetString("Internships.NotFound", resourceCulture);
+                return ResourceManager.GetString("Internships.NotFound", resourceCulture); } }
         ///   Looks up a localized string similar to Tạo issue thành công..
         /// </summary>
         internal static string Issue_CreateSuccess {
@@ -159,7 +159,7 @@ namespace IOCv2.Application.Resources {
         /// </summary>
         internal static string NewRoleMustBeDifferent {
             get {
-                return ResourceManager.GetString("NewRoleMustBeDifferent", resourceCulture);
+                return ResourceManager.GetString("NewRoleMustBeDifferent", resourceCulture); } }
         ///   Looks up a localized string similar to Xóa issue thành công..
         /// </summary>
         internal static string Issue_DeleteSuccess {
@@ -173,7 +173,7 @@ namespace IOCv2.Application.Resources {
         /// </summary>
         internal static string PageNumber_MinValue {
             get {
-                return ResourceManager.GetString("PageNumber.MinValue", resourceCulture);
+                return ResourceManager.GetString("PageNumber.MinValue", resourceCulture); } }
         ///   Looks up a localized string similar to Cập nhật trạng thái issue thành công..
         /// </summary>
         internal static string Issue_UpdateStatusSuccess {
@@ -214,7 +214,7 @@ namespace IOCv2.Application.Resources {
         /// </summary>
         internal static string ProjectResources_GetAllSuccess {
             get {
-                return ResourceManager.GetString("ProjectResources.GetAllSuccess", resourceCulture);
+                return ResourceManager.GetString("ProjectResources.GetAllSuccess", resourceCulture); } }
         ///   Looks up a localized string similar to Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng..
         /// </summary>
         internal static string ResetPassword_StatusNoEmail {
@@ -305,19 +305,6 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng..
-        /// </summary>
-        internal static string ResetPassword_StatusNoEmail {
-            get {
-                return ResourceManager.GetString("ResetPassword.StatusNoEmail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}.
-        /// </summary>
-        internal static string ResetPassword_SuccessNoEmail {
-            get {
         ///   Looks up a localized string similar to Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}.
         /// </summary>
         internal static string ResetPassword_SuccessNoEmail {
@@ -358,7 +345,7 @@ namespace IOCv2.Application.Resources {
         /// </summary>
         internal static string SearchTerm_MaxLength {
             get {
-                return ResourceManager.GetString("SearchTerm.MaxLength", resourceCulture);
+                return ResourceManager.GetString("SearchTerm.MaxLength", resourceCulture); } }
         ///   Looks up a localized string similar to Tạo stakeholder thành công..
         /// </summary>
         internal static string Stakeholder_CreateSuccess {
@@ -372,7 +359,7 @@ namespace IOCv2.Application.Resources {
         /// </summary>
         internal static string SortColumn_AllowedValues {
             get {
-                return ResourceManager.GetString("SortColumn.AllowedValues", resourceCulture);
+                return ResourceManager.GetString("SortColumn.AllowedValues", resourceCulture); } }
         ///   Looks up a localized string similar to Xóa stakeholder thành công..
         /// </summary>
         internal static string Stakeholder_DeleteSuccess {
@@ -386,7 +373,7 @@ namespace IOCv2.Application.Resources {
         /// </summary>
         internal static string SortOrder_AllowedValues {
             get {
-                return ResourceManager.GetString("SortOrder.AllowedValues", resourceCulture);
+                return ResourceManager.GetString("SortOrder.AllowedValues", resourceCulture); } }
         ///   Looks up a localized string similar to Cập nhật stakeholder thành công..
         /// </summary>
         internal static string Stakeholder_UpdateSuccess {

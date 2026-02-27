@@ -15,7 +15,7 @@ namespace IOCv2.Domain.Entities
         public InternshipStudentStatus Status { get; set; }
         public DateTime JoinedAt { get; set; }
         // Navigation property
-        public virtual InternshipGroup InternshipGroup { get; set; }
+        public virtual InternshipGroup InternshipGroup { get; set; } = null!;
 
         public InternshipStudents(Guid internshipId, Guid studentId, InternshipStudentRole role, InternshipStudentStatus status)
         {

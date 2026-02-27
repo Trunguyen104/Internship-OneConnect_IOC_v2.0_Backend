@@ -9,7 +9,7 @@ using IOCv2.Application.Features.WorkItems.Queries.GetWorkItemById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers;
+namespace IOCv2.API.Controllers.ProductBacklog;
 
 /// <summary>
 /// Quản lý Work Items (User Story, Task, Subtask) trong Product Backlog và Sprint Backlog.

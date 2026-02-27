@@ -40,7 +40,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                     if (!internshipExists)
                     {
                         return Result<UpdateProjectResponse>.Failure(
-                            _messageService.GetMessage(MessageKeys.Internships.NotFound, request.InternshipId),
+                            _messageService.GetMessage(MessageKeys.Internships.NotFound, request.InternshipId!),
                             ResultErrorType.NotFound);
                     }
                 }
@@ -71,7 +71,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 }
 
                 // Update project properties if they are provided and different from current values
-                if (request.InternshipId != Guid.Empty && project.InternshipId != request.InternshipId) { project.InternshipId = request.InternshipId.Value; }
+                if (request.InternshipId.HasValue && request.InternshipId != Guid.Empty && project.InternshipId != request.InternshipId) { project.InternshipId = request.InternshipId.Value; }
                 if (request.Description is not null && project.Description != request.Description) { project.Description = request.Description; }
                 if (request.StartDate is not null && project.StartDate != request.StartDate) { project.StartDate = request.StartDate; }
                 if (request.EndDate is not null && project.EndDate != request.EndDate) { project.EndDate = request.EndDate; }

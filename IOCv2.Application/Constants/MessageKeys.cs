@@ -175,6 +175,8 @@
             public const string SearchTermMaxLength = "SearchTerm.MaxLength";
             public const string SortColumnAllowedValues = "SortColumn.AllowedValues";
             public const string SortOrderAllowedValues = "SortOrder.AllowedValues";
+        }
+
         public static class Sprint
         {
             public const string NameRequired = "Sprint.NameRequired";

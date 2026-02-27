@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers.StakeholdersController
+namespace IOCv2.API.Controllers.Stakeholders
 {
     /// <summary>
     /// Stakeholder Issue Management — manage issues related to stakeholders.

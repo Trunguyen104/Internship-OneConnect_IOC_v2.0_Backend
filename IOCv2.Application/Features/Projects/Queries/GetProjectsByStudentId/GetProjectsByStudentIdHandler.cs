@@ -41,7 +41,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             GetProjectsByStudentIdQuery request,
             CancellationToken cancellationToken)
         {
-            var userId = Guid.Parse(_currentUserService.UserId);
+            var userId = Guid.Parse(_currentUserService.UserId!);
             var studentId = await _unitOfWork.Repository<Student>().Query().Where(s => s.UserId == userId).Select(s => s.StudentId).FirstOrDefaultAsync(cancellationToken);
             var studentIdTest = studentId;
             try
