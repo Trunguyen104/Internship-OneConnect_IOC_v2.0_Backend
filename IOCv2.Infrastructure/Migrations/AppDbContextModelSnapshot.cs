@@ -1391,6 +1391,9 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
                 {
+                    b.Navigation("SprintWorkItems");
+                });
+
                     b.Navigation("InternshipStudents")
                         .IsRequired();
                 });

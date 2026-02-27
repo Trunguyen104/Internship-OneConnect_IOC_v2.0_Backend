@@ -26,4 +26,5 @@ public class WorkItem : BaseEntity
     public virtual WorkItem? Parent { get; set; }
     public virtual ICollection<WorkItem> Children { get; set; } = new List<WorkItem>();
     public virtual Student? Assignee { get; set; }
+    public virtual ICollection<Logbook> Logbook { get; set; } = new List<Logbook>();
 }
