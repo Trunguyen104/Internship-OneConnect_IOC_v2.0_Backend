@@ -32,11 +32,11 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
         {
             try
             {
-                // 1. Get project by id
+                // Get project by id
                 var project = await _unitOfWork.Repository<Project>()
                     .GetByIdAsync(request.ProjectId, cancellationToken);
 
-                // 2. Check if project exists
+                // Check if project exists
                 if (project == null)
                 {
                     return Result<string>.Failure(
@@ -44,11 +44,11 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                     ResultErrorType.NotFound);
                 }
 
-                // 3. Delete project (soft delete or hard delete?)
+                // Delete project (soft delete or hard delete?)
                 project.DeletedAt = DateTime.UtcNow;
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
 
-                // 4. Save changes
+                // Save changes
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogDelete), request.ProjectId);

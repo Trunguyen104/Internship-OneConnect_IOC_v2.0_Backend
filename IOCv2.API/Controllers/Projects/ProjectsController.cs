@@ -34,7 +34,7 @@ namespace IOCv2.API.Controllers.Projects
             return HandleResult(result);
         }
 
-        [HttpPut("update")]
+        [HttpPut("{projectId}/update")]
         [ProducesResponseType(typeof(Result<UpdateProjectResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -42,20 +42,32 @@ namespace IOCv2.API.Controllers.Projects
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateProject(
-        [FromBody] UpdateProjectCommand command,
+        [FromRoute] Guid projectId
+            ,[FromBody] UpdateProjectRequest request,
         CancellationToken cancellationToken)
         {
+            var command = new UpdateProjectCommand
+            {
+                ProjectId = projectId,
+                InternshipId = request.InternshipId,
+                ProjectName = request.ProjectName,
+                Description = request.Description,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                Status = request.Status
+            };
             var result = await _mediator.Send(command, cancellationToken);
             return HandleResult(result);
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("{projectId}/delete")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteProject([FromBody] DeleteProjectCommand command, CancellationToken cancellationToken) {
+        public async Task<IActionResult> DeleteProject([FromRoute] Guid projectId, CancellationToken cancellationToken) {
+            var command = new DeleteProjectCommand { ProjectId = projectId };
             var result = await _mediator.Send<Result<string>>(command, cancellationToken);
             return HandleResult(result);
         }

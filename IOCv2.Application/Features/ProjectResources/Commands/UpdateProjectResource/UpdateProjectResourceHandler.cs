@@ -30,6 +30,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
         {
             try
             {
+                // Check if the project resource exists
                 var projectResource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().GetByIdAsync(request.ProjectResourceId);
                 if (projectResource == null)
                 {
@@ -42,6 +43,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.Projects.LogNotFound), request.ProjectId);
                     return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound));
                 }
+                // Update the project resource properties
                 projectResource.ProjectId = request.ProjectId;
                 projectResource.ResourceName = request.ResourceName;
                 projectResource.ResourceType = request.ResourceType;

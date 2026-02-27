@@ -142,7 +142,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Internship not found: {InternshipId}.
+        ///   Looks up a localized string similar to Internship not found: {0}.
         /// </summary>
         internal static string Internships_NotFound {
             get {
@@ -210,6 +210,15 @@ namespace IOCv2.Application.Resources {
         internal static string ProjectResources_GetByIdSuccess {
             get {
                 return ResourceManager.GetString("ProjectResources.GetByIdSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project resource with ID {ResourceId} deleted successfully..
+        /// </summary>
+        internal static string ProjectResources_LogDeleteSuccess {
+            get {
+                return ResourceManager.GetString("ProjectResources.LogDeleteSuccess", resourceCulture);
             }
         }
         

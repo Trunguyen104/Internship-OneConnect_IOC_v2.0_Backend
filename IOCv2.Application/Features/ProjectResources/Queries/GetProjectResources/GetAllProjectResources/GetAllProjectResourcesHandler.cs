@@ -40,11 +40,11 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             {
                 
 
-                // 1. Build query
+                // Build query
                 var query = _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query()
                     .AsNoTracking();
 
-                // 2. Apply search term if provided
+                // Apply search term if provided
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm))
                 {
                     var term = request.SearchTerm.Trim().ToLower();
@@ -52,32 +52,32 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         x.ResourceName.ToLower().Contains(term));
                 }
 
-                // 3. Apply project filter if provided
+                // Apply project filter if provided
                 if (request.ProjectId.HasValue)
                 {
                     query = query.Where(x => x.ProjectId == request.ProjectId.Value);
                 }
 
-                // 4. Apply resource type filter if provided
+                // Apply resource type filter if provided
                 if (request.ResourceType.HasValue)
                 {
                     query = query.Where(x => x.ResourceType == request.ResourceType.Value);
                 }
 
-                // 5. Get total count
+                // Get total count
                 var totalCount = await query.CountAsync(cancellationToken);
 
-                // 6. Apply sorting
+                // Apply sorting
                 query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-                // 7. Apply pagination
+                // Apply pagination
                 var items = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ProjectTo<GetAllProjectResourcesResponse>(_mapper.ConfigurationProvider)
                     .ToListAsync(cancellationToken);
 
-                // 8. Create paginated result
+                // Create paginated result
                 var result = PaginatedResult<GetAllProjectResourcesResponse>.Create(
                     items, totalCount, request.PageNumber, request.PageSize);
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetAllSuccess), items.Count);

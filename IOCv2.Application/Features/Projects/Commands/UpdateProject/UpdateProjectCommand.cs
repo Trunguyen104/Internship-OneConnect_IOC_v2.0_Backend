@@ -15,8 +15,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
     public record UpdateProjectCommand : IRequest<Result<UpdateProjectResponse>>, IMapFrom<Project>
     {
         public Guid ProjectId { get; set; }
-        public Guid InternshipId { get; set; }
-        public string ProjectName { get; set; } = string.Empty;
+        public Guid? InternshipId { get; set; }
+        public string? ProjectName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

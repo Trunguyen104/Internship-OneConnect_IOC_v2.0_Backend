@@ -30,6 +30,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         public async Task<Result<GetProjectResourceByIdResponse>> Handle(GetProjectResourceByIdQuery request, CancellationToken cancellationToken)
         {
             try {
+                // Check if the project resource exists
                 var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().GetByIdAsync(request.ProjectResourceId, cancellationToken);
                 if (resource == null)
                 {
@@ -38,6 +39,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
                         ResultErrorType.NotFound);
                 }
+               
                 var response = _mapper.Map<GetProjectResourceByIdResponse>(resource);
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ProjectResourceId);
                 return Result<GetProjectResourceByIdResponse>.Success(response);

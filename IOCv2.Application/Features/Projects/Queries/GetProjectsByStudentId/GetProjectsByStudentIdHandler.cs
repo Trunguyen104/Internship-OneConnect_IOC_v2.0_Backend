@@ -46,19 +46,19 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             var studentIdTest = studentId;
             try
             {
-                // 1. Build base query
+                // Build base query
                 var query = _unitOfWork.Repository<Project>().Query()
                     .Where(i => i.InternshipGroup.InternshipStudents.StudentId == studentId)
                     .Select(p => p).AsNoTracking();
 
 
-                // 2. Apply status filter
+                // Apply status filter
                 if (request.Status.HasValue)
                 {
                     query = query.Where(p => p.Status == request.Status.Value);
                 }
 
-                // 3. Apply search term
+                // Apply search term
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm))
                 {
                     var term = request.SearchTerm.Trim().ToLower();
@@ -67,20 +67,20 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
                         (p.Description != null && p.Description.ToLower().Contains(term)));
                 }
 
-                // 4. Get total count before pagination
+                // Get total count before pagination
                 var totalCount = await query.CountAsync(cancellationToken);
 
-                // 5. Apply sorting
+                // Apply sorting
                 query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-                // 6. Apply pagination
+                // Apply pagination
                 var items = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ProjectTo<GetProjectsByStudentIdResponse>(_mapper.ConfigurationProvider)
                     .ToListAsync(cancellationToken);
 
-                // 7. Create paginated result
+                // Create paginated result
                 var result = PaginatedResult<GetProjectsByStudentIdResponse>.Create(
                     items, totalCount, request.PageNumber, request.PageSize);
 

@@ -47,7 +47,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             try
             {
 
-                // 2. Validate file
+                // Validate file
                 var fileValidation = FileValidationHelper.ValidateFile(
                     request.File.FileName,
                     request.File.Length);
@@ -59,7 +59,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         ResultErrorType.BadRequest);
                 }
 
-                // 3. Check if project exists
+                // Check if project exists
                 var projectExists = await _unitOfWork.Repository<Project>()
                     .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
@@ -69,7 +69,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         ResultErrorType.NotFound);
                 }
 
-                // 4. Upload file to storage
+                // Upload file to storage
                 var fileName = $"{Guid.NewGuid():N}_{request.File.FileName}";
                 var fileUrl = await _fileStorageService.UploadFileAsync(
                     request.File,
@@ -77,18 +77,18 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     fileName,
                     cancellationToken);
 
-                // 5. Create resource record using constructor
+                // Create resource record using constructor
                 var resource = new Domain.Entities.ProjectResources(
                     request.ProjectId,
                     request.ResourceName ?? request.File.FileName,
                     request.ResourceType,
                     fileUrl);
 
-                // 6. Save to database
+                // Save to database
                 await _unitOfWork.Repository<Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                // 7. Map to response
+                // Map to response
                 var response = _mapper.Map<UploadProjectResourceResponse>(resource);
 
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadSuccess),

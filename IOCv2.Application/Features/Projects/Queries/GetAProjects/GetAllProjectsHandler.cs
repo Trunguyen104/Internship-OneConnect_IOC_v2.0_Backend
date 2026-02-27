@@ -41,10 +41,10 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAProjects
         {
             try
             {
-                // 1. Build base query
+                // Build base query
                 var query = _unitOfWork.Repository<Project>().Query().Select(x => x).AsNoTracking();
 
-                // 2. Apply search term
+                // Apply search term
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm))
                 {
                     var term = request.SearchTerm.Trim().ToLower();
@@ -53,13 +53,13 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAProjects
                         (p.Description != null && p.Description.ToLower().Contains(term)));
                 }
 
-                // 3. Apply status filter
+                // Apply status filter
                 if (request.Status.HasValue)
                 {
                     query = query.Where(p => p.Status == request.Status.Value);
                 }
 
-                // 4. Apply date range filter
+                // Apply date range filter
                 if (request.FromDate.HasValue)
                 {
                     query = query.Where(p => p.StartDate >= request.FromDate.Value);
@@ -70,20 +70,20 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAProjects
                     query = query.Where(p => p.EndDate <= request.ToDate.Value);
                 }
 
-                // 5. Get total count before pagination
+                // Get total count before pagination
                 var totalCount = await query.CountAsync(cancellationToken);
 
-                // 6. Apply sorting
+                // Apply sorting
                 query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-                // 7. Apply pagination
+                // Apply pagination
                 var items = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ProjectTo<GetAllProjectsResponse>(_mapper.ConfigurationProvider)
                     .ToListAsync(cancellationToken);
 
-                // 8. Create paginated result
+                // Create paginated result
                 var result = PaginatedResult<GetAllProjectsResponse>.Create(
                     items, totalCount, request.PageNumber, request.PageSize);
 

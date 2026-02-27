@@ -19,7 +19,6 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectIdRequired));
 
             RuleFor(x => x.ProjectName)
-                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsProjectNameRequired))
                 .MaximumLength(255).WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectNameMaxLength));
 
             RuleFor(x => x.Description)

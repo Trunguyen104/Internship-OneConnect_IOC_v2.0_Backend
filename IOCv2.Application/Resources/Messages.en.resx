@@ -193,4 +193,7 @@
   <data name="Projects.LogGetByInternshipIdSuccess" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="ProjectResources.LogDeleteSuccess" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>

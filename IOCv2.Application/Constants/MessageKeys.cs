@@ -144,7 +144,7 @@
             public const string LogUploadSuccess = "ProjectResources.LogUploadSuccess";
             public const string LogUploadError = "ProjectResources.LogUploadError";
             public const string UpdateSuccess = "ProjectResources.UpdateSuccess";
-            public const string DeleteSuccess = "ProjectResources.DeleteSuccess";
+            public const string LogDeleteSuccess = "ProjectResources.LogDeleteSuccess";
             public const string ProjectIdRequired = "ProjectResources.ProjectIdRequired";
             public const string ResourceNameMaxLength = "ProjectResources.ResourceNameMaxLength";
             public const string LogProjectResourceNotFound = "ProjectResources.LogNotFound";

@@ -30,11 +30,21 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         {
             try
             {
-                // Kiểm tra project name đã tồn tại trong internship chưa
+                // Check if the internship exists
+                var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
+                    .ExistsAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
+
+                if (!internshipExists)
+                {
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Internships.NotFound),
+                        ResultErrorType.NotFound);
+                }
+
+                // Check if the project name exists within the internship
                 var projectExists = await _unitOfWork.Repository<Project>()
                     .ExistsAsync(p => p.InternshipId == request.InternshipId
                                    && p.ProjectName == request.ProjectName, cancellationToken);
-
                 if (projectExists)
                 {
                     return Result<CreateProjectResponse>.Failure(
@@ -42,6 +52,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                         ResultErrorType.Conflict);
                 }
 
+                // Create new project
                 var project = new Project(request.InternshipId, request.ProjectName, request.Description);
                 await _unitOfWork.Repository<Project>().AddAsync(project, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);

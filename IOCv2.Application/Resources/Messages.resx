@@ -217,9 +217,12 @@
     <value>Dự án đã được cập nhật {ProjectId}</value>
   </data>
   <data name="Internships.NotFound" xml:space="preserve">
-    <value>Internship not found: {InternshipId}</value>
+    <value>Internship not found: {0}</value>
   </data>
   <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
     <value>Successfully retrieved {Count} projects for internship ID: {InternshipId}</value>
+  </data>
+  <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
+    <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
 </root>
