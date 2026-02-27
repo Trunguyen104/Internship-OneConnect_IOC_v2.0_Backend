@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IOCv2.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,17 +9,23 @@ namespace IOCv2.Domain.Entities
 {
     public class InternshipGroup : BaseEntity
     {
-        public Guid InternshipId { get; set; }
-        public Guid TermId { get; set; }
-        //public virtual Term Term { get; set; } = null!;
-        public Guid EnterpriseId { get; set; }
-        public virtual Enterprise Enterprise { get; set; } = null!;
-        public Guid MentorId { get; set; }
-        public virtual EnterpriseUser Mentor { get; set; } = null!;
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public short Status { get; set; }
-
-        public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
+        public Guid InternshipId { get; private set; }
+        public Guid TermId { get; private set; }
+        public Guid? EnterpriseId { get; private set; }
+        public Guid MentorId { get; private set; }
+        public DateTime? StartDate { get; private set; }
+        public DateTime? EndDate { get; private set; }
+        public InternshipGroupStatus Status { get; private set; }
+        public virtual InternshipStudents InternshipStudents { get; private set; }
+        public InternshipGroup(Guid internshipId, Guid termId, Guid? enterpriseId, Guid mentorId, DateTime? startDate, DateTime? endDate, InternshipGroupStatus status)
+        {
+            InternshipId = internshipId;
+            TermId = termId;
+            EnterpriseId = enterpriseId;
+            MentorId = mentorId;
+            StartDate = startDate;
+            EndDate = endDate;
+            Status = status;
+        }
     }
 }

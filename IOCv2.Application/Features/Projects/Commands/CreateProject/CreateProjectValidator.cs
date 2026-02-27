@@ -1,0 +1,39 @@
+﻿using FluentValidation;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser;
+using IOCv2.Application.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace IOCv2.Application.Features.Projects.Commands.CreateProject
+{
+    public class CreateProjectValidator : AbstractValidator<CreateProjectCommand>
+    {
+        private readonly IMessageService _messageService;
+        public CreateProjectValidator(IMessageService messageService) {
+            _messageService = messageService;
+            RuleFor(x => x.InternshipId)
+             .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsInternshipIdRequired));
+
+            RuleFor(x => x.ProjectName)
+                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsProjectNameRequired))
+                .MaximumLength(255).WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectNameMaxLength));
+
+            RuleFor(x => x.Description)
+                .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.DescriptionMaxLength));
+
+            RuleFor(x => x.StartDate)
+                .LessThanOrEqualTo(x => x.EndDate)
+                .WithMessage(_messageService.GetMessage(MessageKeys.Projects.StartDateInvalidRange))
+                .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
+
+            RuleFor(x => x.EndDate)
+                .GreaterThanOrEqualTo(x => x.StartDate)
+                .WithMessage(_messageService.GetMessage(MessageKeys.Projects.EndDateInvalidRange))
+                .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
+        }
+    }
+}
