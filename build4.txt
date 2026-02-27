@@ -1,9 +1,0 @@
-﻿d:\ProjectOJT\Internship-OneConnect_IOC_v2.0_Backend\IOCv2.Application\Resources\Messages.Designer.cs(320,18): error CS1513: } expected [d:\ProjectOJT\Internship-OneConnect_IOC_v2.0_Backend\IOCv2.Application\IOCv2.Application.csproj]
-
-Build FAILED.
-    0 Warning(s)
-    1 Error(s)
-
-Time Elapsed 00:00:02.54
-
-Workload updates are available. Run `dotnet workload list` for more information.
