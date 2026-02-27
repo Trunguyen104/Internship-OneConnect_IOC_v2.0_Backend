@@ -57,16 +57,15 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
 
         var incompleteCount = workItemIds.Count - completedCount;
 
-        var incompleteWorkItemIds = workItemIds.Any()
-            ? await _unitOfWork.Repository<WorkItem>().Query()
-                .Where(w => workItemIds.Contains(w.WorkItemId) && w.Status != WorkItemStatus.Done)
-                .Select(w => w.WorkItemId)
+        var incompleteSprintWorkItems = workItemIds.Any()
+            ? await _unitOfWork.Repository<SprintWorkItem>().Query()
+                .Where(swi => swi.SprintId == request.SprintId &&
+                              _unitOfWork.Repository<WorkItem>().Query()
+                                  .Where(w => workItemIds.Contains(w.WorkItemId) && w.Status != WorkItemStatus.Done)
+                                  .Select(w => w.WorkItemId)
+                                  .Contains(swi.WorkItemId))
                 .ToListAsync(cancellationToken)
-            : new List<Guid>();
-
-        var incompleteSprintWorkItems = sprintWorkItems
-            .Where(swi => incompleteWorkItemIds.Contains(swi.WorkItemId))
-            .ToList();
+            : new List<SprintWorkItem>();
 
         int movedCount = 0;
 
@@ -107,17 +106,8 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         {
                             foreach (var item in incompleteSprintWorkItems)
                             {
-                                // In EF Core, you CANNOT change a property that is part of a key.
-                                // We must delete the old relationship and insert a new one.
-                                await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
-                                
-                                var newItem = new SprintWorkItem
-                                {
-                                    SprintId = nextSprint.SprintId,
-                                    WorkItemId = item.WorkItemId,
-                                    BoardOrder = item.BoardOrder
-                                };
-                                await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
+                                item.SprintId = nextSprint.SprintId;
+                                await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
                             }
                         }
                         else
@@ -148,16 +138,8 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         await _unitOfWork.Repository<Sprint>().AddAsync(newSprint, cancellationToken);
                         foreach (var item in incompleteSprintWorkItems)
                         {
-                            // Same PK logic deletion
-                            await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
-                            
-                            var newItem = new SprintWorkItem
-                            {
-                                SprintId = newSprint.SprintId,
-                                WorkItemId = item.WorkItemId,
-                                BoardOrder = item.BoardOrder
-                            };
-                            await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
+                            item.SprintId = newSprint.SprintId;
+                            await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
                         }
                         movedCount = incompleteSprintWorkItems.Count;
                         break;

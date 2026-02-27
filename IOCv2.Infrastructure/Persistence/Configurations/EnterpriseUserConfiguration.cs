@@ -28,11 +28,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .WithOne(u => u.EnterpriseUser)
                 .HasForeignKey<EnterpriseUser>(eu => eu.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(eu => eu.InternshipGroups)
-                .WithOne(ig => ig.Mentor)
-                .HasForeignKey(ig => ig.MentorId)
-                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

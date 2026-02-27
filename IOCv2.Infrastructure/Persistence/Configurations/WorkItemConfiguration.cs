@@ -118,9 +118,5 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
 
         // Global query filter for soft delete
         builder.HasQueryFilter(w => w.DeletedAt == null);
-
-        builder.HasMany(lb => lb.Logbook)
-                .WithMany(wi => wi.WorkItem)
-                .UsingEntity(j => j.ToTable("logbook_work_items")); ;
     }
 }

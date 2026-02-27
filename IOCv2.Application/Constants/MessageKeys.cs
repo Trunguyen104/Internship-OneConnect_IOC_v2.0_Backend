@@ -270,13 +270,5 @@
             public const string DescriptionMaxLength = "Validation.DescriptionMaxLength";
             public const string IdRequired = "Validation.IdRequired";
         }
-
-        public static class Logbook
-        {
-            public const string NotFound = "Logbook.NotFound";
-            public const string InvalidInternship = "Logbook.InvalidInternship";
-            public const string InvalidAuditor = "Logbook.InvalidAuditor";
-            public const string CreationFailed = "Logbook.CreationFailed";
-        }
     }
 }

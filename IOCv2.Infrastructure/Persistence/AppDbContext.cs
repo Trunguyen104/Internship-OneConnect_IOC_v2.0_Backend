@@ -36,7 +36,6 @@ public partial class AppDbContext : DbContext
     public DbSet<SprintWorkItem> SprintWorkItems { get; set; } = null!;
     public DbSet<Domain.Entities.Stakeholder> Stakeholders { get; set; } = null!;
     public DbSet<StakeholderIssue> StakeholderIssues { get; set; } = null!;
-    public DbSet<Domain.Entities.Logbook> Logbooks { get; set; } = null!;
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
