@@ -4,19 +4,26 @@ using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
+using IOCv2.Application.Constants;
+using AutoMapper;
+
 namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGroup
 {
-    public class RemoveStudentsFromGroupHandler : IRequestHandler<RemoveStudentsFromGroupCommand, Result<Guid>>
+    public class RemoveStudentsFromGroupHandler : IRequestHandler<RemoveStudentsFromGroupCommand, Result<RemoveStudentsFromGroupResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMessageService _messageService;
+        private readonly IMapper _mapper;
 
         // Dependency Injection UnitOfWork pattern
-        public RemoveStudentsFromGroupHandler(IUnitOfWork unitOfWork)
+        public RemoveStudentsFromGroupHandler(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _messageService = messageService;
+            _mapper = mapper;
         }
 
-        public async Task<Result<Guid>> Handle(RemoveStudentsFromGroupCommand request, CancellationToken cancellationToken)
+        public async Task<Result<RemoveStudentsFromGroupResponse>> Handle(RemoveStudentsFromGroupCommand request, CancellationToken cancellationToken)
         {
             var group = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(g => g.Members)
@@ -24,7 +31,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
             if (group == null)
             {
-                return Result<Guid>.NotFound($"Không tìm thấy nhóm thực tập với ID {request.InternshipId}");
+                return Result<RemoveStudentsFromGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
             }
 
             var repoStudent = _unitOfWork.Repository<InternshipStudent>();
@@ -43,16 +50,18 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
             if (!hasChanges)
             {
-                return Result<Guid>.Success(group.InternshipId); // Dù không thay đổi gì thì thao tác vẫn có thể coi là thành công (người cần xóa không ở trong nhóm)
+                var responseNoChange = _mapper.Map<RemoveStudentsFromGroupResponse>(group);
+                return Result<RemoveStudentsFromGroupResponse>.Success(responseNoChange); // Dù không thay đổi gì thì thao tác vẫn có thể coi là thành công (người cần xóa không ở trong nhóm)
             }
 
             var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
             if (saved > 0)
             {
-                return Result<Guid>.Success(group.InternshipId);
+                var response = _mapper.Map<RemoveStudentsFromGroupResponse>(group);
+                return Result<RemoveStudentsFromGroupResponse>.Success(response);
             }
 
-            return Result<Guid>.Failure("Có lỗi xảy ra khi xóa sinh viên khỏi nhóm.");
+            return Result<RemoveStudentsFromGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
         }
     }
 }

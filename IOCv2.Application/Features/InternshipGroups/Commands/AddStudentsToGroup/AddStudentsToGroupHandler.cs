@@ -5,18 +5,25 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
+using IOCv2.Application.Constants;
+using AutoMapper;
+
 namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGroup
 {
-    public class AddStudentsToGroupHandler : IRequestHandler<AddStudentsToGroupCommand, Result<Guid>>
+    public class AddStudentsToGroupHandler : IRequestHandler<AddStudentsToGroupCommand, Result<AddStudentsToGroupResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMessageService _messageService;
+        private readonly IMapper _mapper;
 
-        public AddStudentsToGroupHandler(IUnitOfWork unitOfWork)
+        public AddStudentsToGroupHandler(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _messageService = messageService;
+            _mapper = mapper;
         }
 
-        public async Task<Result<Guid>> Handle(AddStudentsToGroupCommand request, CancellationToken cancellationToken)
+        public async Task<Result<AddStudentsToGroupResponse>> Handle(AddStudentsToGroupCommand request, CancellationToken cancellationToken)
         {
             var group = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(g => g.Members)
@@ -24,7 +31,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
 
             if (group == null)
             {
-                return Result<Guid>.NotFound($"Không tìm thấy nhóm thực tập với ID {request.InternshipId}");
+                return Result<AddStudentsToGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
             }
 
             // Lọc bỏ danh sách trùng lặp truyền vào từ Request JSON
@@ -49,10 +56,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
             var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
             if (saved >= 0)
             {
-                return Result<Guid>.Success(group.InternshipId);
+                var response = _mapper.Map<AddStudentsToGroupResponse>(group);
+                return Result<AddStudentsToGroupResponse>.Success(response);
             }
 
-            return Result<Guid>.Failure("Có lỗi xảy ra khi gán sinh viên vào nhóm.");
+            return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
         }
     }
 }

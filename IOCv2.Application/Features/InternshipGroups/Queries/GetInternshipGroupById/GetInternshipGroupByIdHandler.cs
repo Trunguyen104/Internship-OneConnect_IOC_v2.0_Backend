@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById
 {
@@ -11,11 +12,13 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMessageService _messageService;
 
-        public GetInternshipGroupByIdHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetInternshipGroupByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _messageService = messageService;
         }
 
         public async Task<Result<GetInternshipGroupByIdResponse>> Handle(GetInternshipGroupByIdQuery request, CancellationToken cancellationToken)
@@ -29,7 +32,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
 
             if (entity == null)
             {
-                return Result<GetInternshipGroupByIdResponse>.NotFound($"Group with ID {request.InternshipId} is not found.");
+                return Result<GetInternshipGroupByIdResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
             }
 
             var result = _mapper.Map<GetInternshipGroupByIdResponse>(entity);

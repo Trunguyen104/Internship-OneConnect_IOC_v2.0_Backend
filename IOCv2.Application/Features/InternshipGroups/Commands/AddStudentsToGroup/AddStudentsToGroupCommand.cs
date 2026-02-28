@@ -5,17 +5,17 @@ using System.Text.Json.Serialization;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGroup
 {
-    public class AddStudentsToGroupCommand : IRequest<Result<Guid>>
+    public record AddStudentsToGroupCommand : IRequest<Result<AddStudentsToGroupResponse>>
     {
         [JsonIgnore]
-        public Guid InternshipId { get; set; }
+        public Guid InternshipId { get; init; }
 
-        public List<AddStudentItemDto> Students { get; set; } = new List<AddStudentItemDto>();
+        public List<AddStudentItemDto> Students { get; init; } = new List<AddStudentItemDto>();
     }
 
-    public class AddStudentItemDto
+    public record AddStudentItemDto
     {
-        public Guid StudentId { get; set; }
-        public InternshipRole Role { get; set; }
+        public Guid StudentId { get; init; }
+        public InternshipRole Role { get; init; }
     }
 }

@@ -5,18 +5,25 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
+using IOCv2.Application.Constants;
+using AutoMapper;
+
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
 {
-    public class CreateInternshipGroupHandler : IRequestHandler<CreateInternshipGroupCommand, Result<Guid>>
+    public class CreateInternshipGroupHandler : IRequestHandler<CreateInternshipGroupCommand, Result<CreateInternshipGroupResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMessageService _messageService;
+        private readonly IMapper _mapper;
 
-        public CreateInternshipGroupHandler(IUnitOfWork unitOfWork)
+        public CreateInternshipGroupHandler(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _messageService = messageService;
+            _mapper = mapper;
         }
 
-        public async Task<Result<Guid>> Handle(CreateInternshipGroupCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CreateInternshipGroupResponse>> Handle(CreateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
             var newGroup = new InternshipGroup
             {
@@ -58,10 +65,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
             var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
             if (saved > 0)
             {
-                return Result<Guid>.Success(newGroup.InternshipId);
+                var response = _mapper.Map<CreateInternshipGroupResponse>(newGroup);
+                return Result<CreateInternshipGroupResponse>.Success(response);
             }
 
-            return Result<Guid>.Failure("Có lỗi xảy ra khi lưu nhóm vào Cơ sở dữ liệu.");
+            return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
         }
     }
 }

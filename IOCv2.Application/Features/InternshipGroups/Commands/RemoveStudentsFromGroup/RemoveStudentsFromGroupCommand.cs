@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGroup
 {
-    public class RemoveStudentsFromGroupCommand : IRequest<Result<Guid>>
+    public record RemoveStudentsFromGroupCommand : IRequest<Result<RemoveStudentsFromGroupResponse>>
     {
         [JsonIgnore]
-        public Guid InternshipId { get; set; }
+        public Guid InternshipId { get; init; }
 
-        public List<Guid> StudentIds { get; set; } = new List<Guid>();
+        public List<Guid> StudentIds { get; init; } = new List<Guid>();
     }
 }

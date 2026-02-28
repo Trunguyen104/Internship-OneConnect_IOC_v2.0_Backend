@@ -4,18 +4,25 @@ using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
+using IOCv2.Application.Constants;
+using AutoMapper;
+
 namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipGroup
 {
-    public class DeleteInternshipGroupHandler : IRequestHandler<DeleteInternshipGroupCommand, Result<Guid>>
+    public class DeleteInternshipGroupHandler : IRequestHandler<DeleteInternshipGroupCommand, Result<DeleteInternshipGroupResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMessageService _messageService;
+        private readonly IMapper _mapper;
 
-        public DeleteInternshipGroupHandler(IUnitOfWork unitOfWork)
+        public DeleteInternshipGroupHandler(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _messageService = messageService;
+            _mapper = mapper;
         }
 
-        public async Task<Result<Guid>> Handle(DeleteInternshipGroupCommand request, CancellationToken cancellationToken)
+        public async Task<Result<DeleteInternshipGroupResponse>> Handle(DeleteInternshipGroupCommand request, CancellationToken cancellationToken)
         {
             var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(g => g.Members) // Đi kèm dữ liệu sinh viên để dọn rác
@@ -23,7 +30,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
 
             if (entity == null)
             {
-                return Result<Guid>.NotFound($"Không tìm thấy nhóm thực tập với ID {request.InternshipId}");
+                return Result<DeleteInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
             }
 
             // Entity Framework Core có thể tự Cascade Delete nếu config chuẩn. 
@@ -43,10 +50,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
 
             if (saved > 0)
             {
-                return Result<Guid>.Success(entity.InternshipId);
+                var response = _mapper.Map<DeleteInternshipGroupResponse>(entity);
+                return Result<DeleteInternshipGroupResponse>.Success(response);
             }
 
-            return Result<Guid>.Failure("Không thể xóa nhóm thực tập và dữ liệu sinh viên đi kèm.");
+            return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
         }
     }
 }

@@ -3,9 +3,9 @@ using MediatR;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipGroup
 {
-    public class DeleteInternshipGroupCommand : IRequest<Result<Guid>>
+    public record DeleteInternshipGroupCommand : IRequest<Result<DeleteInternshipGroupResponse>>
     {
-        public Guid InternshipId { get; set; }
+        public Guid InternshipId { get; init; }
 
         public DeleteInternshipGroupCommand(Guid internshipId)
         {

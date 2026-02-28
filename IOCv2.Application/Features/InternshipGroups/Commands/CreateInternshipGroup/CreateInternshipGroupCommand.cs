@@ -4,21 +4,21 @@ using MediatR;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
 {
-    public class CreateInternshipGroupCommand : IRequest<Result<Guid>>
+    public record CreateInternshipGroupCommand : IRequest<Result<CreateInternshipGroupResponse>>
     {
-        public Guid TermId { get; set; }
-        public string GroupName { get; set; } = string.Empty;
-        public Guid? EnterpriseId { get; set; }
-        public Guid? MentorId { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public Guid TermId { get; init; }
+        public string GroupName { get; init; } = string.Empty;
+        public Guid? EnterpriseId { get; init; }
+        public Guid? MentorId { get; init; }
+        public DateTime? StartDate { get; init; }
+        public DateTime? EndDate { get; init; }
 
-        public List<CreateInternshipStudentDto> Students { get; set; } = new List<CreateInternshipStudentDto>();
+        public List<CreateInternshipStudentDto> Students { get; init; } = new List<CreateInternshipStudentDto>();
     }
 
-    public class CreateInternshipStudentDto
+    public record CreateInternshipStudentDto
     {
-        public Guid StudentId { get; set; }
-        public InternshipRole Role { get; set; }
+        public Guid StudentId { get; init; }
+        public InternshipRole Role { get; init; }
     }
 }
