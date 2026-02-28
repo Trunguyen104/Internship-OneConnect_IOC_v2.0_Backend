@@ -1,5 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -58,8 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  
-  <!-- User Messages -->
   <data name="CannotPromoteToManager" xml:space="preserve">
     <value>Bạn không thể cho người khác thành quản lí</value>
   </data>
@@ -96,7 +153,6 @@
   <data name="ResetPassword.StatusNoEmail" xml:space="preserve">
     <value>Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng.</value>
   </data>
-  <!-- Authentication -->
   <data name="Auth.LoginSuccess" xml:space="preserve">
     <value>Đăng nhập thành công</value>
   </data>
@@ -115,9 +171,59 @@
   <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
     <value>Nếu tài khoản hợp lệ, hệ thống sẽ gửi link reset mật khẩu qua email.</value>
   </data>
-  <!-- Profile -->
   <data name="Profile.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật thông tin thành công.</value>
+  </data>
+  <data name="PageNumber.MinValue" xml:space="preserve">
+    <value>Page number must be greater than or equal to 1</value>
+  </data>
+  <data name="PageSize.MinValue" xml:space="preserve">
+    <value>Page size must be greater than or equal to 1</value>
+  </data>
+  <data name="PageSize.MaxValue" xml:space="preserve">
+    <value>Page size must not exceed 100</value>
+  </data>
+  <data name="SearchTerm.MaxLength" xml:space="preserve">
+    <value>Search term cannot exceed 200 characters</value>
+  </data>
+  <data name="SortColumn.AllowedValues" xml:space="preserve">
+    <value>Sort column must be one of: projectname, startdate, enddate, status, createdat</value>
+  </data>
+  <data name="SortOrder.AllowedValues" xml:space="preserve">
+    <value>Sort order must be either 'asc' or 'desc'</value>
+  </data>
+  <data name="Projects.NotFound" xml:space="preserve">
+    <value>Dự án không tìm thấy</value>
+  </data>
+  <data name="Projects.DeleteSuccess" xml:space="preserve">
+    <value>Xóa dự án thành công</value>
+  </data>
+  <data name="Projects.LogDelete" xml:space="preserve">
+    <value>Dự án đã bị xóa {ProjectId}</value>
+  </data>
+  <data name="ProjectResources.LogUploadSuccess" xml:space="preserve">
+    <value>Đã tải tệp {FileName} lên dự án {ProjectId}</value>
+  </data>
+  <data name="ProjectResources.GetAllSuccess" xml:space="preserve">
+    <value>Đã truy xuất thành công {Count} tài nguyên dự án</value>
+  </data>
+  <data name="ProjectResources.GetByIdSuccess" xml:space="preserve">
+    <value>Đã truy xuất thành công tài nguyên dự án: {ResourceId}</value>
+  </data>
+  <data name="Projects.LogCreateSuccess" xml:space="preserve">
+    <value>Đã tạo dự án {ProjectId} cho chương trình thực tập {InternshipId}.</value>
+  </data>
+  <data name="Projects.UpdateSuccess" xml:space="preserve">
+    <value>Dự án đã được cập nhật {ProjectId}</value>
+  </data>
+  <data name="Internships.NotFound" xml:space="preserve">
+    <value>Internship not found: {0}</value>
+  </data>
+  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
+    <value>Successfully retrieved {Count} projects for internship ID: {InternshipId}</value>
+  </data>
+  <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
+    <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
   
   <!-- Epic Messages -->

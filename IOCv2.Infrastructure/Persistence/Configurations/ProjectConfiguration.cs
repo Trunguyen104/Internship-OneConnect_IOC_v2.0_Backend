@@ -10,57 +10,75 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Project> builder)
         {
             builder.ToTable("projects");
-            builder.HasKey(p => p.Id);
-            builder.Property(p => p.Id)
-                .HasColumnName("id")
+
+            // Primary Key
+            builder.HasKey(x => x.ProjectId);
+            builder.Property(x => x.ProjectId)
+                .HasColumnName("project_id")
                 .HasDefaultValueSql("gen_random_uuid()");
 
-            builder.Property(p => p.InternshipId)
+            // Properties
+            builder.Property(x => x.InternshipId)
                 .HasColumnName("internship_id")
                 .IsRequired();
 
-            builder.Property(p => p.MentorId)
-                .HasColumnName("mentor_id");
+            builder.Property(x => x.ProjectName)
+                .HasColumnName("project_name")
+                .HasMaxLength(255)
+                .IsRequired();
 
-            builder.Property(p => p.ProjectName)
-                .IsRequired()
-                .HasMaxLength(200)
-                .HasColumnName("project_name");
+            builder.Property(x => x.Description)
+                .HasColumnName("description")
+                .HasMaxLength(2000);
 
-            builder.Property(p => p.Description)
-                .HasColumnName("description");
-
-            builder.Property(p => p.StartDate)
+            builder.Property(x => x.StartDate)
                 .HasColumnName("start_date");
 
-            builder.Property(p => p.EndDate)
+            builder.Property(x => x.EndDate)
                 .HasColumnName("end_date");
 
-            builder.Property(p => p.Status)
-                .HasConversion<short>()
-                .HasDefaultValue(ProjectStatus.Planning)
-                .HasColumnName("status");
+            builder.Property(x => x.Status)
+                .HasColumnName("status")
+                .HasConversion<short>();
 
-            builder.Property(p => p.CreatedAt)
+            // Audit fields from BaseEntity
+            builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
-                .HasDefaultValueSql("now()");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'")
+                .IsRequired();
 
-            builder.Property(p => p.CreatedBy)
-                .HasColumnName("created_by");
-
-            builder.Property(p => p.UpdatedAt)
+            builder.Property(x => x.UpdatedAt)
                 .HasColumnName("updated_at");
 
-            builder.Property(p => p.UpdatedBy)
-                .HasColumnName("updated_by");
-
-            builder.Property(p => p.DeletedAt)
+            builder.Property(x => x.DeletedAt)
                 .HasColumnName("deleted_at");
 
-            builder.HasMany(p => p.Stakeholders)
-                .WithOne(s => s.Project)
-                .HasForeignKey(s => s.ProjectId)
+            builder.Property(x => x.CreatedBy)
+                .HasColumnName("created_by");
+
+            builder.Property(x => x.UpdatedBy)
+                .HasColumnName("updated_by");
+
+            // FK
+            builder.HasOne(p => p.InternshipGroup)
+                .WithMany()
+                .HasForeignKey(p => p.InternshipId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Indexes
+            builder.HasIndex(x => x.InternshipId)
+                .HasDatabaseName("ix_projects_internship_id");
+
+            builder.HasIndex(x => x.Status)
+                .HasDatabaseName("ix_projects_status");
+
+            builder.HasIndex(x => x.CreatedAt)
+                .HasDatabaseName("ix_projects_created_at");
+
+            builder.HasMany(x => x.ProjectResources)
+                .WithOne(pr => pr.Project)
+                .HasForeignKey(pr => pr.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

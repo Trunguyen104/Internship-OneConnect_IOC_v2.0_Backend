@@ -8,8 +8,13 @@ namespace IOCv2.Application.Services
     {
         public string GetMessage(string key)
         {
-            // Try to get from Messages first, then ErrorMessages
-            var message = Resources.Messages.ResourceManager.GetString(key, CultureInfo.CurrentUICulture);
+            // Try sequence: SharedResource -> Messages -> ErrorMessages
+            var message = Resources.SharedResource.ResourceManager.GetString(key, CultureInfo.CurrentUICulture);
+
+            if (string.IsNullOrEmpty(message))
+            {
+                message = Resources.Messages.ResourceManager.GetString(key, CultureInfo.CurrentUICulture);
+            }
 
             if (string.IsNullOrEmpty(message))
             {

@@ -18,6 +18,8 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 // Add Core Services
 builder.Services.AddControllerConfig();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // Add Infrastructure & Application Layers
 builder.Services.AddApplication();
@@ -37,7 +39,7 @@ var app = builder.Build();
 app.UseLocalizationConfig();
 app.UseForwardedHeaders();
 
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseExceptionHandler();
 app.UseMiddleware<RateLimitingMiddleware>();
 app.UseMiddleware<CorrelationIdMiddleware>();
 
