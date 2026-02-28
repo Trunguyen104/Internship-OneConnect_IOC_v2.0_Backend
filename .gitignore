@@ -38,6 +38,8 @@ bld/
 # Visual Studio Code
 .vscode/
 # Sensitive files
+appsettings.Development.json
+appsettings.json
 docker-compose.yml
 .env
 *.env.local
