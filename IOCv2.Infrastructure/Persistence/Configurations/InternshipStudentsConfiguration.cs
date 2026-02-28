@@ -37,11 +37,27 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .HasConversion<short>()
                 .HasColumnType("smallint");
 
-            builder.Property(x => x.JoinedAt)
-                .HasColumnName("joined_at")
+            builder.Property(x => x.CreatedAt)
+                .HasColumnName("joined_at") // keeping the column name as joined_at for domain meaning
                 .HasColumnType("timestamptz")
                 .HasDefaultValueSql("now()")
                 .IsRequired();
+
+            builder.Property(x => x.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamptz");
+            builder.Property(x => x.DeletedAt).HasColumnName("deleted_at").HasColumnType("timestamptz");
+            builder.Property(x => x.CreatedBy).HasColumnName("created_by");
+            builder.Property(x => x.UpdatedBy).HasColumnName("updated_by");
+
+            // Relationships
+            builder.HasOne(x => x.InternshipGroup)
+                .WithMany(ig => ig.InternshipStudents)
+                .HasForeignKey(x => x.InternshipId)
+                .IsRequired(false);
+
+            builder.HasOne(x => x.Student)
+                .WithMany(s => s.InternshipGroups)
+                .HasForeignKey(x => x.StudentId)
+                .IsRequired(false);
         }
     }
 }

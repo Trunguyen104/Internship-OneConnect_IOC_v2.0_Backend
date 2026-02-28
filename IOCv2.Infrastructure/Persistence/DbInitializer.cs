@@ -23,6 +23,10 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedUniversities();
             await SeedEnterprises();
             await SeedUsers();
+            await SeedTerms();
+            await SeedInternshipGroups();
+            await SeedProjects();
+            await SeedLogbooks();
 
             if (_context.ChangeTracker.HasChanges())
             {
@@ -53,7 +57,6 @@ namespace IOCv2.Infrastructure.Persistence
                         Status = 1
                     }
                 };
-                Console.WriteLine($"Seeded University IDs: {string.Join(", ", universities.Select(u => u.UniversityId))}");
                 await _context.Universities.AddRangeAsync(universities);
                 await _context.SaveChangesAsync();
             }
@@ -98,6 +101,7 @@ namespace IOCv2.Infrastructure.Persistence
             var enterpriseList = await _context.Enterprises.ToListAsync();
             var existingEmails = await _context.Users.Select(u => u.Email).ToHashSetAsync();
             CancellationToken cancellationToken = default;
+
             // 1. Super Admin
             if (!await _context.Users.AnyAsync(u => u.Role == UserRole.SuperAdmin))
             {
@@ -115,105 +119,7 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Users.Add(superAdmin);
             }
 
-            // 2. Moderator
-            if (!await _context.Users.AnyAsync(u => u.Role == UserRole.Moderator))
-            {
-                var moderator = new User
-                {
-                    UserId = Guid.NewGuid(),
-                    UserCode = await _userService.GenerateUserCodeAsync(UserRole.Moderator, cancellationToken),
-                    PasswordHash = passHash,
-                    FullName = "System Moderator",
-                    Email = "moderator@iocv2.com",
-                    Role = UserRole.Moderator,
-                    Status = UserStatus.Active,
-                    Gender = UserGender.Male
-                };
-                _context.Users.Add(moderator);
-            }
-
-            // 3. School Admins (1 for each Uni)
-            foreach (var uni in universityList)
-            {
-                var email = $"admin@{uni.Code.ToLower()}.edu.vn";
-                if (!existingEmails.Contains(email))
-                {
-                    var user = new User
-                    {
-                        UserId = Guid.NewGuid(),
-                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.SchoolAdmin, cancellationToken),
-                        PasswordHash = passHash,
-                        FullName = $"{uni.Code} Administrator",
-                        Email = email,
-                        Role = UserRole.SchoolAdmin,
-                        Status = UserStatus.Active
-                    };
-                    _context.Users.Add(user);
-                    _context.UniversityUsers.Add(new UniversityUser { UserId = user.UserId, UniversityId = uni.UniversityId });
-                }
-            }
-
-            // 4. Enterprise Admins (1 for each Enterprise)
-            foreach (var ent in enterpriseList)
-            {
-                var email = $"admin@{ent.Name.Replace(" ", "").ToLower()}.com";
-                if (!existingEmails.Contains(email))
-                {
-                    var user = new User
-                    {
-                        UserId = Guid.NewGuid(),
-                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.EnterpriseAdmin, cancellationToken),
-                        PasswordHash = passHash,
-                        FullName = $"{ent.Name} Admin",
-                        Email = email,
-                        Role = UserRole.EnterpriseAdmin,
-                        Status = UserStatus.Active
-                    };
-                    _context.Users.Add(user);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { UserId = user.UserId, EnterpriseId = ent.EnterpriseId });
-                }
-            }
-
-            // 5. HR & Mentor for FPT
-            var fpt = enterpriseList.FirstOrDefault(e => e.Name.Contains("FPT"));
-            if (fpt != null)
-            {
-                // HR
-                if (!existingEmails.Contains("hr.fpt@iocv2.com"))
-                {
-                    var hr = new User
-                    {
-                        UserId = Guid.NewGuid(),
-                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.HR, cancellationToken),
-                        PasswordHash = passHash,
-                        FullName = "FPT HR Manager",
-                        Email = "hr.fpt@iocv2.com",
-                        Role = UserRole.HR,
-                        Status = UserStatus.Active
-                    };
-                    _context.Users.Add(hr);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { UserId = hr.UserId, EnterpriseId = fpt.EnterpriseId, Position = "HR Manager" });
-                }
-
-                // Mentor
-                if (!existingEmails.Contains("mentor.fpt@iocv2.com"))
-                {
-                    var mentor = new User
-                    {
-                        UserId = Guid.NewGuid(),
-                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken),
-                        PasswordHash = passHash,
-                        FullName = "FPT Senior Mentor",
-                        Email = "mentor.fpt@iocv2.com",
-                        Role = UserRole.Mentor,
-                        Status = UserStatus.Active
-                    };
-                    _context.Users.Add(mentor);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { UserId = mentor.UserId, EnterpriseId = fpt.EnterpriseId, Position = "Technical Lead" });
-                }
-            }
-
-            // 6. Students (3 for FPTU, 2 for NEU)
+            // 6. Students
             foreach (var uni in universityList)
             {
                 int count = uni.Code == "FPTU" ? 3 : 2;
@@ -233,44 +139,201 @@ namespace IOCv2.Infrastructure.Persistence
                             Status = UserStatus.Active
                         };
                         _context.Users.Add(user);
-                        _context.UniversityUsers.Add(new UniversityUser { UserId = user.UserId, UniversityId = uni.UniversityId });
+                        _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId });
                         _context.Students.Add(new Student
                         {
                             StudentId = Guid.NewGuid(),
                             UserId = user.UserId,
-                            Status = StudentStatus.NO_INTERNSHIP,
+                            InternshipStatus = StudentStatus.NO_INTERNSHIP,
                             Major = uni.Code == "FPTU" ? "Computer Science" : "Business Administration",
-                            Class = $"{uni.Code}_K{65 + i}"
+                            ClassName = $"{uni.Code}_K{65 + i}"
                         });
                     }
                 }
             }
+            await _context.SaveChangesAsync();
 
-            // 7. Test Student Account
-            var fptu = universityList.FirstOrDefault(u => u.Code == "FPTU");
-            if (fptu != null && !existingEmails.Contains("trunguyen.104@gmail.com"))
+            // 7. Mentors (Enterprise Users)
+            foreach (var ent in enterpriseList)
             {
-                var testUser = new User
+                var email = $"mentor@{ent.Name.Replace(" ", "").ToLower()}.com";
+                if (!existingEmails.Contains(email))
                 {
-                    UserId = Guid.NewGuid(),
-                    UserCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken),
-                    PasswordHash = passHash,
-                    FullName = "Trung Nguyen",
-                    Email = "trunguyen.104@gmail.com",
-                    Role = UserRole.Student,
-                    Status = UserStatus.Active,
-                    Gender = UserGender.Male
+                    var user = new User
+                    {
+                        UserId = Guid.NewGuid(),
+                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken),
+                        PasswordHash = passHash,
+                        FullName = $"Mentor at {ent.Name}",
+                        Email = email,
+                        Role = UserRole.Mentor,
+                        Status = UserStatus.Active
+                    };
+                    _context.Users.Add(user);
+                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    {
+                        EnterpriseUserId = Guid.NewGuid(),
+                        UserId = user.UserId,
+                        EnterpriseId = ent.EnterpriseId,
+                        Position = "Senior Engineer"
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedTerms()
+        {
+            if (!await _context.Terms.AnyAsync())
+            {
+                var fptu = await _context.Universities.FirstAsync(u => u.Code == "FPTU");
+                var term = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptu.UniversityId,
+                    Name = "Spring 2024",
+                    StartDate = new DateOnly(2024, 1, 1),
+                    EndDate = new DateOnly(2024, 4, 30),
+                    Status = TermStatus.Open
                 };
-                _context.Users.Add(testUser);
-                _context.UniversityUsers.Add(new UniversityUser { UserId = testUser.UserId, UniversityId = fptu.UniversityId });
-                _context.Students.Add(new Student
+                _context.Terms.Add(term);
+
+                var students = await _context.Students.Take(2).ToListAsync();
+                foreach (var s in students)
                 {
-                    StudentId = Guid.NewGuid(),
-                    UserId = testUser.UserId,
-                    Status = StudentStatus.NO_INTERNSHIP,
-                    Major = "Software Engineering",
-                    Class = "SE1801"
+                    _context.StudentTerms.Add(new StudentTerm { StudentId = s.StudentId, TermId = term.TermId, Status = 1 });
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task SeedInternshipGroups()
+        {
+            if (!await _context.InternshipGroups.AnyAsync())
+            {
+                var term = await _context.Terms.FirstAsync();
+                var enterprise = await _context.Enterprises.FirstAsync();
+                
+                // Need a mentor user from this enterprise
+                var mentorUser = await _context.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Mentor);
+                if (mentorUser == null) return;
+                
+                var entUser = await _context.EnterpriseUsers.FirstAsync(eu => eu.UserId == mentorUser.UserId);
+
+                var group = new InternshipGroup
+                {
+                    InternshipId = Guid.NewGuid(),
+                    TermId = term.TermId,
+                    EnterpriseId = enterprise.EnterpriseId,
+                    MentorId = entUser.EnterpriseUserId,
+                    Status = InternshipGroupStatus.InProgress,
+                    StartDate = DateTime.UtcNow.AddDays(-30),
+                    EndDate = DateTime.UtcNow.AddDays(60)
+                };
+                _context.InternshipGroups.Add(group);
+
+                var students = await _context.Students.Take(2).ToListAsync();
+                foreach (var s in students)
+                {
+                    _context.InternshipStudents.Add(new InternshipStudents(group.InternshipId, s.StudentId, InternshipStudentRole.Member, InternshipStudentStatus.InProgress));
+                    
+                    // Also seed an application
+                    _context.InternshipApplications.Add(new InternshipApplication
+                    {
+                        ApplicationId = Guid.NewGuid(),
+                        InternshipId = group.InternshipId,
+                        StudentId = s.StudentId,
+                        Status = InternshipApplicationStatus.Approved,
+                        AppliedAt = DateTime.UtcNow.AddDays(-40)
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task SeedProjects()
+        {
+            if (!await _context.Projects.AnyAsync())
+            {
+                var group = await _context.InternshipGroups.FirstAsync();
+                var project = new Project
+                {
+                    ProjectId = Guid.NewGuid(),
+                    InternshipId = group.InternshipId,
+                    ProjectName = "E-Commerce System IOC",
+                    Description = "Building a next-gen e-commerce platform",
+                    Status = ProjectStatus.InProgress,
+                    StartDate = DateTime.UtcNow.AddDays(-25)
+                };
+                _context.Projects.Add(project);
+
+                _context.ProjectResources.Add(new ProjectResources
+                {
+                    ProjectResourceId = Guid.NewGuid(),
+                    ProjectId = project.ProjectId,
+                    ResourceName = "System Design Document",
+                    ResourceUrl = "https://docs.example.com/design"
                 });
+
+                var sprint = new Sprint
+                {
+                    SprintId = Guid.NewGuid(),
+                    ProjectId = project.ProjectId,
+                    Name = "Sprint 1",
+                    StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)),
+                    EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(4)),
+                    Status = SprintStatus.Active
+                };
+                _context.Sprints.Add(sprint);
+
+                var student = await _context.Students.FirstAsync();
+                _context.WorkItems.Add(new WorkItem
+                {
+                    WorkItemId = Guid.NewGuid(),
+                    ProjectId = project.ProjectId,
+                    Title = "Setup Project Base",
+                    Description = "Initialize repository and basic project structure",
+                    Type = WorkItemType.Task,
+                    Priority = Priority.High,
+                    Status = WorkItemStatus.Done,
+                    AssigneeId = student.StudentId,
+                    DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-15))
+                });
+
+                _context.WorkItems.Add(new WorkItem
+                {
+                    WorkItemId = Guid.NewGuid(),
+                    ProjectId = project.ProjectId,
+                    Title = "Develop Login UI",
+                    Description = "Implement login page with full design",
+                    Type = WorkItemType.Task,
+                    Priority = Priority.Medium,
+                    Status = WorkItemStatus.InProgress,
+                    AssigneeId = student.StudentId,
+                    DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7))
+                });
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task SeedLogbooks()
+        {
+            if (!await _context.Logbooks.AnyAsync())
+            {
+                var group = await _context.InternshipGroups.FirstAsync();
+                var student = await _context.Students.FirstAsync();
+
+                _context.Logbooks.Add(new Logbook
+                {
+                    Id = Guid.NewGuid(),
+                    InternshipId = group.InternshipId,
+                    StudentId = student.StudentId,
+                    Content = "Weekly report: Finished login UI and integrated with API.",
+                    Status = LogbookStatus.SUBMITTED
+                });
+                await _context.SaveChangesAsync();
             }
         }
     }

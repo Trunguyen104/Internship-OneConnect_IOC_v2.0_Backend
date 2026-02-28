@@ -1,6 +1,6 @@
 namespace IOCv2.Domain.Entities
 {
-    public class UniversityUser
+    public class UniversityUser : BaseEntity
     {
         public Guid UniversityUserId { get; set; }
         
@@ -9,7 +9,5 @@ namespace IOCv2.Domain.Entities
 
         public Guid UserId { get; set; }
         public virtual User User { get; set; } = null!;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

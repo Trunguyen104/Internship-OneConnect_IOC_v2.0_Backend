@@ -15,7 +15,7 @@ namespace IOCv2.Domain.Entities
         public FileType ResourceType { get; set; }
         public string ResourceUrl { get; set; } = string.Empty;
         public virtual Project Project { get; set; } = null!;
-        private ProjectResources()
+        public ProjectResources()
         { }
         public ProjectResources (Guid projectId, string resourceName, FileType resourceType, string resourceUrl)
         {

@@ -1,6 +1,6 @@
 namespace IOCv2.Domain.Entities
 {
-    public class EnterpriseUser
+    public class EnterpriseUser : BaseEntity
     {
         public Guid EnterpriseUserId { get; set; }
 
@@ -11,5 +11,8 @@ namespace IOCv2.Domain.Entities
         public virtual User User { get; set; } = null!;
 
         public string? Position { get; set; }
+
+        public virtual ICollection<InternshipGroup> MentoredGroups { get; set; } = new List<InternshipGroup>();
+        public virtual ICollection<InternshipApplication> ReviewedApplications { get; set; } = new List<InternshipApplication>();
     }
 }

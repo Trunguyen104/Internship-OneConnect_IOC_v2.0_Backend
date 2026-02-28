@@ -7,7 +7,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
 {
-    public class AuditLog
+    public class AuditLog : BaseEntity
     {
         public Guid AuditLogId { get; set; }
         public AuditAction Action { get; set; }
@@ -17,6 +17,5 @@ namespace IOCv2.Domain.Entities
         public virtual User PerformedBy { get; set; } = null!;
         public string? Reason { get; set; }
         public string? Metadata { get; set; } // jsonb
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -48,7 +48,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             {
                 // Build base query
                 var query = _unitOfWork.Repository<Project>().Query()
-                    .Where(i => i.InternshipGroup.InternshipStudents.StudentId == studentId)
+                    .Where(i => i.InternshipGroup.InternshipStudents.Any(s => s.StudentId == studentId))
                     .Select(p => p).AsNoTracking();
 
 

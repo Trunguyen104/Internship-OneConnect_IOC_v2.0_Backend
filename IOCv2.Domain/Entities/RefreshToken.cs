@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Domain.Entities
 {
-    public class RefreshToken
+    public class RefreshToken : BaseEntity
     {
         public Guid RefreshTokenId { get; set; }
         public string Token { get; set; } = string.Empty;
         public DateTime Expires { get; set; } = DateTime.UtcNow;
         public bool IsRevoked { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
         public Guid UserId { get; set; }
         public virtual User User { get; set; } = null!;
     }

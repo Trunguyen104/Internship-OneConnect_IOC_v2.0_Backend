@@ -26,7 +26,8 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasOne(t => t.User)
                    .WithMany()
                    .HasForeignKey(t => t.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Cascade)
+                   .IsRequired(false);
 
             builder.HasIndex(t => t.UserId);
         }

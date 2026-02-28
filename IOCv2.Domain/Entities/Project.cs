@@ -13,9 +13,14 @@ namespace IOCv2.Domain.Entities
         public ProjectStatus? Status { get; set; }
 
         // Navigation Properties
-        public InternshipGroup InternshipGroup { get; set; } = null!;
-        public List<ProjectResources> ProjectResources { get; set; } = new();
-        public List<Stakeholder> Stakeholders { get; set; } = new();
+        public virtual InternshipGroup InternshipGroup { get; set; } = null!;
+        public virtual ICollection<ProjectResources> ProjectResources { get; set; } = new List<ProjectResources>();
+        public virtual ICollection<Stakeholder> Stakeholders { get; set; } = new List<Stakeholder>();
+        public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
+        public virtual ICollection<Sprint> Sprints { get; set; } = new List<Sprint>();
+
+        public Project() { }
+
         public Project(Guid internshipId, string projectName, string? description)
         {
             ProjectId = Guid.NewGuid();

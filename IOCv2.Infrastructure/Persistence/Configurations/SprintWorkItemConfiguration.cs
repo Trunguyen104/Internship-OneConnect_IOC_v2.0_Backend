@@ -31,7 +31,8 @@ public class SprintWorkItemConfiguration : IEntityTypeConfiguration<SprintWorkIt
             .WithMany(s => s.SprintWorkItems)
             .HasForeignKey(swi => swi.SprintId)
             .OnDelete(DeleteBehavior.Cascade)
-            .HasConstraintName("fk_sprint_work_items_sprints_sprint_id");
+            .HasConstraintName("fk_sprint_work_items_sprints_sprint_id")
+            .IsRequired(false);
 
         builder.HasOne(swi => swi.WorkItem)
             .WithMany()

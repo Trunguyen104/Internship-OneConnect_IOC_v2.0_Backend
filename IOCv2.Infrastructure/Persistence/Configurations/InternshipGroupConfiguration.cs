@@ -57,12 +57,28 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(e => e.CreatedBy).HasColumnName("created_by");
             builder.Property(e => e.UpdatedBy).HasColumnName("updated_by");
 
-            // ===== Relationship =====
-            builder.HasOne(e => e.InternshipStudents)
-                .WithOne()
-                .HasForeignKey<InternshipStudents>(x => x.InternshipId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // ===== Relationships =====
+            builder.HasOne(e => e.Term)
+                .WithMany(t => t.InternshipGroups)
+                .HasForeignKey(e => e.TermId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
 
+            builder.HasOne(e => e.Enterprise)
+                .WithMany(ent => ent.InternshipGroups)
+                .HasForeignKey(e => e.EnterpriseId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
+
+            builder.HasOne(e => e.Mentor)
+                .WithMany(m => m.MentoredGroups)
+                .HasForeignKey(e => e.MentorId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
+
+            builder.HasMany(e => e.InternshipStudents)
+                .WithOne(ist => ist.InternshipGroup)
+                .HasForeignKey(ist => ist.InternshipId);
         }
     }
 }

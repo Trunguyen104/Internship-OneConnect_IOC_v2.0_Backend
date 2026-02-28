@@ -7,15 +7,17 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Domain.Entities
 {
-    public class InternshipStudents 
+    public class InternshipStudents : BaseEntity
     {
         public Guid InternshipId { get; set; }
         public Guid StudentId { get; set; }
         public InternshipStudentRole Role { get; set; }
         public InternshipStudentStatus Status { get; set; }
-        public DateTime JoinedAt { get; set; }
-        // Navigation property
+        // Navigation properties
         public virtual InternshipGroup InternshipGroup { get; set; } = null!;
+        public virtual Student Student { get; set; } = null!;
+
+        public InternshipStudents() { }
 
         public InternshipStudents(Guid internshipId, Guid studentId, InternshipStudentRole role, InternshipStudentStatus status)
         {
@@ -23,7 +25,7 @@ namespace IOCv2.Domain.Entities
             StudentId = studentId;
             Role = role;
             Status = status;
-            JoinedAt = DateTime.UtcNow;
+            CreatedAt = DateTime.UtcNow;
         }
     }
 }

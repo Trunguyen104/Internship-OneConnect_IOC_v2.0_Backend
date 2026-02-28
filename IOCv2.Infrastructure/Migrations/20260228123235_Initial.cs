@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddStakeholderFunctional : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,50 +35,6 @@ namespace IOCv2.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_enterprises", x => x.enterprise_id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "internship_groups",
-                columns: table => new
-                {
-                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    term_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    enterprise_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    mentor_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    status = table.Column<short>(type: "smallint", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_internship_groups", x => x.internship_id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "sprints",
-                columns: table => new
-                {
-                    sprint_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    goal = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    start_date = table.Column<DateOnly>(type: "date", nullable: true),
-                    end_date = table.Column<DateOnly>(type: "date", nullable: true),
-                    status = table.Column<short>(type: "smallint", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_sprints", x => x.sprint_id);
                 });
 
             migrationBuilder.CreateTable(
@@ -141,45 +97,16 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "internship_students",
+                name: "terms",
                 columns: table => new
                 {
-                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    student_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    role = table.Column<short>(type: "smallint", nullable: false),
+                    term_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    university_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    start_date = table.Column<DateOnly>(type: "date", nullable: false),
+                    end_date = table.Column<DateOnly>(type: "date", nullable: false),
                     status = table.Column<short>(type: "smallint", nullable: false),
-                    joined_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
-                    internship_group_internship_id = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_internship_students", x => new { x.internship_id, x.student_id });
-                    table.ForeignKey(
-                        name: "fk_internship_students_internship_groups_internship_group_inte",
-                        column: x => x.internship_group_internship_id,
-                        principalTable: "internship_groups",
-                        principalColumn: "internship_id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_internship_students_internship_groups_internship_id",
-                        column: x => x.internship_id,
-                        principalTable: "internship_groups",
-                        principalColumn: "internship_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "projects",
-                columns: table => new
-                {
-                    project_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    project_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
-                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    status = table.Column<short>(type: "smallint", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -187,34 +114,38 @@ namespace IOCv2.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_projects", x => x.project_id);
+                    table.PrimaryKey("pk_terms", x => x.term_id);
                     table.ForeignKey(
-                        name: "fk_projects_internship_groups_internship_id",
-                        column: x => x.internship_id,
-                        principalTable: "internship_groups",
-                        principalColumn: "internship_id",
-                        onDelete: ReferentialAction.Restrict);
+                        name: "fk_terms_universities_university_id",
+                        column: x => x.university_id,
+                        principalTable: "universities",
+                        principalColumn: "uni_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "audit_logs",
                 columns: table => new
                 {
-                    audit_log_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    log_id = table.Column<Guid>(type: "uuid", nullable: false),
                     action = table.Column<short>(type: "smallint", nullable: false),
                     entity_type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     entity_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    performed_by_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    performed_by = table.Column<Guid>(type: "uuid", nullable: false),
                     reason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     metadata = table.Column<string>(type: "jsonb", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamptz", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_audit_logs", x => x.audit_log_id);
+                    table.PrimaryKey("pk_audit_logs", x => x.log_id);
                     table.ForeignKey(
                         name: "fk_audit_logs_users_performed_by_id",
-                        column: x => x.performed_by_id,
+                        column: x => x.performed_by,
                         principalTable: "users",
                         principalColumn: "user_id",
                         onDelete: ReferentialAction.Restrict);
@@ -227,7 +158,12 @@ namespace IOCv2.Infrastructure.Migrations
                     enterprise_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     enterprise_id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    position = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
+                    position = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamptz", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -276,9 +212,12 @@ namespace IOCv2.Infrastructure.Migrations
                     token = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     is_revoked = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -297,11 +236,16 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     student_id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    @class = table.Column<string>(name: "class", type: "character varying(50)", maxLength: 50, nullable: true),
+                    class_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     major = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     gpa = table.Column<decimal>(type: "numeric(3,2)", precision: 3, scale: 2, nullable: true),
                     highest_degree = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                    internship_status = table.Column<short>(type: "smallint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamptz", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -321,7 +265,11 @@ namespace IOCv2.Infrastructure.Migrations
                     uni_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     uni_id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamptz", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -338,6 +286,207 @@ namespace IOCv2.Infrastructure.Migrations
                         principalTable: "users",
                         principalColumn: "user_id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "internship_groups",
+                columns: table => new
+                {
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    term_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    enterprise_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    mentor_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_internship_groups", x => x.internship_id);
+                    table.ForeignKey(
+                        name: "fk_internship_groups_enterprise_users_mentor_id",
+                        column: x => x.mentor_id,
+                        principalTable: "enterprise_users",
+                        principalColumn: "enterprise_user_id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_internship_groups_enterprises_enterprise_id",
+                        column: x => x.enterprise_id,
+                        principalTable: "enterprises",
+                        principalColumn: "enterprise_id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_internship_groups_terms_term_id",
+                        column: x => x.term_id,
+                        principalTable: "terms",
+                        principalColumn: "term_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "student_terms",
+                columns: table => new
+                {
+                    term_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    student_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamptz", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_student_terms", x => new { x.student_id, x.term_id });
+                    table.ForeignKey(
+                        name: "fk_student_terms_students_student_id",
+                        column: x => x.student_id,
+                        principalTable: "students",
+                        principalColumn: "student_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_student_terms_terms_term_id",
+                        column: x => x.term_id,
+                        principalTable: "terms",
+                        principalColumn: "term_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "internship_applications",
+                columns: table => new
+                {
+                    application_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    student_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    applied_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
+                    reviewed_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    reviewed_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    reviewer_enterprise_user_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_internship_applications", x => x.application_id);
+                    table.ForeignKey(
+                        name: "fk_internship_applications_enterprise_users_reviewer_enterpris",
+                        column: x => x.reviewer_enterprise_user_id,
+                        principalTable: "enterprise_users",
+                        principalColumn: "enterprise_user_id");
+                    table.ForeignKey(
+                        name: "fk_internship_applications_internship_groups_internship_id",
+                        column: x => x.internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id");
+                    table.ForeignKey(
+                        name: "fk_internship_applications_students_student_id",
+                        column: x => x.student_id,
+                        principalTable: "students",
+                        principalColumn: "student_id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "internship_students",
+                columns: table => new
+                {
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    student_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    role = table.Column<short>(type: "smallint", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    joined_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamptz", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_internship_students", x => new { x.internship_id, x.student_id });
+                    table.ForeignKey(
+                        name: "fk_internship_students_internship_groups_internship_id",
+                        column: x => x.internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id");
+                    table.ForeignKey(
+                        name: "fk_internship_students_students_student_id",
+                        column: x => x.student_id,
+                        principalTable: "students",
+                        principalColumn: "student_id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "logbooks",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    student_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    content = table.Column<string>(type: "text", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_logbooks", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_logbooks_internship_groups_internship_id",
+                        column: x => x.internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id");
+                    table.ForeignKey(
+                        name: "fk_logbooks_students_student_id",
+                        column: x => x.student_id,
+                        principalTable: "students",
+                        principalColumn: "student_id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "projects",
+                columns: table => new
+                {
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    project_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: true),
+                    internship_group_internship_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_projects", x => x.project_id);
+                    table.ForeignKey(
+                        name: "fk_projects_internship_groups_internship_group_internship_id",
+                        column: x => x.internship_group_internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id");
+                    table.ForeignKey(
+                        name: "fk_projects_internship_groups_internship_id",
+                        column: x => x.internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -360,6 +509,34 @@ namespace IOCv2.Infrastructure.Migrations
                     table.PrimaryKey("pk_project_resources", x => x.project_resource_id);
                     table.ForeignKey(
                         name: "fk_project_resources_projects_project_id",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "project_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "sprints",
+                columns: table => new
+                {
+                    sprint_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    goal = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    start_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    end_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_sprints", x => x.sprint_id);
+                    table.ForeignKey(
+                        name: "fk_sprints_projects_project_id",
                         column: x => x.project_id,
                         principalTable: "projects",
                         principalColumn: "project_id",
@@ -411,6 +588,7 @@ namespace IOCv2.Infrastructure.Migrations
                     backlog_order = table.Column<float>(type: "real", nullable: false, defaultValue: 0f),
                     due_date = table.Column<DateOnly>(type: "date", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: true),
+                    student_id = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -421,11 +599,22 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     table.PrimaryKey("pk_work_items", x => x.work_item_id);
                     table.ForeignKey(
+                        name: "fk_work_items_projects_project_id",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "project_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "fk_work_items_students_assignee_id",
                         column: x => x.assignee_id,
                         principalTable: "students",
                         principalColumn: "student_id",
                         onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_work_items_students_student_id",
+                        column: x => x.student_id,
+                        principalTable: "students",
+                        principalColumn: "student_id");
                     table.ForeignKey(
                         name: "fk_work_items_work_items_parent_id",
                         column: x => x.parent_id,
@@ -494,7 +683,7 @@ namespace IOCv2.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "ix_audit_logs_performed_by_id",
                 table: "audit_logs",
-                column: "performed_by_id");
+                column: "performed_by");
 
             migrationBuilder.CreateIndex(
                 name: "ix_enterprise_users_enterprise_id",
@@ -519,6 +708,22 @@ namespace IOCv2.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_internship_applications_internship_id_student_id",
+                table: "internship_applications",
+                columns: new[] { "internship_id", "student_id" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_internship_applications_reviewer_enterprise_user_id",
+                table: "internship_applications",
+                column: "reviewer_enterprise_user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_internship_applications_student_id",
+                table: "internship_applications",
+                column: "student_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_internship_groups_enterprise_id",
                 table: "internship_groups",
                 column: "enterprise_id");
@@ -539,15 +744,19 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "term_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_internship_students_internship_group_internship_id",
+                name: "ix_internship_students_student_id",
                 table: "internship_students",
-                column: "internship_group_internship_id");
+                column: "student_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_internship_students_internship_id",
-                table: "internship_students",
-                column: "internship_id",
-                unique: true);
+                name: "ix_logbooks_internship_id",
+                table: "logbooks",
+                column: "internship_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_logbooks_student_id",
+                table: "logbooks",
+                column: "student_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_password_reset_tokens_expires_at",
@@ -584,6 +793,11 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_projects_created_at",
                 table: "projects",
                 column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_projects_internship_group_internship_id",
+                table: "projects",
+                column: "internship_group_internship_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_projects_internship_id",
@@ -654,10 +868,20 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "project_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_student_terms_term_id",
+                table: "student_terms",
+                column: "term_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_students_user_id",
                 table: "students",
                 column: "user_id",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_terms_university_id",
+                table: "terms",
+                column: "university_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_universities_code",
@@ -731,6 +955,11 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "status");
 
             migrationBuilder.CreateIndex(
+                name: "ix_work_items_student_id",
+                table: "work_items",
+                column: "student_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_work_items_type",
                 table: "work_items",
                 column: "type");
@@ -743,10 +972,13 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "audit_logs");
 
             migrationBuilder.DropTable(
-                name: "enterprise_users");
+                name: "internship_applications");
 
             migrationBuilder.DropTable(
                 name: "internship_students");
+
+            migrationBuilder.DropTable(
+                name: "logbooks");
 
             migrationBuilder.DropTable(
                 name: "password_reset_tokens");
@@ -764,13 +996,13 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "stakeholder_issues");
 
             migrationBuilder.DropTable(
+                name: "student_terms");
+
+            migrationBuilder.DropTable(
                 name: "university_users");
 
             migrationBuilder.DropTable(
                 name: "user_code_sequences");
-
-            migrationBuilder.DropTable(
-                name: "enterprises");
 
             migrationBuilder.DropTable(
                 name: "sprints");
@@ -782,19 +1014,28 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "stakeholders");
 
             migrationBuilder.DropTable(
-                name: "universities");
-
-            migrationBuilder.DropTable(
                 name: "students");
 
             migrationBuilder.DropTable(
                 name: "projects");
 
             migrationBuilder.DropTable(
+                name: "internship_groups");
+
+            migrationBuilder.DropTable(
+                name: "enterprise_users");
+
+            migrationBuilder.DropTable(
+                name: "terms");
+
+            migrationBuilder.DropTable(
+                name: "enterprises");
+
+            migrationBuilder.DropTable(
                 name: "users");
 
             migrationBuilder.DropTable(
-                name: "internship_groups");
+                name: "universities");
         }
     }
 }

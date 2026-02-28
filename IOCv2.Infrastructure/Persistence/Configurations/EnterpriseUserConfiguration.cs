@@ -16,18 +16,26 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(eu => eu.UserId).HasColumnName("user_id").IsRequired();
             builder.Property(eu => eu.Position).HasMaxLength(100).HasColumnName("position");
 
+            builder.Property(eu => eu.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+            builder.Property(eu => eu.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamptz");
+            builder.Property(eu => eu.DeletedAt).HasColumnName("deleted_at").HasColumnType("timestamptz");
+            builder.Property(eu => eu.CreatedBy).HasColumnName("created_by");
+            builder.Property(eu => eu.UpdatedBy).HasColumnName("updated_by");
+
             builder.HasIndex(eu => eu.EnterpriseId);
             builder.HasIndex(eu => eu.UserId).IsUnique();
 
             builder.HasOne(eu => eu.Enterprise)
                 .WithMany(e => e.EnterpriseUsers)
                 .HasForeignKey(eu => eu.EnterpriseId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
 
             builder.HasOne(eu => eu.User)
                 .WithOne(u => u.EnterpriseUser)
                 .HasForeignKey<EnterpriseUser>(eu => eu.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
         }
     }
 }
