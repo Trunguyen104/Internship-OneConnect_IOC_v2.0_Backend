@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 {
-    public class CreateLogbookHandler : IRequestHandler<CreateLogbookCommand, Result<UpdateLogbookResponse>>
+    public class CreateLogbookHandler : IRequestHandler<CreateLogbookCommand, Result<CreateLogbookResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -31,12 +31,12 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
             _logger = logger;
         }
 
-        public async Task<Result<UpdateLogbookResponse>> Handle(CreateLogbookCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CreateLogbookResponse>> Handle(CreateLogbookCommand request, CancellationToken cancellationToken)
         {
             //Validate current user
             if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
             {
-                return Result<UpdateLogbookResponse>.Failure(
+                return Result<CreateLogbookResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
                     ResultErrorType.Unauthorized
                 );
@@ -48,7 +48,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 
             if(!internshipExists)
             {
-               return Result<UpdateLogbookResponse>.Failure(
+               return Result<CreateLogbookResponse>.Failure(
                    _messageService.GetMessage(MessageKeys.Logbook.InvalidInternship),
                    ResultErrorType.BadRequest
                );
@@ -60,7 +60,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 
             if(!isStudentExist)
             {
-                return Result<UpdateLogbookResponse>.Failure(
+                return Result<CreateLogbookResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Users.NotFound),
                     ResultErrorType.BadRequest
                 );
@@ -109,8 +109,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                var response = _mapper.Map<UpdateLogbookResponse>(logbook);
-                return Result<UpdateLogbookResponse>.Success(response);
+                var response = _mapper.Map<CreateLogbookResponse>(logbook);
+                return Result<CreateLogbookResponse>.Success(response);
             }
             catch (Exception ex)
             {
@@ -118,7 +118,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 
                 _logger.LogError(ex, "Error creating logbook");
 
-                return Result<UpdateLogbookResponse>.Failure(
+                return Result<CreateLogbookResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Logbook.CreationFailed),
                     ResultErrorType.BadRequest
                 );

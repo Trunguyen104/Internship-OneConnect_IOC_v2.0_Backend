@@ -1,52 +1,91 @@
 ﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser;
 using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
+using IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook;
+using IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook;
+using IOCv2.Application.Features.Logbooks.Queries.GetLogbookById;
 using IOCv2.Application.Features.Logbooks.Queries.GetLogbooks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers.Logbook
+namespace IOCv2.API.Controllers;
+
+[ApiController]
+[Route("api/logbooks")]
+[Tags("Logbook")]
+public class LogbookController : ControllerBase
 {
-    [Tags("Logbook")]
-    public class LogbookController : ApiControllerBase
+    private readonly IMediator _mediator;
+
+    public LogbookController(IMediator mediator)
     {
-        private readonly IMediator _mediator;
-        private readonly ILogger _logger;
+        _mediator = mediator;
+    }
 
-        public LogbookController(IMediator mediator, ILogger<LogbookController> logger)
-        {
-            _mediator = mediator;
-            _logger = logger;
-        }
+    /// <summary>
+    /// Get all logbooks
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetLogbooks([FromQuery] GetLogbooksQuery query)
+    {
+        var result = await _mediator.Send(query);
+        return HandleResult(result);
+    }
 
-        //Get all logbooks with pagination, filtering, and sorting
-        [HttpGet]
-        [Route("logbooks")]
-        [ProducesResponseType(typeof(Result<GetLogbooksResponse>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetLogbooks([FromQuery] GetLogbooksQuery query)
-        {
-            var result = await _mediator.Send(query);
-            return HandleResult(result);
-        }
+    /// <summary>
+    /// Get logbook by ID
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetLogbookById([FromRoute] Guid id)
+    {
+        var result = await _mediator.Send(new GetLogbookByIdQuery { LogbookId = id });
+        return HandleResult(result);
+    }
 
-        //Get a specific logbook by ID
-        [HttpGet]
-        [Route("logbooks/{id:guid}")]
-        [ProducesResponseType(typeof(Result<GetLogbooksResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Result<GetLogbooksResponse>), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetLogbookById(Guid id)
-        {
-            var result = await _mediator.Send(new GetLogbooksByIdQuery { LogbookId = id });
-            return HandleResult(result);
-        }
+    /// <summary>
+    /// Create new logbook
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> CreateLogbook([FromBody] CreateLogbookCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return HandleResult(result);
+    }
 
-        //Create a new logbook entry
-        [HttpPost]
-        [Route("logbooks")]
-        [ProducesResponseType(typeof(Result<GetLogbooksResponse>), StatusCodes.Status201Created)]
-        public async Task<IActionResult> CreateLogbook([FromBody] CreateLogbookCommand command)
+    /// <summary>
+    /// Update logbook
+    /// </summary>
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateLogbook(
+        [FromRoute] Guid id,
+        [FromBody] UpdateLogbookCommand command)
+    {
+        var result = await _mediator.Send(command with { LogbookId = id });
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Delete logbook
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteLogbook([FromRoute] Guid id)
+    {
+        var result = await _mediator.Send(new DeleteLogbookCommand { LogbookId = id });
+        return HandleResult(result);
+    }
+
+    // Same helper như SprintController
+    private IActionResult HandleResult<T>(Result<T> result)
+    {
+        if (result.IsSuccess)
+            return Ok(result.Data);
+
+        return result.ErrorType switch
         {
-            var result = await _mediator.Send(command);
-            return HandleResult(result);
-        }
+            ResultErrorType.NotFound => NotFound(new { message = result.Error }),
+            ResultErrorType.Unauthorized => Unauthorized(new { message = result.Error }),
+            ResultErrorType.Conflict => Conflict(new { message = result.Error }),
+            _ => BadRequest(new { message = result.Error })
+        };
     }
 }

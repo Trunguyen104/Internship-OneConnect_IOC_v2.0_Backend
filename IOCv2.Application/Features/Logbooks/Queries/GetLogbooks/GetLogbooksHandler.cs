@@ -6,6 +6,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,13 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILogger<GetLogbooksHandler> _logger;
 
-        public GetLogbooksHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetLogbooksHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetLogbooksHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<PaginatedResult<GetLogbooksResponse>>> Handle(GetLogbooksQuery request, CancellationToken cancellationToken)
@@ -53,14 +56,22 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 
             var totalCount = await query.CountAsync(cancellationToken);
 
-            var logbooks = await query
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ProjectTo<GetLogbooksResponse>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
+            try
+            {
+                var logbooks = await query
+                    .Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ProjectTo<GetLogbooksResponse>(_mapper.ConfigurationProvider)
+                    .ToListAsync(cancellationToken);
 
-            var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
-            return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);
+                var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
+                return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching logbooks");
+                throw; // hoặc return Result<PaginatedResult<GetLogbooksResponse>>.Failure(ex.Message);
+            }
         }
 
     }

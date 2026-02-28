@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
-using IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser;
-using IOCv2.Domain.Enums;
 
-namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
+namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
-    internal class UpdateLogbookValidator : AbstractValidator<CreateLogbookCommand>
+    internal class UpdateLogbookValidator : AbstractValidator<UpdateLogbookCommand>
     {
         public UpdateLogbookValidator() 
         {

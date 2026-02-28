@@ -1,12 +1,13 @@
 using AutoMapper;
 using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook;
 using IOCv2.Application.Features.Logbooks.Queries.GetLogbooks;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 {
-    public class UpdateLogbookResponse : IMapFrom<Logbook>
+    public class CreateLogbookResponse : IMapFrom<Logbook>
     {
         public Guid LogbookId { get; set; }
         public Guid InternshipId { get; set; }

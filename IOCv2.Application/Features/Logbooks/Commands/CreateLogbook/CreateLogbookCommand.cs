@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 {
-    public class CreateLogbookCommand : IRequest<Result<UpdateLogbookResponse>>
+    public record CreateLogbookCommand : IRequest<Result<CreateLogbookResponse>>
     {
         public Guid InternshipId { get; set; }
         public Guid StudentId { get; set; }
