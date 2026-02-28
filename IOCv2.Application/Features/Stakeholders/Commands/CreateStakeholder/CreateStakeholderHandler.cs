@@ -31,13 +31,8 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
                 return Result<CreateStakeholderResponse>.NotFound(
                     _messageService.GetMessage(MessageKeys.Stakeholder.ProjectNotFound));
 
-            // Parse Type string to enum
-            if (!Enum.TryParse<Domain.Enums.StakeholderType>(request.Type, true, out var stakeholderType))
-            {
-                return Result<CreateStakeholderResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Stakeholder.InvalidType),
-                    ResultErrorType.BadRequest);
-            }
+            // Parse Type string to enum (already validated by FluentValidation)
+            var stakeholderType = Enum.Parse<Domain.Enums.StakeholderType>(request.Type, true);
 
             // Check email duplicate within same project (case-insensitive)
             var trimmedEmail = request.Email.Trim().ToLower();

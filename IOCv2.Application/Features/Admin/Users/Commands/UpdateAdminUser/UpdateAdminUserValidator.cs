@@ -1,11 +1,13 @@
 ﻿using FluentValidation;
 using IOCv2.Domain.Enums;
+using IOCv2.Application.Interfaces;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
 {
     internal class UpdateAdminUserValidator : AbstractValidator<UpdateAdminUserCommand>
     {
-        public UpdateAdminUserValidator()
+        public UpdateAdminUserValidator(IMessageService messageService)
         {
             // UserId bắt buộc
             RuleFor(x => x.UserId)
@@ -21,28 +23,25 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
                 .MaximumLength(15)
                 .Matches(@"^[0-9+\-\s]*$")
                 .When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber))
-                .WithMessage("Invalid phone number format.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidPhone));
 
             // Status (optional nhưng nếu có phải hợp lệ enum)
             RuleFor(x => x.Status)
                 .Must(status =>
-                    string.IsNullOrWhiteSpace(status) ||
                     Enum.TryParse<UserStatus>(status, true, out _))
-                .WithMessage("Invalid status value.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidStatus));
 
             // Gender (optional nhưng nếu có phải hợp lệ enum)
             RuleFor(x => x.Gender)
                 .Must(gender =>
-                    string.IsNullOrWhiteSpace(gender) ||
                     Enum.TryParse<UserGender>(gender, true, out _))
-                .WithMessage("Invalid gender value.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidGender));
 
             // DateOfBirth (optional nhưng nếu có phải đúng format)
             RuleFor(x => x.DateOfBirth)
                 .Must(dob =>
-                    string.IsNullOrWhiteSpace(dob) ||
                     DateOnly.TryParse(dob, out _))
-                .WithMessage("Invalid date format. Expected yyyy-MM-dd.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidDateFormat));
 
             // AvatarUrl (optional)
             RuleFor(x => x.AvatarUrl)

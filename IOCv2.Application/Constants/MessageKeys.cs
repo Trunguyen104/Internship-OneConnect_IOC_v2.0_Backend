@@ -269,6 +269,17 @@
             public const string NameMaxLength = "Validation.NameMaxLength";
             public const string DescriptionMaxLength = "Validation.DescriptionMaxLength";
             public const string IdRequired = "Validation.IdRequired";
+            public const string UserInvalidRole = "Validation.User.InvalidRole";
+            public const string UserUnitRequired = "Validation.User.UnitRequired";
+            public const string UserInvalidStatus = "Validation.User.InvalidStatus";
+            public const string UserInvalidPhone = "Validation.User.InvalidPhone";
+            public const string UserInvalidGender = "Validation.User.InvalidGender";
+            public const string UserInvalidDateFormat = "Validation.User.InvalidDateFormat";
+        }
+
+        public static class Error
+        {
+            public const string WorkItemNotFound = "Error.WorkItem.NotFound";
         }
     }
 }

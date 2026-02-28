@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Interfaces;
+using IOCv2.Application.Constants;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +12,13 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IMessageService _messageService;
 
-    public GetWorkItemByIdHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public GetWorkItemByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _messageService = messageService;
     }
 
     public async Task<Result<GetWorkItemByIdResponse>> Handle(
@@ -29,7 +32,10 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
             .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId, cancellationToken);
 
         if (workItem is null)
-            return Result<GetWorkItemByIdResponse>.NotFound($"WorkItem {request.WorkItemId} not found.");
+        {
+            return Result<GetWorkItemByIdResponse>.NotFound(
+                _messageService.GetMessage(MessageKeys.Error.WorkItemNotFound, request.WorkItemId));
+        }
 
         return Result<GetWorkItemByIdResponse>.Success(_mapper.Map<GetWorkItemByIdResponse>(workItem));
     }
