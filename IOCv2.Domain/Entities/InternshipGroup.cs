@@ -19,13 +19,8 @@ namespace IOCv2.Domain.Entities
         public InternshipStatus Status { get; set; }
 
         // Navigation properties
-        public virtual ICollection<InternshipStudent> Members { get; set; } = new List<InternshipStudent>();
-
         public virtual Term Term { get; set; } = null!;
-        public virtual Enterprise? Enterprise { get; set; }
-        public virtual EnterpriseUser Mentor { get; set; } = null!;
-
-        public virtual ICollection<InternshipStudents> InternshipStudents { get; set; } = new List<InternshipStudents>();
+        public virtual ICollection<InternshipStudent> Members { get; set; } = new List<InternshipStudent>();
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
         public virtual ICollection<Project> Projects { get; set; } = new List<Project>();

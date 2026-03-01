@@ -33,7 +33,7 @@ public partial class AppDbContext : DbContext
     public DbSet<Term> Terms { get; set; } = null!;
     public DbSet<StudentTerm> StudentTerms { get; set; } = null!;
     public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
-    public DbSet<InternshipStudents> InternshipStudents { get; set; } = null!;
+    public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
     public DbSet<InternshipApplication> InternshipApplications { get; set; } = null!;
     public DbSet<Logbook> Logbooks { get; set; } = null!;
     public DbSet<Project> Projects { get; set; } = null!;
@@ -43,8 +43,6 @@ public partial class AppDbContext : DbContext
     public DbSet<SprintWorkItem> SprintWorkItems { get; set; } = null!;
     public DbSet<Domain.Entities.Stakeholder> Stakeholders { get; set; } = null!;
     public DbSet<StakeholderIssue> StakeholderIssues { get; set; } = null!;
-    public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
-    public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

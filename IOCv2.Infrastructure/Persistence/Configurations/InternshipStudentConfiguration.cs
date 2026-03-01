@@ -21,6 +21,20 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .WithMany(s => s.InternshipStudents)
                 .HasForeignKey(e => e.StudentId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(e => e.Role)
+                .HasColumnName("role")
+                .HasConversion<short>()
+                .IsRequired();
+
+            builder.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasConversion<short>()
+                .IsRequired();
+
+            builder.Property(e => e.JoinedAt)
+                .HasColumnName("joined_at")
+                .IsRequired();
         }
     }
 }

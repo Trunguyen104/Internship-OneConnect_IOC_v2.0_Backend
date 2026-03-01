@@ -294,8 +294,9 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     internship_id = table.Column<Guid>(type: "uuid", nullable: false),
                     term_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    group_name = table.Column<string>(type: "text", nullable: false),
                     enterprise_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    mentor_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    mentor_id = table.Column<Guid>(type: "uuid", nullable: true),
                     start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false),
@@ -404,11 +405,12 @@ namespace IOCv2.Infrastructure.Migrations
                     student_id = table.Column<Guid>(type: "uuid", nullable: false),
                     role = table.Column<short>(type: "smallint", nullable: false),
                     status = table.Column<short>(type: "smallint", nullable: false),
-                    joined_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
+                    joined_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamptz", nullable: true)
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -417,12 +419,14 @@ namespace IOCv2.Infrastructure.Migrations
                         name: "fk_internship_students_internship_groups_internship_id",
                         column: x => x.internship_id,
                         principalTable: "internship_groups",
-                        principalColumn: "internship_id");
+                        principalColumn: "internship_id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "fk_internship_students_students_student_id",
                         column: x => x.student_id,
                         principalTable: "students",
-                        principalColumn: "student_id");
+                        principalColumn: "student_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
