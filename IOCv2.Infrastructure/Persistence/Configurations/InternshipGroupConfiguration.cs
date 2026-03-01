@@ -1,11 +1,6 @@
-﻿using IOCv2.Domain.Entities;
+using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IOCv2.Infrastructure.Persistence.Configurations
 {
@@ -29,7 +24,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .HasColumnName("enterprise_id");
 
             builder.Property(e => e.MentorId)
-                .IsRequired()
                 .HasColumnName("mentor_id");
 
             builder.Property(e => e.StartDate)
@@ -71,12 +65,12 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .IsRequired(false);
 
             builder.HasOne(e => e.Mentor)
-                .WithMany(m => m.MentoredGroups)
+                .WithMany(m => m.MentoringGroups)
                 .HasForeignKey(e => e.MentorId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired(false);
 
-            builder.HasMany(e => e.InternshipStudents)
+            builder.HasMany(e => e.Members)
                 .WithOne(ist => ist.InternshipGroup)
                 .HasForeignKey(ist => ist.InternshipId);
         }

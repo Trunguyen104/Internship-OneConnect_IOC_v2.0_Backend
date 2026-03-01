@@ -17,7 +17,7 @@ namespace IOCv2.Domain.Entities
 
         // Navigation properties
         public virtual ICollection<StudentTerm> StudentTerms { get; set; } = new List<StudentTerm>();
-        public virtual ICollection<InternshipStudents> InternshipGroups { get; set; } = new List<InternshipStudents>();
+        public virtual ICollection<InternshipStudent> InternshipStudents { get; set; } = new List<InternshipStudent>();
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
         public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();

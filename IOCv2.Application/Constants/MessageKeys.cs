@@ -112,6 +112,15 @@
             public const string PhoneInvalid = "Profile.PhoneInvalid";
         }
 
+        public static class InternshipGroups
+        {
+            public const string NameRequired = "InternshipGroup.NameRequired";
+            public const string NameMaxLength = "InternshipGroup.NameMaxLength";
+            public const string TermIdRequired = "InternshipGroup.TermIdRequired";
+            public const string StartDateBeforeEndDate = "InternshipGroup.StartDateBeforeEndDate";
+            public const string StudentListRequired = "InternshipGroup.StudentListRequired";
+            public const string StudentListToRemoveRequired = "InternshipGroup.StudentListToRemoveRequired";
+        }
         public static class Projects
         {
             public const string NotFound = "Projects.NotFound";
@@ -166,6 +175,16 @@
         {
             public const string NotFound = "Internships.NotFound";
             public const string InternshipIdRequired = "Internships.InternshipIdRequired";  
+        }
+
+        public static class Logbook
+        {
+            public const string NotFound = "Logbook.NotFound";
+            public const string InvalidInternship = "Logbook.InvalidInternship";
+            public const string CreationFailed = "Logbook.CreationFailed";
+            public const string UpdateFailed = "Logbook.UpdateFailed";
+            public const string DeleteFailed = "Logbook.DeleteFailed";
+            public const string AlreadyReported = "Logbook.AlreadyReported";
         }
 
         public static class Page {

@@ -12,7 +12,7 @@ namespace IOCv2.Domain.Entities
 
         public string? Position { get; set; }
 
-        public virtual ICollection<InternshipGroup> MentoredGroups { get; set; } = new List<InternshipGroup>();
+        public virtual ICollection<InternshipGroup> MentoringGroups { get; set; } = new List<InternshipGroup>();
         public virtual ICollection<InternshipApplication> ReviewedApplications { get; set; } = new List<InternshipApplication>();
     }
 }

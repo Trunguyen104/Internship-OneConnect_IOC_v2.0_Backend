@@ -257,6 +257,25 @@
   <data name="Common.NotFound" xml:space="preserve">
     <value>Không tìm thấy bản ghi tương ứng.</value>
   </data>
+  <!-- Internship Group Errors -->
+  <data name="InternshipGroup.NameRequired" xml:space="preserve">
+    <value>Tên nhóm không được để trống.</value>
+  </data>
+  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
+    <value>Tên nhóm không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
+    <value>Kỳ thực tập không được để trống.</value>
+  </data>
+  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
+    <value>Ngày bắt đầu phải trước ngày kết thúc.</value>
+  </data>
+  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
+    <value>Danh sách sinh viên không được trống.</value>
+  </data>
+  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
+    <value>Danh sách sinh viên cần xóa không được trống.</value>
+  </data>
   <data name="Projects.LogDeleteError" xml:space="preserve">
     <value>Error deleting project {ProjectId}</value>
   </data>
