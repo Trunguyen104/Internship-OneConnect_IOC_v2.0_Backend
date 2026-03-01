@@ -14,7 +14,7 @@ public static class DatabaseConfig
             var logger = services.GetRequiredService<ILogger<Program>>();
             
             var retryCount = 0;
-            var maxRetries = 5;
+            var maxRetries = 10;
 
             while (retryCount < maxRetries)
             {
@@ -23,14 +23,12 @@ public static class DatabaseConfig
                     var context = services.GetRequiredService<AppDbContext>();
                     var initializer = services.GetRequiredService<DbInitializer>();
 
-                    // Using async migration if available, otherwise sync
-                    if (context.Database.GetPendingMigrations().Any())
-                    {
-                        await context.Database.MigrateAsync();
-                    }
+                    // Ensure database exists before migrating
+                    await context.Database.MigrateAsync();
                     
                     await initializer.InitializeAsync();
                     
+                    logger.LogInformation("Database migrated and seeded successfully.");
                     break; 
                 }
                 catch (Exception ex)
@@ -40,11 +38,15 @@ public static class DatabaseConfig
                     if (retryCount >= maxRetries)
                     {
                         logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+                        if (ex.InnerException != null)
+                        {
+                            logger.LogError(ex.InnerException, "Inner Exception: {Message}", ex.InnerException.Message);
+                        }
                         throw;
                     }
 
-                    logger.LogWarning("Database not ready. Retry {Count}/{Max}...", retryCount, maxRetries);
-                    await Task.Delay(2000);
+                    logger.LogWarning("Database not ready (Retry {Count}/{Max}). Error: {Error}. Retrying in 3s...", retryCount, maxRetries, ex.Message);
+                    await Task.Delay(3000);
                 }
             }
         }

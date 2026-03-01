@@ -1,11 +1,13 @@
 using FluentValidation;
 using IOCv2.Domain.Enums;
+using IOCv2.Application.Interfaces;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
 {
     internal class GetAdminUsersValidator : AbstractValidator<GetAdminUsersQuery>
     {
-        public GetAdminUsersValidator()
+        public GetAdminUsersValidator(IMessageService messageService)
         {
             RuleFor(x => x.PageNumber)
                 .GreaterThanOrEqualTo(1);
@@ -16,11 +18,11 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
 
             RuleFor(x => x.Role)
                 .Must(role => string.IsNullOrWhiteSpace(role) || Enum.TryParse<UserRole>(role, true, out _))
-                .WithMessage("Invalid role value.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidRole));
 
             RuleFor(x => x.Status)
                 .Must(status => string.IsNullOrWhiteSpace(status) || Enum.TryParse<UserStatus>(status, true, out _))
-                .WithMessage("Invalid status value.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidStatus));
         }
     }
 }

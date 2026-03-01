@@ -142,7 +142,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                         {
                             StudentId = Guid.NewGuid(),
                             UserId = user.UserId,
-                            Status = StudentStatus.NO_INTERNSHIP
+                            InternshipStatus = StudentStatus.NO_INTERNSHIP
                         };
                         await _unitOfWork.Repository<Student>().AddAsync(student, cancellationToken);
                     }

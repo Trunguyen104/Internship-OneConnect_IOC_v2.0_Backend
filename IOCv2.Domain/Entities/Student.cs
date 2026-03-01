@@ -8,13 +8,18 @@ namespace IOCv2.Domain.Entities
         public Guid UserId { get; set; }
         public virtual User User { get; set; } = null!;
 
-        public string? Class { get; set; }
+        public string? ClassName { get; set; }
         public string? Major { get; set; }
         public decimal? Gpa { get; set; }
         public string? HighestDegree { get; set; }
 
-        public StudentStatus Status { get; set; }
+        public StudentStatus InternshipStatus { get; set; }
 
-        public virtual ICollection<InternshipStudent> InternshipStudents { get; set; } = new List<InternshipStudent>();
+        // Navigation properties
+        public virtual ICollection<StudentTerm> StudentTerms { get; set; } = new List<StudentTerm>();
+        public virtual ICollection<InternshipStudents> InternshipGroups { get; set; } = new List<InternshipStudents>();
+        public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
+        public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
+        public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
     }
 }

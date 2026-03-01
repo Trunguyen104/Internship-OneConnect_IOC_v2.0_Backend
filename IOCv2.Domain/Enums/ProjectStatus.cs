@@ -1,9 +1,11 @@
-namespace IOCv2.Domain.Enums;
-
-public enum ProjectStatus : short
+﻿namespace IOCv2.Domain.Enums
 {
-    PLANNING = 0,
-    IN_PROGRESS = 1,
-    COMPLETED = 2,
-    CANCELED = 3
+    public enum ProjectStatus : short
+    {
+        Planning   = 1,
+        InProgress = 2,
+        Done       = 3,
+        Cancelled  = 4
+    }
 }
+

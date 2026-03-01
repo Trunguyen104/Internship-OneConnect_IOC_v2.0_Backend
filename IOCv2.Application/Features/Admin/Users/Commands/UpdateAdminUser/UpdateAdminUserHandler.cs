@@ -85,7 +85,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
                 // Update Student fields if applicable
                 if (user.Role == UserRole.Student && user.Student != null)
                 {
-                    if (request.StudentClass != null) user.Student.Class = request.StudentClass;
+                    if (request.StudentClass != null) user.Student.ClassName = request.StudentClass;
                     if (request.StudentMajor != null) user.Student.Major = request.StudentMajor;
                     if (request.StudentGpa != null) user.Student.Gpa = request.StudentGpa;
                     

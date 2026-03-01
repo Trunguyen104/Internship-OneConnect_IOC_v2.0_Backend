@@ -1,11 +1,13 @@
 using FluentValidation;
 using IOCv2.Domain.Enums;
+using IOCv2.Application.Interfaces;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
 {
     internal class CreateAdminUserValidator : AbstractValidator<CreateAdminUserCommand>
     {
-        public CreateAdminUserValidator()
+        public CreateAdminUserValidator(IMessageService messageService)
         {
             RuleFor(x => x.FullName)
                 .NotEmpty()
@@ -24,7 +26,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
             RuleFor(x => x.Role)
                 .NotEmpty()
                 .Must(role => Enum.TryParse<UserRole>(role, true, out _))
-                .WithMessage("Invalid role value.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidRole));
 
             // UnitId is required for most roles
             RuleFor(x => x.UnitId)
@@ -39,9 +41,9 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                                role == UserRole.Mentor ||
                                role == UserRole.Student;
                     }
-                    return false;
+                      return false;
                 })
-                .WithMessage("Unit (University or Enterprise) is required for this role.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserUnitRequired));
         }
     }
 }

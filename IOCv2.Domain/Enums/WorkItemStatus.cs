@@ -2,8 +2,9 @@ namespace IOCv2.Domain.Enums;
 
 public enum WorkItemStatus : short
 {
-    TODO = 0,
-    IN_PROGRESS = 1,
-    REVIEW = 2,
-    DONE = 3
+    Todo = 1,
+    InProgress = 2,
+    Review = 3,
+    Done = 4,
+    Cancelled = 5
 }

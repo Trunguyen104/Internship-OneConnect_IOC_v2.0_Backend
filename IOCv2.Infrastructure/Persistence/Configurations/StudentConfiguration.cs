@@ -15,26 +15,27 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(s => s.UserId).HasColumnName("user_id").IsRequired();
             builder.HasIndex(s => s.UserId).IsUnique();
 
-            builder.Property(s => s.Class).HasMaxLength(50).HasColumnName("class");
+            builder.Property(s => s.ClassName).HasMaxLength(50).HasColumnName("class_name");
             builder.Property(s => s.Major).HasMaxLength(100).HasColumnName("major");
             builder.Property(s => s.Gpa).HasPrecision(3, 2).HasColumnName("gpa");
             builder.Property(s => s.HighestDegree).HasMaxLength(100).HasColumnName("highest_degree");
-            
-            builder.Property(s => s.Status)
-                .HasConversion<string>()
-                .HasMaxLength(20)
-                .HasColumnName("status");
 
-            builder.Property(s => s.CreatedAt).HasColumnName("created_at");
+            builder.Property(s => s.InternshipStatus)
+                .HasConversion<short>()
+                .HasColumnType("smallint")
+                .HasColumnName("internship_status");
+
+            builder.Property(s => s.CreatedAt).HasColumnName("created_at").HasColumnType("timestamptz").HasDefaultValueSql("now()");
+            builder.Property(s => s.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamptz");
+            builder.Property(s => s.DeletedAt).HasColumnName("deleted_at").HasColumnType("timestamptz");
             builder.Property(s => s.CreatedBy).HasColumnName("created_by");
-            builder.Property(s => s.UpdatedAt).HasColumnName("updated_at");
             builder.Property(s => s.UpdatedBy).HasColumnName("updated_by");
-            builder.Property(s => s.DeletedAt).HasColumnName("deleted_at");
 
             builder.HasOne(s => s.User)
                 .WithOne(u => u.Student)
                 .HasForeignKey<Student>(s => s.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
         }
     }
 }
