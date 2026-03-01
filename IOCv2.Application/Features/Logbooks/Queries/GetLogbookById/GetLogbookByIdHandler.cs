@@ -34,8 +34,8 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
         {
             var logbook = await _unitOfWork.Repository<Logbook>()
             .Query()
-            .Include(x => x.Student)
-                .ThenInclude(s => s.User)
+            .Include(x => x.Student!)
+                .ThenInclude(s => s.User!)
             .Include(x => x.WorkItem)
             .FirstOrDefaultAsync(x => x.LogbookId == request.LogbookId, cancellationToken);
 

@@ -327,10 +327,13 @@ namespace IOCv2.Infrastructure.Persistence
 
                 _context.Logbooks.Add(new Logbook
                 {
-                    Id = Guid.NewGuid(),
+                    LogbookId = Guid.NewGuid(),
                     InternshipId = group.InternshipId,
                     StudentId = student.StudentId,
                     Content = "Weekly report: Finished login UI and integrated with API.",
+                    Summary = "Finished login UI and integrated with API.",
+                    Plan = "Continue project development.",
+                    DateReport = DateTime.UtcNow,
                     Status = LogbookStatus.SUBMITTED
                 });
                 await _context.SaveChangesAsync();

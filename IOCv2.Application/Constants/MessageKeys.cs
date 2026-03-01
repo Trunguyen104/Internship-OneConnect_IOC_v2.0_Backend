@@ -168,6 +168,16 @@
             public const string InternshipIdRequired = "Internships.InternshipIdRequired";  
         }
 
+        public static class Logbook
+        {
+            public const string NotFound = "Logbook.NotFound";
+            public const string InvalidInternship = "Logbook.InvalidInternship";
+            public const string CreationFailed = "Logbook.CreationFailed";
+            public const string UpdateFailed = "Logbook.UpdateFailed";
+            public const string DeleteFailed = "Logbook.DeleteFailed";
+            public const string AlreadyReported = "Logbook.AlreadyReported";
+        }
+
         public static class Page {
             public const string PageNumberMinValue = "PageNumber.MinValue";
             public const string PageSizeMinValue = "PageSize.MinValue";

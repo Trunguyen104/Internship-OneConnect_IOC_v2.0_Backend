@@ -27,7 +27,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
         {
             profile.CreateMap<Logbook, GetLogbookByIdResponse>()
                 .ForMember(dest => dest.StudentName,
-                    opt => opt.MapFrom(src => src.Student.User.FullName))
+                    opt => opt.MapFrom(src => src.Student != null && src.Student.User != null ? src.Student.User.FullName : "N/A"))
                 .ForMember(dest => dest.WorkItems,
                     opt => opt.MapFrom(src => src.WorkItem))
                 .ForMember(dest => dest.Status,

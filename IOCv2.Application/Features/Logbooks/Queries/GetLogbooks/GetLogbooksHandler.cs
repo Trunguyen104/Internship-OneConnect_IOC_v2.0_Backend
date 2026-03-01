@@ -32,8 +32,8 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
         {
             var query = _unitOfWork.Repository<Logbook>()
                         .Query()
-                        .Include(x => x.Student)
-                            .ThenInclude(s => s.User)
+                        .Include(x => x.Student!)
+                            .ThenInclude(s => s.User!)
                         .Include(x => x.InternshipGroup)
                         .AsQueryable();
 
@@ -47,8 +47,8 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
             // Sorting
             query = (request.SortColumn?.ToLower(), request.SortOrder?.ToLower()) switch
             {
-                ("studentname", "desc") => query.OrderByDescending(x => x.Student.User.FullName),
-                ("studentname", _) => query.OrderBy(x => x.Student.User.FullName),
+                ("studentname", "desc") => query.OrderByDescending(x => x.Student!.User!.FullName),
+                ("studentname", _) => query.OrderBy(x => x.Student!.User!.FullName),
                 ("createdat", "desc") => query.OrderByDescending(x => x.CreatedAt),
                 ("createdat", _) => query.OrderBy(x => x.CreatedAt),
                 _ => query.OrderByDescending(x => x.CreatedAt)

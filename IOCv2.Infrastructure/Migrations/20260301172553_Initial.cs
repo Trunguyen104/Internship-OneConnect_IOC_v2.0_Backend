@@ -429,11 +429,15 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "logbooks",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    logbook_id = table.Column<Guid>(type: "uuid", nullable: false),
                     internship_id = table.Column<Guid>(type: "uuid", nullable: false),
                     student_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    content = table.Column<string>(type: "text", nullable: false),
+                    date_report = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    summary = table.Column<string>(type: "text", nullable: false),
+                    issue = table.Column<string>(type: "text", nullable: true),
+                    plan = table.Column<string>(type: "text", nullable: false),
                     status = table.Column<short>(type: "smallint", nullable: false),
+                    content = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -442,12 +446,13 @@ namespace IOCv2.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_logbooks", x => x.id);
+                    table.PrimaryKey("pk_logbooks", x => x.logbook_id);
                     table.ForeignKey(
                         name: "fk_logbooks_internship_groups_internship_id",
                         column: x => x.internship_id,
                         principalTable: "internship_groups",
-                        principalColumn: "internship_id");
+                        principalColumn: "internship_id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "fk_logbooks_students_student_id",
                         column: x => x.student_id,
@@ -651,6 +656,30 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "logbook_work_items",
+                columns: table => new
+                {
+                    logbook_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    work_item_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_logbook_work_items", x => new { x.logbook_id, x.work_item_id });
+                    table.ForeignKey(
+                        name: "fk_logbook_work_items_logbooks_logbook_id",
+                        column: x => x.logbook_id,
+                        principalTable: "logbooks",
+                        principalColumn: "logbook_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_logbook_work_items_work_items_work_item_id",
+                        column: x => x.work_item_id,
+                        principalTable: "work_items",
+                        principalColumn: "work_item_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "sprint_work_items",
                 columns: table => new
                 {
@@ -747,6 +776,11 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_internship_students_student_id",
                 table: "internship_students",
                 column: "student_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_logbook_work_items_work_item_id",
+                table: "logbook_work_items",
+                column: "work_item_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_logbooks_internship_id",
@@ -978,7 +1012,7 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "internship_students");
 
             migrationBuilder.DropTable(
-                name: "logbooks");
+                name: "logbook_work_items");
 
             migrationBuilder.DropTable(
                 name: "password_reset_tokens");
@@ -1003,6 +1037,9 @@ namespace IOCv2.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_code_sequences");
+
+            migrationBuilder.DropTable(
+                name: "logbooks");
 
             migrationBuilder.DropTable(
                 name: "sprints");

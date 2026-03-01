@@ -430,10 +430,10 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("LogbookId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnName("logbook_id");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -448,6 +448,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
+                    b.Property<DateTime>("DateReport")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_report");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
@@ -455,6 +459,15 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<Guid>("InternshipId")
                         .HasColumnType("uuid")
                         .HasColumnName("internship_id");
+
+                    b.Property<string>("Issue")
+                        .HasColumnType("text")
+                        .HasColumnName("issue");
+
+                    b.Property<string>("Plan")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("plan");
 
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
@@ -464,6 +477,11 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("student_id");
 
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("summary");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -472,7 +490,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
-                    b.HasKey("Id")
+                    b.HasKey("LogbookId")
                         .HasName("pk_logbooks");
 
                     b.HasIndex("InternshipId")
@@ -1493,6 +1511,25 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("work_items", (string)null);
                 });
 
+            modelBuilder.Entity("LogbookWorkItem", b =>
+                {
+                    b.Property<Guid>("LogbookId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("logbook_id");
+
+                    b.Property<Guid>("WorkItemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("work_item_id");
+
+                    b.HasKey("LogbookId", "WorkItemId")
+                        .HasName("pk_logbook_work_items");
+
+                    b.HasIndex("WorkItemId")
+                        .HasDatabaseName("ix_logbook_work_items_work_item_id");
+
+                    b.ToTable("logbook_work_items", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.AuditLog", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "PerformedBy")
@@ -1596,6 +1633,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
                         .WithMany("Logbooks")
                         .HasForeignKey("InternshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_logbooks_internship_groups_internship_id");
 
                     b.HasOne("IOCv2.Domain.Entities.Student", "Student")
@@ -1805,6 +1844,23 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Assignee");
 
                     b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("LogbookWorkItem", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.Logbook", null)
+                        .WithMany()
+                        .HasForeignKey("LogbookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_logbook_work_items_logbooks_logbook_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.WorkItem", null)
+                        .WithMany()
+                        .HasForeignKey("WorkItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_logbook_work_items_work_items_work_item_id");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Enterprise", b =>
