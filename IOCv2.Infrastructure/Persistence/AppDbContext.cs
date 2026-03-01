@@ -43,7 +43,9 @@ public partial class AppDbContext : DbContext
     public DbSet<SprintWorkItem> SprintWorkItems { get; set; } = null!;
     public DbSet<Domain.Entities.Stakeholder> Stakeholders { get; set; } = null!;
     public DbSet<StakeholderIssue> StakeholderIssues { get; set; } = null!;
-
+    public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
+    public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
+    
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
@@ -52,7 +54,7 @@ public partial class AppDbContext : DbContext
         {
             currentUserId = parsedId;
         }
-
+        
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
             switch (entry.State)
