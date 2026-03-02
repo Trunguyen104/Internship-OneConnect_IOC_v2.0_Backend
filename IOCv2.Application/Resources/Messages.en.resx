@@ -187,9 +187,6 @@
   <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Updated project {ProjectId}</value>
   </data>
-  <data name="Internships.NotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="Projects.LogGetByInternshipIdSuccess" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>

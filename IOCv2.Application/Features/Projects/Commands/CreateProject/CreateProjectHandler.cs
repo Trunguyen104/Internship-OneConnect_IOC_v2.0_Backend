@@ -37,7 +37,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 if (!internshipExists)
                 {
                     return Result<CreateProjectResponse>.Failure(
-                        _message.GetMessage(MessageKeys.Internships.NotFound),
+                        _message.GetMessage(MessageKeys.Internships.NotFound, request.InternshipId),
                         ResultErrorType.NotFound);
                 }
 

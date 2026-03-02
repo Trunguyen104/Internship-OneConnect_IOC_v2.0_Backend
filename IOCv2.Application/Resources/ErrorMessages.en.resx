@@ -297,6 +297,15 @@
   <data name="Projects.GetByStudentIdError" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Projects.LogGetByInternshipIdErr" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Internships.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Projects.LogGetByIdError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -375,10 +384,7 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
   </data>
-  <data name="Projects.LogGetByInternshipIdErr" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Internships.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="Internships.NotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
 </root>

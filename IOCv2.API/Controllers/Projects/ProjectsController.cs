@@ -3,6 +3,7 @@ using IOCv2.Application.Features.Projects.Commands.CreateProject;
 using IOCv2.Application.Features.Projects.Commands.DeleteProject;
 using IOCv2.Application.Features.Projects.Commands.UpdateProject;
 using IOCv2.Application.Features.Projects.Queries.GetAProjects;
+using IOCv2.Application.Features.Projects.Queries.GetProjectById;
 using IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId;
 using IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId;
 using IOCv2.Domain.Enums;
@@ -43,7 +44,7 @@ namespace IOCv2.API.Controllers.Projects
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateProject(
         [FromRoute] Guid projectId
-            ,[FromBody] UpdateProjectRequest request,
+            , [FromBody] UpdateProjectRequest request,
         CancellationToken cancellationToken)
         {
             var command = new UpdateProjectCommand
@@ -61,18 +62,19 @@ namespace IOCv2.API.Controllers.Projects
         }
 
         [HttpDelete("{projectId}/delete")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DeleteProjectResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteProject([FromRoute] Guid projectId, CancellationToken cancellationToken) {
+        public async Task<IActionResult> DeleteProject([FromRoute] Guid projectId, CancellationToken cancellationToken)
+        {
             var command = new DeleteProjectCommand { ProjectId = projectId };
-            var result = await _mediator.Send<Result<string>>(command, cancellationToken);
+            var result = await _mediator.Send(command, cancellationToken);
             return HandleResult(result);
         }
 
-        [HttpGet("projects")]
+        [HttpGet]
         [ProducesResponseType(typeof(Result<PaginatedResult<GetAllProjectsResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -107,7 +109,7 @@ namespace IOCv2.API.Controllers.Projects
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProjectsByInternshipId(
-        [FromRoute] Guid internshipId,[FromQuery] string? searchTerm, [FromQuery] ProjectStatus? status, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [FromRoute] Guid internshipId, [FromQuery] string? searchTerm, [FromQuery] ProjectStatus? status, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var query = new GetProjectsByInternshipIdQuery
             {
@@ -119,6 +121,17 @@ namespace IOCv2.API.Controllers.Projects
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+            var result = await _mediator.Send(query, cancellationToken);
+            return HandleResult(result);
+        }
+
+        [HttpGet("{projectId}/project")]
+        [ProducesResponseType(typeof(Result<GetProjectByIdResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetProjectById([FromRoute] Guid projectId, CancellationToken cancellationToken)
+        {
+            var query = new GetProjectByIdQuery { ProjectId = projectId };
             var result = await _mediator.Send(query, cancellationToken);
             return HandleResult(result);
         }

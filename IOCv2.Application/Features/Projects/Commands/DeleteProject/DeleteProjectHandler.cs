@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
 {
-    public class DeleteProjectHandler : IRequestHandler<DeleteProjectCommand, Result<string>>
+    public class DeleteProjectHandler : IRequestHandler<DeleteProjectCommand, Result<DeleteProjectResponse>>
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
@@ -28,7 +28,7 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
             _logger = logger;
             _messageService = messageService;
         }
-        public async Task<Result<string>> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
+        public async Task<Result<DeleteProjectResponse>> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 // Check if project exists
                 if (project == null)
                 {
-                    return Result<string>.Failure(
+                    return Result<DeleteProjectResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Projects.NotFound),
                     ResultErrorType.NotFound);
                 }
@@ -51,9 +51,10 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 // Save changes
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
+                var response = _mapper.Map<DeleteProjectResponse>(project);
+                
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogDelete), request.ProjectId);
-
-                return Result<string>.Success(_messageService.GetMessage(MessageKeys.Projects.DeleteSuccess));
+                return Result<DeleteProjectResponse>.Success(response);
             }
             catch (Exception ex)
             {

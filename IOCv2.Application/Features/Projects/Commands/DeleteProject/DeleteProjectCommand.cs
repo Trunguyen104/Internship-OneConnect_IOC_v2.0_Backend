@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
 {
-    public record DeleteProjectCommand : IRequest<Result<string>>
+    public record DeleteProjectCommand : IRequest<Result<DeleteProjectResponse>>
     {
         public Guid ProjectId { get; set; }
     }
