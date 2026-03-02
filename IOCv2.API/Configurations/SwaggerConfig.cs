@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿﻿using Microsoft.OpenApi.Models;
 
 namespace IOCv2.API.Configurations;
 
@@ -10,6 +10,9 @@ public static class SwaggerConfig
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "IOCv2 API", Version = "v1" });
+
+            // Use full type names for schema IDs to avoid conflicts
+            c.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
 
             // Config JWT in Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
