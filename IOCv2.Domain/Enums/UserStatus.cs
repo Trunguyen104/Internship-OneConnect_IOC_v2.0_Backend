@@ -10,5 +10,6 @@ namespace IOCv2.Domain.Enums
     {
         Inactive = 0,
         Active = 1,
+        Suspended = 2,
     }
 }

@@ -1,5 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -58,16 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-
-  <!-- Common Errors -->
-  <data name="DatabaseConflict" xml:space="preserve">
+  <data name="Common.DatabaseConflict" xml:space="preserve">
     <value>The record already exists in the system.</value>
   </data>
-  <data name="OperationCancelled" xml:space="preserve">
+  <data name="Common.OperationCancelled" xml:space="preserve">
     <value>The operation was cancelled.</value>
   </data>
-  <data name="Unauthorized" xml:space="preserve">
+  <data name="Common.Unauthorized" xml:space="preserve">
     <value>You are not authorized to perform this action.</value>
+  </data>
+  <data name="Common.PageNumberInvalid" xml:space="preserve">
+    <value>Page number must be greater than 0.</value>
+  </data>
+  <data name="Common.PageSizeInvalid" xml:space="preserve">
+    <value>Page size must be greater than 0.</value>
+  </data>
+  <data name="Common.PageSizeTooLarge" xml:space="preserve">
+    <value>Page size cannot exceed 100.</value>
   </data>
 
   <!-- Password Validation -->
@@ -86,32 +152,6 @@
   <data name="Password.RequireSpecial" xml:space="preserve">
     <value>Password must contain at least one special character.</value>
   </data>
-  <data name="Password.NotEmpty" xml:space="preserve">
-    <value>Password cannot be empty.</value>
-  </data>
-  <data name="Password.ConfirmationMismatch" xml:space="preserve">
-    <value>Password confirmation does not match.</value>
-  </data>
-  <data name="Password.MustBeDifferent" xml:space="preserve">
-    <value>New password must be different from current password.</value>
-  </data>
-  <data name="Password.IncorrectCurrent" xml:space="preserve">
-    <value>Current password is incorrect.</value>
-  </data>
-
-  <!-- Reset Password Errors -->
-  <data name="CannotIdentifyManager" xml:space="preserve">
-    <value>Cannot identify the manager performing the reset.</value>
-  </data>
-  <data name="OnlyManagerCanReset" xml:space="preserve">
-    <value>Only managers are allowed to reset passwords.</value>
-  </data>
-  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
-    <value>Password can only be reset for active accounts.</value>
-  </data>
-  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
-    <value>Employee ID is required.</value>
-  </data>
   <data name="ResetPassword.ReasonRequired" xml:space="preserve">
     <value>Password reset reason is required.</value>
   </data>
@@ -121,11 +161,6 @@
   <data name="ResetPassword.ReasonMaxLength" xml:space="preserve">
     <value>Reason cannot exceed 500 characters.</value>
   </data>
-  <data name="ResetStatusNoEmail" xml:space="preserve">
-    <value>Password reset successful. However, the email could not be sent.</value>
-  </data>
-
-  <!-- Authentication Errors -->
   <data name="Auth.InvalidCredentials" xml:space="preserve">
     <value>Invalid email or password.</value>
   </data>
@@ -165,38 +200,65 @@
   <data name="Auth.TooManyAttempts" xml:space="preserve">
     <value>Too many attempts. Please try again later.</value>
   </data>
-
-  <!-- Profile/Employee Errors -->
+  <data name="Password.ConfirmationMismatch" xml:space="preserve">
+    <value>Password confirmation does not match.</value>
+  </data>
+  <data name="Password.MustBeDifferent" xml:space="preserve">
+    <value>New password must be different from current password.</value>
+  </data>
+  <data name="Password.IncorrectCurrent" xml:space="preserve">
+    <value>Current password is incorrect.</value>
+  </data>
   <data name="Profile.PhoneExists" xml:space="preserve">
-     <value>Phone number is already in use by another user.</value>
-   </data>
-   <data name="Profile.EmailExists" xml:space="preserve">
-     <value>Email is already in use by another user.</value>
-   </data>
-   <data name="Employee.CannotUpdateInactive" xml:space="preserve">
-     <value>Cannot update information for inactive employees.</value>
-   </data>
-   <data name="Profile.EmployeeIdRequired" xml:space="preserve">
-     <value>EmployeeId cannot be empty.</value>
-   </data>
-   <data name="Profile.FullNameRequired" xml:space="preserve">
-     <value>Full name cannot be empty.</value>
-   </data>
-   <data name="Profile.FullNameMaxLength" xml:space="preserve">
-     <value>Full name cannot exceed 100 characters.</value>
-   </data>
-   <data name="Profile.EmailRequired" xml:space="preserve">
-     <value>Email cannot be empty.</value>
-   </data>
-   <data name="Profile.EmailInvalid" xml:space="preserve">
-     <value>Invalid email format.</value>
-   </data>
-   <data name="Profile.PhoneRequired" xml:space="preserve">
-     <value>Phone number cannot be empty.</value>
-   </data>
-   <data name="Profile.PhoneInvalid" xml:space="preserve">
-     <value>Invalid phone number format.</value>
-   </data>
+    <value>Phone number is already in use by another user.</value>
+  </data>
+  <data name="Profile.EmailExists" xml:space="preserve">
+    <value>Email is already in use by another user.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+
+  <data name="Password.NotEmpty" xml:space="preserve">
+    <value>Password cannot be empty.</value>
+  </data>
+  <data name="CannotIdentifyManager" xml:space="preserve">
+    <value>Cannot identify the manager performing the reset.</value>
+  </data>
+  <data name="OnlyManagerCanReset" xml:space="preserve">
+    <value>Only managers are allowed to reset passwords.</value>
+  </data>
+  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Password can only be reset for active accounts.</value>
+  </data>
+  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
+    <value>Employee ID is required.</value>
+  </data>
+  <data name="ResetStatusNoEmail" xml:space="preserve">
+    <value>Password reset successful. However, the email could not be sent.</value>
+  </data>
+  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
+    <value>Cannot update information for inactive employees.</value>
+  </data>
+  <data name="Profile.EmployeeIdRequired" xml:space="preserve">
+    <value>EmployeeId cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameRequired" xml:space="preserve">
+    <value>Full name cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameMaxLength" xml:space="preserve">
+    <value>Full name cannot exceed 100 characters.</value>
+  </data>
+  <data name="Profile.EmailRequired" xml:space="preserve">
+    <value>Email cannot be empty.</value>
+  </data>
+  <data name="Profile.EmailInvalid" xml:space="preserve">
+    <value>Invalid email format.</value>
+  </data>
+  <data name="Profile.PhoneRequired" xml:space="preserve">
+    <value>Phone number cannot be empty.</value>
+  </data>
+  <data name="Profile.PhoneInvalid" xml:space="preserve">
+    <value>Invalid phone number format.</value>
+  </data>
   <data name="Employee.CodeInvalidFormat" xml:space="preserve">
     <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
   </data>
@@ -231,6 +293,114 @@
     <value>An error occurred while updating the database.</value>
   </data>
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
-     <value>Role changed successfully for {0}, but notification email failed to send.</value>
+    <value>Role changed successfully for {0}, but notification email failed to send.</value>
+  </data>
+  <data name="Projects.LogGetByInternshipIdErr" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Internships.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+
+   <!-- Epic Validation Errors -->
+   <data name="Epic.ProjectIdRequired" xml:space="preserve">
+     <value>Project ID is required.</value>
    </data>
+   <data name="Epic.NameRequired" xml:space="preserve">
+     <value>Epic name is required.</value>
+   </data>
+   <data name="Epic.NameMaxLength" xml:space="preserve">
+     <value>Epic name must not exceed 255 characters.</value>
+   </data>
+   <data name="Epic.DescriptionMaxLength" xml:space="preserve">
+     <value>Description must not exceed 2000 characters.</value>
+   </data>
+   <data name="Epic.NotFound" xml:space="preserve">
+     <value>Epic not found.</value>
+   </data>
+   <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
+     <value>Cannot delete Epic with existing children. Please remove or reassign all children first.</value>
+   </data>
+   <data name="Epic.ProjectNotFound" xml:space="preserve">
+     <value>Project not found.</value>
+   </data>
+  <data name="Stakeholder.NotFound" xml:space="preserve">
+    <value>Stakeholder not found.</value>
+  </data>
+  <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
+    <value>Project not found.</value>
+  </data>
+  <data name="Stakeholder.EmailExists" xml:space="preserve">
+    <value>Email already exists in this project.</value>
+  </data>
+  <data name="Stakeholder.IdRequired" xml:space="preserve">
+    <value>Stakeholder ID is required.</value>
+  </data>
+  <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
+    <value>Project ID is required.</value>
+  </data>
+  <data name="Stakeholder.NameRequired" xml:space="preserve">
+    <value>Name is required.</value>
+  </data>
+  <data name="Stakeholder.NameMaxLength" xml:space="preserve">
+    <value>Name cannot exceed 200 characters.</value>
+  </data>
+  <data name="Stakeholder.EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="Stakeholder.EmailInvalid" xml:space="preserve">
+    <value>Email format is invalid.</value>
+  </data>
+  <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
+    <value>Email cannot exceed 150 characters.</value>
+  </data>
+  <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
+    <value>Role cannot exceed 100 characters.</value>
+  </data>
+  <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
+    <value>Description cannot exceed 500 characters.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
+    <value>Phone number is invalid. Please enter a valid phone number format.</value>
+  </data>
+  <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
+    <value>Phone number cannot exceed 15 characters.</value>
+  </data>
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Stakeholder created successfully.</value>
+  </data>
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Stakeholder updated successfully.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Stakeholder deleted successfully.</value>
+  </data>
+  <!-- Issue -->
+  <data name="Issue.NotFound" xml:space="preserve">
+    <value>Issue not found.</value>
+  </data>
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <value>Stakeholder not found.</value>
+  </data>
+  <data name="Issue.TitleRequired" xml:space="preserve">
+    <value>Title is required.</value>
+  </data>
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <value>Description is required.</value>
+  </data>
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <value>Stakeholder ID is required.</value>
+  </data>
+  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <value>Invalid status. Please select: Open, InProgress, Resolved, or Closed.</value>
+  </data>
+  <data name="Issue.CreateFailed" xml:space="preserve">
+    <value>Failed to create issue.</value>
+  </data>
+  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <value>Failed to update issue.</value>
+  </data>
+  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <value>Failed to delete issue.</value>
+  </data>
  </root>

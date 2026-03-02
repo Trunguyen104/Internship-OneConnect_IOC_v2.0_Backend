@@ -1,5 +1,6 @@
 ﻿
 using DotNetEnv;
+using Serilog;
 
 namespace IOCv2.API.Configurations;
 
@@ -7,8 +8,10 @@ public static class EnvironmentConfig
 {
     public static void LoadEnvironmentVariables(this WebApplicationBuilder builder)
     {
-        var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
-        if (File.Exists(envPath))
+        // Walk up parent directories to find the shared root .env file
+        var envPath = FindEnvFile(Directory.GetCurrentDirectory());
+
+        if (envPath != null)
         {
             Env.Load(envPath);
         }
@@ -16,21 +19,23 @@ public static class EnvironmentConfig
         // Map JWT
         var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
         if (!string.IsNullOrEmpty(jwtSecret))
-        {
             builder.Configuration["Jwt:SecretKey"] = jwtSecret;
-        }
+
+        var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+        if (!string.IsNullOrEmpty(jwtIssuer))
+            builder.Configuration["Jwt:Issuer"] = jwtIssuer;
+
+        var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+        if (!string.IsNullOrEmpty(jwtAudience))
+            builder.Configuration["Jwt:Audience"] = jwtAudience;
 
         var jwtAccessExpires = Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_EXPIRES_IN_MINUTE");
         if (!string.IsNullOrEmpty(jwtAccessExpires))
-        {
             builder.Configuration["Jwt:ExpiresInMinute"] = jwtAccessExpires;
-        }
 
         var jwtRefreshExpires = Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRES_IN_DAYS");
         if (!string.IsNullOrEmpty(jwtRefreshExpires))
-        {
             builder.Configuration["Jwt:RefreshTokenExpiresInDays"] = jwtRefreshExpires;
-        }
 
         // Map Database
         var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
@@ -43,17 +48,23 @@ public static class EnvironmentConfig
             builder.Configuration["ConnectionStrings:DefaultConnection"] = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
         }
 
-        // Map Redis & Others
+        // Map Redis
         var redisConnection = Environment.GetEnvironmentVariable("REDIS_CONNECTION");
         if (!string.IsNullOrEmpty(redisConnection))
         {
             builder.Configuration["ConnectionStrings:Redis"] = redisConnection;
+            builder.Configuration["Redis:ConnectionString"] = redisConnection;
         }
+
+        var redisInstance = Environment.GetEnvironmentVariable("REDIS_INSTANCE_NAME");
+        if (!string.IsNullOrEmpty(redisInstance))
+            builder.Configuration["Redis:InstanceName"] = redisInstance;
+
+        // Map CORS
         var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
         if (!string.IsNullOrEmpty(allowedOrigins))
-        {
             builder.Configuration["AllowedOrigins"] = allowedOrigins;
-        }
+
         // Map Email
         var emailSmtpHost = Environment.GetEnvironmentVariable("EMAIL_SMTP_HOST");
         var emailSmtpPort = Environment.GetEnvironmentVariable("EMAIL_SMTP_PORT");
@@ -71,5 +82,28 @@ public static class EnvironmentConfig
             builder.Configuration["EmailSettings:SenderName"] = emailSenderName;
         if (!string.IsNullOrEmpty(emailAppPassword))
             builder.Configuration["EmailSettings:AppPassword"] = emailAppPassword;
+            
+        // Map Logging
+        var logLevelDefault = Environment.GetEnvironmentVariable("LOG_LEVEL_DEFAULT");
+        if (!string.IsNullOrEmpty(logLevelDefault))
+            builder.Configuration["Logging:LogLevel:Default"] = logLevelDefault;
+    }
+
+    /// <summary>
+    /// Walk up parent directories to find the nearest .env file.
+    /// </summary>
+    private static string? FindEnvFile(string startDir)
+    {
+        var dir = startDir;
+        for (var i = 0; i < 5; i++) // max 5 levels up
+        {
+            var candidate = Path.Combine(dir, ".env");
+            if (File.Exists(candidate)) return candidate;
+
+            var parent = Directory.GetParent(dir);
+            if (parent == null) break;
+            dir = parent.FullName;
+        }
+        return null;
     }
 }
