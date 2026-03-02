@@ -30,6 +30,12 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
                .HasColumnName("assignee_id")
                .IsRequired(false);
 
+        // Project relationship
+        builder.HasOne(w => w.Project)
+               .WithMany(p => p.WorkItems)
+               .HasForeignKey(w => w.ProjectId)
+               .OnDelete(DeleteBehavior.Cascade);
+
         // Self-referencing relationship
         builder.HasOne(w => w.Parent)
                .WithMany(w => w.Children)
