@@ -7,17 +7,17 @@ using IOCv2.Application.Features.WorkItems.Commands.UpdateWorkItem;
 using IOCv2.Application.Features.WorkItems.Queries.GetBacklog;
 using IOCv2.Application.Features.WorkItems.Queries.GetWorkItemById;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.ProductBacklog;
 
 /// <summary>
-/// Quản lý Work Items (User Story, Task, Subtask) trong Product Backlog và Sprint Backlog.
+/// Manage Work Items (User Story, Task, Subtask) in the Product Backlog and Sprint Backlog.
 /// </summary>
 [Tags("WorkItems")]
-[ApiController]
+[Authorize]
 [Route("api/projects/{projectId:guid}/work-items")]
-// [Authorize]
 public class WorkItemsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -30,6 +30,8 @@ public class WorkItemsController : ApiControllerBase
     /// </summary>
     [HttpGet("backlog")]
     [ProducesResponseType(typeof(Result<GetBacklogResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetBacklog(
         [FromRoute] Guid projectId,
         [FromQuery] Guid? epicId,
@@ -37,7 +39,8 @@ public class WorkItemsController : ApiControllerBase
         [FromQuery] string? type,
         [FromQuery] string? priority,
         [FromQuery] string? status,
-        [FromQuery] Guid? assigneeId)
+        [FromQuery] Guid? assigneeId,
+        CancellationToken cancellationToken = default)
     {
         var query = new GetBacklogQuery
         {
@@ -49,7 +52,7 @@ public class WorkItemsController : ApiControllerBase
             Status = status,
             AssigneeId = assigneeId
         };
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
 
@@ -58,12 +61,15 @@ public class WorkItemsController : ApiControllerBase
     /// </summary>
     [HttpGet("{workItemId:guid}")]
     [ProducesResponseType(typeof(Result<GetWorkItemByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetWorkItemById(
         [FromRoute] Guid projectId,
-        [FromRoute] Guid workItemId)
+        [FromRoute] Guid workItemId,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetWorkItemByIdQuery(workItemId));
+        var result = await _mediator.Send(new GetWorkItemByIdQuery(workItemId), cancellationToken);
         return HandleResult(result);
     }
 
@@ -71,14 +77,17 @@ public class WorkItemsController : ApiControllerBase
     /// Create a new work item. If SprintId is provided, the item is added to that Sprint's backlog.
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Result<CreateWorkItemResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Result<CreateWorkItemResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateWorkItem(
         [FromRoute] Guid projectId,
-        [FromBody] CreateWorkItemCommand command)
+        [FromBody] CreateWorkItemCommand command,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { ProjectId = projectId });
-        return HandleResult(result);
+        var result = await _mediator.Send(command with { ProjectId = projectId }, cancellationToken);
+        return HandleCreatedResult(result);
     }
 
     /// <summary>
@@ -86,13 +95,16 @@ public class WorkItemsController : ApiControllerBase
     /// </summary>
     [HttpPut("{workItemId:guid}")]
     [ProducesResponseType(typeof(Result<UpdateWorkItemResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateWorkItem(
         [FromRoute] Guid projectId,
         [FromRoute] Guid workItemId,
-        [FromBody] UpdateWorkItemCommand command)
+        [FromBody] UpdateWorkItemCommand command,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { WorkItemId = workItemId });
+        var result = await _mediator.Send(command with { WorkItemId = workItemId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -101,12 +113,15 @@ public class WorkItemsController : ApiControllerBase
     /// </summary>
     [HttpDelete("{workItemId:guid}")]
     [ProducesResponseType(typeof(Result<DeleteWorkItemResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteWorkItem(
         [FromRoute] Guid projectId,
-        [FromRoute] Guid workItemId)
+        [FromRoute] Guid workItemId,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new DeleteWorkItemCommand { WorkItemId = workItemId });
+        var result = await _mediator.Send(new DeleteWorkItemCommand { WorkItemId = workItemId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -116,13 +131,16 @@ public class WorkItemsController : ApiControllerBase
     /// </summary>
     [HttpPost("{workItemId:guid}/move-to-sprint")]
     [ProducesResponseType(typeof(Result<MoveWorkItemToSprintResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MoveToSprint(
         [FromRoute] Guid projectId,
         [FromRoute] Guid workItemId,
-        [FromBody] MoveWorkItemToSprintCommand command)
+        [FromBody] MoveWorkItemToSprintCommand command,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { WorkItemId = workItemId });
+        var result = await _mediator.Send(command with { WorkItemId = workItemId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -132,13 +150,16 @@ public class WorkItemsController : ApiControllerBase
     /// </summary>
     [HttpPost("{workItemId:guid}/move-to-backlog")]
     [ProducesResponseType(typeof(Result<MoveWorkItemToBacklogResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MoveToBacklog(
         [FromRoute] Guid projectId,
         [FromRoute] Guid workItemId,
-        [FromBody] MoveWorkItemToBacklogCommand command)
+        [FromBody] MoveWorkItemToBacklogCommand command,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { WorkItemId = workItemId });
+        var result = await _mediator.Send(command with { WorkItemId = workItemId }, cancellationToken);
         return HandleResult(result);
     }
 }

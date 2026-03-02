@@ -10,97 +10,127 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers.InternshipGroups
+namespace IOCv2.API.Controllers.InternshipGroups;
+
+/// <summary>
+/// Internship Groups Management — manage internship groups and their student members.
+/// </summary>
+[Tags("Internship Groups Management")]
+[Authorize]
+public class InternshipGroupsController : ApiControllerBase
 {
-    [Tags("Internship Groups Management")]
-    [Authorize]
-    public class InternshipGroupsController : ApiControllerBase
+    private readonly IMediator _mediator;
+
+    public InternshipGroupsController(IMediator mediator) => _mediator = mediator;
+
+    /// <summary>
+    /// Get paginated list of internship groups with optional search and filter.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(Result<PaginatedResult<GetInternshipGroupsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetInternshipGroups(
+        [FromQuery] GetInternshipGroupsQuery query,
+        CancellationToken cancellationToken = default)
     {
-        private readonly ISender _mediator;
+        return HandleResult(await _mediator.Send(query, cancellationToken));
+    }
 
-        public InternshipGroupsController(ISender mediator)
-        {
-            _mediator = mediator;
-        }
+    /// <summary>
+    /// Get details of a single internship group by ID.
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(Result<GetInternshipGroupByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetInternshipGroupById(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return HandleResult(await _mediator.Send(new GetInternshipGroupByIdQuery(id), cancellationToken));
+    }
 
-        /// <summary>
-        /// Lấy danh sách nhóm thực tập (hỗ trợ phân trang, tìm kiếm, lọc)
-        /// </summary>
-        [HttpGet]
-        [ProducesResponseType(typeof(Result<PaginatedResult<GetInternshipGroupsResponse>>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetInternshipGroups([FromQuery] GetInternshipGroupsQuery query)
-        {
-            return HandleResult(await _mediator.Send(query));
-        }
+    /// <summary>
+    /// Create a new internship group.
+    /// </summary>
+    [HttpPost]
+    [ProducesResponseType(typeof(Result<CreateInternshipGroupResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> CreateInternshipGroup(
+        [FromBody] CreateInternshipGroupCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        return HandleCreatedResult(await _mediator.Send(command, cancellationToken));
+    }
 
-        /// <summary>
-        /// Xem chi tiết thông tin một nhóm thực tập
-        /// </summary>
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Result<GetInternshipGroupByIdResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetInternshipGroupById(Guid id)
-        {
-            return HandleResult(await _mediator.Send(new GetInternshipGroupByIdQuery(id)));
-        }
+    /// <summary>
+    /// Update an existing internship group.
+    /// </summary>
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(Result<UpdateInternshipGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateInternshipGroup(
+        [FromRoute] Guid id,
+        [FromBody] UpdateInternshipGroupCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = command with { InternshipId = id };
+        return HandleResult(await _mediator.Send(updateCommand, cancellationToken));
+    }
 
-        /// <summary>
-        /// Tạo mới nhóm thực tập
-        /// </summary>
-        [HttpPost]
-        [ProducesResponseType(typeof(Result<CreateInternshipGroupResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateInternshipGroup([FromBody] CreateInternshipGroupCommand command)
-        {
-            return HandleResult(await _mediator.Send(command));
-        }
+    /// <summary>
+    /// Delete an internship group and its associated student list.
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(typeof(Result<DeleteInternshipGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteInternshipGroup(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return HandleResult(await _mediator.Send(new DeleteInternshipGroupCommand(id), cancellationToken));
+    }
 
-        /// <summary>
-        /// Cập nhật thông tin nhóm thực tập
-        /// </summary>
-        [HttpPut("{id}")]
-        [ProducesResponseType(typeof(Result<UpdateInternshipGroupResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateInternshipGroup(Guid id, [FromBody] UpdateInternshipGroupCommand command)
-        {
-            var updateCommand = command with { InternshipId = id };
-            return HandleResult(await _mediator.Send(updateCommand));
-        }
+    /// <summary>
+    /// Add a list of students to an internship group.
+    /// </summary>
+    [HttpPost("{id:guid}/students")]
+    [ProducesResponseType(typeof(Result<AddStudentsToGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddStudentsToGroup(
+        [FromRoute] Guid id,
+        [FromBody] AddStudentsToGroupCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = command with { InternshipId = id };
+        return HandleResult(await _mediator.Send(updateCommand, cancellationToken));
+    }
 
-        /// <summary>
-        /// Xóa bỏ nhóm thực tập và danh sách sinh viên đi kèm
-        /// </summary>
-        [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(Result<DeleteInternshipGroupResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteInternshipGroup(Guid id)
-        {
-            return HandleResult(await _mediator.Send(new DeleteInternshipGroupCommand(id)));
-        }
-
-        /// <summary>
-        /// Bổ sung danh sách sinh viên vào nhóm
-        /// </summary>
-        [HttpPost("{id}/students")]
-        [ProducesResponseType(typeof(Result<AddStudentsToGroupResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> AddStudentsToGroup(Guid id, [FromBody] AddStudentsToGroupCommand command)
-        {
-            var updateCommand = command with { InternshipId = id };
-            return HandleResult(await _mediator.Send(updateCommand));
-        }
-
-        /// <summary>
-        /// Gỡ bỏ sinh viên khỏi nhóm hiện tại
-        /// </summary>
-        [HttpDelete("{id}/students")]
-        [ProducesResponseType(typeof(Result<RemoveStudentsFromGroupResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> RemoveStudentsFromGroup(Guid id, [FromBody] RemoveStudentsFromGroupCommand command)
-        {
-            var updateCommand = command with { InternshipId = id };
-            return HandleResult(await _mediator.Send(updateCommand));
-        }
+    /// <summary>
+    /// Remove students from an internship group.
+    /// </summary>
+    [HttpDelete("{id:guid}/students")]
+    [ProducesResponseType(typeof(Result<RemoveStudentsFromGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveStudentsFromGroup(
+        [FromRoute] Guid id,
+        [FromBody] RemoveStudentsFromGroupCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var updateCommand = command with { InternshipId = id };
+        return HandleResult(await _mediator.Send(updateCommand, cancellationToken));
     }
 }
