@@ -23,6 +23,7 @@ public class WorkItem : BaseEntity
     public WorkItemStatus? Status { get; set; }
 
     // Navigation properties
+    public virtual Project Project { get; set; } = null!;
     public virtual WorkItem? Parent { get; set; }
     public virtual ICollection<WorkItem> Children { get; set; } = new List<WorkItem>();
     public virtual Student? Assignee { get; set; }

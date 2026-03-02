@@ -35,6 +35,12 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
             .HasForeignKey(x => x.StudentId)
             .IsRequired(false);
 
+        builder.HasOne(x => x.Reviewer)
+            .WithMany(eu => eu.ReviewedApplications)
+            .HasForeignKey(x => x.ReviewedBy)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+
         builder.HasIndex(x => new { x.InternshipId, x.StudentId }).IsUnique();
     }
 }

@@ -61,6 +61,12 @@ public class SprintConfiguration : IEntityTypeConfiguration<Sprint>
         builder.Property(s => s.UpdatedBy)
             .HasColumnName("updated_by");
 
+        // Relationships
+        builder.HasOne(s => s.Project)
+            .WithMany(p => p.Sprints)
+            .HasForeignKey(s => s.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // Indexes
         builder.HasIndex(s => s.ProjectId)
             .HasDatabaseName("ix_sprints_project_id");

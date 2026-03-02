@@ -16,5 +16,6 @@ public class Sprint : BaseEntity
     public SprintStatus Status { get; set; }
 
     // Navigation properties
+    public virtual Project Project { get; set; } = null!;
     public virtual ICollection<SprintWorkItem> SprintWorkItems { get; set; } = new List<SprintWorkItem>();
 }
