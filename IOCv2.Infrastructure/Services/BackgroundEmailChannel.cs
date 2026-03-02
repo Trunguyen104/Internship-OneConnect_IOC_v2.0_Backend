@@ -41,28 +41,29 @@ namespace IOCv2.Infrastructure.Services
 
         public ChannelReader<EmailMessage> Reader => _channel.Reader;
 
-        public async ValueTask EnqueueAccountCreationEmailAsync(string email, string employeeName, string employeeCode, string role, string password, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
+        public async ValueTask EnqueueAccountCreationEmailAsync(string email, string fullname, string loginEmail, string role, string password, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
         {
-            var body = EmailTemplates.GetAccountCreationTemplate(employeeName, employeeCode, role, password);
-            await EnqueueEmailAsync(email, "Chào mừng đến FoodHub - Thông tin tài khoản", body, auditTargetId, performedByEmployeeId, cancellationToken);
+            var body = EmailTemplates.GetAccountCreationTemplate(fullname, loginEmail, role, password);
+            await EnqueueEmailAsync(email, "Chào mừng đến Internship OneConnect - Thông tin tài khoản", body, auditTargetId, performedByEmployeeId, cancellationToken);
         }
 
-        public async ValueTask EnqueueRoleChangeEmailAsync(string email, string employeeName, string oldEmployeeCode, string newEmployeeCode, string oldRole, string newRole, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
+        public async ValueTask EnqueueRoleChangeEmailAsync(string email, string oldUserCode, string newUserCode, string oldRole, string newRole, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
         {
-            var body = EmailTemplates.GetRoleChangeTemplate(employeeName, oldEmployeeCode, newEmployeeCode, oldRole, newRole);
-            await EnqueueEmailAsync(email, "Thông báo thay đổi vai trò - FoodHub", body, auditTargetId, performedByEmployeeId, cancellationToken);
+            var body = EmailTemplates.GetRoleChangeTemplate(email, oldUserCode, newUserCode, oldRole, newRole);
+            await EnqueueEmailAsync(email, "Thông báo thay đổi vai trò - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
         }
 
-        public async ValueTask EnqueuePasswordResetByManagerEmailAsync(string email, string employeeName, string employeeCode, string newPassword, string managerName, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
+        public async ValueTask EnqueuePasswordResetBySuperAdminEmailAsync(string email, string fullname, string newPassword, string superAdminName, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
         {
-            var body = EmailTemplates.GetPasswordResetByManagerTemplate(employeeName, employeeCode, newPassword, managerName);
-            await EnqueueEmailAsync(email, "Mật khẩu của bạn đã được reset - FoodHub", body, auditTargetId, performedByEmployeeId, cancellationToken);
+            var body = EmailTemplates.GetPasswordResetByManagerTemplate(fullname, email, newPassword, superAdminName);
+            await EnqueueEmailAsync(email, "Mật khẩu của bạn đã được reset - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
         }
 
-        public async ValueTask EnqueuePasswordResetEmailAsync(string email, string resetLink, string employeeName, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
+        public async ValueTask EnqueuePasswordResetEmailAsync(string email, string resetLink, string fullname, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
         {
-            var body = EmailTemplates.GetPasswordResetTemplate(employeeName, resetLink);
-            await EnqueueEmailAsync(email, "Password Reset - FoodHub", body, auditTargetId, performedByEmployeeId, cancellationToken);
+            var body = EmailTemplates.GetPasswordResetTemplate(fullname, resetLink);
+            await EnqueueEmailAsync(email, "Password Reset - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
+            await EnqueueEmailAsync(email, "Password Reset - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
         }
     }
 }

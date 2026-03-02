@@ -2,10 +2,10 @@
 using IOCv2.Domain.Entities;
 using IOCv2.Infrastructure.Persistence.Repositories;
 
-namespace IOCv2.Infrastructure.Persistence
+namespace IOCv2.Infrastructure.Persistence;
+
+public class UnitOfWork : IUnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
-    {
         private readonly AppDbContext _context;
         private readonly Dictionary<string, object> _repositories;
 
@@ -33,14 +33,12 @@ namespace IOCv2.Infrastructure.Persistence
             return (IGenericRepository<T>)_repositories[type];
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellation = default)
+        public async Task<int> SaveChangeAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync(cancellationToken);
         }
 
         private Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? _currentTransaction;
-
-        public IGenericRepository<User> Users => throw new NotImplementedException();
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
@@ -90,7 +88,4 @@ namespace IOCv2.Infrastructure.Persistence
                 }
             }
         }
-
-
-    }
 }

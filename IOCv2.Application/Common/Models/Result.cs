@@ -1,105 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IOCv2.Application.Common.Models
+﻿﻿namespace IOCv2.Application.Common.Models
 {
-    /// <summary>
-    /// Phân loại lỗi nghiệp vụ để map sang HTTP Status Code ở Presentation layer
-    /// </summary>
     public enum ResultErrorType
     {
-        None = 0,
-        Validation = 1,     // Dữ liệu đầu vào sai
-        BadRequest = 2,     // Request không hợp lệ
-        NotFound = 3,       // Không tìm thấy resource
-        Unauthorized = 4,   // Chưa đăng nhập / token sai
-        Forbidden = 5,      // Không đủ quyền
-        Conflict = 6        // Trùng dữ liệu / vi phạm business rule
+        None,
+        BadRequest,
+        NotFound,
+        Unauthorized,
+        Forbidden,
+        Conflict
     }
 
-    /// <summary>
-    /// Result KHÔNG trả dữ liệu (dùng cho Update / Delete / Command không cần response)
-    /// </summary>
-    public class Result
+    public class Result<T>
     {
-        public bool IsSuccess { get; }
-        public List<string> Errors { get; }
-        public ResultErrorType ErrorType { get; }
+        public bool IsSuccess { get; private set; }
+        public T? Data { get; private set; }
+        public string? Error { get; private set; }
+        public ResultErrorType ErrorType { get; private set; }
+        public string? Warning { get; private set; }
+        public string? Message { get; private set; }
+        public bool HasWarning => !string.IsNullOrEmpty(Warning);
 
-        protected Result(
-            bool isSuccess,
-            List<string>? errors,
-            ResultErrorType errorType)
+        private Result(bool isSuccess, T? data, string? error, ResultErrorType errorType, string? warning = null, string? message = null)
         {
             IsSuccess = isSuccess;
-            Errors = errors ?? new List<string>();
-            ErrorType = errorType;
-        }
-
-        public static Result Success()
-            => new(true, null, ResultErrorType.None);
-
-        public static Result Failure(
-            string error,
-            ResultErrorType errorType = ResultErrorType.BadRequest)
-            => new(false, new List<string> { error }, errorType);
-
-        public static Result Failure(
-            List<string> errors,
-            ResultErrorType errorType = ResultErrorType.BadRequest)
-            => new(false, errors, errorType);
-
-        public static Result ValidationFailure(List<string> errors)
-            => new(false, errors, ResultErrorType.Validation);
-
-        public static Result NotFound(string error)
-            => new(false, new List<string> { error }, ResultErrorType.NotFound);
-
-        public static Result Conflict(string error)
-            => new(false, new List<string> { error }, ResultErrorType.Conflict);
-    }
-
-    /// <summary>
-    /// Result CÓ trả dữ liệu (dùng cho Query / Create)
-    /// </summary>
-    public class Result<T> : Result
-    {
-        public T? Data { get; }
-
-        private Result(
-            bool isSuccess,
-            T? data,
-            List<string>? errors,
-            ResultErrorType errorType)
-            : base(isSuccess, errors, errorType)
-        {
             Data = data;
+            Error = error;
+            ErrorType = errorType;
+            Warning = warning;
+            Message = message;
         }
 
-        public static Result<T> Success(T data)
-            => new(true, data, null, ResultErrorType.None);
+        public static Result<T> Success(T data) => new(true, data, null, ResultErrorType.None);
 
-        public static new Result<T> Failure(
-            string error,
-            ResultErrorType errorType = ResultErrorType.BadRequest)
-            => new(false, default, new List<string> { error }, errorType);
+        public static Result<T> Success(T data, string message) => new(true, data, null, ResultErrorType.None, message: message);
 
-        public static new Result<T> Failure(
-            List<string> errors,
-            ResultErrorType errorType = ResultErrorType.BadRequest)
-            => new(false, default, errors, errorType);
+        public static Result<T> SuccessWithWarning(T data, string warning)
+            => new(true, data, null, ResultErrorType.None, warning);
 
-        public static Result<T> ValidationFailure(List<string> errors)
-            => new(false, default, errors, ResultErrorType.Validation);
+        public static Result<T> Failure(string error, ResultErrorType errorType = ResultErrorType.BadRequest)
+            => new(false, default, error, errorType);
 
-        public static Result<T> NotFound(string error)
-            => new(false, default, new List<string> { error }, ResultErrorType.NotFound);
-
-        public static Result<T> Conflict(string error)
-            => new(false, default, new List<string> { error }, ResultErrorType.Conflict);
+        public static Result<T> NotFound(string error) => Failure(error, ResultErrorType.NotFound);
     }
 }
 

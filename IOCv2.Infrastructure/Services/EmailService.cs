@@ -40,8 +40,8 @@ namespace IOCv2.Infrastructure.Services
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
-                    Subject = "Password Reset - FoodHub",
-                    Body = GetPasswordResetTemplate(employeeName, resetLink),
+                    Subject = "Password Reset - Internship OneConnect",
+                    Body = EmailTemplates.GetPasswordResetTemplate(employeeName, resetLink),
                     IsBodyHtml = true
                 };
 
@@ -106,8 +106,8 @@ namespace IOCv2.Infrastructure.Services
 
         public async Task<bool> SendAccountCreationEmailAsync(
             string email,
-            string employeeName,
-            string employeeCode,
+            string fullName,
+            string userCode,
             string role,
             string password,
             CancellationToken cancellationToken = default)
@@ -128,8 +128,8 @@ namespace IOCv2.Infrastructure.Services
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
-                    Subject = "Chào mừng đến FoodHub - Thông tin tài khoản",
-                    Body = GetAccountCreationTemplate(employeeName, employeeCode, role, password),
+                    Subject = "Chào mừng đến Internship OneConnect - Thông tin tài khoản",
+                    Body = EmailTemplates.GetAccountCreationTemplate(fullName, userCode, role, password),
                     IsBodyHtml = true
                 };
 
@@ -149,8 +149,8 @@ namespace IOCv2.Infrastructure.Services
         public async Task<bool> SendRoleChangeConfirmationEmailAsync(
             string email,
             string employeeName,
-            string oldEmployeeCode,
-            string newEmployeeCode,
+            string oldUserCode,
+            string newUserCode,
             string oldRole,
             string newRole,
             CancellationToken cancellationToken = default)
@@ -171,8 +171,8 @@ namespace IOCv2.Infrastructure.Services
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
-                    Subject = "Thông báo thay đổi vai trò - FoodHub",
-                    Body = GetRoleChangeTemplate(employeeName, oldEmployeeCode, newEmployeeCode, oldRole, newRole),
+                    Subject = "Thông báo thay đổi vai trò - Internship OneConnect",
+                    Body = EmailTemplates.GetRoleChangeTemplate(employeeName, oldUserCode, newUserCode, oldRole, newRole),
                     IsBodyHtml = true
                 };
 
@@ -227,7 +227,7 @@ namespace IOCv2.Infrastructure.Services
         <div class='content'>
             <p>Hello <strong>" + employeeName + @"</strong>,</p>
             
-            <p>We received a request to reset the password for your FoodHub account.</p>
+            <p>We received a request to reset the password for your Internship OneConnect account.</p>
             
             <p>To reset your password, please click the button below:</p>
             
@@ -244,18 +244,18 @@ namespace IOCv2.Infrastructure.Services
                 </ul>
             </div>
             
-            <p>Best regards,<br><strong>FoodHub System</strong></p>
+            <p>Best regards,<br><strong>IOC System</strong></p>
         </div>
         <div class='footer'>
             <p>This is an automated email. Please do not reply to this message.</p>
-            <p>&copy; 2026 FoodHub. All rights reserved.</p>
+            <p>&copy; 2026 Internship OneConnect. All rights reserved.</p>
         </div>
     </div>
 </body>
 </html>";
         }
 
-        private string GetAccountCreationTemplate(string employeeName, string employeeCode, string role, string password)
+        private string GetAccountCreationTemplate(string employeeName, string email, string role, string password)
         {
             return @"
 <!DOCTYPE html>
@@ -278,17 +278,17 @@ namespace IOCv2.Infrastructure.Services
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>🎉 Chào mừng đến với FoodHub</h1>
+            <h1>🎉 Chào mừng đến với Internship OneConnect</h1>
         </div>
         <div class='content'>
             <p>Xin chào <strong>" + employeeName + @"</strong>,</p>
             
-            <p>Tài khoản của bạn đã được tạo thành công trong hệ thống FoodHub. Dưới đây là thông tin đăng nhập của bạn:</p>
+            <p>Tài khoản của bạn đã được tạo thành công trong hệ thống IOC. Dưới đây là thông tin đăng nhập của bạn:</p>
             
             <div class='info-box'>
                 <div class='info-row'>
-                    <div class='info-label'>Mã nhân viên (Employee Code):</div>
-                    <div class='info-value'>" + employeeCode + @"</div>
+                    <div class='info-label'>Tên đăng nhập (Username):</div>
+                    <div class='info-value'>" + email + @"</div>
                 </div>
                 <div class='info-row'>
                     <div class='info-label'>Vai trò (Role):</div>
@@ -305,24 +305,24 @@ namespace IOCv2.Infrastructure.Services
                 <ul>
                     <li>Vui lòng <strong>đổi mật khẩu ngay</strong> khi đăng nhập lần đầu tiên</li>
                     <li>Không chia sẻ thông tin đăng nhập với bất kỳ ai</li>
-                    <li>Sử dụng <strong>mã nhân viên</strong> (" + employeeCode + @") để đăng nhập, không phải email</li>
+                    <li>Sử dụng <strong>Email</strong> (" + email + @") để đăng nhập</li>
                 </ul>
             </div>
             
             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với quản lý của bạn.</p>
             
-            <p>Chúc bạn làm việc hiệu quả!<br><strong>FoodHub System</strong></p>
+            <p>Chúc bạn làm việc hiệu quả!<br><strong>IOC System</strong></p>
         </div>
         <div class='footer'>
             <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
-            <p>&copy; 2026 FoodHub. All rights reserved.</p>
+            <p>&copy; 2026 Internship OneConnect. All rights reserved.</p>
         </div>
     </div>
 </body>
 </html>";
         }
 
-        private string GetRoleChangeTemplate(string employeeName, string oldEmployeeCode, string newEmployeeCode, string oldRole, string newRole)
+        private string GetRoleChangeTemplate(string employeeName, string oldUserCode, string newUserCode, string oldRole, string newRole)
         {
             return @"
 <!DOCTYPE html>
@@ -353,14 +353,14 @@ namespace IOCv2.Infrastructure.Services
         <div class='content'>
             <p>Xin chào <strong>" + employeeName + @"</strong>,</p>
             
-            <p>Vai trò của bạn trong hệ thống FoodHub đã được thay đổi. Vui lòng xem thông tin chi tiết bên dưới:</p>
+            <p>Vai trò của bạn trong hệ thống IOC đã được thay đổi. Vui lòng xem thông tin chi tiết bên dưới:</p>
             
             <div class='change-box'>
                 <div class='old-info'>
                     <h3 style='margin-top: 0; color: #f44336;'>❌ Thông tin cũ (đã vô hiệu hóa)</h3>
                     <div class='info-row'>
-                        <div class='info-label'>Mã nhân viên cũ:</div>
-                        <div class='info-value strikethrough'>" + oldEmployeeCode + @"</div>
+                        <div class='info-label'>Tên đăng nhập cũ:</div>
+                        <div class='info-value strikethrough'>" + oldUserCode + @"</div>
                     </div>
                     <div class='info-row'>
                         <div class='info-label'>Vai trò cũ:</div>
@@ -371,8 +371,8 @@ namespace IOCv2.Infrastructure.Services
                 <div class='new-info'>
                     <h3 style='margin-top: 0; color: #4caf50;'>✅ Thông tin mới (đang hoạt động)</h3>
                     <div class='info-row'>
-                        <div class='info-label'>Mã nhân viên mới:</div>
-                        <div class='info-value'>" + newEmployeeCode + @"</div>
+                        <div class='info-label'>Tên đăng nhập mới:</div>
+                        <div class='info-value'>" + newUserCode + @"</div>
                     </div>
                     <div class='info-row'>
                         <div class='info-label'>Vai trò mới:</div>
@@ -384,20 +384,20 @@ namespace IOCv2.Infrastructure.Services
             <div class='important'>
                 <strong>⚠️ Lưu ý quan trọng:</strong>
                 <ul>
-                    <li>Vui lòng sử dụng <strong>mã nhân viên mới</strong> (" + newEmployeeCode + @") để đăng nhập</li>
+                    <li>Vui lòng sử dụng <strong>mã nhân viên mới</strong> (" + newUserCode + @") để đăng nhập</li>
                     <li><strong>Mật khẩu của bạn giữ nguyên</strong> - không thay đổi</li>
-                    <li>Tài khoản cũ (" + oldEmployeeCode + @") đã bị vô hiệu hóa và không thể đăng nhập</li>
+                    <li>Tài khoản cũ (" + oldUserCode + @") đã bị vô hiệu hóa và không thể đăng nhập</li>
                     <li>Quyền truy cập của bạn đã được cập nhật theo vai trò mới</li>
                 </ul>
             </div>
             
             <p>Nếu bạn có bất kỳ thắc mắc nào về việc thay đổi này, vui lòng liên hệ với quản lý của bạn.</p>
             
-            <p>Trân trọng,<br><strong>FoodHub System</strong></p>
+            <p>Trân trọng,<br><strong>IOC System</strong></p>
         </div>
         <div class='footer'>
             <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
-            <p>&copy; 2026 FoodHub. All rights reserved.</p>
+            <p>&copy; 2026 Internship OneConnect. All rights reserved.</p>
         </div>
     </div>
 </body>
@@ -405,8 +405,8 @@ namespace IOCv2.Infrastructure.Services
         }
         public async Task<bool> SendPasswordResetByManagerEmailAsync(
     string email,
-    string employeeName,
-    string employeeCode,
+    string fullName,
+    string userCode,
     string newPassword,
     string managerName,
     CancellationToken cancellationToken = default)
@@ -426,8 +426,8 @@ namespace IOCv2.Infrastructure.Services
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
-                    Subject = "Mật khẩu của bạn đã được reset - FoodHub",
-                    Body = GetPasswordResetByManagerTemplate(employeeName, employeeCode, newPassword, managerName),
+                    Subject = "Mật khẩu của bạn đã được reset - Internship OneConnect",
+                    Body = EmailTemplates.GetPasswordResetByManagerTemplate(fullName, userCode, newPassword, managerName),
                     IsBodyHtml = true
                 };
                 mailMessage.To.Add(email);
@@ -441,7 +441,7 @@ namespace IOCv2.Infrastructure.Services
                 return false;
             }
         }
-        private string GetPasswordResetByManagerTemplate(string employeeName, string employeeCode, string newPassword, string managerName)
+        private string GetPasswordResetByManagerTemplate(string fullName, string userCode, string newPassword, string managerName)
         {
             return @"
 <!DOCTYPE html>
@@ -467,14 +467,14 @@ namespace IOCv2.Infrastructure.Services
             <h1>🔐 Mật khẩu đã được reset</h1>
         </div>
         <div class='content'>
-            <p>Xin chào <strong>" + employeeName + @"</strong>,</p>
+            <p>Xin chào <strong>" + fullName + @"</strong>,</p>
             
-            <p>Mật khẩu của bạn đã được Manager <strong>" + managerName + @"</strong> reset trong hệ thống FoodHub.</p>
+            <p>Mật khẩu của bạn đã được Manager <strong>" + managerName + @"</strong> reset trong hệ thống IOC.</p>
             
             <div class='info-box'>
                 <div class='info-row'>
-                    <div class='info-label'>Mã nhân viên (Employee Code):</div>
-                    <div class='info-value'>" + employeeCode + @"</div>
+                    <div class='info-label'>Tên đăng nhập (Username):</div>
+                    <div class='info-value'>" + userCode + @"</div>
                 </div>
                 <div class='info-row'>
                     <div class='info-label'>Mật khẩu mới:</div>
@@ -487,18 +487,18 @@ namespace IOCv2.Infrastructure.Services
                 <ul>
                     <li><strong>BẮT BUỘC phải đổi mật khẩu</strong> ngay khi đăng nhập lần đầu tiên</li>
                     <li>Không chia sẻ mật khẩu này với bất kỳ ai</li>
-                    <li>Sử dụng mã nhân viên (" + employeeCode + @") để đăng nhập</li>
+                    <li>Sử dụng tên đăng nhập (" + userCode + @") để đăng nhập</li>
                     <li>Chọn một mật khẩu mạnh mà chỉ bạn biết</li>
                 </ul>
             </div>
             
             <p>Nếu bạn không yêu cầu reset mật khẩu, vui lòng liên hệ với Manager ngay lập tức.</p>
             
-            <p>Trân trọng,<br><strong>FoodHub System</strong></p>
+            <p>Trân trọng,<br><strong>IOC System</strong></p>
         </div>
         <div class='footer'>
             <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
-            <p>&copy; 2026 FoodHub. All rights reserved.</p>
+            <p>&copy; 2026 Internship OneConnect. All rights reserved.</p>
         </div>
     </div>
 </body>

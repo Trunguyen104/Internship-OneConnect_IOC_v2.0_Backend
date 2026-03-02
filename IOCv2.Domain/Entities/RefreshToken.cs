@@ -8,6 +8,7 @@ namespace IOCv2.Domain.Entities
 {
     public class RefreshToken : BaseEntity
     {
+        public Guid RefreshTokenId { get; set; }
         public string Token { get; set; } = string.Empty;
         public DateTime Expires { get; set; } = DateTime.UtcNow;
         public bool IsRevoked { get; set; }
