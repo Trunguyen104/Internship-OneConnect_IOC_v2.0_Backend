@@ -14,6 +14,7 @@ namespace IOCv2.API.Controllers.Stakeholders;
 /// <summary>
 /// Stakeholder Issue Management — manage issues related to stakeholders.
 /// </summary>
+[Route("api/stakeholder-issues")]
 [Tags("Stakeholder Issue Management")]
 [Authorize]
 public class StakeholderIssuesController : ApiControllerBase

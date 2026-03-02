@@ -15,6 +15,7 @@ namespace IOCv2.API.Controllers.InternshipGroups;
 /// <summary>
 /// Internship Groups Management — manage internship groups and their student members.
 /// </summary>
+[Route("api/internshipgroups")]
 [Tags("Internship Groups Management")]
 [Authorize]
 public class InternshipGroupsController : ApiControllerBase

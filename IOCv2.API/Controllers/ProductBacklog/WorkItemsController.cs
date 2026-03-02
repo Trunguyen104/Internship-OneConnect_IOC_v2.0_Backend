@@ -129,7 +129,7 @@ public class WorkItemsController : ApiControllerBase
     /// Move a work item to a Sprint (drag-and-drop from Product Backlog or another Sprint).
     /// AfterWorkItemId = null places the item at the top of the Sprint.
     /// </summary>
-    [HttpPost("{workItemId:guid}/move-to-sprint")]
+    [HttpPatch("{workItemId:guid}/sprint")]
     [ProducesResponseType(typeof(Result<MoveWorkItemToSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -148,7 +148,7 @@ public class WorkItemsController : ApiControllerBase
     /// Move a work item back to the Product Backlog.
     /// AfterWorkItemId = null places the item at the top of the backlog.
     /// </summary>
-    [HttpPost("{workItemId:guid}/move-to-backlog")]
+    [HttpPatch("{workItemId:guid}/backlog")]
     [ProducesResponseType(typeof(Result<MoveWorkItemToBacklogResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

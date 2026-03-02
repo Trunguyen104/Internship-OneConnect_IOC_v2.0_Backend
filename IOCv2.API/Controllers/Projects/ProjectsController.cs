@@ -43,7 +43,7 @@ public class ProjectsController : ApiControllerBase
     /// <summary>
     /// Get paginated list of projects assigned to the currently authenticated student.
     /// </summary>
-    [HttpGet("student")]
+    [HttpGet("my")]
     [Authorize(Roles = "Student")]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetProjectsByStudentIdResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -61,7 +61,7 @@ public class ProjectsController : ApiControllerBase
     /// <summary>
     /// Get paginated list of projects belonging to a specific internship group.
     /// </summary>
-    [HttpGet("internship-group/{internshipId:guid}/projects")]
+    [HttpGet("by-internship-group/{internshipId:guid}")]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetProjectsByInternshipIdResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]

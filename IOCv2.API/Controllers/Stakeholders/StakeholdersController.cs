@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+﻿﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder;
 using IOCv2.Application.Features.Stakeholders.Commands.DeleteStakeholder;
 using IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder;
@@ -13,6 +13,7 @@ namespace IOCv2.API.Controllers.Stakeholders;
 /// <summary>
 /// Stakeholder Management — manage stakeholders for a project.
 /// </summary>
+[Route("api/stakeholders")]
 [Tags("Stakeholder Management")]
 [Authorize]
 public class StakeholdersController : ApiControllerBase
@@ -24,8 +25,7 @@ public class StakeholdersController : ApiControllerBase
     /// <summary>
     /// Get paginated list of stakeholders for a project with optional search and sorting.
     /// </summary>
-    [HttpGet]
-    [Route("project/{projectId:guid}")]
+    [HttpGet("/api/projects/{projectId:guid}/stakeholders")]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetStakeholdersResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

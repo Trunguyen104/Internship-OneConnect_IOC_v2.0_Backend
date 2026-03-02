@@ -15,7 +15,7 @@ namespace IOCv2.API.Controllers.Projects;
 /// </summary>
 [Tags("Project Resources")]
 [Authorize]
-[Route("api/projects/resources")]
+[Route("api/project-resources")]
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;

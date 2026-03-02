@@ -50,7 +50,7 @@ public class AuthController : ApiControllerBase
     /// <summary>
     /// Refresh an expired access token using the refresh token stored in the HTTP-only cookie.
     /// </summary>
-    [HttpPost("refresh-token")]
+    [HttpPost("tokens/refresh")]
     [ProducesResponseType(typeof(Result<LoginResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> RefreshToken()
@@ -100,7 +100,7 @@ public class AuthController : ApiControllerBase
     /// <summary>
     /// Change the current user's password. Requires authentication.
     /// </summary>
-    [HttpPost("change-password")]
+    [HttpPost("passwords/change")]
     [Authorize]
     [ProducesResponseType(typeof(Result<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -113,7 +113,7 @@ public class AuthController : ApiControllerBase
     /// <summary>
     /// Send a password reset email to the specified address.
     /// </summary>
-    [HttpPost("request-password-reset")]
+    [HttpPost("passwords/reset-request")]
     [RateLimit(maxRequests: 3, windowMinutes: 10, blockMinutes: 10)]
     [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
     public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetCommand command)
@@ -125,7 +125,7 @@ public class AuthController : ApiControllerBase
     /// <summary>
     /// Reset the user's password using a valid reset token received via email.
     /// </summary>
-    [HttpPost("reset-password")]
+    [HttpPost("passwords/reset")]
     [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
