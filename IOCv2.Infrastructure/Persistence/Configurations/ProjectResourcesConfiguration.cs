@@ -28,17 +28,15 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.ResourceName)
                 .HasColumnName("resource_name")
-                .HasMaxLength(500);
+                .HasMaxLength(1000);
 
             builder.Property(x => x.ResourceType)
                 .HasColumnName("resource_type")
-                .HasConversion<short>()
-                .IsRequired();
+                .HasMaxLength(50);
 
             builder.Property(x => x.ResourceUrl)
                 .HasColumnName("resource_url")
-                .HasMaxLength(1000)
-                .IsRequired();
+                .HasMaxLength(512);
 
             // Audit fields from BaseEntity
             builder.Property(x => x.CreatedAt)
