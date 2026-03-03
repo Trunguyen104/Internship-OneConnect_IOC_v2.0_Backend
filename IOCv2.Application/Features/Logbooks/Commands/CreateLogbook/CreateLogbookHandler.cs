@@ -119,7 +119,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                 _logger.LogError(ex, "Error creating logbook");
 
                 return Result<CreateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Logbook.CreationFailed),
+                    ex.InnerException?.Message ?? ex.Message,
                     ResultErrorType.BadRequest
                 );
             }
