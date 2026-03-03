@@ -362,10 +362,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("project_id")
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
@@ -373,7 +369,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
-                        .HasDefaultValueSql("now()");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid")
@@ -390,11 +385,6 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<DateOnly?>("EndDate")
-                        .HasColumnType("date")
                         .HasColumnName("end_date");
 
                     b.Property<Guid>("InternshipId")
@@ -413,24 +403,6 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<short?>("Status")
                         .HasColumnType("smallint")
-                    b.Property<Guid?>("MentorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("mentor_id");
-
-                    b.Property<string>("ProjectName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("project_name");
-
-                    b.Property<DateOnly?>("StartDate")
-                        .HasColumnType("date")
-                        .HasColumnName("start_date");
-
-                    b.Property<short>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -519,12 +491,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasDatabaseName("ix_project_resources_resource_type");
 
                     b.ToTable("project_resources", (string)null);
-                });
-
-                    b.HasKey("Id")
-                        .HasName("pk_projects");
-
-                    b.ToTable("projects", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.RefreshToken", b =>
@@ -1398,8 +1364,7 @@ namespace IOCv2.Infrastructure.Migrations
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
                 {
                     b.Navigation("ProjectResources");
-            modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
-                {
+
                     b.Navigation("Stakeholders");
                 });
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitV2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,18 +38,17 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "projects",
+                name: "internship_groups",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     internship_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    mentor_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    project_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    description = table.Column<string>(type: "text", nullable: true),
-                    start_date = table.Column<DateOnly>(type: "date", nullable: true),
-                    end_date = table.Column<DateOnly>(type: "date", nullable: true),
-                    status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    term_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    enterprise_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    mentor_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -57,7 +56,7 @@ namespace IOCv2.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_projects", x => x.id);
+                    table.PrimaryKey("pk_internship_groups", x => x.internship_id);
                 });
 
             migrationBuilder.CreateTable(
@@ -142,18 +141,45 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "stakeholders",
+                name: "internship_students",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    type = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)0),
-                    role = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    student_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    role = table.Column<short>(type: "smallint", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: false),
+                    joined_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
+                    internship_group_internship_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_internship_students", x => new { x.internship_id, x.student_id });
+                    table.ForeignKey(
+                        name: "fk_internship_students_internship_groups_internship_group_inte",
+                        column: x => x.internship_group_internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_internship_students_internship_groups_internship_id",
+                        column: x => x.internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "projects",
+                columns: table => new
+                {
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    internship_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    project_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -161,12 +187,12 @@ namespace IOCv2.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_stakeholders", x => x.id);
+                    table.PrimaryKey("pk_projects", x => x.project_id);
                     table.ForeignKey(
-                        name: "fk_stakeholders_projects",
-                        column: x => x.project_id,
-                        principalTable: "projects",
-                        principalColumn: "id",
+                        name: "fk_projects_internship_groups_internship_id",
+                        column: x => x.internship_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -315,15 +341,43 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "stakeholder_issues",
+                name: "project_resources",
+                columns: table => new
+                {
+                    project_resource_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    resource_name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    resource_type = table.Column<short>(type: "smallint", nullable: false),
+                    resource_url = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_project_resources", x => x.project_resource_id);
+                    table.ForeignKey(
+                        name: "fk_project_resources_projects_project_id",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "project_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "stakeholders",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    stakeholder_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    status = table.Column<int>(type: "integer", nullable: false),
-                    resolved_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    project_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    type = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)0),
+                    role = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -332,13 +386,13 @@ namespace IOCv2.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_stakeholder_issues", x => x.id);
+                    table.PrimaryKey("pk_stakeholders", x => x.id);
                     table.ForeignKey(
-                        name: "fk_stakeholder_issues_stakeholders",
-                        column: x => x.stakeholder_id,
-                        principalTable: "stakeholders",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "fk_stakeholders_projects",
+                        column: x => x.project_id,
+                        principalTable: "projects",
+                        principalColumn: "project_id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -378,6 +432,33 @@ namespace IOCv2.Infrastructure.Migrations
                         principalTable: "work_items",
                         principalColumn: "work_item_id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "stakeholder_issues",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    stakeholder_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    resolved_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_stakeholder_issues", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_stakeholder_issues_stakeholders",
+                        column: x => x.stakeholder_id,
+                        principalTable: "stakeholders",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -438,6 +519,37 @@ namespace IOCv2.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_internship_groups_enterprise_id",
+                table: "internship_groups",
+                column: "enterprise_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_internship_groups_internship_id",
+                table: "internship_groups",
+                column: "internship_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_internship_groups_mentor_id",
+                table: "internship_groups",
+                column: "mentor_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_internship_groups_term_id",
+                table: "internship_groups",
+                column: "term_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_internship_students_internship_group_internship_id",
+                table: "internship_students",
+                column: "internship_group_internship_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_internship_students_internship_id",
+                table: "internship_students",
+                column: "internship_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_password_reset_tokens_expires_at",
                 table: "password_reset_tokens",
                 column: "expires_at");
@@ -452,6 +564,36 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_password_reset_tokens_user_id",
                 table: "password_reset_tokens",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_project_resources_created_at",
+                table: "project_resources",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_project_resources_project_id",
+                table: "project_resources",
+                column: "project_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_project_resources_resource_type",
+                table: "project_resources",
+                column: "resource_type");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_projects_created_at",
+                table: "projects",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_projects_internship_id",
+                table: "projects",
+                column: "internship_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_projects_status",
+                table: "projects",
+                column: "status");
 
             migrationBuilder.CreateIndex(
                 name: "ix_refresh_tokens_token",
@@ -604,7 +746,13 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "enterprise_users");
 
             migrationBuilder.DropTable(
+                name: "internship_students");
+
+            migrationBuilder.DropTable(
                 name: "password_reset_tokens");
+
+            migrationBuilder.DropTable(
+                name: "project_resources");
 
             migrationBuilder.DropTable(
                 name: "refresh_tokens");
@@ -644,6 +792,9 @@ namespace IOCv2.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "users");
+
+            migrationBuilder.DropTable(
+                name: "internship_groups");
         }
     }
 }

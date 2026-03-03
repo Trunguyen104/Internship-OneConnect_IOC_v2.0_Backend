@@ -193,8 +193,7 @@
   <data name="ProjectResources.LogDeleteSuccess" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-</root>
-  
+
   <!-- Epic Messages -->
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Epic created successfully.</value>

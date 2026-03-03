@@ -1,4 +1,4 @@
-﻿﻿﻿namespace IOCv2.Application.Constants
+﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -112,6 +112,15 @@
             public const string PhoneInvalid = "Profile.PhoneInvalid";
         }
 
+        public static class InternshipGroups
+        {
+            public const string NameRequired = "InternshipGroup.NameRequired";
+            public const string NameMaxLength = "InternshipGroup.NameMaxLength";
+            public const string TermIdRequired = "InternshipGroup.TermIdRequired";
+            public const string StartDateBeforeEndDate = "InternshipGroup.StartDateBeforeEndDate";
+            public const string StudentListRequired = "InternshipGroup.StudentListRequired";
+            public const string StudentListToRemoveRequired = "InternshipGroup.StudentListToRemoveRequired";
+        }
         public static class Projects
         {
             public const string NotFound = "Projects.NotFound";
@@ -166,16 +175,29 @@
         public static class Internships
         {
             public const string NotFound = "Internships.NotFound";
-            public const string InternshipIdRequired = "Internships.InternshipIdRequired";  
+            public const string InternshipIdRequired = "Internships.InternshipIdRequired";
         }
 
-        public static class Page {
+        public static class Logbook
+        {
+            public const string NotFound = "Logbook.NotFound";
+            public const string InvalidInternship = "Logbook.InvalidInternship";
+            public const string CreationFailed = "Logbook.CreationFailed";
+            public const string UpdateFailed = "Logbook.UpdateFailed";
+            public const string DeleteFailed = "Logbook.DeleteFailed";
+            public const string AlreadyReported = "Logbook.AlreadyReported";
+        }
+
+        public static class Page
+        {
             public const string PageNumberMinValue = "PageNumber.MinValue";
             public const string PageSizeMinValue = "PageSize.MinValue";
             public const string PageSizeMaxValue = "PageSize.MaxValue";
             public const string SearchTermMaxLength = "SearchTerm.MaxLength";
             public const string SortColumnAllowedValues = "SortColumn.AllowedValues";
             public const string SortOrderAllowedValues = "SortOrder.AllowedValues";
+        }
+
         public static class Sprint
         {
             public const string NameRequired = "Sprint.NameRequired";
@@ -268,6 +290,17 @@
             public const string NameMaxLength = "Validation.NameMaxLength";
             public const string DescriptionMaxLength = "Validation.DescriptionMaxLength";
             public const string IdRequired = "Validation.IdRequired";
+            public const string UserInvalidRole = "Validation.User.InvalidRole";
+            public const string UserUnitRequired = "Validation.User.UnitRequired";
+            public const string UserInvalidStatus = "Validation.User.InvalidStatus";
+            public const string UserInvalidPhone = "Validation.User.InvalidPhone";
+            public const string UserInvalidGender = "Validation.User.InvalidGender";
+            public const string UserInvalidDateFormat = "Validation.User.InvalidDateFormat";
+        }
+
+        public static class Error
+        {
+            public const string WorkItemNotFound = "Error.WorkItem.NotFound";
         }
     }
 }

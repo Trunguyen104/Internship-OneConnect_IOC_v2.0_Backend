@@ -135,8 +135,6 @@
   <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Kích thước trang không được vượt quá 100.</value>
   </data>
-  
-  <!-- Validation Errors -->
   <data name="InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid.</value>
   </data>
@@ -344,9 +342,6 @@
   <data name="Internships.InternshipIdRequired" xml:space="preserve">
     <value>Internship ID is required.</value>
   </data>
-</root>
-  
-  <!-- Epic Validation Errors -->
   <data name="Epic.ProjectIdRequired" xml:space="preserve">
     <value>ID dự án không được để trống.</value>
   </data>
@@ -368,8 +363,6 @@
   <data name="Epic.ProjectNotFound" xml:space="preserve">
     <value>Không tìm thấy dự án.</value>
   </data>
-  
-  <!-- Sprint Validation Errors -->
   <data name="Sprint.ProjectIdRequired" xml:space="preserve">
     <value>ID dự án không được để trống.</value>
   </data>
@@ -442,8 +435,6 @@
   <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
     <value>Sprint đích là bắt buộc khi chọn chuyển sang Sprint có sẵn.</value>
   </data>
-
-  <!-- WorkItem Validation Errors -->
   <data name="WorkItem.TitleRequired" xml:space="preserve">
     <value>Tiêu đề công việc không được để trống.</value>
   </data>
@@ -468,7 +459,6 @@
   <data name="WorkItem.NotFound" xml:space="preserve">
     <value>Không tìm thấy công việc.</value>
   </data>
-  <!-- Stakeholder Errors -->
   <data name="Stakeholder.NotFound" xml:space="preserve">
     <value>Không tìm thấy stakeholder.</value>
   </data>
@@ -520,7 +510,6 @@
   <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Xóa stakeholder thành công.</value>
   </data>
-  <!-- Issue -->
   <data name="Issue.NotFound" xml:space="preserve">
     <value>Không tìm thấy issue.</value>
   </data>
@@ -548,5 +537,7 @@
   <data name="Issue.DeleteFailed" xml:space="preserve">
     <value>Xóa issue thất bại.</value>
   </data>
+  <data name="Projects.LogGetByIdError" xml:space="preserve">
+    <value>Error when get project by id {projectId}</value>
+  </data>
 </root>
-

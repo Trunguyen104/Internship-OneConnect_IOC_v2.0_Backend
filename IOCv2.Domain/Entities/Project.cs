@@ -15,6 +15,7 @@ namespace IOCv2.Domain.Entities
         // Navigation Properties
         public InternshipGroup InternshipGroup { get; set; }
         public List<ProjectResources> ProjectResources { get; set; } = new();
+        public virtual ICollection<Stakeholder> Stakeholders { get; set; } = new List<Stakeholder>();
         public Project(Guid internshipId, string projectName, string description)
         {
             ProjectId = Guid.NewGuid();

@@ -25,7 +25,7 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
         {
             // Check project exists
             var projectExists = await _unitOfWork.Repository<Project>()
-                .ExistsAsync(p => p.Id == request.ProjectId, cancellationToken);
+                .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (!projectExists)
                 return Result<CreateStakeholderResponse>.NotFound(

@@ -52,7 +52,7 @@ namespace IOCv2.API.Controllers.Projects
             return HandleResult(result);
         }
 
-        [HttpGet("{resourceId}/ProjectResourceById")]
+        [HttpGet("{resourceId}")]
         [ProducesResponseType(typeof(Result<GetProjectResourceByIdResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -67,7 +67,7 @@ namespace IOCv2.API.Controllers.Projects
         }
 
 
-        [HttpPut("{resourceId}/update")]
+        [HttpPut("{resourceId}")]
         [ProducesResponseType(typeof(Result<UpdateProjectResourceResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -90,7 +90,7 @@ namespace IOCv2.API.Controllers.Projects
         }
 
 
-        [HttpDelete("{resourceId}/delete")]
+        [HttpDelete("{resourceId}")]
         [ProducesResponseType(typeof(Result<DeleteProjectResourceResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
