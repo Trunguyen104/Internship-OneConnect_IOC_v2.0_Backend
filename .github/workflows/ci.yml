@@ -35,7 +35,6 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build & Push Image
-        if: github.event_name == 'push'
         run: |
           docker build -t trunguyen104/iocv2-backend:latest .
           docker push trunguyen104/iocv2-backend:latest
