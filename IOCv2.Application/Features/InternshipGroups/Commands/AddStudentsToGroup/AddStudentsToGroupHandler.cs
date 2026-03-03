@@ -37,6 +37,19 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
             // Lọc bỏ danh sách trùng lặp truyền vào từ Request JSON
             var distinctInputs = request.Students.GroupBy(s => s.StudentId).Select(g => g.First()).ToList();
 
+            // Validate xem các StudentId truyền vào có thực sự tồn tại trong hệ thống DB không
+            var inputStudentIds = distinctInputs.Select(x => x.StudentId).ToList();
+
+            var existingStudentIds = await _unitOfWork.Repository<Student>().Query()
+                .Where(s => inputStudentIds.Contains(s.StudentId))
+                .Select(s => s.StudentId)
+                .ToListAsync(cancellationToken);
+
+            if (existingStudentIds.Count != distinctInputs.Count)
+            {
+                return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.InvalidStudentId));
+            }
+
             foreach (var item in distinctInputs)
             {
                 // Kiểm tra xem Group này đã tồn tại StudentId đó ở List Navigation chưa. Nếu chưa mới cho Add
