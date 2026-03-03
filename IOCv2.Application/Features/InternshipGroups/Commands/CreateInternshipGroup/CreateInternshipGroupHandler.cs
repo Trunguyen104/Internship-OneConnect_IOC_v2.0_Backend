@@ -25,6 +25,36 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
 
         public async Task<Result<CreateInternshipGroupResponse>> Handle(CreateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
+            // Validate TermId
+            var termExists = await _unitOfWork.Repository<Term>()
+                .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
+            if (!termExists)
+            {
+                return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
+            }
+
+            // Validate EnterpriseId if provided
+            if (request.EnterpriseId.HasValue)
+            {
+                var enterpriseExists = await _unitOfWork.Repository<Enterprise>()
+                    .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
+                if (!enterpriseExists)
+                {
+                    return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
+                }
+            }
+
+            // Validate MentorId if provided
+            if (request.MentorId.HasValue)
+            {
+                var mentorExists = await _unitOfWork.Repository<User>() // Assuming Mentor is a User
+                    .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                if (!mentorExists)
+                {
+                    return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
+                }
+            }
+
             var newGroup = new InternshipGroup
             {
                 InternshipId = Guid.NewGuid(),
@@ -48,7 +78,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
 
                 foreach (var studentRef in distinctStudents)
                 {
-                    // (Optional) Có thể gọi .AnyAsync() để check xem StudentId có trong DB không nếu cần
+                    var studentExists = await _unitOfWork.Repository<User>() // Assuming Student is a User mapped entity or User itself
+                        .ExistsAsync(u => u.UserId == studentRef.StudentId, cancellationToken);
+
+                    if (!studentExists)
+                    {
+                        return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.StudentNotFound), ResultErrorType.NotFound);
+                    }
+
                     newGroup.Members.Add(new InternshipStudent
                     {
                         StudentId = studentRef.StudentId,
