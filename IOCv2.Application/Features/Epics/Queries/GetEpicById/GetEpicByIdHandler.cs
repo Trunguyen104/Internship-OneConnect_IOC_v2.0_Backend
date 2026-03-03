@@ -32,7 +32,7 @@ public class GetEpicByIdHandler : IRequestHandler<GetEpicByIdQuery, Result<GetEp
     public async Task<Result<GetEpicByIdResponse>> Handle(
         GetEpicByIdQuery request, CancellationToken cancellationToken)
     {
-        var cacheKey = EpicCacheKeys.Epic(request.EpicId);
+        var cacheKey = EpicCacheKeys.Epic(request.ProjectId, request.EpicId);
 
         var cachedResult = await _cacheService.GetAsync<GetEpicByIdResponse>(cacheKey, cancellationToken);
         if (cachedResult is not null)
@@ -40,7 +40,7 @@ public class GetEpicByIdHandler : IRequestHandler<GetEpicByIdQuery, Result<GetEp
 
         var epic = await _unitOfWork.Repository<WorkItem>().Query()
             .AsNoTracking()
-            .FirstOrDefaultAsync(w => w.WorkItemId == request.EpicId && w.Type == WorkItemType.Epic, cancellationToken);
+            .FirstOrDefaultAsync(w => w.WorkItemId == request.EpicId && w.ProjectId == request.ProjectId && w.Type == WorkItemType.Epic, cancellationToken);
 
         if (epic is null)
             return Result<GetEpicByIdResponse>.Failure(
