@@ -11,14 +11,32 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
 {
+    /// <summary>
+    /// Detailed response for a single logbook entry.
+    /// </summary>
     public class GetLogbookByIdResponse : IMapFrom<Logbook>
     {
+        /// <summary>
+        /// Logbook entry ID.
+        /// </summary>
         public Guid LogbookId { get; set; }
         public Guid ProjectId { get; set; }
         public required String StudentName { get; set; }
+        /// <summary>
+        /// Summary content.
+        /// </summary>
         public required string Summary { get; set; }
+        /// <summary>
+        /// Issues content.
+        /// </summary>
         public string? Issue { get; set; }
+        /// <summary>
+        /// Submission status.
+        /// </summary>
         public LogbookStatus Status { get; set; }
+        /// <summary>
+        /// Plans content.
+        /// </summary>
         public required string Plan { get; set; }
 
         public ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();

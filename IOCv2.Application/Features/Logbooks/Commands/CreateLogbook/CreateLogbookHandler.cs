@@ -33,97 +33,74 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 
         public async Task<Result<CreateLogbookResponse>> Handle(CreateLogbookCommand request, CancellationToken cancellationToken)
         {
-            //Validate current user
+            _logger.LogInformation("Starting logbook creation process for project {ProjectId} on date {DateReport}", request.ProjectId, request.DateReport);
+
+            // 1. Validate current user
             if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
             {
-                return Result<CreateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
-                    ResultErrorType.Unauthorized
-                );
+                var message = _messageService.GetMessage(MessageKeys.Users.InvalidAuditor);
+                _logger.LogWarning("Invalid auditor ID: {UserId}", _currentUserService.UserId);
+                return Result<CreateLogbookResponse>.Failure(message, ResultErrorType.Unauthorized);
             }
 
-            //Validate project exists
+            // 2. Validate project exists
             var projectExists = await _unitOfWork.Repository<Project>()
-              .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
-
-            if(!projectExists)
+                .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
+            if (!projectExists)
             {
-               return Result<CreateLogbookResponse>.Failure(
-                   _messageService.GetMessage(MessageKeys.Projects.NotFound),
-                   ResultErrorType.BadRequest
-               );
+                var message = _messageService.GetMessage(MessageKeys.Projects.NotFound);
+                _logger.LogWarning("Project {ProjectId} not found", request.ProjectId);
+                return Result<CreateLogbookResponse>.Failure(message, ResultErrorType.BadRequest);
             }
 
-            //Validate student from current logged in user (from JWT Token)
+            // 3. Validate student record
             var student = (await _unitOfWork.Repository<Student>()
                     .FindAsync(s => s.UserId == auditorId, cancellationToken)).FirstOrDefault();
-
             if (student == null)
             {
+                _logger.LogWarning("Student record not found for user {UserId}", auditorId);
                 return Result<CreateLogbookResponse>.Failure(
                     $"Student record not found for logged in user {auditorId}. Ensure you are logged in with a Student account.",
                     ResultErrorType.Unauthorized
                 );
             }
 
+            // 4. Create entity via Domain Factory (Architecture: FFA-CAG)
+            var logbook = Logbook.Create(
+                request.ProjectId,
+                student.StudentId,
+                request.Summary,
+                request.Issue,
+                request.Plan,
+                request.DateReport);
+
+            // 5. Transaction & Writing (FF-TXG)
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            
+            await _unitOfWork.Repository<Logbook>().AddAsync(logbook, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            try
+            // Audit
+            var auditLog = new AuditLog
             {
-                //map request to logbook entity
-                var logbook = _mapper.Map<Logbook>(request);
-                logbook.LogbookId = Guid.NewGuid();
-                logbook.StudentId = student.StudentId;
-                logbook.CreatedAt = DateTime.UtcNow;
-                logbook.DateReport = request.DateReport;
+                AuditLogId = Guid.NewGuid(),
+                Action = AuditAction.Create,
+                EntityType = nameof(Logbook),
+                EntityId = logbook.LogbookId,
+                PerformedById = auditorId,
+                Reason = $"Created logbook for project {logbook.ProjectId}",
+                CreatedAt = DateTime.UtcNow
+            };
+            await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                //determine logbook status based on report date and creation date
-                if (logbook.DateReport.Date == logbook.CreatedAt.Date)
-                {
-                    logbook.Status = LogbookStatus.PUNCTUAL;
-                }
-                else
-                {
-                    logbook.Status = LogbookStatus.LATE;
-                }
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            
+            _logger.LogInformation("Logbook {LogbookId} created successfully for student {StudentId}", logbook.LogbookId, student.StudentId);
 
-                await _unitOfWork.Repository<Logbook>()
-                    .AddAsync(logbook, cancellationToken);
-
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-                //create audit log for logbook creation
-                var auditLog = new AuditLog
-                {
-                    AuditLogId = Guid.NewGuid(),
-                    Action = AuditAction.Create,
-                    EntityType = nameof(Logbook),
-                    EntityId = logbook.LogbookId,
-                    PerformedById = auditorId,
-                    Reason = $"Created logbook for project {logbook.ProjectId}",
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                await _unitOfWork.Repository<AuditLog>()
-                    .AddAsync(auditLog, cancellationToken);
-
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
-                await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-                var response = _mapper.Map<CreateLogbookResponse>(logbook);
-                return Result<CreateLogbookResponse>.Success(response);
-            }
-            catch (Exception ex)
-            {
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-
-                _logger.LogError(ex, "Error creating logbook");
-
-                return Result<CreateLogbookResponse>.Failure(
-                    ex.InnerException?.Message ?? ex.Message,
-                    ResultErrorType.BadRequest
-                );
-            }
+            // 6. Return response
+            var response = _mapper.Map<CreateLogbookResponse>(logbook);
+            return Result<CreateLogbookResponse>.Success(response);
         }
     }
 }
