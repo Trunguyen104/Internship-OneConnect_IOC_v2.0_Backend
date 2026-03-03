@@ -11,9 +11,9 @@ namespace IOCv2.Domain.Entities
     {
         public Guid ProjectResourceId { get; set; }
         public Guid ProjectId { get; set; }
-        public string ResourceName { get; set; } = string.Empty;
+        public string? ResourceName { get; set; }
         public FileType ResourceType { get; set; }
-        public string ResourceUrl { get; set; } = string.Empty;
+        public string ResourceUrl { get; set; }
         public virtual Project Project { get; set; } = null!;
         public ProjectResources()
         { }

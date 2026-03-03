@@ -23,7 +23,7 @@ public class MoveWorkItemToSprintHandler
         MoveWorkItemToSprintCommand request, CancellationToken cancellationToken)
     {
         var workItemExists = await _unitOfWork.Repository<WorkItem>()
-            .ExistsAsync(w => w.WorkItemId == request.WorkItemId, cancellationToken);
+            .ExistsAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
         if (!workItemExists)
             return Result<MoveWorkItemToSprintResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.WorkItem.NotFound), ResultErrorType.NotFound);

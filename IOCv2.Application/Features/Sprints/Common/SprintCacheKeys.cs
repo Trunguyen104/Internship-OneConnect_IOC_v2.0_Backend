@@ -9,9 +9,9 @@ public static class SprintCacheKeys
     private const string SprintListPrefix = "sprints";
     
     /// <summary>
-    /// Cache key for single sprint: sprint:{id}
+    /// Cache key for single sprint: sprint:project:{projectId}:{sprintId}
     /// </summary>
-    public static string Sprint(Guid sprintId) => $"{SprintPrefix}:{sprintId}";
+    public static string Sprint(Guid projectId, Guid sprintId) => $"{SprintPrefix}:project:{projectId}:{sprintId}";
     
     /// <summary>
     /// Cache key pattern for all sprints in a project: sprints:project:{projectId}:*

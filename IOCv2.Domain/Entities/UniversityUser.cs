@@ -9,5 +9,6 @@ namespace IOCv2.Domain.Entities
 
         public Guid UserId { get; set; }
         public virtual User User { get; set; } = null!;
+        public string? Position { get; set; }
     }
 }

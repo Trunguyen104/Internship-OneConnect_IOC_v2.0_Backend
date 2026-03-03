@@ -3,4 +3,4 @@ using MediatR;
 
 namespace IOCv2.Application.Features.WorkItems.Queries.GetWorkItemById;
 
-public record GetWorkItemByIdQuery(Guid WorkItemId) : IRequest<Result<GetWorkItemByIdResponse>>;
+public record GetWorkItemByIdQuery(Guid ProjectId, Guid WorkItemId) : IRequest<Result<GetWorkItemByIdResponse>>;
