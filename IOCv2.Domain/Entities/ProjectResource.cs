@@ -13,7 +13,7 @@ namespace IOCv2.Domain.Entities
         public Guid ProjectId { get; set; }
         public string? ResourceName { get; set; }
         public FileType ResourceType { get; set; }
-        public string ResourceUrl { get; set; }
+        public string ResourceUrl { get; set; } = null!;
         public virtual Project Project { get; set; } = null!;
         public ProjectResources()
         { }
