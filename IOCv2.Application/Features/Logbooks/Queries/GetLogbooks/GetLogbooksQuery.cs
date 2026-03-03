@@ -9,16 +9,39 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 {
+    /// <summary>
+    /// Query to get paginated logbooks for a project.
+    /// </summary>
     public record GetLogbooksQuery : IRequest<Result<PaginatedResult<GetLogbooksResponse>>>
     {
-        [Microsoft.AspNetCore.Mvc.ModelBinding.BindNever]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public Guid ProjectId { get; set; }
+        /// <summary>
+        /// Project ID from route.
+        /// </summary>
+        public Guid ProjectId { get; init; }
+
+        /// <summary>
+        /// Optional status filter.
+        /// </summary>
         public string? Status { get; init; }
+
+        /// <summary>
+        /// Page number (default 1).
+        /// </summary>
         public int PageNumber { get; init; } = 1;
+
+        /// <summary>
+        /// Items per page (default 10).
+        /// </summary>
         public int PageSize { get; init; } = 10;
 
+        /// <summary>
+        /// Column to sort by.
+        /// </summary>
         public string? SortColumn { get; init; }
+
+        /// <summary>
+        /// Sort direction (asc/desc).
+        /// </summary>
         public string? SortOrder { get; init; } // "asc" or "desc"
     }
 }

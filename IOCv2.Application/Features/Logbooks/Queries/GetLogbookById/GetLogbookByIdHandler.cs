@@ -6,6 +6,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,34 +20,42 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
+        private readonly ILogger<GetLogbookByIdHandler> _logger;
 
         public GetLogbookByIdHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            IMessageService messageService)
+            IMessageService messageService,
+            ILogger<GetLogbookByIdHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
+            _logger = logger;
         }
 
         public async Task<Result<GetLogbookByIdResponse>> Handle(GetLogbookByIdQuery request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Fetching logbook details for LogbookId: {LogbookId}", request.LogbookId);
+
             var logbook = await _unitOfWork.Repository<Logbook>()
-            .Query()
-            .Include(x => x.Student!)
-                .ThenInclude(s => s.User!)
-            .Include(x => x.WorkItem)
-            .FirstOrDefaultAsync(x => x.LogbookId == request.LogbookId, cancellationToken);
+                .Query()
+                .AsNoTracking()
+                .Include(x => x.Student!)
+                    .ThenInclude(s => s.User!)
+                .Include(x => x.WorkItem)
+                .FirstOrDefaultAsync(x => x.LogbookId == request.LogbookId, cancellationToken);
 
             if (logbook == null)
             {
+                _logger.LogWarning("Logbook not found: {LogbookId}", request.LogbookId);
                 return Result<GetLogbookByIdResponse>.NotFound(
-                    _messageService.GetMessage(MessageKeys.Logbook.NotFound));
+                    _messageService.GetMessage(MessageKeys.Logbooks.NotFound));
             }
 
-            var response = _mapper.Map<GetLogbookByIdResponse>(logbook);
+            _logger.LogInformation("Successfully retrieved logbook {LogbookId}", request.LogbookId);
 
+            var response = _mapper.Map<GetLogbookByIdResponse>(logbook);
             return Result<GetLogbookByIdResponse>.Success(response);
         }
     }

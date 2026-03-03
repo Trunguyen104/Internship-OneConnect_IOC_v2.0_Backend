@@ -10,13 +10,39 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
+    /// <summary>
+    /// Command to update an existing logbook entry.
+    /// </summary>
     public record UpdateLogbookCommand : IRequest<Result<UpdateLogbookResponse>>
     {
+        /// <summary>
+        /// ID of the logbook to update.
+        /// </summary>
         public Guid LogbookId { get; set; }
+
+        /// <summary>
+        /// Updated summary of activities.
+        /// </summary>
         public required string Summary { get; set; }
+
+        /// <summary>
+        /// Updated issues description.
+        /// </summary>
         public string? Issue { get; set; }
+
+        /// <summary>
+        /// Updated plans for the next period.
+        /// </summary>
         public required string Plan { get; set; }
+
+        /// <summary>
+        /// Updated date report covers.
+        /// </summary>
         public DateTime DateReport { get; set; }
+
+        /// <summary>
+        /// Status of the logbook (Punctual/Late).
+        /// </summary>
         public LogbookStatus Status { get; set; }
     }
 }

@@ -177,14 +177,14 @@
             public const string InternshipIdRequired = "Internships.InternshipIdRequired";  
         }
 
-        public static class Logbook
+        public static class Logbooks
         {
-            public const string NotFound = "Logbook.NotFound";
-            public const string InvalidInternship = "Logbook.InvalidInternship";
-            public const string CreationFailed = "Logbook.CreationFailed";
-            public const string UpdateFailed = "Logbook.UpdateFailed";
-            public const string DeleteFailed = "Logbook.DeleteFailed";
-            public const string AlreadyReported = "Logbook.AlreadyReported";
+            public const string NotFound = "Logbooks.NotFound";
+            public const string InvalidInternship = "Logbooks.InvalidInternship";
+            public const string CreationFailed = "Logbooks.CreationFailed";
+            public const string UpdateFailed = "Logbooks.UpdateFailed";
+            public const string DeleteFailed = "Logbooks.DeleteFailed";
+            public const string AlreadyReported = "Logbooks.AlreadyReported";
         }
 
         public static class Page {
