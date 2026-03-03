@@ -13,8 +13,6 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
     public record UpdateLogbookCommand : IRequest<Result<UpdateLogbookResponse>>
     {
         public Guid LogbookId { get; set; }
-        public Guid InternshipId { get; set; }
-        public Guid StudentId { get; set; }
         public required string Summary { get; set; }
         public string? Issue { get; set; }
         public required string Plan { get; set; }

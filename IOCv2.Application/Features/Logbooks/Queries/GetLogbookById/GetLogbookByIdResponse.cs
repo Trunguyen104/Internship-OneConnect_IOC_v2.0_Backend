@@ -14,7 +14,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
     public class GetLogbookByIdResponse : IMapFrom<Logbook>
     {
         public Guid LogbookId { get; set; }
-        public Guid InternshipId { get; set; }
+        public Guid ProjectId { get; set; }
         public required String StudentName { get; set; }
         public required string Summary { get; set; }
         public string? Issue { get; set; }

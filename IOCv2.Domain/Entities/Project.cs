@@ -18,6 +18,7 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<Stakeholder> Stakeholders { get; set; } = new List<Stakeholder>();
         public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
         public virtual ICollection<Sprint> Sprints { get; set; } = new List<Sprint>();
+        public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
 
         public Project() { }
 
