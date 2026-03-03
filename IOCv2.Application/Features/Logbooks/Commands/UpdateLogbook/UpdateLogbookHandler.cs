@@ -43,27 +43,15 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                 );
             }
 
-            //Validate internship exists
-            var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
-              .ExistsAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
+            //Fetch existing logbook
+            var logbook = (await _unitOfWork.Repository<Logbook>()
+                    .FindAsync(l => l.LogbookId == request.LogbookId, cancellationToken)).FirstOrDefault();
 
-            if (!internshipExists)
+            if (logbook == null)
             {
                 return Result<UpdateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Logbook.InvalidInternship),
-                    ResultErrorType.BadRequest
-                );
-            }
-
-            //Validate student is existing
-            var isStudentExist = await _unitOfWork.Repository<Student>()
-                    .ExistsAsync(s => s.StudentId == request.StudentId, cancellationToken);
-
-            if (!isStudentExist)
-            {
-                return Result<UpdateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Users.NotFound),
-                    ResultErrorType.BadRequest
+                    _messageService.GetMessage(MessageKeys.Logbook.NotFound),
+                    ResultErrorType.NotFound
                 );
             }
 
@@ -71,11 +59,13 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 
             try
             {
-                //map request to logbook entity
-                var logbook = _mapper.Map<Logbook>(request);
-                logbook.LogbookId = Guid.NewGuid();
-                logbook.UpdatedAt = DateTime.UtcNow;
+                //update logbook entity
+                logbook.Summary = request.Summary;
+                logbook.Issue = request.Issue;
+                logbook.Plan = request.Plan;
+                logbook.Status = request.Status;
                 logbook.DateReport = request.DateReport;
+                logbook.UpdatedAt = DateTime.UtcNow;
 
                 //determine logbook status based on report date and creation date
                 if (logbook.DateReport.Date == logbook.CreatedAt.Date)
@@ -88,7 +78,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                 }
 
                 await _unitOfWork.Repository<Logbook>()
-                    .AddAsync(logbook, cancellationToken);
+                    .UpdateAsync(logbook, cancellationToken);
 
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
@@ -100,7 +90,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                     EntityType = nameof(Logbook),
                     EntityId = logbook.LogbookId,
                     PerformedById = auditorId,
-                    Reason = $"Created logbook for internship {logbook.InternshipId}",
+                    Reason = $"Updated logbook for project {logbook.ProjectId}",
                     CreatedAt = DateTime.UtcNow
                 };
 

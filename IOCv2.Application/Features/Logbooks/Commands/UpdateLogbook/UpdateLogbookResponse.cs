@@ -8,8 +8,6 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
     public class UpdateLogbookResponse : IMapFrom<Logbook>
     {
         public Guid LogbookId { get; set; }
-        public Guid InternshipId { get; set; }
-        public Guid StudentId { get; set; }
         public required string Summary { get; set; }
         public LogbookStatus Status { get; set; }
         public string? Plan { get; set; }
@@ -18,9 +16,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Logbook, UpdateLogbook.UpdateLogbookResponse>()
-                .ForMember(dest => dest.StudentId,
-                    opt => opt.MapFrom(src => src.StudentId));
+            profile.CreateMap<Logbook, UpdateLogbook.UpdateLogbookResponse>();
         }
     }
 }

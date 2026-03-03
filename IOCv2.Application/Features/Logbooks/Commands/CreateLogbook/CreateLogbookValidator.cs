@@ -4,17 +4,13 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 {
-    internal class UpdateLogbookValidator : AbstractValidator<CreateLogbookCommand>
+    public class CreateLogbookValidator : AbstractValidator<CreateLogbookCommand>
     {
-        public UpdateLogbookValidator() 
+        public CreateLogbookValidator() 
         {
-            RuleFor(x => x.InternshipId)
+            RuleFor(x => x.ProjectId)
                 .NotEmpty()
-                .WithMessage("InternshipId is required.");
-
-            RuleFor(x => x.StudentId)
-                .NotEmpty()
-                .WithMessage("StudentId is required.");
+                .WithMessage("ProjectId is required.");
 
             RuleFor(x => x.Summary)
                 .NotEmpty()

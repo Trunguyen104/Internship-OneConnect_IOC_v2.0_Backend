@@ -11,7 +11,9 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 {
     public record GetLogbooksQuery : IRequest<Result<PaginatedResult<GetLogbooksResponse>>>
     {
-        public required Guid InternshipId { get; init; }
+        [Microsoft.AspNetCore.Mvc.ModelBinding.BindNever]
+        [System.Text.Json.Serialization.JsonIgnore]
+        public Guid ProjectId { get; set; }
         public string? Status { get; init; }
         public int PageNumber { get; init; } = 1;
         public int PageSize { get; init; } = 10;

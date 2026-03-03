@@ -34,7 +34,8 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
                         .Query()
                         .Include(x => x.Student!)
                             .ThenInclude(s => s.User!)
-                        .Include(x => x.InternshipGroup)
+                        .Include(x => x.Project)
+                        .Where(x => x.ProjectId == request.ProjectId)
                         .AsQueryable();
 
             // Filter by status

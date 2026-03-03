@@ -363,15 +363,14 @@ namespace IOCv2.Infrastructure.Persistence
         {
             if (!await _context.Logbooks.AnyAsync())
             {
-                var group = await _context.InternshipGroups.FirstAsync();
+                var project = await _context.Projects.FirstAsync();
                 var student = await _context.Students.FirstAsync();
 
                 _context.Logbooks.Add(new Logbook
                 {
                     LogbookId = Guid.NewGuid(),
-                    InternshipId = group.InternshipId,
+                    ProjectId = project.ProjectId,
                     StudentId = student.StudentId,
-                    Content = "Weekly report: Finished login UI and integrated with API.",
                     Summary = "Finished login UI and integrated with API.",
                     Plan = "Continue project development.",
                     DateReport = DateTime.UtcNow,

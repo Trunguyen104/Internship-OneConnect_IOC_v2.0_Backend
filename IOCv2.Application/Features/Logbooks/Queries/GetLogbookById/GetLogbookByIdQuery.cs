@@ -10,6 +10,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
 {
     public class GetLogbookByIdQuery : IRequest<Result<GetLogbookByIdResponse>>
     {
+        public Guid ProjectId { get; set; }
         public Guid LogbookId { get; set; }
     }
 }

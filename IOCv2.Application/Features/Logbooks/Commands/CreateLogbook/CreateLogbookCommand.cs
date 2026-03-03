@@ -8,12 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using IOCv2.Application.Extensions.Mappings;
+
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 {
-    public record CreateLogbookCommand : IRequest<Result<CreateLogbookResponse>>
+    public record CreateLogbookCommand : IRequest<Result<CreateLogbookResponse>>, IMapFrom<Logbook>
     {
-        public Guid InternshipId { get; set; }
-        public Guid StudentId { get; set; }
+        public Guid ProjectId { get; set; }
         public required string Summary { get; set; }
         public string? Issue { get; set; }
         public required string Plan { get; set; }

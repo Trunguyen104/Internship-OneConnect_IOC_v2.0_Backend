@@ -13,7 +13,6 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
     public class DeleteLogbookResponse
     {
         public Guid LogbookId { get; set; }
-        public Guid InternshipId { get; set; }
         public Guid StudentId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
