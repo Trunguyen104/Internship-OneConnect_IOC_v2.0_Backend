@@ -145,8 +145,8 @@ public class ProjectsController : ApiControllerBase
         [FromBody] UpdateProjectCommand command,
         CancellationToken cancellationToken)
     {
-        command.ProjectId = projectId;cd 
-        
+        command.ProjectId = projectId;
+
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
