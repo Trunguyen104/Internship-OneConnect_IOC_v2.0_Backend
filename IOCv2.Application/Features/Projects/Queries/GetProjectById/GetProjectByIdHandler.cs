@@ -28,25 +28,24 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         }
         public async Task<Result<GetProjectByIdResponse>> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
         {
-            try {
-                var project = await _unitOfWork.Repository<Domain.Entities.Project>()
-                    .Query()
-                    .Include(x => x.ProjectResources)
-                    .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
-                if (project == null)
-                {
-                    return Result<GetProjectByIdResponse>.Failure(
-                        _message.GetMessage(MessageKeys.Projects.NotFound, request.ProjectId),
-                        ResultErrorType.NotFound);
-                }
-                var response = _mapper.Map<GetProjectByIdResponse>(project);
-                return Result<GetProjectByIdResponse>.Success(response);
-            } catch (Exception ex) {
-                _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogGetByIdError), request.ProjectId);
+            _logger.LogInformation("Retrieving project by ID: {ProjectId}", request.ProjectId);
+
+            var project = await _unitOfWork.Repository<Domain.Entities.Project>()
+                .Query()
+                .Include(x => x.ProjectResources)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
+
+            if (project == null)
+            {
+                _logger.LogWarning("Project not found: {ProjectId}", request.ProjectId);
                 return Result<GetProjectByIdResponse>.Failure(
-                    _message.GetMessage(MessageKeys.Projects.LogGetByIdError, request.ProjectId),
-                    ResultErrorType.BadRequest);
+                    _message.GetMessage(MessageKeys.Projects.NotFound),
+                    ResultErrorType.NotFound);
             }
+
+            var response = _mapper.Map<GetProjectByIdResponse>(project);
+            return Result<GetProjectByIdResponse>.Success(response);
         }
     }
 }

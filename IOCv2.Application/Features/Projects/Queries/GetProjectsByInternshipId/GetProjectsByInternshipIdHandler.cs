@@ -32,14 +32,18 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
 
         public async Task<Result<PaginatedResult<GetProjectsByInternshipIdResponse>>> Handle(GetProjectsByInternshipIdQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-                // Check if the internship exists
-                var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
+            _logger.LogInformation("Retrieving projects for Internship: {InternshipId}", request.InternshipId);
+
+            // Check if the internship exists
+            var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
                 .ExistsAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
-                if (!internshipExists) { _logger.LogWarning(_messageService.GetMessage(MessageKeys.Internships.NotFound), request.InternshipId);
-                    return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
-                        _messageService.GetMessage(MessageKeys.Internships.NotFound, request.InternshipId), ResultErrorType.NotFound); }
+            
+            if (!internshipExists) 
+            { 
+                _logger.LogWarning("Internship not found: {InternshipId}", request.InternshipId);
+                return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
+                    _messageService.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound); 
+            }
 
                 // Base query
                 var query = _unitOfWork.Repository<Project>().Query()
@@ -66,20 +70,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
                 // Apply pagination and project to response
                 var items = await query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize)
                 .ProjectTo<GetProjectsByInternshipIdResponse>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
-
-                // Create paginated result
-                var result = PaginatedResult<GetProjectsByInternshipIdResponse>.Create( items, totalCount, request.PageNumber, request.PageSize);
-
-                _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetByInternshipIdSuccess),
-               items.Count, request.InternshipId);
+                var result = PaginatedResult<GetProjectsByInternshipIdResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
+                
+                _logger.LogInformation("Successfully retrieved {Count} projects for Internship {InternshipId}", items.Count, request.InternshipId);
 
                 return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Success(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.LogGetByInternshipIdErr), request.InternshipId);
-                return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(_messageService.GetMessage(MessageKeys.Projects.LogGetByInternshipIdErr, request.InternshipId), ResultErrorType.BadRequest);
-            }
         }
 
         private IQueryable<Project> ApplySorting(IQueryable<Project> query, string? sortColumn, string? sortOrder)
