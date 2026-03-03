@@ -32,7 +32,7 @@ public class UpdateEpicHandler : IRequestHandler<UpdateEpicCommand, Result<Updat
         UpdateEpicCommand request, CancellationToken cancellationToken)
     {
         var epics = await _unitOfWork.Repository<WorkItem>()
-            .FindAsync(w => w.WorkItemId == request.EpicId && w.Type == WorkItemType.Epic, cancellationToken);
+            .FindAsync(w => w.WorkItemId == request.EpicId && w.ProjectId == request.ProjectId && w.Type == WorkItemType.Epic, cancellationToken);
         var epic = epics.FirstOrDefault();
 
         if (epic is null)
@@ -46,7 +46,7 @@ public class UpdateEpicHandler : IRequestHandler<UpdateEpicCommand, Result<Updat
         await _unitOfWork.Repository<WorkItem>().UpdateAsync(epic, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-        await _cacheService.RemoveAsync(EpicCacheKeys.Epic(request.EpicId), cancellationToken);
+        await _cacheService.RemoveAsync(EpicCacheKeys.Epic(epic.ProjectId, request.EpicId), cancellationToken);
         await _cacheService.RemoveByPatternAsync(
             EpicCacheKeys.EpicListPattern(epic.ProjectId), cancellationToken);
 

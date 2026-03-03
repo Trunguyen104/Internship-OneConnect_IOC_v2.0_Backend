@@ -3,4 +3,4 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Epics.Commands.DeleteEpic;
 
-public record DeleteEpicCommand(Guid EpicId) : IRequest<Result<bool>>;
+public record DeleteEpicCommand(Guid ProjectId, Guid EpicId) : IRequest<Result<DeleteEpicResponse>>;

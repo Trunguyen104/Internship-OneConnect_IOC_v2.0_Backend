@@ -115,7 +115,7 @@ public class AuthController : ApiControllerBase
     /// </summary>
     [HttpPost("passwords/reset-request")]
     [RateLimit(maxRequests: 3, windowMinutes: 10, blockMinutes: 10)]
-    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<string>), StatusCodes.Status200OK)]
     public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetCommand command)
     {
         var result = await _mediator.Send(command);
@@ -126,7 +126,7 @@ public class AuthController : ApiControllerBase
     /// Reset the user's password using a valid reset token received via email.
     /// </summary>
     [HttpPost("passwords/reset")]
-    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<string>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
         var result = await _mediator.Send(command);

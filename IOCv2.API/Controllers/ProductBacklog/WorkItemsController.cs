@@ -69,7 +69,7 @@ public class WorkItemsController : ApiControllerBase
         [FromRoute] Guid workItemId,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetWorkItemByIdQuery(workItemId), cancellationToken);
+        var result = await _mediator.Send(new GetWorkItemByIdQuery(projectId, workItemId), cancellationToken);
         return HandleResult(result);
     }
 
@@ -104,7 +104,7 @@ public class WorkItemsController : ApiControllerBase
         [FromBody] UpdateWorkItemCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { WorkItemId = workItemId }, cancellationToken);
+        var result = await _mediator.Send(command with { WorkItemId = workItemId, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -121,7 +121,7 @@ public class WorkItemsController : ApiControllerBase
         [FromRoute] Guid workItemId,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new DeleteWorkItemCommand { WorkItemId = workItemId }, cancellationToken);
+        var result = await _mediator.Send(new DeleteWorkItemCommand { WorkItemId = workItemId, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -140,7 +140,7 @@ public class WorkItemsController : ApiControllerBase
         [FromBody] MoveWorkItemToSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { WorkItemId = workItemId }, cancellationToken);
+        var result = await _mediator.Send(command with { WorkItemId = workItemId, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -159,7 +159,7 @@ public class WorkItemsController : ApiControllerBase
         [FromBody] MoveWorkItemToBacklogCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { WorkItemId = workItemId }, cancellationToken);
+        var result = await _mediator.Send(command with { WorkItemId = workItemId, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 }

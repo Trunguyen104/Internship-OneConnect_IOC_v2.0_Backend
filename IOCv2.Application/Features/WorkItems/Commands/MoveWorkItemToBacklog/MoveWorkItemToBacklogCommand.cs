@@ -7,6 +7,9 @@ namespace IOCv2.Application.Features.WorkItems.Commands.MoveWorkItemToBacklog;
 public record MoveWorkItemToBacklogCommand : IRequest<Result<MoveWorkItemToBacklogResponse>>
 {
     [JsonIgnore]
+    public Guid ProjectId { get; init; }
+
+    [JsonIgnore]
     public Guid WorkItemId { get; init; }
 
     /// <summary>WorkItemId của item đứng trước vị trí mới trong Product Backlog. Null = đặt lên đầu.</summary>
