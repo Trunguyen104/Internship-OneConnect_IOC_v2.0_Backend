@@ -148,6 +148,7 @@
             public const string EndDateInvalidRange = "Projects.EndDateInvalidRange";
             public const string LogGetByInternshipIdSuccess = "Projects.LogGetByInternshipIdSuccess";
             public const string LogGetByInternshipIdErr = "Projects.LogGetByInternshipIdErr";
+            public const string LogGetByIdError = "Projects.LogGetByIdError";
         }
 
         public static class ProjectResourcesKey

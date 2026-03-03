@@ -135,8 +135,6 @@
   <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Kích thước trang không được vượt quá 100.</value>
   </data>
-  
-  <!-- Validation Errors -->
   <data name="InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid.</value>
   </data>
@@ -257,7 +255,6 @@
   <data name="Common.NotFound" xml:space="preserve">
     <value>Không tìm thấy bản ghi tương ứng.</value>
   </data>
-  <!-- Internship Group Errors -->
   <data name="InternshipGroup.NameRequired" xml:space="preserve">
     <value>Tên nhóm không được để trống.</value>
   </data>
@@ -277,94 +274,89 @@
     <value>Danh sách sinh viên cần xóa không được trống.</value>
   </data>
   <data name="Projects.LogDeleteError" xml:space="preserve">
-    <value>Error deleting project {ProjectId}</value>
+    <value>Lỗi khi xóa dự án {0}</value>
   </data>
   <data name="ProjectResources.ProjectIdRequired" xml:space="preserve">
-    <value>Project Resource ID is required</value>
+    <value>Mã định danh tài nguyên dự án (Project Resource ID) là bắt buộc.</value>
   </data>
   <data name="ProjectResources.ResourceNameMaxLength" xml:space="preserve">
-    <value>Resource name cannot exceed 500 characters</value>
+    <value>Tên tài nguyên không được vượt quá 500 ký tự.</value>
   </data>
   <data name="Projects.ProjectIdRequired" xml:space="preserve">
-    <value>Project ID is required</value>
+    <value>ID dự án là bắt buộc</value>
   </data>
   <data name="ProjectResources.LogNotFound" xml:space="preserve">
-    <value>Project resource with ID {ProjectResourceId} not found</value>
+    <value>Không tìm thấy tài nguyên dự án có ID {0}</value>
   </data>
   <data name="ProjectResources.NotFound" xml:space="preserve">
-    <value>Project Resource Not Found</value>
+    <value>Không tìm thấy tài nguyên dự án</value>
   </data>
   <data name="Projects.LogNotFound" xml:space="preserve">
-    <value>Project with ID {ProjectId} not found</value>
+    <value>Không tìm thấy dự án có ID {0}</value>
   </data>
   <data name="Projects.NotFound" xml:space="preserve">
-    <value>Project Not Found</value>
+    <value>Dự án không tìm thấy</value>
   </data>
   <data name="ProjectResources.LogUpdateError" xml:space="preserve">
-    <value>Error occurred while updating project resource with ID {ProjectResourceId}</value>
+    <value>Đã xảy ra lỗi khi cập nhật tài nguyên dự án có ID {0}</value>
   </data>
   <data name="ProjectResources.UpdateError" xml:space="preserve">
-    <value>An error occurred while updating the project resource.</value>
+    <value>Đã xảy ra lỗi trong quá trình cập nhật tài nguyên dự án.</value>
   </data>
   <data name="ProjectResources.LogUploadError" xml:space="preserve">
-    <value>Error uploading file to project {ProjectId}</value>
+    <value>Lỗi khi tải tệp lên dự án {0}</value>
   </data>
   <data name="ProjectResources.FileRequired" xml:space="preserve">
-    <value>File is required</value>
+    <value>Tập tin là bắt buộc</value>
   </data>
   <data name="ProjectResources.InvalidFileType" xml:space="preserve">
-    <value>Invalid file type. Allowed types: {0}</value>
+    <value>Loại tệp không hợp lệ. Các loại được cho phép: {0}</value>
   </data>
   <data name="ProjectResources.FileSizeExceeded" xml:space="preserve">
-    <value>File size exceeds maximum allowed</value>
+    <value>Kích thước tệp vượt quá kích thước tối đa cho phép.</value>
   </data>
   <data name="ProjectResources.GetAllError" xml:space="preserve">
-    <value>Error getting all project resources</value>
+    <value>Lỗi khi lấy tất cả tài nguyên dự án</value>
   </data>
   <data name="ProjectResources.GetByIdError" xml:space="preserve">
-    <value>Error getting project resource by ID: {ResourceId}</value>
+    <value>Lỗi khi truy xuất tài nguyên dự án theo ID: {0}</value>
   </data>
   <data name="Projects.ProjectNameExistsInternship" xml:space="preserve">
-    <value>Project name already exists for this internship</value>
+    <value>Tên dự án cho chương trình thực tập này đã tồn tại.</value>
   </data>
   <data name="Projects.LogCreateError" xml:space="preserve">
-    <value>Error creating project for internship {InternshipId}</value>
+    <value>Lỗi khi tạo dự án thực tập {0}</value>
   </data>
   <data name="Projects.InternshipIdRequired" xml:space="preserve">
-    <value>Internship ID is required.</value>
+    <value>Cần có mã số thực tập.</value>
   </data>
   <data name="Projects.ProjectNameRequired" xml:space="preserve">
-    <value>Project name is required.</value>
+    <value>Tên dự án là bắt buộc.</value>
   </data>
   <data name="Projects.ProjectNameMaxLength" xml:space="preserve">
-    <value>Project name cannot exceed 255 characters</value>
+    <value>Tên dự án không được vượt quá 255 ký tự.</value>
   </data>
   <data name="Projects.DescriptionMaxLength" xml:space="preserve">
-    <value>Description cannot exceed 2000 characters</value>
+    <value>Phần mô tả không được vượt quá 2000 ký tự.</value>
   </data>
   <data name="Projects.StartDateInvalidRange" xml:space="preserve">
-    <value>Start date must be less than or equal to end date</value>
+    <value>Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.</value>
   </data>
   <data name="Projects.EndDateInvalidRange" xml:space="preserve">
-    <value>End date must be greater than or equal to start date</value>
+    <value>Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.</value>
   </data>
   <data name="Projects.UpdateError" xml:space="preserve">
-    <value>Error updating project {ProjectId}</value>
+    <value>Lỗi khi cập nhật dự án {0}</value>
   </data>
   <data name="Projects.GetAllError" xml:space="preserve">
-    <value>Error getting all projects</value>
+    <value>Lỗi nhận tất cả các dự án</value>
   </data>
   <data name="Projects.GetByStudentIdError" xml:space="preserve">
-    <value>Error getting projects for student {StudentId}</value>
-  </data>
-  <data name="Projects.LogGetByInternshipIdErr" xml:space="preserve">
-    <value>Error occurred while getting projects by {internshipId}</value>
+    <value>Lỗi khi lấy dự án cho sinh viên {0}</value>
   </data>
   <data name="Internships.InternshipIdRequired" xml:space="preserve">
     <value>Internship ID is required.</value>
   </data>
-  
-  <!-- Epic Validation Errors -->
   <data name="Epic.ProjectIdRequired" xml:space="preserve">
     <value>ID dự án không được để trống.</value>
   </data>
@@ -386,8 +378,6 @@
   <data name="Epic.ProjectNotFound" xml:space="preserve">
     <value>Không tìm thấy dự án.</value>
   </data>
-  
-  <!-- Sprint Validation Errors -->
   <data name="Sprint.ProjectIdRequired" xml:space="preserve">
     <value>ID dự án không được để trống.</value>
   </data>
@@ -460,8 +450,6 @@
   <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
     <value>Sprint đích là bắt buộc khi chọn chuyển sang Sprint có sẵn.</value>
   </data>
-  
-  <!-- WorkItem Validation Errors -->
   <data name="WorkItem.TitleRequired" xml:space="preserve">
     <value>Tiêu đề công việc không được để trống.</value>
   </data>
@@ -486,7 +474,6 @@
   <data name="WorkItem.NotFound" xml:space="preserve">
     <value>Không tìm thấy công việc.</value>
   </data>
-  <!-- Stakeholder Errors -->
   <data name="Stakeholder.NotFound" xml:space="preserve">
     <value>Không tìm thấy stakeholder.</value>
   </data>
@@ -538,7 +525,6 @@
   <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Xóa stakeholder thành công.</value>
   </data>
-  <!-- Issue -->
   <data name="Issue.NotFound" xml:space="preserve">
     <value>Không tìm thấy issue.</value>
   </data>
@@ -566,5 +552,13 @@
   <data name="Issue.DeleteFailed" xml:space="preserve">
     <value>Xóa issue thất bại.</value>
   </data>
+  <data name="Projects.LogGetByIdError" xml:space="preserve">
+    <value>Lỗi khi lấy ID dự án: {0}</value>
+  </data>
+  <data name="Projects.LogGetByInternshipIdErr" xml:space="preserve">
+    <value>Lỗi khi lấy dự án theo ID thực tập: {0}</value>
+  </data>
+  <data name="Internships.NotFound" xml:space="preserve">
+    <value>Không tìm thấy Internship với ID: {0}</value>
+  </data>
 </root>
-
