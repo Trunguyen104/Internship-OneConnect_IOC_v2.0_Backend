@@ -121,6 +121,10 @@
             public const string StudentListRequired = "InternshipGroup.StudentListRequired";
             public const string StudentListToRemoveRequired = "InternshipGroup.StudentListToRemoveRequired";
             public const string InvalidStudentId = "InternshipGroup.InvalidStudentId";
+            public const string TermNotFound = "InternshipGroup.TermNotFound";
+            public const string EnterpriseNotFound = "InternshipGroup.EnterpriseNotFound";
+            public const string MentorNotFound = "InternshipGroup.MentorNotFound";
+            public const string StudentNotFound = "InternshipGroup.StudentNotFound";
         }
         public static class Projects
         {

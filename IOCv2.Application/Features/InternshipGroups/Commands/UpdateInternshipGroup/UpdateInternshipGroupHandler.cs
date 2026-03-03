@@ -32,6 +32,36 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 return Result<UpdateInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
             }
 
+            // Validate TermId
+            var termExists = await _unitOfWork.Repository<Term>()
+                .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
+            if (!termExists)
+            {
+                return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
+            }
+
+            // Validate EnterpriseId if provided
+            if (request.EnterpriseId.HasValue)
+            {
+                var enterpriseExists = await _unitOfWork.Repository<Enterprise>()
+                    .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
+                if (!enterpriseExists)
+                {
+                    return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
+                }
+            }
+
+            // Validate MentorId if provided
+            if (request.MentorId.HasValue)
+            {
+                var mentorExists = await _unitOfWork.Repository<User>()
+                    .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                if (!mentorExists)
+                {
+                    return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
+                }
+            }
+
             entity.TermId = request.TermId;
             entity.GroupName = request.GroupName;
             entity.EnterpriseId = request.EnterpriseId;
