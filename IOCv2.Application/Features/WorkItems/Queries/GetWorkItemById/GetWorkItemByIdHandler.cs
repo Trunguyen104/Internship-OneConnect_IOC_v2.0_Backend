@@ -29,7 +29,7 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
             .AsNoTracking()
             .Include(w => w.Assignee)
                 .ThenInclude(s => s!.User)
-            .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId, cancellationToken);
+            .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
 
         if (workItem is null)
         {

@@ -33,7 +33,7 @@ public class UpdateSprintHandler : IRequestHandler<UpdateSprintCommand, Result<U
         UpdateSprintCommand request, CancellationToken cancellationToken)
     {
         var sprint = await _unitOfWork.Repository<Sprint>().Query()
-            .FirstOrDefaultAsync(s => s.SprintId == request.SprintId, cancellationToken);
+            .FirstOrDefaultAsync(s => s.SprintId == request.SprintId && s.ProjectId == request.ProjectId, cancellationToken);
 
         if (sprint is null)
             return Result<UpdateSprintResponse>.Failure(
@@ -52,7 +52,7 @@ public class UpdateSprintHandler : IRequestHandler<UpdateSprintCommand, Result<U
         await _unitOfWork.Repository<Sprint>().UpdateAsync(sprint, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-        await _cacheService.RemoveAsync(SprintCacheKeys.Sprint(request.SprintId), cancellationToken);
+        await _cacheService.RemoveAsync(SprintCacheKeys.Sprint(sprint.ProjectId, request.SprintId), cancellationToken);
         await _cacheService.RemoveByPatternAsync(
             SprintCacheKeys.SprintListPattern(sprint.ProjectId), cancellationToken);
 

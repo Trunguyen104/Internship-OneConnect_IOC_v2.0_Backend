@@ -32,7 +32,7 @@ public class GetSprintByIdHandler : IRequestHandler<GetSprintByIdQuery, Result<G
     public async Task<Result<GetSprintByIdResponse>> Handle(
         GetSprintByIdQuery request, CancellationToken cancellationToken)
     {
-        var cacheKey = SprintCacheKeys.Sprint(request.SprintId);
+        var cacheKey = SprintCacheKeys.Sprint(request.ProjectId, request.SprintId);
 
         var cachedResult = await _cacheService.GetAsync<GetSprintByIdResponse>(cacheKey, cancellationToken);
         if (cachedResult is not null)
@@ -40,7 +40,7 @@ public class GetSprintByIdHandler : IRequestHandler<GetSprintByIdQuery, Result<G
 
         var sprint = await _unitOfWork.Repository<Sprint>().Query()
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.SprintId == request.SprintId, cancellationToken);
+            .FirstOrDefaultAsync(s => s.SprintId == request.SprintId && s.ProjectId == request.ProjectId, cancellationToken);
 
         if (sprint is null)
             return Result<GetSprintByIdResponse>.Failure(

@@ -216,17 +216,12 @@
   <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Dự án đã được cập nhật {ProjectId}</value>
   </data>
-  <data name="Internships.NotFound" xml:space="preserve">
-    <value>Internship not found: {0}</value>
-  </data>
   <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
     <value>Successfully retrieved {Count} projects for internship ID: {InternshipId}</value>
   </data>
   <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
     <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
-  
-  <!-- Epic Messages -->
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Tạo Epic thành công.</value>
   </data>
@@ -236,8 +231,6 @@
   <data name="Epic.DeletedSuccess" xml:space="preserve">
     <value>Xóa Epic thành công.</value>
   </data>
-  
-  <!-- Sprint Success Messages -->
   <data name="Sprint.CreatedSuccess" xml:space="preserve">
     <value>Tạo Sprint thành công.</value>
   </data>
@@ -253,7 +246,6 @@
   <data name="Sprint.CompletedSuccess" xml:space="preserve">
     <value>Sprint đã được hoàn thành thành công. {0} item đã hoàn thành, {1} item đã được di chuyển.</value>
   </data>
-  <!-- Stakeholder -->
   <data name="Stakeholder.CreateSuccess" xml:space="preserve">
     <value>Tạo stakeholder thành công.</value>
   </data>
@@ -263,7 +255,6 @@
   <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Xóa stakeholder thành công.</value>
   </data>
-  <!-- Issue -->
   <data name="Issue.CreateSuccess" xml:space="preserve">
     <value>Tạo issue thành công.</value>
   </data>

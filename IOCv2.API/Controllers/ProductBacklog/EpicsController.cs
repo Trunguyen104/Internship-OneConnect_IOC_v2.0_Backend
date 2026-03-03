@@ -53,7 +53,7 @@ public class EpicsController : ApiControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetEpicByIdQuery(id);
+        var query = new GetEpicByIdQuery(projectId, id);
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
@@ -90,7 +90,7 @@ public class EpicsController : ApiControllerBase
         [FromBody] UpdateEpicCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { EpicId = id }, cancellationToken);
+        var result = await _mediator.Send(command with { EpicId = id, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -98,7 +98,7 @@ public class EpicsController : ApiControllerBase
     /// Soft delete an Epic by ID.
     /// </summary>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<DeleteEpicResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
@@ -107,7 +107,7 @@ public class EpicsController : ApiControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteEpicCommand(id);
+        var command = new DeleteEpicCommand(projectId, id);
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }

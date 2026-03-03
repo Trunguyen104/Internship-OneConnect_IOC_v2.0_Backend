@@ -23,6 +23,11 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(e => e.EnterpriseId)
                 .HasColumnName("enterprise_id");
 
+            builder.Property(e => e.GroupName)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("group_name");
+
             builder.Property(e => e.MentorId)
                 .HasColumnName("mentor_id");
 

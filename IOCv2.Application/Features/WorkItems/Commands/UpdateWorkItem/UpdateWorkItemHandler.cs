@@ -27,7 +27,7 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
     {
         var workItem = await _unitOfWork.Repository<WorkItem>()
             .Query()
-            .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId, cancellationToken);
+            .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
 
         if (workItem is null)
             return Result<UpdateWorkItemResponse>.Failure(
