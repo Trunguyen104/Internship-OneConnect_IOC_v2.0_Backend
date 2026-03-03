@@ -1,8 +1,10 @@
-﻿namespace IOCv2.Domain.Enums
+namespace IOCv2.Domain.Enums;
+
+public enum LogbookStatus
 {
-    public enum LogbookStatus
-    {
-        PUNCTUAL = 1,
-        LATE = 2
-    }
+    SUBMITTED = 0,
+    APPROVED = 1,
+    NEEDS_REVISION = 2,
+    PUNCTUAL = 3,
+    LATE = 4
 }

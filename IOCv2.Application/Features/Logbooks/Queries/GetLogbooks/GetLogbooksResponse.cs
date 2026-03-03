@@ -19,7 +19,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
         {
             profile.CreateMap<Logbook, GetLogbooksResponse>()
                 .ForMember(dest => dest.StudentName,
-                    opt => opt.MapFrom(src => src.Student.User.FullName))
+                    opt => opt.MapFrom(src => src.Student != null && src.Student.User != null ? src.Student.User.FullName : "N/A"))
                 .ForMember(dest => dest.TotalWorkItems,
                     opt => opt.MapFrom(src => src.WorkItem.Count))
                 .ForMember(dest => dest.Status,

@@ -30,6 +30,12 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
                .HasColumnName("assignee_id")
                .IsRequired(false);
 
+        // Project relationship
+        builder.HasOne(w => w.Project)
+               .WithMany(p => p.WorkItems)
+               .HasForeignKey(w => w.ProjectId)
+               .OnDelete(DeleteBehavior.Cascade);
+
         // Self-referencing relationship
         builder.HasOne(w => w.Parent)
                .WithMany(w => w.Children)
@@ -118,9 +124,5 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
 
         // Global query filter for soft delete
         builder.HasQueryFilter(w => w.DeletedAt == null);
-
-        builder.HasMany(lb => lb.Logbook)
-                .WithMany(wi => wi.WorkItem)
-                .UsingEntity(j => j.ToTable("logbook_work_items")); ;
     }
 }

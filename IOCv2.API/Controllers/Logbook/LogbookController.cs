@@ -6,6 +6,7 @@ using IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook;
 using IOCv2.Application.Features.Logbooks.Queries.GetLogbookById;
 using IOCv2.Application.Features.Logbooks.Queries.GetLogbooks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers;

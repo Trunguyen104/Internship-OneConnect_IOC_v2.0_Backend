@@ -19,16 +19,22 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasIndex(uu => uu.UserId).IsUnique();
 
             builder.Property(uu => uu.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+            builder.Property(uu => uu.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamptz");
+            builder.Property(uu => uu.DeletedAt).HasColumnName("deleted_at").HasColumnType("timestamptz");
+            builder.Property(uu => uu.CreatedBy).HasColumnName("created_by");
+            builder.Property(uu => uu.UpdatedBy).HasColumnName("updated_by");
 
             builder.HasOne(uu => uu.University)
                 .WithMany(u => u.UniversityUsers)
                 .HasForeignKey(uu => uu.UniversityId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
 
             builder.HasOne(uu => uu.User)
                 .WithOne(u => u.UniversityUser)
                 .HasForeignKey<UniversityUser>(uu => uu.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
         }
     }
 }

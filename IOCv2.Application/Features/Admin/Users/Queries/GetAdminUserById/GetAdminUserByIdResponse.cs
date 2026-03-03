@@ -36,7 +36,7 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUserById
                 .ForMember(dest => dest.UnitType, opt => opt.MapFrom(src => 
                     src.UniversityUser != null ? "University" : 
                     src.EnterpriseUser != null ? "Enterprise" : "Internal"))
-                .ForMember(dest => dest.StudentClass, opt => opt.MapFrom(src => src.Student != null ? src.Student.Class : null))
+                .ForMember(dest => dest.StudentClass, opt => opt.MapFrom(src => src.Student != null ? src.Student.ClassName : null))
                 .ForMember(dest => dest.StudentMajor, opt => opt.MapFrom(src => src.Student != null ? src.Student.Major : null))
                 .ForMember(dest => dest.StudentGpa, opt => opt.MapFrom(src => src.Student != null ? src.Student.Gpa : (decimal?)null));
         }

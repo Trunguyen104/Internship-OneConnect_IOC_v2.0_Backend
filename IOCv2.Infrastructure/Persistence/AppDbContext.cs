@@ -30,14 +30,20 @@ public partial class AppDbContext : DbContext
     public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
 
     // Project Management
+    public DbSet<Term> Terms { get; set; } = null!;
+    public DbSet<StudentTerm> StudentTerms { get; set; } = null!;
+    public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
+    public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
+    public DbSet<InternshipApplication> InternshipApplications { get; set; } = null!;
+    public DbSet<Logbook> Logbooks { get; set; } = null!;
     public DbSet<Project> Projects { get; set; } = null!;
+    public DbSet<ProjectResources> ProjectResources { get; set; } = null!;
     public DbSet<WorkItem> WorkItems { get; set; } = null!;
     public DbSet<Sprint> Sprints { get; set; } = null!;
     public DbSet<SprintWorkItem> SprintWorkItems { get; set; } = null!;
     public DbSet<Domain.Entities.Stakeholder> Stakeholders { get; set; } = null!;
     public DbSet<StakeholderIssue> StakeholderIssues { get; set; } = null!;
-    public DbSet<Domain.Entities.Logbook> Logbooks { get; set; } = null!;
-
+    
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
@@ -46,7 +52,7 @@ public partial class AppDbContext : DbContext
         {
             currentUserId = parsedId;
         }
-
+        
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
             switch (entry.State)

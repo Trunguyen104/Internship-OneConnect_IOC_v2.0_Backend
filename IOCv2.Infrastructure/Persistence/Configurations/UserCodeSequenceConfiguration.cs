@@ -9,9 +9,17 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<UserCodeSequence> builder)
         {
+            builder.ToTable("user_code_sequences");
+
             builder.HasKey(x => x.Role);
 
+            builder.Property(x => x.Role)
+                .HasColumnName("role")
+                .HasConversion<short>()
+                .HasColumnType("smallint");
+
             builder.Property(x => x.CurrentNumber)
+                .HasColumnName("current_number")
                 .IsRequired();
         }
     }

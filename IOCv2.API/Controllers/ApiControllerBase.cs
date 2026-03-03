@@ -1,43 +1,58 @@
 ﻿using IOCv2.Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers
+namespace IOCv2.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public abstract class ApiControllerBase : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public abstract class ApiControllerBase : ControllerBase
+    protected IActionResult HandleResult<T>(Result<T> result)
     {
-        protected IActionResult HandleResult<T>(Result<T> result)
+        if (result == null) return BadRequest();
+
+        if (result.IsSuccess)
         {
-            if (result == null) return BadRequest();
+            if (result.Data == null) return NoContent();
 
-            if (result.IsSuccess)
+            if (result.HasWarning)
             {
-                if (result.Data == null) return NoContent();
-
-                if (result.HasWarning)
+                return Ok(new
                 {
-                    return Ok(new
-                    {
-                        data = result.Data,
-                        warning = result.Warning
-                    });
-                }
-
-                return Ok(new { data = result.Data });
+                    data = result.Data,
+                    warning = result.Warning
+                });
             }
 
-            var statusCode = result.ErrorType switch
-            {
-                ResultErrorType.NotFound => 404,
-                ResultErrorType.Unauthorized => 401,
-                ResultErrorType.Forbidden => 403,
-                ResultErrorType.Conflict => 409,
-                _ => 400
-            };
-
-            var response = new ErrorResponse(statusCode, result.Error ?? "An error occurred");
-            return StatusCode(statusCode, response);
+            return Ok(new { data = result.Data });
         }
+
+        return StatusCode(ResolveStatusCode(result), new ErrorResponse(ResolveStatusCode(result), result.Error ?? "An error occurred"));
     }
+
+    /// <summary>
+    /// Returns HTTP 201 Created on success. Use for POST creation actions.
+    /// </summary>
+    protected IActionResult HandleCreatedResult<T>(Result<T> result)
+    {
+        if (result == null) return BadRequest();
+
+        if (result.IsSuccess)
+        {
+            if (result.Data == null) return NoContent();
+            return StatusCode(StatusCodes.Status201Created, new { data = result.Data });
+        }
+
+        var code = ResolveStatusCode(result);
+        return StatusCode(code, new ErrorResponse(code, result.Error ?? "An error occurred"));
+    }
+
+    private static int ResolveStatusCode<T>(Result<T> result) => result.ErrorType switch
+    {
+        ResultErrorType.NotFound    => StatusCodes.Status404NotFound,
+        ResultErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+        ResultErrorType.Forbidden   => StatusCodes.Status403Forbidden,
+        ResultErrorType.Conflict    => StatusCodes.Status409Conflict,
+        _                           => StatusCodes.Status400BadRequest
+    };
 }

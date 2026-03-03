@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace IOCv2.Domain.Enums
 {
-    public enum InternshipStatus
+    public enum InternshipStatus : short
     {
-        REGISTERED = 1,
-        ONBOARDED = 2,
-        IN_PROGRESS = 3,
-        COMPLETED = 4,
-        FAILED = 5
+        Registered = 0,
+        Onboarded = 1,
+        InProgress = 2,
+        Completed = 3,
+        Failed = 4
     }
 }

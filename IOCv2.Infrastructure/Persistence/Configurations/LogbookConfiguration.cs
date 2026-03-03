@@ -1,70 +1,41 @@
-﻿using IOCv2.Domain.Entities;
+using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace IOCv2.Infrastructure.Persistence.Configurations
+namespace IOCv2.Infrastructure.Persistence.Configurations;
+
+public class LogbookConfiguration : IEntityTypeConfiguration<Logbook>
 {
-    public class LogbookConfiguration : IEntityTypeConfiguration<Logbook>
+    public void Configure(EntityTypeBuilder<Logbook> builder)
     {
-        public void Configure(EntityTypeBuilder<Logbook> builder)
-        {
-            builder.ToTable("logbooks");
-            builder.HasKey(lb => lb.LogbookId);
-            builder.Property(lb => lb.LogbookId).HasColumnName("logbook_id");
+        builder.ToTable("logbooks");
 
-            builder.Property(lb => lb.InternshipId)
-                .IsRequired()
-                .HasColumnName("internship_id");
+        builder.HasKey(x => x.LogbookId);
+        builder.Property(x => x.LogbookId).HasColumnName("logbook_id").ValueGeneratedOnAdd();
+        builder.Property(x => x.InternshipId).HasColumnName("internship_id");
+        builder.Property(x => x.StudentId).HasColumnName("student_id");
+        builder.Property(x => x.DateReport).HasColumnName("date_report");
+        builder.Property(x => x.Summary).HasColumnName("summary").HasColumnType("text");
+        builder.Property(x => x.Issue).HasColumnName("issue").HasColumnType("text");
+        builder.Property(x => x.Plan).HasColumnName("plan").HasColumnType("text");
+        builder.Property(x => x.Content).HasColumnName("content").HasColumnType("text");
+        
+        builder.Property(x => x.Status)
+            .HasColumnName("status")
+            .HasConversion<short>()
+            .HasColumnType("smallint");
 
-            builder.Property(lb => lb.StudentId)
-                .IsRequired()
-                .HasColumnName("student_id");
+        builder.HasOne(x => x.InternshipGroup)
+            .WithMany(ig => ig.Logbooks)
+            .HasForeignKey(x => x.InternshipId);
 
-            builder.Property(lb => lb.Summary)
-                .IsRequired()
-                .HasMaxLength(200)
-                .HasColumnName("summary");
+        builder.HasOne(x => x.Student)
+            .WithMany(s => s.Logbooks)
+            .HasForeignKey(x => x.StudentId);
 
-            builder.Property(lb => lb.Issue)
-                .HasMaxLength(200)
-                .HasColumnName("issue");
-
-            builder.Property(lb => lb.Plan)
-                .HasMaxLength(200)
-                .IsRequired()
-                .HasColumnName("plan");
-
-            builder.Property(lb => lb.DateReport)
-                .IsRequired()
-                .HasColumnName("date_report");
-
-            builder.Property(lb => lb.Status).HasColumnName("status");
-
-            builder.Property(e => e.CreatedAt).HasColumnName("created_at");
-            builder.Property(e => e.CreatedBy).HasColumnName("created_by");
-            builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
-            builder.Property(e => e.UpdatedBy).HasColumnName("updated_by");
-            builder.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-
-            builder.HasOne(lb => lb.Student)
-                .WithMany(s => s.Logbooks)
-                .HasForeignKey(lb => lb.StudentId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(lb => lb.WorkItem)
-                .WithMany(wi => wi.Logbook)
-                .UsingEntity(j => j.ToTable("logbook_work_items"));
-
-            builder.HasOne(lb => lb.InternshipGroup)
-                .WithMany(i => i.Logbooks)
-                .HasForeignKey(lb => lb.InternshipId)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
+        builder.HasMany(x => x.WorkItem)
+            .WithMany()
+            .UsingEntity(j => j.ToTable("logbook_work_items"));
     }
 }

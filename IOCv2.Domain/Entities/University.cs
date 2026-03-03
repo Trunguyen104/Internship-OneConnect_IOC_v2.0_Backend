@@ -11,5 +11,6 @@ namespace IOCv2.Domain.Entities
         public short Status { get; set; } = 1; // 0=Inactive, 1=Active, 2=Suspended
 
         public virtual ICollection<UniversityUser> UniversityUsers { get; set; } = new List<UniversityUser>();
+        public virtual ICollection<Term> Terms { get; set; } = new List<Term>();
     }
 }
