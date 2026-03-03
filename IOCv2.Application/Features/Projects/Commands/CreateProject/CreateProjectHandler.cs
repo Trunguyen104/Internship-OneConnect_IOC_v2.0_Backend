@@ -28,45 +28,43 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         }
         public async Task<Result<CreateProjectResponse>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
         {
-            try
+            _logger.LogInformation("Creating new project: {ProjectName} for Internship: {InternshipId}", request.ProjectName, request.InternshipId);
+
+            // 1. Existence Check: Internship
+            var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
+                .ExistsAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
+
+            if (!internshipExists)
             {
-                // Check if the internship exists
-                var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
-                    .ExistsAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
-
-                if (!internshipExists)
-                {
-                    return Result<CreateProjectResponse>.Failure(
-                        _message.GetMessage(MessageKeys.Internships.NotFound),
-                        ResultErrorType.NotFound);
-                }
-
-                // Check if the project name exists within the internship
-                var projectExists = await _unitOfWork.Repository<Project>()
-                    .ExistsAsync(p => p.InternshipId == request.InternshipId
-                                   && p.ProjectName == request.ProjectName, cancellationToken);
-                if (projectExists)
-                {
-                    return Result<CreateProjectResponse>.Failure(
-                        _message.GetMessage(MessageKeys.Projects.ProjectNameExistsInternship),
-                        ResultErrorType.Conflict);
-                }
-
-                // Create new project
-                var project = new Project(request.InternshipId, request.ProjectName, request.Description);
-                await _unitOfWork.Repository<Project>().AddAsync(project, cancellationToken);
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-                var response = _mapper.Map<CreateProjectResponse>(project);
-                _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogCreateSuccess), project.ProjectId, request.InternshipId);
-
-                return Result<CreateProjectResponse>.Success(response);
+                _logger.LogWarning("Internship not found: {InternshipId}", request.InternshipId);
+                return Result<CreateProjectResponse>.Failure(
+                    _message.GetMessage(MessageKeys.Internships.NotFound),
+                    ResultErrorType.NotFound);
             }
-            catch (Exception ex)
+
+            // 2. Uniqueness Check: Project Name
+            var projectExists = await _unitOfWork.Repository<Project>()
+                .ExistsAsync(p => p.InternshipId == request.InternshipId
+                               && p.ProjectName == request.ProjectName, cancellationToken);
+            if (projectExists)
             {
-                _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogCreateError), request.InternshipId);
-                throw;
+                _logger.LogWarning("Project name already exists in internship: {ProjectName}", request.ProjectName);
+                return Result<CreateProjectResponse>.Failure(
+                    _message.GetMessage(MessageKeys.Projects.ProjectNameExistsInternship),
+                    ResultErrorType.Conflict);
             }
+
+            // 3. Domain Logic & Persistence (FFA-CAG)
+            var project = new Project(request.InternshipId, request.ProjectName, request.Description);
+            
+            await _unitOfWork.Repository<Project>().AddAsync(project, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            // 4. Mapping & Response (FFA-FLW)
+            _logger.LogInformation("Successfully created project {ProjectId} for Internship {InternshipId}", project.ProjectId, request.InternshipId);
+            
+            var response = _mapper.Map<CreateProjectResponse>(project);
+            return Result<CreateProjectResponse>.Success(response);
         }
     }
 }

@@ -274,10 +274,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("reviewed_by");
 
-                    b.Property<Guid?>("ReviewerEnterpriseUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("reviewer_enterprise_user_id");
-
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
@@ -297,8 +293,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasKey("ApplicationId")
                         .HasName("pk_internship_applications");
 
-                    b.HasIndex("ReviewerEnterpriseUserId")
-                        .HasDatabaseName("ix_internship_applications_reviewer_enterprise_user_id");
+                    b.HasIndex("ReviewedBy")
+                        .HasDatabaseName("ix_internship_applications_reviewed_by");
 
                     b.HasIndex("StudentId")
                         .HasDatabaseName("ix_internship_applications_student_id");
@@ -339,7 +335,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("group_name");
 
                     b.Property<Guid?>("MentorId")
@@ -442,11 +439,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("logbook_id");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("content");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -463,10 +455,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<Guid>("InternshipId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("internship_id");
-
                     b.Property<string>("Issue")
                         .HasColumnType("text")
                         .HasColumnName("issue");
@@ -475,6 +463,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("plan");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
 
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
@@ -500,8 +492,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasKey("LogbookId")
                         .HasName("pk_logbooks");
 
-                    b.HasIndex("InternshipId")
-                        .HasDatabaseName("ix_logbooks_internship_id");
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_logbooks_project_id");
 
                     b.HasIndex("StudentId")
                         .HasDatabaseName("ix_logbooks_student_id");
@@ -662,19 +654,19 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("project_id");
 
                     b.Property<string>("ResourceName")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("resource_name");
 
-                    b.Property<short>("ResourceType")
-                        .HasColumnType("smallint")
+                    b.Property<int>("ResourceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("integer")
                         .HasColumnName("resource_type");
 
                     b.Property<string>("ResourceUrl")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
                         .HasColumnName("resource_url");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1262,6 +1254,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamptz")
                         .HasColumnName("deleted_at");
 
+                    b.Property<string>("Position")
+                        .HasColumnType("text")
+                        .HasColumnName("position");
+
                     b.Property<Guid>("UniversityId")
                         .HasColumnType("uuid")
                         .HasColumnName("uni_id");
@@ -1365,8 +1361,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("user_code");
 
                     b.HasKey("UserId")
@@ -1576,8 +1572,9 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "Reviewer")
                         .WithMany("ReviewedApplications")
-                        .HasForeignKey("ReviewerEnterpriseUserId")
-                        .HasConstraintName("fk_internship_applications_enterprise_users_reviewer_enterpris");
+                        .HasForeignKey("ReviewedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_internship_applications_enterprise_users_reviewed_by");
 
                     b.HasOne("IOCv2.Domain.Entities.Student", "Student")
                         .WithMany("InternshipApplications")
@@ -1641,19 +1638,19 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
+                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
                         .WithMany("Logbooks")
-                        .HasForeignKey("InternshipId")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_logbooks_internship_groups_internship_id");
+                        .HasConstraintName("fk_logbooks_projects_project_id");
 
                     b.HasOne("IOCv2.Domain.Entities.Student", "Student")
                         .WithMany("Logbooks")
                         .HasForeignKey("StudentId")
                         .HasConstraintName("fk_logbooks_students_student_id");
 
-                    b.Navigation("InternshipGroup");
+                    b.Navigation("Project");
 
                     b.Navigation("Student");
                 });
@@ -1712,12 +1709,14 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Sprint", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.Project", null)
+                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
                         .WithMany("Sprints")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_sprints_projects_project_id");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.SprintWorkItem", b =>
@@ -1840,7 +1839,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_work_items_work_items_parent_id");
 
-                    b.HasOne("IOCv2.Domain.Entities.Project", null)
+                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
                         .WithMany("WorkItems")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1855,6 +1854,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Assignee");
 
                     b.Navigation("Parent");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("LogbookWorkItem", b =>
@@ -1892,8 +1893,6 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     b.Navigation("InternshipApplications");
 
-                    b.Navigation("Logbooks");
-
                     b.Navigation("Members");
 
                     b.Navigation("Projects");
@@ -1901,6 +1900,8 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
                 {
+                    b.Navigation("Logbooks");
+
                     b.Navigation("ProjectResources");
 
                     b.Navigation("Sprints");

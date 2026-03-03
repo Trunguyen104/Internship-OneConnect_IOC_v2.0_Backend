@@ -298,15 +298,13 @@ namespace IOCv2.Infrastructure.Persistence
             if (!await _context.Projects.AnyAsync())
             {
                 var group = await _context.InternshipGroups.FirstAsync();
-                var project = new Project
-                {
-                    ProjectId = Guid.NewGuid(),
-                    InternshipId = group.InternshipId,
-                    ProjectName = "E-Commerce System IOC",
-                    Description = "Building a next-gen e-commerce platform",
-                    Status = ProjectStatus.InProgress,
-                    StartDate = DateTime.UtcNow.AddDays(-25)
-                };
+                var project = new Project(
+                    group.InternshipId,
+                    "E-Commerce System IOC",
+                    "Building a next-gen e-commerce platform");
+                
+                project.Update(null, null, null, DateTime.UtcNow.AddDays(-25), null, ProjectStatus.InProgress);
+                
                 _context.Projects.Add(project);
 
                 _context.ProjectResources.Add(new ProjectResources
@@ -363,15 +361,14 @@ namespace IOCv2.Infrastructure.Persistence
         {
             if (!await _context.Logbooks.AnyAsync())
             {
-                var group = await _context.InternshipGroups.FirstAsync();
+                var project = await _context.Projects.FirstAsync();
                 var student = await _context.Students.FirstAsync();
 
                 _context.Logbooks.Add(new Logbook
                 {
                     LogbookId = Guid.NewGuid(),
-                    InternshipId = group.InternshipId,
+                    ProjectId = project.ProjectId,
                     StudentId = student.StudentId,
-                    Content = "Weekly report: Finished login UI and integrated with API.",
                     Summary = "Finished login UI and integrated with API.",
                     Plan = "Continue project development.",
                     DateReport = DateTime.UtcNow,

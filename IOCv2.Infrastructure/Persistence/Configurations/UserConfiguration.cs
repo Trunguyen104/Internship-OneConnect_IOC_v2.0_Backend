@@ -13,7 +13,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.ToTable("users");
             builder.HasKey(u => u.UserId);
 
-            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(20);
+            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(10);
             builder.HasIndex(u => u.UserCode).IsUnique();
 
 

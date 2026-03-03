@@ -56,7 +56,7 @@ public class SprintsController : ApiControllerBase
         [FromRoute] Guid sprintId,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetSprintByIdQuery(sprintId);
+        var query = new GetSprintByIdQuery(projectId, sprintId);
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
@@ -93,7 +93,7 @@ public class SprintsController : ApiControllerBase
         [FromBody] UpdateSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -111,7 +111,7 @@ public class SprintsController : ApiControllerBase
         [FromRoute] Guid sprintId,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteSprintCommand(sprintId);
+        var command = new DeleteSprintCommand(projectId, sprintId);
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
@@ -131,7 +131,7 @@ public class SprintsController : ApiControllerBase
         [FromBody] StartSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -150,7 +150,7 @@ public class SprintsController : ApiControllerBase
         [FromBody] CompleteSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
         return HandleResult(result);
     }
 }

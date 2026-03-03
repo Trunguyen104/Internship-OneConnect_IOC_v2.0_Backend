@@ -42,27 +42,27 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                 );
             }
 
-            //Validate internship exists
-            var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
-              .ExistsAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
+            //Validate project exists
+            var projectExists = await _unitOfWork.Repository<Project>()
+              .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
-            if(!internshipExists)
+            if(!projectExists)
             {
                return Result<CreateLogbookResponse>.Failure(
-                   _messageService.GetMessage(MessageKeys.Logbook.InvalidInternship),
+                   _messageService.GetMessage(MessageKeys.Projects.NotFound),
                    ResultErrorType.BadRequest
                );
             }
 
-            //Validate student is existing
-            var isStudentExist = await _unitOfWork.Repository<Student>()
-                    .ExistsAsync(s => s.StudentId == request.StudentId, cancellationToken);
+            //Validate student from current logged in user (from JWT Token)
+            var student = (await _unitOfWork.Repository<Student>()
+                    .FindAsync(s => s.UserId == auditorId, cancellationToken)).FirstOrDefault();
 
-            if(!isStudentExist)
+            if (student == null)
             {
                 return Result<CreateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Users.NotFound),
-                    ResultErrorType.BadRequest
+                    $"Student record not found for logged in user {auditorId}. Ensure you are logged in with a Student account.",
+                    ResultErrorType.Unauthorized
                 );
             }
 
@@ -73,6 +73,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                 //map request to logbook entity
                 var logbook = _mapper.Map<Logbook>(request);
                 logbook.LogbookId = Guid.NewGuid();
+                logbook.StudentId = student.StudentId;
                 logbook.CreatedAt = DateTime.UtcNow;
                 logbook.DateReport = request.DateReport;
 
@@ -99,7 +100,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                     EntityType = nameof(Logbook),
                     EntityId = logbook.LogbookId,
                     PerformedById = auditorId,
-                    Reason = $"Created logbook for internship {logbook.InternshipId}",
+                    Reason = $"Created logbook for project {logbook.ProjectId}",
                     CreatedAt = DateTime.UtcNow
                 };
 

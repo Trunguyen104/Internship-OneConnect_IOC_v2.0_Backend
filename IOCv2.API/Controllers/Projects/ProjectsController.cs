@@ -3,6 +3,7 @@ using IOCv2.Application.Features.Projects.Commands.CreateProject;
 using IOCv2.Application.Features.Projects.Commands.DeleteProject;
 using IOCv2.Application.Features.Projects.Commands.UpdateProject;
 using IOCv2.Application.Features.Projects.Queries.GetAProjects;
+using IOCv2.Application.Features.Projects.Queries.GetProjectById;
 using IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId;
 using IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId;
 using IOCv2.Domain.Enums;
@@ -41,6 +42,27 @@ public class ProjectsController : ApiControllerBase
     }
 
     /// <summary>
+    /// Retrieves detailed information of a specific project by its unique identifier.
+    /// </summary>
+    /// <param name="projectId">The unique identifier of the project to retrieve.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>
+    /// Returns 200 OK with <see cref="GetProjectByIdResponse"/> if found.
+    /// Returns 400 Bad Request if the request is invalid.
+    /// Returns 401 Unauthorized if the user is not authenticated.
+    /// </returns>
+    [HttpGet("{projectId}")]
+    [ProducesResponseType(typeof(Result<GetProjectByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetProjectById([FromRoute] Guid projectId, CancellationToken cancellationToken)
+    {
+        var query = new GetProjectByIdQuery { ProjectId = projectId };
+        var result = await _mediator.Send(query, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
     /// Get paginated list of projects assigned to the currently authenticated student.
     /// </summary>
     [HttpGet("my")]
@@ -61,7 +83,7 @@ public class ProjectsController : ApiControllerBase
     /// <summary>
     /// Get paginated list of projects belonging to a specific internship group.
     /// </summary>
-    [HttpGet("by-internship-group/{internshipId:guid}")]
+    [HttpGet("internship-group/{internshipId:guid}")]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetProjectsByInternshipIdResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -120,19 +142,11 @@ public class ProjectsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateProject(
         [FromRoute] Guid projectId,
-        [FromBody] UpdateProjectRequest request,
+        [FromBody] UpdateProjectCommand command,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateProjectCommand
-        {
-            ProjectId = projectId,
-            InternshipId = request.InternshipId,
-            ProjectName = request.ProjectName,
-            Description = request.Description,
-            StartDate = request.StartDate,
-            EndDate = request.EndDate,
-            Status = request.Status
-        };
+        command.ProjectId = projectId;
+
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }

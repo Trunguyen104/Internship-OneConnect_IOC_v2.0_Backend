@@ -9,9 +9,9 @@ public static class EpicCacheKeys
     private const string EpicListPrefix = "epics";
     
     /// <summary>
-    /// Cache key for single epic: epic:{id}
+    /// Cache key for single epic: epic:project:{projectId}:{epicId}
     /// </summary>
-    public static string Epic(Guid epicId) => $"{EpicPrefix}:{epicId}";
+    public static string Epic(Guid projectId, Guid epicId) => $"{EpicPrefix}:project:{projectId}:{epicId}";
     
     /// <summary>
     /// Cache key pattern for all epics in a project: epics:project:{projectId}:*

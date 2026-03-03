@@ -12,8 +12,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
         public DeleteLogbookValidator()
         {
             RuleFor(x => x.LogbookId)
-                .NotEmpty().WithMessage("Logbook ID is required.")
-                .Must(id => Guid.TryParse(id.ToString(), out _)).WithMessage("Logbook ID must be a valid GUID.");
+                .NotEmpty()
+                .WithMessage("Logbook ID is required.");
         }
     }
 }

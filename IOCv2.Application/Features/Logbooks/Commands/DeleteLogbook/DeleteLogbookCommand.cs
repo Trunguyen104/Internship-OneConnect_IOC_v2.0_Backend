@@ -11,6 +11,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
 {
     public record DeleteLogbookCommand : IRequest<Result<DeleteLogbookResponse>>
     {
+        public Guid ProjectId { get; set; }
         public Guid LogbookId { get; set; }
     }
 }

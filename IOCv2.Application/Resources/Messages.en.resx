@@ -144,12 +144,9 @@
   <data name="AccountCreatedButEmailFailed" xml:space="preserve">
     <value>Account created successfully but email notification failed. Please notify the employee directly. Code: {0}, Password: {1}</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-
   <data name="SearchTerm.MaxLength" xml:space="preserve">
     <value>Search term cannot exceed 200 characters</value>
   </data>
-
   <data name="Projects.NotFound" xml:space="preserve">
     <value>Project Not Found</value>
   </data>
@@ -174,9 +171,6 @@
   <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Updated project {ProjectId}</value>
   </data>
-
-  
-  <!-- Epic Messages -->
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Epic created successfully.</value>
   </data>
@@ -186,7 +180,15 @@
   <data name="Epic.DeletedSuccess" xml:space="preserve">
     <value>Epic deleted successfully.</value>
   </data>
-  <!-- Issue -->
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <value>Stakeholder created successfully.</value>
+  </data>
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <value>Stakeholder updated successfully.</value>
+  </data>
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <value>Stakeholder deleted successfully.</value>
+  </data>
   <data name="Issue.CreateSuccess" xml:space="preserve">
     <value>Issue created successfully.</value>
   </data>
@@ -195,14 +197,5 @@
   </data>
   <data name="Issue.DeleteSuccess" xml:space="preserve">
     <value>Issue deleted successfully.</value>
-  </data>
-  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
-    <value>Stakeholder created successfully.</value>
-  </data>
-  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
-    <value>Stakeholder deleted successfully.</value>
-  </data>
-  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
-    <value>Stakeholder updated successfully.</value>
   </data>
 </root>
