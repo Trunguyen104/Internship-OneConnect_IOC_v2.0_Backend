@@ -2,17 +2,13 @@
 
 namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
-    internal class UpdateLogbookValidator : AbstractValidator<UpdateLogbookCommand>
+    public class UpdateLogbookValidator : AbstractValidator<UpdateLogbookCommand>
     {
         public UpdateLogbookValidator() 
         {
-            RuleFor(x => x.InternshipId)
+            RuleFor(x => x.LogbookId)
                 .NotEmpty()
-                .WithMessage("InternshipId is required.");
-
-            RuleFor(x => x.StudentId)
-                .NotEmpty()
-                .WithMessage("StudentId is required.");
+                .WithMessage("LogbookId is required.");
 
             RuleFor(x => x.Summary)
                 .NotEmpty()

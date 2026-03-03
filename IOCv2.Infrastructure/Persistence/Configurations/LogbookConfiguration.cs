@@ -13,22 +13,21 @@ public class LogbookConfiguration : IEntityTypeConfiguration<Logbook>
 
         builder.HasKey(x => x.LogbookId);
         builder.Property(x => x.LogbookId).HasColumnName("logbook_id").ValueGeneratedOnAdd();
-        builder.Property(x => x.InternshipId).HasColumnName("internship_id");
+        builder.Property(x => x.ProjectId).HasColumnName("project_id");
         builder.Property(x => x.StudentId).HasColumnName("student_id");
         builder.Property(x => x.DateReport).HasColumnName("date_report");
         builder.Property(x => x.Summary).HasColumnName("summary").HasColumnType("text");
         builder.Property(x => x.Issue).HasColumnName("issue").HasColumnType("text");
         builder.Property(x => x.Plan).HasColumnName("plan").HasColumnType("text");
-        builder.Property(x => x.Content).HasColumnName("content").HasColumnType("text");
         
         builder.Property(x => x.Status)
             .HasColumnName("status")
             .HasConversion<short>()
             .HasColumnType("smallint");
 
-        builder.HasOne(x => x.InternshipGroup)
-            .WithMany(ig => ig.Logbooks)
-            .HasForeignKey(x => x.InternshipId);
+        builder.HasOne(x => x.Project)
+            .WithMany(p => p.Logbooks)
+            .HasForeignKey(x => x.ProjectId);
 
         builder.HasOne(x => x.Student)
             .WithMany(s => s.Logbooks)
