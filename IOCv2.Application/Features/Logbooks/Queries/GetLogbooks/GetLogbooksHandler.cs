@@ -30,13 +30,15 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 
         public async Task<Result<PaginatedResult<GetLogbooksResponse>>> Handle(GetLogbooksQuery request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Fetching logbooks for project {ProjectId} (Page: {Page}, Size: {Size})", request.ProjectId, request.PageNumber, request.PageSize);
+
             var query = _unitOfWork.Repository<Logbook>()
                         .Query()
+                        .AsNoTracking()
                         .Include(x => x.Student!)
                             .ThenInclude(s => s.User!)
                         .Include(x => x.Project)
-                        .Where(x => x.ProjectId == request.ProjectId)
-                        .AsQueryable();
+                        .Where(x => x.ProjectId == request.ProjectId);
 
             // Filter by status
             if (!string.IsNullOrWhiteSpace(request.Status) &&
@@ -57,22 +59,16 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 
             var totalCount = await query.CountAsync(cancellationToken);
 
-            try
-            {
-                var logbooks = await query
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ProjectTo<GetLogbooksResponse>(_mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken);
+            var logbooks = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ProjectTo<GetLogbooksResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
 
-                var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
-                return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching logbooks");
-                throw; // hoặc return Result<PaginatedResult<GetLogbooksResponse>>.Failure(ex.Message);
-            }
+            _logger.LogInformation("Retrieved {Count} logbooks for project {ProjectId}", logbooks.Count, request.ProjectId);
+
+            var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
+            return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);
         }
 
     }

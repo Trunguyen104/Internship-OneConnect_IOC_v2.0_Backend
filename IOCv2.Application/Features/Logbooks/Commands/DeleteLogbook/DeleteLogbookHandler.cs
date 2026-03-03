@@ -38,60 +38,66 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
 
         public async Task<Result<DeleteLogbookResponse>> Handle(DeleteLogbookCommand request, CancellationToken cancellationToken)
         {
-            if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
+            _logger.LogInformation("Starting logbook deletion for LogbookId: {LogbookId}", request.LogbookId);
+
+            // 1. Validate current user
+            if (!Guid.TryParse(_currentUserService.UserId, out var userId))
             {
-                return Result<DeleteLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
-                    ResultErrorType.Unauthorized
-                );
+                var message = _messageService.GetMessage(MessageKeys.Users.InvalidAuditor);
+                _logger.LogWarning("Unauthorized access attempt: {UserId}", _currentUserService.UserId);
+                return Result<DeleteLogbookResponse>.Failure(message, ResultErrorType.Unauthorized);
             }
 
+            // 2. Fetch logbook with existence check
             var logbook = await _unitOfWork.Repository<Domain.Entities.Logbook>()
                 .GetByIdAsync(request.LogbookId, cancellationToken);
 
             if (logbook == null)
-                return Result<DeleteLogbookResponse>.NotFound(_messageService.GetMessage(MessageKeys.Logbook.NotFound));
+            {
+                _logger.LogWarning("Logbook not found: {LogbookId}", request.LogbookId);
+                return Result<DeleteLogbookResponse>.NotFound(_messageService.GetMessage(MessageKeys.Logbooks.NotFound));
+            }
 
+            // 3. Security: Ownership Validation (FFA-SEC)
+            var student = (await _unitOfWork.Repository<Student>()
+                    .FindAsync(s => s.UserId == userId, cancellationToken)).FirstOrDefault();
+
+            if (student == null || logbook.StudentId != student.StudentId)
+            {
+                _logger.LogWarning("User {UserId} attempted to delete logbook {LogbookId} belonging to another student", userId, request.LogbookId);
+                return Result<DeleteLogbookResponse>.Failure("You do not have permission to delete this logbook.", ResultErrorType.Forbidden);
+            }
+
+            // 4. Transaction & Deletion (FF-TXG)
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            
+            // Soft delete is handled by AppDbContext / BaseEntity (sets DeletedAt)
+            await _unitOfWork.Repository<Domain.Entities.Logbook>().DeleteAsync(logbook, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            try
+            var auditLog = new AuditLog
             {
-                // Soft delete is handled by AppDbContext / BaseEntity (sets DeletedAt)
-                await _unitOfWork.Repository<Domain.Entities.Logbook>().DeleteAsync(logbook, cancellationToken);
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
+                AuditLogId = Guid.NewGuid(),
+                Action = AuditAction.Delete,
+                EntityType = nameof(Logbook),
+                EntityId = logbook.LogbookId,
+                PerformedById = userId,
+                Reason = "Deleted logbook",
+                CreatedAt = DateTime.UtcNow,
+            };
+            await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                var auditLog = new AuditLog
-                {
-                    AuditLogId = Guid.NewGuid(),
-                    Action = AuditAction.Delete,
-                    EntityType = nameof(User),
-                    EntityId = logbook.LogbookId,
-                    PerformedById = auditorId,
-                    Reason = $"Deleted logbook",
-                    CreatedAt = DateTime.UtcNow,
-                };
-                await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            // 5. Post-Commit Actions (Cache clearing)
+            await _cacheService.RemoveByPatternAsync("logbook:list", cancellationToken);
+            await _cacheService.RemoveAsync($"logbook:{logbook.LogbookId}", cancellationToken);
 
-                await _cacheService.RemoveByPatternAsync("logbook:list", cancellationToken);
-                await _cacheService.RemoveAsync($"logbook:{logbook.LogbookId}", cancellationToken);
+            _logger.LogInformation("Logbook {LogbookId} deleted successfully", logbook.LogbookId);
 
-                var response = _mapper.Map<DeleteLogbookResponse>(logbook);
-                return Result<DeleteLogbookResponse>.Success(response);
-            }
-            catch (Exception ex)
-            {
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-
-                _logger.LogError(ex, "Error deleting logbook");
-
-                return Result<DeleteLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Logbook.DeleteFailed),
-                    ResultErrorType.BadRequest
-                );
-            }
+            var response = _mapper.Map<DeleteLogbookResponse>(logbook);
+            return Result<DeleteLogbookResponse>.Success(response);
         }
     }
 }

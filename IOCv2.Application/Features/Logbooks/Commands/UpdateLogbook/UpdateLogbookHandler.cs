@@ -34,86 +34,71 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 
         public async Task<Result<UpdateLogbookResponse>> Handle(UpdateLogbookCommand request, CancellationToken cancellationToken)
         {
-            //Validate current user
-            if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
+            _logger.LogInformation("Starting logbook update for LogbookId: {LogbookId}", request.LogbookId);
+
+            // 1. Validate current user
+            if (!Guid.TryParse(_currentUserService.UserId, out var userId))
             {
-                return Result<UpdateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
-                    ResultErrorType.Unauthorized
-                );
+                var message = _messageService.GetMessage(MessageKeys.Users.InvalidAuditor);
+                _logger.LogWarning("Unauthorized access attempt or invalid user ID: {UserId}", _currentUserService.UserId);
+                return Result<UpdateLogbookResponse>.Failure(message, ResultErrorType.Unauthorized);
             }
 
-            //Fetch existing logbook
+            // 2. Fetch logbook with ownership check
             var logbook = (await _unitOfWork.Repository<Logbook>()
                     .FindAsync(l => l.LogbookId == request.LogbookId, cancellationToken)).FirstOrDefault();
 
             if (logbook == null)
             {
-                return Result<UpdateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Logbook.NotFound),
-                    ResultErrorType.NotFound
-                );
+                var message = _messageService.GetMessage(MessageKeys.Logbooks.NotFound);
+                _logger.LogWarning("Logbook not found: {LogbookId}", request.LogbookId);
+                return Result<UpdateLogbookResponse>.Failure(message, ResultErrorType.NotFound);
             }
 
+            // 3. Security: Ownership Validation (FFA-SEC)
+            var student = (await _unitOfWork.Repository<Student>()
+                    .FindAsync(s => s.UserId == userId, cancellationToken)).FirstOrDefault();
+            
+            if (student == null || logbook.StudentId != student.StudentId)
+            {
+                _logger.LogWarning("User {UserId} attempted to update logbook {LogbookId} belonging to another student", userId, request.LogbookId);
+                return Result<UpdateLogbookResponse>.Failure("You do not have permission to update this logbook.", ResultErrorType.Forbidden);
+            }
+
+            // 4. Update via Domain Method (Architecture: FFA-CAG)
+            logbook.Update(
+                request.Summary,
+                request.Issue,
+                request.Plan,
+                request.DateReport);
+
+            // 5. Transaction & Writing (FF-TXG)
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            
+            await _unitOfWork.Repository<Logbook>().UpdateAsync(logbook, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            try
+            // Create audit log
+            var auditLog = new AuditLog
             {
-                //update logbook entity
-                logbook.Summary = request.Summary;
-                logbook.Issue = request.Issue;
-                logbook.Plan = request.Plan;
-                logbook.Status = request.Status;
-                logbook.DateReport = request.DateReport;
-                logbook.UpdatedAt = DateTime.UtcNow;
+                AuditLogId = Guid.NewGuid(),
+                Action = AuditAction.Update,
+                EntityType = nameof(Logbook),
+                EntityId = logbook.LogbookId,
+                PerformedById = userId,
+                Reason = $"Updated logbook for project {logbook.ProjectId}",
+                CreatedAt = DateTime.UtcNow
+            };
+            await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                //determine logbook status based on report date and creation date
-                if (logbook.DateReport.Date == logbook.CreatedAt.Date)
-                {
-                    logbook.Status = LogbookStatus.PUNCTUAL;
-                }
-                else
-                {
-                    logbook.Status = LogbookStatus.LATE;
-                }
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            
+            _logger.LogInformation("Logbook {LogbookId} updated successfully", logbook.LogbookId);
 
-                await _unitOfWork.Repository<Logbook>()
-                    .UpdateAsync(logbook, cancellationToken);
-
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-                //create audit log for logbook creation
-                var auditLog = new AuditLog
-                {
-                    AuditLogId = Guid.NewGuid(),
-                    Action = AuditAction.Create,
-                    EntityType = nameof(Logbook),
-                    EntityId = logbook.LogbookId,
-                    PerformedById = auditorId,
-                    Reason = $"Updated logbook for project {logbook.ProjectId}",
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                await _unitOfWork.Repository<AuditLog>()
-                    .AddAsync(auditLog, cancellationToken);
-
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
-                await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-                var response = _mapper.Map<UpdateLogbookResponse>(logbook);
-                return Result<UpdateLogbookResponse>.Success(response);
-            }
-            catch (Exception ex)
-            {
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-
-                _logger.LogError(ex, "Error updating logbook");
-
-                return Result<UpdateLogbookResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Logbook.UpdateFailed),
-                    ResultErrorType.BadRequest
-                );
-            }
+            // 6. Return response
+            var response = _mapper.Map<UpdateLogbookResponse>(logbook);
+            return Result<UpdateLogbookResponse>.Success(response);
         }
     }
 }

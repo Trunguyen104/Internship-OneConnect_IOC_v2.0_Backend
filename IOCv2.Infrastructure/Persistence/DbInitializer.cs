@@ -364,16 +364,15 @@ namespace IOCv2.Infrastructure.Persistence
                 var project = await _context.Projects.FirstAsync();
                 var student = await _context.Students.FirstAsync();
 
-                _context.Logbooks.Add(new Logbook
-                {
-                    LogbookId = Guid.NewGuid(),
-                    ProjectId = project.ProjectId,
-                    StudentId = student.StudentId,
-                    Summary = "Finished login UI and integrated with API.",
-                    Plan = "Continue project development.",
-                    DateReport = DateTime.UtcNow,
-                    Status = LogbookStatus.SUBMITTED
-                });
+                var logbook = Logbook.Create(
+                    project.ProjectId,
+                    student.StudentId,
+                    "Finished login UI and integrated with API.",
+                    null, // Issue
+                    "Continue project development.",
+                    DateTime.UtcNow);
+                
+                _context.Logbooks.Add(logbook);
                 await _context.SaveChangesAsync();
             }
 

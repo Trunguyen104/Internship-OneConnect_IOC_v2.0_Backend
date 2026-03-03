@@ -12,13 +12,39 @@ using IOCv2.Application.Extensions.Mappings;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 {
+    /// <summary>
+    /// Command to create a new logbook entry.
+    /// </summary>
     public record CreateLogbookCommand : IRequest<Result<CreateLogbookResponse>>, IMapFrom<Logbook>
     {
+        /// <summary>
+        /// ID of the project the logbook belongs to.
+        /// </summary>
         public Guid ProjectId { get; set; }
+
+        /// <summary>
+        /// Summary of activities performed.
+        /// </summary>
         public required string Summary { get; set; }
+
+        /// <summary>
+        /// Description of any issues encountered.
+        /// </summary>
         public string? Issue { get; set; }
+
+        /// <summary>
+        /// Plans for the next period.
+        /// </summary>
         public required string Plan { get; set; }
+
+        /// <summary>
+        /// Date the report covers.
+        /// </summary>
         public DateTime DateReport { get; set; }
+
+        /// <summary>
+        /// Initial status (will be determined by logic if not provided).
+        /// </summary>
         public LogbookStatus Status { get; set; }
     }
 }
