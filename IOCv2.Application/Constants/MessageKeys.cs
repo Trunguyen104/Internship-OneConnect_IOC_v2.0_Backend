@@ -1,4 +1,4 @@
-﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -120,6 +120,11 @@
             public const string StartDateBeforeEndDate = "InternshipGroup.StartDateBeforeEndDate";
             public const string StudentListRequired = "InternshipGroup.StudentListRequired";
             public const string StudentListToRemoveRequired = "InternshipGroup.StudentListToRemoveRequired";
+            public const string InvalidStudentId = "InternshipGroup.InvalidStudentId";
+            public const string TermNotFound = "InternshipGroup.TermNotFound";
+            public const string EnterpriseNotFound = "InternshipGroup.EnterpriseNotFound";
+            public const string MentorNotFound = "InternshipGroup.MentorNotFound";
+            public const string StudentNotFound = "InternshipGroup.StudentNotFound";
         }
         public static class Projects
         {
@@ -175,7 +180,7 @@
         public static class Internships
         {
             public const string NotFound = "Internships.NotFound";
-            public const string InternshipIdRequired = "Internships.InternshipIdRequired";  
+            public const string InternshipIdRequired = "Internships.InternshipIdRequired";
         }
 
         public static class Logbooks
@@ -188,7 +193,8 @@
             public const string AlreadyReported = "Logbooks.AlreadyReported";
         }
 
-        public static class Page {
+        public static class Page
+        {
             public const string PageNumberMinValue = "PageNumber.MinValue";
             public const string PageSizeMinValue = "PageSize.MinValue";
             public const string PageSizeMaxValue = "PageSize.MaxValue";
