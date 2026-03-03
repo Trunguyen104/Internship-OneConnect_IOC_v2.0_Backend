@@ -335,7 +335,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("group_name");
 
                     b.Property<Guid?>("MentorId")
@@ -653,19 +654,19 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("project_id");
 
                     b.Property<string>("ResourceName")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("resource_name");
 
-                    b.Property<short>("ResourceType")
-                        .HasColumnType("smallint")
+                    b.Property<int>("ResourceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("integer")
                         .HasColumnName("resource_type");
 
                     b.Property<string>("ResourceUrl")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
                         .HasColumnName("resource_url");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1253,6 +1254,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamptz")
                         .HasColumnName("deleted_at");
 
+                    b.Property<string>("Position")
+                        .HasColumnType("text")
+                        .HasColumnName("position");
+
                     b.Property<Guid>("UniversityId")
                         .HasColumnType("uuid")
                         .HasColumnName("uni_id");
@@ -1356,8 +1361,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
                         .HasColumnName("user_code");
 
                     b.HasKey("UserId")

@@ -83,7 +83,7 @@ public class ProjectsController : ApiControllerBase
     /// <summary>
     /// Get paginated list of projects belonging to a specific internship group.
     /// </summary>
-    [HttpGet("by-internship-group/{internshipId:guid}")]
+    [HttpGet("internship-group/{internshipId:guid}")]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetProjectsByInternshipIdResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -142,19 +142,11 @@ public class ProjectsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateProject(
         [FromRoute] Guid projectId,
-        [FromBody] UpdateProjectRequest request,
+        [FromBody] UpdateProjectCommand command,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateProjectCommand
-        {
-            ProjectId = projectId,
-            InternshipId = request.InternshipId,
-            ProjectName = request.ProjectName,
-            Description = request.Description,
-            StartDate = request.StartDate,
-            EndDate = request.EndDate,
-            Status = request.Status
-        };
+        command.ProjectId = projectId;
+
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
