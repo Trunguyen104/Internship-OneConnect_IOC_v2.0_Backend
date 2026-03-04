@@ -301,7 +301,7 @@ namespace IOCv2.Infrastructure.Persistence
             if (!await _context.Projects.AnyAsync())
             {
                 var group = await _context.InternshipGroups.FirstAsync();
-                var project = new Project(
+                var project = Project.Create(
                     group.InternshipId,
                     "E-Commerce System IOC",
                     "Building a next-gen e-commerce platform");

@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.Projects.Queries.GetAProjects
+namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 {
     public class GetAllProjectsHandler : IRequestHandler<GetAllProjectsQuery, Result<PaginatedResult<GetAllProjectsResponse>>>
     {
@@ -52,9 +53,9 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAProjects
                     (p.Description != null && p.Description.ToLower().Contains(term)));
             }
 
-            if (request.Status.HasValue)
+            if (!string.IsNullOrWhiteSpace(request.Status) && Enum.TryParse<ProjectStatus>(request.Status, true, out var parsedStatus))
             {
-                query = query.Where(p => p.Status == request.Status.Value);
+                query = query.Where(p => p.Status == parsedStatus);
             }
 
             if (request.FromDate.HasValue)

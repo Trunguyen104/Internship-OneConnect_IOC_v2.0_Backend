@@ -3,7 +3,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using System;
 
-namespace IOCv2.Application.Features.Projects.Queries.GetAProjects
+namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 {
     /// <summary>
     /// Query to retrieve a paginated list of all projects with filtering and search capabilities.
@@ -18,7 +18,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAProjects
         /// <summary>
         /// Filter by specific project status.
         /// </summary>
-        public ProjectStatus? Status { get; set; }
+        public string? Status { get; set; }
 
         /// <summary>
         /// Filter records starting from this date.

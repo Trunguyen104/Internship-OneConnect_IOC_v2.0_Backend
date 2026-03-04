@@ -55,7 +55,12 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             }
 
             // 3. Domain Logic & Persistence (FFA-CAG)
-            var project = new Project(request.InternshipId, request.ProjectName, request.Description);
+            var project = Project.Create(
+                request.InternshipId, 
+                request.ProjectName, 
+                request.Description,
+                request.StartDate,
+                request.EndDate);
             
             await _unitOfWork.Repository<Project>().AddAsync(project, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
