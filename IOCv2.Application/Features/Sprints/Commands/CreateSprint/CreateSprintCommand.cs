@@ -24,4 +24,11 @@ public record CreateSprintCommand : IRequest<Result<CreateSprintResponse>>
     /// Optional goal or description for the sprint.
     /// </summary>
     public string? Goal { get; init; }
+
+    /// <summary>
+    /// Optional: WorkItem IDs (children của một Epic) được chọn để thêm vào Sprint ngay khi tạo.
+    /// Có thể chọn một số hoặc toàn bộ. Để trống nếu không muốn thêm workitem.
+    /// </summary>
+    public List<Guid>? WorkItemIds { get; init; }
 }
+

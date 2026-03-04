@@ -6,6 +6,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 using Microsoft.Extensions.Logging;
 

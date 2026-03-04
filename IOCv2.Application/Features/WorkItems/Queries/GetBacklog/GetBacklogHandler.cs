@@ -112,7 +112,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
                 StoryPointsTotal = items.Sum(i => i.StoryPoint ?? 0),
                 Items = items
             };
-        }).ToList();
+        }).Where(s => !request.EpicId.HasValue || s.Items.Count > 0).ToList();
 
         // Build Product Backlog DTO
         var backlogDtos = backlogItems.Select(w => ToBacklogWorkItemDto(w, w.BacklogOrder)).ToList();
