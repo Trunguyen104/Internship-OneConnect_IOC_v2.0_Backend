@@ -85,11 +85,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
                     
                     // Performance fix: Batch validation of students
-                    var existingStudentIds = await _unitOfWork.Repository<User>()
-                        .Query()
-                        .Where(u => studentIds.Contains(u.UserId))
-                        .Select(u => u.UserId)
-                        .ToListAsync(cancellationToken);
+                    var existingUsers = await _unitOfWork.Repository<User>()
+                        .FindAsync(u => studentIds.Contains(u.UserId), cancellationToken);
+                    var existingStudentIds = existingUsers.Select(u => u.UserId).ToList();
 
                     if (existingStudentIds.Count != studentIds.Count)
                     {

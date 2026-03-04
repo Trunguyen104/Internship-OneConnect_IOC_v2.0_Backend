@@ -48,10 +48,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
                 
                 // Validate students exist in system
-                var existingStudentIds = await _unitOfWork.Repository<Student>().Query()
-                    .Where(s => studentIds.Contains(s.StudentId))
-                    .Select(s => s.StudentId)
-                    .ToListAsync(cancellationToken);
+                var existingUsers = await _unitOfWork.Repository<Student>().FindAsync(s => studentIds.Contains(s.StudentId), cancellationToken);
+                var existingStudentIds = existingUsers.Select(s => s.StudentId).ToList();
 
                 if (existingStudentIds.Count != studentIds.Count)
                 {

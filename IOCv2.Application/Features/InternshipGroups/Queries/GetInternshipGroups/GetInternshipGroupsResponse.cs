@@ -5,6 +5,9 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups
 {
+    /// <summary>
+    /// Summary response for an internship group in a list view.
+    /// </summary>
     public class GetInternshipGroupsResponse : IMapFrom<InternshipGroup>
     {
         public Guid InternshipId { get; set; }
@@ -15,6 +18,10 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string Status { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Total number of students assigned to this group.
+        /// </summary>
         public int NumberOfMembers { get; set; }
 
         public void Mapping(Profile profile)
