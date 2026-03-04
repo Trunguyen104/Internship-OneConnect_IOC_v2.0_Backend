@@ -35,22 +35,43 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
             Enum.TryParse<WorkItemStatus>(request.Status, ignoreCase: true, out var parsedStatus))
             statusFilter = parsedStatus;
 
-        // Load all Sprints (excluding Completed)
-        var sprints = await _unitOfWork.Repository<Sprint>()
-            .Query()
-            .AsNoTracking()
-            .Where(s => s.ProjectId == request.ProjectId && s.Status != SprintStatus.Completed)
-            .OrderBy(s => s.Status == SprintStatus.Active ? 0 : 1)
-            .ThenBy(s => s.CreatedAt)
-            .Include(s => s.SprintWorkItems)
-                .ThenInclude(swi => swi.WorkItem)
-                    .ThenInclude(w => w.Assignee)
-            .ToListAsync(cancellationToken);
+        // BacklogOnly=true: bỏ qua Sprints, chỉ lấy Product Backlog
+        List<Sprint> sprints;
+        HashSet<Guid> assignedIds;
 
-        // All WorkItem IDs assigned to any sprint
-        var assignedIds = sprints
-            .SelectMany(s => s.SprintWorkItems.Select(swi => swi.WorkItemId))
-            .ToHashSet();
+        if (request.BacklogOnly)
+        {
+            // Chỉ cần biết IDs đã trong sprint để loại ra khỏi product backlog
+            var rawAssignedIds = await _unitOfWork.Repository<SprintWorkItem>()
+                .Query()
+                .AsNoTracking()
+                .Where(swi => swi.Sprint.ProjectId == request.ProjectId
+                           && swi.Sprint.Status != SprintStatus.Completed)
+                .Select(swi => swi.WorkItemId)
+                .ToListAsync(cancellationToken);
+
+            sprints = new List<Sprint>();
+            assignedIds = rawAssignedIds.ToHashSet();
+        }
+        else
+        {
+            // Load all Sprints (excluding Completed)
+            sprints = await _unitOfWork.Repository<Sprint>()
+                .Query()
+                .AsNoTracking()
+                .Where(s => s.ProjectId == request.ProjectId && s.Status != SprintStatus.Completed)
+                .OrderBy(s => s.Status == SprintStatus.Active ? 0 : 1)
+                .ThenBy(s => s.CreatedAt)
+                .Include(s => s.SprintWorkItems)
+                    .ThenInclude(swi => swi.WorkItem)
+                        .ThenInclude(w => w.Assignee)
+                .ToListAsync(cancellationToken);
+
+            // All WorkItem IDs assigned to any sprint
+            assignedIds = sprints
+                .SelectMany(s => s.SprintWorkItems.Select(swi => swi.WorkItemId))
+                .ToHashSet();
+        }
 
         // Build base WorkItem query for product backlog (not assigned to any sprint)
         var backlogQuery = _unitOfWork.Repository<WorkItem>()
