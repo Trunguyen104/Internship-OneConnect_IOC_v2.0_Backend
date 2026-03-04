@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource
 {
-    public class UpdateProjectResourceValidator : AbstractValidator<UpdateProjectResourceCommand>
+    internal class UpdateProjectResourceValidator : AbstractValidator<UpdateProjectResourceCommand>
     {
         private readonly IMessageService _messageService;
         public UpdateProjectResourceValidator(IMessageService messageService)

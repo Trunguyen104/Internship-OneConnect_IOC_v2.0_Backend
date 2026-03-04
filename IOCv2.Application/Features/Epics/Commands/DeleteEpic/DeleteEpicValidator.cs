@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Epics.Commands.DeleteEpic;
 
-public class DeleteEpicValidator : AbstractValidator<DeleteEpicCommand>
+internal class DeleteEpicValidator : AbstractValidator<DeleteEpicCommand>
 {
     public DeleteEpicValidator(IMessageService messageService)
     {

@@ -5,7 +5,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.UpdateWorkItem;
 
-public class UpdateWorkItemValidator : AbstractValidator<UpdateWorkItemCommand>
+internal class UpdateWorkItemValidator : AbstractValidator<UpdateWorkItemCommand>
 {
     private static readonly string[] ValidPriorities = Enum.GetNames<Priority>();
     private static readonly string[] ValidStatuses = Enum.GetNames<WorkItemStatus>();

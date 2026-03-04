@@ -5,7 +5,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
 {
-    public class CreateInternshipGroupValidator : AbstractValidator<CreateInternshipGroupCommand>
+    internal class CreateInternshipGroupValidator : AbstractValidator<CreateInternshipGroupCommand>
     {
         public CreateInternshipGroupValidator(IMessageService messageService)
         {

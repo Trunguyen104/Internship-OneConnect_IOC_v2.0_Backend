@@ -5,7 +5,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.CreateWorkItem;
 
-public class CreateWorkItemValidator : AbstractValidator<CreateWorkItemCommand>
+internal class CreateWorkItemValidator : AbstractValidator<CreateWorkItemCommand>
 {
     private static readonly string[] ValidTypes = Enum.GetNames<WorkItemType>();
     private static readonly string[] ValidPriorities = Enum.GetNames<Priority>();

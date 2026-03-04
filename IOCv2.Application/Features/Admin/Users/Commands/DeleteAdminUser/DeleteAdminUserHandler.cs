@@ -5,6 +5,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser
 {
@@ -15,25 +16,32 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly ICacheService _cacheService;
+        private readonly ILogger<DeleteAdminUserHandler> _logger;
 
         public DeleteAdminUserHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ICurrentUserService currentUserService,
             IMessageService messageService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ILogger<DeleteAdminUserHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _cacheService = cacheService;
+            _logger = logger;
         }
 
         public async Task<Result<DeleteAdminUserResponse>> Handle(DeleteAdminUserCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Deleting Admin User {UserId} by Auditor {AuditorId}", 
+                request.UserId, _currentUserService.UserId);
+
             if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
             {
+                _logger.LogWarning("Invalid Auditor ID: {AuditorId}", _currentUserService.UserId);
                 return Result<DeleteAdminUserResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
                     ResultErrorType.Unauthorized
@@ -44,7 +52,10 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser
                 .GetByIdAsync(request.UserId, cancellationToken);
 
             if (user == null)
+            {
+                _logger.LogWarning("User {UserId} not found for deletion", request.UserId);
                 return Result<DeleteAdminUserResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
+            }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -71,11 +82,14 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser
                 await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
                 await _cacheService.RemoveAsync($"user:{user.UserId}", cancellationToken);
 
+                _logger.LogInformation("Successfully deleted Admin User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
+
                 var response = _mapper.Map<DeleteAdminUserResponse>(user);
                 return Result<DeleteAdminUserResponse>.Success(response);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to delete Admin User {UserId}", request.UserId);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 throw;
             }

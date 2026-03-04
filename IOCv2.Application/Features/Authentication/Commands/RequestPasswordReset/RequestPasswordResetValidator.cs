@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordReset
 {
-    public class RequestPasswordResetValidator : AbstractValidator<RequestPasswordResetCommand>
+    internal class RequestPasswordResetValidator : AbstractValidator<RequestPasswordResetCommand>
     {
         public RequestPasswordResetValidator(IMessageService messageService)
         {

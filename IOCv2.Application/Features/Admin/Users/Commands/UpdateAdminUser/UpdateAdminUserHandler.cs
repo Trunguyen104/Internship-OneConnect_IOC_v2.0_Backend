@@ -18,20 +18,32 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly ICacheService _cacheService;
+        private readonly ILogger<UpdateAdminUserHandler> _logger;
 
-        public UpdateAdminUserHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, IMessageService messageService, ICacheService cacheService)
+        public UpdateAdminUserHandler(
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            ICurrentUserService currentUserService, 
+            IMessageService messageService, 
+            ICacheService cacheService,
+            ILogger<UpdateAdminUserHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _cacheService = cacheService;
+            _logger = logger;
         }
 
         public async Task<Result<UpdateAdminUserResponse>> Handle(UpdateAdminUserCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Updating Admin User {UserId} by Auditor {AuditorId}", 
+                request.UserId, _currentUserService.UserId);
+
             if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
             {
+                _logger.LogWarning("Invalid Auditor ID: {AuditorId}", _currentUserService.UserId);
                 return Result<UpdateAdminUserResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
                     ResultErrorType.Unauthorized
@@ -44,42 +56,46 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
                 .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
 
             if (user == null)
+            {
+                _logger.LogWarning("User {UserId} not found for update", request.UserId);
                 return Result<UpdateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.NotFound));
+            }
 
-            if (user.Status == UserStatus.Inactive)
+            if (user.Status == UserStatus.Inactive && !request.Status?.Equals("Active", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                _logger.LogWarning("Attempted to update inactive user {UserId} without activation", request.UserId);
                 return Result<UpdateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.NotActive));
+            }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Update base fields
-                user.FullName = request.FullName;
-
-                if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
-                    user.PhoneNumber = request.PhoneNumber;
-
-                if (!string.IsNullOrWhiteSpace(request.AvatarUrl))
-                    user.AvatarUrl = request.AvatarUrl;
-
-                // Parse Status
-                if (!string.IsNullOrWhiteSpace(request.Status) &&
-                    Enum.TryParse<UserStatus>(request.Status, true, out var parsedStatus))
+                // Prepare update data
+                UserGender? parsedGender = null;
+                if (!string.IsNullOrWhiteSpace(request.Gender) && Enum.TryParse<UserGender>(request.Gender, true, out var genderVal))
                 {
-                    user.Status = parsedStatus;
+                    parsedGender = genderVal;
                 }
 
-                // Parse Gender
-                if (!string.IsNullOrWhiteSpace(request.Gender) &&
-                    Enum.TryParse<UserGender>(request.Gender, true, out var parsedGender))
+                DateOnly? parsedDob = null;
+                if (!string.IsNullOrWhiteSpace(request.DateOfBirth) && DateOnly.TryParse(request.DateOfBirth, out var dobVal))
                 {
-                    user.Gender = parsedGender;
+                    parsedDob = dobVal;
                 }
 
-                // Parse DateOfBirth
-                if (!string.IsNullOrWhiteSpace(request.DateOfBirth) &&
-                    DateOnly.TryParse(request.DateOfBirth, out var parsedDob))
+                // Update using rich domain method
+                user.UpdateProfile(
+                    request.FullName,
+                    request.PhoneNumber,
+                    request.AvatarUrl,
+                    parsedGender,
+                    parsedDob
+                );
+
+                // Update Status if provided
+                if (!string.IsNullOrWhiteSpace(request.Status) && Enum.TryParse<UserStatus>(request.Status, true, out var parsedStatus))
                 {
-                    user.DateOfBirth = parsedDob;
+                    user.SetStatus(parsedStatus);
                 }
 
                 // Update Student fields if applicable
@@ -92,21 +108,35 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
                     await _unitOfWork.Repository<Student>().UpdateAsync(user.Student, cancellationToken);
                 }
 
-                await _unitOfWork.Repository<User>()
-                    .UpdateAsync(user, cancellationToken);
+                await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
+
+                var auditLog = new AuditLog
+                {
+                    AuditLogId = Guid.NewGuid(),
+                    Action = AuditAction.Update,
+                    EntityType = nameof(User),
+                    EntityId = user.UserId,
+                    PerformedById = auditorId,
+                    Reason = $"Updated user {user.UserCode}",
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
 
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                // Clear cache nếu có
+                // Clear cache
                 await _cacheService.RemoveAsync($"user:{user.UserId}");
+                await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
+
+                _logger.LogInformation("Successfully updated Admin User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 
                 var response = _mapper.Map<UpdateAdminUserResponse>(user);
-
                 return Result<UpdateAdminUserResponse>.Success(response);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to update Admin User {UserId}", request.UserId);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 throw;
             }

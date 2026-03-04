@@ -68,9 +68,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             // All validations passed - reset fail count
             await _rateLimiter.ResetAsync(key, cancellationToken);
 
-            // Update password
-            user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
-            user.UpdatedAt = DateTime.UtcNow;
+            // Update password using rich domain method
+            user.UpdatePassword(_passwordService.HashPassword(request.NewPassword));
 
             //Revoke existing refresh tokens
             var refreshTokens = await _unitOfWork.Repository<Domain.Entities.RefreshToken>()

@@ -3,7 +3,7 @@ using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 {
-    public class ChangePasswordValidator : AbstractValidator<ChangePasswordCommand>
+    internal class ChangePasswordValidator : AbstractValidator<ChangePasswordCommand>
     {
         public ChangePasswordValidator(Interfaces.IMessageService messageService)
         {

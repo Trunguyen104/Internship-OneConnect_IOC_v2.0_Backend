@@ -7,21 +7,28 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.Extensions.Logging;
+
 namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
 {
     public class GetAdminUsersHandler : IRequestHandler<GetAdminUsersQuery, Result<PaginatedResult<GetAdminUsersResponse>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILogger<GetAdminUsersHandler> _logger;
 
-        public GetAdminUsersHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetAdminUsersHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAdminUsersHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<PaginatedResult<GetAdminUsersResponse>>> Handle(GetAdminUsersQuery request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Getting paginated Admin Users (Search: {SearchTerm}, Role: {Role}, Status: {Status})", 
+                request.SearchTerm, request.Role, request.Status);
+
             var query = _unitOfWork.Repository<User>().Query()
                 .Include(u => u.UniversityUser).ThenInclude(uu => uu!.University)
                 .Include(u => u.EnterpriseUser).ThenInclude(eu => eu!.Enterprise)
@@ -68,6 +75,8 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
                 .Take(request.PageSize)
                 .ProjectTo<GetAdminUsersResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
+
+            _logger.LogInformation("Successfully retrieved {Count} Admin Users", users.Count);
 
             var result = PaginatedResult<GetAdminUsersResponse>.Create(users, totalCount, request.PageNumber, request.PageSize);
             return Result<PaginatedResult<GetAdminUsersResponse>>.Success(result);

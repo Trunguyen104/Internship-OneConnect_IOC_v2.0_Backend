@@ -4,7 +4,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholderIssueStatus
 {
-    public class UpdateStakeholderIssueStatusCommandValidator : AbstractValidator<UpdateStakeholderIssueStatusCommand>
+    internal class UpdateStakeholderIssueStatusCommandValidator : AbstractValidator<UpdateStakeholderIssueStatusCommand>
     {
         public UpdateStakeholderIssueStatusCommandValidator()
         {

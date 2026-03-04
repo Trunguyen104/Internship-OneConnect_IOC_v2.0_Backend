@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
 {
-    public class GetProjectsByStudentIdValidator : AbstractValidator<GetProjectsByStudentIdQuery>
+    internal class GetProjectsByStudentIdValidator : AbstractValidator<GetProjectsByStudentIdQuery>
     {
         private readonly IMessageService _messageService;
         public GetProjectsByStudentIdValidator(IMessageService messageService)

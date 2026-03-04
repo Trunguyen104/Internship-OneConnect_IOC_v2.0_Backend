@@ -4,16 +4,62 @@ namespace IOCv2.Domain.Entities
 {
     public class Stakeholder : BaseEntity
     {
-        public Guid Id { get; set; }
-        public Guid ProjectId { get; set; }
-        public string Name { get; set; } = null!;
-        public StakeholderType Type { get; set; } = StakeholderType.Real;
-        public string? Role { get; set; }
-        public string? Description { get; set; }
-        public string Email { get; set; } = null!;
-        public string? PhoneNumber { get; set; }
+        public Guid Id { get; private set; }
+        public Guid ProjectId { get; private set; }
+        public string Name { get; private set; } = null!;
+        public StakeholderType Type { get; private set; } = StakeholderType.Real;
+        public string? Role { get; private set; }
+        public string? Description { get; private set; }
+        public string Email { get; private set; } = null!;
+        public string? PhoneNumber { get; private set; }
 
-        public virtual Project Project { get; set; } = null!;
-        public virtual ICollection<StakeholderIssue> Issues { get; set; } = new List<StakeholderIssue>();
+        public virtual Project Project { get; private set; } = null!;
+        public virtual ICollection<StakeholderIssue> Issues { get; private set; } = new List<StakeholderIssue>();
+
+        /// <summary>
+        /// Constructor for EF Core persistence.
+        /// </summary>
+        private Stakeholder() { }
+
+        /// <summary>
+        /// Initializes a new instance of the Stakeholder entity.
+        /// </summary>
+        public Stakeholder(
+            Guid projectId,
+            string name,
+            StakeholderType type,
+            string email,
+            string? role = null,
+            string? description = null,
+            string? phoneNumber = null)
+        {
+            Id = Guid.NewGuid();
+            ProjectId = projectId;
+            Name = name;
+            Type = type;
+            Email = email;
+            Role = role;
+            Description = description;
+            PhoneNumber = phoneNumber;
+        }
+
+        /// <summary>
+        /// Updates stakeholder details.
+        /// </summary>
+        public void UpdateDetails(
+            string name,
+            StakeholderType type,
+            string email,
+            string? role,
+            string? description,
+            string? phoneNumber)
+        {
+            Name = name;
+            Type = type;
+            Email = email;
+            Role = role;
+            Description = description;
+            PhoneNumber = phoneNumber;
+        }
     }
 }

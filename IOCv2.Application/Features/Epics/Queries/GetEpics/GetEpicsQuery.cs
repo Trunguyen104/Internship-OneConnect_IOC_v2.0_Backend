@@ -7,4 +7,4 @@ namespace IOCv2.Application.Features.Epics.Queries.GetEpics;
 public record GetEpicsQuery(
     Guid ProjectId,
     PaginationParams Pagination
-) : IRequest<Result<PagedResult<GetEpicsResponse>>>;
+) : IRequest<Result<PaginatedResult<GetEpicsResponse>>>;

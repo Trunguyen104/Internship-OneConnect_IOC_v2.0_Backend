@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectResource
 {
-    public class DeleteProjectResourceCommand : IRequest<Result<DeleteProjectResourceResponse>>
+    public record DeleteProjectResourceCommand : IRequest<Result<DeleteProjectResourceResponse>>
     {
-        public Guid ResourceId { get; set; }
+        public Guid ResourceId { get; init; }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Localization;
 
 namespace IOCv2.Application.Features.Sprints.Commands.CompleteSprint;
 
-public class CompleteSprintValidator : AbstractValidator<CompleteSprintCommand>
+internal class CompleteSprintValidator : AbstractValidator<CompleteSprintCommand>
 {
     private static readonly string[] ValidOptions =
     [

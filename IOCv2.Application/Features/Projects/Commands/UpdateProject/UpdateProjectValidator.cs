@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 {
-    public class UpdateProjectValidator : AbstractValidator<UpdateProjectCommand>
+    internal class UpdateProjectValidator : AbstractValidator<UpdateProjectCommand>
     {
         private readonly IMessageService _messageService;
         public UpdateProjectValidator(IMessageService messageService)

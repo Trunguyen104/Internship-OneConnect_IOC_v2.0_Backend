@@ -8,7 +8,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
     /// <summary>
     /// Query to retrieve a paginated list of projects belonging to a specific internship group.
     /// </summary>
-    public class GetProjectsByInternshipIdQuery : IRequest<Result<PaginatedResult<GetProjectsByInternshipIdResponse>>>
+    public record GetProjectsByInternshipIdQuery : IRequest<Result<PaginatedResult<GetProjectsByInternshipIdResponse>>>
     {
         /// <summary>
         /// Identity of the target internship group.
@@ -23,27 +23,27 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
         /// <summary>
         /// Filter by project lifecycle status.
         /// </summary>
-        public ProjectStatus? Status { get; set; }
+        public ProjectStatus? Status { get; init; }
 
         /// <summary>
         /// Lower bound for project start date filter.
         /// </summary>
-        public DateTime? FromDate { get; set; }
+        public DateTime? FromDate { get; init; }
 
         /// <summary>
         /// Upper bound for project end date filter.
         /// </summary>
-        public DateTime? ToDate { get; set; }
+        public DateTime? ToDate { get; init; }
 
         /// <summary>
         /// Page number for pagination.
         /// </summary>
-        public int PageNumber { get; set; } = 1;
+        public int PageNumber { get; init; } = 1;
 
         /// <summary>
         /// Number of items per result set.
         /// </summary>
-        public int PageSize { get; set; } = 10;
+        public int PageSize { get; init; } = 10;
 
         /// <summary>
         /// Property name to order by.

@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Epics.Commands.UpdateEpic;
 
-public class UpdateEpicValidator : AbstractValidator<UpdateEpicCommand>
+internal class UpdateEpicValidator : AbstractValidator<UpdateEpicCommand>
 {
     public UpdateEpicValidator(IMessageService messageService)
     {

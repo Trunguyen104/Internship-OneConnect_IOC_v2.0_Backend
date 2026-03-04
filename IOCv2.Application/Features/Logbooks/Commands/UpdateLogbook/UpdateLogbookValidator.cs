@@ -3,7 +3,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
-    public class UpdateLogbookValidator : AbstractValidator<UpdateLogbookCommand>
+    internal class UpdateLogbookValidator : AbstractValidator<UpdateLogbookCommand>
     {
         public UpdateLogbookValidator() 
         {
