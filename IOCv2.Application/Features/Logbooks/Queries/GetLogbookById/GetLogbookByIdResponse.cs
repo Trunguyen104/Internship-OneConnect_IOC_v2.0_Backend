@@ -33,7 +33,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
         /// <summary>
         /// Submission status.
         /// </summary>
-        public LogbookStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         /// <summary>
         /// Plans content.
         /// </summary>
@@ -49,7 +49,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
                 .ForMember(dest => dest.WorkItems,
                     opt => opt.MapFrom(src => src.WorkItem))
                 .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => src.Status));
+                    opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }

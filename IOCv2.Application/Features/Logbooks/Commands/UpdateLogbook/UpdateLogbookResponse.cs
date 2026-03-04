@@ -23,7 +23,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         /// <summary>
         /// Submission status.
         /// </summary>
-        public LogbookStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         /// <summary>
         /// Updated plans.
@@ -42,7 +42,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Logbook, UpdateLogbook.UpdateLogbookResponse>();
+            profile.CreateMap<Logbook, UpdateLogbook.UpdateLogbookResponse>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }

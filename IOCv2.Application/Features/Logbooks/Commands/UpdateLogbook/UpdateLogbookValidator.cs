@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
@@ -25,6 +26,11 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                 .NotEmpty()
                 .LessThanOrEqualTo(DateTime.UtcNow)
                 .WithMessage("DateReport cannot be in the future.");
+
+            // ACV-3: Optional Status — validate only when provided.
+            RuleFor(x => x.Status)
+                .Must(v => v == null || Enum.TryParse<LogbookStatus>(v, ignoreCase: true, out _))
+                .WithMessage($"Status must be one of: {string.Join(", ", Enum.GetNames<LogbookStatus>())}");
         }
     }
 }

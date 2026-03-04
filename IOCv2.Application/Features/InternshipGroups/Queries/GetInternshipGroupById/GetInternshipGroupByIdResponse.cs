@@ -16,7 +16,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public string? MentorName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public InternshipStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         public List<InternshipStudentDto> Members { get; set; } = new List<InternshipStudentDto>();
 
@@ -25,7 +25,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             profile.CreateMap<InternshipGroup, GetInternshipGroupByIdResponse>()
                 .ForMember(d => d.EnterpriseName, opt => opt.MapFrom(s => s.Enterprise != null ? s.Enterprise.Name : null))
                 .ForMember(d => d.MentorName, opt => opt.MapFrom(s => s.Mentor != null && s.Mentor.User != null ? s.Mentor.User.FullName : null))
-                .ForMember(d => d.Members, opt => opt.MapFrom(s => s.Members));
+                .ForMember(d => d.Members, opt => opt.MapFrom(s => s.Members))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
         }
     }
 
@@ -36,8 +37,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public string? Email { get; set; }
         public string? StudentCode { get; set; }
         public string? UniversityName { get; set; }
-        public InternshipRole Role { get; set; }
-        public InternshipStatus Status { get; set; }
+        public string Role { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
         public DateTime JoinedAt { get; set; }
 
         public void Mapping(Profile profile)
@@ -46,7 +47,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Student != null && s.Student.User != null ? s.Student.User.FullName : null))
                 .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Student != null && s.Student.User != null ? s.Student.User.Email : null))
                 .ForMember(d => d.StudentCode, opt => opt.MapFrom(s => s.Student != null && s.Student.User != null ? s.Student.User.UserCode : null))
-                .ForMember(d => d.UniversityName, opt => opt.MapFrom(s => s.Student != null && s.Student.User != null && s.Student.User.UniversityUser != null && s.Student.User.UniversityUser.University != null ? s.Student.User.UniversityUser.University.Name : null));
+                .ForMember(d => d.UniversityName, opt => opt.MapFrom(s => s.Student != null && s.Student.User != null && s.Student.User.UniversityUser != null && s.Student.User.UniversityUser.University != null ? s.Student.User.UniversityUser.University.Name : null))
+                .ForMember(d => d.Role, opt => opt.MapFrom(s => s.Role.ToString()))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
         }
     }
 }

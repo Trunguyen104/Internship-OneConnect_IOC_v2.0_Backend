@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Domain.Enums;
 using MediatR;
 using System;

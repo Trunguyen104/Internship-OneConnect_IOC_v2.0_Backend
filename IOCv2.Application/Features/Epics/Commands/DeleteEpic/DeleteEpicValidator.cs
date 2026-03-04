@@ -1,15 +1,15 @@
 using FluentValidation;
-using IOCv2.Application.Resources;
-using Microsoft.Extensions.Localization;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Epics.Commands.DeleteEpic;
 
 public class DeleteEpicValidator : AbstractValidator<DeleteEpicCommand>
 {
-    public DeleteEpicValidator(IStringLocalizer<ErrorMessages> localizer)
+    public DeleteEpicValidator(IMessageService messageService)
     {
         RuleFor(x => x.EpicId)
             .NotEmpty()
-            .WithMessage(localizer["Epic.ProjectIdRequired"]);
+            .WithMessage(messageService.GetMessage(MessageKeys.Epic.EpicIdRequired));
     }
 }

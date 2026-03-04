@@ -239,17 +239,15 @@ namespace IOCv2.Infrastructure.Persistence
 
                 if (fpt != null && mentor != null && student1 != null)
                 {
-                    var group = new InternshipGroup
-                    {
-                        InternshipId = Guid.NewGuid(),
-                        TermId = term.TermId,
-                        GroupName = "Nhóm .NET Tiềm Năng 2026",
-                        EnterpriseId = fpt.EnterpriseId,
-                        MentorId = mentor.EnterpriseUserId,
-                        StartDate = DateTime.UtcNow,
-                        EndDate = DateTime.UtcNow.AddMonths(2),
-                        Status = InternshipStatus.InProgress
-                    };
+                    var group = InternshipGroup.Create(
+                        term.TermId,
+                        "Nhóm .NET Tiềm Năng 2026",
+                        fpt.EnterpriseId,
+                        mentor.EnterpriseUserId,
+                        DateTime.UtcNow,
+                        DateTime.UtcNow.AddMonths(2)
+                    );
+                    group.UpdateStatus(InternshipStatus.InProgress);
 
                     _context.InternshipGroups.Add(group);
 

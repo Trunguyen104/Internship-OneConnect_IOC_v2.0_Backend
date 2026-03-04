@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,11 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                 .When(x => !string.IsNullOrWhiteSpace(x.ResourceName));
             RuleFor(x => x.ProjectId)
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectIdRequired));
+
+            // ACV-3: Validate Enum string input before parsing in handler.
+            RuleFor(x => x.ResourceType)
+                .Must(v => string.IsNullOrWhiteSpace(v) || Enum.TryParse<FileType>(v, ignoreCase: true, out _))
+                .WithMessage($"ResourceType must be one of: {string.Join(", ", Enum.GetNames<FileType>())}");
         }
     }
 }

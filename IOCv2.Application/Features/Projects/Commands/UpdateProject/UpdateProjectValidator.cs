@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using System;

@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -43,17 +44,23 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.Projects.LogNotFound), request.ProjectId);
                     return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound));
                 }
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
                 // Update the project resource properties
-                projectResource.ProjectId = request.ProjectId;
-                projectResource.ResourceName = request.ResourceName;
-                projectResource.ResourceType = request.ResourceType;
-                await _unitOfWork.Repository<Domain.Entities.ProjectResources>().UpdateAsync(projectResource);
+                var resourceType = Enum.Parse<FileType>(request.ResourceType, ignoreCase: true);
+                projectResource.UpdateInfo(request.ProjectId, request.ResourceName, resourceType);
+                
+                await _unitOfWork.Repository<Domain.Entities.ProjectResources>().UpdateAsync(projectResource, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
                 var response = _mapper.Map<UpdateProjectResourceResponse>(projectResource);
                 return Result<UpdateProjectResourceResponse>.Success(response);
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUpdateError), request.ProjectResourceId);
                 return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.UpdateError));
             }

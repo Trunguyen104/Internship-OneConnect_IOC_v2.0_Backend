@@ -237,6 +237,7 @@
             public const string NotFound = "Epic.NotFound";
             public const string CannotDeleteWithChildren = "Epic.CannotDeleteWithChildren";
             public const string ProjectNotFound = "Epic.ProjectNotFound";
+            public const string EpicIdRequired = "Epic.EpicIdRequired";
         }
 
         public static class WorkItem

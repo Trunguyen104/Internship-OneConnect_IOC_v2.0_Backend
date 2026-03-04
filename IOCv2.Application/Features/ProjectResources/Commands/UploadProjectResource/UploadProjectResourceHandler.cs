@@ -1,9 +1,10 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -69,36 +70,66 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         ResultErrorType.NotFound);
                 }
 
-                // Upload file to storage
-                var fileName = $"{Guid.NewGuid():N}_{request.File.FileName}";
-                var fileUrl = await _fileStorageService.UploadFileAsync(
-                    request.File,
-                    $"projects/{request.ProjectId}/resources",
-                    fileName,
-                    cancellationToken);
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-                // Create resource record using constructor
-                var resource = new Domain.Entities.ProjectResources(
-                    request.ProjectId,
-                    request.ResourceName ?? request.File.FileName,
-                    request.ResourceType,
-                    fileUrl);
+                string? fileUrl = null;
+                try
+                {
+                    // Upload file to storage
+                    var fileName = $"{Guid.NewGuid():N}_{request.File.FileName}";
+                    fileUrl = await _fileStorageService.UploadFileAsync(
+                        request.File,
+                        $"projects/{request.ProjectId}/resources",
+                        fileName,
+                        cancellationToken);
 
-                // Save to database
-                await _unitOfWork.Repository<Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
-                await _unitOfWork.SaveChangeAsync(cancellationToken);
+                    // Create resource record using constructor
+                    var resourceType = Enum.Parse<FileType>(request.ResourceType, ignoreCase: true);
+                    var resource = new Domain.Entities.ProjectResources(
+                        request.ProjectId,
+                        request.ResourceName ?? request.File.FileName,
+                        resourceType,
+                        fileUrl);
 
-                // Map to response
-                var response = _mapper.Map<UploadProjectResourceResponse>(resource);
+                    // Save to database
+                    await _unitOfWork.Repository<Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
+                    await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadSuccess),
-                    request.File.FileName, request.ProjectId);
+                    await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                return Result<UploadProjectResourceResponse>.Success(response);
+                    // Map to response
+                    var response = _mapper.Map<UploadProjectResourceResponse>(resource);
+
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadSuccess),
+                        request.File.FileName, request.ProjectId);
+
+                    return Result<UploadProjectResourceResponse>.Success(response);
+                }
+                catch (Exception ex)
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    
+                    // Compensating transaction: remove the uploaded file if database commit fails
+                    if (!string.IsNullOrEmpty(fileUrl))
+                    {
+                        try
+                        {
+                            await _fileStorageService.DeleteFileAsync(fileUrl, cancellationToken);
+                            _logger.LogInformation("Compensatory action: Deleted orphaned file {FileUrl} from storage after database failure.", fileUrl);
+                        }
+                        catch (Exception deleteEx)
+                        {
+                            _logger.LogError(deleteEx, "Compensatory action failed: Could not delete orphaned file {FileUrl} from storage.", fileUrl);
+                        }
+                    }
+
+                    _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadError), request.ProjectId);
+                    throw;
+                }
             }
-            catch (Exception ex)
+            catch (Exception ex) // Outer catch for validation or project existence checks exceptions
             {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadError), request.ProjectId);
+                _logger.LogError(ex, "Failed to initiate file upload process for project: {ProjectId}", request.ProjectId);
                 throw;
             }
         }

@@ -36,7 +36,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
         /// <summary>
         /// Submission status.
         /// </summary>
-        public LogbookStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         /// <summary>
         /// Count of work items linked.
@@ -51,7 +51,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
                 .ForMember(dest => dest.TotalWorkItems,
                     opt => opt.MapFrom(src => src.WorkItem.Count))
                 .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => src.Status));
+                    opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }

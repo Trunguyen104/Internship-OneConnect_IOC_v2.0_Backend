@@ -30,7 +30,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
         /// <summary>
         /// Submission status (Punctual/Late).
         /// </summary>
-        public LogbookStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         /// <summary>
         /// Next period plans.
@@ -51,7 +51,9 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
         {
             profile.CreateMap<Logbook, CreateLogbookResponse>()
                 .ForMember(dest => dest.StudentId,
-                    opt => opt.MapFrom(src => src.StudentId));
+                    opt => opt.MapFrom(src => src.StudentId))
+                .ForMember(dest => dest.Status,
+                    opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }

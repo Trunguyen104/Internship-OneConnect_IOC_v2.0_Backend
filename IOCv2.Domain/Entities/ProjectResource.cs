@@ -25,5 +25,12 @@ namespace IOCv2.Domain.Entities
             ResourceType = resourceType;
             ResourceUrl = resourceUrl;
         }
+
+        public void UpdateInfo(Guid projectId, string? resourceName, FileType resourceType)
+        {
+            ProjectId = projectId;
+            ResourceName = resourceName;
+            ResourceType = resourceType;
+        }
     }
 }

@@ -59,9 +59,16 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 }
 
                 // Apply resource type filter if provided
-                if (request.ResourceType.HasValue)
+                if (!string.IsNullOrWhiteSpace(request.ResourceType))
                 {
-                    query = query.Where(x => x.ResourceType == request.ResourceType.Value);
+                    if (Enum.TryParse<Domain.Enums.FileType>(request.ResourceType, ignoreCase: true, out var parsedType))
+                    {
+                        query = query.Where(x => x.ResourceType == parsedType);
+                    }
+                    else
+                    {
+                        return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Failure("Invalid ResourceType filter value.");
+                    }
                 }
 
                 // Get total count
