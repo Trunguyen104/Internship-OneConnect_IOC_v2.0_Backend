@@ -4,7 +4,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Logging;
 using IOCv2.Application.Constants;
 using AutoMapper;
 
@@ -15,65 +15,80 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
+        private readonly ILogger<AddStudentsToGroupHandler> _logger;
 
-        public AddStudentsToGroupHandler(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
+        public AddStudentsToGroupHandler(
+            IUnitOfWork unitOfWork, 
+            IMessageService messageService, 
+            IMapper mapper,
+            ILogger<AddStudentsToGroupHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<AddStudentsToGroupResponse>> Handle(AddStudentsToGroupCommand request, CancellationToken cancellationToken)
         {
-            var group = await _unitOfWork.Repository<InternshipGroup>().Query()
-                .Include(g => g.Members)
-                .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
+            _logger.LogInformation("Adding students to group: {InternshipId}", request.InternshipId);
 
-            if (group == null)
+            try
             {
-                return Result<AddStudentsToGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
-            }
+                var group = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .Include(g => g.Members)
+                    .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
-            // Lọc bỏ danh sách trùng lặp truyền vào từ Request JSON
-            var distinctInputs = request.Students.GroupBy(s => s.StudentId).Select(g => g.First()).ToList();
-            
-            // Validate xem các StudentId truyền vào có thực sự tồn tại trong hệ thống DB không
-            var inputStudentIds = distinctInputs.Select(x => x.StudentId).ToList();
-
-            var existingStudentIds = await _unitOfWork.Repository<Student>().Query()
-                .Where(s => inputStudentIds.Contains(s.StudentId))
-                .Select(s => s.StudentId)
-                .ToListAsync(cancellationToken);
-
-            if (existingStudentIds.Count != distinctInputs.Count)
-            {
-                return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.InvalidStudentId));
-            }
-
-            foreach (var item in distinctInputs)
-            {
-                // Kiểm tra xem Group này đã tồn tại StudentId đó ở List Navigation chưa. Nếu chưa mới cho Add
-                if (!group.Members.Any(m => m.StudentId == item.StudentId))
+                if (group == null)
                 {
-                    group.Members.Add(new InternshipStudent
-                    {
-                        StudentId = item.StudentId,
-                        InternshipId = group.InternshipId,
-                        Role = item.Role,
-                        Status = InternshipStatus.Registered,
-                        JoinedAt = DateTime.UtcNow
-                    });
+                    _logger.LogWarning("Internship group not found: {InternshipId}", request.InternshipId);
+                    return Result<AddStudentsToGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
-            }
 
-            var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
-            if (saved >= 0)
+                var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
+                
+                // Validate students exist in system
+                var existingStudentIds = await _unitOfWork.Repository<Student>().Query()
+                    .Where(s => studentIds.Contains(s.StudentId))
+                    .Select(s => s.StudentId)
+                    .ToListAsync(cancellationToken);
+
+                if (existingStudentIds.Count != studentIds.Count)
+                {
+                    _logger.LogWarning("Some student IDs are invalid or not found");
+                    return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.InvalidStudentId));
+                }
+
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+                foreach (var item in request.Students)
+                {
+                    var role = Enum.Parse<InternshipRole>(item.Role, ignoreCase: true);
+                    group.AddMember(item.StudentId, role);
+                }
+
+                await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
+                var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                if (saved >= 0)
+                {
+                    await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    _logger.LogInformation("Successfully added {Count} students to group: {InternshipId}", studentIds.Count, request.InternshipId);
+                    
+                    var response = _mapper.Map<AddStudentsToGroupResponse>(group);
+                    return Result<AddStudentsToGroupResponse>.Success(response);
+                }
+
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError("Failed to update group members in database");
+                return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
+            }
+            catch (Exception ex)
             {
-                var response = _mapper.Map<AddStudentsToGroupResponse>(group);
-                return Result<AddStudentsToGroupResponse>.Success(response);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error occurred while adding students to group");
+                throw;
             }
-
-            return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
         }
     }
 }

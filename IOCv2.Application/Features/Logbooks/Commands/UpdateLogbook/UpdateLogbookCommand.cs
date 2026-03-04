@@ -1,6 +1,5 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
-using IOCv2.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -43,6 +42,6 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         /// <summary>
         /// Status of the logbook (Punctual/Late).
         /// </summary>
-        public LogbookStatus Status { get; set; }
+        public string? Status { get; set; }
     }
 }

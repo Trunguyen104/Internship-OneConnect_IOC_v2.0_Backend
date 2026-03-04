@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;

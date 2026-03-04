@@ -4,7 +4,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Logging;
 using IOCv2.Application.Constants;
 using AutoMapper;
 
@@ -15,98 +15,118 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
+        private readonly ILogger<CreateInternshipGroupHandler> _logger;
 
-        public CreateInternshipGroupHandler(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
+        public CreateInternshipGroupHandler(
+            IUnitOfWork unitOfWork, 
+            IMessageService messageService, 
+            IMapper mapper,
+            ILogger<CreateInternshipGroupHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<CreateInternshipGroupResponse>> Handle(CreateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
-            // Validate TermId
-            var termExists = await _unitOfWork.Repository<Term>()
-                .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
-            if (!termExists)
-            {
-                return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
-            }
+            _logger.LogInformation("Creating a new internship group: {GroupName} for Term: {TermId}", request.GroupName, request.TermId);
 
-            // Validate EnterpriseId if provided
-            if (request.EnterpriseId.HasValue)
+            try
             {
-                var enterpriseExists = await _unitOfWork.Repository<Enterprise>()
-                    .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
-                if (!enterpriseExists)
+                // Validate TermId
+                var termExists = await _unitOfWork.Repository<Term>()
+                    .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
+                if (!termExists)
                 {
-                    return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
+                    _logger.LogWarning("Term not found: {TermId}", request.TermId);
+                    return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
-            }
 
-            // Validate MentorId if provided
-            if (request.MentorId.HasValue)
-            {
-                var mentorExists = await _unitOfWork.Repository<User>() // Assuming Mentor is a User
-                    .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
-                if (!mentorExists)
+                // Validate EnterpriseId if provided
+                if (request.EnterpriseId.HasValue)
                 {
-                    return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
-                }
-            }
-
-            var newGroup = new InternshipGroup
-            {
-                InternshipId = Guid.NewGuid(),
-                TermId = request.TermId,
-                GroupName = request.GroupName,
-                EnterpriseId = request.EnterpriseId,
-                MentorId = request.MentorId,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                Status = InternshipStatus.Registered
-            };
-
-            // Nếu có gửi kèm danh sách sinh viên thì nạp luôn vào
-            if (request.Students != null && request.Students.Any())
-            {
-                // Loại bỏ sinh viên trùng lặp trong request
-                var distinctStudents = request.Students
-                    .GroupBy(s => s.StudentId)
-                    .Select(g => g.First())
-                    .ToList();
-
-                foreach (var studentRef in distinctStudents)
-                {
-                    var studentExists = await _unitOfWork.Repository<User>() // Assuming Student is a User mapped entity or User itself
-                        .ExistsAsync(u => u.UserId == studentRef.StudentId, cancellationToken);
-
-                    if (!studentExists)
+                    var enterpriseExists = await _unitOfWork.Repository<Enterprise>()
+                        .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
+                    if (!enterpriseExists)
                     {
+                        _logger.LogWarning("Enterprise not found: {EnterpriseId}", request.EnterpriseId);
+                        return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
+                    }
+                }
+
+                // Validate MentorId if provided
+                if (request.MentorId.HasValue)
+                {
+                    var mentorExists = await _unitOfWork.Repository<User>()
+                        .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                    if (!mentorExists)
+                    {
+                        _logger.LogWarning("Mentor not found: {MentorId}", request.MentorId);
+                        return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
+                    }
+                }
+
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+                var newGroup = InternshipGroup.Create(
+                    request.TermId,
+                    request.GroupName,
+                    request.EnterpriseId,
+                    request.MentorId,
+                    request.StartDate,
+                    request.EndDate
+                );
+
+                // Nếu có gửi kèm danh sách sinh viên thì nạp luôn vào
+                if (request.Students != null && request.Students.Any())
+                {
+                    var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
+                    
+                    // Performance fix: Batch validation of students
+                    var existingStudentIds = await _unitOfWork.Repository<User>()
+                        .Query()
+                        .Where(u => studentIds.Contains(u.UserId))
+                        .Select(u => u.UserId)
+                        .ToListAsync(cancellationToken);
+
+                    if (existingStudentIds.Count != studentIds.Count)
+                    {
+                        var missingId = studentIds.Except(existingStudentIds).First();
+                        _logger.LogWarning("Student not found: {StudentId}", missingId);
                         return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.StudentNotFound), ResultErrorType.NotFound);
                     }
 
-                    newGroup.Members.Add(new InternshipStudent
+                    foreach (var studentRef in request.Students)
                     {
-                        StudentId = studentRef.StudentId,
-                        InternshipId = newGroup.InternshipId, // EF tự map khóa ngoại
-                        Role = studentRef.Role,
-                        Status = InternshipStatus.Registered,
-                        JoinedAt = DateTime.UtcNow
-                    });
+                        var role = Enum.Parse<InternshipRole>(studentRef.Role, ignoreCase: true);
+                        newGroup.AddMember(studentRef.StudentId, role);
+                    }
                 }
+
+                await _unitOfWork.Repository<InternshipGroup>().AddAsync(newGroup);
+                var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                if (saved > 0)
+                {
+                    await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    _logger.LogInformation("Successfully created internship group: {InternshipId}", newGroup.InternshipId);
+                    
+                    var response = _mapper.Map<CreateInternshipGroupResponse>(newGroup);
+                    return Result<CreateInternshipGroupResponse>.Success(response);
+                }
+
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError("Failed to save internship group to database");
+                return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
             }
-
-            await _unitOfWork.Repository<InternshipGroup>().AddAsync(newGroup);
-
-            var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
-            if (saved > 0)
+            catch (Exception ex)
             {
-                var response = _mapper.Map<CreateInternshipGroupResponse>(newGroup);
-                return Result<CreateInternshipGroupResponse>.Success(response);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error occurred while creating internship group");
+                throw; // Let ExceptionMiddleware handle it
             }
-
-            return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
         }
     }
 }

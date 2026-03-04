@@ -1,6 +1,5 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Domain.Entities;
-using IOCv2.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -43,8 +42,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
         public DateTime DateReport { get; set; }
 
         /// <summary>
-        /// Initial status (will be determined by logic if not provided).
+        /// Initial status of the logbook. Valid values: Punctual, Late.
         /// </summary>
-        public LogbookStatus Status { get; set; }
+        public string? Status { get; set; }
     }
 }

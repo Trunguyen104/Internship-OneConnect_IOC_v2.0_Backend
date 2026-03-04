@@ -35,13 +35,26 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
                 _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ResourceId);
                 return Result<DeleteProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound));
             }
-            // Soft delete the resource by setting IsDeleted to true and updating DeletedAt timestamp
-            resource.DeletedAt = DateTime.UtcNow;
-            await _unitOfWork.Repository<Domain.Entities.ProjectResources>().UpdateAsync(resource, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
-            _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogDeleteSuccess), request.ResourceId);
-            var response = _mapper.Map<DeleteProjectResourceResponse>(resource);
-            return Result<DeleteProjectResourceResponse>.Success(response);
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+                // Soft delete the resource properly via the Repository configuration
+                await _unitOfWork.Repository<Domain.Entities.ProjectResources>().DeleteAsync(resource, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogDeleteSuccess), request.ResourceId);
+                var response = _mapper.Map<DeleteProjectResourceResponse>(resource);
+                return Result<DeleteProjectResourceResponse>.Success(response);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Failed to delete project resource: {ResourceId}", request.ResourceId);
+                throw;
+            }
         }
     }
 }

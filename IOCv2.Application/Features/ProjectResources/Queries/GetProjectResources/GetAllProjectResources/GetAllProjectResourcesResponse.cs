@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         public Guid ProjectResourceId { get; set; }
         public Guid ProjectId { get; set; }
         public string ResourceName { get; set; } = string.Empty;
-        public FileType ResourceType { get; set; }
+        public string ResourceType { get; set; } = string.Empty;
         public string ResourceUrl { get; set; } = string.Empty;
         public void Mapping(MappingProfile profile)
         {

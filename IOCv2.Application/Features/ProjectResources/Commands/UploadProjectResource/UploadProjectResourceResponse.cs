@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Application.Features.Projects.Commands.CreateProject;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -15,11 +15,12 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
         public Guid ProjectResourceId { get; set; }
         public Guid? ProjectId { get; set; }
         public string ResourceName { get; set; } = string.Empty;
-        public FileType ResourceType { get; set; }
+        public string ResourceType { get; set; } = string.Empty;
         public string ResourceUrl { get; set; } = string.Empty;
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Domain.Entities.ProjectResources, UploadProjectResourceResponse>();
+            profile.CreateMap<Domain.Entities.ProjectResources, UploadProjectResourceResponse>()
+                .ForMember(dest => dest.ResourceType, opt => opt.MapFrom(src => src.ResourceType.ToString()));
         }
     }
 }

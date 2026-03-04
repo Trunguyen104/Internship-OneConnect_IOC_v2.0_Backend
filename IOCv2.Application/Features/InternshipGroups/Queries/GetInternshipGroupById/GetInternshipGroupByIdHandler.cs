@@ -40,7 +40,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             // Sắp xếp lại danh sách theo Leader lên đầu
             if (result.Members != null && result.Members.Any())
             {
-                result.Members = result.Members.OrderByDescending(m => m.Role == Domain.Enums.InternshipRole.Leader).ToList();
+                result.Members = result.Members.OrderByDescending(m => m.Role == Domain.Enums.InternshipRole.Leader.ToString()).ToList();
             }
 
             return Result<GetInternshipGroupByIdResponse>.Success(result);

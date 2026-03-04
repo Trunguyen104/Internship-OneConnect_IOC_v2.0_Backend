@@ -14,7 +14,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public string? MentorName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public InternshipStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         public int NumberOfMembers { get; set; }
 
         public void Mapping(Profile profile)
@@ -22,7 +22,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             profile.CreateMap<InternshipGroup, GetInternshipGroupsResponse>()
                 .ForMember(d => d.EnterpriseName, opt => opt.MapFrom(s => s.Enterprise != null ? s.Enterprise.Name : null))
                 .ForMember(d => d.MentorName, opt => opt.MapFrom(s => s.Mentor != null && s.Mentor.User != null ? s.Mentor.User.FullName : null))
-                .ForMember(d => d.NumberOfMembers, opt => opt.MapFrom(s => s.Members.Count));
+                .ForMember(d => d.NumberOfMembers, opt => opt.MapFrom(s => s.Members.Count))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
         }
     }
 }

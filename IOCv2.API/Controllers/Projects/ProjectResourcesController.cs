@@ -84,16 +84,9 @@ public class ProjectResourcesController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProjectResource(
         [FromRoute] Guid resourceId,
-        [FromBody] UpdateProjectResourceRequest request,
+        [FromBody] UpdateProjectResourceCommand command,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateProjectResourceCommand
-        {
-            ProjectResourceId = resourceId,
-            ProjectId = request.ProjectId,
-            ResourceName = request.ResourceName,
-            ResourceType = request.ResourceType
-        };
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }

@@ -1,6 +1,7 @@
 using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
 {
@@ -18,6 +19,16 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
             RuleFor(v => v.StartDate)
                 .LessThan(v => v.EndDate).When(v => v.StartDate.HasValue && v.EndDate.HasValue)
                 .WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.StartDateBeforeEndDate));
+
+            // ACV-3: Validate Enum string input for each student's Role.
+            RuleForEach(v => v.Students)
+                .ChildRules(student =>
+                {
+                    student.RuleFor(s => s.Role)
+                        .NotEmpty()
+                        .Must(v => Enum.TryParse<InternshipRole>(v, ignoreCase: true, out _))
+                        .WithMessage($"Student Role must be one of: {string.Join(", ", Enum.GetNames<InternshipRole>())}");
+                });
         }
     }
 }

@@ -6,6 +6,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Epics.Commands.UpdateEpic;
 
@@ -15,41 +16,61 @@ public class UpdateEpicHandler : IRequestHandler<UpdateEpicCommand, Result<Updat
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
     private readonly IMessageService _messageService;
+    private readonly ILogger<UpdateEpicHandler> _logger;
 
     public UpdateEpicHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         ICacheService cacheService,
-        IMessageService messageService)
+        IMessageService messageService,
+        ILogger<UpdateEpicHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _cacheService = cacheService;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<UpdateEpicResponse>> Handle(
         UpdateEpicCommand request, CancellationToken cancellationToken)
     {
-        var epics = await _unitOfWork.Repository<WorkItem>()
-            .FindAsync(w => w.WorkItemId == request.EpicId && w.ProjectId == request.ProjectId && w.Type == WorkItemType.Epic, cancellationToken);
-        var epic = epics.FirstOrDefault();
+        _logger.LogInformation("Updating epic: {EpicId} in project: {ProjectId}", request.EpicId, request.ProjectId);
 
-        if (epic is null)
-            return Result<UpdateEpicResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Epic.NotFound), ResultErrorType.NotFound);
+        try
+        {
+            var epics = await _unitOfWork.Repository<WorkItem>()
+                .FindAsync(w => w.WorkItemId == request.EpicId && w.ProjectId == request.ProjectId && w.Type == WorkItemType.Epic, cancellationToken);
+            var epic = epics.FirstOrDefault();
 
-        epic.Title = request.Name;
-        epic.Description = request.Description;
-        epic.UpdatedAt = DateTime.UtcNow;
+            if (epic is null)
+            {
+                _logger.LogWarning("Epic not found: {EpicId}", request.EpicId);
+                return Result<UpdateEpicResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Epic.NotFound), ResultErrorType.NotFound);
+            }
 
-        await _unitOfWork.Repository<WorkItem>().UpdateAsync(epic, cancellationToken);
-        await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        await _cacheService.RemoveAsync(EpicCacheKeys.Epic(epic.ProjectId, request.EpicId), cancellationToken);
-        await _cacheService.RemoveByPatternAsync(
-            EpicCacheKeys.EpicListPattern(epic.ProjectId), cancellationToken);
+            epic.UpdateInfo(request.Name, request.Description);
 
-        return Result<UpdateEpicResponse>.Success(_mapper.Map<UpdateEpicResponse>(epic));
+            await _unitOfWork.Repository<WorkItem>().UpdateAsync(epic, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            await _cacheService.RemoveAsync(EpicCacheKeys.Epic(epic.ProjectId, request.EpicId), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(
+                EpicCacheKeys.EpicListPattern(epic.ProjectId), cancellationToken);
+
+            _logger.LogInformation("Epic updated successfully: {EpicId}", request.EpicId);
+            return Result<UpdateEpicResponse>.Success(_mapper.Map<UpdateEpicResponse>(epic));
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Failed to update epic: {EpicId}", request.EpicId);
+            throw;
+        }
     }
 }
