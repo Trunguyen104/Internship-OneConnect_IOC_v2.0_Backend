@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup
 {
-    public class UpdateInternshipGroupValidator : AbstractValidator<UpdateInternshipGroupCommand>
+    internal class UpdateInternshipGroupValidator : AbstractValidator<UpdateInternshipGroupCommand>
     {
         public UpdateInternshipGroupValidator(IMessageService messageService)
         {

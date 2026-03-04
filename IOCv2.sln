@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOCv2.Infrastructure", "IOC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOCv2.API", "IOCv2.API\IOCv2.API.csproj", "{68387917-62B4-4F47-8D1B-B95BE07C2BDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IOCv2.Tests", "IOCv2.Tests\IOCv2.Tests.csproj", "{670EC2DD-FCBF-47F9-A811-75236284672A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{68387917-62B4-4F47-8D1B-B95BE07C2BDC}.Release|x64.Build.0 = Release|Any CPU
 		{68387917-62B4-4F47-8D1B-B95BE07C2BDC}.Release|x86.ActiveCfg = Release|Any CPU
 		{68387917-62B4-4F47-8D1B-B95BE07C2BDC}.Release|x86.Build.0 = Release|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Debug|x64.Build.0 = Debug|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Debug|x86.Build.0 = Debug|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Release|x64.ActiveCfg = Release|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Release|x64.Build.0 = Release|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Release|x86.ActiveCfg = Release|Any CPU
+		{670EC2DD-FCBF-47F9-A811-75236284672A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

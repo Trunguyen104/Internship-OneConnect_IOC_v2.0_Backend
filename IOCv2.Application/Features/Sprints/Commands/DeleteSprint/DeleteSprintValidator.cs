@@ -4,7 +4,7 @@ using Microsoft.Extensions.Localization;
 
 namespace IOCv2.Application.Features.Sprints.Commands.DeleteSprint;
 
-public class DeleteSprintValidator : AbstractValidator<DeleteSprintCommand>
+internal class DeleteSprintValidator : AbstractValidator<DeleteSprintCommand>
 {
     public DeleteSprintValidator(IStringLocalizer<ErrorMessages> localizer)
     {

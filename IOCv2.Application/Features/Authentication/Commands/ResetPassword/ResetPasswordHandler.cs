@@ -60,9 +60,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
             // All validations passed - proceed with password reset
             var user = resetToken.User;
 
-            // Hash the new password
-            user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
-            user.UpdatedAt = DateTime.UtcNow;
+            // Hash and update the new password using rich domain method
+            user.UpdatePassword(_passwordService.HashPassword(request.NewPassword));
 
             // Mark this token as used
             resetToken.UsedAt = DateTimeOffset.UtcNow;

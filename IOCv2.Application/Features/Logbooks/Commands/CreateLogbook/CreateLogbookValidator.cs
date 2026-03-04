@@ -4,7 +4,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 {
-    public class CreateLogbookValidator : AbstractValidator<CreateLogbookCommand>
+    internal class CreateLogbookValidator : AbstractValidator<CreateLogbookCommand>
     {
         public CreateLogbookValidator() 
         {

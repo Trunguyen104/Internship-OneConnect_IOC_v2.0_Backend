@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
 {
-    public class DeleteLogbookValidator : AbstractValidator<DeleteLogbookCommand>
+    internal class DeleteLogbookValidator : AbstractValidator<DeleteLogbookCommand>
     {
         public DeleteLogbookValidator()
         {

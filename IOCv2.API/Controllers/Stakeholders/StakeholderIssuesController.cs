@@ -27,7 +27,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Get a paginated list of stakeholder issues with optional filters (projectId, stakeholderId, status) and search.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PagedResult<GetStakeholderIssuesResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<PaginatedResult<GetStakeholderIssuesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetIssues(

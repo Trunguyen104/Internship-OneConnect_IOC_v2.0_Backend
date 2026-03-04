@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
 {
-    public class ResetPasswordValidator : AbstractValidator<ResetPasswordCommand>
+    internal class ResetPasswordValidator : AbstractValidator<ResetPasswordCommand>
     {
         public ResetPasswordValidator(IMessageService messageService) 
         {

@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource
 {
-    public class UpdateProjectResourceCommand : IRequest<Result<UpdateProjectResourceResponse>>
+    public record UpdateProjectResourceCommand : IRequest<Result<UpdateProjectResourceResponse>>
     {
-        public Guid ProjectResourceId { get; set; }
-        public Guid ProjectId { get; set; }
-        public string ResourceName { get; set; } = string.Empty;
+        public Guid ProjectResourceId { get; init; }
+        public Guid ProjectId { get; init; }
+        public string ResourceName { get; init; } = string.Empty;
         /// <summary>Type of file: DocumentFile, Image, Video, Other</summary>
-        public string ResourceType { get; set; } = string.Empty;
+        public string ResourceType { get; init; } = string.Empty;
     }
 }

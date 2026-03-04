@@ -29,7 +29,7 @@ public class SprintsController : ApiControllerBase
     /// Get all sprints for a project with optional status filter.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<GetSprintsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<PaginatedResult<GetSprintsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetSprints(

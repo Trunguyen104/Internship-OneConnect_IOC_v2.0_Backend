@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById
 {
-    public class GetInternshipGroupByIdValidator : AbstractValidator<GetInternshipGroupByIdQuery>
+    internal class GetInternshipGroupByIdValidator : AbstractValidator<GetInternshipGroupByIdQuery>
     {
         public GetInternshipGroupByIdValidator()
         {

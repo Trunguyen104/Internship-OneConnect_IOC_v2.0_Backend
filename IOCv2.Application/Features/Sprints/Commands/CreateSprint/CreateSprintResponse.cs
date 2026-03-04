@@ -12,6 +12,7 @@ public class CreateSprintResponse : IMapFrom<Sprint>
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public string Status { get; set; } = string.Empty;
+    public int WorkItemCount { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public void Mapping(MappingProfile profile)
@@ -20,3 +21,4 @@ public class CreateSprintResponse : IMapFrom<Sprint>
             .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
     }
 }
+

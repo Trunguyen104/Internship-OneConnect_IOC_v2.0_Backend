@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
-    public class CreateProjectValidator : AbstractValidator<CreateProjectCommand>
+    internal class CreateProjectValidator : AbstractValidator<CreateProjectCommand>
     {
         private readonly IMessageService _messageService;
         public CreateProjectValidator(IMessageService messageService) {

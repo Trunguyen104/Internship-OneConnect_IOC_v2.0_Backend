@@ -1,10 +1,11 @@
-﻿﻿﻿using AutoMapper;
+﻿﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
 {
@@ -13,16 +14,24 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
+        private readonly ILogger<UpdateStakeholderHandler> _logger;
 
-        public UpdateStakeholderHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService)
+        public UpdateStakeholderHandler(
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            IMessageService messageService,
+            ILogger<UpdateStakeholderHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
+            _logger = logger;
         }
 
         public async Task<Result<UpdateStakeholderResponse>> Handle(UpdateStakeholderCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Updating stakeholder {Id}", request.Id);
+
             // Find stakeholder
             var stakeholder = await _unitOfWork.Repository<Stakeholder>()
                 .Query()
@@ -30,21 +39,20 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
 
             if (stakeholder == null)
             {
+                _logger.LogWarning("Stakeholder {Id} not found", request.Id);
                 return Result<UpdateStakeholderResponse>.NotFound(
                     _messageService.GetMessage(MessageKeys.Stakeholder.NotFound));
             }
 
-            // Parse Type string to enum if provided
-            if (!string.IsNullOrWhiteSpace(request.Type))
-            {
-                if (!Enum.TryParse<Domain.Enums.StakeholderType>(request.Type, true, out var stakeholderType))
-                {
-                    return Result<UpdateStakeholderResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Stakeholder.InvalidType),
-                        ResultErrorType.BadRequest);
-                }
-                stakeholder.Type = stakeholderType;
-            }
+            // TODO: Ownership check
+
+            // Partial update values
+            var name = request.Name?.Trim() ?? stakeholder.Name;
+            var type = request.Type ?? stakeholder.Type;
+            var email = request.Email?.Trim() ?? stakeholder.Email;
+            var role = request.Role?.Trim() ?? stakeholder.Role;
+            var description = request.Description?.Trim() ?? stakeholder.Description;
+            var phoneNumber = request.PhoneNumber?.Trim() ?? stakeholder.PhoneNumber;
 
             // Check email duplicate when email is being changed
             if (!string.IsNullOrWhiteSpace(request.Email))
@@ -61,6 +69,7 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
 
                     if (emailExists)
                     {
+                        _logger.LogWarning("Stakeholder email {Email} already exists in project {ProjectId}", request.Email, stakeholder.ProjectId);
                         return Result<UpdateStakeholderResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.Stakeholder.EmailExists),
                             ResultErrorType.Conflict);
@@ -68,33 +77,34 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
                 }
             }
 
-            // Partial update
-            if (!string.IsNullOrWhiteSpace(request.Name))
-                stakeholder.Name = request.Name.Trim();
+            try
+            {
+                // Domain encapsulation
+                stakeholder.UpdateDetails(
+                    name,
+                    type,
+                    email,
+                    role,
+                    description,
+                    phoneNumber
+                );
 
+                await _unitOfWork.Repository<Stakeholder>().UpdateAsync(stakeholder, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            if (request.Role != null)
-                stakeholder.Role = string.IsNullOrWhiteSpace(request.Role) ? null : request.Role.Trim();
+                _logger.LogInformation("Successfully updated stakeholder {Id}", request.Id);
 
-            if (request.Description != null)
-                stakeholder.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
-
-            if (!string.IsNullOrWhiteSpace(request.Email))
-                stakeholder.Email = request.Email.Trim();
-
-            if (request.PhoneNumber != null)
-                stakeholder.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
-
-            // Persist
-            await _unitOfWork.Repository<Stakeholder>().UpdateAsync(stakeholder, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-            // Return response
-            var response = _mapper.Map<UpdateStakeholderResponse>(stakeholder);
-            return Result<UpdateStakeholderResponse>.Success(
-                response,
-                _messageService.GetMessage(MessageKeys.Stakeholder.UpdateSuccess)
-            );
+                var response = _mapper.Map<UpdateStakeholderResponse>(stakeholder);
+                return Result<UpdateStakeholderResponse>.Success(
+                    response,
+                    _messageService.GetMessage(MessageKeys.Stakeholder.UpdateSuccess)
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating stakeholder {Id}", request.Id);
+                throw;
+            }
         }
     }
 }

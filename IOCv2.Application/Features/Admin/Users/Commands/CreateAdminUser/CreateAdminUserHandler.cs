@@ -45,8 +45,12 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
 
         public async Task<Result<CreateAdminUserResponse>> Handle(CreateAdminUserCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Creating Admin User {Email} with Role {Role} by Auditor {AuditorId}", 
+                request.Email, request.Role, _currentUserService.UserId);
+
             if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
             {
+                _logger.LogWarning("Invalid Auditor ID: {AuditorId}", _currentUserService.UserId);
                 return Result<CreateAdminUserResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
                     ResultErrorType.Unauthorized
@@ -56,6 +60,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
             // Parse Role
             if (!Enum.TryParse<UserRole>(request.Role, true, out var parsedRole))
             {
+                _logger.LogWarning("Invalid Role provided: {Role}", request.Role);
                 return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));
             }
 
@@ -66,19 +71,22 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 if (auditorRole == UserRole.SchoolAdmin)
                 {
                     if (parsedRole != UserRole.Student)
+                    {
+                        _logger.LogWarning("Access Denied: SchoolAdmin attempted to create {Role}", parsedRole);
                         return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied));
-                    
-                    // SchoolAdmin must link to their own university
-                    // For now, we trust the UnitId provided or we should fetch auditor's UnitId
-                    // To be safe, let's assume SuperAdmin provides UnitId, but for SchoolAdmin we might want to auto-assign it.
+                    }
                 }
                 else if (auditorRole == UserRole.EnterpriseAdmin)
                 {
                     if (parsedRole != UserRole.HR && parsedRole != UserRole.Mentor)
+                    {
+                        _logger.LogWarning("Access Denied: EnterpriseAdmin attempted to create {Role}", parsedRole);
                         return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied));
+                    }
                 }
                 else if (auditorRole != UserRole.SuperAdmin && auditorRole != UserRole.Moderator)
                 {
+                    _logger.LogWarning("Access Denied: Auditor with role {AuditorRole} attempted to create user", auditorRole);
                     return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied));
                 }
             }
@@ -86,6 +94,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 .ExistsAsync(u => u.Email == request.Email, cancellationToken);
             if (emailExists)
             {
+                _logger.LogWarning("Email Conflict: {Email} already exists", request.Email);
                 return Result<CreateAdminUserResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Users.EmailConflict),
                     ResultErrorType.Conflict
@@ -98,29 +107,49 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 var universityExists = await _unitOfWork.Repository<University>()
                     .ExistsAsync(u => u.UniversityId == request.UnitId.Value, cancellationToken);
                 if (!universityExists)
+                {
+                    _logger.LogWarning("University Not Found: {UnitId}", request.UnitId);
                     return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.University.NotFound), ResultErrorType.NotFound);
+                }
             }
             else if ((parsedRole == UserRole.EnterpriseAdmin || parsedRole == UserRole.HR || parsedRole == UserRole.Mentor) && request.UnitId.HasValue)
             {
                 var enterpriseExists = await _unitOfWork.Repository<Enterprise>()
                     .ExistsAsync(e => e.EnterpriseId == request.UnitId.Value, cancellationToken);
                 if (!enterpriseExists)
+                {
+                    _logger.LogWarning("Enterprise Not Found: {UnitId}", request.UnitId);
                     return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.NotFound), ResultErrorType.NotFound);
+                }
             }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Create user
-                var user = _mapper.Map<User>(request);
-                user.UserId = Guid.NewGuid();
-                user.Role = parsedRole;
-                user.UserCode = await _userServices.GenerateUserCodeAsync(parsedRole, cancellationToken);
-                user.Status = UserStatus.Active;
-
-                // Generate random password if not provided
+                // Prepare domain data
+                var userId = Guid.NewGuid();
+                var userCode = await _userServices.GenerateUserCodeAsync(parsedRole, cancellationToken);
                 var randomPassword = _passwordService.GenerateRandomPassword();
-                user.PasswordHash = _passwordService.HashPassword(randomPassword);
+                var passwordHash = _passwordService.HashPassword(randomPassword);
+
+                // Create user using rich domain constructor
+                var user = new User(
+                    userId,
+                    userCode,
+                    request.Email,
+                    request.FullName,
+                    parsedRole,
+                    passwordHash
+                );
+
+                // Update non-constructor fields if provided
+                user.UpdateProfile(
+                    request.FullName,
+                    request.PhoneNumber,
+                    request.AvatarUrl,
+                    null, // Gender not in create request usually
+                    null  // DOB not in create request usually
+                );
 
                 await _unitOfWork.Repository<User>().AddAsync(user, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
@@ -187,11 +216,14 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 // Clear cache
                 await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
 
+                _logger.LogInformation("Successfully created Admin User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
+
                 var response = _mapper.Map<CreateAdminUserResponse>(user);
                 return Result<CreateAdminUserResponse>.Success(response);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to create Admin User {Email}", request.Email);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 throw;
             }

@@ -27,7 +27,7 @@ public class EpicsController : ApiControllerBase
     /// Get all Epics for a project with pagination.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PagedResult<GetEpicsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<PaginatedResult<GetEpicsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetEpics(

@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Sprints.Commands.CreateSprint;
 
-public class CreateSprintValidator : AbstractValidator<CreateSprintCommand>
+internal class CreateSprintValidator : AbstractValidator<CreateSprintCommand>
 {
     public CreateSprintValidator(IMessageService messageService)
     {

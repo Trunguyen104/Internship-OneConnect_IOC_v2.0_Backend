@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
 {
-    public class GetProjectsByInternshipIdValidator : AbstractValidator<GetProjectsByInternshipIdQuery>
+    internal class GetProjectsByInternshipIdValidator : AbstractValidator<GetProjectsByInternshipIdQuery>
     {
         private readonly IMessageService _messageService;
         public GetProjectsByInternshipIdValidator(IMessageService messageService)

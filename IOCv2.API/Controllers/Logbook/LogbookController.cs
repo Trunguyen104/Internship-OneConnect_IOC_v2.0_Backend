@@ -15,14 +15,14 @@ namespace IOCv2.API.Controllers.Logbook;
 /// </summary>
 [Tags("Logbooks")]
 [Authorize]
-[Route("api/logbooks")]
+[Route("api/projects/{projectId:guid}/logbooks")]
 public class LogbookController : ApiControllerBase
 {
     private readonly IMediator _mediator;
 
     public LogbookController(IMediator mediator) => _mediator = mediator;
 
-    [HttpGet("/api/projects/{projectId:guid}/logbooks")]
+    [HttpGet]
     [ProducesResponseType(typeof(Result<GetLogbooksResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -36,7 +36,7 @@ public class LogbookController : ApiControllerBase
     /// <summary>
     /// Get a single logbook entry by ID.
     /// </summary>
-    [HttpGet("/api/projects/{projectId:guid}/logbooks/{logbookId:guid}")]
+    [HttpGet("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<GetLogbookByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -51,7 +51,7 @@ public class LogbookController : ApiControllerBase
     /// <summary>
     /// Create a new logbook entry.
     /// </summary>
-    [HttpPost("/api/projects/{projectId:guid}/logbooks")]
+    [HttpPost]
     [ProducesResponseType(typeof(Result<CreateLogbookResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -68,7 +68,7 @@ public class LogbookController : ApiControllerBase
     /// <summary>
     /// Update an existing logbook entry.
     /// </summary>
-    [HttpPut("/api/projects/{projectId:guid}/logbooks/{logbookId:guid}")]
+    [HttpPut("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<UpdateLogbookResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -86,7 +86,7 @@ public class LogbookController : ApiControllerBase
     /// <summary>
     /// Soft delete a logbook entry by ID.
     /// </summary>
-    [HttpDelete("/api/projects/{projectId:guid}/logbooks/{logbookId:guid}")]
+    [HttpDelete("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<DeleteLogbookResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

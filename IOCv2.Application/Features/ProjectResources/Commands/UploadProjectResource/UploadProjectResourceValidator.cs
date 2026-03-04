@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource
 {
-    public class UploadProjectResourceValidator : AbstractValidator<UploadProjectResourceCommand>
+    internal class UploadProjectResourceValidator : AbstractValidator<UploadProjectResourceCommand>
     {
         private readonly IMessageService _messageService;
         public UploadProjectResourceValidator(IMessageService messageService)

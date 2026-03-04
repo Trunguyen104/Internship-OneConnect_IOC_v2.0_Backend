@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Epics.Commands.CreateEpic;
 
-public class CreateEpicValidator : AbstractValidator<CreateEpicCommand>
+internal class CreateEpicValidator : AbstractValidator<CreateEpicCommand>
 {
     public CreateEpicValidator(IMessageService messageService)
     {

@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Sprints.Commands.UpdateSprint;
 
-public class UpdateSprintValidator : AbstractValidator<UpdateSprintCommand>
+internal class UpdateSprintValidator : AbstractValidator<UpdateSprintCommand>
 {
     public UpdateSprintValidator(IMessageService messageService)
     {
