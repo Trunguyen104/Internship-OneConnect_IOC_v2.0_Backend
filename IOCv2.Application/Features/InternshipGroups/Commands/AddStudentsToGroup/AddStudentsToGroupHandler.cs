@@ -18,8 +18,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
         private readonly ILogger<AddStudentsToGroupHandler> _logger;
 
         public AddStudentsToGroupHandler(
-            IUnitOfWork unitOfWork, 
-            IMessageService messageService, 
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
             IMapper mapper,
             ILogger<AddStudentsToGroupHandler> logger)
         {
@@ -31,7 +31,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
 
         public async Task<Result<AddStudentsToGroupResponse>> Handle(AddStudentsToGroupCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Adding students to group: {InternshipId}", request.InternshipId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAddingStudents), request.InternshipId);
 
             try
             {
@@ -41,19 +41,19 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
 
                 if (group == null)
                 {
-                    _logger.LogWarning("Internship group not found: {InternshipId}", request.InternshipId);
+                    _logger.LogWarning("{Message}: {InternshipId}", _messageService.GetMessage(MessageKeys.InternshipGroups.NotFound), request.InternshipId);
                     return Result<AddStudentsToGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
                 var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
-                
+
                 // Validate students exist in system
                 var existingUsers = await _unitOfWork.Repository<Student>().FindAsync(s => studentIds.Contains(s.StudentId), cancellationToken);
                 var existingStudentIds = existingUsers.Select(s => s.StudentId).ToList();
 
                 if (existingStudentIds.Count != studentIds.Count)
                 {
-                    _logger.LogWarning("Some student IDs are invalid or not found");
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogInvalidStudentIds));
                     return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.InvalidStudentId));
                 }
 
@@ -71,20 +71,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 if (saved >= 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
-                    _logger.LogInformation("Successfully added {Count} students to group: {InternshipId}", studentIds.Count, request.InternshipId);
-                    
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAddedStudentsSuccess), studentIds.Count, request.InternshipId);
+
                     var response = _mapper.Map<AddStudentsToGroupResponse>(group);
                     return Result<AddStudentsToGroupResponse>.Success(response);
                 }
 
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError("Failed to update group members in database");
+                _logger.LogError(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAddStudentsFailed));
                 return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error occurred while adding students to group");
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogAddStudentsError));
                 throw;
             }
         }

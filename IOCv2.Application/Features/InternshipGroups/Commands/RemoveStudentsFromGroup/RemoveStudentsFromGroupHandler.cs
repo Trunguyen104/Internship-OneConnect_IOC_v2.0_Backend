@@ -17,8 +17,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
         private readonly ILogger<RemoveStudentsFromGroupHandler> _logger;
 
         public RemoveStudentsFromGroupHandler(
-            IUnitOfWork unitOfWork, 
-            IMessageService messageService, 
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
             IMapper mapper,
             ILogger<RemoveStudentsFromGroupHandler> logger)
         {
@@ -30,7 +30,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
         public async Task<Result<RemoveStudentsFromGroupResponse>> Handle(RemoveStudentsFromGroupCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Removing students from group: {InternshipId}", request.InternshipId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemovingStudents), request.InternshipId);
 
             try
             {
@@ -40,7 +40,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
                 if (group == null)
                 {
-                    _logger.LogWarning("Internship group not found: {InternshipId}", request.InternshipId);
+                    _logger.LogWarning("{Message}: {InternshipId}", _messageService.GetMessage(MessageKeys.InternshipGroups.NotFound), request.InternshipId);
                     return Result<RemoveStudentsFromGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
@@ -57,20 +57,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                 if (saved >= 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
-                    _logger.LogInformation("Successfully removed students from group: {InternshipId}", request.InternshipId);
-                    
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemovedStudentsSuccess), request.InternshipId);
+
                     var response = _mapper.Map<RemoveStudentsFromGroupResponse>(group);
                     return Result<RemoveStudentsFromGroupResponse>.Success(response);
                 }
 
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError("Failed to update group in database");
+                _logger.LogError(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemoveStudentsFailed));
                 return Result<RemoveStudentsFromGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error occurred while removing students from group");
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogRemoveStudentsError));
                 throw;
             }
         }

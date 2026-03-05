@@ -18,8 +18,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
         private readonly ILogger<DeleteInternshipGroupHandler> _logger;
 
         public DeleteInternshipGroupHandler(
-            IUnitOfWork unitOfWork, 
-            IMessageService messageService, 
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
             IMapper mapper,
             ILogger<DeleteInternshipGroupHandler> logger)
         {
@@ -31,7 +31,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
 
         public async Task<Result<DeleteInternshipGroupResponse>> Handle(DeleteInternshipGroupCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Deleting internship group: {InternshipId}", request.InternshipId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleting), request.InternshipId);
 
             try
             {
@@ -41,7 +41,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
 
                 if (entity == null)
                 {
-                    _logger.LogWarning("Internship group not found: {InternshipId}", request.InternshipId);
+                    _logger.LogWarning("{Message}: {InternshipId}", _messageService.GetMessage(MessageKeys.InternshipGroups.NotFound), request.InternshipId);
                     return Result<DeleteInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
@@ -63,20 +63,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                 if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
-                    _logger.LogInformation("Successfully deleted internship group: {InternshipId}", request.InternshipId);
-                    
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDeletedSuccess), request.InternshipId);
+
                     var response = _mapper.Map<DeleteInternshipGroupResponse>(entity);
                     return Result<DeleteInternshipGroupResponse>.Success(response);
                 }
 
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError("Failed to delete internship group from database");
+                _logger.LogError(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteFailed));
                 return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error occurred while deleting internship group: {InternshipId}", request.InternshipId);
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteError), request.InternshipId);
                 throw;
             }
         }
