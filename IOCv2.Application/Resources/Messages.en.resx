@@ -198,4 +198,7 @@
   <data name="Issue.DeleteSuccess" xml:space="preserve">
     <value>Issue deleted successfully.</value>
   </data>
+  <data name="Enterprise.RequestManyTimes" xml:space="preserve">
+    <value>You have submitted the request too many times.</value>
+  </data>
 </root>

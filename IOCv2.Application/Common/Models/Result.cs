@@ -7,7 +7,8 @@
         NotFound,
         Unauthorized,
         Forbidden,
-        Conflict
+        Conflict,
+        InternalServerError
     }
 
     public class Result<T>

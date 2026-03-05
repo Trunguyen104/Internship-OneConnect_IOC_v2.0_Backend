@@ -94,9 +94,25 @@
         public static class Enterprise
         {
             public const string NotFound = "Enterprise.NotFound";
+            public const string LogNotFound = "Enterprise.LogNotFound";
             public const string DuplicateTaxCode = "Enterprise.DuplicateTaxCode";
             public const string Unverified = "Enterprise.Unverified";
             public const string Inactive = "Enterprise.Inactive";
+            public const string GetEnterprisesError = "Enterprise.GetEnterprisesError";
+            public const string GetEnterpriseByIdError = "Enterprise.GetEnterpriseByIdError";
+            public const string EnterpriseWithSameTaxCodeExists = "Enterprise.EnterpriseWithSameTaxCodeExists";
+            public const string LogEnterpriseWithSameTaxCodeExists = "Enterprise.LogEnterpriseWithSameTaxCodeExists";
+            public const string ErrorCreatingEnterprise = "Enterprise.ErrorCreatingEnterprise";
+            public const string WebsiteNotValid = "Enterprise.WebsiteNotValid";
+            public const string logoUrlNotValid = "Enterprise.LogoUrlNotValid";
+            public const string BackgroundUrlNotValid = "Enterprise.BackgroundUrlNotValid";
+            public const string UpdatePermissionsNotAllowed = "Enterprise.UpdatePermissionsNotAllowed";
+            public const string UpdateTaxCodeNotAllowed = "Enterprise.UpdateTaxCodeNotAllowed";
+            public const string LogUpdatePermissionsNotAllowed = "Enterprise.LogUpdatePermissionsNotAllowed";
+            public const string LogUpdateEnterpriseError = "Enterprise.LogUpdateEnterpriseError";
+            public const string LogDeleteError = "Enterprise.LogDeleteError";
+            public const string DeleteError = "Enterprise.DeleteError";
+            public const string RequestManyTimes = "Enterprise.RequestManyTimes";
         }
 
         public static class Profile

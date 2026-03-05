@@ -142,6 +142,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bạn đã gửi request quá nhiều lần..
+        /// </summary>
+        internal static string Enterprise_RequestManyTimes {
+            get {
+                return ResourceManager.GetString("Enterprise.RequestManyTimes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tạo Epic thành công..
         /// </summary>
         internal static string Epic_CreatedSuccess {

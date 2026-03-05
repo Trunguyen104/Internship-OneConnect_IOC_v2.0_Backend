@@ -213,6 +213,9 @@
   <data name="Profile.EmailExists" xml:space="preserve">
     <value>Email is already in use by another user.</value>
   </data>
+  <data name="Enterprise.NotFound" xml:space="preserve">
+    <value>No enterprise information found.</value>
+  </data>
   <data name="Projects.LogDeleteError" xml:space="preserve">
     <value>Error deleting project {0}</value>
   </data>
@@ -406,6 +409,51 @@
   <data name="Internships.NotFound" xml:space="preserve">
     <value>No internship found with ID: {0}</value>
   </data>
+  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
+    <value>Error while retrieving enterprises</value>
+  </data>
+  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
+    <value>Error occurred while getting enterprise by id</value>
+  </data>
+  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>The tax identification number already exists in the system.</value>
+  </data>
+  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>The business with tax code '{TaxCode}' already exists.</value>
+  </data>
+  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
+    <value>An error occurred while creating the business.</value>
+  </data>
+  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
+    <value>The tax identification number is not in the correct format.</value>
+  </data>
+  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
+    <value>Name is required.</value>
+  </data>
+  <data name="Enterprise.NameMaxLength" xml:space="preserve">
+    <value>Name must not exceed {0} characters.</value>
+  </data>
+  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
+    <value>Website must start with http or https.</value>
+  </data>
+  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
+    <value>LogoUrl must start with http or https.</value>
+  </data>
+  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
+    <value>BackgroundUrl must start with http or https.</value>
+  </data>
+  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>You are not allowed to modify this enterprise.</value>
+  </data>
+  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>Error: No permission to edit enterprise {enterpriseId}.</value>
+  </data>
+  <data name="Enterprise.LogNotFound" xml:space="preserve">
+    <value>Enterprise {enterpriseId} not found</value>
+  </data>
+  <data name="Enterprise.LogUpdateEnterpriseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -483,5 +531,14 @@
   </data>
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
+  </data>
+  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+    <value>Updating the tax code is not allowed.</value>
+  </data>
+  <data name="Enterprise.LogDeleteError" xml:space="preserve">
+    <value>Error occurred while deleting enterprise with ID {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.DeleteError" xml:space="preserve">
+    <value>An error occurred while deleting the enterprise. Please try again later.</value>
   </data>
 </root>

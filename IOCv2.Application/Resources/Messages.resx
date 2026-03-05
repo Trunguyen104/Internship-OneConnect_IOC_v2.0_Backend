@@ -264,4 +264,7 @@
   <data name="Issue.DeleteSuccess" xml:space="preserve">
     <value>Xóa issue thành công.</value>
   </data>
+  <data name="Enterprise.RequestManyTimes" xml:space="preserve">
+    <value>Bạn đã gửi request quá nhiều lần.</value>
+  </data>
 </root>
