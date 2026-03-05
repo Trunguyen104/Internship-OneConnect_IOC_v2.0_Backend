@@ -3,6 +3,7 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260305032323_AddEvaluationAndDetail")]
+    partial class AddEvaluationAndDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,7 +282,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<Guid?>("StudentId")
+                    b.Property<Guid>("StudentId")
                         .HasColumnType("uuid")
                         .HasColumnName("student_id");
 
@@ -307,9 +310,9 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("StudentId")
                         .HasDatabaseName("ix_evaluations_student_id");
 
-                    b.HasIndex("CycleId", "InternshipId", "StudentId")
+                    b.HasIndex("CycleId", "StudentId")
                         .IsUnique()
-                        .HasDatabaseName("ix_evaluations_cycle_internship_student_unique");
+                        .HasDatabaseName("ix_evaluations_cycle_student_unique");
 
                     b.ToTable("evaluations", (string)null);
                 });
@@ -1849,6 +1852,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
                         .HasConstraintName("fk_evaluations_students_student_id");
 
                     b.Navigation("Cycle");

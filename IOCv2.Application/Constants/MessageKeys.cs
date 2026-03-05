@@ -308,5 +308,41 @@
         {
             public const string WorkItemNotFound = "Error.WorkItem.NotFound";
         }
+
+        public static class EvaluationCycle
+        {
+            public const string NotFound = "EvaluationCycle.NotFound";
+            public const string NameRequired = "EvaluationCycle.NameRequired";
+            public const string NameMaxLength = "EvaluationCycle.NameMaxLength";
+            public const string TermNotFound = "EvaluationCycle.TermNotFound";
+            public const string StartDateRequired = "EvaluationCycle.StartDateRequired";
+            public const string EndDateRequired = "EvaluationCycle.EndDateRequired";
+            public const string EndDateMustBeAfterStart = "EvaluationCycle.EndDateMustBeAfterStart";
+            public const string CannotDeleteWithCriteria = "EvaluationCycle.CannotDeleteWithCriteria";
+        }
+
+        public static class EvaluationCriteriaKey
+        {
+            public const string NotFound = "EvaluationCriteria.NotFound";
+            public const string CycleNotFound = "EvaluationCriteria.CycleNotFound";
+            public const string NameRequired = "EvaluationCriteria.NameRequired";
+            public const string NameMaxLength = "EvaluationCriteria.NameMaxLength";
+            public const string MaxScoreInvalid = "EvaluationCriteria.MaxScoreInvalid";
+            public const string WeightInvalid = "EvaluationCriteria.WeightInvalid";
+        }
+
+        public static class EvaluationKey
+        {
+            public const string NotFound = "Evaluation.NotFound";
+            public const string CycleNotFound = "Evaluation.CycleNotFound";
+            public const string StudentNotFound = "Evaluation.StudentNotFound";
+            public const string InternshipNotFound = "Evaluation.InternshipNotFound";
+            public const string StudentNotInGroup = "Evaluation.StudentNotInGroup";
+            public const string AlreadyExists = "Evaluation.AlreadyExists";
+            public const string CannotUpdateSubmitted = "Evaluation.CannotUpdateSubmitted";
+            public const string CriteriaNotFound = "Evaluation.CriteriaNotFound";
+            public const string ScoreExceedsMax = "Evaluation.ScoreExceedsMax";
+            public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
+        }
     }
 }
