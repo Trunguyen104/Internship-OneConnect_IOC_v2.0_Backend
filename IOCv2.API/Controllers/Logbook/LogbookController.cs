@@ -23,14 +23,16 @@ public class LogbookController : ApiControllerBase
     public LogbookController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
-    [ProducesResponseType(typeof(Result<GetLogbooksResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<PaginatedResult<GetLogbooksResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetLogbooks(
-        [FromRoute] GetLogbooksQuery query,
+        [FromRoute] Guid projectId,
+        [FromQuery] GetLogbooksQuery query,
         CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(query, cancellationToken));
+        var logbookQuery = query with { ProjectId = projectId };
+        return HandleResult(await _mediator.Send(logbookQuery, cancellationToken));
     }
 
     /// <summary>
@@ -42,10 +44,11 @@ public class LogbookController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetLogbookById(
-        [FromRoute] GetLogbookByIdQuery query,
+        [FromRoute] Guid projectId,
+        [FromRoute] Guid logbookId,
         CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(query, cancellationToken));
+        return HandleResult(await _mediator.Send(new GetLogbookByIdQuery { ProjectId = projectId, LogbookId = logbookId }, cancellationToken));
     }
 
     /// <summary>
@@ -75,6 +78,7 @@ public class LogbookController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateLogbook(
+        [FromRoute] Guid projectId,
         [FromRoute] Guid logbookId,
         [FromBody] UpdateLogbookCommand command,
         CancellationToken cancellationToken = default)
@@ -92,9 +96,11 @@ public class LogbookController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteLogbook(
-        [FromRoute] DeleteLogbookCommand command,
+        [FromRoute] Guid projectId,
+        [FromRoute] Guid logbookId,
         CancellationToken cancellationToken = default)
     {
+        var command = new DeleteLogbookCommand { ProjectId = projectId, LogbookId = logbookId };
         return HandleResult(await _mediator.Send(command, cancellationToken));
     }
 }
