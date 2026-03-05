@@ -553,4 +553,19 @@
   <data name="InternshipGroup.NotFound" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
+  <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
+    <value>Term not found for ID: {TermId}</value>
+  </data>
+  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise not found for ID: {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+    <value>Mentor not found for ID: {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+    <value>Student not found for ID: {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+    <value>Internship group not found for ID: {InternshipId}</value>
+  </data>
 </root>

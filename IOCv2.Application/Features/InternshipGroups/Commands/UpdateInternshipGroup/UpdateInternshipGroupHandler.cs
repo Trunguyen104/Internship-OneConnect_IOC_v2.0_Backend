@@ -39,7 +39,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
 
                 if (entity == null)
                 {
-                    _logger.LogWarning("{Message}: {InternshipId}", _messageService.GetMessage(MessageKeys.InternshipGroups.NotFound), request.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNotFound), request.InternshipId);
                     return Result<UpdateInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
@@ -48,7 +48,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
                 if (!termExists)
                 {
-                    _logger.LogWarning("{Message}: {TermId}", _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
                     return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
 
@@ -59,7 +59,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                         .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
                     if (!enterpriseExists)
                     {
-                        _logger.LogWarning("{Message}: {EnterpriseId}", _messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), request.EnterpriseId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogEnterpriseNotFound), request.EnterpriseId);
                         return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
                     }
                 }
@@ -67,11 +67,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 // Validate MentorId if provided
                 if (request.MentorId.HasValue)
                 {
-                    var mentorExists = await _unitOfWork.Repository<User>()
-                        .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                    var mentorExists = await _unitOfWork.Repository<EnterpriseUser>()
+                        .ExistsAsync(u => u.EnterpriseUserId == request.MentorId.Value, cancellationToken);
                     if (!mentorExists)
                     {
-                        _logger.LogWarning("{Message}: {MentorId}", _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), request.MentorId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
                     }
                 }

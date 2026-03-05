@@ -612,4 +612,19 @@
   <data name="InternshipGroup.NotFound" xml:space="preserve">
     <value>Không tìm thấy nhóm thực tập.</value>
   </data>
+  <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ với ID: {TermId}</value>
+  </data>
+  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp với ID: {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+    <value>Không tìm thấy người hướng dẫn với ID: {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên với ID: {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập với ID: {InternshipId}</value>
+  </data>
 </root>

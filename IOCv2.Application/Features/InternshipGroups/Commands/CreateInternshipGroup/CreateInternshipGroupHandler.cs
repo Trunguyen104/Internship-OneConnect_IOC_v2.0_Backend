@@ -40,7 +40,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
                 if (!termExists)
                 {
-                    _logger.LogWarning("{Message}: {TermId}", _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
                     return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
 
@@ -51,7 +51,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
                     if (!enterpriseExists)
                     {
-                        _logger.LogWarning("{Message}: {EnterpriseId}", _messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), request.EnterpriseId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogEnterpriseNotFound), request.EnterpriseId);
                         return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
                     }
                 }
@@ -59,11 +59,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 // Validate MentorId if provided
                 if (request.MentorId.HasValue)
                 {
-                    var mentorExists = await _unitOfWork.Repository<User>()
-                        .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                    var mentorExists = await _unitOfWork.Repository<EnterpriseUser>()
+                        .ExistsAsync(u => u.EnterpriseUserId == request.MentorId.Value, cancellationToken);
                     if (!mentorExists)
                     {
-                        _logger.LogWarning("{Message}: {MentorId}", _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), request.MentorId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
                     }
                 }
@@ -85,14 +85,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
 
                     // Performance fix: Batch validation of students
-                    var existingUsers = await _unitOfWork.Repository<User>()
-                        .FindAsync(u => studentIds.Contains(u.UserId), cancellationToken);
-                    var existingStudentIds = existingUsers.Select(u => u.UserId).ToList();
+                    var existingUsers = await _unitOfWork.Repository<Student>()
+                        .FindAsync(u => studentIds.Contains(u.StudentId), cancellationToken);
+                    var existingStudentIds = existingUsers.Select(u => u.StudentId).ToList();
 
                     if (existingStudentIds.Count != studentIds.Count)
                     {
                         var missingId = studentIds.Except(existingStudentIds).First();
-                        _logger.LogWarning("{Message}: {StudentId}", _messageService.GetMessage(MessageKeys.InternshipGroups.StudentNotFound), missingId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentNotFound), missingId);
                         return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.StudentNotFound), ResultErrorType.NotFound);
                     }
 

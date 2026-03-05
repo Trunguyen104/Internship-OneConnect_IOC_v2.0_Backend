@@ -40,7 +40,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
                 if (group == null)
                 {
-                    _logger.LogWarning("{Message}: {InternshipId}", _messageService.GetMessage(MessageKeys.InternshipGroups.NotFound), request.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNotFound), request.InternshipId);
                     return Result<RemoveStudentsFromGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 

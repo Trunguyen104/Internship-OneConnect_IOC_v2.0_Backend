@@ -48,7 +48,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             var enterpriseId = Guid.NewGuid();
             var mentorId = Guid.NewGuid();
             var studentId = Guid.NewGuid();
-            
+
             var command = new CreateInternshipGroupCommand
             {
                 TermId = termId,
@@ -65,17 +65,17 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 .ReturnsAsync(true);
             _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
-            _mockUnitOfWork.Setup(x => x.Repository<User>().ExistsAsync(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<CancellationToken>()))
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().ExistsAsync(It.IsAny<Expression<Func<EnterpriseUser, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
-            
-            _mockUnitOfWork.Setup(x => x.Repository<User>().FindAsync(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<User> { new User(studentId, "STU001", "stu@test.com", "Student", UserRole.Student, "hash") });
+
+            _mockUnitOfWork.Setup(x => x.Repository<Student>().FindAsync(It.IsAny<Expression<Func<Student, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Student> { new Student { StudentId = studentId, UserId = Guid.NewGuid() } });
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().AddAsync(It.IsAny<InternshipGroup>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((InternshipGroup g, CancellationToken c) => g);
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
-            
+
             _mockMapper.Setup(x => x.Map<CreateInternshipGroupResponse>(It.IsAny<InternshipGroup>()))
                 .Returns(new CreateInternshipGroupResponse { GroupName = "Test Group" });
 
@@ -97,7 +97,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
 
             _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
-            
+
             _mockMessageService.Setup(x => x.GetMessage(MessageKeys.InternshipGroups.TermNotFound))
                 .Returns("Term not found");
 

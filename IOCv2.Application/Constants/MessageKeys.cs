@@ -128,6 +128,12 @@
             public const string NotFound = "InternshipGroup.NotFound";
 
             // Logger Keys
+            public const string LogTermNotFound = "InternshipGroup.LogTermNotFound";
+            public const string LogEnterpriseNotFound = "InternshipGroup.LogEnterpriseNotFound";
+            public const string LogMentorNotFound = "InternshipGroup.LogMentorNotFound";
+            public const string LogStudentNotFound = "InternshipGroup.LogStudentNotFound";
+            public const string LogNotFound = "InternshipGroup.LogNotFound";
+
             public const string LogCreating = "InternshipGroup.LogCreating";
             public const string LogCreatedSuccess = "InternshipGroup.LogCreatedSuccess";
             public const string LogCreationFailed = "InternshipGroup.LogCreationFailed";
