@@ -41,7 +41,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
                 // Check if user is blocked due to too many failed attempts
                 if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
                 {
-                    return Result<GetEnterpriseByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.UpdateRequestManyTimes));
+                    return Result<PaginatedResult<GetEnterprisesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes));
                 }
                 // Register failed attempt (block after 30 attempts in 1 mins)
                 await _rateLimiter.RegisterFailAsync(
