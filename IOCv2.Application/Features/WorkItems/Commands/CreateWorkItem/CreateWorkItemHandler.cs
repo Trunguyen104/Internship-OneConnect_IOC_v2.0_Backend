@@ -50,12 +50,12 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
                     _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
         }
 
-        // Calculate BacklogOrder (append at end)
-        var maxBacklogOrder = await _unitOfWork.Repository<WorkItem>()
+        // Lấy BacklogOrder nhỏ nhất hiện tại (thẻ ở ngay vị trí đầu tiên)
+        var minBacklogOrder = await _unitOfWork.Repository<WorkItem>()
             .Query()
             .Where(w => w.ProjectId == request.ProjectId)
             .Select(w => (float?)w.BacklogOrder)
-            .MaxAsync(cancellationToken) ?? 0f;
+            .MinAsync(cancellationToken) ?? 2000f; // Nếu chưa có thẻ nào, khởi tạo số 2000
 
         var workItem = new WorkItem
         {
@@ -70,25 +70,25 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
             StoryPoint = request.StoryPoint,
             AssigneeId = request.AssigneeId,
             DueDate = request.DueDate,
-            BacklogOrder = maxBacklogOrder + 1000f
+            BacklogOrder = minBacklogOrder - 1000f
         };
 
         await _unitOfWork.Repository<WorkItem>().AddAsync(workItem, cancellationToken);
 
-        // If SprintId provided → assign to Sprint with BoardOrder at end
+        // If SprintId provided → assign to Sprint with BoardOrder at top
         if (request.SprintId.HasValue)
         {
-            var maxBoardOrder = await _unitOfWork.Repository<SprintWorkItem>()
+            var minBoardOrder = await _unitOfWork.Repository<SprintWorkItem>()
                 .Query()
                 .Where(swi => swi.SprintId == request.SprintId.Value)
                 .Select(swi => (float?)swi.BoardOrder)
-                .MaxAsync(cancellationToken) ?? 0f;
+                .MinAsync(cancellationToken) ?? 2000f; // Tương tự, 2000 nếu sprint rỗng
 
             var sprintWorkItem = new SprintWorkItem
             {
                 SprintId = request.SprintId.Value,
                 WorkItemId = workItem.WorkItemId,
-                BoardOrder = maxBoardOrder + 1000f
+                BoardOrder = minBoardOrder - 1000f
             };
             await _unitOfWork.Repository<SprintWorkItem>().AddAsync(sprintWorkItem, cancellationToken);
         }
