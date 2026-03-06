@@ -125,6 +125,40 @@
             public const string EnterpriseNotFound = "InternshipGroup.EnterpriseNotFound";
             public const string MentorNotFound = "InternshipGroup.MentorNotFound";
             public const string StudentNotFound = "InternshipGroup.StudentNotFound";
+            public const string NotFound = "InternshipGroup.NotFound";
+
+            // Logger Keys
+            public const string LogTermNotFound = "InternshipGroup.LogTermNotFound";
+            public const string LogEnterpriseNotFound = "InternshipGroup.LogEnterpriseNotFound";
+            public const string LogMentorNotFound = "InternshipGroup.LogMentorNotFound";
+            public const string LogStudentNotFound = "InternshipGroup.LogStudentNotFound";
+            public const string LogNotFound = "InternshipGroup.LogNotFound";
+
+            public const string LogCreating = "InternshipGroup.LogCreating";
+            public const string LogCreatedSuccess = "InternshipGroup.LogCreatedSuccess";
+            public const string LogCreationFailed = "InternshipGroup.LogCreationFailed";
+            public const string LogCreationError = "InternshipGroup.LogCreationError";
+
+            public const string LogUpdating = "InternshipGroup.LogUpdating";
+            public const string LogUpdatedSuccess = "InternshipGroup.LogUpdatedSuccess";
+            public const string LogUpdateFailed = "InternshipGroup.LogUpdateFailed";
+            public const string LogUpdateError = "InternshipGroup.LogUpdateError";
+
+            public const string LogDeleting = "InternshipGroup.LogDeleting";
+            public const string LogDeletedSuccess = "InternshipGroup.LogDeletedSuccess";
+            public const string LogDeleteFailed = "InternshipGroup.LogDeleteFailed";
+            public const string LogDeleteError = "InternshipGroup.LogDeleteError";
+
+            public const string LogAddingStudents = "InternshipGroup.LogAddingStudents";
+            public const string LogInvalidStudentIds = "InternshipGroup.LogInvalidStudentIds";
+            public const string LogAddedStudentsSuccess = "InternshipGroup.LogAddedStudentsSuccess";
+            public const string LogAddStudentsFailed = "InternshipGroup.LogAddStudentsFailed";
+            public const string LogAddStudentsError = "InternshipGroup.LogAddStudentsError";
+
+            public const string LogRemovingStudents = "InternshipGroup.LogRemovingStudents";
+            public const string LogRemovedStudentsSuccess = "InternshipGroup.LogRemovedStudentsSuccess";
+            public const string LogRemoveStudentsFailed = "InternshipGroup.LogRemoveStudentsFailed";
+            public const string LogRemoveStudentsError = "InternshipGroup.LogRemoveStudentsError";
         }
         public static class Projects
         {

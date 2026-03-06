@@ -18,8 +18,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
         private readonly ILogger<CreateInternshipGroupHandler> _logger;
 
         public CreateInternshipGroupHandler(
-            IUnitOfWork unitOfWork, 
-            IMessageService messageService, 
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
             IMapper mapper,
             ILogger<CreateInternshipGroupHandler> logger)
         {
@@ -31,7 +31,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
 
         public async Task<Result<CreateInternshipGroupResponse>> Handle(CreateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Creating a new internship group: {GroupName} for Term: {TermId}", request.GroupName, request.TermId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogCreating), request.GroupName, request.TermId);
 
             try
             {
@@ -40,7 +40,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
                 if (!termExists)
                 {
-                    _logger.LogWarning("Term not found: {TermId}", request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
                     return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
 
@@ -51,7 +51,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
                     if (!enterpriseExists)
                     {
-                        _logger.LogWarning("Enterprise not found: {EnterpriseId}", request.EnterpriseId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogEnterpriseNotFound), request.EnterpriseId);
                         return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
                     }
                 }
@@ -59,11 +59,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 // Validate MentorId if provided
                 if (request.MentorId.HasValue)
                 {
-                    var mentorExists = await _unitOfWork.Repository<User>()
-                        .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                    var mentorExists = await _unitOfWork.Repository<EnterpriseUser>()
+                        .ExistsAsync(u => u.EnterpriseUserId == request.MentorId.Value, cancellationToken);
                     if (!mentorExists)
                     {
-                        _logger.LogWarning("Mentor not found: {MentorId}", request.MentorId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
                     }
                 }
@@ -83,16 +83,16 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 if (request.Students != null && request.Students.Any())
                 {
                     var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
-                    
+
                     // Performance fix: Batch validation of students
-                    var existingUsers = await _unitOfWork.Repository<User>()
-                        .FindAsync(u => studentIds.Contains(u.UserId), cancellationToken);
-                    var existingStudentIds = existingUsers.Select(u => u.UserId).ToList();
+                    var existingUsers = await _unitOfWork.Repository<Student>()
+                        .FindAsync(u => studentIds.Contains(u.StudentId), cancellationToken);
+                    var existingStudentIds = existingUsers.Select(u => u.StudentId).ToList();
 
                     if (existingStudentIds.Count != studentIds.Count)
                     {
                         var missingId = studentIds.Except(existingStudentIds).First();
-                        _logger.LogWarning("Student not found: {StudentId}", missingId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentNotFound), missingId);
                         return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.StudentNotFound), ResultErrorType.NotFound);
                     }
 
@@ -109,20 +109,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
-                    _logger.LogInformation("Successfully created internship group: {InternshipId}", newGroup.InternshipId);
-                    
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogCreatedSuccess), newGroup.InternshipId);
+
                     var response = _mapper.Map<CreateInternshipGroupResponse>(newGroup);
                     return Result<CreateInternshipGroupResponse>.Success(response);
                 }
 
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError("Failed to save internship group to database");
+                _logger.LogError(_messageService.GetMessage(MessageKeys.InternshipGroups.LogCreationFailed));
                 return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error occurred while creating internship group");
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogCreationError));
                 throw; // Let ExceptionMiddleware handle it
             }
         }
