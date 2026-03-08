@@ -60,10 +60,9 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<Paginat
                 .AsNoTracking()
                 .Where(s => s.ProjectId == request.ProjectId);
 
-            if (!string.IsNullOrEmpty(request.StatusFilter) &&
-                Enum.TryParse<SprintStatus>(request.StatusFilter, ignoreCase: true, out var statusFilter))
+            if (request.StatusFilter.HasValue)
             {
-                query = query.Where(s => s.Status == statusFilter);
+                query = query.Where(s => s.Status == request.StatusFilter.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(request.Pagination.Search))

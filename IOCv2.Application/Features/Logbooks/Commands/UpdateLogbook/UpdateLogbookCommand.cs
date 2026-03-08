@@ -1,5 +1,6 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
+using IOCv2.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,13 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         /// ID of the logbook to update.
         /// </summary>
         public Guid LogbookId { get; set; }
+ 
+         /// <summary>
+         /// Internship group ID from route.
+         /// </summary>
+         public Guid InternshipId { get; set; }
+
+
 
         /// <summary>
         /// Updated summary of activities.
@@ -40,8 +48,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         public DateTime DateReport { get; set; }
 
         /// <summary>
-        /// Status of the logbook (Punctual/Late).
+        /// Status of the logbook.
         /// </summary>
-        public string? Status { get; set; }
+        public LogbookStatus? Status { get; set; }
     }
 }

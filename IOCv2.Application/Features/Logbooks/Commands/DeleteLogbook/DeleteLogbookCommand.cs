@@ -15,9 +15,9 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
     public record DeleteLogbookCommand : IRequest<Result<DeleteLogbookResponse>>
     {
         /// <summary>
-        /// Project ID from route.
+        /// Internship group ID from route.
         /// </summary>
-        public Guid ProjectId { get; set; }
+        public Guid InternshipId { get; set; }
 
         /// <summary>
         /// ID of the logbook to delete.

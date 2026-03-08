@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
 
@@ -34,6 +35,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
         /// <summary>
         /// Assigned role for the student in the group.
         /// </summary>
-        public string Role { get; init; } = string.Empty;
+        public InternshipRole Role { get; init; }
     }
 }
+

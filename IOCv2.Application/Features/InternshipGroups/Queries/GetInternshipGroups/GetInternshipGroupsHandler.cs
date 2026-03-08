@@ -37,7 +37,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             // Lọc theo Status
             if (request.Status.HasValue)
             {
-                query = query.Where(x => (short)x.Status == request.Status.Value);
+                query = query.Where(x => x.Status == request.Status.Value);
             }
 
             // Sắp xếp mặc định theo ngày bắt đầu giảm dần hoặc tên

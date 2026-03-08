@@ -30,7 +30,8 @@ public class GetEvaluationCyclesHandler
                 Name = c.Name,
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
-                Status = c.Status.ToString(),
+                Status = c.Status,
+
                 CriteriaCount = c.Criteria.Count(cr => cr.DeletedAt == null),
                 CreatedAt = c.CreatedAt
             })

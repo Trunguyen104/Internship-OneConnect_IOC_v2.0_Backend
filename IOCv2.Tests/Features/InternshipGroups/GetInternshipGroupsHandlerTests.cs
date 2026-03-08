@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using MockQueryable.Moq;
+using MockQueryable;
 
 namespace IOCv2.Tests.Features.InternshipGroups
 {
@@ -42,7 +44,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             };
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
-                .Returns(groups.AsQueryable());
+                .Returns(groups.AsQueryable().BuildMock());
 
             _mockMapper.Setup(x => x.Map<List<GetInternshipGroupsResponse>>(It.IsAny<List<InternshipGroup>>()))
                 .Returns(new List<GetInternshipGroupsResponse>

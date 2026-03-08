@@ -36,6 +36,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
             {
                 var group = await _unitOfWork.Repository<InternshipGroup>().Query()
                     .Include(g => g.Members)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (group == null)

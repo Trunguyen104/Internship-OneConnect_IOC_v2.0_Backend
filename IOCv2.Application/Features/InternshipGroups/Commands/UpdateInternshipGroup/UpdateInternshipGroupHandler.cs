@@ -35,6 +35,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
             try
             {
                 var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (entity == null)

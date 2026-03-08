@@ -45,7 +45,8 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
         return Result<PublishEvaluationResponse>.Success(new PublishEvaluationResponse
         {
             EvaluationId = evaluation.EvaluationId,
-            Status = evaluation.Status.ToString(),
+            Status = evaluation.Status,
+
             TotalScore = evaluation.TotalScore,
             UpdatedAt = evaluation.UpdatedAt ?? DateTime.UtcNow
         });

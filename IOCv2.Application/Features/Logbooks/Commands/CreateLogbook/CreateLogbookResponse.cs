@@ -16,6 +16,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
         /// Unique identifier for the created logbook.
         /// </summary>
         public Guid LogbookId { get; set; }
+        public Guid InternshipId { get; set; }
+
 
         /// <summary>
         /// ID of the student who created the logbook.
@@ -30,7 +32,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
         /// <summary>
         /// Submission status (Punctual/Late).
         /// </summary>
-        public string Status { get; set; } = string.Empty;
+        public LogbookStatus Status { get; set; }
+
 
         /// <summary>
         /// Next period plans.
@@ -53,7 +56,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                 .ForMember(dest => dest.StudentId,
                     opt => opt.MapFrom(src => src.StudentId))
                 .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => src.Status.ToString()));
+                    opt => opt.MapFrom(src => src.Status));
+
         }
     }
 }

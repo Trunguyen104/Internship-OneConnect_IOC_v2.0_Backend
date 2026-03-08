@@ -25,21 +25,6 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
     public async Task<Result<CreateWorkItemResponse>> Handle(
         CreateWorkItemCommand request, CancellationToken cancellationToken)
     {
-        // Parse Type
-        if (!Enum.TryParse<WorkItemType>(request.Type, ignoreCase: true, out var type))
-            return Result<CreateWorkItemResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.WorkItem.TypeInvalid), ResultErrorType.BadRequest);
-
-        // Parse Priority (optional)
-        Priority? priority = null;
-        if (!string.IsNullOrWhiteSpace(request.Priority))
-        {
-            if (!Enum.TryParse<Priority>(request.Priority, ignoreCase: true, out var parsedPriority))
-                return Result<CreateWorkItemResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.WorkItem.PriorityInvalid), ResultErrorType.BadRequest);
-            priority = parsedPriority;
-        }
-
         // Validate SprintId if provided
         if (request.SprintId.HasValue)
         {
@@ -62,10 +47,10 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
             WorkItemId = Guid.NewGuid(),
             ProjectId = request.ProjectId,
             ParentId = request.ParentId,
-            Type = type,
+            Type = request.Type,
             Title = request.Title,
             Description = request.Description,
-            Priority = priority,
+            Priority = request.Priority,
             Status = WorkItemStatus.Todo,
             StoryPoint = request.StoryPoint,
             AssigneeId = request.AssigneeId,

@@ -47,8 +47,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 // Update the project resource properties
-                var resourceType = Enum.Parse<FileType>(request.ResourceType, ignoreCase: true);
-                projectResource.UpdateInfo(request.ProjectId, request.ResourceName, resourceType);
+                projectResource.UpdateInfo(request.ProjectId, request.ResourceName, request.ResourceType);
+
                 
                 await _unitOfWork.Repository<Domain.Entities.ProjectResources>().UpdateAsync(projectResource, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);

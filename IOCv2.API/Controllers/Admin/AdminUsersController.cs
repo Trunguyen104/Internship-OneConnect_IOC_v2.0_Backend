@@ -1,4 +1,6 @@
+using IOCv2.Domain.Enums;
 using IOCv2.Application.Common.Models;
+
 using IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser;
 using IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser;
 using IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword;
@@ -120,7 +122,8 @@ public class AdminUsersController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ToggleUserStatus(
         [FromRoute] Guid id,
-        [FromBody] string newStatus,
+        [FromBody] UserStatus newStatus,
+
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(new ToggleUserStatusCommand { UserId = id, NewStatus = newStatus }, cancellationToken);

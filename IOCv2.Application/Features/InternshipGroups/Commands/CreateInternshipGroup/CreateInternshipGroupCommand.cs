@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
@@ -57,6 +58,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
         /// <summary>
         /// Assigned role for the student in the group (e.g., Leader, Member).
         /// </summary>
-        public string Role { get; init; } = string.Empty;
+        public InternshipRole Role { get; init; }
     }
 }
+

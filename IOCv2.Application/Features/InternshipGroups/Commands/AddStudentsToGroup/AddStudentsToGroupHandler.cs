@@ -61,9 +61,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
 
                 foreach (var item in request.Students)
                 {
-                    var role = Enum.Parse<InternshipRole>(item.Role, ignoreCase: true);
-                    group.AddMember(item.StudentId, role);
+                    group.AddMember(item.StudentId, item.Role);
                 }
+
 
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);

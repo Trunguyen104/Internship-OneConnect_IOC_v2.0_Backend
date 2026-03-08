@@ -7,6 +7,7 @@ using IOCv2.Application.Features.Sprints.Commands.StartSprint;
 using IOCv2.Application.Features.Sprints.Commands.UpdateSprint;
 using IOCv2.Application.Features.Sprints.Queries.GetSprintById;
 using IOCv2.Application.Features.Sprints.Queries.GetSprints;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetSprints(
         [FromRoute] Guid projectId,
-        [FromQuery] string? status,
+        [FromQuery] SprintStatus? status,
         [FromQuery] PaginationParams pagination,
         CancellationToken cancellationToken = default)
     {

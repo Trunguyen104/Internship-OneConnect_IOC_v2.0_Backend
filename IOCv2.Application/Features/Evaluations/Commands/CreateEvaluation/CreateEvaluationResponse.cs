@@ -1,3 +1,5 @@
+using IOCv2.Domain.Enums;
+
 namespace IOCv2.Application.Features.Evaluations.Commands.CreateEvaluation;
 
 public class CreateEvaluationResponse
@@ -13,7 +15,8 @@ public class CreateEvaluationResponse
     public Guid? StudentId { get; set; }
     public string StudentName { get; set; } = string.Empty;
     public Guid EvaluatorId { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public EvaluationStatus Status { get; set; }
+
     public decimal? TotalScore { get; set; }
     public string? Note { get; set; }
     public int DetailCount { get; set; }

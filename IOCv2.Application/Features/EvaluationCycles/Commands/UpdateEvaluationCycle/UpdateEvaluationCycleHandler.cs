@@ -31,15 +31,13 @@ public class UpdateEvaluationCycleHandler
                 _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
                 ResultErrorType.NotFound);
 
-        if (!Enum.TryParse<EvaluationCycleStatus>(request.Status, ignoreCase: true, out var status))
-            return Result<UpdateEvaluationCycleResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
-                ResultErrorType.BadRequest);
+
 
         cycle.Name = request.Name;
         cycle.StartDate = request.StartDate;
         cycle.EndDate = request.EndDate;
-        cycle.Status = status;
+        cycle.Status = request.Status;
+
         cycle.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.Repository<EvaluationCycle>().UpdateAsync(cycle, cancellationToken);
@@ -52,7 +50,8 @@ public class UpdateEvaluationCycleHandler
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,
-            Status = cycle.Status.ToString(),
+            Status = cycle.Status,
+
             UpdatedAt = cycle.UpdatedAt
         });
     }

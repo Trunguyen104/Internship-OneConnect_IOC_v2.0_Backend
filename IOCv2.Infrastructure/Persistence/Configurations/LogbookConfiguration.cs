@@ -13,7 +13,7 @@ public class LogbookConfiguration : IEntityTypeConfiguration<Logbook>
 
         builder.HasKey(x => x.LogbookId);
         builder.Property(x => x.LogbookId).HasColumnName("logbook_id").ValueGeneratedOnAdd();
-        builder.Property(x => x.ProjectId).HasColumnName("project_id");
+        builder.Property(x => x.InternshipId).HasColumnName("internship_id");
         builder.Property(x => x.StudentId).HasColumnName("student_id");
         builder.Property(x => x.DateReport).HasColumnName("date_report");
         builder.Property(x => x.Summary).HasColumnName("summary").HasColumnType("text");
@@ -25,15 +25,16 @@ public class LogbookConfiguration : IEntityTypeConfiguration<Logbook>
             .HasConversion<short>()
             .HasColumnType("smallint");
 
-        builder.HasOne(x => x.Project)
-            .WithMany(p => p.Logbooks)
-            .HasForeignKey(x => x.ProjectId);
+        builder.HasOne(x => x.Internship)
+            .WithMany(i => i.Logbooks)
+            .HasForeignKey(x => x.InternshipId);
 
         builder.HasOne(x => x.Student)
             .WithMany(s => s.Logbooks)
             .HasForeignKey(x => x.StudentId);
 
-        builder.HasMany(x => x.WorkItem)
+        builder.HasMany(x => x.WorkItems)
+
             .WithMany()
             .UsingEntity(j => j.ToTable("logbook_work_items"));
     }

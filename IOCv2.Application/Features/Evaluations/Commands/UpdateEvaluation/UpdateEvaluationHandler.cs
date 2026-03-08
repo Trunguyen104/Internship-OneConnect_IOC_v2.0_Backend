@@ -103,7 +103,8 @@ public class UpdateEvaluationHandler : IRequestHandler<UpdateEvaluationCommand, 
             return Result<UpdateEvaluationResponse>.Success(new UpdateEvaluationResponse
             {
                 EvaluationId = evaluation.EvaluationId,
-                Status = evaluation.Status.ToString(),
+                Status = evaluation.Status,
+
                 TotalScore = evaluation.TotalScore,
                 Note = evaluation.Note,
                 DetailCount = request.Details.Count > 0 ? request.Details.Count : evaluation.Details.Count,

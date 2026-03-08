@@ -5,6 +5,7 @@ using IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholderIss
 using IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholderIssueStatus;
 using IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIssueById;
 using IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIssues;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ public class StakeholderIssuesController : ApiControllerBase
     public async Task<IActionResult> GetIssues(
         [FromQuery] Guid? projectId,
         [FromQuery] Guid? stakeholderId,
-        [FromQuery] string? status,
+        [FromQuery] StakeholderIssueStatus? status,
         [FromQuery] PaginationParams pagination,
         CancellationToken cancellationToken = default)
     {
@@ -125,6 +126,6 @@ public class StakeholderIssuesController : ApiControllerBase
     /// </summary>
     public class UpdateStatusRequest
     {
-        public string Status { get; set; } = string.Empty;
+        public StakeholderIssueStatus Status { get; set; }
     }
 }

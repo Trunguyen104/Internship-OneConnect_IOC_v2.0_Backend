@@ -53,10 +53,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                     (p.Description != null && p.Description.ToLower().Contains(term)));
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Status) && Enum.TryParse<ProjectStatus>(request.Status, true, out var parsedStatus))
+            if (request.Status.HasValue)
             {
-                query = query.Where(p => p.Status == parsedStatus);
+                query = query.Where(p => p.Status == request.Status.Value);
             }
+
 
             if (request.FromDate.HasValue)
             {

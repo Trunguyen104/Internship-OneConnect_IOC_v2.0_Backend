@@ -46,7 +46,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 
             // 2. Fetch logbook with ownership check
             var logbook = (await _unitOfWork.Repository<Logbook>()
-                    .FindAsync(l => l.LogbookId == request.LogbookId, cancellationToken)).FirstOrDefault();
+                    .FindAsync(l => l.LogbookId == request.LogbookId && l.InternshipId == request.InternshipId, cancellationToken)).FirstOrDefault();
+
 
             if (logbook == null)
             {
@@ -72,33 +73,42 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                 request.Plan,
                 request.DateReport);
 
-            // 5. Transaction & Writing (FF-TXG)
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            
-            await _unitOfWork.Repository<Logbook>().UpdateAsync(logbook, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-            // Create audit log
-            var auditLog = new AuditLog
+            try
             {
-                AuditLogId = Guid.NewGuid(),
-                Action = AuditAction.Update,
-                EntityType = nameof(Logbook),
-                EntityId = logbook.LogbookId,
-                PerformedById = userId,
-                Reason = $"Updated logbook for project {logbook.ProjectId}",
-                CreatedAt = DateTime.UtcNow
-            };
-            await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
+                // 5. Transaction & Writing (FF-TXG)
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+                
+                await _unitOfWork.Repository<Logbook>().UpdateAsync(logbook, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-            
-            _logger.LogInformation("Logbook {LogbookId} updated successfully", logbook.LogbookId);
+                // Create audit log
+                var auditLog = new AuditLog
+                {
+                    AuditLogId = Guid.NewGuid(),
+                    Action = AuditAction.Update,
+                    EntityType = nameof(Logbook),
+                    EntityId = logbook.LogbookId,
+                    PerformedById = userId,
+                    Reason = $"Updated logbook for internship group {logbook.InternshipId}",
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            // 6. Return response
-            var response = _mapper.Map<UpdateLogbookResponse>(logbook);
-            return Result<UpdateLogbookResponse>.Success(response);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                
+                _logger.LogInformation("Logbook {LogbookId} updated successfully", logbook.LogbookId);
+
+                // 6. Return response
+                var response = _mapper.Map<UpdateLogbookResponse>(logbook);
+                return Result<UpdateLogbookResponse>.Success(response);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Failed to update logbook {LogbookId}", request.LogbookId);
+                throw;
+            }
         }
     }
 }

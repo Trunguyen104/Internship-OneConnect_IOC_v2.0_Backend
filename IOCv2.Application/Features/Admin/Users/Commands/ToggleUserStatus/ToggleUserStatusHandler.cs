@@ -58,15 +58,11 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
                 return Result<ToggleUserStatusResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
             }
 
-            // Parse NewStatus
-            if (!Enum.TryParse<UserStatus>(request.NewStatus, true, out var parsedStatus))
-            {
-                _logger.LogWarning("Invalid Status provided: {Status}", request.NewStatus);
-                return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));
-            }
+
 
             // Use rich domain method
-            user.SetStatus(parsedStatus);
+            user.SetStatus(request.NewStatus);
+
             
             await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
 
@@ -77,7 +73,8 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
                 EntityType = nameof(User),
                 EntityId = user.UserId,
                 PerformedById = auditorId,
-                Reason = $"Toggled user {user.UserCode} status to {parsedStatus}",
+                Reason = $"Toggled user {user.UserCode} status to {request.NewStatus}",
+
                 CreatedAt = DateTime.UtcNow
             };
             await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);

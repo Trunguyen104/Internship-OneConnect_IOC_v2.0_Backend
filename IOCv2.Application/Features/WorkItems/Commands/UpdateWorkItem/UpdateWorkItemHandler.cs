@@ -48,21 +48,11 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
         if (request.DueDate.HasValue)
             workItem.DueDate = request.DueDate;
 
-        if (!string.IsNullOrWhiteSpace(request.Priority))
-        {
-            if (!Enum.TryParse<Priority>(request.Priority, ignoreCase: true, out var priority))
-                return Result<UpdateWorkItemResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.WorkItem.PriorityInvalid), ResultErrorType.BadRequest);
-            workItem.Priority = priority;
-        }
+        if (request.Priority.HasValue)
+            workItem.Priority = request.Priority.Value;
 
-        if (!string.IsNullOrWhiteSpace(request.Status))
-        {
-            if (!Enum.TryParse<WorkItemStatus>(request.Status, ignoreCase: true, out var status))
-                return Result<UpdateWorkItemResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.WorkItem.StatusInvalid), ResultErrorType.BadRequest);
-            workItem.Status = status;
-        }
+        if (request.Status.HasValue)
+            workItem.Status = request.Status.Value;
 
         workItem.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.Repository<WorkItem>().UpdateAsync(workItem, cancellationToken);

@@ -23,9 +23,8 @@ public record CompleteSprintCommand : IRequest<Result<CompleteSprintResponse>>
     
     /// <summary>
     /// Option for handling incomplete work items. 
-    /// Possible values: "ToBacklog", "ToNextPlannedSprint", "CreateNewSprint".
     /// </summary>
-    public string IncompleteItemsOption { get; init; } = string.Empty;
+    public MoveIncompleteItemsOption IncompleteItemsOption { get; init; }
 
     /// <summary>
     /// Optional target sprint ID if "ToNextPlannedSprint" is chosen.

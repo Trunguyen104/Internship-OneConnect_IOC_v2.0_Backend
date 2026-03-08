@@ -6,6 +6,7 @@ using IOCv2.Application.Features.WorkItems.Commands.MoveWorkItemToSprint;
 using IOCv2.Application.Features.WorkItems.Commands.UpdateWorkItem;
 using IOCv2.Application.Features.WorkItems.Queries.GetBacklog;
 using IOCv2.Application.Features.WorkItems.Queries.GetWorkItemById;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,9 +37,9 @@ public class WorkItemsController : ApiControllerBase
         [FromRoute] Guid projectId,
         [FromQuery] Guid? epicId,
         [FromQuery] string? searchTerm,
-        [FromQuery] string? type,
-        [FromQuery] string? priority,
-        [FromQuery] string? status,
+        [FromQuery] WorkItemType? type,
+        [FromQuery] Priority? priority,
+        [FromQuery] WorkItemStatus? status,
         [FromQuery] Guid? assigneeId,
         CancellationToken cancellationToken = default)
     {

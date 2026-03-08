@@ -12,6 +12,7 @@ public class CreateEvaluationCycleResponse : IMapFrom<EvaluationCycle>
     public string Name { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public EvaluationCycleStatus Status { get; set; }
+
     public DateTime CreatedAt { get; set; }
 }

@@ -364,7 +364,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var student = await _context.Students.FirstAsync();
 
                 var logbook = Logbook.Create(
-                    project.ProjectId,
+                    project.InternshipId,  // FK → internship_groups.internship_id
                     student.StudentId,
                     "Finished login UI and integrated with API.",
                     null, // Issue
@@ -374,6 +374,7 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Logbooks.Add(logbook);
                 await _context.SaveChangesAsync();
             }
+
 
             if (_context.ChangeTracker.HasChanges())
             {

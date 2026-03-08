@@ -14,6 +14,8 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using MockQueryable.Moq;
+using MockQueryable;
 
 namespace IOCv2.Tests.Features.InternshipGroups
 {
@@ -43,20 +45,20 @@ namespace IOCv2.Tests.Features.InternshipGroups
         public async Task Handle_ValidRequest_ShouldReturnSuccess()
         {
             // Arrange
-            var internshipId = Guid.NewGuid();
             var termId = Guid.NewGuid();
+            var existingGroup = InternshipGroup.Create(termId, "Old Name");
+            var internshipId = existingGroup.InternshipId;
+            
             var command = new UpdateInternshipGroupCommand
             {
                 InternshipId = internshipId,
                 TermId = termId,
                 GroupName = "Updated Name"
             };
-
-            var existingGroup = InternshipGroup.Create(termId, "Old Name");
             // Set private InternshipId via reflection if needed, but here we can just ensure the mock returns it
             
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
-                .Returns(new List<InternshipGroup> { existingGroup }.AsQueryable());
+                .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
             
             _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
@@ -84,7 +86,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             var command = new UpdateInternshipGroupCommand { InternshipId = Guid.NewGuid() };
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
-                .Returns(new List<InternshipGroup>().AsQueryable());
+                .Returns(new List<InternshipGroup>().BuildMock());
             
             _mockMessageService.Setup(x => x.GetMessage(MessageKeys.Common.NotFound))
                 .Returns("Not Found");

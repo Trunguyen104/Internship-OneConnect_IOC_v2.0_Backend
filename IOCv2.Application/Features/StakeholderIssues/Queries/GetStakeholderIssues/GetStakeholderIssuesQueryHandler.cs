@@ -52,12 +52,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
                 query = query.Where(si => si.StakeholderId == request.StakeholderId.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Status))
+            if (request.Status.HasValue)
             {
-                if (Enum.TryParse<StakeholderIssueStatus>(request.Status, true, out var statusEnum))
-                {
-                    query = query.Where(si => si.Status == statusEnum);
-                }
+                query = query.Where(si => si.Status == request.Status.Value);
             }
 
             // Apply global search

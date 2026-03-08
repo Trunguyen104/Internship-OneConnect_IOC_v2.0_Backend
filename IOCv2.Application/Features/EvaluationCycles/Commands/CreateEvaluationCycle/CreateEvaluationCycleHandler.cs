@@ -51,7 +51,8 @@ public class CreateEvaluationCycleHandler
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,
-            Status = cycle.Status.ToString(),
+            Status = cycle.Status,
+
             CreatedAt = cycle.CreatedAt
         });
     }

@@ -19,22 +19,6 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
     public async Task<Result<GetBacklogResponse>> Handle(
         GetBacklogQuery request, CancellationToken cancellationToken)
     {
-        // Parse optional enum filters
-        WorkItemType? typeFilter = null;
-        if (!string.IsNullOrWhiteSpace(request.Type) &&
-            Enum.TryParse<WorkItemType>(request.Type, ignoreCase: true, out var parsedType))
-            typeFilter = parsedType;
-
-        Priority? priorityFilter = null;
-        if (!string.IsNullOrWhiteSpace(request.Priority) &&
-            Enum.TryParse<Priority>(request.Priority, ignoreCase: true, out var parsedPriority))
-            priorityFilter = parsedPriority;
-
-        WorkItemStatus? statusFilter = null;
-        if (!string.IsNullOrWhiteSpace(request.Status) &&
-            Enum.TryParse<WorkItemStatus>(request.Status, ignoreCase: true, out var parsedStatus))
-            statusFilter = parsedStatus;
-
         // BacklogOnly=true: bỏ qua Sprints, chỉ lấy Product Backlog
         List<Sprint> sprints;
         HashSet<Guid> assignedIds;
@@ -93,14 +77,14 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
             backlogQuery = backlogQuery.Where(w => w.Title.ToLower().Contains(term));
         }
 
-        if (typeFilter.HasValue)
-            backlogQuery = backlogQuery.Where(w => w.Type == typeFilter.Value);
+        if (request.Type.HasValue)
+            backlogQuery = backlogQuery.Where(w => w.Type == request.Type.Value);
 
-        if (priorityFilter.HasValue)
-            backlogQuery = backlogQuery.Where(w => w.Priority == priorityFilter.Value);
+        if (request.Priority.HasValue)
+            backlogQuery = backlogQuery.Where(w => w.Priority == request.Priority.Value);
 
-        if (statusFilter.HasValue)
-            backlogQuery = backlogQuery.Where(w => w.Status == statusFilter.Value);
+        if (request.Status.HasValue)
+            backlogQuery = backlogQuery.Where(w => w.Status == request.Status.Value);
 
         if (request.AssigneeId.HasValue)
             backlogQuery = backlogQuery.Where(w => w.AssigneeId == request.AssigneeId.Value);
@@ -115,7 +99,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         {
             var items = sprint.SprintWorkItems
                 .Select(swi => swi.WorkItem)
-                .Where(w => MatchFilters(w, request, typeFilter, priorityFilter, statusFilter))
+                .Where(w => MatchFilters(w, request))
                 .OrderBy(w => sprint.SprintWorkItems.First(swi => swi.WorkItemId == w.WorkItemId).BoardOrder)
                 .Select(w => ToBacklogWorkItemDto(w,
                     sprint.SprintWorkItems.First(swi => swi.WorkItemId == w.WorkItemId).BoardOrder))
@@ -126,7 +110,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
                 SprintId = sprint.SprintId,
                 Name = sprint.Name,
                 Goal = sprint.Goal,
-                Status = sprint.Status.ToString(),
+                Status = sprint.Status,
                 StartDate = sprint.StartDate,
                 EndDate = sprint.EndDate,
                 ItemCount = items.Count,
@@ -152,9 +136,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         return Result<GetBacklogResponse>.Success(response);
     }
 
-    private static bool MatchFilters(
-        WorkItem w, GetBacklogQuery req,
-        WorkItemType? type, Priority? priority, WorkItemStatus? status)
+    private static bool MatchFilters(WorkItem w, GetBacklogQuery req)
     {
         if (w.Type == WorkItemType.Epic) return false;
 
@@ -165,9 +147,9 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
             !w.Title.Contains(req.SearchTerm.Trim(), StringComparison.OrdinalIgnoreCase))
             return false;
 
-        if (type.HasValue && w.Type != type.Value) return false;
-        if (priority.HasValue && w.Priority != priority.Value) return false;
-        if (status.HasValue && w.Status != status.Value) return false;
+        if (req.Type.HasValue && w.Type != req.Type.Value) return false;
+        if (req.Priority.HasValue && w.Priority != req.Priority.Value) return false;
+        if (req.Status.HasValue && w.Status != req.Status.Value) return false;
         if (req.AssigneeId.HasValue && w.AssigneeId != req.AssigneeId.Value) return false;
 
         return true;
@@ -178,9 +160,9 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         WorkItemId = w.WorkItemId,
         ParentId = w.ParentId,
         Title = w.Title,
-        Type = w.Type.ToString(),
-        Status = w.Status?.ToString(),
-        Priority = w.Priority?.ToString(),
+        Type = w.Type,
+        Status = w.Status,
+        Priority = w.Priority,
         StoryPoint = w.StoryPoint,
         AssigneeId = w.AssigneeId,
         AssigneeName = w.Assignee != null ? $"{w.Assignee.User?.FullName}" : null,

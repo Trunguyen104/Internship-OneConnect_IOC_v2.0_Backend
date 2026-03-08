@@ -57,7 +57,7 @@ namespace IOCv2.Tests.Features.Logbooks
             var userId = Guid.NewGuid();
             var studentId = Guid.NewGuid();
             var logbookId = Guid.NewGuid();
-            var command = new DeleteLogbookCommand { LogbookId = logbookId, ProjectId = Guid.NewGuid() };
+            var command = new DeleteLogbookCommand { LogbookId = logbookId, InternshipId = Guid.NewGuid() };
 
             var logbook = Logbook.Create(Guid.NewGuid(), studentId, "Deleted Item", null, "Next Plan", DateTime.UtcNow);
 
@@ -86,7 +86,7 @@ namespace IOCv2.Tests.Features.Logbooks
         {
             // Arrange
             var logbookId = Guid.NewGuid();
-            var command = new DeleteLogbookCommand { LogbookId = logbookId, ProjectId = Guid.NewGuid() };
+            var command = new DeleteLogbookCommand { LogbookId = logbookId, InternshipId = Guid.NewGuid() };
 
             _mockCurrentUserService.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
             _mockLogbookRepo.Setup(x => x.GetByIdAsync(logbookId, It.IsAny<CancellationToken>()))

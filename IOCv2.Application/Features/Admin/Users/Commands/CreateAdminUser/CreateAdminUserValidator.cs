@@ -24,8 +24,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
 
             // Role (required and must be valid enum)
             RuleFor(x => x.Role)
-                .NotEmpty()
-                .Must(role => Enum.TryParse<UserRole>(role, true, out _))
+                .IsInEnum()
                 .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidRole));
 
             // UnitId is required for most roles
@@ -33,15 +32,11 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 .NotEmpty()
                 .When(x =>
                 {
-                    if (Enum.TryParse<UserRole>(x.Role, true, out var role))
-                    {
-                        return role == UserRole.SchoolAdmin ||
-                               role == UserRole.EnterpriseAdmin ||
-                               role == UserRole.HR ||
-                               role == UserRole.Mentor ||
-                               role == UserRole.Student;
-                    }
-                      return false;
+                    return x.Role == UserRole.SchoolAdmin ||
+                           x.Role == UserRole.EnterpriseAdmin ||
+                           x.Role == UserRole.HR ||
+                           x.Role == UserRole.Mentor ||
+                           x.Role == UserRole.Student;
                 })
                 .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserUnitRequired));
         }

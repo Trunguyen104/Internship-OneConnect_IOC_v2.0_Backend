@@ -14,9 +14,9 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
     public record GetLogbookByIdQuery : IRequest<Result<GetLogbookByIdResponse>>
     {
         /// <summary>
-        /// Project ID from route.
+        /// Internship group ID from route.
         /// </summary>
-        public Guid ProjectId { get; init; }
+        public Guid InternshipId { get; init; }
 
         /// <summary>
         /// ID of the logbook to retrieve.

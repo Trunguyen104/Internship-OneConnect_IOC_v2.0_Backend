@@ -37,6 +37,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
             {
                 var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
                     .Include(g => g.Members)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (entity == null)

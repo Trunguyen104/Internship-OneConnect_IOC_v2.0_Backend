@@ -98,9 +98,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
 
                     foreach (var studentRef in request.Students)
                     {
-                        var role = Enum.Parse<InternshipRole>(studentRef.Role, ignoreCase: true);
-                        newGroup.AddMember(studentRef.StudentId, role);
+                        newGroup.AddMember(studentRef.StudentId, studentRef.Role);
                     }
+
                 }
 
                 await _unitOfWork.Repository<InternshipGroup>().AddAsync(newGroup);

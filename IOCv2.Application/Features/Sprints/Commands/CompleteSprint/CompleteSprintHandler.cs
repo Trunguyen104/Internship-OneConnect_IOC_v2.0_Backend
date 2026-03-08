@@ -51,10 +51,6 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                 _messageService.GetMessage(MessageKeys.Sprint.NotActive), ResultErrorType.BadRequest);
         }
 
-        if (!Enum.TryParse<MoveIncompleteItemsOption>(request.IncompleteItemsOption, ignoreCase: true, out var incompleteOption))
-            return Result<CompleteSprintResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Sprint.InvalidIncompleteItemsOption), ResultErrorType.BadRequest);
-
         // Load sprint work items
         var sprintWorkItems = await _unitOfWork.Repository<SprintWorkItem>().Query()
             .Where(swi => swi.SprintId == request.SprintId)
@@ -87,7 +83,7 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
 
             if (incompleteSprintWorkItems.Any())
             {
-                switch (incompleteOption)
+                switch (request.IncompleteItemsOption)
                 {
                     case MoveIncompleteItemsOption.ToBacklog:
                         foreach (var item in incompleteSprintWorkItems)

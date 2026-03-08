@@ -44,7 +44,8 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
         return Result<SubmitEvaluationResponse>.Success(new SubmitEvaluationResponse
         {
             EvaluationId = evaluation.EvaluationId,
-            Status = evaluation.Status.ToString(),
+            Status = evaluation.Status,
+
             TotalScore = evaluation.TotalScore,
             UpdatedAt = evaluation.UpdatedAt ?? DateTime.UtcNow
         });
