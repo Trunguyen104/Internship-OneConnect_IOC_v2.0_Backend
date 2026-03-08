@@ -212,5 +212,34 @@
   </data>
   <data name="Enterprise.RateLimitGetEnterprisesAttempt" xml:space="preserve">
     <value>getEnterprises_enterprise_attempt:{0}</value>
+  <data name="InternshipGroup.LogCreating" xml:space="preserve">
+    <value>Creating a new internship group: {GroupName} for Term: {TermId}</value>
+  </data>
+  <data name="InternshipGroup.LogCreatedSuccess" xml:space="preserve">
+    <value>Successfully created internship group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogUpdating" xml:space="preserve">
+    <value>Updating internship group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogUpdatedSuccess" xml:space="preserve">
+    <value>Successfully updated internship group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogDeleting" xml:space="preserve">
+    <value>Deleting internship group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogDeletedSuccess" xml:space="preserve">
+    <value>Successfully deleted internship group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogAddingStudents" xml:space="preserve">
+    <value>Adding students to group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogAddedStudentsSuccess" xml:space="preserve">
+    <value>Successfully added {Count} students to group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogRemovingStudents" xml:space="preserve">
+    <value>Removing students from group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
+    <value>Successfully removed students from group: {InternshipId}</value>
   </data>
 </root>

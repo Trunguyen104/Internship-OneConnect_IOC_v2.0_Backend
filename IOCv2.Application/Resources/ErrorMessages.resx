@@ -620,5 +620,70 @@
   </data>
   <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
     <value>Không tìm thấy doanh nghiệp cho bộ phận Nhân sự hiện tại.</value>
+  <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
+    <value>Lưu nhóm thực tập vào cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogCreationError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình tạo nhóm thực tập</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
+    <value>Cập nhật nhóm thực tập trong cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình cập nhật nhóm thực tập</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
+    <value>Xóa nhóm thực tập khỏi cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình xóa nhóm thực tập: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
+    <value>Một số mã sinh viên không hợp lệ hoặc không được tìm thấy</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
+    <value>Cập nhật thành viên nhóm trong cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình thêm sinh viên vào nhóm</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
+    <value>Cập nhật nhóm trong cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình xóa sinh viên khỏi nhóm</value>
+  </data>
+  <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
+    <value>Mã sinh viên không hợp lệ.</value>
+  </data>
+  <data name="InternshipGroup.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp.</value>
+  </data>
+  <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
+    <value>Không tìm thấy người hướng dẫn.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên.</value>
+  </data>
+  <data name="InternshipGroup.NotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập.</value>
+  </data>
+  <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ với ID: {TermId}</value>
+  </data>
+  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp với ID: {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+    <value>Không tìm thấy người hướng dẫn với ID: {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên với ID: {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập với ID: {InternshipId}</value>
   </data>
 </root>

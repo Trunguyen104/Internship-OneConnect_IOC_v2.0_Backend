@@ -147,6 +147,40 @@
             public const string EnterpriseNotFound = "InternshipGroup.EnterpriseNotFound";
             public const string MentorNotFound = "InternshipGroup.MentorNotFound";
             public const string StudentNotFound = "InternshipGroup.StudentNotFound";
+            public const string NotFound = "InternshipGroup.NotFound";
+
+            // Logger Keys
+            public const string LogTermNotFound = "InternshipGroup.LogTermNotFound";
+            public const string LogEnterpriseNotFound = "InternshipGroup.LogEnterpriseNotFound";
+            public const string LogMentorNotFound = "InternshipGroup.LogMentorNotFound";
+            public const string LogStudentNotFound = "InternshipGroup.LogStudentNotFound";
+            public const string LogNotFound = "InternshipGroup.LogNotFound";
+
+            public const string LogCreating = "InternshipGroup.LogCreating";
+            public const string LogCreatedSuccess = "InternshipGroup.LogCreatedSuccess";
+            public const string LogCreationFailed = "InternshipGroup.LogCreationFailed";
+            public const string LogCreationError = "InternshipGroup.LogCreationError";
+
+            public const string LogUpdating = "InternshipGroup.LogUpdating";
+            public const string LogUpdatedSuccess = "InternshipGroup.LogUpdatedSuccess";
+            public const string LogUpdateFailed = "InternshipGroup.LogUpdateFailed";
+            public const string LogUpdateError = "InternshipGroup.LogUpdateError";
+
+            public const string LogDeleting = "InternshipGroup.LogDeleting";
+            public const string LogDeletedSuccess = "InternshipGroup.LogDeletedSuccess";
+            public const string LogDeleteFailed = "InternshipGroup.LogDeleteFailed";
+            public const string LogDeleteError = "InternshipGroup.LogDeleteError";
+
+            public const string LogAddingStudents = "InternshipGroup.LogAddingStudents";
+            public const string LogInvalidStudentIds = "InternshipGroup.LogInvalidStudentIds";
+            public const string LogAddedStudentsSuccess = "InternshipGroup.LogAddedStudentsSuccess";
+            public const string LogAddStudentsFailed = "InternshipGroup.LogAddStudentsFailed";
+            public const string LogAddStudentsError = "InternshipGroup.LogAddStudentsError";
+
+            public const string LogRemovingStudents = "InternshipGroup.LogRemovingStudents";
+            public const string LogRemovedStudentsSuccess = "InternshipGroup.LogRemovedStudentsSuccess";
+            public const string LogRemoveStudentsFailed = "InternshipGroup.LogRemoveStudentsFailed";
+            public const string LogRemoveStudentsError = "InternshipGroup.LogRemoveStudentsError";
         }
         public static class Projects
         {
@@ -329,6 +363,42 @@
         public static class Error
         {
             public const string WorkItemNotFound = "Error.WorkItem.NotFound";
+        }
+
+        public static class EvaluationCycle
+        {
+            public const string NotFound = "EvaluationCycle.NotFound";
+            public const string NameRequired = "EvaluationCycle.NameRequired";
+            public const string NameMaxLength = "EvaluationCycle.NameMaxLength";
+            public const string TermNotFound = "EvaluationCycle.TermNotFound";
+            public const string StartDateRequired = "EvaluationCycle.StartDateRequired";
+            public const string EndDateRequired = "EvaluationCycle.EndDateRequired";
+            public const string EndDateMustBeAfterStart = "EvaluationCycle.EndDateMustBeAfterStart";
+            public const string CannotDeleteWithCriteria = "EvaluationCycle.CannotDeleteWithCriteria";
+        }
+
+        public static class EvaluationCriteriaKey
+        {
+            public const string NotFound = "EvaluationCriteria.NotFound";
+            public const string CycleNotFound = "EvaluationCriteria.CycleNotFound";
+            public const string NameRequired = "EvaluationCriteria.NameRequired";
+            public const string NameMaxLength = "EvaluationCriteria.NameMaxLength";
+            public const string MaxScoreInvalid = "EvaluationCriteria.MaxScoreInvalid";
+            public const string WeightInvalid = "EvaluationCriteria.WeightInvalid";
+        }
+
+        public static class EvaluationKey
+        {
+            public const string NotFound = "Evaluation.NotFound";
+            public const string CycleNotFound = "Evaluation.CycleNotFound";
+            public const string StudentNotFound = "Evaluation.StudentNotFound";
+            public const string InternshipNotFound = "Evaluation.InternshipNotFound";
+            public const string StudentNotInGroup = "Evaluation.StudentNotInGroup";
+            public const string AlreadyExists = "Evaluation.AlreadyExists";
+            public const string CannotUpdateSubmitted = "Evaluation.CannotUpdateSubmitted";
+            public const string CriteriaNotFound = "Evaluation.CriteriaNotFound";
+            public const string ScoreExceedsMax = "Evaluation.ScoreExceedsMax";
+            public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
         }
     }
 }

@@ -122,8 +122,9 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         {
                             foreach (var item in incompleteSprintWorkItems)
                             {
-                                item.SprintId = nextSprint.SprintId;
-                                await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
+                                await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
+                                var newItem = new SprintWorkItem { SprintId = nextSprint.SprintId, WorkItemId = item.WorkItemId };
+                                await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
                             }
                         }
                         else
@@ -144,8 +145,9 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         await _unitOfWork.Repository<Sprint>().AddAsync(newSprint, cancellationToken);
                         foreach (var item in incompleteSprintWorkItems)
                         {
-                            item.SprintId = newSprint.SprintId;
-                            await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
+                            await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
+                            var newItem = new SprintWorkItem { SprintId = newSprint.SprintId, WorkItemId = item.WorkItemId };
+                            await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
                         }
                         movedCount = incompleteSprintWorkItems.Count;
                         break;

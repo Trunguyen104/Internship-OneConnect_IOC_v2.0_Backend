@@ -21,4 +21,10 @@ public record GetBacklogQuery : IRequest<Result<GetBacklogResponse>>
     public string? Status { get; init; }
 
     public Guid? AssigneeId { get; init; }
+
+    /// <summary>
+    /// Khi true, chỉ trả về Product Backlog (items chưa trong Sprint nào).
+    /// Dùng khi muốn chọn workitems để thêm vào Sprint mới.
+    /// </summary>
+    public bool BacklogOnly { get; init; } = false;
 }

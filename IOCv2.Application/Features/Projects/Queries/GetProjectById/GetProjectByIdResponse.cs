@@ -1,5 +1,5 @@
 ﻿using IOCv2.Application.Extensions.Mappings;
-using IOCv2.Application.Features.Projects.Queries.GetAProjects;
+using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using System;

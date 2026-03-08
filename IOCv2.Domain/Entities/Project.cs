@@ -20,16 +20,22 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<Sprint> Sprints { get; set; } = new List<Sprint>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
 
-        public Project() { }
+        private Project() { }
 
-        public Project(Guid internshipId, string projectName, string? description)
+        public static Project Create(Guid internshipId, string projectName, string? description, DateTime? startDate = null, DateTime? endDate = null)
         {
-            ProjectId = Guid.NewGuid();
-            InternshipId = internshipId;
-            ProjectName = projectName;
-            Description = description;
-            Status = ProjectStatus.Planning;
-            CreatedAt = DateTime.UtcNow;
+            var project = new Project
+            {
+                ProjectId = Guid.NewGuid(),
+                InternshipId = internshipId,
+                ProjectName = projectName,
+                Description = description,
+                StartDate = startDate,
+                EndDate = endDate,
+                Status = ProjectStatus.Planning,
+                CreatedAt = DateTime.UtcNow
+            };
+            return project;
         }
 
         public void Update(Guid? internshipId, string? projectName, string? description, DateTime? startDate, DateTime? endDate, ProjectStatus? status)
