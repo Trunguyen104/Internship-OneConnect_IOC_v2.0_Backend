@@ -22,31 +22,44 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
     public async Task<Result<SubmitEvaluationResponse>> Handle(
         SubmitEvaluationCommand request, CancellationToken cancellationToken)
     {
-        var evaluation = await _unitOfWork.Repository<Evaluation>().Query()
-            .FirstOrDefaultAsync(e => e.EvaluationId == request.EvaluationId, cancellationToken);
+        var evaluations = await _unitOfWork.Repository<Evaluation>().Query()
+            .Where(e => e.CycleId == request.CycleId && e.InternshipId == request.InternshipId)
+            .ToListAsync(cancellationToken);
 
-        if (evaluation is null)
+        if (request.StudentIds != null && request.StudentIds.Any())
+        {
+            evaluations = evaluations.Where(e => request.StudentIds.Contains(e.StudentId)).ToList();
+        }
+
+        if (evaluations.Count == 0)
             return Result<SubmitEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.NotFound),
                 ResultErrorType.NotFound);
 
-        if (evaluation.Status != EvaluationStatus.Draft)
+        var drafts = evaluations.Where(e => e.Status == EvaluationStatus.Draft || e.Status == EvaluationStatus.Pending).ToList();
+        
+        if (drafts.Count == 0)
             return Result<SubmitEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.AlreadySubmitted),
                 ResultErrorType.BadRequest);
 
-        evaluation.Status = EvaluationStatus.Submitted;
-        evaluation.UpdatedAt = DateTime.UtcNow;
+        var now = DateTime.UtcNow;
+        foreach (var eval in drafts)
+        {
+            eval.Status = EvaluationStatus.Submitted;
+            eval.UpdatedAt = now;
+            await _unitOfWork.Repository<Evaluation>().UpdateAsync(eval, cancellationToken);
+        }
 
-        await _unitOfWork.Repository<Evaluation>().UpdateAsync(evaluation, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
 
         return Result<SubmitEvaluationResponse>.Success(new SubmitEvaluationResponse
         {
-            EvaluationId = evaluation.EvaluationId,
-            Status = evaluation.Status.ToString(),
-            TotalScore = evaluation.TotalScore,
-            UpdatedAt = evaluation.UpdatedAt ?? DateTime.UtcNow
+            CycleId = request.CycleId,
+            InternshipId = request.InternshipId,
+            UpdatedCount = drafts.Count,
+            Status = EvaluationStatus.Submitted.ToString(),
+            UpdatedAt = now
         });
     }
 }

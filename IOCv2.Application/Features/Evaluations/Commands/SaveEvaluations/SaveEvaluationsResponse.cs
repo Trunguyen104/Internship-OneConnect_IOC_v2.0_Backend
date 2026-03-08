@@ -1,6 +1,6 @@
-namespace IOCv2.Application.Features.Evaluations.Commands.CreateEvaluation;
+namespace IOCv2.Application.Features.Evaluations.Commands.SaveEvaluations;
 
-public class CreateEvaluationResponse
+public class SaveEvaluationsResponse
 {
     public Guid EvaluationId { get; set; }
     public Guid CycleId { get; set; }

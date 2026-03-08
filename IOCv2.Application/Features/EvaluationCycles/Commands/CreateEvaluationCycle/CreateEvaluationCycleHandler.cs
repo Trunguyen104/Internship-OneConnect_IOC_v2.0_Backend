@@ -38,7 +38,8 @@ public class CreateEvaluationCycleHandler
             Name = request.Name,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
-            Status = EvaluationCycleStatus.Upcoming
+            Status = EvaluationCycleStatus.Pending,
+            CreatedAt = DateTime.UtcNow
         };
 
         await _unitOfWork.Repository<EvaluationCycle>().AddAsync(cycle, cancellationToken);

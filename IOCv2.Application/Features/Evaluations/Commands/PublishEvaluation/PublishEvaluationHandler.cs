@@ -22,32 +22,58 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
     public async Task<Result<PublishEvaluationResponse>> Handle(
         PublishEvaluationCommand request, CancellationToken cancellationToken)
     {
-        var evaluation = await _unitOfWork.Repository<Evaluation>().Query()
-            .FirstOrDefaultAsync(e => e.EvaluationId == request.EvaluationId, cancellationToken);
+        var internship = await _unitOfWork.Repository<InternshipGroup>().Query()
+            .Include(i => i.Members)
+            .FirstOrDefaultAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
 
-        if (evaluation is null)
+        if (internship == null)
+            return Result<PublishEvaluationResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationKey.InternshipNotFound),
+                ResultErrorType.NotFound);
+
+        var evaluations = await _unitOfWork.Repository<Evaluation>().Query()
+            .Where(e => e.CycleId == request.CycleId && e.InternshipId == request.InternshipId)
+            .ToListAsync(cancellationToken);
+
+        if (evaluations.Count == 0)
             return Result<PublishEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.NotFound),
                 ResultErrorType.NotFound);
 
-        // Chỉ Publish được khi đã Submitted
-        if (evaluation.Status != EvaluationStatus.Submitted)
+        var isGroupEvaluation = evaluations.Any(e => e.StudentId == null);
+        
+        if (!isGroupEvaluation && evaluations.Count < internship.Members.Count)
+        {
             return Result<PublishEvaluationResponse>.Failure(
-                "Evaluation must be in Submitted status to publish.",
+                "Chưa tạo đầy đủ bài đánh giá cho toàn bộ sinh viên trong nhóm.",
                 ResultErrorType.BadRequest);
+        }
 
-        evaluation.Status = EvaluationStatus.Published;
-        evaluation.UpdatedAt = DateTime.UtcNow;
+        var unsubmittedEvals = evaluations.Where(e => e.Status != EvaluationStatus.Submitted).ToList();
+        if (unsubmittedEvals.Count > 0)
+        {
+            return Result<PublishEvaluationResponse>.Failure(
+                "Tất cả bài đánh giá của nhóm phải ở trạng thái Submitted trước khi Publish.",
+                ResultErrorType.BadRequest);
+        }
 
-        await _unitOfWork.Repository<Evaluation>().UpdateAsync(evaluation, cancellationToken);
+        var now = DateTime.UtcNow;
+        foreach (var eval in evaluations)
+        {
+            eval.Status = EvaluationStatus.Published;
+            eval.UpdatedAt = now;
+            await _unitOfWork.Repository<Evaluation>().UpdateAsync(eval, cancellationToken);
+        }
+
         await _unitOfWork.SaveChangeAsync(cancellationToken);
 
         return Result<PublishEvaluationResponse>.Success(new PublishEvaluationResponse
         {
-            EvaluationId = evaluation.EvaluationId,
-            Status = evaluation.Status.ToString(),
-            TotalScore = evaluation.TotalScore,
-            UpdatedAt = evaluation.UpdatedAt ?? DateTime.UtcNow
+            CycleId = request.CycleId,
+            InternshipId = request.InternshipId,
+            UpdatedCount = evaluations.Count,
+            Status = EvaluationStatus.Published.ToString(),
+            UpdatedAt = now
         });
     }
 }
