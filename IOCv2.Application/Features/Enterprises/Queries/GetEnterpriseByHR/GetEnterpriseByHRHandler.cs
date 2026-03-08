@@ -1,0 +1,70 @@
+﻿using AutoMapper;
+using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById;
+using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.RateLimiting;
+using System.Threading.Tasks;
+
+namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
+{
+    public class GetEnterpriseByHRHandler : IRequestHandler<GetEnterpriseByHRCommand, Result<GetEnterpriseByHRResponse>>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly IMessageService _messageService;
+        private readonly ILogger<GetEnterpriseByHRHandler> _logger;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IRateLimiter _rateLimiter;             
+
+        public GetEnterpriseByHRHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService,
+            ILogger<GetEnterpriseByHRHandler> logger, ICurrentUserService currentUserService, IRateLimiter rateLimiter)
+        {
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _messageService = messageService;
+            _logger = logger;
+            _currentUserService = currentUserService;
+            _rateLimiter = rateLimiter;
+        }
+
+        public async Task<Result<GetEnterpriseByHRResponse>> Handle(GetEnterpriseByHRCommand request, CancellationToken cancellationToken)
+        {
+            try {
+                // Each user has own key counting invalid turn
+                var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetByHRAttempt, _currentUserService.UserId);
+                // Check if user is blocked due to too many failed attempts
+                if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
+                {
+                    return Result<GetEnterpriseByHRResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes), ResultErrorType.BadRequest);
+                }
+                // Register failed attempt (block after 30 attempts in 1 mins)
+                await _rateLimiter.RegisterFailAsync(
+                    rateLimitKey,
+                    limit: 30,
+                    window: TimeSpan.FromMinutes(1),
+                    blockFor: TimeSpan.FromMinutes(1),
+                    cancellationToken);
+                var userId = Guid.Parse(_currentUserService.UserId!);
+                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().GetByIdAsync(userId, cancellationToken);
+                if (enterpriseUser == null) return Result<GetEnterpriseByHRResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise));
+                var enterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>().GetByIdAsync(enterpriseUser!.EnterpriseId, cancellationToken);
+                    if (enterprise == null) return Result<GetEnterpriseByHRResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseNotFoundCurrentHR));
+                    var response = _mapper.Map<GetEnterpriseByHRResponse>(enterprise);
+                    await _unitOfWork.CommitTransactionAsync();
+                    return Result<GetEnterpriseByHRResponse>.Success(response);
+                
+            } catch (Exception ex) {
+                _logger.LogError(ex.Message);
+                return Result<GetEnterpriseByHRResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
+            }
+        }
+    }
+}
