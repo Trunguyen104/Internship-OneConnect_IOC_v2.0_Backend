@@ -454,6 +454,15 @@
   <data name="Enterprise.LogUpdateEnterpriseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+    <value>Updating the tax code is not allowed.</value>
+  </data>
+  <data name="Enterprise.LogDeleteError" xml:space="preserve">
+    <value>Error occurred while deleting enterprise with ID {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.DeleteError" xml:space="preserve">
+    <value>An error occurred while deleting the enterprise. Please try again later.</value>
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -532,13 +541,10 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
   </data>
-  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
-    <value>Updating the tax code is not allowed.</value>
+  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+    <value>You are not associated with any enterprise as an HR.</value>
   </data>
-  <data name="Enterprise.LogDeleteError" xml:space="preserve">
-    <value>Error occurred while deleting enterprise with ID {EnterpriseId}</value>
-  </data>
-  <data name="Enterprise.DeleteError" xml:space="preserve">
-    <value>An error occurred while deleting the enterprise. Please try again later.</value>
+  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+    <value>Enterprise not found for the current HR.</value>
   </data>
 </root>

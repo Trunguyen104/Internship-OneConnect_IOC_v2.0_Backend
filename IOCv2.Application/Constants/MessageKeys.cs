@@ -113,6 +113,12 @@
             public const string LogDeleteError = "Enterprise.LogDeleteError";
             public const string DeleteError = "Enterprise.DeleteError";
             public const string RequestManyTimes = "Enterprise.RequestManyTimes";
+            public const string RateLimitUpdateAttempt = "Enterprise.RateLimitUpdateAttempt";
+            public const string RateLimitGetByHRAttempt = "Enterprise.RateLimitGetByHRAttempt";
+            public const string RateLimitGetByIDAttempt = "Enterprise.RateLimitGetByIDAttempt";
+            public const string RateLimitGetEnterprisesAttempt = "Enterprise.RateLimitGetEnterprisesAttempt";
+            public const string HRNotAssociatedWithEnterprise = "Enterprise.HR.NotAssociatedWithEnterprise";
+            public const string EnterpriseNotFoundCurrentHR = "Enterprise.NotFoundCurrentHR";
         }
 
         public static class Profile

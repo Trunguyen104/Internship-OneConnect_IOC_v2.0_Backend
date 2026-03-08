@@ -615,4 +615,10 @@
   <data name="Enterprise.DeleteError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình xóa doanh nghiệp. Vui lòng thử lại sau.</value>
   </data>
+  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+    <value>Bạn không liên kết với bất kỳ doanh nghiệp nào với tư cách là nhân sự.</value>
+  </data>
+  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp cho bộ phận Nhân sự hiện tại.</value>
+  </data>
 </root>

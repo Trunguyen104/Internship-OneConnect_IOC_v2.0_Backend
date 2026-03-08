@@ -41,11 +41,11 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
             try
             {
                 // Each user has own key counting invalid turn
-                var rateLimitKey = $"update_enterprise_attempt:{request.EnterpriseId}";
+                var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitUpdateAttempt, _currentUserService.UserId!);
                 // Check if user is blocked due to too many failed attempts
                 if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
                 {
-                    return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes));
+                    return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes), ResultErrorType.TooManyRequests);
                 }
                 // Register failed attempt (block after 5 attempts in 1 mins)
                 await _rateLimiter.RegisterFailAsync(
@@ -93,7 +93,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
                 // Rollback transaction on failure
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 // Log unexpected exception
-                _logger.LogError(_messageService.GetMessage(MessageKeys.Enterprise.LogUpdateEnterpriseError), ResultErrorType.InternalServerError);
+                _logger.LogError(ex.Message, ResultErrorType.InternalServerError);
                 throw;
             }
         }

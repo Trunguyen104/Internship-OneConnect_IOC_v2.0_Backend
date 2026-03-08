@@ -37,11 +37,11 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
             try
             {
                 // Each user has own key counting invalid turn
-                var rateLimitKey = $"get_enterprise_attempt:{_currentUserService.UserId}";
+                var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetEnterprisesAttempt);
                 // Check if user is blocked due to too many failed attempts
                 if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
                 {
-                    return Result<PaginatedResult<GetEnterprisesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes));
+                    return Result<PaginatedResult<GetEnterprisesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes), ResultErrorType.TooManyRequests);
                 }
                 // Register failed attempt (block after 30 attempts in 1 mins)
                 await _rateLimiter.RegisterFailAsync(

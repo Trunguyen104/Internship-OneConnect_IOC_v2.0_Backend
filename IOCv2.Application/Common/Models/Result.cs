@@ -8,7 +8,8 @@
         Unauthorized,
         Forbidden,
         Conflict,
-        InternalServerError
+        InternalServerError,
+        TooManyRequests
     }
 
     public class Result<T>

@@ -267,4 +267,16 @@
   <data name="Enterprise.RequestManyTimes" xml:space="preserve">
     <value>Bạn đã gửi request quá nhiều lần.</value>
   </data>
+  <data name="Enterprise.RateLimitUpdateAttempt" xml:space="preserve">
+    <value>update_enterprise_attempt:{0}</value>
+  </data>
+  <data name="Enterprise.RateLimitGetByHRAttempt" xml:space="preserve">
+    <value>getByHR_enterprise_attempt:{0}</value>
+  </data>
+  <data name="Enterprise.RateLimitGetByIDAttempt" xml:space="preserve">
+    <value>getByID_enterprise_attempt:{0}</value>
+  </data>
+  <data name="Enterprise.RateLimitGetEnterprisesAttempt" xml:space="preserve">
+    <value>getEnterprises_enterprise_attempt:{0}</value>
+  </data>
 </root>
