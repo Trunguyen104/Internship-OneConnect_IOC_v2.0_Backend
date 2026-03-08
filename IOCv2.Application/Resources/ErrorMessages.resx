@@ -620,6 +620,7 @@
   </data>
   <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
     <value>Không tìm thấy doanh nghiệp cho bộ phận Nhân sự hiện tại.</value>
+  </data>
   <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
     <value>Lưu nhóm thực tập vào cơ sở dữ liệu thất bại</value>
   </data>
