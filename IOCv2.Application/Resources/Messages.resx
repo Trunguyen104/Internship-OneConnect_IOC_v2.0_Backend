@@ -278,6 +278,7 @@
   </data>
   <data name="Enterprise.RateLimitGetEnterprisesAttempt" xml:space="preserve">
     <value>getEnterprises_enterprise_attempt:{0}</value>
+  </data>
   <data name="InternshipGroup.LogCreating" xml:space="preserve">
     <value>Đang tạo nhóm thực tập mới: {GroupName} cho kỳ: {TermId}</value>
   </data>
