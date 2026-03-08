@@ -546,6 +546,7 @@
   </data>
   <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
     <value>Enterprise not found for the current HR.</value>
+  </data>
   <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
     <value>Failed to save internship group to database</value>
   </data>
