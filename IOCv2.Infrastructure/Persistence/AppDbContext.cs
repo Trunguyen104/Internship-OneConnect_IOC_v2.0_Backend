@@ -71,6 +71,18 @@ public partial class AppDbContext : DbContext
             }
         }
 
+        // Track DeletedBy for soft deletes - ONLY for Term entities
+        foreach (var entry in ChangeTracker.Entries<Term>())
+        {
+            if (entry.State == EntityState.Modified)
+            {
+                if (entry.Entity.DeletedAt.HasValue && !entry.OriginalValues.GetValue<DateTime?>(nameof(BaseEntity.DeletedAt)).HasValue)
+                {
+                    entry.Entity.DeletedBy = currentUserId;
+                }
+            }
+        }
+
         return await base.SaveChangesAsync(cancellationToken);
     }
 
