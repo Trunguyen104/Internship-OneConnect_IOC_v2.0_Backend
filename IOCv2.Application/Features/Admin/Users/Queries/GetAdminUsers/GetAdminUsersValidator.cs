@@ -17,11 +17,11 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
                 .LessThanOrEqualTo(100);
 
             RuleFor(x => x.Role)
-                .Must(role => string.IsNullOrWhiteSpace(role) || Enum.TryParse<UserRole>(role, true, out _))
+                .IsInEnum().When(x => x.Role.HasValue)
                 .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidRole));
 
             RuleFor(x => x.Status)
-                .Must(status => string.IsNullOrWhiteSpace(status) || Enum.TryParse<UserStatus>(status, true, out _))
+                .IsInEnum().When(x => x.Status.HasValue)
                 .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidStatus));
         }
     }

@@ -5,7 +5,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
 {
-    public class CreateInternshipGroupValidator : AbstractValidator<CreateInternshipGroupCommand>
+    internal class CreateInternshipGroupValidator : AbstractValidator<CreateInternshipGroupCommand>
     {
         public CreateInternshipGroupValidator(IMessageService messageService)
         {
@@ -25,9 +25,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 .ChildRules(student =>
                 {
                     student.RuleFor(s => s.Role)
-                        .NotEmpty()
-                        .Must(v => Enum.TryParse<InternshipRole>(v, ignoreCase: true, out _))
-                        .WithMessage($"Student Role must be one of: {string.Join(", ", Enum.GetNames<InternshipRole>())}");
+                        .IsInEnum().WithMessage("Invalid student role.");
+
                 });
         }
     }

@@ -105,17 +105,20 @@ namespace IOCv2.Infrastructure.Persistence
             // 1. Super Admin
             if (!await _context.Users.AnyAsync(u => u.Role == UserRole.SuperAdmin))
             {
-                var superAdmin = new User
-                {
-                    UserId = Guid.NewGuid(),
-                    UserCode = await _userService.GenerateUserCodeAsync(UserRole.SuperAdmin, cancellationToken),
-                    PasswordHash = passHash,
-                    FullName = "Super Administrator",
-                    Email = "admin@iocv2.com",
-                    Role = UserRole.SuperAdmin,
-                    Status = UserStatus.Active,
-                    Gender = UserGender.Other
-                };
+                var userId = Guid.NewGuid();
+                var userCode = await _userService.GenerateUserCodeAsync(UserRole.SuperAdmin, cancellationToken);
+                var superAdmin = new User(
+                    userId,
+                    userCode,
+                    "admin@iocv2.com",
+                    "Super Administrator",
+                    UserRole.SuperAdmin,
+                    passHash
+                );
+                // Status is Active by default in constructor, but we can set it explicitly if needed
+                superAdmin.SetStatus(UserStatus.Active);
+                superAdmin.UpdateProfile("Super Administrator", null, null, UserGender.Other, null);
+                
                 _context.Users.Add(superAdmin);
             }
 
@@ -128,16 +131,17 @@ namespace IOCv2.Infrastructure.Persistence
                     var email = $"student{i}@{uni.Code.ToLower()}.edu.vn";
                     if (!existingEmails.Contains(email))
                     {
-                        var user = new User
-                        {
-                            UserId = Guid.NewGuid(),
-                            UserCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken),
-                            PasswordHash = passHash,
-                            FullName = $"Student {i} of {uni.Code}",
-                            Email = email,
-                            Role = UserRole.Student,
-                            Status = UserStatus.Active
-                        };
+                        var userId = Guid.NewGuid();
+                        var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                        var user = new User(
+                            userId,
+                            userCode,
+                            email,
+                            $"Student {i} of {uni.Code}",
+                            UserRole.Student,
+                            passHash
+                        );
+                        user.SetStatus(UserStatus.Active);
                         _context.Users.Add(user);
                         _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId });
                         _context.Students.Add(new Student
@@ -159,16 +163,17 @@ namespace IOCv2.Infrastructure.Persistence
                 var email = $"mentor@{ent.Name.Replace(" ", "").ToLower()}.com";
                 if (!existingEmails.Contains(email))
                 {
-                    var user = new User
-                    {
-                        UserId = Guid.NewGuid(),
-                        UserCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken),
-                        PasswordHash = passHash,
-                        FullName = $"Mentor at {ent.Name}",
-                        Email = email,
-                        Role = UserRole.Mentor,
-                        Status = UserStatus.Active
-                    };
+                    var userId = Guid.NewGuid();
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
+                    var user = new User(
+                        userId,
+                        userCode,
+                        email,
+                        $"Mentor at {ent.Name}",
+                        UserRole.Mentor,
+                        passHash
+                    );
+                    user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     _context.EnterpriseUsers.Add(new EnterpriseUser
                     {
@@ -296,7 +301,7 @@ namespace IOCv2.Infrastructure.Persistence
             if (!await _context.Projects.AnyAsync())
             {
                 var group = await _context.InternshipGroups.FirstAsync();
-                var project = new Project(
+                var project = Project.Create(
                     group.InternshipId,
                     "E-Commerce System IOC",
                     "Building a next-gen e-commerce platform");
@@ -313,15 +318,11 @@ namespace IOCv2.Infrastructure.Persistence
                     ResourceUrl = "https://docs.example.com/design"
                 });
 
-                var sprint = new Sprint
-                {
-                    SprintId = Guid.NewGuid(),
-                    ProjectId = project.ProjectId,
-                    Name = "Sprint 1",
-                    StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)),
-                    EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(4)),
-                    Status = SprintStatus.Active
-                };
+                var sprint = new Sprint(project.ProjectId, "Sprint 1", "Initial sprint for seeding");
+                sprint.Start(
+                    DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)),
+                    DateOnly.FromDateTime(DateTime.UtcNow.AddDays(4))
+                );
                 _context.Sprints.Add(sprint);
 
                 var student = await _context.Students.FirstAsync();
@@ -363,7 +364,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var student = await _context.Students.FirstAsync();
 
                 var logbook = Logbook.Create(
-                    project.ProjectId,
+                    project.InternshipId,  // FK → internship_groups.internship_id
                     student.StudentId,
                     "Finished login UI and integrated with API.",
                     null, // Issue
@@ -373,6 +374,7 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Logbooks.Add(logbook);
                 await _context.SaveChangesAsync();
             }
+
 
             if (_context.ChangeTracker.HasChanges())
             {

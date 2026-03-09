@@ -3,8 +3,19 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
 {
+    /// <summary>
+    /// Query to get a single stakeholder by ID.
+    /// </summary>
     public record GetStakeholderByIdQuery : IRequest<Result<GetStakeholderByIdResponse>>
     {
-        public Guid Id { get; init; }
+        /// <summary>
+        /// The ID of the stakeholder to retrieve.
+        /// </summary>
+        public Guid StakeholderId { get; init; }
+
+        /// <summary>
+        /// The ID of the internship group.
+        /// </summary>
+        public Guid InternshipId { get; init; }
     }
 }

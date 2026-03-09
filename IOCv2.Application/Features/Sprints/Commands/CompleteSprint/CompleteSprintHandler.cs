@@ -6,6 +6,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Sprints.Commands.CompleteSprint;
 
@@ -14,34 +15,41 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICacheService _cacheService;
     private readonly IMessageService _messageService;
+    private readonly ILogger<CompleteSprintHandler> _logger;
 
     public CompleteSprintHandler(
         IUnitOfWork unitOfWork,
         ICacheService cacheService,
-        IMessageService messageService)
+        IMessageService messageService,
+        ILogger<CompleteSprintHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _cacheService = cacheService;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<CompleteSprintResponse>> Handle(
         CompleteSprintCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Completing sprint {SprintId} for project {ProjectId}", request.SprintId, request.ProjectId);
+
         var sprint = await _unitOfWork.Repository<Sprint>().Query()
             .FirstOrDefaultAsync(s => s.SprintId == request.SprintId && s.ProjectId == request.ProjectId, cancellationToken);
 
         if (sprint is null)
+        {
+            _logger.LogWarning("Sprint {SprintId} not found", request.SprintId);
             return Result<CompleteSprintResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
+        }
 
         if (sprint.Status != SprintStatus.Active)
+        {
+            _logger.LogWarning("Sprint {SprintId} is not in Active status", request.SprintId);
             return Result<CompleteSprintResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.Sprint.NotActive), ResultErrorType.BadRequest);
-
-        if (!Enum.TryParse<MoveIncompleteItemsOption>(request.IncompleteItemsOption, ignoreCase: true, out var incompleteOption))
-            return Result<CompleteSprintResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Sprint.InvalidIncompleteItemsOption), ResultErrorType.BadRequest);
+        }
 
         // Load sprint work items
         var sprintWorkItems = await _unitOfWork.Repository<SprintWorkItem>().Query()
@@ -69,12 +77,13 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
 
         int movedCount = 0;
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
             if (incompleteSprintWorkItems.Any())
             {
-                switch (incompleteOption)
+                switch (request.IncompleteItemsOption)
                 {
                     case MoveIncompleteItemsOption.ToBacklog:
                         foreach (var item in incompleteSprintWorkItems)
@@ -91,8 +100,11 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                                 .FirstOrDefaultAsync(s => s.SprintId == request.TargetSprintId.Value, cancellationToken);
 
                             if (nextSprint is null)
+                            {
+                                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                                 return Result<CompleteSprintResponse>.Failure(
                                     _messageService.GetMessage(MessageKeys.Sprint.TargetSprintNotFound), ResultErrorType.NotFound);
+                            }
                         }
                         else
                         {
@@ -106,8 +118,9 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         {
                             foreach (var item in incompleteSprintWorkItems)
                             {
-                                item.SprintId = nextSprint.SprintId;
-                                await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
+                                await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
+                                var newItem = new SprintWorkItem { SprintId = nextSprint.SprintId, WorkItemId = item.WorkItemId };
+                                await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
                             }
                         }
                         else
@@ -123,45 +136,39 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                             ? request.NewSprintName
                             : $"{sprint.Name} (Continued)";
 
-                        var newSprint = new Sprint
-                        {
-                            SprintId = Guid.NewGuid(),
-                            ProjectId = sprint.ProjectId,
-                            Name = sprintName,
-                            Goal = "Incomplete items from previous sprint",
-                            StartDate = sprint.EndDate?.AddDays(1) ?? DateOnly.FromDateTime(DateTime.UtcNow),
-                            EndDate = sprint.EndDate?.AddDays(15) ?? DateOnly.FromDateTime(DateTime.UtcNow.AddDays(14)),
-                            Status = SprintStatus.Planned,
-                            CreatedAt = DateTime.UtcNow
-                        };
+                        var newSprint = new Sprint(sprint.ProjectId, sprintName, "Incomplete items from previous sprint");
 
                         await _unitOfWork.Repository<Sprint>().AddAsync(newSprint, cancellationToken);
                         foreach (var item in incompleteSprintWorkItems)
                         {
-                            item.SprintId = newSprint.SprintId;
-                            await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
+                            await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
+                            var newItem = new SprintWorkItem { SprintId = newSprint.SprintId, WorkItemId = item.WorkItemId };
+                            await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
                         }
                         movedCount = incompleteSprintWorkItems.Count;
                         break;
                 }
             }
 
-            sprint.Status = SprintStatus.Completed;
-            sprint.UpdatedAt = DateTime.UtcNow;
+            sprint.Complete();
 
             await _unitOfWork.Repository<Sprint>().UpdateAsync(sprint, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            await _cacheService.RemoveAsync(SprintCacheKeys.Sprint(sprint.ProjectId, request.SprintId), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(
+                SprintCacheKeys.SprintListPattern(sprint.ProjectId), cancellationToken);
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            _logger.LogInformation("Successfully completed sprint {SprintId}", request.SprintId);
         }
-        catch
+        catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
+            _logger.LogError(ex, "Error occurred while completing sprint {SprintId}", request.SprintId);
+            return Result<CompleteSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
-
-        await _cacheService.RemoveAsync(SprintCacheKeys.Sprint(sprint.ProjectId, request.SprintId), cancellationToken);
-        await _cacheService.RemoveByPatternAsync(
-            SprintCacheKeys.SprintListPattern(sprint.ProjectId), cancellationToken);
 
         return Result<CompleteSprintResponse>.Success(new CompleteSprintResponse
         {

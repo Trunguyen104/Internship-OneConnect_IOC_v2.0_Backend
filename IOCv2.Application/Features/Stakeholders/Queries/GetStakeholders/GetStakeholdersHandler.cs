@@ -6,6 +6,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
 {
@@ -14,28 +15,69 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
+        private readonly ILogger<GetStakeholdersHandler> _logger;
+        private readonly ICurrentUserService _currentUserService;
 
-        public GetStakeholdersHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService)
+        public GetStakeholdersHandler(
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            IMessageService messageService,
+            ILogger<GetStakeholdersHandler> logger,
+            ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
+            _logger = logger;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Result<PaginatedResult<GetStakeholdersResponse>>> Handle(GetStakeholdersQuery request, CancellationToken cancellationToken)
         {
-            // Check project exists
-            var projectExists = await _unitOfWork.Repository<Project>()
-                .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
+            _logger.LogInformation("Getting paginated stakeholders for internship {InternshipId}", request.InternshipId);
 
-            if (!projectExists)
-                return Result<PaginatedResult<GetStakeholdersResponse>>.NotFound(
-                    _messageService.GetMessage(MessageKeys.Stakeholder.ProjectNotFound));
+            try
+            {
+
+            // Check internship exists
+            var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
+                .ExistsAsync(p => p.InternshipId == request.InternshipId, cancellationToken);
+
+            if (!internshipExists)
+            {
+                _logger.LogWarning("InternshipGroup {InternshipId} not found", request.InternshipId);
+                return Result<PaginatedResult<GetStakeholdersResponse>>.NotFound("InternshipGroup not found");
+            }
+
+            // Security: Ownership check (FFA-SEC)
+            var currentUserIdStr = _currentUserService.UserId;
+            if (string.IsNullOrEmpty(currentUserIdStr) || !Guid.TryParse(currentUserIdStr, out var currentUserId))
+            {
+                return Result<PaginatedResult<GetStakeholdersResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+            }
+
+            var userRole = _currentUserService.Role;
+            if (userRole != "SchoolAdmin" && userRole != "SuperAdmin" && userRole != "Moderator")
+            {
+                var isAuthorized = await _unitOfWork.Repository<InternshipGroup>()
+                    .Query()
+                    .AnyAsync(g => g.InternshipId == request.InternshipId &&
+                        (
+                            (g.Mentor != null && g.Mentor.UserId == currentUserId) ||
+                            g.Members.Any(m => m.Student.UserId == currentUserId)
+                        ), cancellationToken);
+
+                if (!isAuthorized)
+                {
+                    _logger.LogWarning("User {UserId} attempted to get stakeholders in internship {InternshipId} without permission", currentUserId, request.InternshipId);
+                    return Result<PaginatedResult<GetStakeholdersResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+                }
+            }
 
             // Build base query
             var query = _unitOfWork.Repository<Stakeholder>()
                 .Query()
-                .Where(s => s.ProjectId == request.ProjectId)
+                .Where(s => s.InternshipId == request.InternshipId)
                 .AsNoTracking();
 
             // Filter by search term
@@ -68,8 +110,16 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
                 .ProjectTo<GetStakeholdersResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 
+            _logger.LogInformation("Successfully retrieved {Count} stakeholders for internship {InternshipId}", items.Count, request.InternshipId);
+
             var result = PaginatedResult<GetStakeholdersResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
             return Result<PaginatedResult<GetStakeholdersResponse>>.Success(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting stakeholders for internship {InternshipId}", request.InternshipId);
+                return Result<PaginatedResult<GetStakeholdersResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            }
         }
     }
 }

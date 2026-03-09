@@ -84,12 +84,13 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         cancellationToken);
 
                     // Create resource record using constructor
-                    var resourceType = Enum.Parse<FileType>(request.ResourceType, ignoreCase: true);
+                    // Create resource record using constructor
                     var resource = new Domain.Entities.ProjectResources(
                         request.ProjectId,
                         request.ResourceName ?? request.File.FileName,
-                        resourceType,
+                        request.ResourceType,
                         fileUrl);
+
 
                     // Save to database
                     await _unitOfWork.Repository<Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
@@ -124,13 +125,13 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     }
 
                     _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadError), request.ProjectId);
-                    throw;
+                    return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
                 }
             }
             catch (Exception ex) // Outer catch for validation or project existence checks exceptions
             {
                 _logger.LogError(ex, "Failed to initiate file upload process for project: {ProjectId}", request.ProjectId);
-                throw;
+                return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

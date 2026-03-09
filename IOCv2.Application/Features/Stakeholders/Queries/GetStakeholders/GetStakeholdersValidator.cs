@@ -7,7 +7,7 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
     {
         public GetStakeholdersValidator()
         {
-            RuleFor(x => x.ProjectId)
+            RuleFor(x => x.InternshipId)
                 .NotEmpty()
                 .WithMessage(MessageKeys.Stakeholder.ProjectIdRequired);
 

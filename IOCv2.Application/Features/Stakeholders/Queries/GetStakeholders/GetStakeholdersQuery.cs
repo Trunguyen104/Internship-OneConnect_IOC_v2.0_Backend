@@ -3,13 +3,40 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
 {
+    /// <summary>
+    /// Query to get a paginated list of stakeholders for a project.
+    /// </summary>
     public record GetStakeholdersQuery : IRequest<Result<PaginatedResult<GetStakeholdersResponse>>>
     {
-        public Guid ProjectId { get; init; }
+        /// <summary>
+        /// The ID of the internship group to get stakeholders for.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public Guid InternshipId { get; init; }
+
+        /// <summary>
+        /// Optional search term to filter stakeholders by Name, Email, or Role.
+        /// </summary>
         public string? SearchTerm { get; init; }
+
+        /// <summary>
+        /// Column to sort by.
+        /// </summary>
         public string? SortColumn { get; init; }
-        public string? SortOrder { get; init; } // "asc" or "desc"
+
+        /// <summary>
+        /// Sort order ("asc" or "desc").
+        /// </summary>
+        public string? SortOrder { get; init; }
+
+        /// <summary>
+        /// Page number (starting from 1).
+        /// </summary>
         public int PageNumber { get; init; } = 1;
+
+        /// <summary>
+        /// Number of items per page.
+        /// </summary>
         public int PageSize { get; init; } = 10;
     }
 }

@@ -1,4 +1,6 @@
+using IOCv2.Domain.Enums;
 using IOCv2.Application.Common.Models;
+
 using IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser;
 using IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser;
 using IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword;
@@ -17,7 +19,7 @@ namespace IOCv2.API.Controllers.Admin;
 /// </summary>
 [Tags("Admin - User Management")]
 [Authorize]
-[Route("api/admin")]
+[Route("api/admin/users")]
 public class AdminUsersController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -27,7 +29,7 @@ public class AdminUsersController : ApiControllerBase
     /// <summary>
     /// Get paginated list of admin accounts with optional filters and sorting.
     /// </summary>
-    [HttpGet("users")]
+    [HttpGet]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetAdminUsersResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -42,7 +44,7 @@ public class AdminUsersController : ApiControllerBase
     /// <summary>
     /// Get a single admin account by ID.
     /// </summary>
-    [HttpGet("users/{id:guid}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(Result<GetAdminUserByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -59,7 +61,7 @@ public class AdminUsersController : ApiControllerBase
     /// Create a new administrative account.
     /// Requires: SuperAdmin role.
     /// </summary>
-    [HttpPost("users")]
+    [HttpPost]
     [ProducesResponseType(typeof(Result<CreateAdminUserResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -77,7 +79,7 @@ public class AdminUsersController : ApiControllerBase
     /// Update an existing administrative account.
     /// Requires: SuperAdmin role.
     /// </summary>
-    [HttpPut("users/{id:guid}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(Result<UpdateAdminUserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -96,7 +98,7 @@ public class AdminUsersController : ApiControllerBase
     /// Soft delete an admin account.
     /// Requires: SuperAdmin role.
     /// </summary>
-    [HttpDelete("users/{id:guid}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(Result<DeleteAdminUserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -113,14 +115,15 @@ public class AdminUsersController : ApiControllerBase
     /// Change the status of an admin account (Active / Inactive / Suspended).
     /// Requires: SuperAdmin role.
     /// </summary>
-    [HttpPatch("users/{id:guid}/status")]
+    [HttpPatch("{id:guid}/status")]
     [ProducesResponseType(typeof(Result<ToggleUserStatusResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ToggleUserStatus(
         [FromRoute] Guid id,
-        [FromBody] string newStatus,
+        [FromBody] UserStatus newStatus,
+
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(new ToggleUserStatusCommand { UserId = id, NewStatus = newStatus }, cancellationToken);
@@ -131,7 +134,7 @@ public class AdminUsersController : ApiControllerBase
     /// Reset the password of an admin account to a system-generated secure password.
     /// Requires: SuperAdmin or Moderator role.
     /// </summary>
-    [HttpPost("users/{id:guid}/reset-password")]
+    [HttpPost("{id:guid}/reset-password")]
     [ProducesResponseType(typeof(Result<ResetUserPasswordResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

@@ -4,20 +4,34 @@ using MediatR;
 
 namespace IOCv2.Application.Features.Sprints.Commands.CompleteSprint;
 
+/// <summary>
+/// Command to complete an active sprint.
+/// </summary>
 public record CompleteSprintCommand : IRequest<Result<CompleteSprintResponse>>
 {
-    [JsonIgnore]
+    /// <summary>
+    /// The ID of the project the sprint belongs to.
+    /// </summary>
     public Guid ProjectId { get; init; }
 
+    /// <summary>
+    /// The ID of the sprint to complete.
+    /// </summary>
     [JsonIgnore]
     public Guid SprintId { get; init; }
     
-    /// <summary>FE gửi string: "ToBacklog" | "ToNextPlannedSprint" | "CreateNewSprint"</summary>
-    public string IncompleteItemsOption { get; init; } = string.Empty;
+    /// <summary>
+    /// Option for handling incomplete work items. 
+    /// </summary>
+    public MoveIncompleteItemsOption IncompleteItemsOption { get; init; }
 
-    /// <summary>Chỉ truyền UUID nếu chọn ToNextPlannedSprint + muốn chỉ định sprint cụ thể</summary>
+    /// <summary>
+    /// Optional target sprint ID if "ToNextPlannedSprint" is chosen.
+    /// </summary>
     public Guid? TargetSprintId { get; init; }
 
-    /// <summary>Chỉ truyền nếu chọn CreateNewSprint + muốn đặt tên tùy chỉnh</summary>
+    /// <summary>
+    /// Optional name for the new sprint if "CreateNewSprint" is chosen.
+    /// </summary>
     public string? NewSprintName { get; init; }
 }

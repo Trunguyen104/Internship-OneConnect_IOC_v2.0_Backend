@@ -14,6 +14,11 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
         /// </summary>
         public Guid LogbookId { get; set; }
         /// <summary>
+        /// Internship group ID.
+        /// </summary>
+        public Guid InternshipId { get; set; }
+
+        /// <summary>
         /// Student ID who submitted.
         /// </summary>
         public Guid StudentId { get; set; }
@@ -36,7 +41,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
         /// <summary>
         /// Submission status.
         /// </summary>
-        public string Status { get; set; } = string.Empty;
+        public LogbookStatus Status { get; set; }
 
         /// <summary>
         /// Count of work items linked.
@@ -49,9 +54,10 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
                 .ForMember(dest => dest.StudentName,
                     opt => opt.MapFrom(src => src.Student != null && src.Student.User != null ? src.Student.User.FullName : "N/A"))
                 .ForMember(dest => dest.TotalWorkItems,
-                    opt => opt.MapFrom(src => src.WorkItem.Count))
+                    opt => opt.MapFrom(src => src.WorkItems.Count))
+
                 .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => src.Status.ToString()));
+                    opt => opt.MapFrom(src => src.Status));
         }
     }
 }

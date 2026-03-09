@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Authentication.Commands.RevokeToken
 {
-    public class RevokeTokenCommand : IRequest<Result<bool>>
+    public record RevokeTokenCommand : IRequest<Result<bool>>
     {
-        public string RefreshToken { get; set; } = string.Empty;
+        public string RefreshToken { get; init; } = string.Empty;
     }
 }

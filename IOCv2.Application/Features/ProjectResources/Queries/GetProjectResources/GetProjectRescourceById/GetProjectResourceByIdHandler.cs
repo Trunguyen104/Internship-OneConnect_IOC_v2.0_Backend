@@ -31,7 +31,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         {
             try {
                 // Check if the project resource exists
-                var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().GetByIdAsync(request.ProjectResourceId, cancellationToken);
+                var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query().AsNoTracking().FirstOrDefaultAsync(x => x.ProjectResourceId == request.ProjectResourceId, cancellationToken);
                 if (resource == null)
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ProjectResourceId);
@@ -46,7 +46,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
 
             } catch (Exception ex) {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdError), request.ProjectResourceId);
-                throw;
+                return Result<GetProjectResourceByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

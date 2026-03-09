@@ -6,6 +6,8 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 
+using Microsoft.Extensions.Logging;
+
 namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
 {
     public class ToggleUserStatusHandler : IRequestHandler<ToggleUserStatusCommand, Result<ToggleUserStatusResponse>>
@@ -15,25 +17,32 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly ICacheService _cacheService;
+        private readonly ILogger<ToggleUserStatusHandler> _logger;
 
         public ToggleUserStatusHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ICurrentUserService currentUserService,
             IMessageService messageService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ILogger<ToggleUserStatusHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _cacheService = cacheService;
+            _logger = logger;
         }
 
         public async Task<Result<ToggleUserStatusResponse>> Handle(ToggleUserStatusCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Toggling status for User {UserId} to {NewStatus} by Auditor {AuditorId}", 
+                request.UserId, request.NewStatus, _currentUserService.UserId);
+
             if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
             {
+                _logger.LogWarning("Invalid Auditor ID: {AuditorId}", _currentUserService.UserId);
                 return Result<ToggleUserStatusResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Users.InvalidAuditor),
                     ResultErrorType.Unauthorized
@@ -44,15 +53,21 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
                 .GetByIdAsync(request.UserId, cancellationToken);
 
             if (user == null)
-                return Result<ToggleUserStatusResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
-
-            // Parse NewStatus
-            if (!Enum.TryParse<UserStatus>(request.NewStatus, true, out var parsedStatus))
             {
-                return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));
+                _logger.LogWarning("User {UserId} not found for status toggle", request.UserId);
+                return Result<ToggleUserStatusResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
             }
 
-            user.Status = parsedStatus;
+
+
+            // Use rich domain method
+            user.SetStatus(request.NewStatus);
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            
             await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
 
             var auditLog = new AuditLog
@@ -62,17 +77,28 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
                 EntityType = nameof(User),
                 EntityId = user.UserId,
                 PerformedById = auditorId,
-                Reason = $"Toggled user {user.UserCode} status to {parsedStatus}",
+                Reason = $"Toggled user {user.UserCode} status to {request.NewStatus}",
+
                 CreatedAt = DateTime.UtcNow
             };
             await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
             await _cacheService.RemoveAsync($"user:{user.UserId}", cancellationToken);
 
+            _logger.LogInformation("Successfully toggled status for User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
+
             var response = _mapper.Map<ToggleUserStatusResponse>(user);
             return Result<ToggleUserStatusResponse>.Success(response);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Failed to toggle status for User {UserId}", request.UserId);
+                return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            }
         }
     }
 }

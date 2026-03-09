@@ -5,6 +5,7 @@ using IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholderIss
 using IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholderIssueStatus;
 using IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIssueById;
 using IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIssues;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,22 +25,22 @@ public class StakeholderIssuesController : ApiControllerBase
     public StakeholderIssuesController(IMediator mediator) => _mediator = mediator;
 
     /// <summary>
-    /// Get a paginated list of stakeholder issues with optional filters (projectId, stakeholderId, status) and search.
+    /// Get a paginated list of stakeholder issues with optional filters (internshipId, stakeholderId, status) and search.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PagedResult<GetStakeholderIssuesResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<PaginatedResult<GetStakeholderIssuesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetIssues(
-        [FromQuery] Guid? projectId,
+        [FromQuery] Guid? internshipId,
         [FromQuery] Guid? stakeholderId,
-        [FromQuery] string? status,
+        [FromQuery] StakeholderIssueStatus? status,
         [FromQuery] PaginationParams pagination,
         CancellationToken cancellationToken = default)
     {
         var query = new GetStakeholderIssuesQuery
         {
-            ProjectId = projectId,
+            InternshipId = internshipId,
             StakeholderId = stakeholderId,
             Status = status,
             Pagination = pagination
@@ -125,6 +126,6 @@ public class StakeholderIssuesController : ApiControllerBase
     /// </summary>
     public class UpdateStatusRequest
     {
-        public string Status { get; set; } = string.Empty;
+        public StakeholderIssueStatus Status { get; set; }
     }
 }

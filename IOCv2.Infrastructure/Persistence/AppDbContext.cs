@@ -43,6 +43,12 @@ public partial class AppDbContext : DbContext
     public DbSet<SprintWorkItem> SprintWorkItems { get; set; } = null!;
     public DbSet<Domain.Entities.Stakeholder> Stakeholders { get; set; } = null!;
     public DbSet<StakeholderIssue> StakeholderIssues { get; set; } = null!;
+
+    // Evaluation
+    public DbSet<EvaluationCycle> EvaluationCycles { get; set; } = null!;
+    public DbSet<EvaluationCriteria> EvaluationCriteria { get; set; } = null!;
+    public DbSet<Evaluation> Evaluations { get; set; } = null!;
+    public DbSet<EvaluationDetail> EvaluationDetails { get; set; } = null!;
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

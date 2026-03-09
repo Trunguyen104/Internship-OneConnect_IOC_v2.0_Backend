@@ -1,4 +1,5 @@
-﻿using IOCv2.Application.Extensions.Pagination;
+﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Extensions.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 using System.Linq.Expressions;
@@ -7,18 +8,19 @@ namespace IOCv2.Application.Extensions.Query
 {
     public static class QueryableExtension
     {
-        public static async Task<PagedResult<T>> ToPagedResultAsync<T>(
+        public static async Task<PaginatedResult<T>> ToPaginatedResultAsync<T>(
             this IQueryable<T> query,
-            PaginationParams pagination)
+            int pageNumber,
+            int pageSize,
+            CancellationToken cancellationToken = default)
         {
-            var totalCount = await query.CountAsync();
-
+            var count = await query.CountAsync(cancellationToken);
             var items = await query
-                .Skip((pagination.PageIndex - 1) * pagination.PageSize)
-                .Take(pagination.PageSize)
-                .ToListAsync();
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
 
-            return new PagedResult<T>(items, pagination, totalCount);
+            return PaginatedResult<T>.Create(items, count, pageNumber, pageSize);
         }
 
         public static IQueryable<T> ApplyGlobalSearch<T>(

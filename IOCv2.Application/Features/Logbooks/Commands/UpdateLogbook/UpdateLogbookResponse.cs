@@ -14,6 +14,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         /// Unique identifier for the updated logbook.
         /// </summary>
         public Guid LogbookId { get; set; }
+        public Guid InternshipId { get; set; }
+
 
         /// <summary>
         /// Updated summary.
@@ -23,7 +25,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         /// <summary>
         /// Submission status.
         /// </summary>
-        public string Status { get; set; } = string.Empty;
+        public LogbookStatus Status { get; set; }
+
 
         /// <summary>
         /// Updated plans.
@@ -43,7 +46,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         public void Mapping(Profile profile)
         {
             profile.CreateMap<Logbook, UpdateLogbook.UpdateLogbookResponse>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
         }
     }
 }

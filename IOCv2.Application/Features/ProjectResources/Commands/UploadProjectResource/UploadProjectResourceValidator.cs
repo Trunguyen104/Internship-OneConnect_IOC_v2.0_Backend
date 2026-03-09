@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource
 {
-    public class UploadProjectResourceValidator : AbstractValidator<UploadProjectResourceCommand>
+    internal class UploadProjectResourceValidator : AbstractValidator<UploadProjectResourceCommand>
     {
         private readonly IMessageService _messageService;
         public UploadProjectResourceValidator(IMessageService messageService)
@@ -22,9 +22,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
 
             // ACV-3: Validate Enum string input before parsing in handler.
             RuleFor(x => x.ResourceType)
-                .NotEmpty().WithMessage("ResourceType is required.")
-                .Must(v => Enum.TryParse<FileType>(v, ignoreCase: true, out _))
-                .WithMessage($"ResourceType must be one of: {string.Join(", ", Enum.GetNames<FileType>())}");
+                .IsInEnum().WithMessage("Invalid ResourceType.");
+
 
             RuleFor(x => x.File)
                 .NotNull().WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileRequired));

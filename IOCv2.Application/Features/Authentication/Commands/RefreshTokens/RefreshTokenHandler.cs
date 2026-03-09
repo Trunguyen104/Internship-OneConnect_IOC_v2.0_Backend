@@ -85,7 +85,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.RefreshTokens
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
                 Email = user.Email,
-                Role = user.Role.ToString(),
+                Role = user.Role,
                 RefreshTokenExpiresIn = (newRefreshTokenEntity.Expires - DateTime.UtcNow).TotalSeconds,
                 ExpiresIn = _tokenService.GetTokenExpirationSeconds()
             };

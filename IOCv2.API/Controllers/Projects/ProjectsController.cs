@@ -2,7 +2,7 @@
 using IOCv2.Application.Features.Projects.Commands.CreateProject;
 using IOCv2.Application.Features.Projects.Commands.DeleteProject;
 using IOCv2.Application.Features.Projects.Commands.UpdateProject;
-using IOCv2.Application.Features.Projects.Queries.GetAProjects;
+using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
 using IOCv2.Application.Features.Projects.Queries.GetProjectById;
 using IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId;
 using IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId;
@@ -83,32 +83,18 @@ public class ProjectsController : ApiControllerBase
     /// <summary>
     /// Get paginated list of projects belonging to a specific internship group.
     /// </summary>
-    [HttpGet("internship-group/{internshipId:guid}")]
+    [HttpGet("internship-group")]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetProjectsByInternshipIdResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProjectsByInternshipId(
-        [FromRoute] Guid internshipId,
-        [FromQuery] string? searchTerm,
-        [FromQuery] ProjectStatus? status,
-        [FromQuery] DateTime? fromDate,
-        [FromQuery] DateTime? toDate,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10,
+        [FromQuery] Guid internshipId,
+        [FromQuery] GetProjectsByInternshipIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetProjectsByInternshipIdQuery
-        {
-            InternshipId = internshipId,
-            SearchTerm = searchTerm,
-            Status = status,
-            FromDate = fromDate,
-            ToDate = toDate,
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
+        query.InternshipId = internshipId;
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }

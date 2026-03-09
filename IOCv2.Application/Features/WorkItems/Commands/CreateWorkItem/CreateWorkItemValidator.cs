@@ -5,7 +5,7 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.CreateWorkItem;
 
-public class CreateWorkItemValidator : AbstractValidator<CreateWorkItemCommand>
+internal class CreateWorkItemValidator : AbstractValidator<CreateWorkItemCommand>
 {
     private static readonly string[] ValidTypes = Enum.GetNames<WorkItemType>();
     private static readonly string[] ValidPriorities = Enum.GetNames<Priority>();
@@ -21,11 +21,12 @@ public class CreateWorkItemValidator : AbstractValidator<CreateWorkItemCommand>
         RuleFor(x => x.Type)
             .NotEmpty()
             .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.TypeRequired))
-            .Must(t => ValidTypes.Contains(t, StringComparer.OrdinalIgnoreCase))
+            .IsInEnum()
             .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.TypeInvalid));
 
         RuleFor(x => x.Priority)
-            .Must(p => p == null || ValidPriorities.Contains(p, StringComparer.OrdinalIgnoreCase))
+            .IsInEnum()
+            .When(x => x.Priority.HasValue)
             .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.PriorityInvalid));
 
         RuleFor(x => x.StoryPoint)

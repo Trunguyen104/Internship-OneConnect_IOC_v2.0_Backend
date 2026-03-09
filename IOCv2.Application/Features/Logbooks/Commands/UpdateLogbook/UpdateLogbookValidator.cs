@@ -3,13 +3,18 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
 {
-    public class UpdateLogbookValidator : AbstractValidator<UpdateLogbookCommand>
+    internal class UpdateLogbookValidator : AbstractValidator<UpdateLogbookCommand>
     {
         public UpdateLogbookValidator() 
         {
             RuleFor(x => x.LogbookId)
                 .NotEmpty()
                 .WithMessage("LogbookId is required.");
+
+            RuleFor(x => x.InternshipId)
+                .NotEmpty()
+                .WithMessage("InternshipId is required.");
+
 
             RuleFor(x => x.Summary)
                 .NotEmpty()
@@ -27,10 +32,10 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                 .LessThanOrEqualTo(DateTime.UtcNow)
                 .WithMessage("DateReport cannot be in the future.");
 
-            // ACV-3: Optional Status — validate only when provided.
+            // ACV-3: Numeric Enum Validation.
             RuleFor(x => x.Status)
-                .Must(v => v == null || Enum.TryParse<LogbookStatus>(v, ignoreCase: true, out _))
-                .WithMessage($"Status must be one of: {string.Join(", ", Enum.GetNames<LogbookStatus>())}");
+                .IsInEnum()
+                .When(x => x.Status.HasValue);
         }
     }
 }

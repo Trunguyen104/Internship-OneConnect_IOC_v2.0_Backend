@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 {
@@ -19,32 +20,41 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMessageService _messageService;
         private readonly ILogger<GetLogbooksHandler> _logger;
 
-        public GetLogbooksHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetLogbooksHandler> logger)
+        public GetLogbooksHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ILogger<GetLogbooksHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _messageService = messageService;
             _logger = logger;
         }
 
         public async Task<Result<PaginatedResult<GetLogbooksResponse>>> Handle(GetLogbooksQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fetching logbooks for project {ProjectId} (Page: {Page}, Size: {Size})", request.ProjectId, request.PageNumber, request.PageSize);
+            _logger.LogInformation("Fetching logbooks for internship {InternshipId} (Page: {Page}, Size: {Size})", request.InternshipId, request.PageNumber, request.PageSize);
+            
+            var internship = await _unitOfWork.Repository<InternshipGroup>().GetByIdAsync(request.InternshipId, cancellationToken);
+            
+            if (internship == null)
+            {
+                _logger.LogWarning("Internship not found: {InternshipId}", request.InternshipId);
+                return Result<PaginatedResult<GetLogbooksResponse>>.Failure("Internship group not found", ResultErrorType.NotFound);
+            }
 
             var query = _unitOfWork.Repository<Logbook>()
                         .Query()
                         .AsNoTracking()
                         .Include(x => x.Student!)
                             .ThenInclude(s => s.User!)
-                        .Include(x => x.Project)
-                        .Where(x => x.ProjectId == request.ProjectId);
+                        .Include(x => x.Internship)
+                        .Where(x => x.InternshipId == request.InternshipId);
 
             // Filter by status
-            if (!string.IsNullOrWhiteSpace(request.Status) &&
-                Enum.TryParse<LogbookStatus>(request.Status, true, out var parsedStatus))
+            if (request.Status.HasValue)
             {
-                query = query.Where(x => x.Status == parsedStatus);
+                query = query.Where(x => x.Status == request.Status.Value);
             }
 
             // Sorting
@@ -65,7 +75,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
                 .ProjectTo<GetLogbooksResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Retrieved {Count} logbooks for project {ProjectId}", logbooks.Count, request.ProjectId);
+            _logger.LogInformation("Retrieved {Count} logbooks for internship {InternshipId}", logbooks.Count, request.InternshipId);
 
             var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
             return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);

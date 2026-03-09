@@ -5,10 +5,8 @@ using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.UpdateWorkItem;
 
-public class UpdateWorkItemValidator : AbstractValidator<UpdateWorkItemCommand>
+internal class UpdateWorkItemValidator : AbstractValidator<UpdateWorkItemCommand>
 {
-    private static readonly string[] ValidPriorities = Enum.GetNames<Priority>();
-    private static readonly string[] ValidStatuses = Enum.GetNames<WorkItemStatus>();
 
     public UpdateWorkItemValidator(IMessageService messageService)
     {
@@ -18,11 +16,13 @@ public class UpdateWorkItemValidator : AbstractValidator<UpdateWorkItemCommand>
             .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.TitleMaxLength));
 
         RuleFor(x => x.Priority)
-            .Must(p => p == null || ValidPriorities.Contains(p, StringComparer.OrdinalIgnoreCase))
+            .IsInEnum()
+            .When(x => x.Priority.HasValue)
             .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.PriorityInvalid));
 
         RuleFor(x => x.Status)
-            .Must(s => s == null || ValidStatuses.Contains(s, StringComparer.OrdinalIgnoreCase))
+            .IsInEnum()
+            .When(x => x.Status.HasValue)
             .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.StatusInvalid));
 
         RuleFor(x => x.StoryPoint)

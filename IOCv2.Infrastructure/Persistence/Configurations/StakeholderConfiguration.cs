@@ -15,8 +15,8 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .HasColumnName("id")
                 .HasDefaultValueSql("gen_random_uuid()");
 
-            builder.Property(s => s.ProjectId)
-                .HasColumnName("project_id")
+            builder.Property(s => s.InternshipId)
+                .HasColumnName("internship_id")
                 .IsRequired();
 
             builder.Property(s => s.Name)
@@ -62,21 +62,21 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(s => s.DeletedAt)
                 .HasColumnName("deleted_at");
 
-            builder.HasIndex(s => s.ProjectId)
-                .HasDatabaseName("ix_stakeholders_project_id");
+            builder.HasIndex(s => s.InternshipId)
+                .HasDatabaseName("ix_stakeholders_internship_id");
 
             builder.HasIndex(s => s.Email)
                 .HasDatabaseName("ix_stakeholders_email");
 
-            builder.HasIndex(s => new { s.ProjectId, s.Email })
+            builder.HasIndex(s => new { s.InternshipId, s.Email })
                 .IsUnique()
                 .HasFilter("deleted_at IS NULL")
-                .HasDatabaseName("ix_stakeholders_project_email_unique");
+                .HasDatabaseName("ix_stakeholders_internship_email_unique");
 
-            builder.HasOne(s => s.Project)
+            builder.HasOne(s => s.InternshipGroup)
                 .WithMany(p => p.Stakeholders)
-                .HasForeignKey(s => s.ProjectId)
-                .HasConstraintName("fk_stakeholders_projects")
+                .HasForeignKey(s => s.InternshipId)
+                .HasConstraintName("fk_stakeholders_internship_groups")
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

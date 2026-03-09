@@ -87,7 +87,8 @@ public class ProjectResourcesController : ApiControllerBase
         [FromBody] UpdateProjectResourceCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
+        var updateCommand = command with { ProjectResourceId = resourceId };
+        var result = await _mediator.Send(updateCommand, cancellationToken);
         return HandleResult(result);
     }
 

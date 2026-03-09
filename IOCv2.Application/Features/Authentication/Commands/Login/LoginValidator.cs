@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Authentication.Commands.Login
 {
-    public class LoginValidator : AbstractValidator<LoginCommand>
+    internal class LoginValidator : AbstractValidator<LoginCommand>
     {
         public LoginValidator()
         {

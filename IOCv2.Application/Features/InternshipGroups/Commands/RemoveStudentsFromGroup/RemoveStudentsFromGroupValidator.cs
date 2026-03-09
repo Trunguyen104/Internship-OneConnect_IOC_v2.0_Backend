@@ -4,7 +4,7 @@ using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGroup
 {
-    public class RemoveStudentsFromGroupValidator : AbstractValidator<RemoveStudentsFromGroupCommand>
+    internal class RemoveStudentsFromGroupValidator : AbstractValidator<RemoveStudentsFromGroupCommand>
     {
         public RemoveStudentsFromGroupValidator(IMessageService messageService)
         {

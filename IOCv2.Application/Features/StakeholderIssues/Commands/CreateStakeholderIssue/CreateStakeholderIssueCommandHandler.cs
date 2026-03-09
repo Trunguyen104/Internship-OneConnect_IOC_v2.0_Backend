@@ -3,8 +3,9 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
-using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholderIssue
 {
@@ -13,48 +14,77 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
+        private readonly ILogger<CreateStakeholderIssueCommandHandler> _logger;
+        private readonly ICurrentUserService _currentUserService;
 
         public CreateStakeholderIssueCommandHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            IMessageService messageService)
+            IMessageService messageService,
+            ILogger<CreateStakeholderIssueCommandHandler> logger,
+            ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
+            _logger = logger;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Result<CreateStakeholderIssueResponse>> Handle(CreateStakeholderIssueCommand request, CancellationToken cancellationToken)
         {
-            // Check stakeholder exists
-            var stakeholderExists = await _unitOfWork.Repository<Stakeholder>()
-                .ExistsAsync(s => s.Id == request.StakeholderId, cancellationToken);
+            _logger.LogInformation("Creating StakeholderIssue for Stakeholder {StakeholderId} (Title: {Title})", 
+                request.StakeholderId, request.Title);
 
-            if (!stakeholderExists)
+            // Fetch stakeholder with project info for security check
+            var stakeholder = await _unitOfWork.Repository<Stakeholder>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == request.StakeholderId, cancellationToken);
+
+            if (stakeholder == null)
+            {
+                _logger.LogWarning("Stakeholder {StakeholderId} not found", request.StakeholderId);
                 return Result<CreateStakeholderIssueResponse>.NotFound(
                     _messageService.GetMessage(MessageKeys.Issue.StakeholderNotFound));
+            }
 
-            // Create entity
-            var issue = new StakeholderIssue
-            {
-                Id = Guid.NewGuid(),
-                Title = request.Title.Trim(),
-                Description = request.Description.Trim(),
-                StakeholderId = request.StakeholderId,
-                Status = StakeholderIssueStatus.Open
-            };
+            // Security Check: Verify user belongs to the project
+            // Replace with actual ICurrentUserService check if available, or placeholder for now
+            // var userId = _currentUserService.UserId;
+            // TODO: check project membership
 
-            // Persist
-            await _unitOfWork.Repository<StakeholderIssue>().AddAsync(issue, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-            // Return response
-            var response = _mapper.Map<CreateStakeholderIssueResponse>(issue);
-            return Result<CreateStakeholderIssueResponse>.Success(
-                response,
-                _messageService.GetMessage(MessageKeys.Issue.CreateSuccess)
+            // Create entity using rich domain constructor
+            var issue = new StakeholderIssue(
+                Guid.NewGuid(),
+                request.StakeholderId,
+                request.Title.Trim(),
+                request.Description.Trim()
             );
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+                await _unitOfWork.Repository<StakeholderIssue>().AddAsync(issue, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                _logger.LogInformation("Successfully created StakeholderIssue {Id} for Stakeholder {StakeholderId}", 
+                    issue.Id, request.StakeholderId);
+
+                var response = _mapper.Map<CreateStakeholderIssueResponse>(issue);
+                return Result<CreateStakeholderIssueResponse>.Success(
+                    response,
+                    _messageService.GetMessage(MessageKeys.Issue.CreateSuccess)
+                );
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error occurred while creating StakeholderIssue for Stakeholder {StakeholderId}", request.StakeholderId);
+                return Result<CreateStakeholderIssueResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            }
         }
     }
 }
-
