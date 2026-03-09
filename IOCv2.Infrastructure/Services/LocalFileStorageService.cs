@@ -15,13 +15,17 @@ namespace IOCv2.Infrastructure.Services
         private readonly string _storagePath;
         private readonly string _baseUrl;
         private readonly ILogger<LocalFileStorageService> _logger;
+        private const string _domain = "localhost:5050"; // Change this to your actual domain
 
         public LocalFileStorageService(
             IConfiguration configuration,
             ILogger<LocalFileStorageService> logger)
         {
-            _storagePath = configuration["FileStorage:Path"] ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-            _baseUrl = configuration["FileStorage:BaseUrl"] ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+            _storagePath = configuration["FileStorage:Path"]
+                ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+
+            _baseUrl = configuration["FileStorage:BaseUrl"]
+                ?? "/Uploads";
             _logger = logger;
 
             // Create root directory if not exists
@@ -77,14 +81,12 @@ namespace IOCv2.Infrastructure.Services
             try
             {
                 var filePath = GetFilePathFromUrl(fileUrl);
-
                 if (File.Exists(filePath))
                 {
                     await Task.Run(() => File.Delete(filePath), cancellationToken);
                     _logger.LogInformation("File deleted: {FilePath}", filePath);
                     return true;
                 }
-
                 _logger.LogWarning("File not found for deletion: {FileUrl}", fileUrl);
                 return false;
             }
@@ -160,6 +162,11 @@ namespace IOCv2.Infrastructure.Services
         {
             var relativePath = fileUrl.Replace(_baseUrl, "").TrimStart('/');
             return Path.Combine(_storagePath, relativePath);
+        }
+
+        public string GetDomainUrl()
+        {
+            return _domain;
         }
     }
 

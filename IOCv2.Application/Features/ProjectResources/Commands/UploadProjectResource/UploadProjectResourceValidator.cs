@@ -20,11 +20,6 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             RuleFor(x => x.ProjectId)
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectIdRequired));
 
-            // ACV-3: Validate Enum string input before parsing in handler.
-            RuleFor(x => x.ResourceType)
-                .IsInEnum().WithMessage("Invalid ResourceType.");
-
-
             RuleFor(x => x.File)
                 .NotNull().WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileRequired));
 

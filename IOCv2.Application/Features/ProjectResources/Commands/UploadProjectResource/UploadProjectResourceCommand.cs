@@ -14,8 +14,6 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
     {
         public Guid ProjectId { get; init; }
         public string ResourceName { get; init; } = string.Empty;
-        /// <summary>Type of file: DocumentFile, Image, Video, Other</summary>
-        public FileType ResourceType { get; init; }
         public IFormFile File { get; init; } = null!;
     }
 }

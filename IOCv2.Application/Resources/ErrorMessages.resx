@@ -699,4 +699,7 @@
   <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Nhóm thực tập không hợp lệ hoặc không được tìm thấy.</value>
   </data>
+  <data name="ProjectResources.Upload.LogAutoSetFileTypeError" xml:space="preserve">
+    <value>Không thể tự động thiết lập loại tệp cho {FileUrl}. Mặc định là 'Không xác định'.</value>
+  </data>
 </root>

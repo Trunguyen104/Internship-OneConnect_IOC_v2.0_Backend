@@ -214,6 +214,96 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đã thêm thành công {Count} sinh viên vào nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogAddedStudentsSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogAddedStudentsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang thêm sinh viên vào nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogAddingStudents {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogAddingStudents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tạo nhóm thực tập thành công: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogCreatedSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogCreatedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang tạo nhóm thực tập mới: {GroupName} cho kỳ: {TermId}.
+        /// </summary>
+        internal static string InternshipGroup_LogCreating {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogCreating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xóa nhóm thực tập thành công: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogDeletedSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogDeletedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang xóa nhóm thực tập: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogDeleting {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogDeleting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã xóa thành công sinh viên khỏi nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogRemovedStudentsSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogRemovedStudentsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang xóa sinh viên khỏi nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogRemovingStudents {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogRemovingStudents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cập nhật nhóm thực tập thành công: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogUpdatedSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogUpdatedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang cập nhật nhóm thực tập: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogUpdating {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tạo issue thành công..
         /// </summary>
         internal static string Issue_CreateSuccess {
@@ -318,6 +408,15 @@ namespace IOCv2.Application.Resources {
         internal static string ProjectResources_LogUploadSuccess {
             get {
                 return ResourceManager.GetString("ProjectResources.LogUploadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loại tệp không được hỗ trợ. Các loại tệp được cho phép là: PDF, DOCX, PPTX, ZIP, RAR, JPG, PNG..
+        /// </summary>
+        internal static string ProjectResources_Upload_UnsupportedFileType {
+            get {
+                return ResourceManager.GetString("ProjectResources.Upload.UnsupportedFileType", resourceCulture);
             }
         }
         

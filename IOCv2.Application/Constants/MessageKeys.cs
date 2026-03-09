@@ -231,6 +231,10 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
+
+            // Upload
+            public const string LogUploadAutoSetFileTypeError = "ProjectResources.Upload.LogAutoSetFileTypeError";
+            public const string UnsupportedFileType = "ProjectResources.Upload.UnsupportedFileType";
         }
 
         public static class Internships

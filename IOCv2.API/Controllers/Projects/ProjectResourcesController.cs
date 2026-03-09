@@ -4,6 +4,7 @@ using IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource
 using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetAllProjectResources;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById;
+using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetReadProjectResourceById;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,6 @@ public class ProjectResourcesController : ApiControllerBase
     [ProducesResponseType(typeof(Result<PaginatedResult<GetAllProjectResourcesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAllProjectResources(
         [FromQuery] GetAllProjectResourcesQuery query,
         CancellationToken cancellationToken)
@@ -39,18 +39,30 @@ public class ProjectResourcesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get a single project resource by ID.
+    /// Download a single project resource by ID.
     /// </summary>
-    [HttpGet("{resourceId:guid}")]
-    [ProducesResponseType(typeof(Result<GetProjectResourceByIdResponse>), StatusCodes.Status200OK)]
+    [HttpGet("{resourceId:guid}/download")]
+    [ProducesResponseType(typeof(Result<GetDownloadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProjectResourceById(
         [FromRoute] Guid resourceId,
         CancellationToken cancellationToken)
     {
-        var query = new GetProjectResourceByIdQuery { ProjectResourceId = resourceId };
+        var query = new GetDownloadProjectResourceByIdQuery { ProjectResourceId = resourceId };
+        var result = await _mediator.Send(query, cancellationToken);
+        return HandleResult(result);
+    }
+
+    [HttpGet("{resourceId:guid}/read")]
+    [ProducesResponseType(typeof(Result<GetReadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReadProjectResourceById(
+        [FromRoute] Guid resourceId,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetReadProjectResourceByIdQuery { ResourceId = resourceId };
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
@@ -63,8 +75,8 @@ public class ProjectResourcesController : ApiControllerBase
     [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UploadProjectResource(
         [FromForm] UploadProjectResourceCommand command,
         CancellationToken cancellationToken)
