@@ -28,22 +28,24 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
     public async Task<Result<SubmitEvaluationResponse>> Handle(
         SubmitEvaluationCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Submitting Evaluation {EvaluationId}", request.EvaluationId);
+        var evaluations = await _unitOfWork.Repository<Evaluation>().Query()
+            .Where(e => e.CycleId == request.CycleId && e.InternshipId == request.InternshipId)
+            .ToListAsync(cancellationToken);
 
-        var evaluation = await _unitOfWork.Repository<Evaluation>().Query()
-            .FirstOrDefaultAsync(e => e.EvaluationId == request.EvaluationId, cancellationToken);
-
-        if (evaluation is null)
+        if (request.StudentIds != null && request.StudentIds.Any())
         {
-            _logger.LogWarning("Evaluation {EvaluationId} not found", request.EvaluationId);
+            evaluations = evaluations.Where(e => request.StudentIds.Contains(e.StudentId)).ToList();
+        }
+
+        if (evaluations.Count == 0)
             return Result<SubmitEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.NotFound),
                 ResultErrorType.NotFound);
         }
 
-        if (evaluation.Status != EvaluationStatus.Draft)
-        {
-            _logger.LogWarning("Evaluation {EvaluationId} cannot be submitted because its status is {Status}", request.EvaluationId, evaluation.Status);
+        var drafts = evaluations.Where(e => e.Status == EvaluationStatus.Draft || e.Status == EvaluationStatus.Pending).ToList();
+        
+        if (drafts.Count == 0)
             return Result<SubmitEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.AlreadySubmitted),
                 ResultErrorType.BadRequest);
@@ -53,10 +55,14 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        evaluation.Status = EvaluationStatus.Submitted;
-        evaluation.UpdatedAt = DateTime.UtcNow;
+        var now = DateTime.UtcNow;
+        foreach (var eval in drafts)
+        {
+            eval.Status = EvaluationStatus.Submitted;
+            eval.UpdatedAt = now;
+            await _unitOfWork.Repository<Evaluation>().UpdateAsync(eval, cancellationToken);
+        }
 
-        await _unitOfWork.Repository<Evaluation>().UpdateAsync(evaluation, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
@@ -64,11 +70,11 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
 
         return Result<SubmitEvaluationResponse>.Success(new SubmitEvaluationResponse
         {
-            EvaluationId = evaluation.EvaluationId,
-            Status = evaluation.Status,
-
-            TotalScore = evaluation.TotalScore,
-            UpdatedAt = evaluation.UpdatedAt ?? DateTime.UtcNow
+            CycleId = request.CycleId,
+            InternshipId = request.InternshipId,
+            UpdatedCount = drafts.Count,
+            Status = EvaluationStatus.Submitted.ToString(),
+            UpdatedAt = now
         });
         }
         catch (Exception ex)

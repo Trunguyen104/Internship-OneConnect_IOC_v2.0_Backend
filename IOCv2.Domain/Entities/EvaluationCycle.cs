@@ -12,7 +12,7 @@ public class EvaluationCycle : BaseEntity
     public string Name { get; set; } = null!;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public EvaluationCycleStatus Status { get; set; } = EvaluationCycleStatus.Upcoming;
+    public EvaluationCycleStatus Status { get; set; } = EvaluationCycleStatus.Pending;
 
     public virtual ICollection<EvaluationCriteria> Criteria { get; set; } = new List<EvaluationCriteria>();
 }

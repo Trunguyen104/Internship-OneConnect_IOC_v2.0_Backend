@@ -7,10 +7,11 @@ using IOCv2.Application.Features.EvaluationCriteria.Commands.CreateEvaluationCri
 using IOCv2.Application.Features.EvaluationCriteria.Commands.DeleteEvaluationCriteria;
 using IOCv2.Application.Features.EvaluationCriteria.Commands.UpdateEvaluationCriteria;
 using IOCv2.Application.Features.EvaluationCriteria.Queries.GetEvaluationCriteria;
-using IOCv2.Application.Features.Evaluations.Commands.CreateEvaluation;
+using IOCv2.Application.Features.Evaluations.Commands.SaveEvaluations;
 using IOCv2.Application.Features.Evaluations.Commands.UpdateEvaluation;
 using IOCv2.Application.Features.Evaluations.Commands.SubmitEvaluation;
 using IOCv2.Application.Features.Evaluations.Commands.PublishEvaluation;
+using IOCv2.Application.Features.Evaluations.Queries.GetInternshipEvaluations;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -161,8 +162,7 @@ public class EvaluationsController : ApiControllerBase
     // ==========================================
 
     /// <summary>
-    /// Mentor tạo đánh giá cho một sinh viên trong chu kỳ (Status = Draft).
-    /// Details có thể để trống, sẽ bổ sung sau qua UpdateEvaluation.
+    /// Lấy danh sách đánh giá của một nhóm thực tập trong một chu kỳ (Grid View).
     /// </summary>
     [HttpPost("evaluations")]
     [ProducesResponseType(typeof(CreateEvaluationResponse), StatusCodes.Status201Created)]
@@ -178,10 +178,40 @@ public class EvaluationsController : ApiControllerBase
         if (!Guid.TryParse(evaluatorIdStr, out var evaluatorId))
             return Unauthorized();
 
+        var result = await _mediator.Send(command with { EvaluatorId = evaluatorId },
+             cancellationToken);
+        return HandleResult(result);
+    }
+    [HttpGet("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations")]
+    [ProducesResponseType(typeof(GetInternshipEvaluationsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetInternshipEvaluations(
+        [FromRoute] Guid cycleId,
+        [FromRoute] Guid internshipId,
+        CancellationToken cancellationToken)
+    {
         var result = await _mediator.Send(
-            command with { EvaluatorId = evaluatorId },
+            new GetInternshipEvaluationsQuery { CycleId = cycleId, InternshipId = internshipId },
             cancellationToken);
-        return HandleCreatedResult(result);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Upsert (Lưu mới/Cập nhật) đánh giá cho một hoặc nhiều sinh viên trong chu kỳ.
+    /// Hỗ trợ cả thao tác trên Grid (nhiều sinh viên) và Form (1 sinh viên).
+    /// </summary>
+    [HttpPut("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations")]
+    [ProducesResponseType(typeof(List<SaveEvaluationsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SaveEvaluations(
+        [FromRoute] Guid cycleId,
+        [FromRoute] Guid internshipId,
+        [FromBody] SaveEvaluationsCommand command,
+        
+            command with { CycleId = cycleId, InternshipId = internshipId, EvaluatorId = evaluatorId },
+             cancellationToken);
+        return HandleResult(result);
     }
 
     /// <summary>
@@ -203,37 +233,40 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Mentor nộp đánh giá chính thức (Draft → Submitted).
+    /// Mentor nộp đánh giá chính thức (Pending/Draft → Submitted) cho TOÀN BỘ học sinh trong 1 nhóm.
     /// Sau khi submit không thể chỉnh sửa nữa.
     /// </summary>
-    [HttpPatch("evaluations/{evaluationId:guid}/submit")]
+    [HttpPatch("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations/submit")]
     [ProducesResponseType(typeof(SubmitEvaluationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SubmitEvaluation(
-        [FromRoute] Guid evaluationId,
+        [FromRoute] Guid cycleId,
+        [FromRoute] Guid internshipId,
+        [FromBody] SubmitEvaluationCommand command,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
-            new SubmitEvaluationCommand { EvaluationId = evaluationId },
+            command with { CycleId = cycleId, InternshipId = internshipId },
             cancellationToken);
         return HandleResult(result);
     }
 
     /// <summary>
-    /// Admin/University công bố kết quả đánh giá (Submitted → Published).
+    /// Admin/University công bố kết quả đánh giá (Submitted → Published) cho TOÀN BỘ học sinh trong 1 nhóm.
     /// Sinh viên có thể xem điểm sau khi Published.
     /// </summary>
-    [HttpPatch("evaluations/{evaluationId:guid}/publish")]
+    [HttpPatch("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations/publish")]
     [ProducesResponseType(typeof(PublishEvaluationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PublishEvaluation(
-        [FromRoute] Guid evaluationId,
+        [FromRoute] Guid cycleId,
+        [FromRoute] Guid internshipId,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
-            new PublishEvaluationCommand { EvaluationId = evaluationId },
+            new PublishEvaluationCommand { CycleId = cycleId, InternshipId = internshipId },
             cancellationToken);
         return HandleResult(result);
     }

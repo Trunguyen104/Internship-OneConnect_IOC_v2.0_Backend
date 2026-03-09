@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using IOCv2.Application.Common.Models;
 using IOCv2.Domain.Enums;
 using MediatR;
@@ -7,7 +8,7 @@ namespace IOCv2.Application.Features.EvaluationCycles.Commands.UpdateEvaluationC
 
 public record UpdateEvaluationCycleCommand : IRequest<Result<UpdateEvaluationCycleResponse>>
 {
-    [System.Text.Json.Serialization.JsonIgnore]
+    [JsonIgnore]
     public Guid CycleId { get; init; }
     public string Name { get; init; } = null!;
     public DateTime StartDate { get; init; }

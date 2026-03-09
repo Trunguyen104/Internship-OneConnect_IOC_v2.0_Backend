@@ -561,6 +561,66 @@
   <data name="Internships.NotFound" xml:space="preserve">
     <value>Không tìm thấy Internship với ID: {0}</value>
   </data>
+  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
+    <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
+  </data>
+  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi truy xuất thông tin doanh nghiệp theo ID.</value>
+  </data>
+  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>Mã số thuế đã tồn tại trong hệ thống.</value>
+  </data>
+  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>Doanh nghiệp với mã số thuế '{TaxCode}' đã tồn tại.</value>
+  </data>
+  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi tạo doanh nghiệp.</value>
+  </data>
+  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
+    <value>Mã số thuế không đúng định dạng.</value>
+  </data>
+  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
+    <value>Tên là bắt buộc.</value>
+  </data>
+  <data name="Enterprise.NameMaxLength" xml:space="preserve">
+    <value>Tên không được vượt quá {0} ký tự</value>
+  </data>
+  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
+    <value>Trang web phải bắt đầu bằng http hoặc https.</value>
+  </data>
+  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
+    <value>LogoUrl phải bắt đầu bằng http hoặc https.</value>
+  </data>
+  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
+    <value>BackgroundUrl phải bắt đầu bằng http hoặc https.</value>
+  </data>
+  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>Bạn không được phép chỉnh sửa doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>Lỗi: Không có quyền chỉnh sửa doanh nghiệp {enterpriseId}.</value>
+  </data>
+  <data name="Enterprise.LogNotFound" xml:space="preserve">
+    <value>Không tìm thấy Enterprise {enterpriseId}</value>
+  </data>
+  <data name="Enterprise.LogUpdateEnterpriseError" xml:space="preserve">
+    <value>Unexpected error while updating enterprise.</value>
+  </data>
+  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+    <value>Không được phép cập nhật mã số thuế.</value>
+  </data>
+  <data name="Enterprise.LogDeleteError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi xóa doanh nghiệp có ID {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.DeleteError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình xóa doanh nghiệp. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+    <value>Bạn không liên kết với bất kỳ doanh nghiệp nào với tư cách là nhân sự.</value>
+  </data>
+  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp cho bộ phận Nhân sự hiện tại.</value>
+  </data>
   <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
     <value>Lưu nhóm thực tập vào cơ sở dữ liệu thất bại</value>
   </data>

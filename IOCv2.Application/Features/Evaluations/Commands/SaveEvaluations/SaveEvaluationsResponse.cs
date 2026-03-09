@@ -1,8 +1,6 @@
-using IOCv2.Domain.Enums;
+namespace IOCv2.Application.Features.Evaluations.Commands.SaveEvaluations;
 
-namespace IOCv2.Application.Features.Evaluations.Commands.CreateEvaluation;
-
-public class CreateEvaluationResponse
+public class SaveEvaluationsResponse
 {
     public Guid EvaluationId { get; set; }
     public Guid CycleId { get; set; }
