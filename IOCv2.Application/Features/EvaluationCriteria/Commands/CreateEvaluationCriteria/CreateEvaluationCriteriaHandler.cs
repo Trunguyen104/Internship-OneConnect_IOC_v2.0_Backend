@@ -41,6 +41,18 @@ public class CreateEvaluationCriteriaHandler
                 ResultErrorType.NotFound);
         }
 
+        var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
+            
+        if (cycle!.Status == Domain.Enums.EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot create criteria: EvaluationCycle {CycleId} is already completed", request.CycleId);
+            return Result<CreateEvaluationCriteriaResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationCriteriaKey.CannotCreateInCompletedCycle),
+                ResultErrorType.BadRequest);
+        }
+
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

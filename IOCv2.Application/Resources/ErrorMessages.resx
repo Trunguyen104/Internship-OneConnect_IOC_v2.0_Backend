@@ -699,4 +699,85 @@
   <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Nhóm thực tập không hợp lệ hoặc không được tìm thấy.</value>
   </data>
+  <data name="EvaluationCycle.NotFound" xml:space="preserve">
+    <value>Không tìm thấy chu kỳ đánh giá.</value>
+  </data>
+  <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ tương ứng.</value>
+  </data>
+  <data name="EvaluationCycle.NameRequired" xml:space="preserve">
+    <value>Tên chu kỳ đánh giá là bắt buộc.</value>
+  </data>
+  <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
+    <value>Thời gian bắt đầu là bắt buộc.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
+    <value>Thời gian kết thúc là bắt buộc.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
+    <value>Không thể xóa chu kỳ đánh giá đã có bộ tiêu chí.</value>
+  </data>
+  <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
+    <value>Không thể cập nhật chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
+    <value>Chu kỳ đánh giá này đã được hoàn thành hoặc hủy bỏ trước đó.</value>
+  </data>
+  <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
+    <value>Không thể hoàn thành chu kỳ đánh giá chưa có bất kỳ tiêu chí nào.</value>
+  </data>
+  <data name="EvaluationCriteria.NotFound" xml:space="preserve">
+    <value>Không tìm thấy tiêu chí đánh giá.</value>
+  </data>
+  <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
+    <value>Không tìm thấy chu kỳ đánh giá tương ứng.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
+    <value>Không thể thêm tiêu chí mới khi chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Không thể cập nhật tiêu chí khi chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
+    <value>Không thể xóa tiêu chí khi chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.NotFound" xml:space="preserve">
+    <value>Không tìm thấy kết quả đánh giá.</value>
+  </data>
+  <data name="Evaluation.CycleNotFound" xml:space="preserve">
+    <value>Không tìm thấy chu kỳ đánh giá tương ứng.</value>
+  </data>
+  <data name="Evaluation.InternshipNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
+    <value>Không thể cập nhật bài đánh giá báo cáo đã nộp hoặc số điểm đã công bố.</value>
+  </data>
+  <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
+    <value>Không tồn tại một số tiêu chí trong bản đánh giá.</value>
+  </data>
+  <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
+    <value>Số điểm đánh giá không được vượt quá điểm tối đa của tiêu chí.</value>
+  </data>
+  <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
+    <value>Tất cả các thành viên trong nhóm đã được nộp điểm đánh giá.</value>
+  </data>
+  <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
+    <value>Không thể công bố nếu nhóm thực tập vẫn còn sinh viên chưa được phê duyệt đánh giá.</value>
+  </data>
+  <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
+    <value>Không thể lưu điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Không thể cập nhật điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
+    <value>Không thể nộp điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
+    <value>Không thể công bố điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
 </root>
