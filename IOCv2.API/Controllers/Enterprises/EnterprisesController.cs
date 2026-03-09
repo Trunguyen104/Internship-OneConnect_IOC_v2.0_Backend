@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.Enterprises
 {
-    [Route("api/Enterprises")]
+    [Route("api/enterprises")]
     [Authorize]
     [ApiController]
     public class EnterprisesController : ControllerBase

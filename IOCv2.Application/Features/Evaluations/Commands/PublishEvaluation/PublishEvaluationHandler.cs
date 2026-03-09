@@ -28,7 +28,7 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
     public async Task<Result<PublishEvaluationResponse>> Handle(
         PublishEvaluationCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Publishing Evaluation {EvaluationId}", request.EvaluationId);
+        _logger.LogInformation("Publishing Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
 
         var internship = await _unitOfWork.Repository<InternshipGroup>().Query()
             .Include(i => i.Members)
@@ -47,7 +47,6 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
             return Result<PublishEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.NotFound),
                 ResultErrorType.NotFound);
-        }
 
         var isGroupEvaluation = evaluations.Any(e => e.StudentId == null);
         
@@ -79,7 +78,7 @@ try
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-        _logger.LogInformation("Successfully published Evaluation {EvaluationId}", request.EvaluationId);
+        _logger.LogInformation("Successfully published Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
 
         return Result<PublishEvaluationResponse>.Success(new PublishEvaluationResponse
         {
@@ -93,7 +92,7 @@ try
         catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogError(ex, "Error occurred while publishing Evaluation {EvaluationId}", request.EvaluationId);
+            _logger.LogError(ex, "Error occurred while publishing Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
             return Result<PublishEvaluationResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }

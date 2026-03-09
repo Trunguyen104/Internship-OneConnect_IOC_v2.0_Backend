@@ -41,7 +41,6 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
             return Result<SubmitEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.NotFound),
                 ResultErrorType.NotFound);
-        }
 
         var drafts = evaluations.Where(e => e.Status == EvaluationStatus.Draft || e.Status == EvaluationStatus.Pending).ToList();
         
@@ -49,7 +48,6 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
             return Result<SubmitEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.AlreadySubmitted),
                 ResultErrorType.BadRequest);
-        }
 
         try
         {
@@ -66,7 +64,7 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-        _logger.LogInformation("Successfully submitted Evaluation {EvaluationId}", request.EvaluationId);
+        _logger.LogInformation("Successfully submitted Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
 
         return Result<SubmitEvaluationResponse>.Success(new SubmitEvaluationResponse
         {
@@ -80,7 +78,7 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
         catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogError(ex, "Error occurred while submitting Evaluation {EvaluationId}", request.EvaluationId);
+            _logger.LogError(ex, "Error occurred while submitting Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
             return Result<SubmitEvaluationResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
