@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.RateLimiting;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
 {
@@ -53,7 +54,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
                     blockFor: TimeSpan.FromMinutes(1),
                     cancellationToken);
                 var userId = Guid.Parse(_currentUserService.UserId!);
-                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().GetByIdAsync(userId, cancellationToken);
+                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query().Select(x => x).FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
                 if (enterpriseUser == null) return Result<GetEnterpriseByHRResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise));
                 var enterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>().GetByIdAsync(enterpriseUser!.EnterpriseId, cancellationToken);
                     if (enterprise == null) return Result<GetEnterpriseByHRResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseNotFoundCurrentHR));
