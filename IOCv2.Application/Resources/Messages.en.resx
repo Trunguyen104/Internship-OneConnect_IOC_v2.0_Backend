@@ -246,4 +246,10 @@
   <data name="ProjectResources.Upload.UnsupportedFileType" xml:space="preserve">
     <value>Unsupported file type. Allowed types are: PDF, DOCX, PPTX, ZIP, RAR, JPG, PNG.</value>
   </data>
+  <data name="File.UploadSuccess" xml:space="preserve">
+    <value>File uploaded successfully: {FilePath}</value>
+  </data>
+  <data name="File.DeleteSuccess" xml:space="preserve">
+    <value>File deleted: {FilePath}</value>
+  </data>
 </root>

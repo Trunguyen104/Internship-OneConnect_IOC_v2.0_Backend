@@ -565,6 +565,9 @@
   <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
+  <data name="ProjectResources.Upload.LogAutoSetFileTypeError" xml:space="preserve">
+    <value>Failed to auto-set file type for {FileUrl}. Defaulting to 'Unknown'.</value>
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -643,7 +646,19 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
   </data>
-  <data name="ProjectResources.Upload.LogAutoSetFileTypeError" xml:space="preserve">
-    <value>Failed to auto-set file type for {FileUrl}. Defaulting to 'Unknown'.</value>
+  <data name="File.UploadError" xml:space="preserve">
+    <value>Error uploading file {FileName}</value>
+  </data>
+  <data name="File.NotFound" xml:space="preserve">
+    <value>File not found: {0}</value>
+  </data>
+  <data name="File.DeleteError" xml:space="preserve">
+    <value>Error deleting file {FileUrl}</value>
+  </data>
+  <data name="File.CheckExistsError" xml:space="preserve">
+    <value>Error checking file existence: {FileUrl}</value>
+  </data>
+  <data name="File.GetStreamError" xml:space="preserve">
+    <value>Error getting file stream: {FileUrl}</value>
   </data>
 </root>

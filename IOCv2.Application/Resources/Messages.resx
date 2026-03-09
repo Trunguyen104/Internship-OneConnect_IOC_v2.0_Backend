@@ -312,4 +312,10 @@
   <data name="ProjectResources.Upload.UnsupportedFileType" xml:space="preserve">
     <value>Loại tệp không được hỗ trợ. Các loại tệp được cho phép là: PDF, DOCX, PPTX, ZIP, RAR, JPG, PNG.</value>
   </data>
+  <data name="File.UploadSuccess" xml:space="preserve">
+    <value>Tệp đã được tải lên thành công: {FilePath}</value>
+  </data>
+  <data name="File.DeleteSuccess" xml:space="preserve">
+    <value>Tệp đã bị xóa: {FilePath}</value>
+  </data>
 </root>

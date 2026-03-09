@@ -214,6 +214,24 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tệp đã bị xóa: {FilePath}.
+        /// </summary>
+        internal static string File_DeleteSuccess {
+            get {
+                return ResourceManager.GetString("File.DeleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tệp đã được tải lên thành công: {FilePath}.
+        /// </summary>
+        internal static string File_UploadSuccess {
+            get {
+                return ResourceManager.GetString("File.UploadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đã thêm thành công {Count} sinh viên vào nhóm: {InternshipId}.
         /// </summary>
         internal static string InternshipGroup_LogAddedStudentsSuccess {

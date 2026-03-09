@@ -5,6 +5,7 @@ using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetAllProjectResources;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetReadProjectResourceById;
+using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,8 +21,13 @@ namespace IOCv2.API.Controllers.Projects;
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IFileStorageService _fileStorageService;
 
-    public ProjectResourcesController(IMediator mediator) => _mediator = mediator;
+    public ProjectResourcesController(IMediator mediator, IFileStorageService fileStorageService)
+    {
+        _mediator = mediator;
+        _fileStorageService = fileStorageService;
+    }
 
     /// <summary>
     /// Get paginated list of project resources with optional filters.
@@ -51,7 +57,9 @@ public class ProjectResourcesController : ApiControllerBase
     {
         var query = new GetDownloadProjectResourceByIdQuery { ProjectResourceId = resourceId };
         var result = await _mediator.Send(query, cancellationToken);
-        return HandleResult(result);
+        var stream = await _fileStorageService.GetFileAsync(result.Data.FilePath);
+
+        return File(stream, "application/octet-stream", result.Data.FileName);
     }
 
     [HttpGet("{resourceId:guid}/read")]

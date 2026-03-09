@@ -702,4 +702,19 @@
   <data name="ProjectResources.Upload.LogAutoSetFileTypeError" xml:space="preserve">
     <value>Không thể tự động thiết lập loại tệp cho {FileUrl}. Mặc định là 'Không xác định'.</value>
   </data>
+  <data name="File.UploadError" xml:space="preserve">
+    <value>Lỗi khi tải lên tệp {FileName}</value>
+  </data>
+  <data name="File.NotFound" xml:space="preserve">
+    <value>Không tìm thấy tệp: {0}</value>
+  </data>
+  <data name="File.DeleteError" xml:space="preserve">
+    <value>Lỗi khi xóa tệp {FileUrl}</value>
+  </data>
+  <data name="File.CheckExistsError" xml:space="preserve">
+    <value>Lỗi khi kiểm tra sự tồn tại của tệp: {FileUrl}</value>
+  </data>
+  <data name="File.GetStreamError" xml:space="preserve">
+    <value>Lỗi khi lấy luồng tệp: {FileUrl}</value>
+  </data>
 </root>

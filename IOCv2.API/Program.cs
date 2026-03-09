@@ -73,7 +73,7 @@ app.UseAuthorization();
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider("/app/Uploads"),
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/app/Uploads"),
     RequestPath = "/uploads"
 });
 

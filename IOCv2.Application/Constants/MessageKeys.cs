@@ -409,5 +409,15 @@
             public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
             public const string CannotPublishIfNotSubmitted = "Evaluation.CannotPublishIfNotSubmitted";
         }
+
+        public static class File {
+            public const string FileUploadedSuccess = "File.UploadSuccess";
+            public const string FileUploadedError = "File.UploadError";
+            public const string FileDeletedSuccess = "File.DeleteSuccess";
+            public const string FileDeletedError = "File.DeleteError";
+            public const string FileNotFound = "File.NotFound";
+            public const string FileCheckExistsError = "File.CheckExistsError";
+            public const string FileGetStreamError = "File.GetStreamError";
+        }
     }
 }
