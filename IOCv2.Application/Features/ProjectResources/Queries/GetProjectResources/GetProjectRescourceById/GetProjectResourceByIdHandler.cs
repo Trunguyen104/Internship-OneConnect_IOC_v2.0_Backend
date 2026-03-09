@@ -21,11 +21,13 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         private readonly ILogger<GetProjectResourceByIdHandler> _logger;
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
-        public GetProjectResourceByIdHandler(IMapper mapper , IUnitOfWork unitOfWork, ILogger<GetProjectResourceByIdHandler> logger, IMessageService messageService) {
+        private readonly IFileStorageService _fileStorageService;
+        public GetProjectResourceByIdHandler(IMapper mapper , IUnitOfWork unitOfWork, ILogger<GetProjectResourceByIdHandler> logger, IMessageService messageService, IFileStorageService fileStorageService) {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
             _messageService = messageService;
+            _fileStorageService = fileStorageService;
         }
         public async Task<Result<GetProjectResourceByIdResponse>> Handle(GetProjectResourceByIdQuery request, CancellationToken cancellationToken)
         {
@@ -39,11 +41,17 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
                         ResultErrorType.NotFound);
                 }
-               
-                var response = _mapper.Map<GetProjectResourceByIdResponse>(resource);
+                // get stream from storage
+                var filePath = _fileStorageService.GetFilePathFromUrl(resource.ResourceUrl);
+                var extension = Path.GetExtension(filePath);
+                var response = new GetProjectResourceByIdResponse
+                {
+                    FilePath = filePath,
+                    FileName = $"{resource.ResourceName}{extension}"
+                };
+
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ProjectResourceId);
                 return Result<GetProjectResourceByIdResponse>.Success(response);
-
             } catch (Exception ex) {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdError), request.ProjectResourceId);
                 return Result<GetProjectResourceByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);

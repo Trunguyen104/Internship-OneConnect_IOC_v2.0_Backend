@@ -3,6 +3,7 @@ using IOCv2.API.Middlewares;
 using IOCv2.Application;
 using IOCv2.Infrastructure;
 using IOCv2.Infrastructure.Services.Logging;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +52,8 @@ if (app.Environment.IsDevelopment())
     // Database Migration & Seeding
     await DatabaseConfig.ApplyMigrations(app);
 }
+
+
 // redirect / → /swagger
 app.Use(async (context, next) =>
 {
@@ -71,6 +74,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.UseMiddleware<SerilogUserEnricherMiddleware>();
 app.UseSerilogRequestLogging();

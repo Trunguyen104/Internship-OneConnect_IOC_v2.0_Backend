@@ -20,8 +20,11 @@ namespace IOCv2.Infrastructure.Services
             IConfiguration configuration,
             ILogger<LocalFileStorageService> logger)
         {
-            _storagePath = configuration["FileStorage:Path"] ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-            _baseUrl = configuration["FileStorage:BaseUrl"] ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+            _storagePath = configuration["FileStorage:Path"]
+                ?? Path.Combine(Directory.GetCurrentDirectory()+ "/Internship-OneConnect_IOC_v2.0_Backend/IOCv2.API/wwwroot", "uploads");
+
+            _baseUrl = configuration["FileStorage:BaseUrl"]
+                ?? "/uploads";
             _logger = logger;
 
             // Create root directory if not exists
@@ -126,7 +129,13 @@ namespace IOCv2.Infrastructure.Services
                     throw new FileNotFoundException($"File not found: {fileUrl}");
                 }
 
-                return await Task.Run(() => File.OpenRead(filePath), cancellationToken);
+                var fileStream = File.OpenRead(filePath);
+
+                var memoryStream = new MemoryStream();
+                await fileStream.CopyToAsync(memoryStream, cancellationToken);
+                memoryStream.Position = 0;
+
+                return memoryStream;
             }
             catch (Exception ex)
             {
@@ -156,9 +165,15 @@ namespace IOCv2.Infrastructure.Services
             }
         }
 
-        private string GetFilePathFromUrl(string fileUrl)
+        public string GetFilePathFromUrl(string fileUrl)
         {
-            var relativePath = fileUrl.Replace(_baseUrl, "").TrimStart('/');
+            var uri = new Uri(fileUrl, UriKind.RelativeOrAbsolute);
+            var path = uri.IsAbsoluteUri ? uri.AbsolutePath : uri.ToString();
+            // Decode URL (%20, %E1%BB%8B ...)
+            path = Uri.UnescapeDataString(path);
+            // remove /uploads/ ở đầu
+            var relativePath = path.Replace("/uploads/", "", StringComparison.OrdinalIgnoreCase)
+                                   .TrimStart('/');
             return Path.Combine(_storagePath, relativePath);
         }
     }
