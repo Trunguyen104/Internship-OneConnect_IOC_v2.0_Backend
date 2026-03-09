@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Migrations
+namespace IOCv2.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260308052034_Initial")]
-    partial class Initial
+    [Migration("20260308134146_ShiftStakeholderToInternshipGroup")]
+    partial class ShiftStakeholderToInternshipGroup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1143,6 +1143,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("email");
 
+                    b.Property<Guid>("InternshipId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_id");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1153,10 +1157,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("character varying(15)")
                         .HasColumnName("phone_number");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
 
                     b.Property<string>("Role")
                         .HasMaxLength(100)
@@ -1183,12 +1183,12 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .HasDatabaseName("ix_stakeholders_email");
 
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_stakeholders_project_id");
+                    b.HasIndex("InternshipId")
+                        .HasDatabaseName("ix_stakeholders_internship_id");
 
-                    b.HasIndex("ProjectId", "Email")
+                    b.HasIndex("InternshipId", "Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_stakeholders_project_email_unique")
+                        .HasDatabaseName("ix_stakeholders_internship_email_unique")
                         .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("stakeholders", (string)null);
@@ -1610,7 +1610,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
+                        .HasDefaultValue((short)2)
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -2086,14 +2086,14 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
                         .WithMany("Stakeholders")
-                        .HasForeignKey("ProjectId")
+                        .HasForeignKey("InternshipId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_stakeholders_projects");
+                        .HasConstraintName("fk_stakeholders_internship_groups");
 
-                    b.Navigation("Project");
+                    b.Navigation("InternshipGroup");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.StakeholderIssue", b =>
@@ -2253,6 +2253,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Members");
 
                     b.Navigation("Projects");
+
+                    b.Navigation("Stakeholders");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
@@ -2260,8 +2262,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("ProjectResources");
 
                     b.Navigation("Sprints");
-
-                    b.Navigation("Stakeholders");
 
                     b.Navigation("WorkItems");
                 });

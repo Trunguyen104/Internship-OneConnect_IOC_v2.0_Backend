@@ -51,8 +51,11 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholde
 
             try
             {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
                 await _unitOfWork.Repository<StakeholderIssue>().UpdateAsync(issue, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 _logger.LogInformation("Successfully updated StakeholderIssue {Id} status to {Status}", request.Id, request.Status);
 
@@ -64,8 +67,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholde
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Error occurred while updating status for StakeholderIssue {Id}", request.Id);
-                throw;
+                return Result<UpdateStakeholderIssueStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

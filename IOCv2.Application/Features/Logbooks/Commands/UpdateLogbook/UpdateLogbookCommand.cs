@@ -18,6 +18,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         /// <summary>
         /// ID of the logbook to update.
         /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
         public Guid LogbookId { get; set; }
  
          /// <summary>

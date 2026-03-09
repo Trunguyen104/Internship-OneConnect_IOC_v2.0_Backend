@@ -45,7 +45,7 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
                     .ThenInclude(s => s.User!)
                 .Include(x => x.WorkItems)
 
-                .FirstOrDefaultAsync(x => x.LogbookId == request.LogbookId && x.InternshipId == request.InternshipId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.LogbookId == request.LogbookId, cancellationToken);
 
 
             if (logbook == null)

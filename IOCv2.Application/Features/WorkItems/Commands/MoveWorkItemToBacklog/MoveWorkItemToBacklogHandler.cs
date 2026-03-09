@@ -4,6 +4,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.MoveWorkItemToBacklog;
 
@@ -12,16 +13,26 @@ public class MoveWorkItemToBacklogHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<MoveWorkItemToBacklogHandler> _logger;
 
-    public MoveWorkItemToBacklogHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public MoveWorkItemToBacklogHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<MoveWorkItemToBacklogHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<MoveWorkItemToBacklogResponse>> Handle(
         MoveWorkItemToBacklogCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Moving work item {WorkItemId} to backlog for project {ProjectId}", request.WorkItemId, request.ProjectId);
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var workItem = await _unitOfWork.Repository<WorkItem>()
             .Query()
             .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
@@ -45,12 +56,21 @@ public class MoveWorkItemToBacklogHandler
         workItem.BacklogOrder = backlogOrder;
         await _unitOfWork.Repository<WorkItem>().UpdateAsync(workItem, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+        _logger.LogInformation("Successfully moved work item {WorkItemId} to backlog", request.WorkItemId);
         return Result<MoveWorkItemToBacklogResponse>.Success(new MoveWorkItemToBacklogResponse
         {
             WorkItemId = request.WorkItemId,
             BacklogOrder = backlogOrder
         });
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while moving work item {WorkItemId} to backlog", request.WorkItemId);
+            return Result<MoveWorkItemToBacklogResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 
     private async Task<float> CalculateBacklogOrderAsync(

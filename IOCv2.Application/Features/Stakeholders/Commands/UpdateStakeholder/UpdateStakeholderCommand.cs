@@ -14,7 +14,12 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
         /// The ID of the stakeholder to update.
         /// </summary>
         [JsonIgnore]
-        public Guid Id { get; init; }
+        public Guid StakeholderId { get; init; }
+
+        /// <summary>
+        /// The ID of the internship group.
+        /// </summary>
+        public Guid InternshipId { get; init; }
 
         /// <summary>
         /// The new name of the stakeholder (optional).

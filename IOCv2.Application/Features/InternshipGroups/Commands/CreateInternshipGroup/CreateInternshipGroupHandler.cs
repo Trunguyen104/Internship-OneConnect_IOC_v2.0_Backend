@@ -123,7 +123,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogCreationError));
-                throw; // Let ExceptionMiddleware handle it
+                return Result<CreateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

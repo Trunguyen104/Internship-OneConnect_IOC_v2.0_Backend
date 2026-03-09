@@ -83,7 +83,7 @@ namespace IOCv2.Infrastructure.Migrations
                     avatar_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     date_of_birth = table.Column<DateOnly>(type: "date", nullable: true),
                     gender = table.Column<short>(type: "smallint", nullable: false),
-                    status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
+                    status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)2),
                     role = table.Column<short>(type: "smallint", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),

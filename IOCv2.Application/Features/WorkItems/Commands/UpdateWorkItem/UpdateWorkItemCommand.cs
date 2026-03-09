@@ -7,7 +7,6 @@ namespace IOCv2.Application.Features.WorkItems.Commands.UpdateWorkItem;
 
 public record UpdateWorkItemCommand : IRequest<Result<UpdateWorkItemResponse>>
 {
-    [JsonIgnore]
     public Guid ProjectId { get; init; }
 
     [JsonIgnore]

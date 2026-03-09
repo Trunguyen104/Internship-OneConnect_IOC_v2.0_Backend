@@ -21,10 +21,10 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
         /// </summary>
         public string Email { get; init; } = null!;
 
-        /// <summary>
-        /// Initial password for the user.
-        /// </summary>
-        public string Password { get; init; } = null!;
+        ///// <summary>
+        ///// Initial password for the user.
+        ///// </summary>
+        //public string Password { get; init; } = null!;
 
         /// <summary>
         /// Role to be assigned (e.g., SchoolAdmin, EnterpriseAdmin).

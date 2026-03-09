@@ -4,21 +4,34 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.WorkItems.Queries.GetBacklog;
 
 public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBacklogResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMessageService _messageService;
+    private readonly ILogger<GetBacklogHandler> _logger;
 
-    public GetBacklogHandler(IUnitOfWork unitOfWork)
+    public GetBacklogHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<GetBacklogHandler> logger)
     {
         _unitOfWork = unitOfWork;
+        _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<GetBacklogResponse>> Handle(
         GetBacklogQuery request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Getting backlog for project {ProjectId}", request.ProjectId);
+
+        try
+        {
         // BacklogOnly=true: bỏ qua Sprints, chỉ lấy Product Backlog
         List<Sprint> sprints;
         HashSet<Guid> assignedIds;
@@ -134,6 +147,12 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         };
 
         return Result<GetBacklogResponse>.Success(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting backlog for project {ProjectId}", request.ProjectId);
+            return Result<GetBacklogResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 
     private static bool MatchFilters(WorkItem w, GetBacklogQuery req)

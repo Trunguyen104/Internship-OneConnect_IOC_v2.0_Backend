@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Evaluations.Commands.CreateEvaluation;
 
@@ -12,16 +13,24 @@ public class CreateEvaluationHandler : IRequestHandler<CreateEvaluationCommand, 
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<CreateEvaluationHandler> _logger;
 
-    public CreateEvaluationHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public CreateEvaluationHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<CreateEvaluationHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<CreateEvaluationResponse>> Handle(
         CreateEvaluationCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Creating Evaluation for Internship {InternshipId}, Cycle {CycleId}, Student {StudentId}", 
+            request.InternshipId, request.CycleId, request.StudentId);
+
         var isGroupEvaluation = !request.StudentId.HasValue;
 
         // 1. Validate Cycle tồn tại
@@ -61,9 +70,13 @@ public class CreateEvaluationHandler : IRequestHandler<CreateEvaluationCommand, 
                         && e.StudentId == request.StudentId, cancellationToken);
 
         if (exists)
+        {
+            _logger.LogWarning("Evaluation already exists for Cycle {CycleId}, Internship {InternshipId}, Student {StudentId}", 
+                request.CycleId, request.InternshipId, request.StudentId);
             return Result<CreateEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.AlreadyExists),
                 ResultErrorType.Conflict);
+        }
 
         // 5. Validate criteria và tính TotalScore nếu có Details
         decimal? totalScore = null;
@@ -141,6 +154,8 @@ public class CreateEvaluationHandler : IRequestHandler<CreateEvaluationCommand, 
                 studentName = student?.User?.FullName ?? string.Empty;
             }
 
+            _logger.LogInformation("Successfully created Evaluation {EvaluationId}", evaluation.EvaluationId);
+
             return Result<CreateEvaluationResponse>.Success(new CreateEvaluationResponse
             {
                 EvaluationId = evaluation.EvaluationId,
@@ -159,10 +174,11 @@ public class CreateEvaluationHandler : IRequestHandler<CreateEvaluationCommand, 
                 CreatedAt = evaluation.CreatedAt
             });
         }
-        catch
+        catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
+            _logger.LogError(ex, "Error occurred while creating Evaluation for Internship {InternshipId}", request.InternshipId);
+            return Result<CreateEvaluationResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

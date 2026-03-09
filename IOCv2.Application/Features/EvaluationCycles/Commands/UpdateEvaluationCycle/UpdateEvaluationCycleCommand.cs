@@ -7,6 +7,7 @@ namespace IOCv2.Application.Features.EvaluationCycles.Commands.UpdateEvaluationC
 
 public record UpdateEvaluationCycleCommand : IRequest<Result<UpdateEvaluationCycleResponse>>
 {
+    [System.Text.Json.Serialization.JsonIgnore]
     public Guid CycleId { get; init; }
     public string Name { get; init; } = null!;
     public DateTime StartDate { get; init; }

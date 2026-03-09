@@ -10,9 +10,9 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
     public record CreateStakeholderCommand : IRequest<Result<CreateStakeholderResponse>>
     {
         /// <summary>
-        /// The ID of the project the stakeholder belongs to.
+        /// The ID of the internship group the stakeholder belongs to.
         /// </summary>
-        public Guid ProjectId { get; init; }
+        public Guid InternshipId { get; init; }
 
         /// <summary>
         /// The name of the stakeholder.

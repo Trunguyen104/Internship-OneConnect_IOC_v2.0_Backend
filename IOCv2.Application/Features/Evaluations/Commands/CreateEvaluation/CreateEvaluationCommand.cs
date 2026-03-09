@@ -6,7 +6,6 @@ namespace IOCv2.Application.Features.Evaluations.Commands.CreateEvaluation;
 
 public record CreateEvaluationCommand : IRequest<Result<CreateEvaluationResponse>>
 {
-    [JsonIgnore]
     public Guid CycleId { get; init; }
 
     /// <summary>ID của nhóm thực tập</summary>

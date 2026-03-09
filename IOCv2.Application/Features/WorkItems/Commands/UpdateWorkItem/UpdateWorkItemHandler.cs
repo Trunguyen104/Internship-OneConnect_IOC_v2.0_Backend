@@ -6,6 +6,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.UpdateWorkItem;
 
@@ -14,17 +15,28 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
+    private readonly ILogger<UpdateWorkItemHandler> _logger;
 
-    public UpdateWorkItemHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService)
+    public UpdateWorkItemHandler(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper, 
+        IMessageService messageService,
+        ILogger<UpdateWorkItemHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<UpdateWorkItemResponse>> Handle(
         UpdateWorkItemCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Updating work item {WorkItemId} for project {ProjectId}", request.WorkItemId, request.ProjectId);
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var workItem = await _unitOfWork.Repository<WorkItem>()
             .Query()
             .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
@@ -57,7 +69,16 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
         workItem.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.Repository<WorkItem>().UpdateAsync(workItem, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+        _logger.LogInformation("Successfully updated work item {WorkItemId}", request.WorkItemId);
         return Result<UpdateWorkItemResponse>.Success(_mapper.Map<UpdateWorkItemResponse>(workItem));
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while updating work item {WorkItemId}", request.WorkItemId);
+            return Result<UpdateWorkItemResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 }

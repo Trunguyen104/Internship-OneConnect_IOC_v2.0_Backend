@@ -221,7 +221,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
             {
                 _logger.LogError(ex, "Failed to create Admin User {Email}", request.Email);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                throw;
+                return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

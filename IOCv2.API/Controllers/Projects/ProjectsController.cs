@@ -83,14 +83,14 @@ public class ProjectsController : ApiControllerBase
     /// <summary>
     /// Get paginated list of projects belonging to a specific internship group.
     /// </summary>
-    [HttpGet("internship-group/{internshipId:guid}")]
+    [HttpGet("internship-group")]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetProjectsByInternshipIdResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProjectsByInternshipId(
-        [FromRoute] Guid internshipId,
+        [FromQuery] Guid internshipId,
         [FromQuery] GetProjectsByInternshipIdQuery query,
         CancellationToken cancellationToken = default)
     {

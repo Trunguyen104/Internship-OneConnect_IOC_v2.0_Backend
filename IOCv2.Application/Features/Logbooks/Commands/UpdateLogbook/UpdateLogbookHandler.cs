@@ -59,11 +59,11 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
             // 3. Security: Ownership Validation (FFA-SEC)
             var student = (await _unitOfWork.Repository<Student>()
                     .FindAsync(s => s.UserId == userId, cancellationToken)).FirstOrDefault();
-            
+
             if (student == null || logbook.StudentId != student.StudentId)
             {
                 _logger.LogWarning("User {UserId} attempted to update logbook {LogbookId} belonging to another student", userId, request.LogbookId);
-                return Result<UpdateLogbookResponse>.Failure("You do not have permission to update this logbook.", ResultErrorType.Forbidden);
+                return Result<UpdateLogbookResponse>.Failure(_messageService.GetMessage(MessageKeys.Logbooks.UpdateForbidden), ResultErrorType.Forbidden);
             }
 
             // 4. Update via Domain Method (Architecture: FFA-CAG)
@@ -77,7 +77,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
             {
                 // 5. Transaction & Writing (FF-TXG)
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
-                
+
                 await _unitOfWork.Repository<Logbook>().UpdateAsync(logbook, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
@@ -96,7 +96,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
-                
+
                 _logger.LogInformation("Logbook {LogbookId} updated successfully", logbook.LogbookId);
 
                 // 6. Return response
@@ -107,7 +107,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Failed to update logbook {LogbookId}", request.LogbookId);
-                throw;
+                return Result<UpdateLogbookResponse>.Failure("An error occurred while updating the logbook. Please try again later.", ResultErrorType.Conflict);
             }
         }
     }

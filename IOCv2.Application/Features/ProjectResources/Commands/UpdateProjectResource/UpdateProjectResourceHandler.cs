@@ -36,13 +36,13 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                 if (projectResource == null)
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ProjectResourceId);
-                    return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound));
+                    return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound), ResultErrorType.NotFound);
                 }
                 var projectExists = await _unitOfWork.Repository<Domain.Entities.Project>().ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
                 if (!projectExists)
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.Projects.LogNotFound), request.ProjectId);
-                    return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound));
+                    return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
                 }
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -62,7 +62,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUpdateError), request.ProjectResourceId);
-                return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.UpdateError));
+                return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.UpdateError), ResultErrorType.Conflict);
             }
         }
     }

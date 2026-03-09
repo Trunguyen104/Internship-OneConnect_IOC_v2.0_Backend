@@ -13,7 +13,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
         /// <summary>
         /// Unique identifier of the internship group.
         /// </summary>
-        [JsonIgnore]
         public Guid InternshipId { get; init; }
 
         /// <summary>

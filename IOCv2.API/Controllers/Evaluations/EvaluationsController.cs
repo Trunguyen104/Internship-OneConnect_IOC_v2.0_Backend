@@ -105,9 +105,9 @@ public class EvaluationsController : ApiControllerBase
     /// <summary>
     /// Lấy danh sách tiêu chí của một chu kỳ đánh giá.
     /// </summary>
-    [HttpGet("cycles/{cycleId:guid}/criteria")]
+    [HttpGet("criteria")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetEvaluationCriteria(Guid cycleId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetEvaluationCriteria([FromQuery] Guid cycleId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetEvaluationCriteriaQuery(cycleId), cancellationToken);
         return HandleResult(result);
@@ -116,16 +116,15 @@ public class EvaluationsController : ApiControllerBase
     /// <summary>
     /// Thêm tiêu chí mới vào chu kỳ đánh giá.
     /// </summary>
-    [HttpPost("cycles/{cycleId:guid}/criteria")]
+    [HttpPost("criteria")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateEvaluationCriteria(
-        Guid cycleId,
         [FromBody] CreateEvaluationCriteriaCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command with { CycleId = cycleId }, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
         return HandleCreatedResult(result);
     }
 
@@ -165,13 +164,12 @@ public class EvaluationsController : ApiControllerBase
     /// Mentor tạo đánh giá cho một sinh viên trong chu kỳ (Status = Draft).
     /// Details có thể để trống, sẽ bổ sung sau qua UpdateEvaluation.
     /// </summary>
-    [HttpPost("cycles/{cycleId:guid}/evaluations")]
+    [HttpPost("evaluations")]
     [ProducesResponseType(typeof(CreateEvaluationResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateEvaluation(
-        [FromRoute] Guid cycleId,
         [FromBody] CreateEvaluationCommand command,
         CancellationToken cancellationToken)
     {
@@ -181,7 +179,7 @@ public class EvaluationsController : ApiControllerBase
             return Unauthorized();
 
         var result = await _mediator.Send(
-            command with { CycleId = cycleId, EvaluatorId = evaluatorId },
+            command with { EvaluatorId = evaluatorId },
             cancellationToken);
         return HandleCreatedResult(result);
     }

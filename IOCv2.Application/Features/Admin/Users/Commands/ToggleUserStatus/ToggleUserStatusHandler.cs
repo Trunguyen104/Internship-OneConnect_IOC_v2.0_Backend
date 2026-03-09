@@ -63,6 +63,10 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
             // Use rich domain method
             user.SetStatus(request.NewStatus);
 
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
             
             await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
 
@@ -79,6 +83,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
             };
             await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
             await _cacheService.RemoveAsync($"user:{user.UserId}", cancellationToken);
@@ -87,6 +92,13 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
 
             var response = _mapper.Map<ToggleUserStatusResponse>(user);
             return Result<ToggleUserStatusResponse>.Success(response);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Failed to toggle status for User {UserId}", request.UserId);
+                return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            }
         }
     }
 }

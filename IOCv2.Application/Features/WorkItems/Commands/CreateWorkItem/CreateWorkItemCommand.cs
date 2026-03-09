@@ -7,7 +7,6 @@ namespace IOCv2.Application.Features.WorkItems.Commands.CreateWorkItem;
 
 public record CreateWorkItemCommand : IRequest<Result<CreateWorkItemResponse>>
 {
-    [JsonIgnore]
     public Guid ProjectId { get; init; }
 
     public string Title { get; init; } = string.Empty;

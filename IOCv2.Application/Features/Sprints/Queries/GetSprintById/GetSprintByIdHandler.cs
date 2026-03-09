@@ -86,7 +86,7 @@ public class GetSprintByIdHandler : IRequestHandler<GetSprintByIdQuery, Result<G
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting sprint {SprintId}", request.SprintId);
-            throw;
+            return Result<GetSprintByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

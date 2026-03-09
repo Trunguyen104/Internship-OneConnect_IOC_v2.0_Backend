@@ -57,13 +57,13 @@ namespace IOCv2.Tests.Features.Logbooks
             var userId = Guid.NewGuid();
             var studentId = Guid.NewGuid();
             var logbookId = Guid.NewGuid();
-            var command = new DeleteLogbookCommand { LogbookId = logbookId, InternshipId = Guid.NewGuid() };
+            var command = new DeleteLogbookCommand { LogbookId = logbookId };
 
             var logbook = Logbook.Create(Guid.NewGuid(), studentId, "Deleted Item", null, "Next Plan", DateTime.UtcNow);
 
             _mockCurrentUserService.Setup(x => x.UserId).Returns(userId.ToString());
-            _mockLogbookRepo.Setup(x => x.GetByIdAsync(logbookId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(logbook);
+            _mockLogbookRepo.Setup(x => x.FindAsync(It.IsAny<Expression<Func<Logbook, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Logbook> { logbook });
             
             _mockStudentRepo.Setup(x => x.FindAsync(It.IsAny<Expression<Func<Student, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Student> { new Student { StudentId = studentId, UserId = userId } });
@@ -86,7 +86,7 @@ namespace IOCv2.Tests.Features.Logbooks
         {
             // Arrange
             var logbookId = Guid.NewGuid();
-            var command = new DeleteLogbookCommand { LogbookId = logbookId, InternshipId = Guid.NewGuid() };
+            var command = new DeleteLogbookCommand { LogbookId = logbookId };
 
             _mockCurrentUserService.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
             _mockLogbookRepo.Setup(x => x.GetByIdAsync(logbookId, It.IsAny<CancellationToken>()))

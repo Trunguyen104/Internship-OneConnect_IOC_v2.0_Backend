@@ -167,7 +167,7 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error occurred while completing sprint {SprintId}", request.SprintId);
-            throw;
+            return Result<CompleteSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
 
         return Result<CompleteSprintResponse>.Success(new CompleteSprintResponse

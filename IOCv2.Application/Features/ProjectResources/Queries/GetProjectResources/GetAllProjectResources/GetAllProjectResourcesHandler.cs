@@ -88,7 +88,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             catch (Exception ex)
             {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetAllError));
-                throw;
+                return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
 

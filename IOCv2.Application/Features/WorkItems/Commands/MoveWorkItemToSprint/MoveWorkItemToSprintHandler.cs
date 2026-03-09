@@ -4,6 +4,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.MoveWorkItemToSprint;
 
@@ -12,16 +13,26 @@ public class MoveWorkItemToSprintHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<MoveWorkItemToSprintHandler> _logger;
 
-    public MoveWorkItemToSprintHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public MoveWorkItemToSprintHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<MoveWorkItemToSprintHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<MoveWorkItemToSprintResponse>> Handle(
         MoveWorkItemToSprintCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Moving work item {WorkItemId} to sprint {TargetSprintId}", request.WorkItemId, request.TargetSprintId);
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var workItemExists = await _unitOfWork.Repository<WorkItem>()
             .ExistsAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
         if (!workItemExists)
@@ -74,13 +85,22 @@ public class MoveWorkItemToSprintHandler
         }
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+        _logger.LogInformation("Successfully moved work item {WorkItemId} to sprint {TargetSprintId}", request.WorkItemId, request.TargetSprintId);
         return Result<MoveWorkItemToSprintResponse>.Success(new MoveWorkItemToSprintResponse
         {
             WorkItemId = request.WorkItemId,
             SprintId = request.TargetSprintId,
             BoardOrder = boardOrder
         });
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while moving work item {WorkItemId} to sprint", request.WorkItemId);
+            return Result<MoveWorkItemToSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 
     private async Task<float> CalculateBoardOrderAsync(

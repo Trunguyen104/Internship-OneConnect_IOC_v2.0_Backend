@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Evaluations.Commands.UpdateEvaluation;
 
@@ -12,31 +13,44 @@ public class UpdateEvaluationHandler : IRequestHandler<UpdateEvaluationCommand, 
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<UpdateEvaluationHandler> _logger;
 
-    public UpdateEvaluationHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public UpdateEvaluationHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<UpdateEvaluationHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<UpdateEvaluationResponse>> Handle(
         UpdateEvaluationCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Updating Evaluation {EvaluationId}", request.EvaluationId);
+
         // 1. Lấy Evaluation
         var evaluation = await _unitOfWork.Repository<Evaluation>().Query()
             .Include(e => e.Details)
             .FirstOrDefaultAsync(e => e.EvaluationId == request.EvaluationId, cancellationToken);
 
         if (evaluation is null)
+        {
+            _logger.LogWarning("Evaluation {EvaluationId} not found", request.EvaluationId);
             return Result<UpdateEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.NotFound),
                 ResultErrorType.NotFound);
+        }
 
         // 2. Chỉ cho update khi Status = Draft
         if (evaluation.Status != EvaluationStatus.Draft)
+        {
+            _logger.LogWarning("Evaluation {EvaluationId} cannot be updated because its status is {Status}", request.EvaluationId, evaluation.Status);
             return Result<UpdateEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.CannotUpdateSubmitted),
                 ResultErrorType.BadRequest);
+        }
 
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
         try
@@ -100,6 +114,8 @@ public class UpdateEvaluationHandler : IRequestHandler<UpdateEvaluationCommand, 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+            _logger.LogInformation("Successfully updated Evaluation {EvaluationId}", evaluation.EvaluationId);
+
             return Result<UpdateEvaluationResponse>.Success(new UpdateEvaluationResponse
             {
                 EvaluationId = evaluation.EvaluationId,
@@ -111,10 +127,11 @@ public class UpdateEvaluationHandler : IRequestHandler<UpdateEvaluationCommand, 
                 UpdatedAt = evaluation.UpdatedAt ?? DateTime.UtcNow
             });
         }
-        catch
+        catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
+            _logger.LogError(ex, "Error occurred while updating Evaluation {EvaluationId}", request.EvaluationId);
+            return Result<UpdateEvaluationResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

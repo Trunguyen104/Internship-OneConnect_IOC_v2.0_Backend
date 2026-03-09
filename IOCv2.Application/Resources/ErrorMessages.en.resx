@@ -568,4 +568,16 @@
   <data name="InternshipGroup.LogNotFound" xml:space="preserve">
     <value>Internship group not found for ID: {InternshipId}</value>
   </data>
+  <data name="Logbooks.StudentNotFound" xml:space="preserve">
+    <value>Student record not found for logged in user. Ensure you are logged in with a Student account.</value>
+  </data>
+  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
+    <value>You do not have permission to update this logbook.</value>
+  </data>
+  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
+    <value>You do not have permission to delete this logbook.</value>
+  </data>
+  <data name="Logbooks.InvalidInternship" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
 </root>

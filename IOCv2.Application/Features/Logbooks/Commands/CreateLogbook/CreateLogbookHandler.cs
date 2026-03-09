@@ -49,7 +49,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
             if (!internshipExists)
             {
                 _logger.LogWarning("Internship {InternshipId} not found", request.InternshipId);
-                return Result<CreateLogbookResponse>.Failure("Internship group not found", ResultErrorType.BadRequest);
+                return Result<CreateLogbookResponse>.Failure(_messageService.GetMessage(MessageKeys.Logbooks.InvalidInternship), ResultErrorType.NotFound);
             }
 
             // 3. Validate student record
@@ -58,10 +58,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
             if (student == null)
             {
                 _logger.LogWarning("Student record not found for user {UserId}", auditorId);
-                return Result<CreateLogbookResponse>.Failure(
-                    $"Student record not found for logged in user {auditorId}. Ensure you are logged in with a Student account.",
-                    ResultErrorType.Unauthorized
-                );
+                return Result<CreateLogbookResponse>.Failure(_messageService.GetMessage(MessageKeys.Logbooks.StudentNotFound), ResultErrorType.Unauthorized);
             }
 
             // 4. Create entity via Domain Factory (Architecture: FFA-CAG)
@@ -107,7 +104,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Failed to create logbook for internship {InternshipId}", request.InternshipId);
-                throw;
+                return Result<CreateLogbookResponse>.Failure("An error occurred while creating the logbook.", ResultErrorType.Conflict);
             }
         }
     }

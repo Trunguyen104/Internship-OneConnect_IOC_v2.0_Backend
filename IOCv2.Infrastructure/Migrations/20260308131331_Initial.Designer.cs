@@ -3,6 +3,7 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260308131331_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1140,10 +1143,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("email");
 
-                    b.Property<Guid>("InternshipId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("internship_id");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1154,6 +1153,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("character varying(15)")
                         .HasColumnName("phone_number");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
 
                     b.Property<string>("Role")
                         .HasMaxLength(100)
@@ -1180,12 +1183,12 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .HasDatabaseName("ix_stakeholders_email");
 
-                    b.HasIndex("InternshipId")
-                        .HasDatabaseName("ix_stakeholders_internship_id");
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_stakeholders_project_id");
 
-                    b.HasIndex("InternshipId", "Email")
+                    b.HasIndex("ProjectId", "Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_stakeholders_internship_email_unique")
+                        .HasDatabaseName("ix_stakeholders_project_email_unique")
                         .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("stakeholders", (string)null);
@@ -2083,14 +2086,14 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
+                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
                         .WithMany("Stakeholders")
-                        .HasForeignKey("InternshipId")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_stakeholders_internship_groups");
+                        .HasConstraintName("fk_stakeholders_projects");
 
-                    b.Navigation("InternshipGroup");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.StakeholderIssue", b =>
@@ -2250,8 +2253,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Members");
 
                     b.Navigation("Projects");
-
-                    b.Navigation("Stakeholders");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
@@ -2259,6 +2260,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("ProjectResources");
 
                     b.Navigation("Sprints");
+
+                    b.Navigation("Stakeholders");
 
                     b.Navigation("WorkItems");
                 });

@@ -50,13 +50,13 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
 
             // 2. Fetch logbook with existence check
             var logbook = (await _unitOfWork.Repository<Domain.Entities.Logbook>()
-                .FindAsync(l => l.LogbookId == request.LogbookId && l.InternshipId == request.InternshipId, cancellationToken)).FirstOrDefault();
+                .FindAsync(l => l.LogbookId == request.LogbookId, cancellationToken)).FirstOrDefault();
 
 
             if (logbook == null)
             {
                 _logger.LogWarning("Logbook not found: {LogbookId}", request.LogbookId);
-                return Result<DeleteLogbookResponse>.NotFound(_messageService.GetMessage(MessageKeys.Logbooks.NotFound));
+                return Result<DeleteLogbookResponse>.Failure(_messageService.GetMessage(MessageKeys.Logbooks.NotFound), ResultErrorType.NotFound);
             }
 
             // 3. Security: Ownership Validation (FFA-SEC)
@@ -66,7 +66,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
             if (student == null || logbook.StudentId != student.StudentId)
             {
                 _logger.LogWarning("User {UserId} attempted to delete logbook {LogbookId} belonging to another student", userId, request.LogbookId);
-                return Result<DeleteLogbookResponse>.Failure("You do not have permission to delete this logbook.", ResultErrorType.Forbidden);
+                return Result<DeleteLogbookResponse>.Failure(_messageService.GetMessage(MessageKeys.Logbooks.DeleteForbidden), ResultErrorType.Forbidden);
             }
 
             try
@@ -106,7 +106,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Failed to delete logbook {LogbookId}", request.LogbookId);
-                throw;
+                return Result<DeleteLogbookResponse>.Failure("An error occurred while deleting the logbook.", ResultErrorType.Conflict);
             }
         }
     }

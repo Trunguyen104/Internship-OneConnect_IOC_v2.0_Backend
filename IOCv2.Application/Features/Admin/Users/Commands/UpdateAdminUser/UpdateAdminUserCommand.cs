@@ -12,6 +12,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
         /// <summary>
         /// ID of the user to update (from route).
         /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
         public Guid UserId { get; init; }
 
         /// <summary>

@@ -74,7 +74,7 @@ public class DeleteEpicHandler : IRequestHandler<DeleteEpicCommand, Result<Delet
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Failed to delete epic: {EpicId}", request.EpicId);
-            throw;
+            return Result<DeleteEpicResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

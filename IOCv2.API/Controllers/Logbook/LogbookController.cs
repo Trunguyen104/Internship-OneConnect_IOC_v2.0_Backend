@@ -15,7 +15,7 @@ namespace IOCv2.API.Controllers.Logbook;
 /// </summary>
 [Tags("Logbooks")]
 [Authorize]
-[Route("api/internships/{internshipId:guid}/logbooks")]
+[Route("api/logbooks")]
 public class LogbookController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -28,10 +28,9 @@ public class LogbookController : ApiControllerBase
     [ProducesResponseType(typeof(Result<PaginatedResult<GetLogbooksResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetLogbooks([FromRoute] Guid internshipId, [FromQuery] GetLogbooksQuery query)
+    public async Task<IActionResult> GetLogbooks([FromQuery] GetLogbooksQuery query)
     {
-        var logbookQuery = query with { InternshipId = internshipId };
-        return HandleResult(await _mediator.Send(logbookQuery));
+        return HandleResult(await _mediator.Send(query));
     }
 
     /// <summary>
@@ -40,9 +39,9 @@ public class LogbookController : ApiControllerBase
     [HttpGet("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<GetLogbookByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLogbookById([FromRoute] Guid internshipId, [FromRoute] Guid logbookId)
+    public async Task<IActionResult> GetLogbookById([FromRoute] Guid logbookId)
     {
-        return HandleResult(await _mediator.Send(new GetLogbookByIdQuery { InternshipId = internshipId, LogbookId = logbookId }));
+        return HandleResult(await _mediator.Send(new GetLogbookByIdQuery { LogbookId = logbookId }));
     }
 
     /// <summary>
@@ -51,9 +50,8 @@ public class LogbookController : ApiControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(Result<CreateLogbookResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateLogbook([FromRoute] Guid internshipId, [FromBody] CreateLogbookCommand command)
+    public async Task<IActionResult> CreateLogbook([FromBody] CreateLogbookCommand command)
     {
-        command.InternshipId = internshipId;
         return HandleCreatedResult(await _mediator.Send(command));
     }
 
@@ -64,10 +62,9 @@ public class LogbookController : ApiControllerBase
     [ProducesResponseType(typeof(Result<UpdateLogbookResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateLogbook([FromRoute] Guid internshipId, [FromRoute] Guid logbookId, [FromBody] UpdateLogbookCommand command)
+    public async Task<IActionResult> UpdateLogbook([FromRoute] Guid logbookId, [FromBody] UpdateLogbookCommand command)
     {
         command.LogbookId = logbookId;
-        command.InternshipId = internshipId;
         return HandleResult(await _mediator.Send(command));
     }
 
@@ -78,9 +75,9 @@ public class LogbookController : ApiControllerBase
     [HttpDelete("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<DeleteLogbookResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteLogbook([FromRoute] Guid internshipId, [FromRoute] Guid logbookId)
+    public async Task<IActionResult> DeleteLogbook([FromRoute] Guid logbookId, [FromBody] DeleteLogbookCommand command)
     {
-        var command = new DeleteLogbookCommand { InternshipId = internshipId, LogbookId = logbookId };
+        command.LogbookId = logbookId;
         return HandleResult(await _mediator.Send(command));
     }
 }

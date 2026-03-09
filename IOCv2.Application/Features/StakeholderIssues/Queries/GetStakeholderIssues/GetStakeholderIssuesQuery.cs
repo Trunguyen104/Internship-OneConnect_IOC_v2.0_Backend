@@ -10,7 +10,7 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
     /// </summary>
     public record GetStakeholderIssuesQuery : IRequest<IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>>
     {
-        public Guid? ProjectId { get; init; }
+        public Guid? InternshipId { get; init; }
         public Guid? StakeholderId { get; init; }
         public StakeholderIssueStatus? Status { get; init; }
 

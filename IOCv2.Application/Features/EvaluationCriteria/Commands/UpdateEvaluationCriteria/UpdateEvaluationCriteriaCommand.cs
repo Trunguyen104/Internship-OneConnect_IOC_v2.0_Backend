@@ -5,6 +5,7 @@ namespace IOCv2.Application.Features.EvaluationCriteria.Commands.UpdateEvaluatio
 
 public record UpdateEvaluationCriteriaCommand : IRequest<Result<UpdateEvaluationCriteriaResponse>>
 {
+    [System.Text.Json.Serialization.JsonIgnore]
     public Guid CriteriaId { get; init; }
     public string Name { get; init; } = null!;
     public string? Description { get; init; }
