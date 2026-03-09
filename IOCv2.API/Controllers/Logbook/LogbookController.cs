@@ -75,9 +75,8 @@ public class LogbookController : ApiControllerBase
     [HttpDelete("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<DeleteLogbookResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteLogbook([FromRoute] Guid logbookId, [FromBody] DeleteLogbookCommand command)
+    public async Task<IActionResult> DeleteLogbook([FromRoute] Guid logbookId)
     {
-        command.LogbookId = logbookId;
-        return HandleResult(await _mediator.Send(command));
+        return HandleResult(await _mediator.Send(new DeleteLogbookCommand { LogbookId = logbookId }));
     }
 }

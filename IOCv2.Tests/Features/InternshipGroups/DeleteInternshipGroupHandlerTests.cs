@@ -46,7 +46,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             // Arrange
             var existingGroup = InternshipGroup.Create(Guid.NewGuid(), "Test Group");
             var internshipId = existingGroup.InternshipId;
-            var command = new DeleteInternshipGroupCommand(internshipId);
+            var command = new DeleteInternshipGroupCommand { InternshipId = internshipId };
             
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
                 .Returns(new List<InternshipGroup> { existingGroup }.AsQueryable().BuildMock());
@@ -71,7 +71,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
         public async Task Handle_NotFound_ShouldReturnNotFound()
         {
             // Arrange
-            var command = new DeleteInternshipGroupCommand(Guid.NewGuid());
+            var command = new DeleteInternshipGroupCommand { InternshipId = Guid.NewGuid() };
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
                 .Returns(new List<InternshipGroup>().AsQueryable().BuildMock());

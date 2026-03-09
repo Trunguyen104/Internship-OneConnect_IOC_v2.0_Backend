@@ -9,6 +9,7 @@ using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.API.Controllers.InternshipGroups;
 
@@ -98,7 +99,7 @@ public class InternshipGroupsController : ApiControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(new DeleteInternshipGroupCommand(id), cancellationToken));
+        return HandleResult(await _mediator.Send(new DeleteInternshipGroupCommand { InternshipId = id }, cancellationToken));
     }
 
     /// <summary>

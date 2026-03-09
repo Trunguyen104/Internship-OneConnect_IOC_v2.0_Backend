@@ -55,7 +55,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
 
             // Assert
             result.IsSuccess.Should().BeTrue($"Error: {result.Message}");
-            result.Data.InternshipId.Should().Be(internshipId);
+            result.Data!.InternshipId.Should().Be(internshipId);
         }
 
         [Fact]

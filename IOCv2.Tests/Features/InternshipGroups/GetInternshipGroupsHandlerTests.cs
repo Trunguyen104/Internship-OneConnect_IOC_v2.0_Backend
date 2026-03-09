@@ -58,8 +58,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            result.Data.Items.Should().HaveCount(2);
-            result.Data.TotalCount.Should().Be(2);
+            result.Data!.Items.Should().HaveCount(2);
+            result.Data!.TotalCount.Should().Be(2);
         }
     }
 }
