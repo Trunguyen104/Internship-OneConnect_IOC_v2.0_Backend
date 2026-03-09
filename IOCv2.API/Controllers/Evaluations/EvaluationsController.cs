@@ -23,6 +23,7 @@ namespace IOCv2.API.Controllers;
 /// </summary>
 [Tags("evaluations")]
 [Authorize]
+[Route("api/evaluations")]
 public class EvaluationsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
