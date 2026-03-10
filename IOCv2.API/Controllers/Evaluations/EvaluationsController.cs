@@ -12,18 +12,19 @@ using IOCv2.Application.Features.Evaluations.Commands.UpdateEvaluation;
 using IOCv2.Application.Features.Evaluations.Commands.SubmitEvaluation;
 using IOCv2.Application.Features.Evaluations.Commands.PublishEvaluation;
 using IOCv2.Application.Features.Evaluations.Queries.GetInternshipEvaluations;
+using IOCv2.Application.Common.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers;
 
 /// <summary>
-/// Quản lý chu kỳ đánh giá, tiêu chí và điểm đánh giá.
+/// Evaluation Management — manage evaluation cycles, criteria, and mentor grading.
 /// </summary>
-[Tags("evaluations")]
+[Tags("Evaluations")]
 [Authorize]
-[Route("api/evaluations")]
 public class EvaluationsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -35,10 +36,10 @@ public class EvaluationsController : ApiControllerBase
     // ==========================================
 
     /// <summary>
-    /// Lấy danh sách chu kỳ đánh giá theo học kỳ.
+    /// Get evaluation cycles filtered by term.
     /// </summary>
     [HttpGet("cycles")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<List<GetEvaluationCyclesResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEvaluationCycles([FromQuery] Guid termId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetEvaluationCyclesQuery { TermId = termId }, cancellationToken);
@@ -46,11 +47,11 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Lấy chi tiết một chu kỳ đánh giá kèm danh sách tiêu chí.
+    /// Get details of an evaluation cycle including its criteria.
     /// </summary>
-    [HttpGet("cycles/{cycleId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet("cycles/{cycleId:guid}", Name = "GetEvaluationCycleById")]
+    [ProducesResponseType(typeof(ApiResponse<GetEvaluationCycleByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEvaluationCycleById(Guid cycleId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetEvaluationCycleByIdQuery(cycleId), cancellationToken);
@@ -58,26 +59,25 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Tạo chu kỳ đánh giá mới.
+    /// Create a new evaluation cycle.
     /// </summary>
     [HttpPost("cycles")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<CreateEvaluationCycleResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateEvaluationCycle(
         [FromBody] CreateEvaluationCycleCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result);
+        return HandleCreateResult(result, nameof(GetEvaluationCycleById), new { cycleId = result.Data?.CycleId, version = "1" });
     }
 
     /// <summary>
-    /// Cập nhật thông tin chu kỳ đánh giá.
+    /// Update evaluation cycle information.
     /// </summary>
     [HttpPut("cycles/{cycleId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateEvaluationCycleResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEvaluationCycle(
         Guid cycleId,
         [FromBody] UpdateEvaluationCycleCommand command,
@@ -88,12 +88,12 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Xóa chu kỳ đánh giá (soft delete). Không thể xóa nếu đã có tiêu chí.
+    /// Soft delete an evaluation cycle. Cannot delete if criteria exist.
     /// </summary>
     [HttpDelete("cycles/{cycleId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEvaluationCycle(Guid cycleId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeleteEvaluationCycleCommand(cycleId), cancellationToken);
@@ -105,10 +105,10 @@ public class EvaluationsController : ApiControllerBase
     // ==========================================
 
     /// <summary>
-    /// Lấy danh sách tiêu chí của một chu kỳ đánh giá.
+    /// Get criteria for a specific evaluation cycle.
     /// </summary>
     [HttpGet("criteria")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<List<GetEvaluationCriteriaResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEvaluationCriteria([FromQuery] Guid cycleId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetEvaluationCriteriaQuery(cycleId), cancellationToken);
@@ -116,27 +116,26 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Thêm tiêu chí mới vào chu kỳ đánh giá.
+    /// Add new criteria to an evaluation cycle.
     /// </summary>
     [HttpPost("criteria")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<CreateEvaluationCriteriaResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateEvaluationCriteria(
         [FromBody] CreateEvaluationCriteriaCommand command,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result);
+        return HandleResult(result);
     }
 
     /// <summary>
-    /// Cập nhật tiêu chí đánh giá.
+    /// Update evaluation criteria.
     /// </summary>
     [HttpPut("criteria/{criteriaId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateEvaluationCriteriaResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEvaluationCriteria(
         Guid criteriaId,
         [FromBody] UpdateEvaluationCriteriaCommand command,
@@ -147,11 +146,11 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Xóa tiêu chí đánh giá (soft delete).
+    /// Soft delete evaluation criteria.
     /// </summary>
     [HttpDelete("criteria/{criteriaId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEvaluationCriteria(Guid criteriaId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeleteEvaluationCriteriaCommand(criteriaId), cancellationToken);
@@ -159,16 +158,15 @@ public class EvaluationsController : ApiControllerBase
     }
 
     // ==========================================
-    // EVALUATIONS (Mentor grading)
+    // EVALUATIONS
     // ==========================================
 
     /// <summary>
-    /// Lấy danh sách đánh giá của một nhóm thực tập trong một chu kỳ (Grid View).
+    /// Get all evaluations in a cycle for an internship group (Grid View).
     /// </summary>
-
     [HttpGet("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations")]
-    [ProducesResponseType(typeof(GetInternshipEvaluationsResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<GetInternshipEvaluationsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetInternshipEvaluations(
         [FromRoute] Guid cycleId,
         [FromRoute] Guid internshipId,
@@ -181,36 +179,35 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Upsert (Lưu mới/Cập nhật) đánh giá cho một hoặc nhiều sinh viên trong chu kỳ.
-    /// Hỗ trợ cả thao tác trên Grid (nhiều sinh viên) và Form (1 sinh viên).
+    /// Save (Upsert) evaluations for one or more students.
     /// </summary>
     [HttpPut("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations")]
-    [ProducesResponseType(typeof(List<SaveEvaluationsResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<List<SaveEvaluationsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SaveEvaluations(
         [FromRoute] Guid cycleId,
         [FromRoute] Guid internshipId,
         [FromBody] SaveEvaluationsCommand command,
         CancellationToken cancellationToken)
     {
-        var evaluatorIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (!Guid.TryParse(evaluatorIdStr, out var evaluatorId))
-            return Unauthorized();
+        var evaluatorId = GetCurrentUserId();
+        if (evaluatorId == null)
+            return Unauthorized(ApiResponse<object>.Fail("Unauthorized access."));
 
         var result = await _mediator.Send(
-            command with { CycleId = cycleId, InternshipId = internshipId, EvaluatorId = evaluatorId },
+            command with { CycleId = cycleId, InternshipId = internshipId, EvaluatorId = evaluatorId.Value },
              cancellationToken);
         return HandleResult(result);
     }
 
     /// <summary>
-    /// Cập nhật điểm các tiêu chí cho evaluation. Chỉ được cập nhật khi Status = Draft.
+    /// Update scores for a specific evaluation. Only allowed when Status = Draft.
     /// </summary>
     [HttpPut("evaluations/{evaluationId:guid}")]
-    [ProducesResponseType(typeof(UpdateEvaluationResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateEvaluationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEvaluation(
         [FromRoute] Guid evaluationId,
         [FromBody] UpdateEvaluationCommand command,
@@ -223,13 +220,13 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Mentor nộp đánh giá chính thức (Pending/Draft → Submitted) cho TOÀN BỘ học sinh trong 1 nhóm.
-    /// Sau khi submit không thể chỉnh sửa nữa.
+    /// Mentor officially submits evaluations (Draft -> Submitted) for all students in a group.
+    /// Cannot edit after submission.
     /// </summary>
     [HttpPatch("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations/submit")]
-    [ProducesResponseType(typeof(SubmitEvaluationResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<SubmitEvaluationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SubmitEvaluation(
         [FromRoute] Guid cycleId,
         [FromRoute] Guid internshipId,
@@ -243,13 +240,12 @@ public class EvaluationsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Admin/University công bố kết quả đánh giá (Submitted → Published) cho TOÀN BỘ học sinh trong 1 nhóm.
-    /// Sinh viên có thể xem điểm sau khi Published.
+    /// University publishes results (Submitted -> Published). Students can view scores after publication.
     /// </summary>
     [HttpPatch("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations/publish")]
-    [ProducesResponseType(typeof(PublishEvaluationResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<PublishEvaluationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PublishEvaluation(
         [FromRoute] Guid cycleId,
         [FromRoute] Guid internshipId,

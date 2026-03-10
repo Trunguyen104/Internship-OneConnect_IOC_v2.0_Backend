@@ -12,8 +12,15 @@ public static class ControllerConfig
         })
         .AddJsonOptions(options =>
         {
-         
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
+
+        services.Configure<RouteOptions>(options =>
+        {
+            options.LowercaseUrls = true;
+            options.LowercaseQueryStrings = true;
+        });
+
         return services;
     }
 }
