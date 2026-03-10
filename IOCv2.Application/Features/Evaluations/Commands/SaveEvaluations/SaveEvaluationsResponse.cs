@@ -1,4 +1,5 @@
 namespace IOCv2.Application.Features.Evaluations.Commands.SaveEvaluations;
+using IOCv2.Domain.Enums;
 
 public class SaveEvaluationsResponse
 {

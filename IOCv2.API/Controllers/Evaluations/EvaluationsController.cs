@@ -21,8 +21,9 @@ namespace IOCv2.API.Controllers;
 /// <summary>
 /// Quản lý chu kỳ đánh giá, tiêu chí và điểm đánh giá.
 /// </summary>
-[Tags("Evaluations")]
+[Tags("evaluations")]
 [Authorize]
+[Route("api/evaluations")]
 public class EvaluationsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -164,24 +165,7 @@ public class EvaluationsController : ApiControllerBase
     /// <summary>
     /// Lấy danh sách đánh giá của một nhóm thực tập trong một chu kỳ (Grid View).
     /// </summary>
-    [HttpPost("evaluations")]
-    [ProducesResponseType(typeof(CreateEvaluationResponse), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateEvaluation(
-        [FromBody] CreateEvaluationCommand command,
-        CancellationToken cancellationToken)
-    {
-        // EvaluatorId lấy từ JWT claim
-        var evaluatorIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (!Guid.TryParse(evaluatorIdStr, out var evaluatorId))
-            return Unauthorized();
 
-        var result = await _mediator.Send(command with { EvaluatorId = evaluatorId },
-             cancellationToken);
-        return HandleResult(result);
-    }
     [HttpGet("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations")]
     [ProducesResponseType(typeof(GetInternshipEvaluationsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -208,7 +192,13 @@ public class EvaluationsController : ApiControllerBase
         [FromRoute] Guid cycleId,
         [FromRoute] Guid internshipId,
         [FromBody] SaveEvaluationsCommand command,
-        
+        CancellationToken cancellationToken)
+    {
+        var evaluatorIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(evaluatorIdStr, out var evaluatorId))
+            return Unauthorized();
+
+        var result = await _mediator.Send(
             command with { CycleId = cycleId, InternshipId = internshipId, EvaluatorId = evaluatorId },
              cancellationToken);
         return HandleResult(result);
