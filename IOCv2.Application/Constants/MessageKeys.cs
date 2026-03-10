@@ -1,4 +1,4 @@
-﻿﻿namespace IOCv2.Application.Constants
+﻿﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -9,10 +9,12 @@
             public const string OperationCancelled = "Common.OperationCancelled";
             public const string Unauthorized = "Common.Unauthorized";
             public const string Forbidden = "Common.Forbidden";
+            public const string NoPermission = "Common.NoPermission";
             public const string AccessDenied = "Common.AccessDenied";
             public const string NotFound = "Common.NotFound";
             public const string RecordNotFound = "Common.RecordNotFound";
             public const string InvalidRequest = "Common.InvalidRequest";
+            public const string IdMismatch = "Common.IdMismatch";
             public const string InternalError = "Common.InternalError";
             public const string PageNumberInvalid = "Common.PageNumberInvalid";
             public const string PageSizeInvalid = "Common.PageSizeInvalid";
@@ -181,6 +183,56 @@
             public const string LogRemovedStudentsSuccess = "InternshipGroup.LogRemovedStudentsSuccess";
             public const string LogRemoveStudentsFailed = "InternshipGroup.LogRemoveStudentsFailed";
             public const string LogRemoveStudentsError = "InternshipGroup.LogRemoveStudentsError";
+        }
+
+        public static class Terms
+        {
+            public const string NotFound = "Terms.NotFound";
+            public const string UniversityIdRequired = "Terms.UniversityIdRequired";
+            public const string NameRequired = "Terms.NameRequired";
+            public const string NameMaxLength = "Terms.NameMaxLength";
+            public const string NameContainsDangerousCharacters = "Terms.NameContainsDangerousCharacters";
+            public const string NameExists = "Terms.NameExists";
+            public const string StartDateRequired = "Terms.StartDateRequired";
+            public const string EndDateRequired = "Terms.EndDateRequired";
+            public const string EndDateMustBeAfterStart = "Terms.EndDateMustBeAfterStart";
+            public const string StartDateInPast = "Terms.StartDateInPast";
+            public const string InvalidDateFormat = "Terms.InvalidDateFormat";
+            public const string OverlapWithActiveTerm = "Terms.OverlapWithActiveTerm";
+            public const string CreateSuccess = "Terms.CreateSuccess";
+            public const string UpdateSuccess = "Terms.UpdateSuccess";
+            public const string CloseSuccess = "Terms.CloseSuccess";
+            public const string DeleteSuccess = "Terms.DeleteSuccess";
+            public const string OnlyActiveCanBeClosed = "Terms.OnlyActiveCanBeClosed";
+            public const string OnlyUpcomingCanBeDeleted = "Terms.OnlyUpcomingCanBeDeleted";
+            public const string VersionConflict = "Terms.VersionConflict";
+            public const string StatusChanged = "Terms.StatusChanged";
+            public const string AlreadyDeleted = "Terms.AlreadyDeleted";
+            public const string UnplacedStudentsWarning = "Terms.UnplacedStudentsWarning";
+            public const string HasRelatedData = "Terms.HasRelatedData";
+            public const string StartDateLocked = "Terms.StartDateLocked";
+            public const string YearInvalidRange = "Terms.YearInvalidRange";
+            
+            // Logging messages
+            public const string LogTermCreated = "Terms.Log.TermCreated";
+            public const string LogTermUpdated = "Terms.Log.TermUpdated";
+            public const string LogTermClosed = "Terms.Log.TermClosed";
+            public const string LogTermDeleted = "Terms.Log.TermDeleted";
+            public const string LogTermsRetrieved = "Terms.Log.TermsRetrieved";
+            public const string LogUserNotAssociatedWithUniversity = "Terms.Log.UserNotAssociatedWithUniversity";
+            public const string LogTermNotFound = "Terms.Log.TermNotFound";
+            public const string LogTermNotFoundOrAccessDenied = "Terms.Log.TermNotFoundOrAccessDenied";
+            public const string LogVersionConflict = "Terms.Log.VersionConflict";
+            public const string LogVersionConflictDetailed = "Terms.Log.VersionConflictDetailed";
+            public const string LogDuplicateTermName = "Terms.Log.DuplicateTermName";
+            public const string LogConcurrencyConflictUpdating = "Terms.Log.ConcurrencyConflictUpdating";
+            public const string LogConcurrencyConflictClosing = "Terms.Log.ConcurrencyConflictClosing";
+            public const string LogErrorCreatingTerm = "Terms.Log.ErrorCreatingTerm";
+            public const string LogErrorUpdatingTerm = "Terms.Log.ErrorUpdatingTerm";
+            public const string LogErrorClosingTerm = "Terms.Log.ErrorClosingTerm";
+            public const string LogErrorDeletingTerm = "Terms.Log.ErrorDeletingTerm";
+            public const string LogErrorRetrievingTerms = "Terms.Log.ErrorRetrievingTerms";
+            public const string LogErrorRetrievingTerm = "Terms.Log.ErrorRetrievingTerm";
         }
         public static class Projects
         {

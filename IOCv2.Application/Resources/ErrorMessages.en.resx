@@ -132,8 +132,14 @@
   <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Page size cannot exceed 100.</value>
   </data>
+  <data name="Common.IdMismatch" xml:space="preserve">
+    <value>ID in URL does not match ID in body.</value>
+  </data>
   <data name="Common.Unauthorized" xml:space="preserve">
     <value>You are not authorized to perform this action.</value>
+  </data>
+  <data name="Common.NoPermission" xml:space="preserve">
+    <value>You do not have permission to perform this action</value>
   </data>
   <data name="Password.MinLength" xml:space="preserve">
     <value>Password must be at least 8 characters long.</value>
@@ -540,6 +546,138 @@
   </data>
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
+  </data>
+  <data name="Terms.NotFound" xml:space="preserve">
+    <value>Term not found.</value>
+  </data>
+  <data name="Terms.UniversityIdRequired" xml:space="preserve">
+    <value>SuperAdmin must specify a UniversityId when creating a term.</value>
+  </data>
+  <data name="Terms.NameRequired" xml:space="preserve">
+    <value>Term name is required.</value>
+  </data>
+  <data name="Terms.NameMaxLength" xml:space="preserve">
+    <value>Term name cannot exceed 255 characters.</value>
+  </data>
+  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
+    <value>Term name contains invalid or dangerous characters.</value>
+  </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Term name already exists. Please choose a different name.</value>
+  </data>
+  <data name="Terms.StartDateRequired" xml:space="preserve">
+    <value>Start date is required.</value>
+  </data>
+  <data name="Terms.EndDateRequired" xml:space="preserve">
+    <value>End date is required.</value>
+  </data>
+  <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="Terms.StartDateInPast" xml:space="preserve">
+    <value>Start date cannot be in the past.</value>
+  </data>
+  <data name="Terms.InvalidDateFormat" xml:space="preserve">
+    <value>Invalid date format. Please use dd/mm/yyyy format.</value>
+  </data>
+  <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
+    <value>This time period overlaps with term [{0}].</value>
+  </data>
+  <data name="Terms.CreateSuccess" xml:space="preserve">
+    <value>Term created successfully.</value>
+  </data>
+  <data name="Terms.UpdateSuccess" xml:space="preserve">
+    <value>Term updated successfully.</value>
+  </data>
+  <data name="Terms.CloseSuccess" xml:space="preserve">
+    <value>Term [{0}] has been closed successfully.</value>
+  </data>
+  <data name="Terms.DeleteSuccess" xml:space="preserve">
+    <value>Term deleted successfully.</value>
+  </data>
+  <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
+    <value>Only active terms can be closed.</value>
+  </data>
+  <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
+    <value>Cannot delete active, ended, or closed terms. Please use Close Term feature if needed.</value>
+  </data>
+  <data name="Terms.VersionConflict" xml:space="preserve">
+    <value>This term has been updated by someone else. Please reload the page to see the latest information before editing.</value>
+  </data>
+  <data name="Terms.StatusChanged" xml:space="preserve">
+    <value>Cannot delete this term because its status has changed. Please reload the page to see the latest information.</value>
+  </data>
+  <data name="Terms.AlreadyDeleted" xml:space="preserve">
+    <value>This term has already been deleted. Please reload the page.</value>
+  </data>
+  <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
+    <value>There are {0} students without company assignments in this term. Are you sure you want to close it?</value>
+  </data>
+  <data name="Terms.HasRelatedData" xml:space="preserve">
+    <value>Warning: This term has related data</value>
+  </data>
+  <data name="Terms.StartDateLocked" xml:space="preserve">
+    <value>Start date cannot be changed after the term has started.</value>
+  </data>
+  <data name="Terms.YearInvalidRange" xml:space="preserve">
+    <value>Year must be between 2000 and 2100.</value>
+  </data>
+  <data name="Terms.Log.TermCreated" xml:space="preserve">
+    <value>Term {0} created successfully by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermUpdated" xml:space="preserve">
+    <value>Term {0} updated successfully by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermClosed" xml:space="preserve">
+    <value>Term {0} closed by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermDeleted" xml:space="preserve">
+    <value>Term {0} soft-deleted by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
+    <value>Retrieved {0} terms for university {1}</value>
+  </data>
+  <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
+    <value>User {0} is not associated with any university</value>
+  </data>
+  <data name="Terms.Log.TermNotFound" xml:space="preserve">
+    <value>Term {0} not found</value>
+  </data>
+  <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
+    <value>Term {0} not found or access denied for user {1}</value>
+  </data>
+  <data name="Terms.Log.VersionConflict" xml:space="preserve">
+    <value>Version conflict for term {0}</value>
+  </data>
+  <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
+    <value>Version conflict for term {0}. Expected: {1}, Got: {2}</value>
+  </data>
+  <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
+    <value>Duplicate term name detected: {0}</value>
+  </data>
+  <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
+    <value>Concurrency conflict updating term {0}</value>
+  </data>
+  <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
+    <value>Concurrency conflict closing term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
+    <value>Error creating term</value>
+  </data>
+  <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
+    <value>Error updating term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
+    <value>Error closing term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
+    <value>Error deleting term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
+    <value>Error retrieving terms</value>
+  </data>
+  <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
+    <value>Error retrieving term {0}</value>
   </data>
   <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
     <value>You are not associated with any enterprise as an HR.</value>
