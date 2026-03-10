@@ -7,7 +7,6 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 
 namespace IOCv2.Application.Features.Terms.Commands.CreateTerm;
 
@@ -137,7 +136,9 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
             return Result<CreateTermResponse>.Success(response,
                 _messageService.GetMessage(MessageKeys.Terms.CreateSuccess));
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505" })
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key") == true || 
+                                            ex.InnerException?.Message.Contains("UNIQUE constraint") == true ||
+                                            ex.InnerException?.Message.Contains("IX_Terms_Name") == true)
         {
             _logger.LogWarning(_messageService.GetMessage(MessageKeys.Terms.LogDuplicateTermName), ex.Message);
             return Result<CreateTermResponse>.Failure(
