@@ -103,7 +103,7 @@ public class CreateSprintHandler : IRequestHandler<CreateSprintCommand, Result<C
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error occurred while creating sprint for project: {ProjectId}", request.ProjectId);
-            throw;
+            return Result<CreateSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

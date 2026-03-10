@@ -2,7 +2,8 @@ namespace IOCv2.Domain.Enums;
 
 public enum EvaluationCycleStatus : short
 {
-    Upcoming = 0,
-    Ongoing = 1,
-    Completed = 2
+    Pending = 0,
+    Grading = 1,
+    Completed = 2,
+    Cancelled = 3
 }

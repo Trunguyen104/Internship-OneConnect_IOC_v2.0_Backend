@@ -58,7 +58,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 MentorId = mentorId,
                 Students = new List<CreateInternshipStudentDto>
                 {
-                    new CreateInternshipStudentDto { StudentId = studentId, Role = "Leader" }
+                    new CreateInternshipStudentDto { StudentId = studentId, Role = IOCv2.Domain.Enums.InternshipRole.Leader }
+
                 }
             };
 

@@ -94,9 +94,31 @@
         public static class Enterprise
         {
             public const string NotFound = "Enterprise.NotFound";
+            public const string LogNotFound = "Enterprise.LogNotFound";
             public const string DuplicateTaxCode = "Enterprise.DuplicateTaxCode";
             public const string Unverified = "Enterprise.Unverified";
             public const string Inactive = "Enterprise.Inactive";
+            public const string GetEnterprisesError = "Enterprise.GetEnterprisesError";
+            public const string GetEnterpriseByIdError = "Enterprise.GetEnterpriseByIdError";
+            public const string EnterpriseWithSameTaxCodeExists = "Enterprise.EnterpriseWithSameTaxCodeExists";
+            public const string LogEnterpriseWithSameTaxCodeExists = "Enterprise.LogEnterpriseWithSameTaxCodeExists";
+            public const string ErrorCreatingEnterprise = "Enterprise.ErrorCreatingEnterprise";
+            public const string WebsiteNotValid = "Enterprise.WebsiteNotValid";
+            public const string logoUrlNotValid = "Enterprise.LogoUrlNotValid";
+            public const string BackgroundUrlNotValid = "Enterprise.BackgroundUrlNotValid";
+            public const string UpdatePermissionsNotAllowed = "Enterprise.UpdatePermissionsNotAllowed";
+            public const string UpdateTaxCodeNotAllowed = "Enterprise.UpdateTaxCodeNotAllowed";
+            public const string LogUpdatePermissionsNotAllowed = "Enterprise.LogUpdatePermissionsNotAllowed";
+            public const string LogUpdateEnterpriseError = "Enterprise.LogUpdateEnterpriseError";
+            public const string LogDeleteError = "Enterprise.LogDeleteError";
+            public const string DeleteError = "Enterprise.DeleteError";
+            public const string RequestManyTimes = "Enterprise.RequestManyTimes";
+            public const string RateLimitUpdateAttempt = "Enterprise.RateLimitUpdateAttempt";
+            public const string RateLimitGetByHRAttempt = "Enterprise.RateLimitGetByHRAttempt";
+            public const string RateLimitGetByIDAttempt = "Enterprise.RateLimitGetByIDAttempt";
+            public const string RateLimitGetEnterprisesAttempt = "Enterprise.RateLimitGetEnterprisesAttempt";
+            public const string HRNotAssociatedWithEnterprise = "Enterprise.HR.NotAssociatedWithEnterprise";
+            public const string EnterpriseNotFoundCurrentHR = "Enterprise.NotFoundCurrentHR";
         }
 
         public static class Profile
@@ -225,6 +247,9 @@
             public const string UpdateFailed = "Logbooks.UpdateFailed";
             public const string DeleteFailed = "Logbooks.DeleteFailed";
             public const string AlreadyReported = "Logbooks.AlreadyReported";
+            public const string StudentNotFound = "Logbooks.StudentNotFound";
+            public const string UpdateForbidden = "Logbooks.UpdateForbidden";
+            public const string DeleteForbidden = "Logbooks.DeleteForbidden";
         }
 
         public static class Page
@@ -295,6 +320,7 @@
             public const string UpdateSuccess = "Stakeholder.UpdateSuccess";
             public const string DeleteSuccess = "Stakeholder.DeleteSuccess";
             public const string IdRequired = "Stakeholder.IdRequired";
+            public const string InternshipIdRequired = "Stakeholder.InternshipIdRequired";
             public const string ProjectIdRequired = "Stakeholder.ProjectIdRequired";
             public const string NameRequired = "Stakeholder.NameRequired";
             public const string NameMaxLength = "Stakeholder.NameMaxLength";
@@ -377,6 +403,7 @@
             public const string CriteriaNotFound = "Evaluation.CriteriaNotFound";
             public const string ScoreExceedsMax = "Evaluation.ScoreExceedsMax";
             public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
+            public const string CannotPublishIfNotSubmitted = "Evaluation.CannotPublishIfNotSubmitted";
         }
     }
 }

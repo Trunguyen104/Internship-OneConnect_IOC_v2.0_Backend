@@ -57,12 +57,8 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 );
             }
 
-            // Parse Role
-            if (!Enum.TryParse<UserRole>(request.Role, true, out var parsedRole))
-            {
-                _logger.LogWarning("Invalid Role provided: {Role}", request.Role);
-                return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));
-            }
+            // Use Role
+            var parsedRole = request.Role;
 
             // Business Rules for delegated management
             var auditorRoleStr = _currentUserService.Role;
@@ -225,7 +221,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
             {
                 _logger.LogError(ex, "Failed to create Admin User {Email}", request.Email);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                throw;
+                return Result<CreateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

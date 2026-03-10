@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
 using System.Text.Json.Serialization;
 
@@ -15,9 +16,6 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholde
         [JsonIgnore]
         public Guid Id { get; init; }
 
-        /// <summary>
-        /// The new status for the issue (Open, InProgress, Resolved, Closed).
-        /// </summary>
-        public string Status { get; init; } = string.Empty;
+        public StakeholderIssueStatus Status { get; init; }
     }
 }

@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
 {
@@ -15,11 +16,18 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordService _passwordService;
         private readonly IMessageService _messageService;
-        public ResetPasswordHandler(IUnitOfWork unitOfWork, IMessageService messageService, IPasswordService passwordService)
+        private readonly ILogger<ResetPasswordHandler> _logger;
+
+        public ResetPasswordHandler(
+            IUnitOfWork unitOfWork, 
+            IMessageService messageService, 
+            IPasswordService passwordService,
+            ILogger<ResetPasswordHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _passwordService = passwordService;
             _messageService = messageService;
+            _logger = logger;
         }
         public async Task<Result<string>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
@@ -56,6 +64,10 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
             {
                 return Result<string>.Failure(invalidLinkMessage);
             }
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             // All validations passed - proceed with password reset
             var user = resetToken.User;
@@ -94,8 +106,18 @@ namespace IOCv2.Application.Features.Authentication.Commands.ResetPassword
 
             // Save all changes
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            _logger.LogInformation("Successfully reset password for user ID {UserId}", user.UserId);
 
             return Result<string>.Success(_messageService.GetMessage(MessageKeys.Auth.PasswordResetSuccess));
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error resetting password via token");
+                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError));
+            }
         }
 
         private static string ComputeSha256Hash(string input)

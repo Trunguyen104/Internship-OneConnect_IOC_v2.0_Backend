@@ -12,7 +12,6 @@ public record UpdateSprintCommand : IRequest<Result<UpdateSprintResponse>>
     /// <summary>
     /// The ID of the project the sprint belongs to.
     /// </summary>
-    [JsonIgnore]
     public Guid ProjectId { get; init; }
 
     /// <summary>

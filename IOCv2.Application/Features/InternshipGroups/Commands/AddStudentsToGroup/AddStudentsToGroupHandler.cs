@@ -37,6 +37,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
             {
                 var group = await _unitOfWork.Repository<InternshipGroup>().Query()
                     .Include(g => g.Members)
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (group == null)
@@ -61,9 +62,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
 
                 foreach (var item in request.Students)
                 {
-                    var role = Enum.Parse<InternshipRole>(item.Role, ignoreCase: true);
-                    group.AddMember(item.StudentId, role);
+                    group.AddMember(item.StudentId, item.Role);
                 }
+
 
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
@@ -85,7 +86,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogAddStudentsError));
-                throw;
+                return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

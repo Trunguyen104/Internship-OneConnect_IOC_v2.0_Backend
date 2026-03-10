@@ -142,6 +142,51 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to getByHR_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitGetByHRAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitGetByHRAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to getByID_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitGetByIDAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitGetByIDAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to getEnterprises_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitGetEnterprisesAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitGetEnterprisesAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to update_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitUpdateAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitUpdateAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn đã gửi request quá nhiều lần..
+        /// </summary>
+        internal static string Enterprise_RequestManyTimes {
+            get {
+                return ResourceManager.GetString("Enterprise.RequestManyTimes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tạo Epic thành công..
         /// </summary>
         internal static string Epic_CreatedSuccess {

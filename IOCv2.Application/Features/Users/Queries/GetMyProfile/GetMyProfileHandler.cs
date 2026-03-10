@@ -34,19 +34,27 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         {
             _logger.LogInformation("Getting profile for User {UserId}", request.UserId);
 
-            var user = await _unitOfWork.Repository<User>()
-                .Query()
-                .AsNoTracking()
-                .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
-
-            if (user == null)
+            try
             {
-                _logger.LogWarning("User {UserId} not found when fetching profile", request.UserId);
-                return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
-            }
+                var user = await _unitOfWork.Repository<User>()
+                    .Query()
+                    .AsNoTracking()
+                    .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
 
-            return Result<GetMyProfileResponse>.Success(user);
+                if (user == null)
+                {
+                    _logger.LogWarning("User {UserId} not found when fetching profile", request.UserId);
+                    return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
+                }
+
+                return Result<GetMyProfileResponse>.Success(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting profile for User {UserId}", request.UserId);
+                return Result<GetMyProfileResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError));
+            }
         }
     }
 }

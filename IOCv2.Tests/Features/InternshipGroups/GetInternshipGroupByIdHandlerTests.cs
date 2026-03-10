@@ -12,6 +12,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using MockQueryable.Moq;
+using MockQueryable;
 
 namespace IOCv2.Tests.Features.InternshipGroups
 {
@@ -38,12 +40,12 @@ namespace IOCv2.Tests.Features.InternshipGroups
         public async Task Handle_ExistingId_ShouldReturnSuccess()
         {
             // Arrange
-            var internshipId = Guid.NewGuid();
-            var query = new GetInternshipGroupByIdQuery(internshipId);
             var group = InternshipGroup.Create(Guid.NewGuid(), "Test Group");
+            var internshipId = group.InternshipId;
+            var query = new GetInternshipGroupByIdQuery(internshipId);
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
-                .Returns(new List<InternshipGroup> { group }.AsQueryable());
+                .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
 
             _mockMapper.Setup(x => x.Map<GetInternshipGroupByIdResponse>(It.IsAny<InternshipGroup>()))
                 .Returns(new GetInternshipGroupByIdResponse { InternshipId = internshipId, GroupName = "Test Group" });
@@ -52,8 +54,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
             var result = await _handler.Handle(query, CancellationToken.None);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
-            result.Data.InternshipId.Should().Be(internshipId);
+            result.IsSuccess.Should().BeTrue($"Error: {result.Message}");
+            result.Data!.InternshipId.Should().Be(internshipId);
         }
 
         [Fact]
@@ -63,7 +65,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             var query = new GetInternshipGroupByIdQuery(Guid.NewGuid());
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
-                .Returns(new List<InternshipGroup>().AsQueryable());
+                .Returns(new List<InternshipGroup>().AsQueryable().BuildMock());
 
             _mockMessageService.Setup(x => x.GetMessage(MessageKeys.Common.NotFound))
                 .Returns("Not Found");

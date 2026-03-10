@@ -70,7 +70,7 @@ public class UpdateEpicHandler : IRequestHandler<UpdateEpicCommand, Result<Updat
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Failed to update epic: {EpicId}", request.EpicId);
-            throw;
+            return Result<UpdateEpicResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

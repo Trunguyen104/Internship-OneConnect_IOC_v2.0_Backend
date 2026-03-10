@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Extensions.Pagination;
 using IOCv2.Application.Extensions.Query;
 using IOCv2.Application.Features.Sprints.Common;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -18,17 +19,20 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<Paginat
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly IMessageService _messageService;
     private readonly ILogger<GetSprintsHandler> _logger;
 
     public GetSprintsHandler(
         IUnitOfWork unitOfWork, 
         IMapper mapper, 
         ICacheService cacheService,
+        IMessageService messageService,
         ILogger<GetSprintsHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _cacheService = cacheService;
+        _messageService = messageService;
         _logger = logger;
     }
 
@@ -60,10 +64,9 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<Paginat
                 .AsNoTracking()
                 .Where(s => s.ProjectId == request.ProjectId);
 
-            if (!string.IsNullOrEmpty(request.StatusFilter) &&
-                Enum.TryParse<SprintStatus>(request.StatusFilter, ignoreCase: true, out var statusFilter))
+            if (request.StatusFilter.HasValue)
             {
-                query = query.Where(s => s.Status == statusFilter);
+                query = query.Where(s => s.Status == request.StatusFilter.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(request.Pagination.Search))
@@ -97,7 +100,7 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<Paginat
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting sprints for project {ProjectId}", request.ProjectId);
-            throw;
+            return Result<PaginatedResult<GetSprintsResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

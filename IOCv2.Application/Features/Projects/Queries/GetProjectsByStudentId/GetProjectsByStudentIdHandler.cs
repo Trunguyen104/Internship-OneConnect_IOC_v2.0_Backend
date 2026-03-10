@@ -43,7 +43,6 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         {
             var userId = Guid.Parse(_currentUserService.UserId!);
             var studentId = await _unitOfWork.Repository<Student>().Query().Where(s => s.UserId == userId).Select(s => s.StudentId).FirstOrDefaultAsync(cancellationToken);
-            var studentIdTest = studentId;
             try
             {
                 // Build base query
@@ -89,7 +88,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             catch (Exception ex)
             {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.GetByStuIdEr), studentId);
-                throw;
+                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
 

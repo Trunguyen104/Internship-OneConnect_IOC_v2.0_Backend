@@ -24,6 +24,7 @@ public class UpdateEvaluationCycleValidator : AbstractValidator<UpdateEvaluation
             .WithMessage(messageService.GetMessage(MessageKeys.EvaluationCycle.EndDateMustBeAfterStart));
 
         RuleFor(x => x.Status)
-            .NotEmpty();
+            .IsInEnum();
+
     }
 }

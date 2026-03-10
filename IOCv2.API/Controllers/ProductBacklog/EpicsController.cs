@@ -16,7 +16,7 @@ namespace IOCv2.API.Controllers.ProductBacklog;
 /// </summary>
 [Tags("Product Backlog - Epics")]
 [Authorize]
-[Route("api/projects/{projectId:guid}/epics")]
+[Route("api/epics")]
 public class EpicsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -31,7 +31,7 @@ public class EpicsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetEpics(
-        [FromRoute] Guid projectId,
+        [FromQuery] Guid projectId,
         [FromQuery] PaginationParams pagination,
         CancellationToken cancellationToken = default)
     {
@@ -49,8 +49,8 @@ public class EpicsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEpicById(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid id,
+        [FromQuery] Guid projectId,
         CancellationToken cancellationToken = default)
     {
         var query = new GetEpicByIdQuery(projectId, id);
@@ -67,11 +67,10 @@ public class EpicsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateEpic(
-        [FromRoute] Guid projectId,
         [FromBody] CreateEpicCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
         return HandleCreatedResult(result);
     }
 
@@ -85,12 +84,11 @@ public class EpicsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateEpic(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid id,
         [FromBody] UpdateEpicCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { EpicId = id, ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command with { EpicId = id }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -103,12 +101,11 @@ public class EpicsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEpic(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid id,
+        [FromBody] DeleteEpicCommand command,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteEpicCommand(projectId, id);
-        var result = await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(command with { EpicId = id }, cancellationToken);
         return HandleResult(result);
     }
 }

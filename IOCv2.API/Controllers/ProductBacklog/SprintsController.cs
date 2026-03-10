@@ -7,6 +7,7 @@ using IOCv2.Application.Features.Sprints.Commands.StartSprint;
 using IOCv2.Application.Features.Sprints.Commands.UpdateSprint;
 using IOCv2.Application.Features.Sprints.Queries.GetSprintById;
 using IOCv2.Application.Features.Sprints.Queries.GetSprints;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace IOCv2.API.Controllers.ProductBacklog;
 /// </summary>
 [Tags("Product Backlog - Sprints")]
 [Authorize]
-[Route("api/projects/{projectId:guid}/sprints")]
+[Route("api/sprints")]
 public class SprintsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -33,8 +34,8 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetSprints(
-        [FromRoute] Guid projectId,
-        [FromQuery] string? status,
+        [FromQuery] Guid projectId,
+        [FromQuery] SprintStatus? status,
         [FromQuery] PaginationParams pagination,
         CancellationToken cancellationToken = default)
     {
@@ -52,8 +53,8 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSprintById(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
+        [FromQuery] Guid projectId,
         CancellationToken cancellationToken = default)
     {
         var query = new GetSprintByIdQuery(projectId, sprintId);
@@ -70,11 +71,10 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateSprint(
-        [FromRoute] Guid projectId,
         [FromBody] CreateSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command, cancellationToken);
         return HandleCreatedResult(result);
     }
 
@@ -88,12 +88,11 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
         [FromBody] UpdateSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -107,12 +106,11 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
+        [FromBody] DeleteSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteSprintCommand(projectId, sprintId);
-        var result = await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -126,12 +124,11 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> StartSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
         [FromBody] StartSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -145,12 +142,11 @@ public class SprintsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CompleteSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
         [FromBody] CompleteSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 }

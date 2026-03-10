@@ -11,6 +11,11 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.DeleteStakeholder
         /// <summary>
         /// The ID of the stakeholder to delete.
         /// </summary>
-        public Guid Id { get; init; }
+        public Guid StakeholderId { get; init; }
+
+        /// <summary>
+        /// The ID of the internship group.
+        /// </summary>
+        public Guid InternshipId { get; init; }
     }
 }

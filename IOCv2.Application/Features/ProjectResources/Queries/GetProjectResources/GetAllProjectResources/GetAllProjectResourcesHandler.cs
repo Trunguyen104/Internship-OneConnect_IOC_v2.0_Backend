@@ -59,16 +59,9 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 }
 
                 // Apply resource type filter if provided
-                if (!string.IsNullOrWhiteSpace(request.ResourceType))
+                if (request.ResourceType.HasValue)
                 {
-                    if (Enum.TryParse<Domain.Enums.FileType>(request.ResourceType, ignoreCase: true, out var parsedType))
-                    {
-                        query = query.Where(x => x.ResourceType == parsedType);
-                    }
-                    else
-                    {
-                        return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Failure("Invalid ResourceType filter value.");
-                    }
+                    query = query.Where(x => x.ResourceType == request.ResourceType.Value);
                 }
 
                 // Get total count
@@ -95,7 +88,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             catch (Exception ex)
             {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetAllError));
-                throw;
+                return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
 

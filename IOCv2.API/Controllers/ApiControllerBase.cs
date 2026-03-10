@@ -9,25 +9,22 @@ public abstract class ApiControllerBase : ControllerBase
 {
     protected IActionResult HandleResult<T>(Result<T> result)
     {
-        if (result == null) return BadRequest();
+        if (result == null) return BadRequest(ApiResponse<object>.Fail("Invalid result"));
 
         if (result.IsSuccess)
         {
-            if (result.Data == null) return NoContent();
-
-            if (result.HasWarning)
+            var message = result.HasWarning ? $"Request successful. Warning: {result.Warning}" : "Request successful";
+            
+            if (result.Data == null) 
             {
-                return Ok(new
-                {
-                    data = result.Data,
-                    warning = result.Warning
-                });
+                return Ok(new ApiResponse<object>(true, message, new { }));
             }
 
-            return Ok(new { data = result.Data });
+            return Ok(new ApiResponse<T>(true, message, result.Data));
         }
 
-        return StatusCode(ResolveStatusCode(result), new ErrorResponse(ResolveStatusCode(result), result.Error ?? "An error occurred"));
+        var code = ResolveStatusCode(result);
+        return StatusCode(code, ApiResponse<object>.Fail(result.Message ?? result.Error ?? "An error occurred"));
     }
 
     /// <summary>
@@ -35,16 +32,19 @@ public abstract class ApiControllerBase : ControllerBase
     /// </summary>
     protected IActionResult HandleCreatedResult<T>(Result<T> result)
     {
-        if (result == null) return BadRequest();
+        if (result == null) return BadRequest(ApiResponse<object>.Fail("Invalid result"));
 
         if (result.IsSuccess)
         {
-            if (result.Data == null) return NoContent();
-            return StatusCode(StatusCodes.Status201Created, new { data = result.Data });
+            if (result.Data == null) 
+            {
+                return StatusCode(StatusCodes.Status201Created, new ApiResponse<object>(true, "Resource created successfully", new { }));
+            }
+            return StatusCode(StatusCodes.Status201Created, new ApiResponse<T>(true, "Resource created successfully", result.Data));
         }
 
         var code = ResolveStatusCode(result);
-        return StatusCode(code, new ErrorResponse(code, result.Error ?? "An error occurred"));
+        return StatusCode(code, ApiResponse<object>.Fail(result.Message ?? result.Error ?? "An error occurred"));
     }
 
     private static int ResolveStatusCode<T>(Result<T> result) => result.ErrorType switch

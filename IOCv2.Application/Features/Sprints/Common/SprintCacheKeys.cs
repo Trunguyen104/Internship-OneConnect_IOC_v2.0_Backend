@@ -1,3 +1,5 @@
+using IOCv2.Domain.Enums;
+
 namespace IOCv2.Application.Features.Sprints.Common;
 
 /// <summary>
@@ -25,11 +27,11 @@ public static class SprintCacheKeys
         Guid projectId,
         int pageIndex,
         int pageSize,
-        string? statusFilter = null,
+        SprintStatus? statusFilter = null,
         string? search = null,
         string? orderBy = null)
     {
-        var statusPart = string.IsNullOrWhiteSpace(statusFilter) ? "all" : statusFilter;
+        var statusPart = !statusFilter.HasValue ? "all" : statusFilter.Value.ToString();
         var searchPart = string.IsNullOrWhiteSpace(search) ? "none" : search;
         var orderPart = string.IsNullOrWhiteSpace(orderBy) ? "default" : orderBy;
         

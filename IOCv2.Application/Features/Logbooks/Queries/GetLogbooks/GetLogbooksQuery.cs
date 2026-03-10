@@ -1,5 +1,6 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers;
+using IOCv2.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,19 +11,19 @@ using System.Threading.Tasks;
 namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 {
     /// <summary>
-    /// Query to get paginated logbooks for a project.
+    /// Query to get paginated logbooks for an internship group.
     /// </summary>
     public record GetLogbooksQuery : IRequest<Result<PaginatedResult<GetLogbooksResponse>>>
     {
         /// <summary>
-        /// Project ID from route.
+        /// Internship group ID from route.
         /// </summary>
-        public Guid ProjectId { get; init; }
+        public Guid InternshipId { get; init; }
 
         /// <summary>
         /// Optional status filter.
         /// </summary>
-        public string? Status { get; init; }
+        public LogbookStatus? Status { get; init; }
 
         /// <summary>
         /// Page number (default 1).

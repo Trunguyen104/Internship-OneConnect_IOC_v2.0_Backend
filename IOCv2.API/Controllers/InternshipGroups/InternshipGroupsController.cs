@@ -9,6 +9,7 @@ using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static IOCv2.Application.Constants.MessageKeys;
 
 namespace IOCv2.API.Controllers.InternshipGroups;
 
@@ -98,40 +99,36 @@ public class InternshipGroupsController : ApiControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(new DeleteInternshipGroupCommand(id), cancellationToken));
+        return HandleResult(await _mediator.Send(new DeleteInternshipGroupCommand { InternshipId = id }, cancellationToken));
     }
 
     /// <summary>
     /// Add a list of students to an internship group.
     /// </summary>
-    [HttpPost("{id:guid}/students")]
+    [HttpPost("students")]
     [ProducesResponseType(typeof(Result<AddStudentsToGroupResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddStudentsToGroup(
-        [FromRoute] Guid id,
         [FromBody] AddStudentsToGroupCommand command,
         CancellationToken cancellationToken = default)
     {
-        var updateCommand = command with { InternshipId = id };
-        return HandleResult(await _mediator.Send(updateCommand, cancellationToken));
+        return HandleResult(await _mediator.Send(command, cancellationToken));
     }
 
     /// <summary>
     /// Remove students from an internship group.
     /// </summary>
-    [HttpDelete("{id:guid}/students")]
+    [HttpDelete("students")]
     [ProducesResponseType(typeof(Result<RemoveStudentsFromGroupResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemoveStudentsFromGroup(
-        [FromRoute] Guid id,
         [FromBody] RemoveStudentsFromGroupCommand command,
         CancellationToken cancellationToken = default)
     {
-        var updateCommand = command with { InternshipId = id };
-        return HandleResult(await _mediator.Send(updateCommand, cancellationToken));
+        return HandleResult(await _mediator.Send(command, cancellationToken));
     }
 }

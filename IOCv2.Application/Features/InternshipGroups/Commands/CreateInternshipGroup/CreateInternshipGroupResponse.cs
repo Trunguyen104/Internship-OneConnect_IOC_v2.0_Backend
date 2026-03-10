@@ -1,5 +1,7 @@
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
 {
@@ -26,12 +28,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
         /// <summary>
         /// Current lifecycle status of the group.
         /// </summary>
-        public string Status { get; set; } = string.Empty;
+        public InternshipStatus Status { get; set; }
+
 
         public void Mapping(MappingProfile profile)
         {
             profile.CreateMap<InternshipGroup, CreateInternshipGroupResponse>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
         }
     }
 }

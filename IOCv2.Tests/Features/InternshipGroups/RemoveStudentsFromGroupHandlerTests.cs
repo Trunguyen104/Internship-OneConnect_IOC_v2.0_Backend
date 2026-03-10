@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using MockQueryable.Moq;
+using MockQueryable;
 
 namespace IOCv2.Tests.Features.InternshipGroups
 {
@@ -42,19 +44,20 @@ namespace IOCv2.Tests.Features.InternshipGroups
         public async Task Handle_ValidRequest_ShouldReturnSuccess()
         {
             // Arrange
-            var internshipId = Guid.NewGuid();
             var studentId = Guid.NewGuid();
+            var group = InternshipGroup.Create(Guid.NewGuid(), "Group Name");
+            var internshipId = group.InternshipId;
+            
             var command = new RemoveStudentsFromGroupCommand
             {
                 InternshipId = internshipId,
                 StudentIds = new List<Guid> { studentId }
             };
 
-            var group = InternshipGroup.Create(Guid.NewGuid(), "Group Name");
             group.AddMember(studentId, IOCv2.Domain.Enums.InternshipRole.Member);
             
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
-                .Returns(new List<InternshipGroup> { group }.AsQueryable());
+                .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
             
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
@@ -79,7 +82,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             var command = new RemoveStudentsFromGroupCommand { InternshipId = Guid.NewGuid() };
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
-                .Returns(new List<InternshipGroup>().AsQueryable());
+                .Returns(new List<InternshipGroup>().AsQueryable().BuildMock());
             
             _mockMessageService.Setup(x => x.GetMessage(MessageKeys.Common.NotFound))
                 .Returns("Not Found");

@@ -45,15 +45,15 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
             }
 
             // Filter by role
-            if (!string.IsNullOrWhiteSpace(request.Role) && Enum.TryParse<UserRole>(request.Role, true, out var parsedRole))
+            if (request.Role.HasValue)
             {
-                query = query.Where(u => u.Role == parsedRole);
+                query = query.Where(u => u.Role == request.Role.Value);
             }
 
             // Filter by status
-            if (!string.IsNullOrWhiteSpace(request.Status) && Enum.TryParse<UserStatus>(request.Status, true, out var parsedStatus))
+            if (request.Status.HasValue)
             {
-                query = query.Where(u => u.Status == parsedStatus);
+                query = query.Where(u => u.Status == request.Status.Value);
             }
 
             // Sorting

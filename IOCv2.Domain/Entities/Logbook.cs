@@ -5,7 +5,7 @@ namespace IOCv2.Domain.Entities;
 public class Logbook : BaseEntity
 {
     public Guid LogbookId { get; private set; }
-    public Guid ProjectId { get; private set; }
+    public Guid InternshipId { get; private set; }
     public Guid? StudentId { get; private set; }
     public DateTime DateReport { get; private set; }
     public string Summary { get; private set; } = string.Empty;
@@ -13,16 +13,17 @@ public class Logbook : BaseEntity
     public string Plan { get; private set; } = string.Empty;
     public LogbookStatus Status { get; private set; }
 
-    public virtual Project Project { get; set; } = null!;
+    public virtual InternshipGroup Internship { get; set; } = null!;
     public virtual Student? Student { get; set; }
-    public virtual ICollection<WorkItem> WorkItem { get; set; } = new List<WorkItem>();
+    public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
 
-    public static Logbook Create(Guid projectId, Guid studentId, string summary, string? issue, string plan, DateTime dateReport)
+
+    public static Logbook Create(Guid internshipId, Guid studentId, string summary, string? issue, string plan, DateTime dateReport)
     {
         var logbook = new Logbook
         {
             LogbookId = Guid.NewGuid(),
-            ProjectId = projectId,
+            InternshipId = internshipId,
             StudentId = studentId,
             Summary = summary,
             Issue = issue,

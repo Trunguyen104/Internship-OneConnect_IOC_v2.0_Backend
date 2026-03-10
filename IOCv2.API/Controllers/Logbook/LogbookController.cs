@@ -15,24 +15,22 @@ namespace IOCv2.API.Controllers.Logbook;
 /// </summary>
 [Tags("Logbooks")]
 [Authorize]
-[Route("api/projects/{projectId:guid}/logbooks")]
+[Route("api/logbooks")]
 public class LogbookController : ApiControllerBase
 {
     private readonly IMediator _mediator;
-
     public LogbookController(IMediator mediator) => _mediator = mediator;
 
+    /// <summary>
+    /// Get paginated logbooks for an internship group.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetLogbooksResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetLogbooks(
-        [FromRoute] Guid projectId,
-        [FromQuery] GetLogbooksQuery query,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetLogbooks([FromQuery] GetLogbooksQuery query)
     {
-        var logbookQuery = query with { ProjectId = projectId };
-        return HandleResult(await _mediator.Send(logbookQuery, cancellationToken));
+        return HandleResult(await _mediator.Send(query));
     }
 
     /// <summary>
@@ -40,15 +38,10 @@ public class LogbookController : ApiControllerBase
     /// </summary>
     [HttpGet("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<GetLogbookByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLogbookById(
-        [FromRoute] Guid projectId,
-        [FromRoute] Guid logbookId,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetLogbookById([FromRoute] Guid logbookId)
     {
-        return HandleResult(await _mediator.Send(new GetLogbookByIdQuery { ProjectId = projectId, LogbookId = logbookId }, cancellationToken));
+        return HandleResult(await _mediator.Send(new GetLogbookByIdQuery { LogbookId = logbookId }));
     }
 
     /// <summary>
@@ -57,15 +50,9 @@ public class LogbookController : ApiControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(Result<CreateLogbookResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> CreateLogbook(
-        [FromRoute] Guid projectId,
-        [FromBody] CreateLogbookCommand command,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CreateLogbook([FromBody] CreateLogbookCommand command)
     {
-        command.ProjectId = projectId;
-        return HandleCreatedResult(await _mediator.Send(command, cancellationToken));
+        return HandleCreatedResult(await _mediator.Send(command));
     }
 
     /// <summary>
@@ -74,33 +61,22 @@ public class LogbookController : ApiControllerBase
     [HttpPut("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<UpdateLogbookResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateLogbook(
-        [FromRoute] Guid projectId,
-        [FromRoute] Guid logbookId,
-        [FromBody] UpdateLogbookCommand command,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UpdateLogbook([FromRoute] Guid logbookId, [FromBody] UpdateLogbookCommand command)
     {
         command.LogbookId = logbookId;
-        return HandleResult(await _mediator.Send(command, cancellationToken));
+        return HandleResult(await _mediator.Send(command));
     }
+
 
     /// <summary>
     /// Soft delete a logbook entry by ID.
     /// </summary>
     [HttpDelete("{logbookId:guid}")]
     [ProducesResponseType(typeof(Result<DeleteLogbookResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteLogbook(
-        [FromRoute] Guid projectId,
-        [FromRoute] Guid logbookId,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> DeleteLogbook([FromRoute] Guid logbookId)
     {
-        var command = new DeleteLogbookCommand { ProjectId = projectId, LogbookId = logbookId };
-        return HandleResult(await _mediator.Send(command, cancellationToken));
+        return HandleResult(await _mediator.Send(new DeleteLogbookCommand { LogbookId = logbookId }));
     }
 }

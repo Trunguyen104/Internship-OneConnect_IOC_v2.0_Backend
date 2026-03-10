@@ -88,7 +88,7 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<Sta
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error occurred while starting sprint {SprintId}", request.SprintId);
-            throw;
+            return Result<StartSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

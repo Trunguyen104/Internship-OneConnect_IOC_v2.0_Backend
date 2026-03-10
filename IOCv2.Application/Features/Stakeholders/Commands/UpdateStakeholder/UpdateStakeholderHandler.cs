@@ -15,36 +15,62 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
         private readonly ILogger<UpdateStakeholderHandler> _logger;
+        private readonly ICurrentUserService _currentUserService;
 
         public UpdateStakeholderHandler(
             IUnitOfWork unitOfWork, 
             IMapper mapper, 
             IMessageService messageService,
-            ILogger<UpdateStakeholderHandler> logger)
+            ILogger<UpdateStakeholderHandler> logger,
+            ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Result<UpdateStakeholderResponse>> Handle(UpdateStakeholderCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Updating stakeholder {Id}", request.Id);
+            _logger.LogInformation("Updating stakeholder {Id}", request.StakeholderId);
 
             // Find stakeholder
             var stakeholder = await _unitOfWork.Repository<Stakeholder>()
                 .Query()
-                .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(s => s.Id == request.StakeholderId && s.InternshipId == request.InternshipId, cancellationToken);
 
             if (stakeholder == null)
             {
-                _logger.LogWarning("Stakeholder {Id} not found", request.Id);
+                _logger.LogWarning("Stakeholder {Id} not found in internship {InternshipId}", request.StakeholderId, request.InternshipId);
                 return Result<UpdateStakeholderResponse>.NotFound(
                     _messageService.GetMessage(MessageKeys.Stakeholder.NotFound));
             }
 
-            // TODO: Ownership check
+            // Security: Ownership check (FFA-SEC)
+            var currentUserIdStr = _currentUserService.UserId;
+            if (string.IsNullOrEmpty(currentUserIdStr) || !Guid.TryParse(currentUserIdStr, out var currentUserId))
+            {
+                return Result<UpdateStakeholderResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+            }
+
+            var userRole = _currentUserService.Role;
+            if (userRole != "SchoolAdmin" && userRole != "SuperAdmin" && userRole != "Moderator")
+            {
+                var isAuthorized = await _unitOfWork.Repository<InternshipGroup>()
+                    .Query()
+                    .AnyAsync(g => g.InternshipId == request.InternshipId &&
+                        (
+                            (g.Mentor != null && g.Mentor.UserId == currentUserId) ||
+                            g.Members.Any(m => m.Student.UserId == currentUserId)
+                        ), cancellationToken);
+
+                if (!isAuthorized)
+                {
+                    _logger.LogWarning("User {UserId} attempted to update stakeholder in internship {InternshipId} without permission", currentUserId, request.InternshipId);
+                    return Result<UpdateStakeholderResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+                }
+            }
 
             // Partial update values
             var name = request.Name?.Trim() ?? stakeholder.Name;
@@ -63,13 +89,13 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
                     var lowerEmail = trimmedEmail.ToLower();
                     var emailExists = await _unitOfWork.Repository<Stakeholder>()
                         .Query()
-                        .AnyAsync(s => s.ProjectId == stakeholder.ProjectId
+                        .AnyAsync(s => s.InternshipId == stakeholder.InternshipId
                                     && s.Email.ToLower() == lowerEmail
-                                    && s.Id != request.Id, cancellationToken);
+                                    && s.Id != request.StakeholderId, cancellationToken);
 
                     if (emailExists)
                     {
-                        _logger.LogWarning("Stakeholder email {Email} already exists in project {ProjectId}", request.Email, stakeholder.ProjectId);
+                        _logger.LogWarning("Stakeholder email {Email} already exists in internship {InternshipId}", request.Email, stakeholder.InternshipId);
                         return Result<UpdateStakeholderResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.Stakeholder.EmailExists),
                             ResultErrorType.Conflict);
@@ -79,6 +105,8 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
 
             try
             {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
                 // Domain encapsulation
                 stakeholder.UpdateDetails(
                     name,
@@ -92,7 +120,9 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
                 await _unitOfWork.Repository<Stakeholder>().UpdateAsync(stakeholder, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                _logger.LogInformation("Successfully updated stakeholder {Id}", request.Id);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                _logger.LogInformation("Successfully updated stakeholder {Id}", request.StakeholderId);
 
                 var response = _mapper.Map<UpdateStakeholderResponse>(stakeholder);
                 return Result<UpdateStakeholderResponse>.Success(
@@ -102,8 +132,9 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.UpdateStakeholder
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while updating stakeholder {Id}", request.Id);
-                throw;
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error occurred while updating stakeholder {Id}", request.StakeholderId);
+                return Result<UpdateStakeholderResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

@@ -6,7 +6,6 @@ namespace IOCv2.Application.Features.WorkItems.Commands.MoveWorkItemToBacklog;
 
 public record MoveWorkItemToBacklogCommand : IRequest<Result<MoveWorkItemToBacklogResponse>>
 {
-    [JsonIgnore]
     public Guid ProjectId { get; init; }
 
     [JsonIgnore]

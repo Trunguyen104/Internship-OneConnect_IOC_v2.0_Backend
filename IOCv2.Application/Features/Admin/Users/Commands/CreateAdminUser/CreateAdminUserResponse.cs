@@ -1,5 +1,7 @@
-﻿using IOCv2.Application.Extensions.Mappings;
+﻿using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
 {
@@ -9,14 +11,14 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
         public string Email { get; set; } = null!;
         public string FullName { get; set; } = null!;
         public string UserCode { get; set; } = null!;
-        public string Role { get; set; } = null!;
-        public string Status { get; set; } = null!;
+        public UserRole Role { get; set; }
+        public UserStatus Status { get; set; }
 
-        public void Mapping(MappingProfile profile)
+        public void Mapping(Profile profile)
         {
             profile.CreateMap<User, CreateAdminUserResponse>()
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
         }
     }
 }

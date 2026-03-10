@@ -35,6 +35,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
             try
             {
                 var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (entity == null)
@@ -107,7 +108,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdateError));
-                throw;
+                return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

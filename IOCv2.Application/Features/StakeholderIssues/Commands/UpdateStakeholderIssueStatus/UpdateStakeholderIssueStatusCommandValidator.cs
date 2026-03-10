@@ -14,14 +14,8 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholde
 
             RuleFor(x => x.Status)
                 .NotEmpty()
-                .WithMessage(MessageKeys.Issue.InvalidStatus)
-                .Must(BeValidStatus)
+                .IsInEnum()
                 .WithMessage(MessageKeys.Issue.InvalidStatus);
-        }
-
-        private bool BeValidStatus(string status)
-        {
-            return Enum.TryParse<StakeholderIssueStatus>(status, true, out _);
         }
     }
 }

@@ -111,7 +111,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Transaction failed while updating project {ProjectId}", request.ProjectId);
-                throw;
+                return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }
