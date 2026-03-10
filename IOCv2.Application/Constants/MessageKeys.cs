@@ -400,5 +400,23 @@
             public const string ScoreExceedsMax = "Evaluation.ScoreExceedsMax";
             public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
         }
+
+        public static class Students
+        {
+            public const string ProfileNotFound = "Students.ProfileNotFound";
+            public const string TermNotFoundOrNoAccess = "Students.TermNotFoundOrNoAccess";
+            public const string BadgePlaced = "Students.BadgePlaced";
+            public const string BadgeUnplaced = "Students.BadgeUnplaced";
+            public const string EnterpriseNotAssigned = "Students.EnterpriseNotAssigned";
+            public const string MessageApplyToEnterprise = "Students.MessageApplyToEnterprise";
+            public const string MessageContactAdmin = "Students.MessageContactAdmin";
+
+            // Logger Keys
+            public const string LogUnauthorizedAccess = "Students.LogUnauthorizedAccess";
+            public const string LogProfileNotFound = "Students.LogProfileNotFound";
+            public const string LogTermNotFoundOrNoAccess = "Students.LogTermNotFoundOrNoAccess";
+            public const string LogGetInternshipsSuccess = "Students.LogGetInternshipsSuccess";
+            public const string LogGetInternshipDetailSuccess = "Students.LogGetInternshipDetailSuccess";
+        }
     }
 }

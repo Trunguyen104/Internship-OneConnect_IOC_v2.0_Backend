@@ -2,7 +2,8 @@ namespace IOCv2.Domain.Enums;
 
 public enum TermStatus
 {
-    Draft = 0,
-    Open = 1,
-    Closed = 2
+    Upcoming = 0,
+    Active = 1,
+    Ended = 2,
+    Closed = 3
 }

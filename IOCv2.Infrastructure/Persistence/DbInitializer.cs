@@ -118,7 +118,7 @@ namespace IOCv2.Infrastructure.Persistence
                 // Status is Active by default in constructor, but we can set it explicitly if needed
                 superAdmin.SetStatus(UserStatus.Active);
                 superAdmin.UpdateProfile("Super Administrator", null, null, UserGender.Other, null);
-                
+
                 _context.Users.Add(superAdmin);
             }
 
@@ -198,16 +198,20 @@ namespace IOCv2.Infrastructure.Persistence
                     TermId = Guid.NewGuid(),
                     UniversityId = fptu.UniversityId,
                     Name = "Spring 2024",
-                    StartDate = new DateOnly(2024, 1, 1),
-                    EndDate = new DateOnly(2024, 4, 30),
-                    Status = TermStatus.Open
+                    StartDate = new DateOnly(2026, 1, 1),
+                    EndDate = new DateOnly(2026, 4, 30),
+                    Status = TermStatus.Active
                 };
                 _context.Terms.Add(term);
 
-                var students = await _context.Students.Take(2).ToListAsync();
-                foreach (var s in students)
+                var fptuStudents = await _context.Users
+                    .Where(u => u.Role == UserRole.Student && (u.Email == "student1@fptu.edu.vn" || u.Email == "student2@fptu.edu.vn"))
+                    .Join(_context.Students, u => u.UserId, s => s.UserId, (u, s) => s)
+                    .ToListAsync();
+
+                foreach (var s in fptuStudents)
                 {
-                    _context.StudentTerms.Add(new StudentTerm { StudentId = s.StudentId, TermId = term.TermId, Status = 1 });
+                    _context.StudentTerms.Add(new StudentTerm { StudentId = s.StudentId, TermId = term.TermId, Status = StudentTermStatus.Enrolled });
                 }
                 await _context.SaveChangesAsync();
             }
@@ -221,25 +225,26 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     TermId = Guid.NewGuid(),
                     Name = "Default Term",
-                    StartDate = new DateOnly(2024, 1, 1),
-                    EndDate = new DateOnly(2024, 12, 31),
-                    Status = TermStatus.Open
+                    StartDate = new DateOnly(2026, 1, 1),
+                    EndDate = new DateOnly(2026, 12, 31),
+                    Status = TermStatus.Active
                 };
                 if (term.CreatedAt == default) _context.Terms.Add(term);
 
-                var fpt = await _context.Enterprises.FirstOrDefaultAsync(e => e.Name.Contains("FPT")) 
+                var fpt = await _context.Enterprises.FirstOrDefaultAsync(e => e.Name.Contains("FPT"))
                           ?? await _context.Enterprises.FirstOrDefaultAsync();
-                
+
                 var mentorUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor.fpt@iocv2.com")
                                  ?? await _context.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Mentor);
-                
+
                 var mentor = await _context.EnterpriseUsers.FirstOrDefaultAsync(eu => mentorUser != null && eu.UserId == mentorUser.UserId);
 
-                var student1User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "trunguyen.104@gmail.com")
+                var student1User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "student1@fptu.edu.vn")
                                    ?? await _context.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Student);
                 var student1 = await _context.Students.FirstOrDefaultAsync(s => student1User != null && s.UserId == student1User.UserId);
 
-                var student2User = await _context.Users.Where(u => u.Role == UserRole.Student).Skip(1).FirstOrDefaultAsync();
+                var student2User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "student2@fptu.edu.vn")
+                                   ?? await _context.Users.Where(u => u.Role == UserRole.Student).Skip(1).FirstOrDefaultAsync();
                 var student2 = await _context.Students.FirstOrDefaultAsync(s => student2User != null && s.UserId == student2User.UserId);
 
                 if (fpt != null && mentor != null && student1 != null)
@@ -265,19 +270,6 @@ namespace IOCv2.Infrastructure.Persistence
                         JoinedAt = DateTime.UtcNow
                     };
                     _context.InternshipStudents.Add(member1);
-
-                    if (student2 != null)
-                    {
-                        var member2 = new InternshipStudent
-                        {
-                            InternshipId = group.InternshipId,
-                            StudentId = student2.StudentId,
-                            Role = InternshipRole.Member,
-                            Status = InternshipStatus.InProgress,
-                            JoinedAt = DateTime.UtcNow
-                        };
-                        _context.InternshipStudents.Add(member2);
-                    }
 
                     // Also seed an application for the leader
                     _context.InternshipApplications.Add(new InternshipApplication
@@ -305,9 +297,9 @@ namespace IOCv2.Infrastructure.Persistence
                     group.InternshipId,
                     "E-Commerce System IOC",
                     "Building a next-gen e-commerce platform");
-                
+
                 project.Update(null, null, null, DateTime.UtcNow.AddDays(-25), null, ProjectStatus.InProgress);
-                
+
                 _context.Projects.Add(project);
 
                 _context.ProjectResources.Add(new ProjectResources
@@ -370,7 +362,7 @@ namespace IOCv2.Infrastructure.Persistence
                     null, // Issue
                     "Continue project development.",
                     DateTime.UtcNow);
-                
+
                 _context.Logbooks.Add(logbook);
                 await _context.SaveChangesAsync();
             }

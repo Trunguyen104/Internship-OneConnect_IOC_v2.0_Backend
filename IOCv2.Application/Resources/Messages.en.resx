@@ -243,4 +243,25 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Successfully removed students from group: {InternshipId}</value>
   </data>
+  <data name="Students.BadgePlaced" xml:space="preserve">
+    <value>Placed at an enterprise</value>
+  </data>
+  <data name="Students.BadgeUnplaced" xml:space="preserve">
+    <value>Not yet placed</value>
+  </data>
+  <data name="Students.EnterpriseNotAssigned" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Students.MessageApplyToEnterprise" xml:space="preserve">
+    <value>Please apply for job postings to find an internship company</value>
+  </data>
+  <data name="Students.MessageContactAdmin" xml:space="preserve">
+    <value>You don't have an internship company yet, please contact Uni Admin for support</value>
+  </data>
+  <data name="Students.LogGetInternshipsSuccess" xml:space="preserve">
+    <value>Successfully retrieved {0} internships for StudentId: {1}</value>
+  </data>
+  <data name="Students.LogGetInternshipDetailSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship detail. TermId: {0}, StudentId: {1}</value>
+  </data>
 </root>

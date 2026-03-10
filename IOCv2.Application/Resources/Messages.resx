@@ -309,4 +309,25 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Đã xóa thành công sinh viên khỏi nhóm: {InternshipId}</value>
   </data>
+  <data name="Students.BadgePlaced" xml:space="preserve">
+    <value>Đã được xếp doanh nghiệp</value>
+  </data>
+  <data name="Students.BadgeUnplaced" xml:space="preserve">
+    <value>Chưa được xếp doanh nghiệp</value>
+  </data>
+  <data name="Students.EnterpriseNotAssigned" xml:space="preserve">
+    <value>Chưa có</value>
+  </data>
+  <data name="Students.MessageApplyToEnterprise" xml:space="preserve">
+    <value>Hãy apply vào các vị trí tuyển dụng để tìm công ty thực tập</value>
+  </data>
+  <data name="Students.MessageContactAdmin" xml:space="preserve">
+    <value>Bạn chưa có công ty thực tập, vui lòng liên hệ Uni Admin để được hỗ trợ</value>
+  </data>
+  <data name="Students.LogGetInternshipsSuccess" xml:space="preserve">
+    <value>Đã truy xuất thành công {0} kỳ thực tập cho Sinh viên: {1}</value>
+  </data>
+  <data name="Students.LogGetInternshipDetailSuccess" xml:space="preserve">
+    <value>Đã truy xuất chi tiết kỳ thực tập thành công. TermId: {0}, StudentId: {1}</value>
+  </data>
 </root>

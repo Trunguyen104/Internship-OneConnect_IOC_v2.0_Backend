@@ -631,4 +631,19 @@
   <data name="InternshipGroup.LogNotFound" xml:space="preserve">
     <value>Internship group not found for ID: {InternshipId}</value>
   </data>
+  <data name="Students.ProfileNotFound" xml:space="preserve">
+    <value>Student profile not found.</value>
+  </data>
+  <data name="Students.TermNotFoundOrNoAccess" xml:space="preserve">
+    <value>Term not found or you don't have access to it.</value>
+  </data>
+  <data name="Students.LogUnauthorizedAccess" xml:space="preserve">
+    <value>Unauthorized access attempt. UserId: {0}</value>
+  </data>
+  <data name="Students.LogProfileNotFound" xml:space="preserve">
+    <value>Student profile not found. UserId: {0}</value>
+  </data>
+  <data name="Students.LogTermNotFoundOrNoAccess" xml:space="preserve">
+    <value>Term not found or no access. TermId: {0}, StudentId: {1}</value>
+  </data>
 </root>

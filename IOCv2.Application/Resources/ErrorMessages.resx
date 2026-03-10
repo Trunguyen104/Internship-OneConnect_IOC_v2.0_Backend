@@ -687,4 +687,19 @@
   <data name="InternshipGroup.LogNotFound" xml:space="preserve">
     <value>Không tìm thấy nhóm thực tập với ID: {InternshipId}</value>
   </data>
+  <data name="Students.ProfileNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên.</value>
+  </data>
+  <data name="Students.TermNotFoundOrNoAccess" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập hoặc bạn không có quyền truy cập.</value>
+  </data>
+  <data name="Students.LogUnauthorizedAccess" xml:space="preserve">
+    <value>Nỗ lực truy cập trái phép. UserId: {0}</value>
+  </data>
+  <data name="Students.LogProfileNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên. UserId: {0}</value>
+  </data>
+  <data name="Students.LogTermNotFoundOrNoAccess" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập hoặc không có quyền truy cập. TermId: {0}, StudentId: {1}</value>
+  </data>
 </root>

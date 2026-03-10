@@ -21,6 +21,7 @@ public partial class AppDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
     public DbSet<UserCodeSequence> UserCodeSequences { get; set; } = null!;
+    public DbSet<Notification> Notifications { get; set; } = null!;
 
     // University & Enterprise
     public DbSet<Student> Students { get; set; } = null!;
@@ -49,7 +50,7 @@ public partial class AppDbContext : DbContext
     public DbSet<EvaluationCriteria> EvaluationCriteria { get; set; } = null!;
     public DbSet<Evaluation> Evaluations { get; set; } = null!;
     public DbSet<EvaluationDetail> EvaluationDetails { get; set; } = null!;
-    
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
@@ -58,7 +59,7 @@ public partial class AppDbContext : DbContext
         {
             currentUserId = parsedId;
         }
-        
+
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
             switch (entry.State)
