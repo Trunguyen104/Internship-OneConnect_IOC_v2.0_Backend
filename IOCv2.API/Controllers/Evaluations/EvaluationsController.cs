@@ -146,15 +146,16 @@ public class EvaluationsController : ApiControllerBase
     /// <summary>
     /// Thêm tiêu chí mới vào chu kỳ đánh giá.
     /// </summary>
-    [HttpPost("criteria")]
+    [HttpPost("cycles/{cycleId:guid}/criteria")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateEvaluationCriteria(
+        [FromRoute] Guid cycleId,
         [FromBody] CreateEvaluationCriteriaCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(command with { CycleId = cycleId }, cancellationToken);
         return HandleCreatedResult(result);
     }
 
