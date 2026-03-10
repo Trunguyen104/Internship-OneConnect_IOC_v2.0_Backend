@@ -17,7 +17,6 @@ namespace IOCv2.API.Controllers.Auth;
 /// Authentication — login, logout, token refresh, and password management.
 /// </summary>
 [Tags("Auth")]
-[Route("api/auth")]
 public class AuthController : ApiControllerBase
 {
     private readonly IMediator _mediator;
