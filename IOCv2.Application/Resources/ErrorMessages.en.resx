@@ -645,6 +645,7 @@
   </data>
   <data name="Students.LogTermNotFoundOrNoAccess" xml:space="preserve">
     <value>Term not found or no access. TermId: {0}, StudentId: {1}</value>
+  </data>
   <data name="Logbooks.StudentNotFound" xml:space="preserve">
     <value>Student record not found for logged in user. Ensure you are logged in with a Student account.</value>
   </data>

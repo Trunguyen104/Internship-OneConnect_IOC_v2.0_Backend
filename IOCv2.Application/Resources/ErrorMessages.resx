@@ -701,6 +701,7 @@
   </data>
   <data name="Students.LogTermNotFoundOrNoAccess" xml:space="preserve">
     <value>Không tìm thấy kỳ thực tập hoặc không có quyền truy cập. TermId: {0}, StudentId: {1}</value>
+  </data>
   <data name="Logbooks.StudentNotFound" xml:space="preserve">
     <value>Không tìm thấy hồ sơ sinh viên cho người dùng hiện tại. Vui lòng đảm bảo bạn đăng nhập bằng tài khoản Sinh viên.</value>
   </data>
