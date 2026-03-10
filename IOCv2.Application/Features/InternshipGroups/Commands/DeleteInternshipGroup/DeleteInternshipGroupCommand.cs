@@ -13,9 +13,5 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
         /// </summary>
         public Guid InternshipId { get; init; }
 
-        public DeleteInternshipGroupCommand(Guid internshipId)
-        {
-            InternshipId = internshipId;
-        }
     }
 }

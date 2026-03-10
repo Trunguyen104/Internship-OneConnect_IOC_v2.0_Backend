@@ -98,7 +98,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
                 RefreshToken = refreshToken,
                 RefreshTokenExpiresIn = (expirationDate - DateTime.UtcNow).TotalSeconds,
                 Email = user.Email,
-                Role = user.Role.ToString(),
+                Role = user.Role,
                 ExpiresIn = expiresIn
             };
 

@@ -1,5 +1,7 @@
 namespace IOCv2.Application.Features.Evaluations.Commands.SaveEvaluations;
 
+using IOCv2.Domain.Enums;
+
 public class SaveEvaluationsResponse
 {
     public Guid EvaluationId { get; set; }
@@ -13,7 +15,8 @@ public class SaveEvaluationsResponse
     public Guid? StudentId { get; set; }
     public string StudentName { get; set; } = string.Empty;
     public Guid EvaluatorId { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public EvaluationStatus Status { get; set; }
+
     public decimal? TotalScore { get; set; }
     public string? Note { get; set; }
     public int DetailCount { get; set; }

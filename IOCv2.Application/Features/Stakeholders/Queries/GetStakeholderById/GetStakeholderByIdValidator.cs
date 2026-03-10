@@ -7,9 +7,13 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
     {
         public GetStakeholderByIdValidator()
         {
-            RuleFor(x => x.Id)
+            RuleFor(x => x.StakeholderId)
                 .NotEmpty()
                 .WithMessage(MessageKeys.Stakeholder.IdRequired);
+
+            RuleFor(x => x.InternshipId)
+                .NotEmpty()
+                .WithMessage(MessageKeys.Stakeholder.InternshipIdRequired);
         }
     }
 }

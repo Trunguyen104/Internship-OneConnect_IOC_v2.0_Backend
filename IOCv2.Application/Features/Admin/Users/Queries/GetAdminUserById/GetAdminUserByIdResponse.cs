@@ -1,3 +1,4 @@
+using AutoMapper;
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -12,8 +13,8 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUserById
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public string? AvatarUrl { get; set; }
-        public string Role { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
+        public UserRole Role { get; set; }
+        public UserStatus Status { get; set; }
         public Guid? UnitId { get; set; }
         public string? UnitName { get; set; }
         public string UnitType { get; set; } = string.Empty; // "Internal", "University", "Enterprise"
@@ -22,11 +23,11 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUserById
         public string? StudentMajor { get; set; }
         public decimal? StudentGpa { get; set; }
 
-        public void Mapping(MappingProfile profile)
+        public void Mapping(Profile profile)
         {
             profile.CreateMap<User, GetAdminUserByIdResponse>()
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => 
                     src.UniversityUser != null ? src.UniversityUser.UniversityId : 
                     src.EnterpriseUser != null ? src.EnterpriseUser.EnterpriseId : (Guid?)null))

@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Evaluations.Commands.SubmitEvaluation;
 
@@ -12,11 +13,16 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<SubmitEvaluationHandler> _logger;
 
-    public SubmitEvaluationHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public SubmitEvaluationHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<SubmitEvaluationHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<SubmitEvaluationResponse>> Handle(
@@ -43,6 +49,10 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
                 _messageService.GetMessage(MessageKeys.EvaluationKey.AlreadySubmitted),
                 ResultErrorType.BadRequest);
 
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
         var now = DateTime.UtcNow;
         foreach (var eval in drafts)
         {
@@ -52,6 +62,9 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
         }
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully submitted Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
 
         return Result<SubmitEvaluationResponse>.Success(new SubmitEvaluationResponse
         {
@@ -61,5 +74,12 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
             Status = EvaluationStatus.Submitted.ToString(),
             UpdatedAt = now
         });
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while submitting Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
+            return Result<SubmitEvaluationResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 }

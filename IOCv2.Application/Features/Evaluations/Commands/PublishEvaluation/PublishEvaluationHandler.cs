@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Evaluations.Commands.PublishEvaluation;
 
@@ -12,16 +13,23 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<PublishEvaluationHandler> _logger;
 
-    public PublishEvaluationHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public PublishEvaluationHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<PublishEvaluationHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<PublishEvaluationResponse>> Handle(
         PublishEvaluationCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Publishing Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
+
         var internship = await _unitOfWork.Repository<InternshipGroup>().Query()
             .Include(i => i.Members)
             .FirstOrDefaultAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
@@ -48,7 +56,9 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
                 "Chưa tạo đầy đủ bài đánh giá cho toàn bộ sinh viên trong nhóm.",
                 ResultErrorType.BadRequest);
         }
-
+try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var unsubmittedEvals = evaluations.Where(e => e.Status != EvaluationStatus.Submitted).ToList();
         if (unsubmittedEvals.Count > 0)
         {
@@ -66,6 +76,9 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
         }
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully published Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
 
         return Result<PublishEvaluationResponse>.Success(new PublishEvaluationResponse
         {
@@ -75,5 +88,12 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
             Status = EvaluationStatus.Published.ToString(),
             UpdatedAt = now
         });
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while publishing Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
+            return Result<PublishEvaluationResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 }

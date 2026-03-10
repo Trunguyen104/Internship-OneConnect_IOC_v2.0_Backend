@@ -714,6 +714,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
+                    b.Property<Guid>("InternshipId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_id");
+
                     b.Property<string>("Issue")
                         .HasColumnType("text")
                         .HasColumnName("issue");
@@ -722,10 +726,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("plan");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
 
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
@@ -751,8 +751,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasKey("LogbookId")
                         .HasName("pk_logbooks");
 
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_logbooks_project_id");
+                    b.HasIndex("InternshipId")
+                        .HasDatabaseName("ix_logbooks_internship_id");
 
                     b.HasIndex("StudentId")
                         .HasDatabaseName("ix_logbooks_student_id");
@@ -1140,6 +1140,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("email");
 
+                    b.Property<Guid>("InternshipId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_id");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1150,10 +1154,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("character varying(15)")
                         .HasColumnName("phone_number");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("project_id");
 
                     b.Property<string>("Role")
                         .HasMaxLength(100)
@@ -1180,12 +1180,12 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .HasDatabaseName("ix_stakeholders_email");
 
-                    b.HasIndex("ProjectId")
-                        .HasDatabaseName("ix_stakeholders_project_id");
+                    b.HasIndex("InternshipId")
+                        .HasDatabaseName("ix_stakeholders_internship_id");
 
-                    b.HasIndex("ProjectId", "Email")
+                    b.HasIndex("InternshipId", "Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_stakeholders_project_email_unique")
+                        .HasDatabaseName("ix_stakeholders_internship_email_unique")
                         .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("stakeholders", (string)null);
@@ -1607,7 +1607,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
+                        .HasDefaultValue((short)2)
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1779,15 +1779,15 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("logbook_id");
 
-                    b.Property<Guid>("WorkItemId")
+                    b.Property<Guid>("WorkItemsWorkItemId")
                         .HasColumnType("uuid")
-                        .HasColumnName("work_item_id");
+                        .HasColumnName("work_items_work_item_id");
 
-                    b.HasKey("LogbookId", "WorkItemId")
+                    b.HasKey("LogbookId", "WorkItemsWorkItemId")
                         .HasName("pk_logbook_work_items");
 
-                    b.HasIndex("WorkItemId")
-                        .HasDatabaseName("ix_logbook_work_items_work_item_id");
+                    b.HasIndex("WorkItemsWorkItemId")
+                        .HasDatabaseName("ix_logbook_work_items_work_items_work_item_id");
 
                     b.ToTable("logbook_work_items", (string)null);
                 });
@@ -1980,19 +1980,19 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "Internship")
                         .WithMany("Logbooks")
-                        .HasForeignKey("ProjectId")
+                        .HasForeignKey("InternshipId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_logbooks_projects_project_id");
+                        .HasConstraintName("fk_logbooks_internship_groups_internship_id");
 
                     b.HasOne("IOCv2.Domain.Entities.Student", "Student")
                         .WithMany("Logbooks")
                         .HasForeignKey("StudentId")
                         .HasConstraintName("fk_logbooks_students_student_id");
 
-                    b.Navigation("Project");
+                    b.Navigation("Internship");
 
                     b.Navigation("Student");
                 });
@@ -2083,14 +2083,14 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Stakeholder", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.Project", "Project")
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
                         .WithMany("Stakeholders")
-                        .HasForeignKey("ProjectId")
+                        .HasForeignKey("InternshipId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_stakeholders_projects");
+                        .HasConstraintName("fk_stakeholders_internship_groups");
 
-                    b.Navigation("Project");
+                    b.Navigation("InternshipGroup");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.StakeholderIssue", b =>
@@ -2211,10 +2211,10 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasOne("IOCv2.Domain.Entities.WorkItem", null)
                         .WithMany()
-                        .HasForeignKey("WorkItemId")
+                        .HasForeignKey("WorkItemsWorkItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_logbook_work_items_work_items_work_item_id");
+                        .HasConstraintName("fk_logbook_work_items_work_items_work_items_work_item_id");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Enterprise", b =>
@@ -2245,20 +2245,20 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     b.Navigation("InternshipApplications");
 
+                    b.Navigation("Logbooks");
+
                     b.Navigation("Members");
 
                     b.Navigation("Projects");
+
+                    b.Navigation("Stakeholders");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
                 {
-                    b.Navigation("Logbooks");
-
                     b.Navigation("ProjectResources");
 
                     b.Navigation("Sprints");
-
-                    b.Navigation("Stakeholders");
 
                     b.Navigation("WorkItems");
                 });

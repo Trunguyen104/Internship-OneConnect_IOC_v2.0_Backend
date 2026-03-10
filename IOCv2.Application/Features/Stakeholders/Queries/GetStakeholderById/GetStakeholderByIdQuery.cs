@@ -11,6 +11,11 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
         /// <summary>
         /// The ID of the stakeholder to retrieve.
         /// </summary>
-        public Guid Id { get; init; }
+        public Guid StakeholderId { get; init; }
+
+        /// <summary>
+        /// The ID of the internship group.
+        /// </summary>
+        public Guid InternshipId { get; init; }
     }
 }

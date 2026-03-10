@@ -48,8 +48,11 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
 
             try
             {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
                 await _unitOfWork.Repository<StakeholderIssue>().HardDeleteAsync(issue, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 _logger.LogInformation("Successfully deleted StakeholderIssue {Id}", request.Id);
 
@@ -61,8 +64,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Error occurred while deleting StakeholderIssue {Id}", request.Id);
-                throw;
+                return Result<DeleteStakeholderIssueResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

@@ -247,6 +247,9 @@
             public const string UpdateFailed = "Logbooks.UpdateFailed";
             public const string DeleteFailed = "Logbooks.DeleteFailed";
             public const string AlreadyReported = "Logbooks.AlreadyReported";
+            public const string StudentNotFound = "Logbooks.StudentNotFound";
+            public const string UpdateForbidden = "Logbooks.UpdateForbidden";
+            public const string DeleteForbidden = "Logbooks.DeleteForbidden";
         }
 
         public static class Page
@@ -317,6 +320,7 @@
             public const string UpdateSuccess = "Stakeholder.UpdateSuccess";
             public const string DeleteSuccess = "Stakeholder.DeleteSuccess";
             public const string IdRequired = "Stakeholder.IdRequired";
+            public const string InternshipIdRequired = "Stakeholder.InternshipIdRequired";
             public const string ProjectIdRequired = "Stakeholder.ProjectIdRequired";
             public const string NameRequired = "Stakeholder.NameRequired";
             public const string NameMaxLength = "Stakeholder.NameMaxLength";
@@ -399,6 +403,7 @@
             public const string CriteriaNotFound = "Evaluation.CriteriaNotFound";
             public const string ScoreExceedsMax = "Evaluation.ScoreExceedsMax";
             public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
+            public const string CannotPublishIfNotSubmitted = "Evaluation.CannotPublishIfNotSubmitted";
         }
 
         public static class Students

@@ -1,6 +1,8 @@
 using AutoMapper;
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+
 
 namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIssueById
 {
@@ -9,7 +11,8 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
+        public StakeholderIssueStatus Status { get; set; }
+
         public Guid StakeholderId { get; set; }
         public string StakeholderName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
@@ -18,8 +21,8 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
         public void Mapping(Profile profile)
         {
             profile.CreateMap<StakeholderIssue, GetStakeholderIssueByIdResponse>()
-                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()))
                 .ForMember(d => d.StakeholderName, opt => opt.MapFrom(s => s.Stakeholder.Name));
+
         }
     }
 }

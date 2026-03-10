@@ -27,14 +27,14 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
 
             // Status (optional nhưng nếu có phải hợp lệ enum)
             RuleFor(x => x.Status)
-                .Must(status =>
-                    Enum.TryParse<UserStatus>(status, true, out _))
+                .IsInEnum()
+                .When(x => x.Status.HasValue)
                 .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidStatus));
 
             // Gender (optional nhưng nếu có phải hợp lệ enum)
             RuleFor(x => x.Gender)
-                .Must(gender =>
-                    Enum.TryParse<UserGender>(gender, true, out _))
+                .IsInEnum()
+                .When(x => x.Gender.HasValue)
                 .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidGender));
 
             // DateOfBirth (optional nhưng nếu có phải đúng format)

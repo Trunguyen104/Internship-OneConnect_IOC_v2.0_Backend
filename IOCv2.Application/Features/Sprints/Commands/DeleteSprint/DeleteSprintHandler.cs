@@ -86,7 +86,7 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result<D
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error occurred while deleting sprint {SprintId}", request.SprintId);
-            throw;
+            return Result<DeleteSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

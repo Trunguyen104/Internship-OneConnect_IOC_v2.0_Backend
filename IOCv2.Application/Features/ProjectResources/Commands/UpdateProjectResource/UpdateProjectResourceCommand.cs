@@ -1,3 +1,4 @@
+using IOCv2.Domain.Enums;
 using IOCv2.Application.Common.Models;
 using MediatR;
 using System;
@@ -10,10 +11,12 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
 {
     public record UpdateProjectResourceCommand : IRequest<Result<UpdateProjectResourceResponse>>
     {
+        [System.Text.Json.Serialization.JsonIgnore]
         public Guid ProjectResourceId { get; init; }
         public Guid ProjectId { get; init; }
         public string ResourceName { get; init; } = string.Empty;
         /// <summary>Type of file: DocumentFile, Image, Video, Other</summary>
-        public string ResourceType { get; init; } = string.Empty;
+        public FileType ResourceType { get; init; }
     }
 }
+

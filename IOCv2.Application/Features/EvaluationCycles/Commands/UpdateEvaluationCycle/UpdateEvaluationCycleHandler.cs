@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.EvaluationCycles.Commands.UpdateEvaluationCycle;
 
@@ -13,37 +14,52 @@ public class UpdateEvaluationCycleHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<UpdateEvaluationCycleHandler> _logger;
 
-    public UpdateEvaluationCycleHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public UpdateEvaluationCycleHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<UpdateEvaluationCycleHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<UpdateEvaluationCycleResponse>> Handle(
         UpdateEvaluationCycleCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Updating EvaluationCycle {CycleId}", request.CycleId);
+
         var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
             .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
         if (cycle is null)
+        {
+            _logger.LogWarning("EvaluationCycle {CycleId} not found", request.CycleId);
             return Result<UpdateEvaluationCycleResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
                 ResultErrorType.NotFound);
+        }
 
-        if (!Enum.TryParse<EvaluationCycleStatus>(request.Status, ignoreCase: true, out var status))
-            return Result<UpdateEvaluationCycleResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
-                ResultErrorType.BadRequest);
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+
 
         cycle.Name = request.Name;
         cycle.StartDate = request.StartDate;
         cycle.EndDate = request.EndDate;
-        cycle.Status = status;
+        cycle.Status = request.Status;
+
         cycle.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.Repository<EvaluationCycle>().UpdateAsync(cycle, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully updated EvaluationCycle {CycleId}", request.CycleId);
 
         return Result<UpdateEvaluationCycleResponse>.Success(new UpdateEvaluationCycleResponse
         {
@@ -52,8 +68,16 @@ public class UpdateEvaluationCycleHandler
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,
-            Status = cycle.Status.ToString(),
+            Status = cycle.Status,
+
             UpdatedAt = cycle.UpdatedAt
         });
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while updating EvaluationCycle {CycleId}", request.CycleId);
+            return Result<UpdateEvaluationCycleResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 }

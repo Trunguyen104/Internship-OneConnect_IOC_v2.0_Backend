@@ -6,6 +6,7 @@ using IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById;
 using IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.Stakeholders;
@@ -13,7 +14,6 @@ namespace IOCv2.API.Controllers.Stakeholders;
 /// <summary>
 /// Stakeholder Management — manage stakeholders for a project.
 /// </summary>
-[Route("api/stakeholders")]
 [Tags("Stakeholder Management")]
 [Authorize]
 public class StakeholdersController : ApiControllerBase
@@ -23,73 +23,73 @@ public class StakeholdersController : ApiControllerBase
     public StakeholdersController(IMediator mediator) => _mediator = mediator;
 
     /// <summary>
-    /// Get paginated list of stakeholders for a project with optional search and sorting.
+    /// Get paginated list of stakeholders for an internship group with optional search and sorting.
     /// </summary>
-    [HttpGet("/api/projects/{projectId:guid}/stakeholders")]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetStakeholdersResponse>>), StatusCodes.Status200OK)]
+    [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetStakeholdersResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetStakeholders(
-        [FromRoute] Guid projectId,
+        [FromQuery] Guid internshipId,
         [FromQuery] GetStakeholdersQuery query,
         CancellationToken cancellationToken = default)
     {
-        var queryWithProject = query with { ProjectId = projectId };
-        var result = await _mediator.Send(queryWithProject, cancellationToken);
+        var queryWithInternship = query with { InternshipId = internshipId };
+        var result = await _mediator.Send(queryWithInternship, cancellationToken);
         return HandleResult(result);
     }
 
     /// <summary>
     /// Get a single stakeholder by ID.
     /// </summary>
-    [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(Result<GetStakeholderByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    /// <param name="stakeholderId">Stakeholder ID.</param>
+    /// <param name="internshipId">Internship ID.</param>
+    /// <returns code="200">Returns the stakeholder details.</returns>
+    [HttpGet("{stakeholderId:guid}", Name = "GetStakeholderById")]
+    [ProducesResponseType(typeof(ApiResponse<GetStakeholderByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetStakeholderById(
-        [FromRoute] Guid id,
+        [FromRoute] Guid stakeholderId,
+        [FromQuery] Guid internshipId,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetStakeholderByIdQuery { Id = id }, cancellationToken);
+        var result = await _mediator.Send(new GetStakeholderByIdQuery { InternshipId = internshipId, StakeholderId = stakeholderId }, cancellationToken);
         return HandleResult(result);
     }
 
     /// <summary>
     /// Create a new stakeholder for a project.
     /// </summary>
+    /// <param name="command">Stakeholder data.</param>
+    /// <returns code="201">Returns the created stakeholder.</returns>
     [HttpPost]
-    [ProducesResponseType(typeof(Result<CreateStakeholderResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<CreateStakeholderResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateStakeholder(
         [FromBody] CreateStakeholderCommand command,
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result);
+        return HandleCreateResult(result, nameof(GetStakeholderById), new { stakeholderId = result.Data?.Id, internshipId = command.InternshipId, version = "1" });
     }
 
     /// <summary>
     /// Update an existing stakeholder. All fields are optional (partial update).
     /// </summary>
-    [HttpPut("{id:guid}")]
-    [ProducesResponseType(typeof(Result<UpdateStakeholderResponse>), StatusCodes.Status200OK)]
+    [HttpPut("{stakeholderId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<UpdateStakeholderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateStakeholder(
-        [FromRoute] Guid id,
+        [FromRoute] Guid stakeholderId,
         [FromBody] UpdateStakeholderCommand command,
         CancellationToken cancellationToken = default)
     {
-        var updateCommand = command with { Id = id };
+        var updateCommand = command with { StakeholderId = stakeholderId };
         var result = await _mediator.Send(updateCommand, cancellationToken);
         return HandleResult(result);
     }
@@ -97,16 +97,17 @@ public class StakeholdersController : ApiControllerBase
     /// <summary>
     /// Soft delete a stakeholder by ID.
     /// </summary>
-    [HttpDelete("{id:guid}")]
-    [ProducesResponseType(typeof(Result<DeleteStakeholderResponse>), StatusCodes.Status200OK)]
+    [HttpDelete("{stakeholderId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<DeleteStakeholderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteStakeholder(
-        [FromRoute] Guid id,
+        [FromRoute] Guid stakeholderId,
+        [FromBody] DeleteStakeholderCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new DeleteStakeholderCommand { Id = id }, cancellationToken);
+        var result = await _mediator.Send(command with { StakeholderId = stakeholderId }, cancellationToken);
         return HandleResult(result);
     }
 }

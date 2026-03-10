@@ -1,3 +1,5 @@
+using IOCv2.Domain.Enums;
+
 namespace IOCv2.Application.Features.Evaluations.Commands.PublishEvaluation;
 
 public class PublishEvaluationResponse

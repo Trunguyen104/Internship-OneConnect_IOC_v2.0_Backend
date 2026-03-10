@@ -6,7 +6,6 @@ namespace IOCv2.Application.Features.Evaluations.Commands.SaveEvaluations;
 
 public record SaveEvaluationsCommand : IRequest<Result<List<SaveEvaluationsResponse>>>
 {
-    [JsonIgnore]
     public Guid CycleId { get; init; }
 
     /// <summary>ID của nhóm thực tập</summary>

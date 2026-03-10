@@ -121,6 +121,69 @@ namespace IOCv2.Infrastructure.Persistence
 
                 _context.Users.Add(superAdmin);
             }
+            // Enterprise Admins
+            foreach (var ent in enterpriseList)
+            {
+                var email = $"admin@{ent.Name.Replace(" ", "").ToLower()}.com";
+                if (!existingEmails.Contains(email))
+                {
+                    var userId = Guid.NewGuid();
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.EnterpriseAdmin, cancellationToken);
+
+                    var user = new User(
+                        userId,
+                        userCode,
+                        email,
+                        $"Enterprise Admin of {ent.Name}",
+                        UserRole.EnterpriseAdmin,
+                        passHash
+                    );
+
+                    user.SetStatus(UserStatus.Active);
+
+                    _context.Users.Add(user);
+
+                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    {
+                        EnterpriseUserId = Guid.NewGuid(),
+                        UserId = user.UserId,
+                        EnterpriseId = ent.EnterpriseId,
+                        Position = "Enterprise Administrator"
+                    });
+                }
+            }
+
+            // HRs
+            foreach (var ent in enterpriseList)
+            {
+                var email = $"hr@{ent.Name.Replace(" ", "").ToLower()}.com";
+                if (!existingEmails.Contains(email))
+                {
+                    var userId = Guid.NewGuid();
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.HR, cancellationToken);
+
+                    var user = new User(
+                        userId,
+                        userCode,
+                        email,
+                        $"HR of {ent.Name}",
+                        UserRole.HR,
+                        passHash
+                    );
+
+                    user.SetStatus(UserStatus.Active);
+
+                    _context.Users.Add(user);
+
+                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    {
+                        EnterpriseUserId = Guid.NewGuid(),
+                        UserId = user.UserId,
+                        EnterpriseId = ent.EnterpriseId,
+                        Position = "HR Manager"
+                    });
+                }
+            }
 
             // 6. Students
             foreach (var uni in universityList)
@@ -356,7 +419,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var student = await _context.Students.FirstAsync();
 
                 var logbook = Logbook.Create(
-                    project.ProjectId,
+                    project.InternshipId,  // FK → internship_groups.internship_id
                     student.StudentId,
                     "Finished login UI and integrated with API.",
                     null, // Issue
@@ -366,6 +429,7 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Logbooks.Add(logbook);
                 await _context.SaveChangesAsync();
             }
+
 
             if (_context.ChangeTracker.HasChanges())
             {

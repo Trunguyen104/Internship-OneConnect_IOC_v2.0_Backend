@@ -1,4 +1,5 @@
-﻿using IOCv2.Application.Extensions.Mappings;
+﻿using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 
@@ -13,14 +14,14 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
         public string? PhoneNumber { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public string Role { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
+        public UserRole Role { get; set; }
+        public UserStatus Status { get; set; }
 
-        public void Mapping(MappingProfile profile)
+        public void Mapping(Profile profile)
         {
             profile.CreateMap<User, UpdateAdminUserResponse>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
         }
     }
 }

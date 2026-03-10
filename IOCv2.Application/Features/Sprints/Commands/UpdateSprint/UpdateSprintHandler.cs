@@ -78,7 +78,7 @@ public class UpdateSprintHandler : IRequestHandler<UpdateSprintCommand, Result<U
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error occurred while updating sprint {SprintId}", request.SprintId);
-            throw;
+            return Result<UpdateSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }
 }

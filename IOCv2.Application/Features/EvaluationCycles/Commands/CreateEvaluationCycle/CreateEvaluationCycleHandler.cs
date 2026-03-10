@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.EvaluationCycles.Commands.CreateEvaluationCycle;
 
@@ -13,23 +14,37 @@ public class CreateEvaluationCycleHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<CreateEvaluationCycleHandler> _logger;
 
-    public CreateEvaluationCycleHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public CreateEvaluationCycleHandler(
+        IUnitOfWork unitOfWork, 
+        IMessageService messageService,
+        ILogger<CreateEvaluationCycleHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<CreateEvaluationCycleResponse>> Handle(
         CreateEvaluationCycleCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Creating EvaluationCycle {Name} for Term {TermId}", request.Name, request.TermId);
+
         var termExists = await _unitOfWork.Repository<Term>().Query()
             .AnyAsync(t => t.TermId == request.TermId, cancellationToken);
 
         if (!termExists)
+        {
+            _logger.LogWarning("Term {TermId} not found", request.TermId);
             return Result<CreateEvaluationCycleResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationCycle.TermNotFound),
                 ResultErrorType.NotFound);
+        }
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         var cycle = new EvaluationCycle
         {
@@ -44,6 +59,9 @@ public class CreateEvaluationCycleHandler
 
         await _unitOfWork.Repository<EvaluationCycle>().AddAsync(cycle, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        _logger.LogInformation("Successfully created EvaluationCycle {CycleId}", cycle.CycleId);
 
         return Result<CreateEvaluationCycleResponse>.Success(new CreateEvaluationCycleResponse
         {
@@ -52,8 +70,16 @@ public class CreateEvaluationCycleHandler
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,
-            Status = cycle.Status.ToString(),
+            Status = cycle.Status,
+
             CreatedAt = cycle.CreatedAt
         });
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while creating EvaluationCycle for Term {TermId}", request.TermId);
+            return Result<CreateEvaluationCycleResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 }

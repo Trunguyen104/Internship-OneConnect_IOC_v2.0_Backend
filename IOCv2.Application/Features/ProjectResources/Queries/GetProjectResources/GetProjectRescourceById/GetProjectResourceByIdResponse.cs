@@ -14,21 +14,14 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         public Guid ProjectResourceId { get; set; }
         public Guid ProjectId { get; set; }
         public string ResourceName { get; set; } = string.Empty;
-        public string ResourceType { get; set; } = string.Empty;
+        public FileType ResourceType { get; set; }
+
+
         public string ResourceUrl { get; set; } = string.Empty;
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Domain.Entities.ProjectResources, GetProjectResourceByIdResponse>()
-                .ForMember(dest => dest.ProjectResourceId,
-                    opt => opt.MapFrom(src => src.ProjectResourceId))
-                .ForMember(dest => dest.ProjectId,
-                    opt => opt.MapFrom(src => src.ProjectId))
-                .ForMember(dest => dest.ResourceName,
-                    opt => opt.MapFrom(src => src.ResourceName))
-                .ForMember(dest => dest.ResourceType,
-                    opt => opt.MapFrom(src => src.ResourceType.ToString()))
-                .ForMember(dest => dest.ResourceUrl,
-                    opt => opt.MapFrom(src => src.ResourceUrl));
+            profile.CreateMap<Domain.Entities.ProjectResources, GetProjectResourceByIdResponse>();
+
         }
     }
 }

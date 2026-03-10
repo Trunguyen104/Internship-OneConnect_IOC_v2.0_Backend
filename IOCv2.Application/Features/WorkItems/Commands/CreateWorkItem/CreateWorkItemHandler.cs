@@ -6,6 +6,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.WorkItems.Commands.CreateWorkItem;
 
@@ -14,32 +15,28 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
+    private readonly ILogger<CreateWorkItemHandler> _logger;
 
-    public CreateWorkItemHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService)
+    public CreateWorkItemHandler(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper, 
+        IMessageService messageService,
+        ILogger<CreateWorkItemHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<CreateWorkItemResponse>> Handle(
         CreateWorkItemCommand request, CancellationToken cancellationToken)
     {
-        // Parse Type
-        if (!Enum.TryParse<WorkItemType>(request.Type, ignoreCase: true, out var type))
-            return Result<CreateWorkItemResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.WorkItem.TypeInvalid), ResultErrorType.BadRequest);
+        _logger.LogInformation("Creating new work item for project {ProjectId}", request.ProjectId);
 
-        // Parse Priority (optional)
-        Priority? priority = null;
-        if (!string.IsNullOrWhiteSpace(request.Priority))
+        try
         {
-            if (!Enum.TryParse<Priority>(request.Priority, ignoreCase: true, out var parsedPriority))
-                return Result<CreateWorkItemResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.WorkItem.PriorityInvalid), ResultErrorType.BadRequest);
-            priority = parsedPriority;
-        }
-
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
         // Validate SprintId if provided
         if (request.SprintId.HasValue)
         {
@@ -62,10 +59,10 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
             WorkItemId = Guid.NewGuid(),
             ProjectId = request.ProjectId,
             ParentId = request.ParentId,
-            Type = type,
+            Type = request.Type,
             Title = request.Title,
             Description = request.Description,
-            Priority = priority,
+            Priority = request.Priority,
             Status = WorkItemStatus.Todo,
             StoryPoint = request.StoryPoint,
             AssigneeId = request.AssigneeId,
@@ -94,8 +91,18 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
         }
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
         var response = _mapper.Map<CreateWorkItemResponse>(workItem);
+        
+        _logger.LogInformation("Successfully created work item {WorkItemId}", workItem.WorkItemId);
         return Result<CreateWorkItemResponse>.Success(response);
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Error occurred while creating work item");
+            return Result<CreateWorkItemResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+        }
     }
 }

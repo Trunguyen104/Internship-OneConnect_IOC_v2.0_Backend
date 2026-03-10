@@ -9,8 +9,9 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         public GetAllProjectsValidator()
         {
             RuleFor(x => x.Status)
-                .Must(v => string.IsNullOrEmpty(v) || Enum.TryParse<ProjectStatus>(v, true, out _))
-                .WithMessage($"Status must be one of: {string.Join(", ", Enum.GetNames<ProjectStatus>())}");
+                .IsInEnum()
+                .When(x => x.Status.HasValue);
+
 
             RuleFor(x => x.PageNumber)
                 .GreaterThanOrEqualTo(1)

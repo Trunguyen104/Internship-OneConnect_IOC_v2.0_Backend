@@ -1,3 +1,5 @@
+using IOCv2.Domain.Enums;
+
 namespace IOCv2.Application.Features.EvaluationCycles.Queries.GetEvaluationCycleById;
 
 public class GetEvaluationCycleByIdResponse
@@ -8,7 +10,8 @@ public class GetEvaluationCycleByIdResponse
     public string Name { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public EvaluationCycleStatus Status { get; set; }
+
     public List<CriteriaDto> Criteria { get; set; } = new();
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

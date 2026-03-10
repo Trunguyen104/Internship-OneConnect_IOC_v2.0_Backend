@@ -701,5 +701,16 @@
   </data>
   <data name="Students.LogTermNotFoundOrNoAccess" xml:space="preserve">
     <value>Không tìm thấy kỳ thực tập hoặc không có quyền truy cập. TermId: {0}, StudentId: {1}</value>
+  <data name="Logbooks.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên cho người dùng hiện tại. Vui lòng đảm bảo bạn đăng nhập bằng tài khoản Sinh viên.</value>
+  </data>
+  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
+    <value>Bạn không có quyền cập nhật nhật ký thực tập này.</value>
+  </data>
+  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
+    <value>Bạn không có quyền xóa nhật ký thực tập này.</value>
+  </data>
+  <data name="Logbooks.InvalidInternship" xml:space="preserve">
+    <value>Nhóm thực tập không hợp lệ hoặc không được tìm thấy.</value>
   </data>
 </root>

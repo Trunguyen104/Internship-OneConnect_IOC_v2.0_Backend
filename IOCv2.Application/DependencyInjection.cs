@@ -29,7 +29,9 @@ namespace IOCv2.Application
             });
 
             // Đăng ký FluentValidation
-            services.AddFluentValidationAutoValidation();
+            // KHÔNG DÙNG AutoValidation vì nó sẽ validate ModelBinding trước khi Controller kịp gán Route Parameter.
+            // Hệ thống ĐÃ CÓ ValidationBehavior của MediatR để lo việc này.
+            // services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             // Đăng ký Application Services

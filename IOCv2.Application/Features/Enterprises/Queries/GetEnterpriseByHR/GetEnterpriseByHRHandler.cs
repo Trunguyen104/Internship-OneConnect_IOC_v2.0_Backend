@@ -39,7 +39,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
         {
             try {
                 // Each user has own key counting invalid turn
-                var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetByHRAttempt, _currentUserService.UserId);
+                var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetByHRAttempt, _currentUserService.UserId ?? string.Empty);
                 // Check if user is blocked due to too many failed attempts
                 if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
                 {

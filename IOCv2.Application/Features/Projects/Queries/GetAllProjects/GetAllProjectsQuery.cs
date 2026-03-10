@@ -18,7 +18,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// <summary>
         /// Filter by specific project status.
         /// </summary>
-        public string? Status { get; set; }
+        public ProjectStatus? Status { get; set; }
+
 
         /// <summary>
         /// Filter records starting from this date.
