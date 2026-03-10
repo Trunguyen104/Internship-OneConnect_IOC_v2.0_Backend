@@ -1,4 +1,5 @@
-﻿﻿using Microsoft.OpenApi.Models;
+﻿﻿using Asp.Versioning.ApiExplorer;
+using Microsoft.OpenApi.Models;
 
 namespace IOCv2.API.Configurations;
 
@@ -7,10 +8,9 @@ public static class SwaggerConfig
     public static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
+        services.ConfigureOptions<ConfigureSwaggerOptions>();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "IOCv2 API", Version = "v1" });
-
             // Use full type names for schema IDs to avoid conflicts
             c.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
 
@@ -49,7 +49,14 @@ public static class SwaggerConfig
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "IOCv2 API v1");
+            var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+            foreach (var description in provider.ApiVersionDescriptions)
+            {
+                options.SwaggerEndpoint(
+                    $"/swagger/{description.GroupName}/swagger.json",
+                    description.GroupName.ToUpperInvariant());
+            }
         });
         return app;
     }

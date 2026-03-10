@@ -38,6 +38,7 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
             {
                 var user = await _unitOfWork.Repository<User>()
                     .Query()
+                    .Include(u => u.Student)
                     .AsNoTracking()
                     .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
                     .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);

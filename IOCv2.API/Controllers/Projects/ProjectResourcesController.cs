@@ -17,7 +17,6 @@ namespace IOCv2.API.Controllers.Projects;
 /// </summary>
 [Tags("Project Resources")]
 [Authorize]
-[Route("api/project-resources")]
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -33,9 +32,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// Get paginated list of project resources with optional filters.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetAllProjectResourcesResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetAllProjectResourcesResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllProjectResources(
         [FromQuery] GetAllProjectResourcesQuery query,
         CancellationToken cancellationToken)
@@ -47,9 +44,8 @@ public class ProjectResourcesController : ApiControllerBase
     /// <summary>
     /// Download a single project resource by ID.
     /// </summary>
-    [HttpGet("{resourceId:guid}/download")]
-    [ProducesResponseType(typeof(Result<GetDownloadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [HttpGet("{resourceId:guid}", Name = "GetProjectResourceById")]
+    [ProducesResponseType(typeof(ApiResponse<GetProjectResourceByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProjectResourceById(
         [FromRoute] Guid resourceId,
@@ -80,27 +76,22 @@ public class ProjectResourcesController : ApiControllerBase
     /// </summary>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UploadProjectResource(
         [FromForm] UploadProjectResourceCommand command,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleResult(result);
+        return HandleCreateResult(result, nameof(GetProjectResourceById), new { resourceId = result.Data?.ProjectResourceId, version = "1" });
     }
 
     /// <summary>
     /// Update metadata of an existing project resource.
     /// </summary>
     [HttpPut("{resourceId:guid}")]
-    [ProducesResponseType(typeof(Result<UpdateProjectResourceResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProjectResource(
         [FromRoute] Guid resourceId,
@@ -116,10 +107,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// Delete a project resource by ID.
     /// </summary>
     [HttpDelete("{resourceId:guid}")]
-    [ProducesResponseType(typeof(Result<DeleteProjectResourceResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProjectResource(
         [FromRoute] Guid resourceId,

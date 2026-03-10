@@ -1,10 +1,12 @@
-﻿using IOCv2.Application.Common.Models;
+﻿using Asp.Versioning;
+using IOCv2.Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public abstract class ApiControllerBase : ControllerBase
 {
     protected IActionResult HandleResult<T>(Result<T> result)
@@ -13,38 +15,42 @@ public abstract class ApiControllerBase : ControllerBase
 
         if (result.IsSuccess)
         {
-            var message = result.HasWarning ? $"Request successful. Warning: {result.Warning}" : "Request successful";
-            
             if (result.Data == null) 
             {
-                return Ok(new ApiResponse<object>(true, message, new { }));
+                return Ok(new ApiResponse<object>(true, result.Message ?? "Request successful", new { }));
             }
 
-            return Ok(new ApiResponse<T>(true, message, result.Data));
+            return Ok(new ApiResponse<T>(true, result.Message ?? "Request successful", result.Data));
         }
 
         var code = ResolveStatusCode(result);
-        return StatusCode(code, ApiResponse<object>.Fail(result.Message ?? result.Error ?? "An error occurred"));
+        var errors = !string.IsNullOrEmpty(result.Error) ? new List<string> { result.Error } : null;
+        return StatusCode(code, new ErrorResponse(code, result.Message ?? "An error occurred", errors));
     }
 
     /// <summary>
-    /// Returns HTTP 201 Created on success. Use for POST creation actions.
+    /// Handles resource creation responses (201 Created).
     /// </summary>
-    protected IActionResult HandleCreatedResult<T>(Result<T> result)
+    protected IActionResult HandleCreateResult<T>(Result<T> result, string actionName, object routeValues)
     {
         if (result == null) return BadRequest(ApiResponse<object>.Fail("Invalid result"));
 
-        if (result.IsSuccess)
+        if (result.IsSuccess && result.Data != null)
         {
-            if (result.Data == null) 
-            {
-                return StatusCode(StatusCodes.Status201Created, new ApiResponse<object>(true, "Resource created successfully", new { }));
-            }
-            return StatusCode(StatusCodes.Status201Created, new ApiResponse<T>(true, "Resource created successfully", result.Data));
+            return CreatedAtAction(actionName, routeValues, 
+                new ApiResponse<T>(true, result.Message ?? "Created successfully", result.Data));
         }
 
-        var code = ResolveStatusCode(result);
-        return StatusCode(code, ApiResponse<object>.Fail(result.Message ?? result.Error ?? "An error occurred"));
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Safely retrieves the current user's ID from claims.
+    /// </summary>
+    protected Guid? GetCurrentUserId()
+    {
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(userIdStr, out var userId) ? userId : null;
     }
 
     private static int ResolveStatusCode<T>(Result<T> result) => result.ErrorType switch
