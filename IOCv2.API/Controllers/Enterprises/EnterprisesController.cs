@@ -231,5 +231,5 @@ public class EnterprisesController : ApiControllerBase
             if (result.ErrorType == ResultErrorType.NotFound) return NotFound(result);
             return StatusCode(StatusCodes.Status500InternalServerError, result);
         }
-    }
+    
 }

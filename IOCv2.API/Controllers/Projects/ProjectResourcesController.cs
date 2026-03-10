@@ -44,10 +44,10 @@ public class ProjectResourcesController : ApiControllerBase
     /// <summary>
     /// Download a single project resource by ID.
     /// </summary>
-    [HttpGet("{resourceId:guid}", Name = "GetProjectResourceById")]
-    [ProducesResponseType(typeof(ApiResponse<GetProjectResourceByIdResponse>), StatusCodes.Status200OK)]
+    [HttpGet("{resourceId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<GetDownloadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetProjectResourceById(
+    public async Task<IActionResult> GetDownloadProjectResourceById(
         [FromRoute] Guid resourceId,
         CancellationToken cancellationToken)
     {
@@ -62,7 +62,7 @@ public class ProjectResourcesController : ApiControllerBase
     [ProducesResponseType(typeof(Result<GetReadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ReadProjectResourceById(
+    public async Task<IActionResult> GetReadProjectResourceById(
         [FromRoute] Guid resourceId,
         CancellationToken cancellationToken)
     {
@@ -83,7 +83,7 @@ public class ProjectResourcesController : ApiControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreateResult(result, nameof(GetProjectResourceById), new { resourceId = result.Data?.ProjectResourceId, version = "1" });
+        return HandleCreateResult(result, nameof(GetReadProjectResourceById), new { resourceId = result.Data?.ProjectResourceId, version = "1" });
     }
 
     /// <summary>
