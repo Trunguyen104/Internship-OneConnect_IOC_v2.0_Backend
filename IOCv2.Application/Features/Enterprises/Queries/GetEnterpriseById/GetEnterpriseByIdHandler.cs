@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise;
@@ -38,6 +39,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById
         public async Task<Result<GetEnterpriseByIdResponse>> Handle(GetEnterpriseByIdQuery request, CancellationToken cancellationToken)
         {
             try {
+                var userId = CurrentUserHelper.GetValidGuidUserId(_currentUserService.UserId!);
                 // Each user has own key counting invalid turn
                 var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetByIDAttempt, _currentUserService.UserId!);
                 // Check if user is blocked due to too many failed attempts
@@ -54,12 +56,19 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById
                     cancellationToken);
                 // Log the incoming request
                 var enterprise = await _unitOfWork.Repository<Enterprise>().Query().AsNoTracking().FirstOrDefaultAsync(e => e.EnterpriseId == request.Id);
+                
                 // Check if the enterprise was found
                 if (enterprise == null) {
                     _logger.LogError(_messageService.GetMessage(MessageKeys.Enterprise.NotFound));
                     return Result<GetEnterpriseByIdResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Enterprise.NotFound),
                     ResultErrorType.NotFound);
+                }
+                if (_currentUserService.Role != "SuperAdmin")
+                {
+                    // Verify that user belong to the target enterprise
+                    if (!(await _unitOfWork.Repository<EnterpriseUser>().ExistsAsync(e => e.UserId == userId && enterprise.EnterpriseId == e.EnterpriseId)))
+                        return Result<GetEnterpriseByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.GetByIDPermissionsNotAllowed), ResultErrorType.Forbidden);
                 }
                 var response = _mapper.Map<GetEnterpriseByIdResponse>(enterprise);
                 return Result<GetEnterpriseByIdResponse>.Success(response);

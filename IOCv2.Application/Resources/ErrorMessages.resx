@@ -717,4 +717,13 @@
   <data name="File.GetStreamError" xml:space="preserve">
     <value>Lỗi khi lấy luồng tệp: {FileUrl}</value>
   </data>
+  <data name="CurrentUserHelper.GetValidGuidUserIdError" xml:space="preserve">
+    <value>Không thể chuyển đổi UserId '{0}' thành Guid. Lỗi: {1}</value>
+  </data>
+  <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
+    <value>Khôi phục nhật ký hệ thống không thành công. Vui lòng kiểm tra lại tệp nguồn hoặc quyền truy cập.</value>
+  </data>
+  <data name="Enterprise.RestoreFailed" xml:space="preserve">
+    <value>Quá trình khôi phục dữ liệu doanh nghiệp thất bại.</value>
+  </data>
 </root>

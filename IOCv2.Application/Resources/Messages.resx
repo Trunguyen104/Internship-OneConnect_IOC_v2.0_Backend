@@ -141,7 +141,7 @@
   <data name="AccountCreatedSuccessfully" xml:space="preserve">
     <value>Tài khoản đã được tạo thành công</value>
   </data>
-  <data name="AccountCreatedButEmailFailed" xml:space="preserve">
+  <data name="a" xml:space="preserve">
     <value>Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mã: {0}, Mật khẩu: {1}</value>
   </data>
   <data name="ResetPassword.SuccessWithEmail" xml:space="preserve">
@@ -317,5 +317,17 @@
   </data>
   <data name="File.DeleteSuccess" xml:space="preserve">
     <value>Tệp đã bị xóa: {FilePath}</value>
+  </data>
+  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <value>Bạn không có quyền truy cập vào doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
+    <value>Bạn không có quyền xóa doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <value>Bạn không có quyền để khôi phục doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <value>File không bị xóa.</value>
   </data>
 </root>

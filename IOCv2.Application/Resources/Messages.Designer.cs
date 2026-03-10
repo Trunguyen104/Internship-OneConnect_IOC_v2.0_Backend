@@ -63,9 +63,9 @@ namespace IOCv2.Application.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mã: {0}, Mật khẩu: {1}.
         /// </summary>
-        internal static string AccountCreatedButEmailFailed {
+        internal static string a {
             get {
-                return ResourceManager.GetString("AccountCreatedButEmailFailed", resourceCulture);
+                return ResourceManager.GetString("a", resourceCulture);
             }
         }
         
@@ -142,6 +142,33 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền xóa doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_DeletePermissionDenied {
+            get {
+                return ResourceManager.GetString("Enterprise.DeletePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền truy cập vào doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_GetByIDPermissionsNotAllowed {
+            get {
+                return ResourceManager.GetString("Enterprise.GetByIDPermissionsNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File không bị xóa..
+        /// </summary>
+        internal static string Enterprise_NotDeleted {
+            get {
+                return ResourceManager.GetString("Enterprise.NotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to getByHR_enterprise_attempt:{0}.
         /// </summary>
         internal static string Enterprise_RateLimitGetByHRAttempt {
@@ -183,6 +210,15 @@ namespace IOCv2.Application.Resources {
         internal static string Enterprise_RequestManyTimes {
             get {
                 return ResourceManager.GetString("Enterprise.RequestManyTimes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền để khôi phục doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_RestorePermissionDenied {
+            get {
+                return ResourceManager.GetString("Enterprise.RestorePermissionDenied", resourceCulture);
             }
         }
         

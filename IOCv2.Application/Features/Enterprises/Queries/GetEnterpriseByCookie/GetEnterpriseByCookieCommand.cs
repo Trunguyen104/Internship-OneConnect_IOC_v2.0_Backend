@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
 {
-    public record GetEnterpriseByHRCommand : IRequest<Result<GetEnterpriseByHRResponse>>
+    public record GetEnterpriseByCookieCommand : IRequest<Result<GetEnterpriseByCookieResponse>>
     {
     }
 }

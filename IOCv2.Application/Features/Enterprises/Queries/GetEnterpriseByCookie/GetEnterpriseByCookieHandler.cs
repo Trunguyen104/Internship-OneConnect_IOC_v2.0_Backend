@@ -16,17 +16,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
 {
-    public class GetEnterpriseByHRHandler : IRequestHandler<GetEnterpriseByHRCommand, Result<GetEnterpriseByHRResponse>>
+    public class GetEnterpriseByCookieHandler : IRequestHandler<GetEnterpriseByCookieCommand, Result<GetEnterpriseByCookieResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
-        private readonly ILogger<GetEnterpriseByHRHandler> _logger;
+        private readonly ILogger<GetEnterpriseByCookieHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
         private readonly IRateLimiter _rateLimiter;             
 
-        public GetEnterpriseByHRHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService,
-            ILogger<GetEnterpriseByHRHandler> logger, ICurrentUserService currentUserService, IRateLimiter rateLimiter)
+        public GetEnterpriseByCookieHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService,
+            ILogger<GetEnterpriseByCookieHandler> logger, ICurrentUserService currentUserService, IRateLimiter rateLimiter)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -36,7 +36,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
             _rateLimiter = rateLimiter;
         }
 
-        public async Task<Result<GetEnterpriseByHRResponse>> Handle(GetEnterpriseByHRCommand request, CancellationToken cancellationToken)
+        public async Task<Result<GetEnterpriseByCookieResponse>> Handle(GetEnterpriseByCookieCommand request, CancellationToken cancellationToken)
         {
             try {
                 // Each user has own key counting invalid turn
@@ -44,7 +44,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
                 // Check if user is blocked due to too many failed attempts
                 if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
                 {
-                    return Result<GetEnterpriseByHRResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes), ResultErrorType.BadRequest);
+                    return Result<GetEnterpriseByCookieResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes), ResultErrorType.BadRequest);
                 }
                 // Register failed attempt (block after 30 attempts in 1 mins)
                 await _rateLimiter.RegisterFailAsync(
@@ -55,16 +55,16 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
                     cancellationToken);
                 var userId = Guid.Parse(_currentUserService.UserId!);
                 var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query().Select(x => x).FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
-                if (enterpriseUser == null) return Result<GetEnterpriseByHRResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise));
+                if (enterpriseUser == null) return Result<GetEnterpriseByCookieResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise));
                 var enterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>().GetByIdAsync(enterpriseUser!.EnterpriseId, cancellationToken);
-                    if (enterprise == null) return Result<GetEnterpriseByHRResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseNotFoundCurrentHR));
-                    var response = _mapper.Map<GetEnterpriseByHRResponse>(enterprise);
+                    if (enterprise == null) return Result<GetEnterpriseByCookieResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseNotFoundCurrentHR));
+                    var response = _mapper.Map<GetEnterpriseByCookieResponse>(enterprise);
                     await _unitOfWork.CommitTransactionAsync();
-                    return Result<GetEnterpriseByHRResponse>.Success(response);
+                    return Result<GetEnterpriseByCookieResponse>.Success(response);
                 
             } catch (Exception ex) {
                 _logger.LogError(ex.Message);
-                return Result<GetEnterpriseByHRResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
+                return Result<GetEnterpriseByCookieResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
             }
         }
     }

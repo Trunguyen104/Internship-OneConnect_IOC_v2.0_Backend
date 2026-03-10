@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Authentication.Commands.Login;
@@ -63,19 +64,20 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.Enterprise.LogNotFound), request.EnterpriseId);
                     return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.NotFound), ResultErrorType.NotFound);
                 }
-                // If current user has HR role, verify that they belong to the target enterprise
-                if (_currentUserService.Role == "HR")
+                // Verify that user belong to the target enterprise
+                if (_currentUserService.Role != "SuperAdmin")
                 {
-                    bool canUpdate = await _unitOfWork.Repository<EnterpriseUser>().ExistsAsync(x => x.UserId == Guid.Parse(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
-                    // If HR does not belong to this enterprise → forbid
+                    bool canUpdate = await _unitOfWork.Repository<EnterpriseUser>().ExistsAsync(x => x.UserId == CurrentUserHelper.GetValidGuidUserId(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
+                    // Verify that user has permission to update enterprise
                     if (!canUpdate)
                     {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.Enterprise.LogUpdatePermissionsNotAllowed));
                         return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.UpdatePermissionsNotAllowed), ResultErrorType.Forbidden);
                     }
-                    if (enterprise.TaxCode != request.TaxCode) return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.UpdateTaxCodeNotAllowed), ResultErrorType.Forbidden);
-                }
-                
+                //if (enterprise.TaxCode != request.TaxCode) return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.UpdateTaxCodeNotAllowed), ResultErrorType.Forbidden);
+                }   
+
                 // Map updated fields from request into existing entity
                 _mapper.Map(request, enterprise);
 

@@ -119,6 +119,15 @@
             public const string RateLimitGetEnterprisesAttempt = "Enterprise.RateLimitGetEnterprisesAttempt";
             public const string HRNotAssociatedWithEnterprise = "Enterprise.HR.NotAssociatedWithEnterprise";
             public const string EnterpriseNotFoundCurrentHR = "Enterprise.NotFoundCurrentHR";
+            // Get by Id
+            public const string GetByIDPermissionsNotAllowed = "Enterprise.GetByIDPermissionsNotAllowed";
+            // Delete
+            public const string DeletePermissionDenied = "Enterprise.DeletePermissionDenied";
+            // Restore
+            public const string RestorePermissionDenied = "Enterprise.RestorePermissionDenied";
+            public const string LogRestoreFailed = "Enterprise.LogRestoreFailed";
+            public const string RestoreFailed = "Enterprise.RestoreFailed";
+            public const string NotDeleted = "Enterprise.NotDeleted";
         }
 
         public static class Profile
@@ -418,6 +427,11 @@
             public const string FileNotFound = "File.NotFound";
             public const string FileCheckExistsError = "File.CheckExistsError";
             public const string FileGetStreamError = "File.GetStreamError";
+        }
+
+        public static class CurrentUserHelper
+        {
+            public const string GetValidGuidUserIdError = "CurrentUserHelper.GetValidGuidUserIdError";
         }
     }
 }

@@ -141,7 +141,7 @@
   <data name="AccountCreatedSuccessfully" xml:space="preserve">
     <value>Account created successfully</value>
   </data>
-  <data name="AccountCreatedButEmailFailed" xml:space="preserve">
+  <data name="a" xml:space="preserve">
     <value>Account created successfully but email notification failed. Please notify the employee directly. Code: {0}, Password: {1}</value>
   </data>
   <data name="SearchTerm.MaxLength" xml:space="preserve">
@@ -251,5 +251,17 @@
   </data>
   <data name="File.DeleteSuccess" xml:space="preserve">
     <value>File deleted: {FilePath}</value>
+  </data>
+  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <value>You do not have permissions to access to this business.</value>
+  </data>
+  <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
+    <value>You do not have permissions to delete this business.</value>
+  </data>
+  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <value>You do not have permissions to restore this enterprise.</value>
+  </data>
+  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <value>The file was not deleted.</value>
   </data>
 </root>

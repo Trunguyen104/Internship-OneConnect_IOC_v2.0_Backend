@@ -1,4 +1,5 @@
-﻿using IOCv2.Domain.Enums;
+﻿using IOCv2.Application.Constants;
+using IOCv2.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,23 +10,46 @@ namespace IOCv2.Application.Common.Helpers
 {
     public static class FileValidationHelper
     {
+        /// <summary>
+        /// A collection of file extensions that are allowed for upload.
+        /// HashSet is used for fast lookup (O(1)) when validating file extensions.
+        /// StringComparer.OrdinalIgnoreCase ensures the comparison is case-insensitive
+        /// (e.g., ".PDF", ".Pdf", ".pdf" are treated the same).
+        /// </summary>
         private static readonly HashSet<string> _allowedExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".pdf", ".docx", ".pptx", ".zip", ".rar", ".jpg", ".jpeg", ".png"
-    };
-
-        private static readonly Dictionary<string, FileType> _extensionToTypeMap = new(StringComparer.OrdinalIgnoreCase)
         {
-            [".pdf"] = FileType.PDF,
-            [".docx"] = FileType.DOCX,
-            [".pptx"] = FileType.PPTX,
-            [".zip"] = FileType.ZIP,
-            [".rar"] = FileType.RAR,
-            [".jpg"] = FileType.JPG,
-            [".jpeg"] = FileType.JPG,
-            [".png"] = FileType.PNG
+            FileConstants.PdfExtension,
+            FileConstants.DocxExtension,
+            FileConstants.PptxExtension,
+            FileConstants.ZipExtension,
+            FileConstants.RarExtension,
+            FileConstants.JpgExtension,
+            FileConstants.JpegExtension,
+            FileConstants.PngExtension
         };
 
+        /// <summary>
+        /// Maps file extensions to their corresponding <see cref="FileType"/>.
+        /// This dictionary is used to determine the file type based on the file extension.
+        /// StringComparer.OrdinalIgnoreCase ensures extension matching is case-insensitive
+        /// (e.g., ".PDF" and ".pdf" map to the same FileType).
+        /// </summary>
+        private static readonly Dictionary<string, FileType> _extensionToTypeMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            [FileConstants.PdfExtension] = FileType.PDF,
+            [FileConstants.DocxExtension] = FileType.DOCX,
+            [FileConstants.PptxExtension] = FileType.PPTX,
+            [FileConstants.ZipExtension] = FileType.ZIP,
+            [FileConstants.RarExtension] = FileType.RAR,
+            [FileConstants.JpgExtension] = FileType.JPG,
+            [FileConstants.JpegExtension] = FileType.JPG,
+            [FileConstants.PngExtension] = FileType.PNG
+        };
+
+        /// <summary>
+        /// Defines the maximum allowed file size (in bytes) for each <see cref="FileType"/>.
+        /// Used during file validation to ensure uploaded files do not exceed the permitted size.
+        /// </summary>
         private static readonly Dictionary<FileType, long> _maxFileSizes = new()
         {
             [FileType.PDF] = 50 * 1024 * 1024,      // 50MB
@@ -38,8 +62,12 @@ namespace IOCv2.Application.Common.Helpers
         };
 
         /// <summary>
-        /// Kiểm tra file extension có được phép không
+        /// Checks whether the file extension of the provided file name is allowed.
         /// </summary>
+        /// <param name="fileName">The name of the file to validate.</param>
+        /// <returns>
+        /// True if the file extension exists and is included in the allowed extensions list; otherwise false.
+        /// </returns>
         public static bool IsFileExtensionAllowed(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
@@ -50,8 +78,12 @@ namespace IOCv2.Application.Common.Helpers
         }
 
         /// <summary>
-        /// Lấy FileType từ file name
+        /// Gets the corresponding <see cref="FileType"/> based on the file extension.
         /// </summary>
+        /// <param name="fileName">The name of the file used to determine its type.</param>
+        /// <returns>
+        /// The matched <see cref="FileType"/> if the extension exists in the mapping; otherwise null.
+        /// </returns>
         public static FileType? GetFileType(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
@@ -62,8 +94,13 @@ namespace IOCv2.Application.Common.Helpers
         }
 
         /// <summary>
-        /// Kiểm tra kích thước file có vượt quá giới hạn không
+        /// Validates whether the file size is within the allowed limit for its file type.
         /// </summary>
+        /// <param name="fileName">The name of the file used to determine its type.</param>
+        /// <param name="fileSizeInBytes">The size of the file in bytes.</param>
+        /// <returns>
+        /// True if the file type is recognized and the size does not exceed the configured limit; otherwise false.
+        /// </returns>
         public static bool IsFileSizeValid(string fileName, long fileSizeInBytes)
         {
             var fileType = GetFileType(fileName);
@@ -76,45 +113,61 @@ namespace IOCv2.Application.Common.Helpers
         }
 
         /// <summary>
-        /// Lấy giới hạn kích thước cho loại file
+        /// Gets the maximum allowed file size (in bytes) for the specified <see cref="FileType"/>.
         /// </summary>
+        /// <param name="fileType">The file type used to retrieve the configured maximum size.</param>
+        /// <returns>
+        /// The maximum allowed file size in bytes if the file type exists in the configuration; otherwise 0.
+        /// </returns>
         public static long GetMaxFileSize(FileType fileType)
         {
             return _maxFileSizes.TryGetValue(fileType, out var maxSize) ? maxSize : 0;
         }
 
         /// <summary>
-        /// Lấy danh sách các extension được phép (dạng string)
+        /// Returns a comma-separated string of all allowed file extensions.
         /// </summary>
+        /// <returns>
+        /// A formatted string containing the allowed file extensions.
+        /// </returns>
         public static string GetAllowedExtensionsString()
         {
             return string.Join(", ", _allowedExtensions.OrderBy(x => x));
         }
 
         /// <summary>
-        /// Validate file và trả về kết quả chi tiết
+        /// Validates a file by checking both its extension and file size.
         /// </summary>
+        /// <param name="fileName">The name of the file to validate.</param>
+        /// <param name="fileSizeInBytes">The size of the file in bytes.</param>
+        /// <returns>
+        /// A <see cref="FileValidationResult"/> containing validation status,
+        /// error message (if any), and detected file type.
+        /// </returns>
         public static FileValidationResult ValidateFile(string fileName, long fileSizeInBytes)
         {
             var result = new FileValidationResult();
 
-            // Kiểm tra extension
+            // Check if file extension is allowed
             if (!IsFileExtensionAllowed(fileName))
             {
                 result.IsValid = false;
-                result.ErrorMessage = $"File type not allowed. Allowed types: {GetAllowedExtensionsString()}";
+                result.ErrorMessage = string.Format(FileConstants.ErrorFileTypeNotAllowed, GetAllowedExtensionsString());
                 return result;
             }
 
-            // Lấy loại file
+            // Determine file type from extension
             var fileType = GetFileType(fileName);
             result.FileType = fileType;
 
-            // Kiểm tra kích thước
+            // Validate file size based on file type
             if (!IsFileSizeValid(fileName, fileSizeInBytes))
             {
+                var max = GetMaxFileSize(fileType!.Value) / (1024 * 1024);
                 result.IsValid = false;
-                result.ErrorMessage = $"File size exceeds maximum allowed ({GetMaxFileSize(fileType!.Value) / (1024 * 1024)}MB)";
+                result.ErrorMessage = string.Format(
+                        FileConstants.ErrorFileSizeExceeded,
+                        max);
                 return result;
             }
 
@@ -123,65 +176,99 @@ namespace IOCv2.Application.Common.Helpers
         }
 
         /// <summary>
-        /// Lấy MIME type cho file
+        /// Gets the MIME type corresponding to the provided file name.
         /// </summary>
+        /// <param name="fileName">The file name used to determine its MIME type.</param>
+        /// <returns>
+        /// The MIME type associated with the file type, or the default MIME type if not recognized.
+        /// </returns>
         public static string GetMimeType(string fileName)
         {
             var fileType = GetFileType(fileName);
-            return fileType?.GetMimeType() ?? "application/octet-stream";
+            return fileType?.GetMimeType() ?? FileConstants.DefaultMime;
         }
     }
 
+    /// <summary>
+    /// Represents the result of validating a file.
+    /// </summary>
     public class FileValidationResult
     {
+        /// <summary>
+        /// Indicates whether the file passed all validation checks.
+        /// </summary>
         public bool IsValid { get; set; }
+        /// <summary>
+        /// Contains the validation error message if validation fails.
+        /// </summary>
         public string? ErrorMessage { get; set; }
+        /// <summary>
+        /// The detected file type based on the file extension.
+        /// </summary>
         public FileType? FileType { get; set; }
     }
 
+    /// <summary>
+    /// Provides extension methods related to <see cref="FileType"/>.
+    /// </summary>
     public static class FileTypeExtensions
     {
+        /// <summary>
+        /// Gets the MIME type associated with the specified <see cref="FileType"/>.
+        /// </summary>
+        /// <param name="fileType">The file type.</param>
+        /// <returns>The corresponding MIME type.</returns>
         public static string GetMimeType(this FileType fileType)
         {
             return fileType switch
             {
-                FileType.PDF => "application/pdf",
-                FileType.DOCX => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                FileType.PPTX => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                FileType.ZIP => "application/zip",
-                FileType.RAR => "application/x-rar-compressed",
-                FileType.JPG => "image/jpeg",
-                FileType.PNG => "image/png",
-                _ => "application/octet-stream"
+                FileType.PDF => FileConstants.MimePdf,
+                FileType.DOCX => FileConstants.MimeDocx,
+                FileType.PPTX => FileConstants.MimePptx,
+                FileType.ZIP => FileConstants.MimeZip,
+                FileType.RAR => FileConstants.MimeRar,
+                FileType.JPG => FileConstants.MimeJpg,
+                FileType.PNG => FileConstants.MimePng,
+                _ => FileConstants.DefaultMime
             };
         }
 
+        /// <summary>
+        /// Gets the default file extension associated with the specified <see cref="FileType"/>.
+        /// </summary>
+        /// <param name="fileType">The file type.</param>
+        /// <returns>The file extension string.</returns>
         public static string GetExtension(this FileType fileType)
         {
             return fileType switch
             {
-                FileType.PDF => ".pdf",
-                FileType.DOCX => ".docx",
-                FileType.PPTX => ".pptx",
-                FileType.ZIP => ".zip",
-                FileType.RAR => ".rar",
-                FileType.JPG => ".jpg",
-                FileType.PNG => ".png",
+                FileType.PDF => FileConstants.PdfExtension,
+                FileType.DOCX => FileConstants.DocxExtension,
+                FileType.PPTX => FileConstants.PptxExtension,
+                FileType.ZIP => FileConstants.ZipExtension,
+                FileType.RAR => FileConstants.RarExtension,
+                FileType.JPG => FileConstants.JpgExtension,
+                FileType.PNG => FileConstants.PngExtension,
                 _ => string.Empty
             };
         }
 
+        /// <summary>
+        /// Gets a human-readable display name for the specified <see cref="FileType"/>.
+        /// </summary>
+        /// <param name="fileType">The file type.</param>
+        /// <returns>A descriptive display name for the file type.</returns>
         public static string GetDisplayName(this FileType fileType)
         {
             return fileType switch
             {
-                FileType.PDF => "PDF Document",
-                FileType.DOCX => "Word Document",
-                FileType.PPTX => "PowerPoint Presentation",
-                FileType.ZIP => "ZIP Archive",
-                FileType.RAR => "RAR Archive",
-                FileType.JPG => "JPEG Image",
-                FileType.PNG => "PNG Image",
+                FileType.PDF => FileConstants.DisplayNamePdf,
+                FileType.DOCX => FileConstants.DisplayNameDocx,
+                FileType.PPTX => FileConstants.DisplayNamePptx,
+                FileType.ZIP => FileConstants.DisplayNameZip,
+                FileType.RAR => FileConstants.DisplayNameRar,
+                FileType.JPG => FileConstants.DisplayNameJpg,
+                FileType.PNG => FileConstants.DisplayNamePng,
                 _ => fileType.ToString()
             };
         }
