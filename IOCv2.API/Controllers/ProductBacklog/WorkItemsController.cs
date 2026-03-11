@@ -9,6 +9,7 @@ using IOCv2.Application.Features.WorkItems.Queries.GetWorkItemById;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.ProductBacklog;
@@ -18,7 +19,6 @@ namespace IOCv2.API.Controllers.ProductBacklog;
 /// </summary>
 [Tags("WorkItems")]
 [Authorize]
-[Route("api/work-items")]
 public class WorkItemsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -30,9 +30,7 @@ public class WorkItemsController : ApiControllerBase
     /// Supports filtering by Epic, Type, Priority, Status, Assignee, and search term.
     /// </summary>
     [HttpGet("backlog")]
-    [ProducesResponseType(typeof(Result<GetBacklogResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<GetBacklogResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBacklog(
         [FromQuery] Guid projectId,
         [FromQuery] Guid? epicId,
@@ -60,10 +58,8 @@ public class WorkItemsController : ApiControllerBase
     /// <summary>
     /// Get a work item by ID.
     /// </summary>
-    [HttpGet("{workItemId:guid}")]
-    [ProducesResponseType(typeof(Result<GetWorkItemByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [HttpGet("{workItemId:guid}", Name = "GetWorkItemById")]
+    [ProducesResponseType(typeof(ApiResponse<GetWorkItemByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetWorkItemById(
         [FromRoute] Guid workItemId,
@@ -78,25 +74,21 @@ public class WorkItemsController : ApiControllerBase
     /// Create a new work item. If SprintId is provided, the item is added to that Sprint's backlog.
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Result<CreateWorkItemResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<CreateWorkItemResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateWorkItem(
         [FromBody] CreateWorkItemCommand command,
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result);
+        return HandleCreateResult(result, nameof(GetWorkItemById), new { workItemId = result.Data?.WorkItemId, projectId = command.ProjectId, version = "1" });
     }
 
     /// <summary>
     /// Update a work item (PATCH-style — only fields provided are updated).
     /// </summary>
     [HttpPut("{workItemId:guid}")]
-    [ProducesResponseType(typeof(Result<UpdateWorkItemResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateWorkItemResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateWorkItem(
         [FromRoute] Guid workItemId,
@@ -111,9 +103,7 @@ public class WorkItemsController : ApiControllerBase
     /// Soft-delete a work item.
     /// </summary>
     [HttpDelete("{workItemId:guid}")]
-    [ProducesResponseType(typeof(Result<DeleteWorkItemResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteWorkItemResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteWorkItem(
         [FromRoute] Guid workItemId,
@@ -129,9 +119,7 @@ public class WorkItemsController : ApiControllerBase
     /// AfterWorkItemId = null places the item at the top of the Sprint.
     /// </summary>
     [HttpPatch("{workItemId:guid}/sprint")]
-    [ProducesResponseType(typeof(Result<MoveWorkItemToSprintResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<MoveWorkItemToSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MoveToSprint(
         [FromRoute] Guid workItemId,
@@ -147,9 +135,7 @@ public class WorkItemsController : ApiControllerBase
     /// AfterWorkItemId = null places the item at the top of the backlog.
     /// </summary>
     [HttpPatch("{workItemId:guid}/backlog")]
-    [ProducesResponseType(typeof(Result<MoveWorkItemToBacklogResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<MoveWorkItemToBacklogResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MoveToBacklog(
         [FromRoute] Guid workItemId,

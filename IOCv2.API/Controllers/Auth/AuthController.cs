@@ -17,7 +17,6 @@ namespace IOCv2.API.Controllers.Auth;
 /// Authentication — login, logout, token refresh, and password management.
 /// </summary>
 [Tags("Auth")]
-[Route("api/auth")]
 public class AuthController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -195,22 +194,27 @@ public class AuthController : ApiControllerBase
 
     private void SetTokenCookies(LoginResponse response)
     {
+        // Access Token Cookie (Short lived)
         var accessCookieOptions = BuildCookieOptions(response.ExpiresIn);
-        var cookieOptions = BuildCookieOptions(response.ExpiresIn);
+        
+        // Refresh Token Cookie (Long lived)
+        // Convert double seconds to int, ensuring we don't have scientific notation or decimal issues in the header
+        var refreshCookieOptions = BuildCookieOptions((int)response.RefreshTokenExpiresIn);
 
         Response.Cookies.Append("accessToken", response.AccessToken, accessCookieOptions);
-        Response.Cookies.Append("refreshToken", response.RefreshToken, cookieOptions);
+        Response.Cookies.Append("refreshToken", response.RefreshToken, refreshCookieOptions);
     }
 
-    private CookieOptions BuildCookieOptions(int expiresIn)
+    private CookieOptions BuildCookieOptions(int expiresInSeconds)
     {
         var isDev = _env.IsDevelopment();
 
         return new CookieOptions
         {
             HttpOnly = true,
-            Expires = DateTime.UtcNow.AddSeconds(expiresIn),
+            Expires = DateTime.UtcNow.AddSeconds(expiresInSeconds),
             Secure = !isDev,
+            // SameSite None requires Secure=true. In Dev (HTTP), we use Unspecified or Lax.
             SameSite = isDev ? SameSiteMode.Unspecified : SameSiteMode.None,
             Path = "/"
         };

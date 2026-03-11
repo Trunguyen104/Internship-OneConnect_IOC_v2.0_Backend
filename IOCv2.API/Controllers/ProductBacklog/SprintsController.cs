@@ -10,16 +10,13 @@ using IOCv2.Application.Features.Sprints.Queries.GetSprints;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.ProductBacklog;
 
-/// <summary>
-/// Product Backlog — Sprints management for a project.
-/// </summary>
 [Tags("Product Backlog - Sprints")]
 [Authorize]
-[Route("api/sprints")]
 public class SprintsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -30,9 +27,7 @@ public class SprintsController : ApiControllerBase
     /// Get all sprints for a project with optional status filter.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetSprintsResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetSprintsResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSprints(
         [FromQuery] Guid projectId,
         [FromQuery] SprintStatus? status,
@@ -47,10 +42,8 @@ public class SprintsController : ApiControllerBase
     /// <summary>
     /// Get a single sprint by ID.
     /// </summary>
-    [HttpGet("{sprintId:guid}")]
-    [ProducesResponseType(typeof(Result<GetSprintByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [HttpGet("{sprintId:guid}", Name = "GetSprintById")]
+    [ProducesResponseType(typeof(ApiResponse<GetSprintByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSprintById(
         [FromRoute] Guid sprintId,
@@ -66,26 +59,22 @@ public class SprintsController : ApiControllerBase
     /// Create a new sprint for a project.
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Result<CreateSprintResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<CreateSprintResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateSprint(
         [FromBody] CreateSprintCommand command,
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result);
+        return HandleCreateResult(result, nameof(GetSprintById), new { sprintId = result.Data?.SprintId, projectId = command.ProjectId, version = "1" });
     }
 
     /// <summary>
     /// Update an existing sprint.
     /// </summary>
     [HttpPut("{sprintId:guid}")]
-    [ProducesResponseType(typeof(Result<UpdateSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateSprint(
         [FromRoute] Guid sprintId,
@@ -100,10 +89,8 @@ public class SprintsController : ApiControllerBase
     /// Delete a sprint. Only sprints with Planned status can be deleted.
     /// </summary>
     [HttpDelete("{sprintId:guid}")]
-    [ProducesResponseType(typeof(Result<DeleteSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSprint(
         [FromRoute] Guid sprintId,
@@ -118,10 +105,8 @@ public class SprintsController : ApiControllerBase
     /// Start a sprint — transitions status from Planned to Active.
     /// </summary>
     [HttpPost("{sprintId:guid}/start")]
-    [ProducesResponseType(typeof(Result<StartSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<StartSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> StartSprint(
         [FromRoute] Guid sprintId,
@@ -136,10 +121,8 @@ public class SprintsController : ApiControllerBase
     /// Complete a sprint — transitions status from Active to Completed.
     /// </summary>
     [HttpPost("{sprintId:guid}/complete")]
-    [ProducesResponseType(typeof(Result<CompleteSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CompleteSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CompleteSprint(
         [FromRoute] Guid sprintId,

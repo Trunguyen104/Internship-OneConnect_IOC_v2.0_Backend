@@ -17,12 +17,14 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
         public string? AvatarUrl { get; set; }
+        public Guid? StudentId { get; set; }
 
         public void Mapping(Profile profile)
         {
             profile.CreateMap<User, GetMyProfileResponse>()
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.Student != null ? src.Student.StudentId : (Guid?)null));
         }
     }
 }

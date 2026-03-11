@@ -8,6 +8,7 @@ using IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIssues;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.Stakeholders;
@@ -15,9 +16,9 @@ namespace IOCv2.API.Controllers.Stakeholders;
 /// <summary>
 /// Stakeholder Issue Management — manage issues related to stakeholders.
 /// </summary>
-[Route("api/stakeholder-issues")]
 [Tags("Stakeholder Issue Management")]
 [Authorize]
+[Route("api/v{version:apiVersion}/stakeholder-issues")]
 public class StakeholderIssuesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -28,9 +29,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Get a paginated list of stakeholder issues with optional filters (internshipId, stakeholderId, status) and search.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetStakeholderIssuesResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetStakeholderIssuesResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetIssues(
         [FromQuery] Guid? internshipId,
         [FromQuery] Guid? stakeholderId,
@@ -52,10 +51,8 @@ public class StakeholderIssuesController : ApiControllerBase
     /// <summary>
     /// Get a single stakeholder issue by ID.
     /// </summary>
-    [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(Result<GetStakeholderIssueByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [HttpGet("{id:guid}", Name = "GetStakeholderIssueById")]
+    [ProducesResponseType(typeof(ApiResponse<GetStakeholderIssueByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetIssueById(
         [FromRoute] Guid id,
@@ -69,27 +66,22 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Create a new stakeholder issue.
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Result<CreateStakeholderIssueResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<CreateStakeholderIssueResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateIssue(
         [FromBody] CreateStakeholderIssueCommand command,
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result);
+        return HandleCreateResult(result, nameof(GetIssueById), new { id = result.Data?.Id, version = "1" });
     }
 
     /// <summary>
     /// Update the status of a stakeholder issue.
     /// </summary>
     [HttpPatch("{id:guid}/status")]
-    [ProducesResponseType(typeof(Result<UpdateStakeholderIssueStatusResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateStakeholderIssueStatusResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateIssueStatus(
         [FromRoute] Guid id,
@@ -109,9 +101,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Delete (hard delete) a stakeholder issue by ID.
     /// </summary>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(typeof(Result<DeleteStakeholderIssueResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteStakeholderIssueResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteIssue(
         [FromRoute] Guid id,

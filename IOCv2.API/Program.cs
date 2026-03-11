@@ -18,6 +18,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 // Add Core Services
 builder.Services.AddControllerConfig();
+builder.Services.AddVersioningConfig();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
