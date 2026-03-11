@@ -44,17 +44,37 @@ public class ProjectResourcesController : ApiControllerBase
     /// <summary>
     /// Download a single project resource by ID.
     /// </summary>
-    [HttpGet("{resourceId:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<GetDownloadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
+    [HttpGet("{resourceId:guid}/download")]
+    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDownloadProjectResourceById(
         [FromRoute] Guid resourceId,
         CancellationToken cancellationToken)
     {
-        var query = new GetDownloadProjectResourceByIdQuery { ProjectResourceId = resourceId };
+        // First, retrieve the resource metadata to get the file path
+        var query = new GetDownloadProjectResourceByIdQuery
+        {
+            ProjectResourceId = resourceId
+        };
+
         var result = await _mediator.Send(query, cancellationToken);
+
+        // If the resource metadata retrieval failed, return the appropriate error response
+        if (!result.IsSuccess || result.Data == null)
+        {
+            return HandleResult(result);
+        }
+
+        // Attempt to retrieve the file stream from storage
         var stream = await _fileStorageService.GetFileAsync(result.Data.FilePath);
 
+        // If the file stream is null, it means the file was not found in storage
+        if (stream == null)
+        {
+            return NotFound("File not found.");
+        }
+
+        // Return the file stream with the appropriate content type and file name for download
         return File(stream, "application/octet-stream", result.Data.FileName);
     }
 
@@ -83,7 +103,7 @@ public class ProjectResourcesController : ApiControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return HandleCreateResult(result, nameof(GetReadProjectResourceById), new { resourceId = result.Data?.ProjectResourceId, version = "1" });
+        return HandleResult(result);
     }
 
     /// <summary>
