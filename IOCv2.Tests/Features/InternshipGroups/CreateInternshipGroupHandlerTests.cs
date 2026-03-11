@@ -33,6 +33,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockMapper = new Mock<IMapper>();
             _mockLogger = new Mock<ILogger<CreateInternshipGroupHandler>>();
 
+            // Inject dependencies
             _handler = new CreateInternshipGroupHandler(
                 _mockUnitOfWork.Object,
                 _mockMessageService.Object,
@@ -62,6 +63,10 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 }
             };
 
+            // Mock behavior
+            // Handler return true -> existed
+            // Expression<Func<T>> = ExistsAsync(x => x.Id == termId)
+            // It.IsAny<Expression<Func<Term, bool>>>() = accept any expression
             _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
             _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
@@ -69,6 +74,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().ExistsAsync(It.IsAny<Expression<Func<EnterpriseUser, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
+            //Mock FindAsync return list student
             _mockUnitOfWork.Setup(x => x.Repository<Student>().FindAsync(It.IsAny<Expression<Func<Student, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Student> { new Student { StudentId = studentId, UserId = Guid.NewGuid() } });
 
@@ -84,7 +90,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.IsSuccess.Should().BeTrue(); //expect result true
+            //Check if transaction is started and committed
             _mockUnitOfWork.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
             _mockUnitOfWork.Verify(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
