@@ -98,19 +98,6 @@ public class EvaluationsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteEvaluationCycle(Guid cycleId, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new DeleteEvaluationCycleCommand(cycleId), cancellationToken);
-        return HandleResult(result);
-    }
-
-    /// <summary>
-    /// Bắt đầu chu kỳ đánh giá (Pending -> Grading).
-    /// </summary>
-    [HttpPatch("cycles/{cycleId:guid}/start")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> StartEvaluationCycle(Guid cycleId, CancellationToken cancellationToken)
-    {
         var result = await _mediator.Send(new StartEvaluationCycleCommand { CycleId = cycleId }, cancellationToken);
         return HandleResult(result);
     }
@@ -146,17 +133,16 @@ public class EvaluationsController : ApiControllerBase
     /// <summary>
     /// Add new criteria to an evaluation cycle.
     /// </summary>
-    [HttpPost("cycles/{cycleId:guid}/criteria")]
+    [HttpPost("criteria")]
     [ProducesResponseType(typeof(ApiResponse<CreateEvaluationCriteriaResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateEvaluationCriteria(
         [FromRoute] Guid cycleId,
         [FromBody] CreateEvaluationCriteriaCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command with { CycleId = cycleId }, cancellationToken);
-        return HandleCreateResult(result, nameof(GetEvaluationCriteria), new { cycleId = cycleId, version = "1" });
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
     }
 
     /// <summary>
