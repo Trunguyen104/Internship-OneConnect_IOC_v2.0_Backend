@@ -1,4 +1,4 @@
-﻿﻿using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -26,7 +26,7 @@ public class CreateTermValidator : AbstractValidator<CreateTermCommand>
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.StartDateRequired))
             .Must(BeValidDate)
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.InvalidDateFormat))
-            .Must(BeAtLeastOneWeekAheadOrInPast)
+            .Must(BeAtLeastOneWeekAheadOrMore)
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.StartDateMustBeOneWeekAhead));
 
         RuleFor(x => x.EndDate)
@@ -43,18 +43,13 @@ public class CreateTermValidator : AbstractValidator<CreateTermCommand>
         return date != default;
     }
 
-    private bool BeAtLeastOneWeekAheadOrInPast(DateOnly startDate)
+    private bool BeAtLeastOneWeekAheadOrMore(DateOnly startDate)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        
+
         // If startDate is today, return false (not allowed)
         if (startDate == today)
             return false;
-        
-        // If startDate is in the past (before today), allow it
-        if (startDate < today)
-            return true;
-        
         // If startDate is in the future, it must be at least 7 days ahead
         return startDate >= today.AddDays(7);
     }
