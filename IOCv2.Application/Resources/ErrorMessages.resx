@@ -135,17 +135,11 @@
   <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Kích thước trang không được vượt quá 100.</value>
   </data>
-  <data name="Common.IdMismatch" xml:space="preserve">
-    <value>ID trong URL không khớp với ID trong body.</value>
-  </data>
   <data name="InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid.</value>
   </data>
   <data name="Common.Unauthorized" xml:space="preserve">
     <value>Bạn không có quyền thực hiện thao tác này.</value>
-  </data>
-  <data name="Common.NoPermission" xml:space="preserve">
-    <value>Bạn không có quyền thực hiện hành động này</value>
   </data>
   <data name="Users.InvalidAuditor" xml:space="preserve">
     <value>Không thể xác định Manager thực hiện thao tác</value>
@@ -567,151 +561,6 @@
   <data name="Internships.NotFound" xml:space="preserve">
     <value>Không tìm thấy Internship với ID: {0}</value>
   </data>
-  <data name="Terms.NotFound" xml:space="preserve">
-    <value>Không tìm thấy kỳ thực tập.</value>
-  </data>
-  <data name="Terms.UniversityIdRequired" xml:space="preserve">
-    <value>SuperAdmin phải chỉ định UniversityId khi tạo kỳ thực tập.</value>
-  </data>
-  <data name="Terms.NameRequired" xml:space="preserve">
-    <value>Tên kỳ thực tập là bắt buộc.</value>
-  </data>
-  <data name="Terms.NameMaxLength" xml:space="preserve">
-    <value>Tên kỳ thực tập không được vượt quá 255 ký tự.</value>
-  </data>
-  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
-    <value>Tên kỳ thực tập chứa ký tự không hợp lệ hoặc nguy hiểm.</value>
-  </data>
-  <data name="Terms.NameExists" xml:space="preserve">
-    <value>Tên kỳ thực tập đã tồn tại, vui lòng chọn tên khác.</value>
-  </data>
-  <data name="Terms.StartDateRequired" xml:space="preserve">
-    <value>Ngày bắt đầu là bắt buộc.</value>
-  </data>
-  <data name="Terms.EndDateRequired" xml:space="preserve">
-    <value>Ngày kết thúc là bắt buộc.</value>
-  </data>
-  <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
-    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
-  </data>
-  <data name="Terms.StartDateInPast" xml:space="preserve">
-    <value>Ngày bắt đầu không được là ngày trong quá khứ.</value>
-  </data>
-  <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
-    <value>Ngày bắt đầu không được là hôm nay. Vui lòng chọn ngày ít nhất 1 tuần sau hôm nay hoặc ngày trước đó.</value>
-  </data>
-  <data name="Terms.InvalidDateFormat" xml:space="preserve">
-    <value>Ngày không hợp lệ, vui lòng nhập đúng định dạng dd/mm/yyyy.</value>
-  </data>
-  <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
-    <value>Khoảng thời gian này trùng với kỳ thực tập [{0}] đang diễn ra.</value>
-  </data>
-  <data name="Terms.CreateSuccess" xml:space="preserve">
-    <value>Tạo kỳ thực tập thành công.</value>
-  </data>
-  <data name="Terms.UpdateSuccess" xml:space="preserve">
-    <value>Cập nhật kỳ thực tập thành công.</value>
-  </data>
-  <data name="Terms.CloseSuccess" xml:space="preserve">
-    <value>Kỳ thực tập [{0}] đã được đóng thành công.</value>
-  </data>
-  <data name="Terms.DeleteSuccess" xml:space="preserve">
-    <value>Xóa kỳ thực tập thành công.</value>
-  </data>
-  <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
-    <value>Chỉ có thể đóng kỳ thực tập đang ở trạng thái Active.</value>
-  </data>
-  <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
-    <value>Không thể xóa kỳ thực tập đang diễn ra, đã kết thúc hoặc đã đóng. Vui lòng sử dụng chức năng Đóng kỳ nếu cần.</value>
-  </data>
-  <data name="Terms.VersionConflict" xml:space="preserve">
-    <value>Kỳ thực tập này vừa được cập nhật bởi người khác. Vui lòng tải lại trang để xem thông tin mới nhất trước khi chỉnh sửa.</value>
-  </data>
-  <data name="Terms.StatusChanged" xml:space="preserve">
-    <value>Không thể xóa kỳ thực tập này vì trạng thái vừa thay đổi. Vui lòng tải lại trang để xem thông tin mới nhất.</value>
-  </data>
-  <data name="Terms.AlreadyDeleted" xml:space="preserve">
-    <value>Kỳ thực tập này đã được xóa trước đó. Vui lòng tải lại trang.</value>
-  </data>
-  <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
-    <value>Kỳ thực tập hiện còn {0} sinh viên chưa được gán công ty. Bạn có chắc chắn muốn đóng kỳ?</value>
-  </data>
-  <data name="Terms.HasRelatedData" xml:space="preserve">
-    <value>Cảnh báo: Kỳ thực tập này đang có dữ liệu liên quan</value>
-  </data>
-  <data name="Terms.StartDateLocked" xml:space="preserve">
-    <value>Ngày bắt đầu không thể thay đổi sau khi kỳ thực tập đã diễn ra.</value>
-  </data>
-  <data name="Terms.YearInvalidRange" xml:space="preserve">
-    <value>Năm phải nằm trong khoảng từ 2000 đến 2100.</value>
-  </data>
-  <data name="Terms.CloseReasonRequired" xml:space="preserve">
-    <value>Lý do đóng kỳ là bắt buộc.</value>
-  </data>
-  <data name="Terms.CloseReasonMinLength" xml:space="preserve">
-    <value>Lý do đóng kỳ phải có ít nhất 10 ký tự.</value>
-  </data>
-  <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
-    <value>Lý do đóng kỳ không được vượt quá 500 ký tự.</value>
-  </data>
-  <data name="Terms.Log.TermCreated" xml:space="preserve">
-    <value>Term {0} created successfully by user {1}</value>
-  </data>
-  <data name="Terms.Log.TermUpdated" xml:space="preserve">
-    <value>Term {0} updated successfully by user {1}</value>
-  </data>
-  <data name="Terms.Log.TermClosed" xml:space="preserve">
-    <value>Term {0} closed by user {1}</value>
-  </data>
-  <data name="Terms.Log.TermDeleted" xml:space="preserve">
-    <value>Term {0} soft-deleted by user {1}</value>
-  </data>
-  <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
-    <value>Retrieved {0} terms for university {1}</value>
-  </data>
-  <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
-    <value>User {0} is not associated with any university</value>
-  </data>
-  <data name="Terms.Log.TermNotFound" xml:space="preserve">
-    <value>Term {0} not found</value>
-  </data>
-  <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
-    <value>Term {0} not found or access denied for user {1}</value>
-  </data>
-  <data name="Terms.Log.VersionConflict" xml:space="preserve">
-    <value>Version conflict for term {0}</value>
-  </data>
-  <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
-    <value>Version conflict for term {0}. Expected: {1}, Got: {2}</value>
-  </data>
-  <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
-    <value>Duplicate term name detected: {0}</value>
-  </data>
-  <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
-    <value>Concurrency conflict updating term {0}</value>
-  </data>
-  <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
-    <value>Concurrency conflict closing term {0}</value>
-  </data>
-  <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
-    <value>Error creating term</value>
-  </data>
-  <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
-    <value>Error updating term {0}</value>
-  </data>
-  <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
-    <value>Lỗi khi đóng kỳ thực tập {0}</value>
-  </data>
-  <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
-    <value>Error deleting term {0}</value>
-  </data>
-  <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
-    <value>Error retrieving terms</value>
-  </data>
-  <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
-    <value>Error retrieving term {0}</value>
-  </data>
-
   <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
     <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
   </data>
