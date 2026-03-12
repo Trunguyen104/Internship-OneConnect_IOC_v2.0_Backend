@@ -4,7 +4,7 @@ namespace IOCv2.Domain.Enums
     {
         NO_INTERNSHIP,
         APPLIED,
-        ONBOARDED,
+        INTERNSHIP_IN_PROGRESS,
         COMPLETED
     }
 }
