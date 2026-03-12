@@ -42,11 +42,22 @@ public class StartEvaluationCycleHandler
                 ResultErrorType.NotFound);
         }
 
-        if (cycle.Status == EvaluationCycleStatus.Completed || cycle.Status == EvaluationCycleStatus.Cancelled)
+        if (cycle.Status != EvaluationCycleStatus.Pending)
         {
-            _logger.LogWarning("Cannot start EvaluationCycle {CycleId} because it is already completed or cancelled", request.CycleId);
+            _logger.LogWarning("Cannot start EvaluationCycle {CycleId} because it is not in Pending status (Current: {Status})", request.CycleId, cycle.Status);
             return Result<StartEvaluationCycleResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.EvaluationCycle.AlreadyCompleted),
+                "Chỉ có thể bắt đầu (Start) đợt đánh giá khi nó đang ở trạng thái Khởi tạo (Pending).",
+                ResultErrorType.BadRequest);
+        }
+
+        var hasCriteria = await _unitOfWork.Repository<Domain.Entities.EvaluationCriteria>().Query()
+            .AnyAsync(c => c.CycleId == request.CycleId, cancellationToken);
+
+        if (!hasCriteria)
+        {
+            _logger.LogWarning("Cannot start EvaluationCycle {CycleId} because it has no criteria configured.", request.CycleId);
+            return Result<StartEvaluationCycleResponse>.Failure(
+                "Không thể bắt đầu đợt đánh giá vì chưa có bất kỳ Tiêu chí chấm điểm (Criteria) nào được cấu hình.",
                 ResultErrorType.BadRequest);
         }
 

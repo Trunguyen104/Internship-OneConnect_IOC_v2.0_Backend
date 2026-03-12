@@ -45,11 +45,11 @@ public class CreateEvaluationCriteriaHandler
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
             
-        if (cycle!.Status == Domain.Enums.EvaluationCycleStatus.Completed)
+        if (cycle!.Status != Domain.Enums.EvaluationCycleStatus.Pending)
         {
-            _logger.LogWarning("Cannot create criteria: EvaluationCycle {CycleId} is already completed", request.CycleId);
+            _logger.LogWarning("Cannot create criteria: EvaluationCycle {CycleId} is not in Pending status (Current: {Status})", request.CycleId, cycle.Status);
             return Result<CreateEvaluationCriteriaResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.EvaluationCriteriaKey.CannotCreateInCompletedCycle),
+                "Chỉ được phép cấu hình tiêu chí khi Đợt đánh giá đang ở trạng thái Khởi tạo (Pending).",
                 ResultErrorType.BadRequest);
         }
 
