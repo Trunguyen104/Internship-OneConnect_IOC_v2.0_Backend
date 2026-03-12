@@ -87,5 +87,28 @@ namespace IOCv2.Tests.Features.Projects
             result.IsSuccess.Should().BeFalse();
             result.Error.Should().Be("Internship not found");
         }
+
+        [Fact]
+        public async Task Handle_ProjectAlreadyExists_ShouldReturnFailure()
+        {
+            // Arrange
+            var internshipId = Guid.NewGuid();
+            var command = new CreateProjectCommand { ProjectName = "New Project", InternshipId = internshipId };
+
+            _mockInternshipRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<InternshipGroup, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            
+            _mockProjectRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Project, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            
+            _mockMessage.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Project already exists");
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be("Project already exists");
+        }
     }
 }

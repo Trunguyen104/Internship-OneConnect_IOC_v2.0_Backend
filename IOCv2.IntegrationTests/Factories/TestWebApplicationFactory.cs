@@ -18,7 +18,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             // Remove ALL Entity Framework Core and Npgsql related registrations
-            // This is required when moving from real Postgres to InMemory because EF internal DI cache
             var efDescriptors = services.Where(d => 
                 (d.ServiceType.Namespace != null && d.ServiceType.Namespace.StartsWith("Microsoft.EntityFrameworkCore")) ||
                 (d.ServiceType.Namespace != null && d.ServiceType.Namespace.StartsWith("Npgsql.EntityFrameworkCore")) ||
@@ -37,11 +36,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
-                options.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning));
+                // Ignore transaction warning for in-memory database
+                options.ConfigureWarnings(x => x.Ignore(
+                    Microsoft.EntityFrameworkCore.Diagnostics.
+                    InMemoryEventId.TransactionIgnoredWarning
+                )); 
             });
 
-            // If you use Redis or other external services, you can mock or disable them here
-            // e.g. services.Remove(...) for Redis Cache
+            // Remove Redis and Rate Limiter registrations
             var rateLimiterDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IOCv2.Application.Interfaces.IRateLimiter));
             if (rateLimiterDescriptor != null) services.Remove(rateLimiterDescriptor);
 
@@ -51,9 +53,11 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             var connectionMultiplexerDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(StackExchange.Redis.IConnectionMultiplexer));
             if (connectionMultiplexerDescriptor != null) services.Remove(connectionMultiplexerDescriptor);
 
+            // Add mock implementations for testing
             services.AddScoped<IOCv2.Application.Interfaces.IRateLimiter>(sp => new MockRateLimiter());
             services.AddScoped<IOCv2.Application.Interfaces.ICacheService>(sp => new MockCacheService());
 
+            // Build the service provider
             var sp = services.BuildServiceProvider();
 
             // Ensure the in-memory database is created.
