@@ -22,6 +22,7 @@ public class Term : BaseEntity
     // Track who closed the term
     public Guid? ClosedBy { get; set; }
     public DateTime? ClosedAt { get; set; }
+    public string? CloseReason { get; set; }
 
     // Track who deleted the term (Terms-specific field)
     public Guid? DeletedBy { get; set; }

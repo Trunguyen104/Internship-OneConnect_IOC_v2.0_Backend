@@ -577,6 +577,9 @@
   <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Start date cannot be in the past.</value>
   </data>
+  <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
+    <value>Start date cannot be today. Please select a date at least 1 week from now or a date before today.</value>
+  </data>
   <data name="Terms.InvalidDateFormat" xml:space="preserve">
     <value>Invalid date format. Please use dd/mm/yyyy format.</value>
   </data>
@@ -621,6 +624,15 @@
   </data>
   <data name="Terms.YearInvalidRange" xml:space="preserve">
     <value>Year must be between 2000 and 2100.</value>
+  </data>
+  <data name="Terms.CloseReasonRequired" xml:space="preserve">
+    <value>Close reason is required.</value>
+  </data>
+  <data name="Terms.CloseReasonMinLength" xml:space="preserve">
+    <value>Close reason must be at least 10 characters long.</value>
+  </data>
+  <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
+    <value>Close reason cannot exceed 500 characters.</value>
   </data>
   <data name="Terms.Log.TermCreated" xml:space="preserve">
     <value>Term {0} created successfully by user {1}</value>

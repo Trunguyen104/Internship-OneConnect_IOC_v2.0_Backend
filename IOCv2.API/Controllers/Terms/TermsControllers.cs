@@ -114,7 +114,7 @@ public class TermsController : ApiControllerBase
     /// <param name="id">Term ID</param>
     /// <param name="command">Close term data including version</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Success message with a warning if unplaced students exist</returns>
+    /// <returns>Success message</returns>
     [HttpPatch("{id:guid}/close")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
     [ProducesResponseType(typeof(Result<CloseTermResponse>), StatusCodes.Status200OK)]

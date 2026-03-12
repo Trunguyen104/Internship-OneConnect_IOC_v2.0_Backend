@@ -89,6 +89,7 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
             term.Status = TermStatus.Closed;
             term.ClosedBy = userId;
             term.ClosedAt = DateTime.UtcNow;
+            term.CloseReason = request.Reason.Trim();
             term.Version++;
 
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
@@ -100,14 +101,8 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
 
             var response = new CloseTermResponse
             {
-                Message = message,
-                UnplacedStudentsCount = term.TotalUnplaced
+                Message = message
             };
-
-            // Check for unplaced students warning
-            if (term.TotalUnplaced > 0)
-                response.Warning = string.Format(_messageService.GetMessage(MessageKeys.Terms.UnplacedStudentsWarning),
-                    term.TotalUnplaced);
 
             return Result<CloseTermResponse>.Success(response, message);
         }

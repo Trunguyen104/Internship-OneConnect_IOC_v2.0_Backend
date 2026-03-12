@@ -7,4 +7,5 @@ public record CloseTermCommand : IRequest<Result<CloseTermResponse>>
 {
     public Guid TermId { get; init; }
     public int Version { get; init; }
+    public string Reason { get; init; } = string.Empty;
 }

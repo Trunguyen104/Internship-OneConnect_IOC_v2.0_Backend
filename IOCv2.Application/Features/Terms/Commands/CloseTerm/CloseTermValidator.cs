@@ -15,5 +15,13 @@ public class CloseTermValidator : AbstractValidator<CloseTermCommand>
         RuleFor(x => x.Version)
             .GreaterThan(0)
             .WithMessage(messageService.GetMessage(MessageKeys.Common.InvalidRequest));
+
+        RuleFor(x => x.Reason)
+            .NotEmpty()
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.CloseReasonRequired))
+            .MinimumLength(10)
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.CloseReasonMinLength))
+            .MaximumLength(500)
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.CloseReasonMaxLength));
     }
 }

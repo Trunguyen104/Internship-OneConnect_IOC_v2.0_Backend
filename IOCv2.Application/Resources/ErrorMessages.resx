@@ -597,6 +597,9 @@
   <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Ngày bắt đầu không được là ngày trong quá khứ.</value>
   </data>
+  <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
+    <value>Ngày bắt đầu không được là hôm nay. Vui lòng chọn ngày ít nhất 1 tuần sau hôm nay hoặc ngày trước đó.</value>
+  </data>
   <data name="Terms.InvalidDateFormat" xml:space="preserve">
     <value>Ngày không hợp lệ, vui lòng nhập đúng định dạng dd/mm/yyyy.</value>
   </data>
@@ -641,6 +644,15 @@
   </data>
   <data name="Terms.YearInvalidRange" xml:space="preserve">
     <value>Năm phải nằm trong khoảng từ 2000 đến 2100.</value>
+  </data>
+  <data name="Terms.CloseReasonRequired" xml:space="preserve">
+    <value>Lý do đóng kỳ là bắt buộc.</value>
+  </data>
+  <data name="Terms.CloseReasonMinLength" xml:space="preserve">
+    <value>Lý do đóng kỳ phải có ít nhất 10 ký tự.</value>
+  </data>
+  <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
+    <value>Lý do đóng kỳ không được vượt quá 500 ký tự.</value>
   </data>
   <data name="Terms.Log.TermCreated" xml:space="preserve">
     <value>Term {0} created successfully by user {1}</value>

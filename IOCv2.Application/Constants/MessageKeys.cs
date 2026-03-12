@@ -1,4 +1,4 @@
-﻿﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -197,6 +197,7 @@
             public const string EndDateRequired = "Terms.EndDateRequired";
             public const string EndDateMustBeAfterStart = "Terms.EndDateMustBeAfterStart";
             public const string StartDateInPast = "Terms.StartDateInPast";
+            public const string StartDateMustBeOneWeekAhead = "Terms.StartDateMustBeOneWeekAhead";
             public const string InvalidDateFormat = "Terms.InvalidDateFormat";
             public const string OverlapWithActiveTerm = "Terms.OverlapWithActiveTerm";
             public const string CreateSuccess = "Terms.CreateSuccess";
@@ -212,6 +213,9 @@
             public const string HasRelatedData = "Terms.HasRelatedData";
             public const string StartDateLocked = "Terms.StartDateLocked";
             public const string YearInvalidRange = "Terms.YearInvalidRange";
+            public const string CloseReasonRequired = "Terms.CloseReasonRequired";
+            public const string CloseReasonMinLength = "Terms.CloseReasonMinLength";
+            public const string CloseReasonMaxLength = "Terms.CloseReasonMaxLength";
             
             // Logging messages
             public const string LogTermCreated = "Terms.Log.TermCreated";
