@@ -1,0 +1,124 @@
+using FluentAssertions;
+using IOCv2.Application.Common.Exceptions;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Features.InternshipGroups.Queries.GetMyInternshipGroups;
+using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
+using Microsoft.Extensions.Logging;
+using MockQueryable;
+using MockQueryable.Moq;
+using Moq;
+using Xunit;
+
+namespace IOCv2.Tests.Features.InternshipGroups;
+
+public class GetMyInternshipGroupsHandlerTests
+{
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<ICurrentUserService> _mockCurrentUserService;
+    private readonly Mock<IMessageService> _mockMessageService;
+    private readonly Mock<ILogger<GetMyInternshipGroupsHandler>> _mockLogger;
+    private readonly Mock<IGenericRepository<Student>> _mockStudentRepository;
+    private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipGroupRepository;
+    private readonly Mock<IGenericRepository<Project>> _mockProjectRepository;
+    private readonly GetMyInternshipGroupsHandler _handler;
+
+    public GetMyInternshipGroupsHandlerTests()
+    {
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockCurrentUserService = new Mock<ICurrentUserService>();
+        _mockMessageService = new Mock<IMessageService>();
+        _mockLogger = new Mock<ILogger<GetMyInternshipGroupsHandler>>();
+        _mockStudentRepository = new Mock<IGenericRepository<Student>>();
+        _mockInternshipGroupRepository = new Mock<IGenericRepository<InternshipGroup>>();
+        _mockProjectRepository = new Mock<IGenericRepository<Project>>();
+
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Student>()).Returns(_mockStudentRepository.Object);
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<InternshipGroup>()).Returns(_mockInternshipGroupRepository.Object);
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Project>()).Returns(_mockProjectRepository.Object);
+
+        _handler = new GetMyInternshipGroupsHandler(
+            _mockUnitOfWork.Object,
+            _mockCurrentUserService.Object,
+            _mockMessageService.Object,
+            _mockLogger.Object);
+    }
+
+    [Fact]
+    public async Task Handle_WhenCurrentUserHasInternshipGroups_ShouldReturnMappedGroups()
+    {
+        var userId = Guid.NewGuid();
+        var studentId = Guid.NewGuid();
+        var termId = Guid.NewGuid();
+        var schoolId = Guid.NewGuid();
+        var enterpriseId = Guid.NewGuid();
+        var mentorId = Guid.NewGuid();
+        var internshipId = Guid.NewGuid();
+        var projectId = Guid.NewGuid();
+        var university = new University { UniversityId = schoolId, Name = "FU Cần Thơ" };
+        var term = new Term { TermId = termId, UniversityId = schoolId, Name = "FU Cần Thơ - Mùa xuân 2026", University = university };
+        var mentorUser = new User(Guid.NewGuid(), "MENTOR001", "mentor@rikkei.vn", "Mentor Name", IOCv2.Domain.Enums.UserRole.Mentor, "hash");
+        var mentor = new EnterpriseUser { EnterpriseUserId = mentorId, EnterpriseId = enterpriseId, UserId = Guid.NewGuid(), User = mentorUser };
+        var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
+        group.Enterprise = new Enterprise { EnterpriseId = enterpriseId, Name = "Rikasoft" };
+        group.Term = term;
+        group.Mentor = mentor;
+        group.AddMember(studentId, IOCv2.Domain.Enums.InternshipRole.Leader);
+
+        typeof(InternshipGroup).GetProperty(nameof(InternshipGroup.InternshipId))!.SetValue(group, internshipId);
+
+        var project = Project.Create(internshipId, "IOC Version 2", string.Empty);
+        typeof(Project).GetProperty(nameof(Project.ProjectId))!.SetValue(project, projectId);
+
+        _mockCurrentUserService.Setup(service => service.UserId).Returns(userId.ToString());
+        _mockStudentRepository.Setup(repository => repository.Query())
+            .Returns(new List<Student>
+            {
+                new() { StudentId = studentId, UserId = userId }
+            }.AsQueryable().BuildMock());
+        _mockInternshipGroupRepository.Setup(repository => repository.Query())
+            .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
+        _mockProjectRepository.Setup(repository => repository.Query())
+            .Returns(new List<Project> { project }.AsQueryable().BuildMock());
+
+        var result = await _handler.Handle(new GetMyInternshipGroupsQuery(), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Data.Should().HaveCount(1);
+        result.Data![0].Id.Should().Be(internshipId);
+        result.Data[0].Name.Should().Be("FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)");
+        result.Data[0].SchoolId.Should().Be(schoolId);
+        result.Data[0].Enterprise!.Name.Should().Be("Rikasoft");
+        result.Data[0].Mentors.Should().ContainSingle();
+        result.Data[0].ProjectId.Should().Be(projectId);
+        result.Data[0].Project!.Name.Should().Be("IOC Version 2");
+        result.Data[0].StudentCount.Should().Be(1);
+        result.Data[0].GroupStatus.Should().Be("ACTIVE");
+    }
+
+    [Fact]
+    public async Task Handle_WhenCurrentUserIsMissing_ShouldThrowUnauthorizedAccessException()
+    {
+        _mockCurrentUserService.Setup(service => service.UserId).Returns((string?)null);
+        _mockMessageService.Setup(service => service.GetMessage(MessageKeys.Common.Unauthorized)).Returns("Unauthorized");
+
+        var act = async () => await _handler.Handle(new GetMyInternshipGroupsQuery(), CancellationToken.None);
+
+        await act.Should().ThrowAsync<UnauthorizedAccessException>()
+            .WithMessage("Unauthorized");
+    }
+
+    [Fact]
+    public async Task Handle_WhenStudentProfileDoesNotExist_ShouldThrowNotFoundException()
+    {
+        _mockCurrentUserService.Setup(service => service.UserId).Returns(Guid.NewGuid().ToString());
+        _mockMessageService.Setup(service => service.GetMessage(MessageKeys.Users.NotFound)).Returns("User not found");
+        _mockStudentRepository.Setup(repository => repository.Query())
+            .Returns(new List<Student>().AsQueryable().BuildMock());
+
+        var act = async () => await _handler.Handle(new GetMyInternshipGroupsQuery(), CancellationToken.None);
+
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("User not found");
+    }
+}
