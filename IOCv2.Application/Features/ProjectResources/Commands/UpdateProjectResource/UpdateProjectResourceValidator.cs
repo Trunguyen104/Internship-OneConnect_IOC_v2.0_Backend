@@ -28,8 +28,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
 
             // ACV-3: Validate Enum string input before parsing in handler.
             RuleFor(x => x.ResourceType)
-                .Must(v => string.IsNullOrWhiteSpace(v) || Enum.TryParse<FileType>(v, ignoreCase: true, out _))
-                .WithMessage($"ResourceType must be one of: {string.Join(", ", Enum.GetNames<FileType>())}");
+                .IsInEnum().WithMessage("Invalid ResourceType.");
+
         }
     }
 }

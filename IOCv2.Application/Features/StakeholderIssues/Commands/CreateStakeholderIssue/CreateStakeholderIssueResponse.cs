@@ -1,5 +1,7 @@
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+
 
 namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholderIssue
 {
@@ -7,13 +9,14 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
+        public StakeholderIssueStatus Status { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public void Mapping(AutoMapper.Profile profile)
         {
-            profile.CreateMap<StakeholderIssue, CreateStakeholderIssueResponse>()
-                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
+            profile.CreateMap<StakeholderIssue, CreateStakeholderIssueResponse>();
+
         }
     }
 }

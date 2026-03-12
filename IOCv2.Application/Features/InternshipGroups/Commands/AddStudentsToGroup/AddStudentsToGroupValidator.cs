@@ -16,9 +16,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 .ChildRules(student =>
                 {
                     student.RuleFor(s => s.Role)
-                        .NotEmpty()
-                        .Must(v => Enum.TryParse<InternshipRole>(v, ignoreCase: true, out _))
-                        .WithMessage($"Student Role must be one of: {string.Join(", ", Enum.GetNames<InternshipRole>())}");
+                        .IsInEnum().WithMessage("Invalid student role.");
+
                 });
         }
     }

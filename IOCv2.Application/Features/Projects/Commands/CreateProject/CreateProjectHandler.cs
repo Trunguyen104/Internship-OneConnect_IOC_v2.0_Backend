@@ -55,16 +55,32 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             }
 
             // 3. Domain Logic & Persistence (FFA-CAG)
-            var project = new Project(request.InternshipId, request.ProjectName, request.Description);
+            var project = Project.Create(
+                request.InternshipId, 
+                request.ProjectName, 
+                request.Description,
+                request.StartDate,
+                request.EndDate);
             
-            await _unitOfWork.Repository<Project>().AddAsync(project, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await _unitOfWork.Repository<Project>().AddAsync(project, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            // 4. Mapping & Response (FFA-FLW)
-            _logger.LogInformation("Successfully created project {ProjectId} for Internship {InternshipId}", project.ProjectId, request.InternshipId);
-            
-            var response = _mapper.Map<CreateProjectResponse>(project);
-            return Result<CreateProjectResponse>.Success(response);
+                // 4. Mapping & Response (FFA-FLW)
+                _logger.LogInformation("Successfully created project {ProjectId} for Internship {InternshipId}", project.ProjectId, request.InternshipId);
+                
+                var response = _mapper.Map<CreateProjectResponse>(project);
+                return Result<CreateProjectResponse>.Success(response);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogCreateError));
+                return Result<CreateProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            }
         }
     }
 }

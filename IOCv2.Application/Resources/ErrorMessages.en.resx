@@ -132,8 +132,14 @@
   <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Page size cannot exceed 100.</value>
   </data>
+  <data name="Common.IdMismatch" xml:space="preserve">
+    <value>ID in URL does not match ID in body.</value>
+  </data>
   <data name="Common.Unauthorized" xml:space="preserve">
     <value>You are not authorized to perform this action.</value>
+  </data>
+  <data name="Common.NoPermission" xml:space="preserve">
+    <value>You do not have permission to perform this action</value>
   </data>
   <data name="Password.MinLength" xml:space="preserve">
     <value>Password must be at least 8 characters long.</value>
@@ -212,6 +218,9 @@
   </data>
   <data name="Profile.EmailExists" xml:space="preserve">
     <value>Email is already in use by another user.</value>
+  </data>
+  <data name="Enterprise.NotFound" xml:space="preserve">
+    <value>No enterprise information found.</value>
   </data>
   <data name="Projects.LogDeleteError" xml:space="preserve">
     <value>Error deleting project {0}</value>
@@ -406,6 +415,60 @@
   <data name="Internships.NotFound" xml:space="preserve">
     <value>No internship found with ID: {0}</value>
   </data>
+  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
+    <value>Error while retrieving enterprises</value>
+  </data>
+  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
+    <value>Error occurred while getting enterprise by id</value>
+  </data>
+  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>The tax identification number already exists in the system.</value>
+  </data>
+  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>The business with tax code '{TaxCode}' already exists.</value>
+  </data>
+  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
+    <value>An error occurred while creating the business.</value>
+  </data>
+  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
+    <value>The tax identification number is not in the correct format.</value>
+  </data>
+  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
+    <value>Name is required.</value>
+  </data>
+  <data name="Enterprise.NameMaxLength" xml:space="preserve">
+    <value>Name must not exceed {0} characters.</value>
+  </data>
+  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
+    <value>Website must start with http or https.</value>
+  </data>
+  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
+    <value>LogoUrl must start with http or https.</value>
+  </data>
+  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
+    <value>BackgroundUrl must start with http or https.</value>
+  </data>
+  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>You are not allowed to modify this enterprise.</value>
+  </data>
+  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>Error: No permission to edit enterprise {enterpriseId}.</value>
+  </data>
+  <data name="Enterprise.LogNotFound" xml:space="preserve">
+    <value>Enterprise {enterpriseId} not found</value>
+  </data>
+  <data name="Enterprise.LogUpdateEnterpriseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+    <value>Updating the tax code is not allowed.</value>
+  </data>
+  <data name="Enterprise.LogDeleteError" xml:space="preserve">
+    <value>Error occurred while deleting enterprise with ID {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.DeleteError" xml:space="preserve">
+    <value>An error occurred while deleting the enterprise. Please try again later.</value>
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -483,5 +546,332 @@
   </data>
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
+  </data>
+  <data name="Terms.NotFound" xml:space="preserve">
+    <value>Term not found.</value>
+  </data>
+  <data name="Terms.UniversityIdRequired" xml:space="preserve">
+    <value>SuperAdmin must specify a UniversityId when creating a term.</value>
+  </data>
+  <data name="Terms.NameRequired" xml:space="preserve">
+    <value>Term name is required.</value>
+  </data>
+  <data name="Terms.NameMaxLength" xml:space="preserve">
+    <value>Term name cannot exceed 255 characters.</value>
+  </data>
+  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
+    <value>Term name contains invalid or dangerous characters.</value>
+  </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Term name already exists. Please choose a different name.</value>
+  </data>
+  <data name="Terms.StartDateRequired" xml:space="preserve">
+    <value>Start date is required.</value>
+  </data>
+  <data name="Terms.EndDateRequired" xml:space="preserve">
+    <value>End date is required.</value>
+  </data>
+  <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="Terms.StartDateInPast" xml:space="preserve">
+    <value>Start date cannot be in the past.</value>
+  </data>
+  <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
+    <value>Start date cannot be today. Please select a date at least 1 week from now or a date before today.</value>
+  </data>
+  <data name="Terms.InvalidDateFormat" xml:space="preserve">
+    <value>Invalid date format. Please use dd/mm/yyyy format.</value>
+  </data>
+  <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
+    <value>This time period overlaps with term [{0}].</value>
+  </data>
+  <data name="Terms.CreateSuccess" xml:space="preserve">
+    <value>Term created successfully.</value>
+  </data>
+  <data name="Terms.UpdateSuccess" xml:space="preserve">
+    <value>Term updated successfully.</value>
+  </data>
+  <data name="Terms.CloseSuccess" xml:space="preserve">
+    <value>Term [{0}] has been closed successfully.</value>
+  </data>
+  <data name="Terms.DeleteSuccess" xml:space="preserve">
+    <value>Term deleted successfully.</value>
+  </data>
+  <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
+    <value>Only active terms can be closed.</value>
+  </data>
+  <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
+    <value>Cannot delete active, ended, or closed terms. Please use Close Term feature if needed.</value>
+  </data>
+  <data name="Terms.VersionConflict" xml:space="preserve">
+    <value>This term has been updated by someone else. Please reload the page to see the latest information before editing.</value>
+  </data>
+  <data name="Terms.StatusChanged" xml:space="preserve">
+    <value>Cannot delete this term because its status has changed. Please reload the page to see the latest information.</value>
+  </data>
+  <data name="Terms.AlreadyDeleted" xml:space="preserve">
+    <value>This term has already been deleted. Please reload the page.</value>
+  </data>
+  <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
+    <value>There are {0} students without company assignments in this term. Are you sure you want to close it?</value>
+  </data>
+  <data name="Terms.HasRelatedData" xml:space="preserve">
+    <value>Warning: This term has related data</value>
+  </data>
+  <data name="Terms.StartDateLocked" xml:space="preserve">
+    <value>Start date cannot be changed after the term has started.</value>
+  </data>
+  <data name="Terms.YearInvalidRange" xml:space="preserve">
+    <value>Year must be between 2000 and 2100.</value>
+  </data>
+  <data name="Terms.CloseReasonRequired" xml:space="preserve">
+    <value>Close reason is required.</value>
+  </data>
+  <data name="Terms.CloseReasonMinLength" xml:space="preserve">
+    <value>Close reason must be at least 10 characters long.</value>
+  </data>
+  <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
+    <value>Close reason cannot exceed 500 characters.</value>
+  </data>
+  <data name="Terms.Log.TermCreated" xml:space="preserve">
+    <value>Term {0} created successfully by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermUpdated" xml:space="preserve">
+    <value>Term {0} updated successfully by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermClosed" xml:space="preserve">
+    <value>Term {0} closed by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermDeleted" xml:space="preserve">
+    <value>Term {0} soft-deleted by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
+    <value>Retrieved {0} terms for university {1}</value>
+  </data>
+  <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
+    <value>User {0} is not associated with any university</value>
+  </data>
+  <data name="Terms.Log.TermNotFound" xml:space="preserve">
+    <value>Term {0} not found</value>
+  </data>
+  <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
+    <value>Term {0} not found or access denied for user {1}</value>
+  </data>
+  <data name="Terms.Log.VersionConflict" xml:space="preserve">
+    <value>Version conflict for term {0}</value>
+  </data>
+  <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
+    <value>Version conflict for term {0}. Expected: {1}, Got: {2}</value>
+  </data>
+  <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
+    <value>Duplicate term name detected: {0}</value>
+  </data>
+  <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
+    <value>Concurrency conflict updating term {0}</value>
+  </data>
+  <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
+    <value>Concurrency conflict closing term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
+    <value>Error creating term</value>
+  </data>
+  <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
+    <value>Error updating term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
+    <value>Error closing term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
+    <value>Error deleting term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
+    <value>Error retrieving terms</value>
+  </data>
+  <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
+    <value>Error retrieving term {0}</value>
+  </data>
+  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+    <value>You are not associated with any enterprise as an HR.</value>
+  </data>
+  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+    <value>Enterprise not found for the current HR.</value>
+  </data>
+  <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
+    <value>Failed to save internship group to database</value>
+  </data>
+  <data name="InternshipGroup.LogCreationError" xml:space="preserve">
+    <value>Error occurred while creating internship group</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
+    <value>Failed to update internship group in database</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
+    <value>Error occurred while updating internship group</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
+    <value>Failed to delete internship group from database</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
+    <value>Error occurred while deleting internship group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
+    <value>Some student IDs are invalid or not found</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
+    <value>Failed to update group members in database</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
+    <value>Error occurred while adding students to group</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
+    <value>Failed to update group in database</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
+    <value>Error occurred while removing students from group</value>
+  </data>
+  <data name="InternshipGroup.NameRequired" xml:space="preserve">
+    <value>Internship group name is required.</value>
+  </data>
+  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
+    <value>Internship group name cannot exceed 255 characters.</value>
+  </data>
+  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
+    <value>Term ID is required.</value>
+  </data>
+  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
+    <value>Start date must be before end date.</value>
+  </data>
+  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
+    <value>Student list is required.</value>
+  </data>
+  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
+    <value>List of students to remove is required.</value>
+  </data>
+  <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
+    <value>Invalid student ID.</value>
+  </data>
+  <data name="InternshipGroup.TermNotFound" xml:space="preserve">
+    <value>Term not found.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise not found.</value>
+  </data>
+  <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
+    <value>Mentor not found.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
+    <value>Student not found.</value>
+  </data>
+  <data name="InternshipGroup.NotFound" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
+    <value>Term not found for ID: {TermId}</value>
+  </data>
+  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise not found for ID: {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+    <value>Mentor not found for ID: {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+    <value>Student not found for ID: {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+    <value>Internship group not found for ID: {InternshipId}</value>
+  </data>
+  <data name="Logbooks.StudentNotFound" xml:space="preserve">
+    <value>Student record not found for logged in user. Ensure you are logged in with a Student account.</value>
+  </data>
+  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
+    <value>You do not have permission to update this logbook.</value>
+  </data>
+  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
+    <value>You do not have permission to delete this logbook.</value>
+  </data>
+  <data name="Logbooks.InvalidInternship" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="EvaluationCycle.NotFound" xml:space="preserve">
+    <value>Evaluation cycle not found.</value>
+  </data>
+  <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
+    <value>Corresponding term not found.</value>
+  </data>
+  <data name="EvaluationCycle.NameRequired" xml:space="preserve">
+    <value>Evaluation cycle name is required.</value>
+  </data>
+  <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
+    <value>Start date is required.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
+    <value>End date is required.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
+    <value>Evaluation cycles with criteria cannot be deleted.</value>
+  </data>
+  <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
+    <value>Cannot update a completed evaluation cycle.</value>
+  </data>
+  <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
+    <value>This evaluation cycle has already been completed or cancelled.</value>
+  </data>
+  <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
+    <value>Cannot complete an evaluation cycle without any criteria.</value>
+  </data>
+  <data name="EvaluationCriteria.NotFound" xml:space="preserve">
+    <value>Evaluation criteria not found.</value>
+  </data>
+  <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
+    <value>Corresponding evaluation cycle not found.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
+    <value>Cannot add new criteria to an already completed evaluation cycle.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Cannot update criteria in an already completed evaluation cycle.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
+    <value>Cannot delete criteria in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.NotFound" xml:space="preserve">
+    <value>Evaluation results not found.</value>
+  </data>
+  <data name="Evaluation.CycleNotFound" xml:space="preserve">
+    <value>Corresponding evaluation cycle not found.</value>
+  </data>
+  <data name="Evaluation.InternshipNotFound" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
+    <value>Cannot update an evaluation once the results is submitted or published.</value>
+  </data>
+  <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
+    <value>Some evaluation criteria are missing.</value>
+  </data>
+  <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
+    <value>Given score cannot exceed the maximum score of its respective criteria.</value>
+  </data>
+  <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
+    <value>All members in this group have been fully submitted.</value>
+  </data>
+  <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
+    <value>Cannot publish the scores unless all students in the internship group are marked as "Submitted".</value>
+  </data>
+  <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
+    <value>Cannot draft evaluation scores in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Cannot update evaluation scores in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
+    <value>Cannot submit evaluation scores in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
+    <value>Cannot publish evaluation scores in an already completed evaluation cycle.</value>
   </data>
 </root>

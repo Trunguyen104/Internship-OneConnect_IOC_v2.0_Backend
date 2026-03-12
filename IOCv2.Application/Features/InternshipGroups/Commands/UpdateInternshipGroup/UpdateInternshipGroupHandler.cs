@@ -17,8 +17,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         private readonly ILogger<UpdateInternshipGroupHandler> _logger;
 
         public UpdateInternshipGroupHandler(
-            IUnitOfWork unitOfWork, 
-            IMessageService messageService, 
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
             IMapper mapper,
             ILogger<UpdateInternshipGroupHandler> logger)
         {
@@ -30,16 +30,17 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
 
         public async Task<Result<UpdateInternshipGroupResponse>> Handle(UpdateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Updating internship group: {InternshipId}", request.InternshipId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdating), request.InternshipId);
 
             try
             {
                 var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (entity == null)
                 {
-                    _logger.LogWarning("Internship group not found: {InternshipId}", request.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNotFound), request.InternshipId);
                     return Result<UpdateInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
@@ -48,7 +49,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
                 if (!termExists)
                 {
-                    _logger.LogWarning("Term not found: {TermId}", request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
                     return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
 
@@ -59,7 +60,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                         .ExistsAsync(e => e.EnterpriseId == request.EnterpriseId.Value, cancellationToken);
                     if (!enterpriseExists)
                     {
-                        _logger.LogWarning("Enterprise not found: {EnterpriseId}", request.EnterpriseId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogEnterpriseNotFound), request.EnterpriseId);
                         return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound), ResultErrorType.NotFound);
                     }
                 }
@@ -67,11 +68,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 // Validate MentorId if provided
                 if (request.MentorId.HasValue)
                 {
-                    var mentorExists = await _unitOfWork.Repository<User>()
-                        .ExistsAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                    var mentorExists = await _unitOfWork.Repository<EnterpriseUser>()
+                        .ExistsAsync(u => u.EnterpriseUserId == request.MentorId.Value, cancellationToken);
                     if (!mentorExists)
                     {
-                        _logger.LogWarning("Mentor not found: {MentorId}", request.MentorId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
                     }
                 }
@@ -93,21 +94,21 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 if (saved > 0 || !_unitOfWork.Repository<InternshipGroup>().Query().Any(x => x.InternshipId == request.InternshipId))
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
-                    _logger.LogInformation("Successfully updated internship group: {InternshipId}", entity.InternshipId);
-                    
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdatedSuccess), entity.InternshipId);
+
                     var response = _mapper.Map<UpdateInternshipGroupResponse>(entity);
                     return Result<UpdateInternshipGroupResponse>.Success(response);
                 }
 
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError("Failed to update internship group in database");
+                _logger.LogError(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdateFailed));
                 return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error occurred while updating internship group");
-                throw;
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdateError));
+                return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

@@ -67,7 +67,7 @@ public class CreateEpicHandler : IRequestHandler<CreateEpicCommand, Result<Creat
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Failed to create epic for project: {ProjectId}", request.ProjectId);
-            throw;
+            return Result<CreateEpicResponse>.Failure("An unexpected error occurred while creating the epic.", ResultErrorType.Conflict);
         }
     }
 }

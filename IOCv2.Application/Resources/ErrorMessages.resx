@@ -135,11 +135,17 @@
   <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Kích thước trang không được vượt quá 100.</value>
   </data>
+  <data name="Common.IdMismatch" xml:space="preserve">
+    <value>ID trong URL không khớp với ID trong body.</value>
+  </data>
   <data name="InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid.</value>
   </data>
   <data name="Common.Unauthorized" xml:space="preserve">
     <value>Bạn không có quyền thực hiện thao tác này.</value>
+  </data>
+  <data name="Common.NoPermission" xml:space="preserve">
+    <value>Bạn không có quyền thực hiện hành động này</value>
   </data>
   <data name="Users.InvalidAuditor" xml:space="preserve">
     <value>Không thể xác định Manager thực hiện thao tác</value>
@@ -560,5 +566,369 @@
   </data>
   <data name="Internships.NotFound" xml:space="preserve">
     <value>Không tìm thấy Internship với ID: {0}</value>
+  </data>
+  <data name="Terms.NotFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập.</value>
+  </data>
+  <data name="Terms.UniversityIdRequired" xml:space="preserve">
+    <value>SuperAdmin phải chỉ định UniversityId khi tạo kỳ thực tập.</value>
+  </data>
+  <data name="Terms.NameRequired" xml:space="preserve">
+    <value>Tên kỳ thực tập là bắt buộc.</value>
+  </data>
+  <data name="Terms.NameMaxLength" xml:space="preserve">
+    <value>Tên kỳ thực tập không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
+    <value>Tên kỳ thực tập chứa ký tự không hợp lệ hoặc nguy hiểm.</value>
+  </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Tên kỳ thực tập đã tồn tại, vui lòng chọn tên khác.</value>
+  </data>
+  <data name="Terms.StartDateRequired" xml:space="preserve">
+    <value>Ngày bắt đầu là bắt buộc.</value>
+  </data>
+  <data name="Terms.EndDateRequired" xml:space="preserve">
+    <value>Ngày kết thúc là bắt buộc.</value>
+  </data>
+  <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="Terms.StartDateInPast" xml:space="preserve">
+    <value>Ngày bắt đầu không được là ngày trong quá khứ.</value>
+  </data>
+  <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
+    <value>Ngày bắt đầu không được là hôm nay. Vui lòng chọn ngày ít nhất 1 tuần sau hôm nay hoặc ngày trước đó.</value>
+  </data>
+  <data name="Terms.InvalidDateFormat" xml:space="preserve">
+    <value>Ngày không hợp lệ, vui lòng nhập đúng định dạng dd/mm/yyyy.</value>
+  </data>
+  <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
+    <value>Khoảng thời gian này trùng với kỳ thực tập [{0}] đang diễn ra.</value>
+  </data>
+  <data name="Terms.CreateSuccess" xml:space="preserve">
+    <value>Tạo kỳ thực tập thành công.</value>
+  </data>
+  <data name="Terms.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật kỳ thực tập thành công.</value>
+  </data>
+  <data name="Terms.CloseSuccess" xml:space="preserve">
+    <value>Kỳ thực tập [{0}] đã được đóng thành công.</value>
+  </data>
+  <data name="Terms.DeleteSuccess" xml:space="preserve">
+    <value>Xóa kỳ thực tập thành công.</value>
+  </data>
+  <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
+    <value>Chỉ có thể đóng kỳ thực tập đang ở trạng thái Active.</value>
+  </data>
+  <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
+    <value>Không thể xóa kỳ thực tập đang diễn ra, đã kết thúc hoặc đã đóng. Vui lòng sử dụng chức năng Đóng kỳ nếu cần.</value>
+  </data>
+  <data name="Terms.VersionConflict" xml:space="preserve">
+    <value>Kỳ thực tập này vừa được cập nhật bởi người khác. Vui lòng tải lại trang để xem thông tin mới nhất trước khi chỉnh sửa.</value>
+  </data>
+  <data name="Terms.StatusChanged" xml:space="preserve">
+    <value>Không thể xóa kỳ thực tập này vì trạng thái vừa thay đổi. Vui lòng tải lại trang để xem thông tin mới nhất.</value>
+  </data>
+  <data name="Terms.AlreadyDeleted" xml:space="preserve">
+    <value>Kỳ thực tập này đã được xóa trước đó. Vui lòng tải lại trang.</value>
+  </data>
+  <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
+    <value>Kỳ thực tập hiện còn {0} sinh viên chưa được gán công ty. Bạn có chắc chắn muốn đóng kỳ?</value>
+  </data>
+  <data name="Terms.HasRelatedData" xml:space="preserve">
+    <value>Cảnh báo: Kỳ thực tập này đang có dữ liệu liên quan</value>
+  </data>
+  <data name="Terms.StartDateLocked" xml:space="preserve">
+    <value>Ngày bắt đầu không thể thay đổi sau khi kỳ thực tập đã diễn ra.</value>
+  </data>
+  <data name="Terms.YearInvalidRange" xml:space="preserve">
+    <value>Năm phải nằm trong khoảng từ 2000 đến 2100.</value>
+  </data>
+  <data name="Terms.CloseReasonRequired" xml:space="preserve">
+    <value>Lý do đóng kỳ là bắt buộc.</value>
+  </data>
+  <data name="Terms.CloseReasonMinLength" xml:space="preserve">
+    <value>Lý do đóng kỳ phải có ít nhất 10 ký tự.</value>
+  </data>
+  <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
+    <value>Lý do đóng kỳ không được vượt quá 500 ký tự.</value>
+  </data>
+  <data name="Terms.Log.TermCreated" xml:space="preserve">
+    <value>Term {0} created successfully by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermUpdated" xml:space="preserve">
+    <value>Term {0} updated successfully by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermClosed" xml:space="preserve">
+    <value>Term {0} closed by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermDeleted" xml:space="preserve">
+    <value>Term {0} soft-deleted by user {1}</value>
+  </data>
+  <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
+    <value>Retrieved {0} terms for university {1}</value>
+  </data>
+  <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
+    <value>User {0} is not associated with any university</value>
+  </data>
+  <data name="Terms.Log.TermNotFound" xml:space="preserve">
+    <value>Term {0} not found</value>
+  </data>
+  <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
+    <value>Term {0} not found or access denied for user {1}</value>
+  </data>
+  <data name="Terms.Log.VersionConflict" xml:space="preserve">
+    <value>Version conflict for term {0}</value>
+  </data>
+  <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
+    <value>Version conflict for term {0}. Expected: {1}, Got: {2}</value>
+  </data>
+  <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
+    <value>Duplicate term name detected: {0}</value>
+  </data>
+  <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
+    <value>Concurrency conflict updating term {0}</value>
+  </data>
+  <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
+    <value>Concurrency conflict closing term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
+    <value>Error creating term</value>
+  </data>
+  <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
+    <value>Error updating term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
+    <value>Lỗi khi đóng kỳ thực tập {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
+    <value>Error deleting term {0}</value>
+  </data>
+  <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
+    <value>Error retrieving terms</value>
+  </data>
+  <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
+    <value>Error retrieving term {0}</value>
+  </data>
+
+  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
+    <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
+  </data>
+  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi truy xuất thông tin doanh nghiệp theo ID.</value>
+  </data>
+  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>Mã số thuế đã tồn tại trong hệ thống.</value>
+  </data>
+  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>Doanh nghiệp với mã số thuế '{TaxCode}' đã tồn tại.</value>
+  </data>
+  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi tạo doanh nghiệp.</value>
+  </data>
+  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
+    <value>Mã số thuế không đúng định dạng.</value>
+  </data>
+  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
+    <value>Tên là bắt buộc.</value>
+  </data>
+  <data name="Enterprise.NameMaxLength" xml:space="preserve">
+    <value>Tên không được vượt quá {0} ký tự</value>
+  </data>
+  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
+    <value>Trang web phải bắt đầu bằng http hoặc https.</value>
+  </data>
+  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
+    <value>LogoUrl phải bắt đầu bằng http hoặc https.</value>
+  </data>
+  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
+    <value>BackgroundUrl phải bắt đầu bằng http hoặc https.</value>
+  </data>
+  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>Bạn không được phép chỉnh sửa doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>Lỗi: Không có quyền chỉnh sửa doanh nghiệp {enterpriseId}.</value>
+  </data>
+  <data name="Enterprise.LogNotFound" xml:space="preserve">
+    <value>Không tìm thấy Enterprise {enterpriseId}</value>
+  </data>
+  <data name="Enterprise.LogUpdateEnterpriseError" xml:space="preserve">
+    <value>Unexpected error while updating enterprise.</value>
+  </data>
+  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+    <value>Không được phép cập nhật mã số thuế.</value>
+  </data>
+  <data name="Enterprise.LogDeleteError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi xóa doanh nghiệp có ID {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.DeleteError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình xóa doanh nghiệp. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+    <value>Bạn không liên kết với bất kỳ doanh nghiệp nào với tư cách là nhân sự.</value>
+  </data>
+  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp cho bộ phận Nhân sự hiện tại.</value>
+  </data>
+  <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
+    <value>Lưu nhóm thực tập vào cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogCreationError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình tạo nhóm thực tập</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
+    <value>Cập nhật nhóm thực tập trong cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình cập nhật nhóm thực tập</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
+    <value>Xóa nhóm thực tập khỏi cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình xóa nhóm thực tập: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
+    <value>Một số mã sinh viên không hợp lệ hoặc không được tìm thấy</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
+    <value>Cập nhật thành viên nhóm trong cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình thêm sinh viên vào nhóm</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
+    <value>Cập nhật nhóm trong cơ sở dữ liệu thất bại</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình xóa sinh viên khỏi nhóm</value>
+  </data>
+  <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
+    <value>Mã sinh viên không hợp lệ.</value>
+  </data>
+  <data name="InternshipGroup.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp.</value>
+  </data>
+  <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
+    <value>Không tìm thấy người hướng dẫn.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên.</value>
+  </data>
+  <data name="InternshipGroup.NotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập.</value>
+  </data>
+  <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ với ID: {TermId}</value>
+  </data>
+  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp với ID: {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+    <value>Không tìm thấy người hướng dẫn với ID: {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên với ID: {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập với ID: {InternshipId}</value>
+  </data>
+  <data name="Logbooks.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên cho người dùng hiện tại. Vui lòng đảm bảo bạn đăng nhập bằng tài khoản Sinh viên.</value>
+  </data>
+  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
+    <value>Bạn không có quyền cập nhật nhật ký thực tập này.</value>
+  </data>
+  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
+    <value>Bạn không có quyền xóa nhật ký thực tập này.</value>
+  </data>
+  <data name="Logbooks.InvalidInternship" xml:space="preserve">
+    <value>Nhóm thực tập không hợp lệ hoặc không được tìm thấy.</value>
+  </data>
+  <data name="EvaluationCycle.NotFound" xml:space="preserve">
+    <value>Không tìm thấy chu kỳ đánh giá.</value>
+  </data>
+  <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ tương ứng.</value>
+  </data>
+  <data name="EvaluationCycle.NameRequired" xml:space="preserve">
+    <value>Tên chu kỳ đánh giá là bắt buộc.</value>
+  </data>
+  <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
+    <value>Thời gian bắt đầu là bắt buộc.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
+    <value>Thời gian kết thúc là bắt buộc.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
+    <value>Không thể xóa chu kỳ đánh giá đã có bộ tiêu chí.</value>
+  </data>
+  <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
+    <value>Không thể cập nhật chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
+    <value>Chu kỳ đánh giá này đã được hoàn thành hoặc hủy bỏ trước đó.</value>
+  </data>
+  <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
+    <value>Không thể hoàn thành chu kỳ đánh giá chưa có bất kỳ tiêu chí nào.</value>
+  </data>
+  <data name="EvaluationCriteria.NotFound" xml:space="preserve">
+    <value>Không tìm thấy tiêu chí đánh giá.</value>
+  </data>
+  <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
+    <value>Không tìm thấy chu kỳ đánh giá tương ứng.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
+    <value>Không thể thêm tiêu chí mới khi chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Không thể cập nhật tiêu chí khi chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
+    <value>Không thể xóa tiêu chí khi chu kỳ đánh giá đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.NotFound" xml:space="preserve">
+    <value>Không tìm thấy kết quả đánh giá.</value>
+  </data>
+  <data name="Evaluation.CycleNotFound" xml:space="preserve">
+    <value>Không tìm thấy chu kỳ đánh giá tương ứng.</value>
+  </data>
+  <data name="Evaluation.InternshipNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
+    <value>Không thể cập nhật bài đánh giá báo cáo đã nộp hoặc số điểm đã công bố.</value>
+  </data>
+  <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
+    <value>Không tồn tại một số tiêu chí trong bản đánh giá.</value>
+  </data>
+  <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
+    <value>Số điểm đánh giá không được vượt quá điểm tối đa của tiêu chí.</value>
+  </data>
+  <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
+    <value>Tất cả các thành viên trong nhóm đã được nộp điểm đánh giá.</value>
+  </data>
+  <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
+    <value>Không thể công bố nếu nhóm thực tập vẫn còn sinh viên chưa được phê duyệt đánh giá.</value>
+  </data>
+  <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
+    <value>Không thể lưu điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Không thể cập nhật điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
+    <value>Không thể nộp điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
+    <value>Không thể công bố điểm đánh giá khi chu kỳ đã hoàn thành.</value>
   </data>
 </root>

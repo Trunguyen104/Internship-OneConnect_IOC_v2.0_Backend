@@ -51,10 +51,6 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                 _messageService.GetMessage(MessageKeys.Sprint.NotActive), ResultErrorType.BadRequest);
         }
 
-        if (!Enum.TryParse<MoveIncompleteItemsOption>(request.IncompleteItemsOption, ignoreCase: true, out var incompleteOption))
-            return Result<CompleteSprintResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Sprint.InvalidIncompleteItemsOption), ResultErrorType.BadRequest);
-
         // Load sprint work items
         var sprintWorkItems = await _unitOfWork.Repository<SprintWorkItem>().Query()
             .Where(swi => swi.SprintId == request.SprintId)
@@ -87,7 +83,7 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
 
             if (incompleteSprintWorkItems.Any())
             {
-                switch (incompleteOption)
+                switch (request.IncompleteItemsOption)
                 {
                     case MoveIncompleteItemsOption.ToBacklog:
                         foreach (var item in incompleteSprintWorkItems)
@@ -122,8 +118,9 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         {
                             foreach (var item in incompleteSprintWorkItems)
                             {
-                                item.SprintId = nextSprint.SprintId;
-                                await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
+                                await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
+                                var newItem = new SprintWorkItem { SprintId = nextSprint.SprintId, WorkItemId = item.WorkItemId };
+                                await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
                             }
                         }
                         else
@@ -144,8 +141,9 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
                         await _unitOfWork.Repository<Sprint>().AddAsync(newSprint, cancellationToken);
                         foreach (var item in incompleteSprintWorkItems)
                         {
-                            item.SprintId = newSprint.SprintId;
-                            await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(item, cancellationToken);
+                            await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(item, cancellationToken);
+                            var newItem = new SprintWorkItem { SprintId = newSprint.SprintId, WorkItemId = item.WorkItemId };
+                            await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newItem, cancellationToken);
                         }
                         movedCount = incompleteSprintWorkItems.Count;
                         break;
@@ -169,7 +167,7 @@ public class CompleteSprintHandler : IRequestHandler<CompleteSprintCommand, Resu
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error occurred while completing sprint {SprintId}", request.SprintId);
-            throw;
+            return Result<CompleteSprintResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
 
         return Result<CompleteSprintResponse>.Success(new CompleteSprintResponse

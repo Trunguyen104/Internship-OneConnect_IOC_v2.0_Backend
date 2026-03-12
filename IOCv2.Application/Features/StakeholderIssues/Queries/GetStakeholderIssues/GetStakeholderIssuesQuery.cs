@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Extensions.Pagination;
+using IOCv2.Domain.Enums;
 using MediatR;
 
 namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIssues
@@ -9,20 +10,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
     /// </summary>
     public record GetStakeholderIssuesQuery : IRequest<IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>>
     {
-        /// <summary>
-        /// Optional project filter.
-        /// </summary>
-        public Guid? ProjectId { get; init; }
-
-        /// <summary>
-        /// Optional stakeholder filter.
-        /// </summary>
+        public Guid? InternshipId { get; init; }
         public Guid? StakeholderId { get; init; }
-
-        /// <summary>
-        /// Optional status filter (Open, InProgress, Resolved, Closed).
-        /// </summary>
-        public string? Status { get; init; }
+        public StakeholderIssueStatus? Status { get; init; }
 
         /// <summary>
         /// Pagination and sorting parameters.

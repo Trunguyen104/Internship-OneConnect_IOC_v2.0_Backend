@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
@@ -11,6 +12,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
         /// <summary>
         /// ID of the user to update (from route).
         /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
         public Guid UserId { get; init; }
 
         /// <summary>
@@ -26,7 +28,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
         /// <summary>
         /// (Optional) New account status.
         /// </summary>
-        public string? Status { get; init; }
+        public UserStatus? Status { get; init; }
 
         /// <summary>
         /// (Optional) Date of birth.
@@ -36,7 +38,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
         /// <summary>
         /// (Optional) Gender.
         /// </summary>
-        public string? Gender { get; init; }
+        public UserGender? Gender { get; init; }
 
         /// <summary>
         /// (Optional) New avatar URL.

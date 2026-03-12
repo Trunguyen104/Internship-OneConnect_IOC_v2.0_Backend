@@ -14,12 +14,14 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
         public Guid ProjectResourceId { get; set; }
         public Guid? ProjectId { get; set; }
         public string ResourceName { get; set; } = string.Empty;
-        public string ResourceType { get; set; } = string.Empty;
+        public FileType ResourceType { get; set; }
+
+
         public string ResourceUrl { get; set; } = string.Empty;
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Domain.Entities.ProjectResources, DeleteProjectResourceResponse>()
-                .ForMember(dest => dest.ResourceType, opt => opt.MapFrom(src => src.ResourceType.ToString()));
+            profile.CreateMap<Domain.Entities.ProjectResources, DeleteProjectResourceResponse>();
+
         }
     }
 }

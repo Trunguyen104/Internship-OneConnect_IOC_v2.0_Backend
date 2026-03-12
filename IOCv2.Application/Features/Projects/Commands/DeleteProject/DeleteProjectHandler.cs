@@ -55,12 +55,23 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
             // 2. Logic & Persistence (FFA-FLW)
             // Soft delete
             project.DeletedAt = DateTime.UtcNow;
-            await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            _logger.LogInformation("Successfully deleted project {ProjectId}", request.ProjectId);
+                _logger.LogInformation("Successfully deleted project {ProjectId}", request.ProjectId);
 
-            return Result<string>.Success(_messageService.GetMessage(MessageKeys.Projects.DeleteSuccess));
+                return Result<string>.Success(_messageService.GetMessage(MessageKeys.Projects.DeleteSuccess));
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Transaction failed while deleting project {ProjectId}", request.ProjectId);
+                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            }
         }
     }
 }

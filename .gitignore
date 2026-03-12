@@ -43,7 +43,8 @@ docker-compose.yml
 *.env.local
 *.pfx
 *.publishsettings
-
+*.txt
+*.log
 # Auto-generated files
 
 

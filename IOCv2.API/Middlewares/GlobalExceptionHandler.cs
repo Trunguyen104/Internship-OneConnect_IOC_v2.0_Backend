@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using IOCv2.Application.Common.Models;
 
 namespace IOCv2.API.Middlewares
 {
@@ -22,41 +23,38 @@ namespace IOCv2.API.Middlewares
         {
             _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
-            var problemDetails = new ProblemDetails
-            {
-                Status = (int)HttpStatusCode.InternalServerError,
-                Type = exception.GetType().Name,
-                Title = "An unexpected error occurred",
-                Detail = exception.Message,
-                Instance = httpContext.Request.Path
-            };
+            var statusCode = (int)HttpStatusCode.InternalServerError;
+            var message = "An unexpected error occurred.";
+            List<string>? errors = null;
 
             switch (exception)
             {
                 case ValidationException validationException:
-                    problemDetails.Status = (int)HttpStatusCode.BadRequest;
-                    problemDetails.Title = "Validation Error";
-                    problemDetails.Detail = "One or more validation errors occurred.";
-                    problemDetails.Extensions.Add("errors", validationException.Errors.Select(x => x.ErrorMessage).ToList());
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    message = "Validation Error";
+                    errors = validationException.Errors.Select(x => x.ErrorMessage).ToList();
                     break;
                 case BusinessException businessException:
-                    problemDetails.Status = (int)HttpStatusCode.BadRequest;
-                    problemDetails.Title = "Business Rule Violation";
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    message = businessException.Message;
                     break;
                 case NotFoundException notFoundException:
-                    problemDetails.Status = (int)HttpStatusCode.NotFound;
-                    problemDetails.Title = "Not Found";
+                    statusCode = (int)HttpStatusCode.NotFound;
+                    message = notFoundException.Message;
                     break;
-                case UnauthorizedAccessException:
-                    problemDetails.Status = (int)HttpStatusCode.Unauthorized;
-                    problemDetails.Title = "Unauthorized";
+                case UnauthorizedAccessException unauthorizedEx:
+                    statusCode = (int)HttpStatusCode.Unauthorized;
+                    message = unauthorizedEx.Message;
+                    break;
+                case TaskCanceledException _:
+                    statusCode = (int)HttpStatusCode.RequestTimeout;
+                    message = "Request was cancelled.";
                     break;
             }
 
-            httpContext.Response.StatusCode = problemDetails.Status.Value;
-
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-
+            var errorResponse = new ErrorResponse(statusCode, message, errors);
+            httpContext.Response.StatusCode = statusCode;
+            await httpContext.Response.WriteAsJsonAsync(errorResponse, cancellationToken);
             return true;
         }
     }

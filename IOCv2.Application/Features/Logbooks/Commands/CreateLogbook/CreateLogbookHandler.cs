@@ -33,7 +33,7 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
 
         public async Task<Result<CreateLogbookResponse>> Handle(CreateLogbookCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Starting logbook creation process for project {ProjectId} on date {DateReport}", request.ProjectId, request.DateReport);
+            _logger.LogInformation("Starting logbook creation process for internship {InternshipId} on date {DateReport}", request.InternshipId, request.DateReport);
 
             // 1. Validate current user
             if (!Guid.TryParse(_currentUserService.UserId, out var auditorId))
@@ -43,14 +43,13 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                 return Result<CreateLogbookResponse>.Failure(message, ResultErrorType.Unauthorized);
             }
 
-            // 2. Validate project exists
-            var projectExists = await _unitOfWork.Repository<Project>()
-                .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
-            if (!projectExists)
+            // 2. Validate internship exists
+            var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
+                .ExistsAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
+            if (!internshipExists)
             {
-                var message = _messageService.GetMessage(MessageKeys.Projects.NotFound);
-                _logger.LogWarning("Project {ProjectId} not found", request.ProjectId);
-                return Result<CreateLogbookResponse>.Failure(message, ResultErrorType.BadRequest);
+                _logger.LogWarning("Internship {InternshipId} not found", request.InternshipId);
+                return Result<CreateLogbookResponse>.Failure(_messageService.GetMessage(MessageKeys.Logbooks.InvalidInternship), ResultErrorType.NotFound);
             }
 
             // 3. Validate student record
@@ -59,48 +58,54 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
             if (student == null)
             {
                 _logger.LogWarning("Student record not found for user {UserId}", auditorId);
-                return Result<CreateLogbookResponse>.Failure(
-                    $"Student record not found for logged in user {auditorId}. Ensure you are logged in with a Student account.",
-                    ResultErrorType.Unauthorized
-                );
+                return Result<CreateLogbookResponse>.Failure(_messageService.GetMessage(MessageKeys.Logbooks.StudentNotFound), ResultErrorType.Unauthorized);
             }
 
             // 4. Create entity via Domain Factory (Architecture: FFA-CAG)
             var logbook = Logbook.Create(
-                request.ProjectId,
+                request.InternshipId,
                 student.StudentId,
                 request.Summary,
                 request.Issue,
                 request.Plan,
                 request.DateReport);
 
-            // 5. Transaction & Writing (FF-TXG)
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            
-            await _unitOfWork.Repository<Logbook>().AddAsync(logbook, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-            // Audit
-            var auditLog = new AuditLog
+            try
             {
-                AuditLogId = Guid.NewGuid(),
-                Action = AuditAction.Create,
-                EntityType = nameof(Logbook),
-                EntityId = logbook.LogbookId,
-                PerformedById = auditorId,
-                Reason = $"Created logbook for project {logbook.ProjectId}",
-                CreatedAt = DateTime.UtcNow
-            };
-            await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
+                // 5. Transaction & Writing (FF-TXG)
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+                
+                await _unitOfWork.Repository<Logbook>().AddAsync(logbook, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-            
-            _logger.LogInformation("Logbook {LogbookId} created successfully for student {StudentId}", logbook.LogbookId, student.StudentId);
+                // Audit
+                var auditLog = new AuditLog
+                {
+                    AuditLogId = Guid.NewGuid(),
+                    Action = AuditAction.Create,
+                    EntityType = nameof(Logbook),
+                    EntityId = logbook.LogbookId,
+                    PerformedById = auditorId,
+                    Reason = $"Created logbook for internship group {logbook.InternshipId}",
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.Repository<AuditLog>().AddAsync(auditLog, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            // 6. Return response
-            var response = _mapper.Map<CreateLogbookResponse>(logbook);
-            return Result<CreateLogbookResponse>.Success(response);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                
+                _logger.LogInformation("Logbook {LogbookId} created successfully for student {StudentId}", logbook.LogbookId, student.StudentId);
+
+                // 6. Return response
+                var response = _mapper.Map<CreateLogbookResponse>(logbook);
+                return Result<CreateLogbookResponse>.Success(response);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Failed to create logbook for internship {InternshipId}", request.InternshipId);
+                return Result<CreateLogbookResponse>.Failure("An error occurred while creating the logbook.", ResultErrorType.Conflict);
+            }
         }
     }
 }

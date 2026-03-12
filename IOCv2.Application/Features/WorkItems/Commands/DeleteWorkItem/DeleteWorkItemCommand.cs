@@ -6,7 +6,6 @@ namespace IOCv2.Application.Features.WorkItems.Commands.DeleteWorkItem;
 
 public record DeleteWorkItemCommand : IRequest<Result<DeleteWorkItemResponse>>
 {
-    [JsonIgnore]
     public Guid ProjectId { get; init; }
 
     [JsonIgnore]

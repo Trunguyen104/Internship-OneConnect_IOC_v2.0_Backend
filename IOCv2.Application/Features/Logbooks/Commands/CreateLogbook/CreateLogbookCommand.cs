@@ -1,5 +1,6 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -17,9 +18,9 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
     public record CreateLogbookCommand : IRequest<Result<CreateLogbookResponse>>, IMapFrom<Logbook>
     {
         /// <summary>
-        /// ID of the project the logbook belongs to.
+        /// ID of the internship group the logbook belongs to.
         /// </summary>
-        public Guid ProjectId { get; set; }
+        public Guid InternshipId { get; set; }
 
         /// <summary>
         /// Summary of activities performed.
@@ -42,8 +43,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
         public DateTime DateReport { get; set; }
 
         /// <summary>
-        /// Initial status of the logbook. Valid values: Punctual, Late.
+        /// Initial status of the logbook.
         /// </summary>
-        public string? Status { get; set; }
+        public LogbookStatus? Status { get; set; }
     }
 }
