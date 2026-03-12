@@ -31,7 +31,7 @@ public class TermsController : ApiControllerBase
     /// <returns>Paginated list of terms</returns>
     [HttpGet]
     [RateLimit(maxRequests: 60, windowMinutes: 1)]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetTermsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetTermsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
@@ -48,9 +48,9 @@ public class TermsController : ApiControllerBase
     /// <param name="id">Term ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Term details</returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetTermById")]
     [RateLimit(maxRequests: 60, windowMinutes: 1)]
-    [ProducesResponseType(typeof(Result<GetTermByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetTermByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -70,7 +70,7 @@ public class TermsController : ApiControllerBase
     /// <returns>Created term</returns>
     [HttpPost]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
-    [ProducesResponseType(typeof(Result<CreateTermResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<CreateTermResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -80,7 +80,8 @@ public class TermsController : ApiControllerBase
         [FromBody] CreateTermCommand command,
         CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(command, cancellationToken));
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleCreateResult(result, nameof(GetTermById), new { id = result.Data?.TermId, version = "1" });
     }
 
     /// <summary>
@@ -92,7 +93,7 @@ public class TermsController : ApiControllerBase
     /// <returns>Updated term</returns>
     [HttpPut("{id:guid}")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
-    [ProducesResponseType(typeof(Result<UpdateTermResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateTermResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -116,7 +117,7 @@ public class TermsController : ApiControllerBase
     /// <returns>Success message</returns>
     [HttpPatch("{id:guid}/close")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
-    [ProducesResponseType(typeof(Result<CloseTermResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CloseTermResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -139,7 +140,7 @@ public class TermsController : ApiControllerBase
     /// <returns>Success message with related data information</returns>
     [HttpDelete("{id:guid}")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
-    [ProducesResponseType(typeof(Result<DeleteTermResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteTermResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
