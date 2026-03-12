@@ -41,6 +41,18 @@ public class CreateEvaluationCriteriaHandler
                 ResultErrorType.NotFound);
         }
 
+        var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
+            
+        if (cycle!.Status != Domain.Enums.EvaluationCycleStatus.Pending)
+        {
+            _logger.LogWarning("Cannot create criteria: EvaluationCycle {CycleId} is not in Pending status (Current: {Status})", request.CycleId, cycle.Status);
+            return Result<CreateEvaluationCriteriaResponse>.Failure(
+                "Chỉ được phép cấu hình tiêu chí khi Đợt đánh giá đang ở trạng thái Khởi tạo (Pending).",
+                ResultErrorType.BadRequest);
+        }
+
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

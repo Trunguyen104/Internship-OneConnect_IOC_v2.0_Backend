@@ -40,6 +40,18 @@ public class UpdateEvaluationCriteriaHandler
                 ResultErrorType.NotFound);
         }
 
+        var cycle = await _unitOfWork.Repository<Domain.Entities.EvaluationCycle>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CycleId == criteria.CycleId, cancellationToken);
+
+        if (cycle!.Status == Domain.Enums.EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot update criteria: EvaluationCycle {CycleId} is already completed", criteria.CycleId);
+            return Result<UpdateEvaluationCriteriaResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationCriteriaKey.CannotUpdateInCompletedCycle),
+                ResultErrorType.BadRequest);
+        }
+
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

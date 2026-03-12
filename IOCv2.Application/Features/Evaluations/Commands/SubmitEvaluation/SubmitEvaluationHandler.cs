@@ -28,6 +28,23 @@ public class SubmitEvaluationHandler : IRequestHandler<SubmitEvaluationCommand, 
     public async Task<Result<SubmitEvaluationResponse>> Handle(
         SubmitEvaluationCommand request, CancellationToken cancellationToken)
     {
+        var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
+            
+        if (cycle == null)
+            return Result<SubmitEvaluationResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationKey.CycleNotFound),
+                ResultErrorType.NotFound);
+
+        if (cycle.Status == EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot submit evaluation: EvaluationCycle {CycleId} is already completed", request.CycleId);
+            return Result<SubmitEvaluationResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationKey.CannotSubmitInCompletedCycle),
+                ResultErrorType.BadRequest);
+        }
+
         var evaluations = await _unitOfWork.Repository<Evaluation>().Query()
             .Where(e => e.CycleId == request.CycleId && e.InternshipId == request.InternshipId)
             .ToListAsync(cancellationToken);
