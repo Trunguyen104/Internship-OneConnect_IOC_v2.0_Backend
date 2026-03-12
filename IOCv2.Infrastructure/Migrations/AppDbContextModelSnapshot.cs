@@ -1376,6 +1376,19 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("term_id");
 
+                    b.Property<string>("CloseReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("close_reason");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("closed_at");
+
+                    b.Property<Guid?>("ClosedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("closed_by");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -1387,6 +1400,10 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
 
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date")
@@ -1406,6 +1423,18 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
+                    b.Property<int>("TotalEnrolled")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_enrolled");
+
+                    b.Property<int>("TotalPlaced")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_placed");
+
+                    b.Property<int>("TotalUnplaced")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_unplaced");
+
                     b.Property<Guid>("UniversityId")
                         .HasColumnType("uuid")
                         .HasColumnName("university_id");
@@ -1417,6 +1446,10 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
 
                     b.HasKey("TermId")
                         .HasName("pk_terms");
