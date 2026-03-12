@@ -34,6 +34,10 @@ public class TermConfiguration : IEntityTypeConfiguration<Term>
             .HasConversion<short>()
             .HasColumnType("smallint");
 
+        builder.Property(x => x.CloseReason)
+            .HasColumnName("close_reason")
+            .HasMaxLength(500);
+
         builder.HasOne(x => x.University)
             .WithMany(u => u.Terms)
             .HasForeignKey(x => x.UniversityId)

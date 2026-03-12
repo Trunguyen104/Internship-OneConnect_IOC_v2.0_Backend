@@ -40,6 +40,18 @@ public class DeleteEvaluationCriteriaHandler
                 ResultErrorType.NotFound);
         }
 
+        var cycle = await _unitOfWork.Repository<Domain.Entities.EvaluationCycle>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CycleId == criteria.CycleId, cancellationToken);
+
+        if (cycle!.Status == Domain.Enums.EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot delete criteria: EvaluationCycle {CycleId} is already completed", criteria.CycleId);
+            return Result<bool>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationCriteriaKey.CannotDeleteInCompletedCycle),
+                ResultErrorType.BadRequest);
+        }
+
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
