@@ -81,7 +81,7 @@ public class TermsController : ApiControllerBase
         [FromBody] CreateTermCommand command,
         CancellationToken cancellationToken = default)
     {
-        return HandleCreatedResult(await _mediator.Send(command, cancellationToken));
+        return HandleResult(await _mediator.Send(command, cancellationToken));
     }
 
     /// <summary>
