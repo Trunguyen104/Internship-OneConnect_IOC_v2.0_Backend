@@ -793,4 +793,85 @@
   <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
+  <data name="EvaluationCycle.NotFound" xml:space="preserve">
+    <value>Evaluation cycle not found.</value>
+  </data>
+  <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
+    <value>Corresponding term not found.</value>
+  </data>
+  <data name="EvaluationCycle.NameRequired" xml:space="preserve">
+    <value>Evaluation cycle name is required.</value>
+  </data>
+  <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
+    <value>Start date is required.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
+    <value>End date is required.</value>
+  </data>
+  <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
+    <value>Evaluation cycles with criteria cannot be deleted.</value>
+  </data>
+  <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
+    <value>Cannot update a completed evaluation cycle.</value>
+  </data>
+  <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
+    <value>This evaluation cycle has already been completed or cancelled.</value>
+  </data>
+  <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
+    <value>Cannot complete an evaluation cycle without any criteria.</value>
+  </data>
+  <data name="EvaluationCriteria.NotFound" xml:space="preserve">
+    <value>Evaluation criteria not found.</value>
+  </data>
+  <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
+    <value>Corresponding evaluation cycle not found.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
+    <value>Cannot add new criteria to an already completed evaluation cycle.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Cannot update criteria in an already completed evaluation cycle.</value>
+  </data>
+  <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
+    <value>Cannot delete criteria in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.NotFound" xml:space="preserve">
+    <value>Evaluation results not found.</value>
+  </data>
+  <data name="Evaluation.CycleNotFound" xml:space="preserve">
+    <value>Corresponding evaluation cycle not found.</value>
+  </data>
+  <data name="Evaluation.InternshipNotFound" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
+    <value>Cannot update an evaluation once the results is submitted or published.</value>
+  </data>
+  <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
+    <value>Some evaluation criteria are missing.</value>
+  </data>
+  <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
+    <value>Given score cannot exceed the maximum score of its respective criteria.</value>
+  </data>
+  <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
+    <value>All members in this group have been fully submitted.</value>
+  </data>
+  <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
+    <value>Cannot publish the scores unless all students in the internship group are marked as "Submitted".</value>
+  </data>
+  <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
+    <value>Cannot draft evaluation scores in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <value>Cannot update evaluation scores in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
+    <value>Cannot submit evaluation scores in an already completed evaluation cycle.</value>
+  </data>
+  <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
+    <value>Cannot publish evaluation scores in an already completed evaluation cycle.</value>
+  </data>
 </root>

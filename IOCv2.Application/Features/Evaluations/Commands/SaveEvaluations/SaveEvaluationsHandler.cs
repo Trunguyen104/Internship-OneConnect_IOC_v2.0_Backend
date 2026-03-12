@@ -30,6 +30,13 @@ public class SaveEvaluationsHandler : IRequestHandler<SaveEvaluationsCommand, Re
                 _messageService.GetMessage(MessageKeys.EvaluationKey.CycleNotFound),
                 ResultErrorType.NotFound);
 
+        if (cycle.Status == EvaluationCycleStatus.Completed)
+        {
+            return Result<List<SaveEvaluationsResponse>>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationKey.CannotSaveInCompletedCycle),
+                ResultErrorType.BadRequest);
+        }
+
         // 2. Validate InternshipGroup
         var internship = await _unitOfWork.Repository<InternshipGroup>().Query()
             .Include(i => i.Members)

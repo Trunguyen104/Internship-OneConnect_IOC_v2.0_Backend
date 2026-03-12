@@ -42,6 +42,14 @@ public class UpdateEvaluationCycleHandler
                 ResultErrorType.NotFound);
         }
 
+        if (cycle.Status == EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot update EvaluationCycle {CycleId} because it is already completed", request.CycleId);
+            return Result<UpdateEvaluationCycleResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationCycle.CannotUpdateCompleted),
+                ResultErrorType.BadRequest);
+        }
+
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

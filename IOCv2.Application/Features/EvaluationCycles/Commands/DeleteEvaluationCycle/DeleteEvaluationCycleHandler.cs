@@ -41,6 +41,15 @@ public class DeleteEvaluationCycleHandler
                 ResultErrorType.NotFound);
         }
 
+        if (cycle.Status == Domain.Enums.EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot delete EvaluationCycle {CycleId} because it is already completed", request.CycleId);
+            // Có thể định nghĩa key riêng, tạm dùng CannotUpdateCompleted / Validation Fail
+            return Result<bool>.Failure(
+                "Không thể xóa chu kỳ đánh giá đã hoàn thành.",
+                ResultErrorType.BadRequest);
+        }
+
         var hasCriteria = await _unitOfWork.Repository<Domain.Entities.EvaluationCriteria>().Query()
             .AnyAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
