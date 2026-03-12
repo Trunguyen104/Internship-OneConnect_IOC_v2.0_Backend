@@ -31,15 +31,38 @@ public class CreateEvaluationCycleHandler
     {
         _logger.LogInformation("Creating EvaluationCycle {Name} for Term {TermId}", request.Name, request.TermId);
 
-        var termExists = await _unitOfWork.Repository<Term>().Query()
-            .AnyAsync(t => t.TermId == request.TermId, cancellationToken);
+        var term = await _unitOfWork.Repository<Term>().Query()
+            .FirstOrDefaultAsync(t => t.TermId == request.TermId, cancellationToken);
 
-        if (!termExists)
+        if (term == null)
         {
             _logger.LogWarning("Term {TermId} not found", request.TermId);
             return Result<CreateEvaluationCycleResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationCycle.TermNotFound),
                 ResultErrorType.NotFound);
+        }
+
+        var isDuplicateName = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .AnyAsync(c => c.TermId == request.TermId && c.Name.ToLower() == request.Name.ToLower(), cancellationToken);
+
+        if (isDuplicateName)
+        {
+            _logger.LogWarning("EvaluationCycle {Name} already exists in Term {TermId}", request.Name, request.TermId);
+            return Result<CreateEvaluationCycleResponse>.Failure(
+                "Tên đợt đánh giá đã tồn tại trong học kỳ này.",
+                ResultErrorType.Conflict);
+        }
+
+        var requestStartDate = DateOnly.FromDateTime(request.StartDate);
+        var requestEndDate = DateOnly.FromDateTime(request.EndDate);
+
+        if (requestStartDate < term.StartDate || requestEndDate > term.EndDate)
+        {
+            _logger.LogWarning("EvaluationCycle dates {StartDate} to {EndDate} are out of bounds for Term {TermId} ({TermStart} to {TermEnd})", 
+                request.StartDate, request.EndDate, request.TermId, term.StartDate, term.EndDate);
+            return Result<CreateEvaluationCycleResponse>.Failure(
+                $"Thời gian đợt đánh giá phải nằm trong khoảng thời gian của Học kỳ ({term.StartDate:dd/MM/yyyy} - {term.EndDate:dd/MM/yyyy}).",
+                ResultErrorType.BadRequest);
         }
 
         try

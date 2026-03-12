@@ -18,7 +18,6 @@ namespace IOCv2.API.Controllers.Stakeholders;
 /// </summary>
 [Tags("Stakeholder Issue Management")]
 [Authorize]
-[Route("api/v{version:apiVersion}/stakeholder-issues")]
 public class StakeholderIssuesController : ApiControllerBase
 {
     private readonly IMediator _mediator;

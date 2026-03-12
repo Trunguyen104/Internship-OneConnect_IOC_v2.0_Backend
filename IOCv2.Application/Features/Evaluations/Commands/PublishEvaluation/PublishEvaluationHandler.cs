@@ -30,6 +30,23 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
     {
         _logger.LogInformation("Publishing Evaluations for Cycle {CycleId} and Internship {InternshipId}", request.CycleId, request.InternshipId);
 
+        var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
+            
+        if (cycle == null)
+            return Result<PublishEvaluationResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationKey.CycleNotFound),
+                ResultErrorType.NotFound);
+
+        if (cycle.Status == EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot publish evaluation: EvaluationCycle {CycleId} is already completed", request.CycleId);
+            return Result<PublishEvaluationResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationKey.CannotPublishInCompletedCycle),
+                ResultErrorType.BadRequest);
+        }
+
         var internship = await _unitOfWork.Repository<InternshipGroup>().Query()
             .Include(i => i.Members)
             .FirstOrDefaultAsync(i => i.InternshipId == request.InternshipId, cancellationToken);

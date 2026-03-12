@@ -1,10 +1,11 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Authentication.Commands.Login
 {
@@ -15,14 +16,16 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
         private readonly ITokenService _tokenService;
         private readonly IRateLimiter _rateLimiter;
         private readonly IMessageService _messageService;
+        private readonly ILogger<LoginHandler> _logger;
 
-        public LoginHandler(IUnitOfWork unitOfWork, IPasswordService passwordService, ITokenService tokenService, IRateLimiter rateLimiter, IMessageService messageService)
+        public LoginHandler(IUnitOfWork unitOfWork, IPasswordService passwordService, ITokenService tokenService, IRateLimiter rateLimiter, IMessageService messageService, ILogger<LoginHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _passwordService = passwordService;
             _tokenService = tokenService;
             _rateLimiter = rateLimiter;
             _messageService = messageService;
+            _logger = logger;
         }
 
         public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -30,8 +33,11 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
             // Each user has own key counting invalid turn
             var rateLimitKey = $"login_attempt:{request.Email}";
 
+            _logger.LogInformation("Login attempt for email: {Email}", request.Email);
+
             if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
             {
+                _logger.LogWarning("Login blocked for email: {Email} due to rate limiting", request.Email);
                 return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.AccountBlocked));
             }
 
@@ -41,6 +47,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
 
             if (user == null)
             {
+                _logger.LogWarning("Login failed: User not found with email: {Email}", request.Email);
                 return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.InvalidCredentials));
             }
 
@@ -54,8 +61,10 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
                     blockFor: TimeSpan.FromMinutes(15),
                     cancellationToken);
 
+                _logger.LogWarning("Login failed: Invalid password for email: {Email}", request.Email);
                 return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.InvalidCredentials));
             }
+
 
             // All good - reset failure count
             await _rateLimiter.ResetAsync(rateLimitKey, cancellationToken);
@@ -63,6 +72,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
             // Kiểm tra trạng thái account
             if (user.Status == UserStatus.Inactive)
             {
+                _logger.LogWarning("Login failed: Account is inactive for email: {Email}", request.Email);
                 return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.AccountInactive));
             }
 
@@ -87,9 +97,20 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
                 UserId = user.UserId
             };
 
-            // Attach refresh token with user
-            await _unitOfWork.Repository<RefreshToken>().AddAsync(refreshTokenEntity, cancellationToken);
-            await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                // Attach refresh token with user
+                await _unitOfWork.Repository<RefreshToken>().AddAsync(refreshTokenEntity, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Failed to save refresh token and commit transaction for user: {Email}", request.Email);
+                throw;
+            }
 
             // Response Client
             var response = new LoginResponse
@@ -102,6 +123,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
                 ExpiresIn = expiresIn
             };
 
+            _logger.LogInformation("Login successful for email: {Email}", request.Email);
             return Result<LoginResponse>.Success(response);
         }
     }

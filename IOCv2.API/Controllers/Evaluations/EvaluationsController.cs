@@ -1,6 +1,8 @@
 using IOCv2.Application.Features.EvaluationCycles.Commands.CreateEvaluationCycle;
 using IOCv2.Application.Features.EvaluationCycles.Commands.DeleteEvaluationCycle;
 using IOCv2.Application.Features.EvaluationCycles.Commands.UpdateEvaluationCycle;
+using IOCv2.Application.Features.EvaluationCycles.Commands.StartEvaluationCycle;
+using IOCv2.Application.Features.EvaluationCycles.Commands.CompleteEvaluationCycle;
 using IOCv2.Application.Features.EvaluationCycles.Queries.GetEvaluationCycleById;
 using IOCv2.Application.Features.EvaluationCycles.Queries.GetEvaluationCycles;
 using IOCv2.Application.Features.EvaluationCriteria.Commands.CreateEvaluationCriteria;
@@ -100,6 +102,32 @@ public class EvaluationsController : ApiControllerBase
         return HandleResult(result);
     }
 
+    /// <summary>
+    /// Bắt đầu chu kỳ đánh giá (Pending -> Grading).
+    /// </summary>
+    [HttpPatch("cycles/{cycleId:guid}/start")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> StartEvaluationCycle(Guid cycleId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new StartEvaluationCycleCommand { CycleId = cycleId }, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Hoàn thành chu kỳ đánh giá (Grading -> Completed).
+    /// </summary>
+    [HttpPatch("cycles/{cycleId:guid}/complete")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CompleteEvaluationCycle(Guid cycleId, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new CompleteEvaluationCycleCommand { CycleId = cycleId }, cancellationToken);
+        return HandleResult(result);
+    }
+
     // ==========================================
     // EVALUATION CRITERIA
     // ==========================================
@@ -118,15 +146,17 @@ public class EvaluationsController : ApiControllerBase
     /// <summary>
     /// Add new criteria to an evaluation cycle.
     /// </summary>
-    [HttpPost("criteria")]
+    [HttpPost("cycles/{cycleId:guid}/criteria")]
     [ProducesResponseType(typeof(ApiResponse<CreateEvaluationCriteriaResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateEvaluationCriteria(
+        [FromRoute] Guid cycleId,
         [FromBody] CreateEvaluationCriteriaCommand command,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
-        return HandleResult(result);
+        var result = await _mediator.Send(command with { CycleId = cycleId }, cancellationToken);
+        return HandleCreateResult(result, nameof(GetEvaluationCriteria), new { cycleId = cycleId, version = "1" });
     }
 
     /// <summary>
