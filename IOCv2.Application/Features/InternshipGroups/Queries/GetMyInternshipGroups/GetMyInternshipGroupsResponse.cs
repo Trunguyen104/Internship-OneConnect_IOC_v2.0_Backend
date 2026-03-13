@@ -9,8 +9,8 @@ public class GetMyInternshipGroupsResponse
     public string Name { get; set; } = string.Empty;
     public Guid? EnterpriseId { get; set; }
     public Guid SchoolId { get; set; }
-    public Guid InternshipPhaseId { get; set; }
-    public string GroupStatus { get; set; } = string.Empty;
+    public Guid TermId { get; set; }
+    public InternshipStatus GroupStatus { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Description { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ public class GetMyInternshipGroupsResponse
     public DateTime? UpdatedAt { get; set; }
     public MineEnterpriseDto? Enterprise { get; set; }
     public MineSchoolDto? School { get; set; }
-    public MineInternshipPhaseDto? InternshipPhase { get; set; }
+    public MineTermDto? Term { get; set; }
     public MineProjectDto? Project { get; set; }
     public List<MineMentorDto> Mentors { get; set; } = new();
     public int StudentCount { get; set; }
@@ -37,8 +37,8 @@ public class GetMyInternshipGroupsResponse
             Name = group.GroupName,
             EnterpriseId = group.EnterpriseId,
             SchoolId = group.Term.UniversityId,
-            InternshipPhaseId = group.TermId,
-            GroupStatus = MapGroupStatus(group.Status),
+            TermId = group.TermId,
+            GroupStatus = group.Status,
             StartDate = group.StartDate,
             EndDate = group.EndDate,
             Description = string.Empty,
@@ -59,7 +59,7 @@ public class GetMyInternshipGroupsResponse
                     Id = group.Term.University.UniversityId,
                     Name = group.Term.University.Name
                 },
-            InternshipPhase = new MineInternshipPhaseDto
+            Term = new MineTermDto
             {
                 Id = group.Term.TermId,
                 Name = group.Term.Name
@@ -92,16 +92,6 @@ public class GetMyInternshipGroupsResponse
             UpdatedBy = group.UpdatedBy
         };
     }
-
-    private static string MapGroupStatus(InternshipStatus status)
-    {
-        return status switch
-        {
-            InternshipStatus.Completed => "COMPLETED",
-            InternshipStatus.Failed => "FAILED",
-            _ => "ACTIVE"
-        };
-    }
 }
 
 public class MineEnterpriseDto
@@ -116,7 +106,7 @@ public class MineSchoolDto
     public string Name { get; set; } = string.Empty;
 }
 
-public class MineInternshipPhaseDto
+public class MineTermDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;

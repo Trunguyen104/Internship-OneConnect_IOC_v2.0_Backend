@@ -93,7 +93,7 @@ public class GetMyInternshipGroupsHandlerTests
         result.Data[0].ProjectId.Should().Be(projectId);
         result.Data[0].Project!.Name.Should().Be("IOC Version 2");
         result.Data[0].StudentCount.Should().Be(1);
-        result.Data[0].GroupStatus.Should().Be("ACTIVE");
+        result.Data[0].GroupStatus.Should().Be(IOCv2.Domain.Enums.InternshipStatus.InProgress);
     }
 
     [Fact]
