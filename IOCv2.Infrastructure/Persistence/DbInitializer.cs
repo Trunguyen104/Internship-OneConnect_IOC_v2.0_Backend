@@ -51,7 +51,7 @@ namespace IOCv2.Infrastructure.Persistence
                     new University
                     {
                         UniversityId = Guid.NewGuid(),
-                        Code = "FPTU",
+                        Code = "FPTU-CT",
                         Name = "FPT University Can Tho",
                         Address = "600 Nguyen Van Cu, Ninh Kieu, Can Tho",
                         Status = 1
