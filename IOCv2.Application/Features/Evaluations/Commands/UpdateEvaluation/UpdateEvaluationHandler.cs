@@ -43,6 +43,18 @@ public class UpdateEvaluationHandler : IRequestHandler<UpdateEvaluationCommand, 
                 ResultErrorType.NotFound);
         }
 
+        var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CycleId == evaluation.CycleId, cancellationToken);
+
+        if (cycle!.Status == EvaluationCycleStatus.Completed)
+        {
+            _logger.LogWarning("Cannot update evaluation: EvaluationCycle {CycleId} is already completed", evaluation.CycleId);
+            return Result<UpdateEvaluationResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationKey.CannotUpdateInCompletedCycle),
+                ResultErrorType.BadRequest);
+        }
+
         // 2. Chỉ cho update khi Status = Draft
         if (evaluation.Status != EvaluationStatus.Draft)
         {

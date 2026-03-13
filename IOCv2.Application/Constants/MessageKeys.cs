@@ -287,6 +287,8 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
+
+            public const string LogUploadAutoSetFileTypeError = "ProjectResources.LogUploadAutoSetFileTypeError";
         }
 
         public static class Internships
@@ -435,6 +437,9 @@
             public const string EndDateRequired = "EvaluationCycle.EndDateRequired";
             public const string EndDateMustBeAfterStart = "EvaluationCycle.EndDateMustBeAfterStart";
             public const string CannotDeleteWithCriteria = "EvaluationCycle.CannotDeleteWithCriteria";
+            public const string CannotUpdateCompleted = "EvaluationCycle.CannotUpdateCompleted";
+            public const string AlreadyCompleted = "EvaluationCycle.AlreadyCompleted";
+            public const string CannotCompleteWithoutCriteria = "EvaluationCycle.CannotCompleteWithoutCriteria";
         }
 
         public static class EvaluationCriteriaKey
@@ -445,6 +450,9 @@
             public const string NameMaxLength = "EvaluationCriteria.NameMaxLength";
             public const string MaxScoreInvalid = "EvaluationCriteria.MaxScoreInvalid";
             public const string WeightInvalid = "EvaluationCriteria.WeightInvalid";
+            public const string CannotCreateInCompletedCycle = "EvaluationCriteria.CannotCreateInCompletedCycle";
+            public const string CannotUpdateInCompletedCycle = "EvaluationCriteria.CannotUpdateInCompletedCycle";
+            public const string CannotDeleteInCompletedCycle = "EvaluationCriteria.CannotDeleteInCompletedCycle";
         }
 
         public static class EvaluationKey
@@ -460,6 +468,15 @@
             public const string ScoreExceedsMax = "Evaluation.ScoreExceedsMax";
             public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
             public const string CannotPublishIfNotSubmitted = "Evaluation.CannotPublishIfNotSubmitted";
+            public const string CannotSaveInCompletedCycle = "Evaluation.CannotSaveInCompletedCycle";
+            public const string CannotUpdateInCompletedCycle = "Evaluation.CannotUpdateInCompletedCycle";
+            public const string CannotSubmitInCompletedCycle = "Evaluation.CannotSubmitInCompletedCycle";
+            public const string CannotPublishInCompletedCycle = "Evaluation.CannotPublishInCompletedCycle";
+        }
+
+        public static class File
+        {
+            
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using IOCv2.API.Configurations;
+using IOCv2.API.Configurations;
 using IOCv2.API.Middlewares;
 using IOCv2.Application;
 using IOCv2.Infrastructure;
@@ -28,8 +28,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add API Configurations
 builder.Services.AddSwaggerConfig();
-builder.Services.AddCorsPolicy(builder.Configuration);
-builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddSecurityConfig(builder.Configuration);
 builder.Services.AddRedisConfig(builder.Configuration);
 builder.Services.AddForwardedHeadersConfig();
 builder.Services.AddLocalizationConfig();
@@ -74,7 +73,11 @@ app.UseAuthorization();
 
 app.UseMiddleware<SerilogUserEnricherMiddleware>();
 app.UseSerilogRequestLogging();
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/app/Uploads"),
+    RequestPath = "/uploads"
+});
 app.MapControllers();
 
 app.Run();
