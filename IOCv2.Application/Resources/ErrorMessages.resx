@@ -699,4 +699,7 @@
   <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Nhóm thực tập không hợp lệ hoặc không được tìm thấy.</value>
   </data>
+  <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi lấy danh sách báo cáo vi phạm.</value>
+  </data>
 </root>

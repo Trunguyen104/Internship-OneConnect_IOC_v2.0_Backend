@@ -27,6 +27,7 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
         public virtual ICollection<Stakeholder> Stakeholders { get; set; } = new List<Stakeholder>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
+        public virtual ICollection<ViolationReport> ViolationReports { get; set; } = new List<ViolationReport>();
 
         protected InternshipGroup() { }
 

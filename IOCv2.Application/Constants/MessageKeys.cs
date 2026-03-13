@@ -405,5 +405,12 @@
             public const string AlreadySubmitted = "Evaluation.AlreadySubmitted";
             public const string CannotPublishIfNotSubmitted = "Evaluation.CannotPublishIfNotSubmitted";
         }
+
+        public static class ViolationReportKey {
+            // Get All
+            public const string GetViolationReportsError = "ViolationReport.GetViolationReportsError";
+            public const string FilteredNotFound = "ViolationReport.FilteredNotFound";
+            public const string NotFound = "ViolationReport.NotFound";
+        }
     }
 }

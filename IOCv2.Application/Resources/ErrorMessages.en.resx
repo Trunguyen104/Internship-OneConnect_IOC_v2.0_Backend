@@ -216,6 +216,24 @@
   <data name="Enterprise.NotFound" xml:space="preserve">
     <value>No enterprise information found.</value>
   </data>
+  <data name="InternshipGroup.NameRequired" xml:space="preserve">
+    <value>Internship group name is required.</value>
+  </data>
+  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
+    <value>Internship group name cannot exceed 255 characters.</value>
+  </data>
+  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
+    <value>Term ID is required.</value>
+  </data>
+  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
+    <value>Start date must be before end date.</value>
+  </data>
+  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
+    <value>Student list is required.</value>
+  </data>
+  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
+    <value>List of students to remove is required.</value>
+  </data>
   <data name="Projects.LogDeleteError" xml:space="preserve">
     <value>Error deleting project {0}</value>
   </data>
@@ -463,6 +481,90 @@
   <data name="Enterprise.DeleteError" xml:space="preserve">
     <value>An error occurred while deleting the enterprise. Please try again later.</value>
   </data>
+  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+    <value>You are not associated with any enterprise as an HR.</value>
+  </data>
+  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+    <value>Enterprise not found for the current HR.</value>
+  </data>
+  <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
+    <value>Failed to save internship group to database</value>
+  </data>
+  <data name="InternshipGroup.LogCreationError" xml:space="preserve">
+    <value>Error occurred while creating internship group</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
+    <value>Failed to update internship group in database</value>
+  </data>
+  <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
+    <value>Error occurred while updating internship group</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
+    <value>Failed to delete internship group from database</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
+    <value>Error occurred while deleting internship group: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
+    <value>Some student IDs are invalid or not found</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
+    <value>Failed to update group members in database</value>
+  </data>
+  <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
+    <value>Error occurred while adding students to group</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
+    <value>Failed to update group in database</value>
+  </data>
+  <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
+    <value>Error occurred while removing students from group</value>
+  </data>
+  <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
+    <value>Invalid student ID.</value>
+  </data>
+  <data name="InternshipGroup.TermNotFound" xml:space="preserve">
+    <value>Term not found.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise not found.</value>
+  </data>
+  <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
+    <value>Mentor not found.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
+    <value>Student not found.</value>
+  </data>
+  <data name="InternshipGroup.NotFound" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
+    <value>Term not found for ID: {TermId}</value>
+  </data>
+  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise not found for ID: {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+    <value>Mentor not found for ID: {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+    <value>Student not found for ID: {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+    <value>Internship group not found for ID: {InternshipId}</value>
+  </data>
+  <data name="Logbooks.StudentNotFound" xml:space="preserve">
+    <value>Student record not found for logged in user. Ensure you are logged in with a Student account.</value>
+  </data>
+  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
+    <value>You do not have permission to update this logbook.</value>
+  </data>
+  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
+    <value>You do not have permission to delete this logbook.</value>
+  </data>
+  <data name="Logbooks.InvalidInternship" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -541,106 +643,7 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
   </data>
-  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
-    <value>You are not associated with any enterprise as an HR.</value>
-  </data>
-  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
-    <value>Enterprise not found for the current HR.</value>
-  </data>
-  <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
-    <value>Failed to save internship group to database</value>
-  </data>
-  <data name="InternshipGroup.LogCreationError" xml:space="preserve">
-    <value>Error occurred while creating internship group</value>
-  </data>
-  <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
-    <value>Failed to update internship group in database</value>
-  </data>
-  <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
-    <value>Error occurred while updating internship group</value>
-  </data>
-  <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
-    <value>Failed to delete internship group from database</value>
-  </data>
-  <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
-    <value>Error occurred while deleting internship group: {InternshipId}</value>
-  </data>
-  <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
-    <value>Some student IDs are invalid or not found</value>
-  </data>
-  <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
-    <value>Failed to update group members in database</value>
-  </data>
-  <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
-    <value>Error occurred while adding students to group</value>
-  </data>
-  <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
-    <value>Failed to update group in database</value>
-  </data>
-  <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
-    <value>Error occurred while removing students from group</value>
-  </data>
-  <data name="InternshipGroup.NameRequired" xml:space="preserve">
-    <value>Internship group name is required.</value>
-  </data>
-  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
-    <value>Internship group name cannot exceed 255 characters.</value>
-  </data>
-  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
-    <value>Term ID is required.</value>
-  </data>
-  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
-    <value>Start date must be before end date.</value>
-  </data>
-  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
-    <value>Student list is required.</value>
-  </data>
-  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
-    <value>List of students to remove is required.</value>
-  </data>
-  <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
-    <value>Invalid student ID.</value>
-  </data>
-  <data name="InternshipGroup.TermNotFound" xml:space="preserve">
-    <value>Term not found.</value>
-  </data>
-  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
-    <value>Enterprise not found.</value>
-  </data>
-  <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
-    <value>Mentor not found.</value>
-  </data>
-  <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
-    <value>Student not found.</value>
-  </data>
-  <data name="InternshipGroup.NotFound" xml:space="preserve">
-    <value>Internship group not found.</value>
-  </data>
-  <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
-    <value>Term not found for ID: {TermId}</value>
-  </data>
-  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
-    <value>Enterprise not found for ID: {EnterpriseId}</value>
-  </data>
-  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
-    <value>Mentor not found for ID: {MentorId}</value>
-  </data>
-  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
-    <value>Student not found for ID: {StudentId}</value>
-  </data>
-  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
-    <value>Internship group not found for ID: {InternshipId}</value>
-  </data>
-  <data name="Logbooks.StudentNotFound" xml:space="preserve">
-    <value>Student record not found for logged in user. Ensure you are logged in with a Student account.</value>
-  </data>
-  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
-    <value>You do not have permission to update this logbook.</value>
-  </data>
-  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
-    <value>You do not have permission to delete this logbook.</value>
-  </data>
-  <data name="Logbooks.InvalidInternship" xml:space="preserve">
-    <value>Internship group not found.</value>
+  <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
+    <value>Error getting violation reports</value>
   </data>
 </root>

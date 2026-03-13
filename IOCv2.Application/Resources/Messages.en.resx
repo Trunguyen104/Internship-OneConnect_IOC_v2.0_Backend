@@ -243,4 +243,10 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Successfully removed students from group: {InternshipId}</value>
   </data>
+  <data name="ViolationReport.FilteredNotFound" xml:space="preserve">
+    <value>No matching violation report found</value>
+  </data>
+  <data name="ViolationReport.NotFound" xml:space="preserve">
+    <value>No violation reports available</value>
+  </data>
 </root>

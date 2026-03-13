@@ -39,8 +39,6 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             GetAllProjectsQuery request,
             CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Retrieving all projects with SearchTerm: {SearchTerm}, Status: {Status}", request.SearchTerm, request.Status);
-
             // 1. Build base query
             var query = _unitOfWork.Repository<Project>().Query().AsNoTracking();
 
@@ -57,7 +55,6 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             {
                 query = query.Where(p => p.Status == request.Status.Value);
             }
-
 
             if (request.FromDate.HasValue)
             {
@@ -84,8 +81,6 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 
             var result = PaginatedResult<GetAllProjectsResponse>.Create(
                 items, totalCount, request.PageNumber, request.PageSize);
-
-            _logger.LogInformation("Successfully retrieved {Count} projects", items.Count);
 
             return Result<PaginatedResult<GetAllProjectsResponse>>.Success(result);
         }
