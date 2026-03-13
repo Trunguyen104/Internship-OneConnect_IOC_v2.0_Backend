@@ -47,91 +47,113 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
         {
             try
             {
-
-                // Validate file
+                // Validate file name and file size before processing upload
                 var fileValidation = FileValidationHelper.ValidateFile(
                     request.File.FileName,
                     request.File.Length);
 
                 if (!fileValidation.IsValid)
                 {
+                    // Return BadRequest if file validation fails
                     return Result<UploadProjectResourceResponse>.Failure(
                         fileValidation.ErrorMessage!,
                         ResultErrorType.BadRequest);
                 }
 
-                // Check if project exists
+                // Check if the target project exists in the database
                 var projectExists = await _unitOfWork.Repository<Project>()
                     .ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
-
                 if (!projectExists)
                 {
+                    // Return NotFound if project does not exist
                     return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound),
                         ResultErrorType.NotFound);
                 }
-
+                // Start database transaction
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
                 string? fileUrl = null;
                 try
                 {
-                    // Upload file to storage
-                    var fileName = $"{Guid.NewGuid():N}_{request.File.FileName}";
+                    // Generate a unique file name to avoid collisions
+                    var fileName = FileConstants.GetFileName(request.File.FileName);
+                    // Upload file to storage service (local, S3, etc.)
                     fileUrl = await _fileStorageService.UploadFileAsync(
                         request.File,
-                        $"projects/{request.ProjectId}/resources",
+                        FileConstants.GetFolder(request.ProjectId),
                         fileName,
                         cancellationToken);
-
-                    // Create resource record using constructor
-                    var resourceType = Enum.Parse<FileType>(request.ResourceType, ignoreCase: true);
+                    FileType fileType;
+                    try
+                    {
+                        // Automatically detect file type based on file extension
+                        fileType = AutoSetFileType(fileUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log error if file type detection fails
+                        _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadAutoSetFileTypeError), fileUrl);
+                        // Reject unsupported file types
+                        return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"), ResultErrorType.BadRequest);
+                    }
+                    // Create ProjectResources entity
                     var resource = new Domain.Entities.ProjectResources(
                         request.ProjectId,
                         request.ResourceName ?? request.File.FileName,
-                        resourceType,
+                        fileType,
                         fileUrl);
 
-                    // Save to database
+                    // Save resource metadata to database
                     await _unitOfWork.Repository<Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
                     await _unitOfWork.SaveChangeAsync(cancellationToken);
-
+                    // Commit transaction after successful database operation
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-                    // Map to response
+                    // Map entity to response DTO
                     var response = _mapper.Map<UploadProjectResourceResponse>(resource);
-
+                    // Log successful upload
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadSuccess),
                         request.File.FileName, request.ProjectId);
-
                     return Result<UploadProjectResourceResponse>.Success(response);
                 }
                 catch (Exception ex)
                 {
+                    // Rollback transaction if any error occurs
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                    
-                    // Compensating transaction: remove the uploaded file if database commit fails
+
+                    // Compensating action:
+                    // If the file was uploaded but database operation failed,
+                    // delete the uploaded file to prevent orphaned files in storage
                     if (!string.IsNullOrEmpty(fileUrl))
                     {
-                        try
-                        {
-                            await _fileStorageService.DeleteFileAsync(fileUrl, cancellationToken);
-                            _logger.LogInformation("Compensatory action: Deleted orphaned file {FileUrl} from storage after database failure.", fileUrl);
-                        }
-                        catch (Exception deleteEx)
-                        {
-                            _logger.LogError(deleteEx, "Compensatory action failed: Could not delete orphaned file {FileUrl} from storage.", fileUrl);
-                        }
+                        await _fileStorageService.DeleteFileAsync(fileUrl, cancellationToken);
                     }
-
+                    // Log upload failure
                     _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadError), request.ProjectId);
-                    throw;
+                    return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
                 }
             }
-            catch (Exception ex) // Outer catch for validation or project existence checks exceptions
+            catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to initiate file upload process for project: {ProjectId}", request.ProjectId);
-                throw;
+                // Catch unexpected errors during validation or initialization
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadError), request.ProjectId);
+                return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
+        }
+
+        private FileType AutoSetFileType(string filePath)
+        {
+            var extension = System.IO.Path.GetExtension(filePath).ToLower();
+            return extension switch
+            {
+                FileConstants.PdfExtension => FileType.PDF,
+                FileConstants.DocxExtension => FileType.DOCX,
+                FileConstants.PptxExtension => FileType.PPTX,
+                FileConstants.ZipExtension => FileType.ZIP,
+                FileConstants.RarExtension => FileType.RAR,
+                FileConstants.JpgExtension => FileType.JPG,
+                FileConstants.JpegExtension => FileType.JPG,
+                FileConstants.PngExtension => FileType.PNG,
+                _ => throw new InvalidOperationException(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"))
+            };
         }
     }
 }

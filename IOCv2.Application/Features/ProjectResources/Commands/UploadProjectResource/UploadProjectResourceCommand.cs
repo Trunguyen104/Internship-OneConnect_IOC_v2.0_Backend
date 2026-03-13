@@ -1,3 +1,4 @@
+using IOCv2.Domain.Enums;
 using IOCv2.Application.Common.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -13,8 +14,6 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
     {
         public Guid ProjectId { get; init; }
         public string ResourceName { get; init; } = string.Empty;
-        /// <summary>Type of file: DocumentFile, Image, Video, Other</summary>
-        public string ResourceType { get; init; } = string.Empty;
         public IFormFile File { get; init; } = null!;
     }
 }

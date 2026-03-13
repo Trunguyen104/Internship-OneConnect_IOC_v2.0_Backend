@@ -175,6 +175,8 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
+
+            public const string LogUploadAutoSetFileTypeError = "ProjectResources.LogUploadAutoSetFileTypeError";
         }
 
         public static class Internships
@@ -307,6 +309,11 @@
         public static class Error
         {
             public const string WorkItemNotFound = "Error.WorkItem.NotFound";
+        }
+
+        public static class File
+        {
+            
         }
     }
 }
