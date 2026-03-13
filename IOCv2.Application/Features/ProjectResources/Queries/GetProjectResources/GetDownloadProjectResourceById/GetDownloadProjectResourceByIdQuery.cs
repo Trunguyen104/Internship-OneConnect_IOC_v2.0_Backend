@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById
 {
-    public record GetProjectResourceByIdQuery : IRequest<Result<GetProjectResourceByIdResponse>>
+    public record GetDownloadProjectResourceByIdQuery : IRequest<Result<GetDownloadProjectResourceByIdResponse>>
     {
         public Guid ProjectResourceId { get; set; }
     }

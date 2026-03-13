@@ -287,6 +287,8 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
+
+            public const string LogUploadAutoSetFileTypeError = "ProjectResources.LogUploadAutoSetFileTypeError";
         }
 
         public static class Internships
@@ -470,6 +472,11 @@
             public const string CannotUpdateInCompletedCycle = "Evaluation.CannotUpdateInCompletedCycle";
             public const string CannotSubmitInCompletedCycle = "Evaluation.CannotSubmitInCompletedCycle";
             public const string CannotPublishInCompletedCycle = "Evaluation.CannotPublishInCompletedCycle";
+        }
+
+        public static class File
+        {
+            
         }
     }
 }

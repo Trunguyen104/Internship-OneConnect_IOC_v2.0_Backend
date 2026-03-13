@@ -1,4 +1,5 @@
-﻿using IOCv2.Application.Interfaces;
+﻿using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,14 +16,20 @@ namespace IOCv2.Infrastructure.Services
         private readonly string _storagePath;
         private readonly string _baseUrl;
         private readonly ILogger<LocalFileStorageService> _logger;
+        private const string _domain = FileConstants.FileDomain;
+        private readonly IMessageService _messageService;
 
         public LocalFileStorageService(
             IConfiguration configuration,
-            ILogger<LocalFileStorageService> logger)
+            ILogger<LocalFileStorageService> logger, IMessageService messageService)
         {
-            _storagePath = configuration["FileStorage:Path"] ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
-            _baseUrl = configuration["FileStorage:BaseUrl"] ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+            _storagePath = configuration["FileStorage:Path"]
+                ?? Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+
+            _baseUrl = configuration["FileStorage:BaseUrl"]
+                ?? "/Uploads";
             _logger = logger;
+            _messageService = messageService;
 
             // Create root directory if not exists
             if (!Directory.Exists(_storagePath))
@@ -61,13 +68,13 @@ namespace IOCv2.Infrastructure.Services
                 var relativePath = Path.Combine(folder, uniqueFileName).Replace('\\', '/');
                 var fileUrl = $"{_baseUrl}/{relativePath}";
 
-                _logger.LogInformation("File uploaded successfully: {FilePath}", filePath);
+                _logger.LogInformation(_messageService.GetMessage("ProjectResources.LogUploadAutoSetFileTypeError"), filePath);
 
                 return fileUrl;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error uploading file {FileName}", file.FileName);
+                _logger.LogError(ex, _messageService.GetMessage("MessageKeys.File.FileUploadedError"), file.FileName);
                 throw;
             }
         }
@@ -77,20 +84,18 @@ namespace IOCv2.Infrastructure.Services
             try
             {
                 var filePath = GetFilePathFromUrl(fileUrl);
-
                 if (File.Exists(filePath))
                 {
                     await Task.Run(() => File.Delete(filePath), cancellationToken);
-                    _logger.LogInformation("File deleted: {FilePath}", filePath);
+                    _logger.LogInformation(_messageService.GetMessage("MessageKeys.File.FileDeletedSuccess"), filePath);
                     return true;
                 }
-
-                _logger.LogWarning("File not found for deletion: {FileUrl}", fileUrl);
+                _logger.LogWarning(_messageService.GetMessage("MessageKeys.File.FileNotFound"), fileUrl);
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting file {FileUrl}", fileUrl);
+                _logger.LogError(ex, _messageService.GetMessage("MessageKeys.File.FileDeletedError"), fileUrl);
                 return false;
             }
         }
@@ -104,7 +109,7 @@ namespace IOCv2.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking file existence: {FileUrl}", fileUrl);
+                _logger.LogError(ex, _messageService.GetMessage("MessageKeys.File.FileCheckExistsError"), fileUrl);
                 return false;
             }
         }
@@ -123,14 +128,14 @@ namespace IOCv2.Infrastructure.Services
 
                 if (!File.Exists(filePath))
                 {
-                    throw new FileNotFoundException($"File not found: {fileUrl}");
+                    throw new FileNotFoundException(_messageService.GetMessage("MessageKeys.File.FileNotFound", fileUrl), fileUrl);
                 }
 
                 return await Task.Run(() => File.OpenRead(filePath), cancellationToken);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting file stream: {FileUrl}", fileUrl);
+                _logger.LogError(ex, _messageService.GetMessage("MessageKeys.File.FileGetStreamError"), fileUrl);
                 throw;
             }
         }
@@ -140,7 +145,6 @@ namespace IOCv2.Infrastructure.Services
             try
             {
                 var filePath = GetFilePathFromUrl(fileUrl);
-
                 if (!File.Exists(filePath))
                 {
                     return null;
@@ -156,10 +160,16 @@ namespace IOCv2.Infrastructure.Services
             }
         }
 
-        private string GetFilePathFromUrl(string fileUrl)
+        public string GetFilePathFromUrl(string fileUrl)
         {
-            var relativePath = fileUrl.Replace(_baseUrl, "").TrimStart('/');
+            var relativePath = fileUrl.Replace(_baseUrl, "").Replace("/Uploads", "").TrimStart('/');
+
             return Path.Combine(_storagePath, relativePath);
+        }
+
+        public string GetDomainUrl()
+        {
+            return _domain;
         }
     }
 
