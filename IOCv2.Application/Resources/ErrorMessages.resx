@@ -931,4 +931,97 @@
   <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Không thể công bố điểm đánh giá khi chu kỳ đã hoàn thành.</value>
   </data>
+
+  <!-- ── InternshipApplication: Validation ── -->
+  <data name="InternshipApplication.ApplicationIdRequired" xml:space="preserve">
+    <value>Mã đơn ứng tuyển không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.MentorIdRequired" xml:space="preserve">
+    <value>Mã Mentor không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonRequired" xml:space="preserve">
+    <value>Lý do từ chối không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonMaxLength" xml:space="preserve">
+    <value>Lý do từ chối không được vượt quá 500 ký tự.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameRequired" xml:space="preserve">
+    <value>Tên dự án không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameMaxLength" xml:space="preserve">
+    <value>Tên dự án không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="InternshipApplication.ProjectDescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả dự án không được vượt quá 1000 ký tự.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Business Errors ── -->
+  <data name="InternshipApplication.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đơn ứng tuyển.</value>
+  </data>
+  <data name="InternshipApplication.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin nhân viên doanh nghiệp của người dùng hiện tại.</value>
+  </data>
+  <data name="InternshipApplication.MentorNotBelongToEnterprise" xml:space="preserve">
+    <value>Mentor không thuộc doanh nghiệp của bạn.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToAccept" xml:space="preserve">
+    <value>Chỉ có thể chấp nhận đơn đang ở trạng thái Chờ duyệt.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToReject" xml:space="preserve">
+    <value>Chỉ có thể từ chối đơn đang ở trạng thái Chờ duyệt.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBeApprovedToAssign" xml:space="preserve">
+    <value>Chỉ có thể gán Mentor cho đơn đã được chấp nhận (Approved).</value>
+  </data>
+  <data name="InternshipApplication.StudentAlreadyInGroup" xml:space="preserve">
+    <value>Sinh viên đã được gán vào một nhóm thực tập trong kỳ này.</value>
+  </data>
+  <data name="InternshipApplication.StudentNotInMentorGroup" xml:space="preserve">
+    <value>Sinh viên không thuộc nhóm của bạn. Vui lòng liên hệ HR để gán Mentor trước.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameExistsInGroup" xml:space="preserve">
+    <value>Tên dự án đã tồn tại trong nhóm này.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Log Keys (dùng trong Logger, tiếng Anh) ── -->
+  <data name="InternshipApplication.Log.Accepting" xml:space="preserve">
+    <value>Accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptSuccess" xml:space="preserve">
+    <value>Application {0} accepted successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptError" xml:space="preserve">
+    <value>Error accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.Rejecting" xml:space="preserve">
+    <value>Rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectSuccess" xml:space="preserve">
+    <value>Application {0} rejected successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectError" xml:space="preserve">
+    <value>Error rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningMentor" xml:space="preserve">
+    <value>Assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorError" xml:space="preserve">
+    <value>Error assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningProject" xml:space="preserve">
+    <value>Assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectSuccess" xml:space="preserve">
+    <value>Project assigned successfully for application {0}, project: {1}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectError" xml:space="preserve">
+    <value>Error assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
+    <value>Current user identity is missing or invalid</value>
+  </data>
 </root>

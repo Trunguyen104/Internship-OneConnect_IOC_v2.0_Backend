@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -470,6 +470,52 @@
             public const string CannotUpdateInCompletedCycle = "Evaluation.CannotUpdateInCompletedCycle";
             public const string CannotSubmitInCompletedCycle = "Evaluation.CannotSubmitInCompletedCycle";
             public const string CannotPublishInCompletedCycle = "Evaluation.CannotPublishInCompletedCycle";
+        }
+
+        public static class InternshipApplication
+        {
+            // Validation
+            public const string ApplicationIdRequired = "InternshipApplication.ApplicationIdRequired";
+            public const string MentorIdRequired = "InternshipApplication.MentorIdRequired";
+            public const string RejectReasonRequired = "InternshipApplication.RejectReasonRequired";
+            public const string RejectReasonMaxLength = "InternshipApplication.RejectReasonMaxLength";
+            public const string ProjectNameRequired = "InternshipApplication.ProjectNameRequired";
+            public const string ProjectNameMaxLength = "InternshipApplication.ProjectNameMaxLength";
+            public const string ProjectDescriptionMaxLength = "InternshipApplication.ProjectDescriptionMaxLength";
+
+            // Business errors
+            public const string NotFound = "InternshipApplication.NotFound";
+            public const string EnterpriseUserNotFound = "InternshipApplication.EnterpriseUserNotFound";
+            public const string MentorNotBelongToEnterprise = "InternshipApplication.MentorNotBelongToEnterprise";
+            public const string StatusMustBePendingToAccept = "InternshipApplication.StatusMustBePendingToAccept";
+            public const string StatusMustBePendingToReject = "InternshipApplication.StatusMustBePendingToReject";
+            public const string StatusMustBeApprovedToAssign = "InternshipApplication.StatusMustBeApprovedToAssign";
+            public const string StudentAlreadyInGroup = "InternshipApplication.StudentAlreadyInGroup";
+            public const string StudentNotInMentorGroup = "InternshipApplication.StudentNotInMentorGroup";
+            public const string ProjectNameExistsInGroup = "InternshipApplication.ProjectNameExistsInGroup";
+
+            // Success messages
+            public const string AcceptSuccess = "InternshipApplication.AcceptSuccess";
+            public const string RejectSuccess = "InternshipApplication.RejectSuccess";
+            public const string AssignMentorSuccess = "InternshipApplication.AssignMentorSuccess";
+            public const string AssignMentorNewGroupSuccess = "InternshipApplication.AssignMentorNewGroupSuccess";
+            public const string AssignMentorExistingGroupSuccess = "InternshipApplication.AssignMentorExistingGroupSuccess";
+            public const string AssignProjectSuccess = "InternshipApplication.AssignProjectSuccess";
+
+            // Log keys
+            public const string LogAccepting = "InternshipApplication.Log.Accepting";
+            public const string LogAcceptSuccess = "InternshipApplication.Log.AcceptSuccess";
+            public const string LogAcceptError = "InternshipApplication.Log.AcceptError";
+            public const string LogRejecting = "InternshipApplication.Log.Rejecting";
+            public const string LogRejectSuccess = "InternshipApplication.Log.RejectSuccess";
+            public const string LogRejectError = "InternshipApplication.Log.RejectError";
+            public const string LogAssigningMentor = "InternshipApplication.Log.AssigningMentor";
+            public const string LogAssignMentorSuccess = "InternshipApplication.Log.AssignMentorSuccess";
+            public const string LogAssignMentorError = "InternshipApplication.Log.AssignMentorError";
+            public const string LogAssigningProject = "InternshipApplication.Log.AssigningProject";
+            public const string LogAssignProjectSuccess = "InternshipApplication.Log.AssignProjectSuccess";
+            public const string LogAssignProjectError = "InternshipApplication.Log.AssignProjectError";
+            public const string LogInvalidUserId = "InternshipApplication.Log.InvalidUserId";
         }
     }
 }

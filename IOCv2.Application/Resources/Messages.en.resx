@@ -243,4 +243,24 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Successfully removed students from group: {InternshipId}</value>
   </data>
+
+  <!-- ── InternshipApplication: Success Messages ── -->
+  <data name="InternshipApplication.AcceptSuccess" xml:space="preserve">
+    <value>Application accepted successfully.</value>
+  </data>
+  <data name="InternshipApplication.RejectSuccess" xml:space="preserve">
+    <value>Application rejected successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorNewGroupSuccess" xml:space="preserve">
+    <value>Mentor assigned and a new internship group has been created successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorExistingGroupSuccess" xml:space="preserve">
+    <value>Mentor assigned and student added to existing group successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignProjectSuccess" xml:space="preserve">
+    <value>Project assigned to internship group successfully.</value>
+  </data>
 </root>

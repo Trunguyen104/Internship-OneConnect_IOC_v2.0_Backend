@@ -874,4 +874,97 @@
   <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Cannot publish evaluation scores in an already completed evaluation cycle.</value>
   </data>
+
+  <!-- ── InternshipApplication: Validation ── -->
+  <data name="InternshipApplication.ApplicationIdRequired" xml:space="preserve">
+    <value>Application ID is required.</value>
+  </data>
+  <data name="InternshipApplication.MentorIdRequired" xml:space="preserve">
+    <value>Mentor ID is required.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonRequired" xml:space="preserve">
+    <value>Rejection reason is required.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonMaxLength" xml:space="preserve">
+    <value>Rejection reason cannot exceed 500 characters.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameRequired" xml:space="preserve">
+    <value>Project name is required.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameMaxLength" xml:space="preserve">
+    <value>Project name cannot exceed 255 characters.</value>
+  </data>
+  <data name="InternshipApplication.ProjectDescriptionMaxLength" xml:space="preserve">
+    <value>Project description cannot exceed 1000 characters.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Business Errors ── -->
+  <data name="InternshipApplication.NotFound" xml:space="preserve">
+    <value>Application not found.</value>
+  </data>
+  <data name="InternshipApplication.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Enterprise user record not found for the current user.</value>
+  </data>
+  <data name="InternshipApplication.MentorNotBelongToEnterprise" xml:space="preserve">
+    <value>The selected mentor does not belong to your enterprise.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToAccept" xml:space="preserve">
+    <value>Only applications with Pending status can be accepted.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToReject" xml:space="preserve">
+    <value>Only applications with Pending status can be rejected.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBeApprovedToAssign" xml:space="preserve">
+    <value>A mentor can only be assigned to an Approved application.</value>
+  </data>
+  <data name="InternshipApplication.StudentAlreadyInGroup" xml:space="preserve">
+    <value>The student has already been assigned to an internship group in this term.</value>
+  </data>
+  <data name="InternshipApplication.StudentNotInMentorGroup" xml:space="preserve">
+    <value>The student is not in your group. Please contact HR to assign a mentor first.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameExistsInGroup" xml:space="preserve">
+    <value>A project with this name already exists in the group.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Log Keys ── -->
+  <data name="InternshipApplication.Log.Accepting" xml:space="preserve">
+    <value>Accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptSuccess" xml:space="preserve">
+    <value>Application {0} accepted successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptError" xml:space="preserve">
+    <value>Error accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.Rejecting" xml:space="preserve">
+    <value>Rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectSuccess" xml:space="preserve">
+    <value>Application {0} rejected successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectError" xml:space="preserve">
+    <value>Error rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningMentor" xml:space="preserve">
+    <value>Assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorError" xml:space="preserve">
+    <value>Error assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningProject" xml:space="preserve">
+    <value>Assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectSuccess" xml:space="preserve">
+    <value>Project assigned successfully for application {0}, project: {1}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectError" xml:space="preserve">
+    <value>Error assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
+    <value>Current user identity is missing or invalid</value>
+  </data>
 </root>

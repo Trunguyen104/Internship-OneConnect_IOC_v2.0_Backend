@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -305,6 +305,9 @@ namespace IOCv2.Infrastructure.Persistence
                 var student2User = await _context.Users.Where(u => u.Role == UserRole.Student).Skip(1).FirstOrDefaultAsync();
                 var student2 = await _context.Students.FirstOrDefaultAsync(s => student2User != null && s.UserId == student2User.UserId);
 
+                var student3User = await _context.Users.Where(u => u.Role == UserRole.Student).Skip(2).FirstOrDefaultAsync();
+                var student3 = await _context.Students.FirstOrDefaultAsync(s => student3User != null && s.UserId == student3User.UserId);
+
                 if (fpt != null && mentor != null && student1 != null)
                 {
                     var group = InternshipGroup.Create(
@@ -329,28 +332,47 @@ namespace IOCv2.Infrastructure.Persistence
                     };
                     _context.InternshipStudents.Add(member1);
 
-                    if (student2 != null)
-                    {
-                        var member2 = new InternshipStudent
-                        {
-                            InternshipId = group.InternshipId,
-                            StudentId = student2.StudentId,
-                            Role = InternshipRole.Member,
-                            Status = InternshipStatus.InProgress,
-                            JoinedAt = DateTime.UtcNow
-                        };
-                        _context.InternshipStudents.Add(member2);
-                    }
+                    // NOTE: student2 và student3 đang ở trạng thái Pending nên KHÔNG thêm vào Group.
+                    // Chỉ student1 (Approved) mới có Mentor và Group.
 
-                    // Also seed an application for the leader
+                    // Application 1: student1 - Approved (already processed)
                     _context.InternshipApplications.Add(new InternshipApplication
                     {
                         ApplicationId = Guid.NewGuid(),
-                        InternshipId = group.InternshipId,
+                        EnterpriseId = fpt!.EnterpriseId,
+                        TermId = term.TermId,
                         StudentId = student1.StudentId,
                         Status = InternshipApplicationStatus.Approved,
                         AppliedAt = DateTime.UtcNow.AddDays(-40)
                     });
+
+                    // Application 2: student2 - Pending (chờ HR xét duyệt)
+                    if (student2 != null)
+                    {
+                        _context.InternshipApplications.Add(new InternshipApplication
+                        {
+                            ApplicationId = Guid.NewGuid(),
+                            EnterpriseId = fpt.EnterpriseId,
+                            TermId = term.TermId,
+                            StudentId = student2.StudentId,
+                            Status = InternshipApplicationStatus.Pending,
+                            AppliedAt = DateTime.UtcNow.AddDays(-10)
+                        });
+                    }
+
+                    // Application 3: student3 - Pending (chờ HR xét duyệt)
+                    if (student3 != null)
+                    {
+                        _context.InternshipApplications.Add(new InternshipApplication
+                        {
+                            ApplicationId = Guid.NewGuid(),
+                            EnterpriseId = fpt.EnterpriseId,
+                            TermId = term.TermId,
+                            StudentId = student3.StudentId,
+                            Status = InternshipApplicationStatus.Pending,
+                            AppliedAt = DateTime.UtcNow.AddDays(-5)
+                        });
+                    }
 
                     if (_context.ChangeTracker.HasChanges())
                     {
