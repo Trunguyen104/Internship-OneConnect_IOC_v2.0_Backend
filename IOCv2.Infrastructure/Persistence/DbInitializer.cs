@@ -51,9 +51,9 @@ namespace IOCv2.Infrastructure.Persistence
                     new University
                     {
                         UniversityId = Guid.NewGuid(),
-                        Code = "NEU",
-                        Name = "National Economics University",
-                        Address = "207 Giai Phong, Dong Da, Hanoi",
+                        Code = "FPTU",
+                        Name = "FPT University Can Tho",
+                        Address = "600 Nguyen Van Cu, Ninh Kieu, Can Tho",
                         Status = 1
                     }
                 };
@@ -74,17 +74,17 @@ namespace IOCv2.Infrastructure.Persistence
                         Name = "FPT Software",
                         TaxCode = "0101248141",
                         Industry = "Information Technology",
-                        Address = "Hoa Lac Hi-Tech Park, Hanoi",
+                        Address = "Hồ Chí Minh",
                         IsVerified = true,
                         Status = 1
                     },
                     new Enterprise
                     {
                         EnterpriseId = Guid.NewGuid(),
-                        Name = "Viettel Group",
+                        Name = "Rikkeisoft",
                         TaxCode = "0100109106",
-                        Industry = "Telecommunications",
-                        Address = "Giang Vo, Ba Dinh, Hanoi",
+                        Industry = "Information Technology",
+                        Address = "Hồ Chí Minh",
                         IsVerified = true,
                         Status = 1
                     }
@@ -261,7 +261,7 @@ namespace IOCv2.Infrastructure.Persistence
                         userId,
                         userCode,
                         email,
-                        $"Mentor at {ent.Name}",
+                        $"Trần Doãn Đô",
                         UserRole.Mentor,
                         passHash
                     );
@@ -289,9 +289,9 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     TermId = Guid.NewGuid(),
                     UniversityId = fptu.UniversityId,
-                    Name = "Spring 2024",
-                    StartDate = new DateOnly(2024, 1, 1),
-                    EndDate = new DateOnly(2024, 4, 30),
+                    Name = "Spring 2026",
+                    StartDate = new DateOnly(2026, 1, 1),
+                    EndDate = new DateOnly(2026, 4, 30),
                     Status = TermStatus.Open
                 };
                 _context.Terms.Add(term);
@@ -327,7 +327,7 @@ namespace IOCv2.Infrastructure.Persistence
                     {
                         var group = InternshipGroup.Create(
                             term.TermId,
-                            "Nhóm OJT .NET WebCore - FPT Software",
+                            "Nhóm OJT .NET WebCore - Rikkeisoft",
                             fpt.EnterpriseId,
                             mentor.EnterpriseUserId,
                             DateTime.UtcNow.AddMonths(-1),

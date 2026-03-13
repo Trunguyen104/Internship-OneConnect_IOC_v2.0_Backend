@@ -23,6 +23,7 @@ public class GetMyInternshipGroupsResponse
     public MineProjectDto? Project { get; set; }
     public List<MineMentorDto> Mentors { get; set; } = new();
     public int StudentCount { get; set; }
+    public int EvaluationCount { get; set; }
     public Guid? ProjectId { get; set; }
     public DateTime? DeletedAt { get; set; }
     public Guid? CreatedBy { get; set; }
@@ -69,7 +70,7 @@ public class GetMyInternshipGroupsResponse
                 {
                     Id = project.ProjectId,
                     Name = project.ProjectName,
-                    Domain = null,
+                    Domain = project.InternshipId,
                     SpaceTemplate = null
                 },
             Mentors = group.Mentor == null || group.Mentor.User == null
@@ -84,6 +85,7 @@ public class GetMyInternshipGroupsResponse
                     }
                 },
             StudentCount = group.Members.Count,
+            EvaluationCount = 0, // Will be populated in the handler for efficiency if needed, or here if we have it
             ProjectId = project?.ProjectId,
             DeletedAt = group.DeletedAt,
             CreatedBy = group.CreatedBy,
