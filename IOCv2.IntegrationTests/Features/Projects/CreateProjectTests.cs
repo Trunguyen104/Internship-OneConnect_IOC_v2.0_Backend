@@ -36,7 +36,7 @@ public class CreateProjectTests : BaseIntegrationTest
         };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/projects", request);
+        var response = await Client.PostAsJsonAsync("/api/v1/projects", request);
 
         // Assert
         var content = await response.Content.ReadAsStringAsync();
@@ -64,7 +64,7 @@ public class CreateProjectTests : BaseIntegrationTest
         };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/projects", request);
+        var response = await Client.PostAsJsonAsync("/api/v1/projects", request);
 
         // Assert
         // The exact expected status might be Created (201) or OK (200) depending on your controller implementation.

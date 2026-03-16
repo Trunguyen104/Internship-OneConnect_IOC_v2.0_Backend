@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IOCv2.IntegrationTests.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace IOCv2.IntegrationTests;
 
@@ -17,7 +18,7 @@ public abstract class BaseIntegrationTest : IClassFixture<TestWebApplicationFact
     {
         _factory = factory;
         // Create a client that will be used to make requests to the test server
-        Client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        Client = _factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false //test login statuscode
         });
@@ -40,11 +41,14 @@ public abstract class BaseIntegrationTest : IClassFixture<TestWebApplicationFact
 
     protected internal async Task AuthenticateAsUserAsync(string email, string password)
     {
-        var response = await Client.PostAsJsonAsync("/api/auth/login", new { email, password });
+        var response = await Client.PostAsJsonAsync("/api/v1/auth/login", new { email, password });
         var content = await response.Content.ReadAsStringAsync();
-        Console.WriteLine(content);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Authentication failed with status {response.StatusCode}. Content: {errorContent}");
+        }
 
         var result = await response.Content.ReadFromJsonAsync<ApiResult>();
         
@@ -55,12 +59,7 @@ public abstract class BaseIntegrationTest : IClassFixture<TestWebApplicationFact
             if (tokenCookie != null)
             {
                 accessToken = tokenCookie.Split(';')[0].Substring("accessToken=".Length);
-                Console.WriteLine($"Token extracted from Cookie: {accessToken}");
             }
-        }
-        else
-        {
-            Console.WriteLine("No Set-Cookie header found!");
         }
 
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);

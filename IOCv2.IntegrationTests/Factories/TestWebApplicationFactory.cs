@@ -3,6 +3,7 @@ using IOCv2.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
-
+        
+        // Ensure JWT secret is set for tests
+        Environment.SetEnvironmentVariable("JWT_SECRET_KEY", "SuperSecretKeyForTestingThatIsLongEnoughToWork");
+        Environment.SetEnvironmentVariable("JWT_ISSUER", "IOCv2_Server");
+        Environment.SetEnvironmentVariable("JWT_AUDIENCE", "IOCv2_Client");
+        Environment.SetEnvironmentVariable("JWT_ACCESS_TOKEN_EXPIRES_IN_MINUTE", "60");
+        Environment.SetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRES_IN_DAYS", "7");
+        
         builder.ConfigureServices(services =>
         {
             // Remove ALL Entity Framework Core and Npgsql related registrations
@@ -79,24 +87,24 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.ConfigureLogging(logging =>
         {
             logging.ClearProviders();
-            logging.AddConsole(); // log ra console để xem chi tiết exception
+            logging.AddConsole(); 
             logging.SetMinimumLevel(LogLevel.Debug);
         });
     }
-public class MockRateLimiter : IOCv2.Application.Interfaces.IRateLimiter
-{
-    public Task<bool> IsBlockedAsync(string key, CancellationToken ct) => Task.FromResult(false);
-    public Task<int> RegisterFailAsync(string key, int limit, TimeSpan window, TimeSpan blockFor, CancellationToken ct) => Task.FromResult(0);
-    public Task ResetAsync(string key, CancellationToken ct) => Task.CompletedTask;
-}
+    public class MockRateLimiter : IOCv2.Application.Interfaces.IRateLimiter
+    {
+        public Task<bool> IsBlockedAsync(string key, CancellationToken ct) => Task.FromResult(false);
+        public Task<int> RegisterFailAsync(string key, int limit, TimeSpan window, TimeSpan blockFor, CancellationToken ct) => Task.FromResult(0);
+        public Task ResetAsync(string key, CancellationToken ct) => Task.CompletedTask;
+    }
 
-public class MockCacheService : IOCv2.Application.Interfaces.ICacheService
-{
-    public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) => Task.FromResult(default(T));
-    public Task SetAsync<T>(string key, T value, TimeSpan? slidingExpiration = null, CancellationToken cancellationToken = default) => Task.CompletedTask;
-    public Task RemoveAsync(string key, CancellationToken cancellationToken = default) => Task.CompletedTask;
-    public Task RemoveByPrefixAsync(string prefixKey, CancellationToken cancellationToken = default) => Task.CompletedTask;
-    public Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default) => Task.FromResult(false);
-    public Task RemoveByPatternAsync(string pattern, CancellationToken cancellationToken = default) => Task.CompletedTask;
-}
+    public class MockCacheService : IOCv2.Application.Interfaces.ICacheService
+    {
+        public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) => Task.FromResult(default(T));
+        public Task SetAsync<T>(string key, T value, TimeSpan? slidingExpiration = null, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task RemoveAsync(string key, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task RemoveByPrefixAsync(string prefixKey, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default) => Task.FromResult(false);
+        public Task RemoveByPatternAsync(string pattern, CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
 }

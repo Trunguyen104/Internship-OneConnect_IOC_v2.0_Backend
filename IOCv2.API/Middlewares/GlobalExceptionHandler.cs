@@ -21,11 +21,11 @@ namespace IOCv2.API.Middlewares
             Exception exception,
             CancellationToken cancellationToken)
         {
-            _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
-
             var statusCode = (int)HttpStatusCode.InternalServerError;
             var message = "An unexpected error occurred.";
             List<string>? errors = null;
+            
+            _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
             switch (exception)
             {
