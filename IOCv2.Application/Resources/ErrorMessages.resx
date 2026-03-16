@@ -711,7 +711,6 @@
   <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
     <value>Error retrieving term {0}</value>
   </data>
-
   <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
     <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
   </data>
@@ -930,5 +929,32 @@
   </data>
   <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Không thể công bố điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="ProjectResources.LogDeleteError" xml:space="preserve">
+    <value>Không thể xóa tài nguyên dự án: {ResourceId}</value>
+  </data>
+  <data name="ProjectResources.ErrorRetrievingFileFromStorage" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi truy xuất tệp từ bộ nhớ.</value>
+  </data>
+  <data name="ProjectResources.ErrorCreatingFileStreamResult" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình tạo luồng dữ liệu đầu ra cho tệp.</value>
+  </data>
+  <data name="ProjectResources.LogUploadAutoSetFileTypeError" xml:space="preserve">
+    <value>Lỗi tự động xác định loại file cho tệp: {0}</value>
+  </data>
+  <data name="File.FileUploadedError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình tải file lên. File có thể bị hỏng, định dạng không được hỗ trợ, hoặc không đủ dung lượng lưu trữ. Vui lòng kiểm tra file và thử lại. Nếu lỗi vẫn tiếp tục xảy ra, hãy liên hệ với quản trị viên hệ thống.</value>
+  </data>
+  <data name="File.FileDeletedError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi xóa file. File có thể đang được sử dụng hoặc bạn không có đủ quyền truy cập. Vui lòng thử lại hoặc liên hệ quản trị viên hệ thống nếu lỗi vẫn tiếp tục xảy ra.</value>
+  </data>
+  <data name="File.FileCheckExistsError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình kiểm tra sự tồn tại của file. Vui lòng thử lại hoặc liên hệ quản trị viên hệ thống nếu lỗi vẫn tiếp tục xảy ra.</value>
+  </data>
+  <data name="File.FileGetStreamError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi cố gắng truy cập luồng dữ liệu của file. File có thể bị hỏng, đang được sử dụng bởi ứng dụng khác, hoặc bạn không có đủ quyền truy cập. Vui lòng kiểm tra file và thử lại.</value>
+  </data>
+  <data name="File.FileGetError" xml:space="preserve">
+    <value>Lỗi khi lấy thông tin tệp: {FileUrl}</value>
   </data>
 </root>

@@ -7,13 +7,15 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetAllProjectResources
 {
+    /// <summary>
+    /// Handler to fetch paginated list of ProjectResources with optional filtering, sorting and search.
+    /// </summary>
     public class GetAllProjectResourcesHandler : IRequestHandler<GetAllProjectResourcesQuery, Result<PaginatedResult<GetAllProjectResourcesResponse>>>
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -32,19 +34,24 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             _messageService = messageService;
         }
 
+        /// <summary>
+        /// Build and execute a query that supports:
+        /// - optional search by resource name
+        /// - optional project and resource type filters
+        /// - sorting by provided column/order
+        /// - pagination (page number / size)
+        /// </summary>
         public async Task<Result<PaginatedResult<GetAllProjectResourcesResponse>>> Handle(
             GetAllProjectResourcesQuery request,
             CancellationToken cancellationToken)
         {
             try
             {
-                
-
-                // Build query
+                // Start with repository queryable and avoid tracking for read-only operations.
                 var query = _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query()
                     .AsNoTracking();
 
-                // Apply search term if provided
+                // Apply search term (case-insensitive contains).
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm))
                 {
                     var term = request.SearchTerm.Trim().ToLower();
@@ -52,36 +59,36 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         x.ResourceName.ToLower().Contains(term));
                 }
 
-                // Apply project filter if provided
+                // Filter by project if provided.
                 if (request.ProjectId.HasValue)
                 {
                     query = query.Where(x => x.ProjectId == request.ProjectId.Value);
                 }
 
-                // Apply resource type filter if provided
+                // Filter by resource type if provided.
                 if (request.ResourceType.HasValue)
                 {
                     query = query.Where(x => x.ResourceType == request.ResourceType.Value);
                 }
 
-                // Get total count
+                // Get total count before pagination.
                 var totalCount = await query.CountAsync(cancellationToken);
 
-                // Apply sorting
+                // Apply ordering.
                 query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-                // Apply pagination
+                // Apply pagination and projection to DTO.
                 var items = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ProjectTo<GetAllProjectResourcesResponse>(_mapper.ConfigurationProvider)
                     .ToListAsync(cancellationToken);
 
-                // Create paginated result
+                // Construct paginated result.
                 var result = PaginatedResult<GetAllProjectResourcesResponse>.Create(
                     items, totalCount, request.PageNumber, request.PageSize);
+
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetAllSuccess), items.Count);
-           
 
                 return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Success(result);
             }
@@ -92,23 +99,27 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             }
         }
 
+        /// <summary>
+        /// Applies sorting to the query based on column and order.
+        /// Defaults to CreatedAt descending when unknown.
+        /// </summary>
         private IQueryable<Domain.Entities.ProjectResources> ApplySorting(
             IQueryable<Domain.Entities.ProjectResources> query,
             string? sortColumn,
             string? sortOrder)
         {
-            var isDescending = sortOrder?.ToLower() == "desc";
+            var isDescending = sortOrder?.ToLower() == ProjectResourceParams.Filter.Desc;
 
             return (sortColumn?.ToLower(), isDescending) switch
             {
-                ("resourcename", true) => query.OrderByDescending(x => x.ResourceName),
-                ("resourcename", false) => query.OrderBy(x => x.ResourceName),
+                (ProjectResourceParams.Filter.ResourceName, true) => query.OrderByDescending(x => x.ResourceName),
+                (ProjectResourceParams.Filter.ResourceName, false) => query.OrderBy(x => x.ResourceName),
 
-                ("resourcetype", true) => query.OrderByDescending(x => x.ResourceType),
-                ("resourcetype", false) => query.OrderBy(x => x.ResourceType),
+                (ProjectResourceParams.Filter.ResourceType, true) => query.OrderByDescending(x => x.ResourceType),
+                (ProjectResourceParams.Filter.ResourceType, false) => query.OrderBy(x => x.ResourceType),
 
-                ("createdat", true) => query.OrderByDescending(x => x.CreatedAt),
-                ("createdat", false) => query.OrderBy(x => x.CreatedAt),
+                (ProjectResourceParams.Filter.CreateDate, true) => query.OrderByDescending(x => x.CreatedAt),
+                (ProjectResourceParams.Filter.CreateDate, false) => query.OrderBy(x => x.CreatedAt),
 
                 _ => query.OrderByDescending(x => x.CreatedAt)
             };

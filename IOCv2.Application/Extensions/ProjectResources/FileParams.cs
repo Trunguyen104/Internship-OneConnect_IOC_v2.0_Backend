@@ -7,7 +7,17 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Constants
 {
-    public static class FileConstants
+    public class ProjectResourceParams
+    {
+        public class Filter
+        {
+            public const string Desc = "desc";
+            public const string ResourceName = "resourcename";
+            public const string ResourceType = "resourcetype";
+            public const string CreateDate = "createdat";
+        }
+    }
+    public static class FileParams
     {
         public const string PdfExtension = ".pdf";
         public const string DocxExtension = ".docx";
@@ -40,11 +50,38 @@ namespace IOCv2.Application.Constants
         public const string DisplayNamePng = "PNG Image";
 
         public const string FileDomain = "localhost:5050";
-        public static string GetFolder(Guid projectId) {
+
+        //configuration
+        public const string ConfigurationStoragePathKey = "FileStorage:Path";
+        public const string ConfigurationBaseUrl = "FileStorage:BaseUrl";
+
+        public const string BaseUrl = "/Uploads";
+
+        public static string GetStoragePath()
+        {
+            // D:\GIT\Ppp\Internship-OneConnect_IOC_v2.0_Backend\IOCv2.API
+            string currentDir = Directory.GetCurrentDirectory();
+            // D:\GIT\Ppp
+            string projectRoot = Directory.GetParent(currentDir)!.Parent!.FullName;
+            // D:\GIT\Ppp\Uploads
+            return Path.Combine(projectRoot, "Uploads");
+
+        }
+
+        public static string GetFolder(Guid projectId)
+        {
             return string.Format($"projects/{projectId}/resources");
         }
-        public static string GetFileName(string fileName) {
+        public static string GetFileName(string fileName)
+        {
             return $"{Guid.NewGuid():N}_{fileName}";
         }
+
+        public static string GetFileDownloadName(string resourceName, string extension)
+        {
+            return $"{resourceName}{extension}";
+        }
+
+
     }
 }

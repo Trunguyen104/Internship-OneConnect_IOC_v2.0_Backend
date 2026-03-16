@@ -1,17 +1,11 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
-using IOCv2.Application.Services;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById
 {
@@ -30,12 +24,22 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             _messageService = messageService;
             _fileStorageService = fileStorageService;
         }
+
+        /// <summary>
+        /// Handles the GetDownloadProjectResourceByIdQuery to retrieve a project resource by its ID and return a file stream for download.
+        /// </summary>
+        /// <param name="request">The request containing the project resource ID.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>A Result containing the response with the file stream for download.</returns>
         public async Task<Result<GetDownloadProjectResourceByIdResponse>> Handle(GetDownloadProjectResourceByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 // Check if the project resource exists
-                var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query().AsNoTracking().FirstOrDefaultAsync(x => x.ProjectResourceId == request.ProjectResourceId, cancellationToken);
+                var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.ProjectResourceId == request.ProjectResourceId, cancellationToken);
                 if (resource == null)
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ProjectResourceId);
@@ -43,21 +47,59 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
                         ResultErrorType.NotFound);
                 }
-                // get stream from storage
+
                 var extension = Path.GetExtension(resource.ResourceUrl);
+                Stream? stream = null;
+                try
+                {
+                    stream = await _fileStorageService.GetFileAsync(resource.ResourceUrl, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    // Use localized message key instead of hard-coded string
+                    _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.ErrorRetrievingFileFromStorage, request.ProjectResourceId));
+                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
+                        ResultErrorType.NotFound);
+                }
+
+                if (stream == null)
+                {
+                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
+                        ResultErrorType.NotFound);
+                }
+
+                FileStreamResult fileResult;
+                try
+                {
+                    fileResult = new FileStreamResult(stream, FileParams.DefaultMime)
+                    {
+                        FileDownloadName = FileParams.GetFileDownloadName(resource.ResourceName!, extension)
+                    };
+                }
+                catch (Exception ex)
+                {
+                    stream.Dispose();
+                    // Use localized message key instead of hard-coded string
+                    _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.ErrorCreatingFileStreamResult, request.ProjectResourceId));
+                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.InternalError),
+                        ResultErrorType.InternalServerError);
+                }
+
                 var response = new GetDownloadProjectResourceByIdResponse
                 {
-                    FilePath = resource.ResourceUrl,
-                    FileName = $"{resource.ResourceName}{extension}"
+                    FileResponse = fileResult
                 };
-
-                _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ProjectResourceId);
                 return Result<GetDownloadProjectResourceByIdResponse>.Success(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdError), request.ProjectResourceId);
-                return Result<GetDownloadProjectResourceByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.InternalError),
+                    ResultErrorType.InternalServerError);
             }
         }
     }

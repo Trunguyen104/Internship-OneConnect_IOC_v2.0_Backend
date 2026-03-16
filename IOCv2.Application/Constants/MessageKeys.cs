@@ -275,6 +275,7 @@
             public const string LogUploadError = "ProjectResources.LogUploadError";
             public const string UpdateSuccess = "ProjectResources.UpdateSuccess";
             public const string LogDeleteSuccess = "ProjectResources.LogDeleteSuccess";
+            public const string LogDeleteError = "ProjectResources.LogDeleteError";
             public const string ProjectIdRequired = "ProjectResources.ProjectIdRequired";
             public const string ResourceNameMaxLength = "ProjectResources.ResourceNameMaxLength";
             public const string LogProjectResourceNotFound = "ProjectResources.LogNotFound";
@@ -287,8 +288,10 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
-
             public const string LogUploadAutoSetFileTypeError = "ProjectResources.LogUploadAutoSetFileTypeError";
+            public const string UnsupportedFileType = "ProjectResources.UnsupportedFileType";
+            public const string ErrorRetrievingFileFromStorage = "ProjectResources.ErrorRetrievingFileFromStorage";
+            public const string ErrorCreatingFileStreamResult = "ProjectResources.ErrorCreatingFileStreamResult";
         }
 
         public static class Internships
@@ -476,7 +479,13 @@
 
         public static class File
         {
-            
+            public const string FileUploadedError = "File.FileUploadedError";
+            public const string FileDeletedSuccess = "File.FileDeletedSuccess";
+            public const string FileDeletedError = "File.FileDeletedError";
+            public const string FileNotFound = "File.FileNotFound";
+            public const string FileCheckExistsError = "File.FileCheckExistsError";
+            public const string FileGetStreamError = "File.FileGetStreamError";
+            public const string FileGetError = "File.FileGetError";
         }
     }
 }

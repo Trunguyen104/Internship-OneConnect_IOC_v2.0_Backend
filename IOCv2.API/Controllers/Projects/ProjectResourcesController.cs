@@ -15,15 +15,20 @@ namespace IOCv2.API.Controllers.Projects;
 
 /// <summary>
 /// Project Resources — manage files and resources attached to projects.
+/// Exposes endpoints to list, upload, download, read, update and delete project resources.
 /// </summary>
 [Tags("Project Resources")]
 [Authorize]
-[Route("api/project-resources")]
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IFileStorageService _fileStorageService;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="ProjectResourcesController"/>.
+    /// </summary>
+    /// <param name="mediator">MediatR mediator to dispatch commands and queries to application handlers.</param>
+    /// <param name="fileStorageService">Service used to read/write files from external storage (blob, disk, etc.).</param>
     public ProjectResourcesController(IMediator mediator, IFileStorageService fileStorageService)
     {
         _fileStorageService = fileStorageService;
@@ -31,8 +36,11 @@ public class ProjectResourcesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get paginated list of project resources with optional filters.
+    /// Retrieves a paginated list of project resources matching the provided query.
     /// </summary>
+    /// <param name="query">Query parameters (filters, paging, sorting) for retrieving resources.</param>
+    /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
+    /// <returns>Paginated result with project resources or an error response.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetAllProjectResourcesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -42,13 +50,21 @@ public class ProjectResourcesController : ApiControllerBase
         [FromQuery] GetAllProjectResourcesQuery query,
         CancellationToken cancellationToken)
     {
+        // Forward query to application layer and return standardized result handling.
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
 
+    /// <summary>
+    /// Downloads the binary file for a specific project resource.
+    /// </summary>
+    /// <param name="resourceId">The id of the project resource to download.</param>
+    /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
+    /// <returns>File stream result with content-disposition for download, or NotFound / error response.</returns>
     [HttpGet("{resourceId:guid}/download")]
     [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetDownloadProjectResourceById(
        [FromRoute] Guid resourceId,
        CancellationToken cancellationToken)
@@ -58,28 +74,20 @@ public class ProjectResourcesController : ApiControllerBase
         {
             ProjectResourceId = resourceId
         };
-
         var result = await _mediator.Send(query, cancellationToken);
-
-        // If the resource metadata retrieval failed, return the appropriate error response
-        if (!result.IsSuccess || result.Data == null)
+        if (!result.IsSuccess)
         {
             return HandleResult(result);
         }
-
-        // Attempt to retrieve the file stream from storage
-        var stream = await _fileStorageService.GetFileAsync(result.Data.FilePath);
-
-        // If the file stream is null, it means the file was not found in storage
-        if (stream == null)
-        {
-            return NotFound("File not found.");
-        }
-
-        // Return the file stream with the appropriate content type and file name for download
-        return File(stream, "application/octet-stream", result.Data.FileName);
+        return result.Data!.FileResponse;
     }
 
+    /// <summary>
+    /// Returns a readable file stream or inline content for the specified resource (for preview/inline view).
+    /// </summary>
+    /// <param name="resourceId">The id of the project resource to read/preview.</param>
+    /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
+    /// <returns>File content or an error response handled by application layer.</returns>
     [HttpGet("{resourceId:guid}/read")]
     [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
@@ -93,8 +101,11 @@ public class ProjectResourcesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Upload a new file resource to a project.
+    /// Uploads a new project resource. Expects multipart/form-data with file and metadata.
     /// </summary>
+    /// <param name="command">Upload command containing file, project id and other metadata (bound from form-data).</param>
+    /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
+    /// <returns>Created resource information or an error response.</returns>
     [HttpPost]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
@@ -111,8 +122,12 @@ public class ProjectResourcesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Update metadata of an existing project resource.
+    /// Updates metadata for an existing project resource.
     /// </summary>
+    /// <param name="resourceId">The id of the project resource to update.</param>
+    /// <param name="command">Update command containing the new metadata (bound from request body).</param>
+    /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
+    /// <returns>Updated resource information or an error response.</returns>
     [HttpPut("{resourceId:guid}")]
     [ProducesResponseType(typeof(ApiResponse<UpdateProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -130,8 +145,11 @@ public class ProjectResourcesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Delete a project resource by ID.
+    /// Deletes a project resource by id. This will remove metadata and (if applicable) the stored file.
     /// </summary>
+    /// <param name="resourceId">The id of the resource to delete.</param>
+    /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
+    /// <returns>Result indicating success or the appropriate error response.</returns>
     [HttpDelete("{resourceId:guid}")]
     [ProducesResponseType(typeof(Result<DeleteProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
