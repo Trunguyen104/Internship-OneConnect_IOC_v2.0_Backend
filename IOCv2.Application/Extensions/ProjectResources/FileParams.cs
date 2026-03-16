@@ -62,7 +62,15 @@ namespace IOCv2.Application.Constants
             // D:\GIT\Ppp\Internship-OneConnect_IOC_v2.0_Backend\IOCv2.API
             string currentDir = Directory.GetCurrentDirectory();
             // D:\GIT\Ppp
-            string projectRoot = Directory.GetParent(currentDir)!.Parent!.FullName;
+            string projectRoot = "";
+            try
+            {
+                projectRoot = Directory.GetParent(currentDir)!.Parent!.FullName;
+            }
+            catch (Exception ex)
+            {
+                projectRoot = currentDir; // Fallback to current directory if parent retrieval fails
+            }
             // D:\GIT\Ppp\Uploads
             return Path.Combine(projectRoot, "Uploads");
 
