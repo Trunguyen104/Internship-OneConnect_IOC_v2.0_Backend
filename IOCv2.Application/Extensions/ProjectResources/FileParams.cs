@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Constants
 {
-    public static class FileConstants
+    public static class FileParams
     {
         public const string PdfExtension = ".pdf";
         public const string DocxExtension = ".docx";

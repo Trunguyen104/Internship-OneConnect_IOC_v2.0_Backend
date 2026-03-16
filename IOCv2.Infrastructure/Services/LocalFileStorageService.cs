@@ -16,7 +16,7 @@ namespace IOCv2.Infrastructure.Services
         private readonly string _storagePath;
         private readonly string _baseUrl;
         private readonly ILogger<LocalFileStorageService> _logger;
-        private const string _domain = FileConstants.FileDomain;
+        private const string _domain = FileParams.FileDomain;
         private readonly IMessageService _messageService;
 
         public LocalFileStorageService(
