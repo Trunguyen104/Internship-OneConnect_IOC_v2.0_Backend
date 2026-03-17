@@ -45,11 +45,11 @@ public class EnterprisesController : ApiControllerBase
     /// </returns>
     [HttpGet]
     [Authorize(Roles = "SuperAdmin")]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetEnterprisesResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetEnterprisesResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetEnterprises(
         [FromQuery] GetEnterprisesQuery query,
         CancellationToken cancellationToken)
@@ -91,10 +91,10 @@ public class EnterprisesController : ApiControllerBase
     /// </returns>
     [HttpPost]
     [Authorize(Roles = "SuperAdmin")]
-    [ProducesResponseType(typeof(Result<GetEnterpriseByIdResponse>), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<GetEnterpriseByIdResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateEnterprise(
         [FromBody] CreateEnterpriseCommand command,
         CancellationToken cancellationToken)
@@ -125,12 +125,12 @@ public class EnterprisesController : ApiControllerBase
     /// </returns>
     [HttpPut("{enterpriseId}")]
     [Authorize(Roles = "SuperAdmin,EnterpriseAdmin")]
-    [ProducesResponseType(typeof(Result<UpdateEnterpriseResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateEnterprise([FromRoute] Guid enterpriseId, [FromBody] UpdateEnterpriseCommand body, CancellationToken cancellationToken)
     {
         body.EnterpriseId = enterpriseId;
@@ -151,9 +151,9 @@ public class EnterprisesController : ApiControllerBase
     /// </returns>
     [HttpDelete("{enterpriseId}")]
     [Authorize(Roles = "SuperAdmin")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteEnterprise([FromRoute] Guid enterpriseId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new DeleteEnterpriseCommand { EnterpriseId = enterpriseId }, cancellationToken);
@@ -174,11 +174,11 @@ public class EnterprisesController : ApiControllerBase
     /// </returns>
     [HttpGet("Cookie")]
     [Authorize(Roles = "HR,EnterpriseAdmin")]
-    [ProducesResponseType(typeof(Result<GetEnterpriseByCookieResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<GetEnterpriseByCookieResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetEnterpriseByCookie(CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetEnterpriseByCookieCommand(), cancellationToken);
@@ -196,10 +196,10 @@ public class EnterprisesController : ApiControllerBase
     /// </returns>
     [HttpPut("{enterpriseId}/restore")]
     [Authorize(Roles = "SuperAdmin")]
-    [ProducesResponseType(typeof(Result<RestoreEnterpriseResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse<RestoreEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RestoreEnterprise([FromRoute] Guid enterpriseId, CancellationToken cancellationToken)
     {
         var command = new RestoreEnterpriseCommand { EnterpriseId = enterpriseId };
