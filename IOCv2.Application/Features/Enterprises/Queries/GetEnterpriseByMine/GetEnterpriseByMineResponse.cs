@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
 {
-    public class GetEnterpriseByCookieResponse : IMapFrom<Domain.Entities.Enterprise>
+    public class GetEnterpriseByMineResponse : IMapFrom<Domain.Entities.Enterprise>
     {
         public Guid EnterpriseId { get; set; }
         public string? TaxCode { get; set; }
@@ -26,7 +26,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
         public EnterpriseStatus Status { get; set; } = EnterpriseStatus.Active; // 0=Inactive, 1=Active, 2=Suspended
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Enterprise, GetEnterpriseByCookieResponse>()
+            profile.CreateMap<Enterprise, GetEnterpriseByMineResponse>()
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => (EnterpriseStatus)src.Status));
         }

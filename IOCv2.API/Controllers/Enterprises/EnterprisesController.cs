@@ -172,16 +172,16 @@ public class EnterprisesController : ApiControllerBase
     /// 429 TooManyRequests: Too many requests were sent in a given amount of time.
     /// 500 InternalServerError: An unexpected server error occurred.
     /// </returns>
-    [HttpGet("Cookie")]
+    [HttpGet("mine")]
     [Authorize(Roles = "HR,EnterpriseAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<GetEnterpriseByCookieResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetEnterpriseByMineResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetEnterpriseByCookie(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetEnterpriseByMine(CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetEnterpriseByCookieCommand(), cancellationToken);
+        var result = await _mediator.Send(new GetEnterpriseByMineCommand(), cancellationToken);
         return HandleResult(result);
     }
 
