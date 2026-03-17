@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource;
 using IOCv2.Domain.Enums;
 using System;
@@ -11,7 +11,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
 {
     public class GetDownloadProjectResourceByIdResponse
     {
-        public string FilePath { get; set; }
-        public string FileName { get; set; }
+        public string FilePath { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
     }
 }

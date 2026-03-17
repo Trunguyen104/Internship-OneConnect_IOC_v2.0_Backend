@@ -2,14 +2,14 @@
 {
     public enum ResultErrorType
     {
-        None,
-        BadRequest,
-        NotFound,
-        Unauthorized,
-        Forbidden,
-        Conflict,
-        InternalServerError,
-        TooManyRequests
+        None = 1,
+        BadRequest = 2,
+        NotFound = 3,
+        Unauthorized = 4,
+        Forbidden = 5,
+        Conflict = 6,
+        InternalServerError = 7,
+        TooManyRequests = 8
     }
 
     public class Result<T>

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -39,6 +39,8 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
                 var user = await _unitOfWork.Repository<User>()
                     .Query()
                     .Include(u => u.Student)
+                    .Include(u => u.UniversityUser)
+                    .Include(u => u.EnterpriseUser)
                     .AsNoTracking()
                     .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
                     .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);

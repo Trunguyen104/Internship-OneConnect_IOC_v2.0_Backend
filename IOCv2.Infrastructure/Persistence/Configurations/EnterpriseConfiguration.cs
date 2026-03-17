@@ -1,4 +1,5 @@
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -26,7 +27,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(e => e.BackgroundUrl).HasMaxLength(255).HasColumnName("background_url");
             
             builder.Property(e => e.IsVerified).HasDefaultValue(false).HasColumnName("is_verified");
-            builder.Property(e => e.Status).HasDefaultValue(1).HasColumnName("status");
+            builder.Property(e => e.Status).HasDefaultValue((short)EnterpriseStatus.Active).HasColumnName("status");
 
             builder.Property(e => e.CreatedAt).HasColumnName("created_at");
             builder.Property(e => e.CreatedBy).HasColumnName("created_by");
