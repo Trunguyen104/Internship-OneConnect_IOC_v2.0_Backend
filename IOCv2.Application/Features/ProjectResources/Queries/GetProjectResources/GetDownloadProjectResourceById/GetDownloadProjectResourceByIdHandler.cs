@@ -1,5 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -44,10 +45,20 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         ResultErrorType.NotFound);
                 }
                 // get stream from storage
+                var stream = await _fileStorageService.GetFileAsync(resource.ResourceUrl);
+                if (stream == null)
+                {
+                    _logger.LogWarning("File not found in storage for resource: {ResourceId}", request.ProjectResourceId);
+                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                        "File not found in storage.",
+                        ResultErrorType.NotFound);
+                }
+
                 var extension = Path.GetExtension(resource.ResourceUrl);
                 var response = new GetDownloadProjectResourceByIdResponse
                 {
-                    FilePath = resource.ResourceUrl,
+                    Content = stream,
+                    ContentType = FileValidationHelper.GetMimeType(resource.ResourceName),
                     FileName = $"{resource.ResourceName}{extension}"
                 };
 
@@ -57,7 +68,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             catch (Exception ex)
             {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdError), request.ProjectResourceId);
-                return Result<GetDownloadProjectResourceByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<GetDownloadProjectResourceByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

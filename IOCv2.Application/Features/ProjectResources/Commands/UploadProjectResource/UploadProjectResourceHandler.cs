@@ -82,19 +82,14 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         FileParams.GetFolder(request.ProjectId),
                         fileName,
                         cancellationToken);
-                    FileType fileType;
-                    try
+                    // Automatically detect file type based on file extension
+                    var detectedType = FileValidationHelper.GetFileType(fileUrl);
+                    if (detectedType == null)
                     {
-                        // Automatically detect file type based on file extension
-                        fileType = AutoSetFileType(fileUrl);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log error if file type detection fails
-                        _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadAutoSetFileTypeError), fileUrl);
-                        // Reject unsupported file types
+                        _logger.LogWarning("Unsupported file type for uploaded file: {FileUrl}", fileUrl);
                         return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"), ResultErrorType.BadRequest);
                     }
+                    var fileType = detectedType.Value;
                     // Create ProjectResources entity
                     var resource = new Domain.Entities.ProjectResources(
                         request.ProjectId,
@@ -139,21 +134,5 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             }
         }
 
-        private FileType AutoSetFileType(string filePath)
-        {
-            var extension = System.IO.Path.GetExtension(filePath).ToLower();
-            return extension switch
-            {
-                FileParams.PdfExtension => FileType.PDF,
-                FileParams.DocxExtension => FileType.DOCX,
-                FileParams.PptxExtension => FileType.PPTX,
-                FileParams.ZipExtension => FileType.ZIP,
-                FileParams.RarExtension => FileType.RAR,
-                FileParams.JpgExtension => FileType.JPG,
-                FileParams.JpegExtension => FileType.JPG,
-                FileParams.PngExtension => FileType.PNG,
-                _ => throw new InvalidOperationException(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"))
-            };
-        }
     }
 }

@@ -11,7 +11,8 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
 {
     public class GetDownloadProjectResourceByIdResponse
     {
-        public string FilePath { get; set; } = string.Empty;
+        public Stream? Content { get; set; }
+        public string ContentType { get; set; } = "application/octet-stream";
         public string FileName { get; set; } = string.Empty;
     }
 }
