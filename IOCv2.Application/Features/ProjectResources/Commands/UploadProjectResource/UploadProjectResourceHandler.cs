@@ -75,11 +75,11 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                 try
                 {
                     // Generate a unique file name to avoid collisions
-                    var fileName = FileConstants.GetFileName(request.File.FileName);
+                    var fileName = FileParams.GetFileName(request.File.FileName);
                     // Upload file to storage service (local, S3, etc.)
                     fileUrl = await _fileStorageService.UploadFileAsync(
                         request.File,
-                        FileConstants.GetFolder(request.ProjectId),
+                        FileParams.GetFolder(request.ProjectId),
                         fileName,
                         cancellationToken);
                     FileType fileType;
@@ -144,14 +144,14 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             var extension = System.IO.Path.GetExtension(filePath).ToLower();
             return extension switch
             {
-                FileConstants.PdfExtension => FileType.PDF,
-                FileConstants.DocxExtension => FileType.DOCX,
-                FileConstants.PptxExtension => FileType.PPTX,
-                FileConstants.ZipExtension => FileType.ZIP,
-                FileConstants.RarExtension => FileType.RAR,
-                FileConstants.JpgExtension => FileType.JPG,
-                FileConstants.JpegExtension => FileType.JPG,
-                FileConstants.PngExtension => FileType.PNG,
+                FileParams.PdfExtension => FileType.PDF,
+                FileParams.DocxExtension => FileType.DOCX,
+                FileParams.PptxExtension => FileType.PPTX,
+                FileParams.ZipExtension => FileType.ZIP,
+                FileParams.RarExtension => FileType.RAR,
+                FileParams.JpgExtension => FileType.JPG,
+                FileParams.JpegExtension => FileType.JPG,
+                FileParams.PngExtension => FileType.PNG,
                 _ => throw new InvalidOperationException(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"))
             };
         }

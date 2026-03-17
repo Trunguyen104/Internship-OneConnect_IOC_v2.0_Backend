@@ -243,4 +243,16 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Successfully removed students from group: {InternshipId}</value>
   </data>
+  <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
+    <value>You do not have permission to delete this enterprise.</value>
+  </data>
+  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <value>You do not have permission to restore this enterprise.</value>
+  </data>
+  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <value>The enterprise has not been deleted and cannot be restored.</value>
+  </data>
+  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <value>You do not have permission to view this enterprise.</value>
+  </data>
 </root>
