@@ -12,6 +12,6 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
 {
     public class GetDownloadProjectResourceByIdResponse
     {
-        public FileStreamResult FileResponse { get; set; }
+        public FileStreamResult FileResponse { get; set; } = null!;
     }
 }

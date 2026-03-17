@@ -67,7 +67,7 @@ namespace IOCv2.Application.Constants
             {
                 projectRoot = Directory.GetParent(currentDir)!.Parent!.FullName;
             }
-            catch (Exception ex)
+            catch
             {
                 projectRoot = currentDir; // Fallback to current directory if parent retrieval fails
             }
