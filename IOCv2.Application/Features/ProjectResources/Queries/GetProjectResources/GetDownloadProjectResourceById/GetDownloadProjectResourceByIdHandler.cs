@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.ProjectResources;
 using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById
+namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetDownloadProjectResourceById
 {
     public class GetDownloadProjectResourceByIdHandler : IRequestHandler<GetDownloadProjectResourceByIdQuery, Result<GetDownloadProjectResourceByIdResponse>>
     {
@@ -73,10 +74,11 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 FileStreamResult fileResult;
                 try
                 {
-                    fileResult = new FileStreamResult(stream, FileParams.DefaultMime)
+                    fileResult = new FileStreamResult(stream, ProjectResourceParams.FileParams.DefaultMime)
                     {
-                        FileDownloadName = FileParams.GetFileDownloadName(resource.ResourceName!, extension)
+                        FileDownloadName = string.Format(ProjectResourceParams.FileParams.GetFileDownloadName, resource.ResourceName!, extension)
                     };
+                    var sad = fileResult.FileDownloadName;
                 }
                 catch (Exception ex)
                 {

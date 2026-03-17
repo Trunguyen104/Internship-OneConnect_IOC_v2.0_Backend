@@ -3,7 +3,7 @@ using IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectResource
 using IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource;
 using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetAllProjectResources;
-using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById;
+using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetDownloadProjectResourceById;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetReadProjectResourceById;
 using IOCv2.Application.Interfaces;
 using MediatR;

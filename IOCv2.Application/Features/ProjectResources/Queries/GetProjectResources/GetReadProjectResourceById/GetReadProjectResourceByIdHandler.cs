@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.ProjectResources;
 using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -51,7 +52,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 }
 
                 // Combine storage domain with stored relative path so clients receive a valid download URL.
-                resource.ResourceUrl = _fileStorageService.GetDomainUrl() + resource.ResourceUrl;
+                resource.ResourceUrl = ProjectResourceParams.FileParams.FileDomain + resource.ResourceUrl;
 
                 // Map domain entity to response DTO and return success.
                 var response = _mapper.Map<GetReadProjectResourceByIdResponse>(resource);

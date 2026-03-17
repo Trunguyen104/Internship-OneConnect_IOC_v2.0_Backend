@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.ProjectResources;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -89,12 +90,12 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                 try
                 {
                     // Generate a unique file name to avoid collisions.
-                    var fileName = FileParams.GetFileName(request.File.FileName);
+                    var fileName = string.Format(ProjectResourceParams.FileParams.GetFileName, Guid.NewGuid().ToString("N"), request.File.FileName);
 
                     // Upload file to configured storage (local/S3/etc).
                     fileUrl = await _fileStorageService.UploadFileAsync(
                         request.File,
-                        FileParams.GetFolder(request.ProjectId),
+                        string.Format(ProjectResourceParams.FileParams.GetFolder, request.ProjectId),
                         fileName,
                         cancellationToken);
 
@@ -163,14 +164,14 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             var extension = System.IO.Path.GetExtension(filePath).ToLower();
             return extension switch
             {
-                FileParams.PdfExtension => FileType.PDF,
-                FileParams.DocxExtension => FileType.DOCX,
-                FileParams.PptxExtension => FileType.PPTX,
-                FileParams.ZipExtension => FileType.ZIP,
-                FileParams.RarExtension => FileType.RAR,
-                FileParams.JpgExtension => FileType.JPG,
-                FileParams.JpegExtension => FileType.JPG,
-                FileParams.PngExtension => FileType.PNG,
+                ProjectResourceParams.FileParams.PdfExtension => FileType.PDF,
+                ProjectResourceParams.FileParams.DocxExtension => FileType.DOCX,
+                ProjectResourceParams.FileParams.PptxExtension => FileType.PPTX,
+                ProjectResourceParams.FileParams.ZipExtension => FileType.ZIP,
+                ProjectResourceParams.FileParams.RarExtension => FileType.RAR,
+                ProjectResourceParams.FileParams.JpgExtension => FileType.JPG,
+                ProjectResourceParams.FileParams.JpegExtension => FileType.JPG,
+                ProjectResourceParams.FileParams.PngExtension => FileType.PNG,
                 _ => throw new InvalidOperationException(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.UnsupportedFileType))
             };
         }

@@ -16,6 +16,5 @@ namespace IOCv2.Application.Interfaces
         Task<Stream> GetFileAsync(string fileUrl, CancellationToken cancellationToken = default);
         Task<FileInfo?> GetFileInfoAsync(string fileUrl, CancellationToken cancellationToken = default);
         string GetFilePathFromUrl(string resourceUrl);
-        string GetDomainUrl();
     }
 }

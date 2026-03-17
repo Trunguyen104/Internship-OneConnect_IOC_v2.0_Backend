@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using IOCv2.Application.Extensions.ProjectResources;
 
 namespace IOCv2.Infrastructure.Services
 {
@@ -27,9 +28,6 @@ namespace IOCv2.Infrastructure.Services
 
         private readonly ILogger<LocalFileStorageService> _logger;
 
-        // Domain constant coming from FileParams (used by GetDomainUrl).
-        private const string _domain = FileParams.FileDomain;
-
         private readonly IMessageService _messageService;
 
         /// <summary>
@@ -41,11 +39,11 @@ namespace IOCv2.Infrastructure.Services
             IConfiguration configuration,
             ILogger<LocalFileStorageService> logger, IMessageService messageService)
         {
-            _storagePath = configuration[FileParams.ConfigurationStoragePathKey]
-                ?? FileParams.GetStoragePath();
+            _storagePath = configuration[ProjectResourceParams.FileParams.ConfigurationStoragePathKey]
+                ?? GetStoragePath();
 
-            _baseUrl = configuration[FileParams.ConfigurationBaseUrl]
-                ?? FileParams.BaseUrl;
+            _baseUrl = configuration[ProjectResourceParams.FileParams.ConfigurationBaseUrl]
+                ?? ProjectResourceParams.FileParams.BaseUrl;
             _logger = logger;
             _messageService = messageService;
 
@@ -232,13 +230,22 @@ namespace IOCv2.Infrastructure.Services
             return Path.Combine(_storagePath, relativePath);
         }
 
-        /// <summary>
-        /// Returns the configured file domain constant.
-        /// </summary>
-        public string GetDomainUrl()
+        private string GetStoragePath()
         {
-            return _domain;
+            // D:\GIT\Ppp\Internship-OneConnect_IOC_v2.0_Backend\IOCv2.API
+            string currentDir = Directory.GetCurrentDirectory();
+            // D:\GIT\Ppp
+            string projectRoot = "";
+            try
+            {
+                projectRoot = Directory.GetParent(currentDir)!.Parent!.FullName;
+            }
+            catch
+            {
+                projectRoot = currentDir; // Fallback to current directory if parent retrieval fails
+            }
+            // D:\GIT\Ppp\Uploads
+            return string.Format(ProjectResourceParams.FileParams.StoragePath, projectRoot);
         }
     }
-
 }
