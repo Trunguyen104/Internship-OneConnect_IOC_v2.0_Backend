@@ -243,4 +243,60 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Successfully removed students from group: {InternshipId}</value>
   </data>
+
+  <!-- StudentTerms -->
+  <data name="StudentTerms.AddSuccess" xml:space="preserve">
+    <value>Student added to term successfully.</value>
+  </data>
+  <data name="StudentTerms.ImportPreviewSuccess" xml:space="preserve">
+    <value>Import preview completed successfully.</value>
+  </data>
+  <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
+    <value>Successfully imported {0} students.</value>
+  </data>
+  <data name="StudentTerms.ImportPartialSuccess" xml:space="preserve">
+    <value>Successfully imported {0} students. Skipped {1} already existing students.</value>
+  </data>
+  <data name="StudentTerms.UpdateSuccess" xml:space="preserve">
+    <value>Student information updated successfully.</value>
+  </data>
+  <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
+    <value>Student withdrawn from term successfully.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
+    <value>Successfully withdrew {0} students. Skipped {1} placed students.</value>
+  </data>
+  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
+    <value>Student enrollment restored successfully.</value>
+  </data>
+  <data name="StudentTerms.Log.Added" xml:space="preserve">
+    <value>Added student to term. StudentTermId: {0}, UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Imported" xml:space="preserve">
+    <value>Imported {0} students to term. UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Updated" xml:space="preserve">
+    <value>Updated student information in term. StudentTermId: {0}, UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
+    <value>Withdrew student from term. StudentTermId: {0}, UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Restored" xml:space="preserve">
+    <value>Restored student enrollment. StudentTermId: {0}, UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Error" xml:space="preserve">
+    <value>Error occurred while processing StudentTerm operation.</value>
+  </data>
+  <data name="StudentTerms.NotifyWithdraw.Subject" xml:space="preserve">
+    <value>Term Withdrawal Notification</value>
+  </data>
+  <data name="StudentTerms.NotifyWithdraw.Body" xml:space="preserve">
+    <value>You have been withdrawn from the internship term &lt;b&gt;{0}&lt;/b&gt;. Please contact your Uni Admin for more information.</value>
+  </data>
+  <data name="StudentTerms.NotifyRestore.Subject" xml:space="preserve">
+    <value>Term Restoration Notification</value>
+  </data>
+  <data name="StudentTerms.NotifyRestore.Body" xml:space="preserve">
+    <value>You have been restored to the internship term &lt;b&gt;{0}&lt;/b&gt;. Please log in to view your details.</value>
+  </data>
 </root>

@@ -51,6 +51,11 @@ namespace IOCv2.Domain.Entities
             Status = status;
         }
 
+        public void UpdateEmail(string email)
+        {
+            Email = email;
+        }
+
         public void UpdatePassword(string passwordHash)
         {
             PasswordHash = passwordHash;

@@ -48,18 +48,15 @@ namespace IOCv2.API.Attributes
                 return;
             }
 
-            var executedContext = await next();
-            if (executedContext.Exception != null ||
-                (executedContext.Result is ObjectResult result && result.StatusCode >= 400))
-            {
-                await rateLimiter.RegisterFailAsync(
-                    rateLimitKey,
-                    _maxRequests,
-                    TimeSpan.FromMinutes(_windowMinutes),
-                    TimeSpan.FromMinutes(_blockMinutes),
-                    CancellationToken.None
-                    );
-            }
+            // Count EVERY request (success or failure) to enforce the rate limit correctly
+            await rateLimiter.RegisterFailAsync(
+                rateLimitKey,
+                _maxRequests,
+                TimeSpan.FromMinutes(_windowMinutes),
+                TimeSpan.FromMinutes(_blockMinutes),
+                CancellationToken.None);
+
+            await next();
         }
 
         private string GetClientIdentifer(HttpContext context)

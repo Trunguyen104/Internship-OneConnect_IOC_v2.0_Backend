@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -308,5 +308,61 @@
   </data>
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Đã xóa thành công sinh viên khỏi nhóm: {InternshipId}</value>
+  </data>
+
+  <!-- StudentTerms -->
+  <data name="StudentTerms.AddSuccess" xml:space="preserve">
+    <value>Thêm sinh viên vào học kỳ thành công.</value>
+  </data>
+  <data name="StudentTerms.ImportPreviewSuccess" xml:space="preserve">
+    <value>Xem trước file import thành công.</value>
+  </data>
+  <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
+    <value>Import thành công {0} sinh viên.</value>
+  </data>
+  <data name="StudentTerms.ImportPartialSuccess" xml:space="preserve">
+    <value>Import thành công {0} sinh viên. Bỏ qua {1} sinh viên đã tồn tại.</value>
+  </data>
+  <data name="StudentTerms.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật thông tin sinh viên thành công.</value>
+  </data>
+  <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
+    <value>Rút sinh viên khỏi học kỳ thành công.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
+    <value>Rút thành công {0} sinh viên. Bỏ qua {1} sinh viên đã xếp chỗ.</value>
+  </data>
+  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
+    <value>Khôi phục đăng ký sinh viên thành công.</value>
+  </data>
+  <data name="StudentTerms.Log.Added" xml:space="preserve">
+    <value>Đã thêm sinh viên vào học kỳ. StudentTermId: {0}, UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Imported" xml:space="preserve">
+    <value>Đã import {0} sinh viên vào học kỳ. UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Updated" xml:space="preserve">
+    <value>Đã cập nhật thông tin sinh viên trong học kỳ. StudentTermId: {0}, UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
+    <value>Đã rút {0} sinh viên khỏi học kỳ. UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Restored" xml:space="preserve">
+    <value>Đã khôi phục đăng ký sinh viên. StudentTermId: {0}, UserId: {1}</value>
+  </data>
+  <data name="StudentTerms.Log.Error" xml:space="preserve">
+    <value>Lỗi trong quá trình xử lý thao tác StudentTerm.</value>
+  </data>
+  <data name="StudentTerms.NotifyWithdraw.Subject" xml:space="preserve">
+    <value>Thông báo rút khỏi kỳ thực tập</value>
+  </data>
+  <data name="StudentTerms.NotifyWithdraw.Body" xml:space="preserve">
+    <value>Bạn đã bị rút khỏi kỳ thực tập &lt;b&gt;{0}&lt;/b&gt;. Vui lòng liên hệ Uni Admin để biết thêm thông tin.</value>
+  </data>
+  <data name="StudentTerms.NotifyRestore.Subject" xml:space="preserve">
+    <value>Thông báo khôi phục vào kỳ thực tập</value>
+  </data>
+  <data name="StudentTerms.NotifyRestore.Body" xml:space="preserve">
+    <value>Bạn đã được khôi phục vào kỳ thực tập &lt;b&gt;{0}&lt;/b&gt;. Hãy đăng nhập để xem thông tin chi tiết.</value>
   </data>
 </root>

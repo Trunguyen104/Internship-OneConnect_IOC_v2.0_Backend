@@ -874,4 +874,120 @@
   <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Cannot publish evaluation scores in an already completed evaluation cycle.</value>
   </data>
+
+  <!-- StudentTerms -->
+  <data name="StudentTerms.NotFound" xml:space="preserve">
+    <value>Student enrollment record not found.</value>
+  </data>
+  <data name="StudentTerms.TermNotFound" xml:space="preserve">
+    <value>Term not found.</value>
+  </data>
+  <data name="StudentTerms.StudentNotFound" xml:space="preserve">
+    <value>Student not found.</value>
+  </data>
+  <data name="StudentTerms.EnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise not found.</value>
+  </data>
+  <data name="StudentTerms.AccessDenied" xml:space="preserve">
+    <value>You do not have permission to perform this action on another university's term.</value>
+  </data>
+  <data name="StudentTerms.TermEndedOrClosed" xml:space="preserve">
+    <value>Cannot add students to a term that has ended or is not open.</value>
+  </data>
+  <data name="StudentTerms.AlreadyEnrolledInThisTerm" xml:space="preserve">
+    <value>Student is already enrolled in this term.</value>
+  </data>
+  <data name="StudentTerms.AlreadyEnrolledInActiveTerm" xml:space="preserve">
+    <value>Student is already enrolled in another active term.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeExistsInUniversity" xml:space="preserve">
+    <value>Student code already exists in this university.</value>
+  </data>
+  <data name="StudentTerms.EmailExistsInSystem" xml:space="preserve">
+    <value>Email is already used in the system.</value>
+  </data>
+  <data name="StudentTerms.FileInvalidFormat" xml:space="preserve">
+    <value>Invalid file format. Only .xlsx or .xls files are accepted.</value>
+  </data>
+  <data name="StudentTerms.FileSizeExceeded" xml:space="preserve">
+    <value>File exceeds the allowed size limit (max 5MB).</value>
+  </data>
+  <data name="StudentTerms.FileRowLimitExceeded" xml:space="preserve">
+    <value>File exceeds the allowed row limit (max 1000 students).</value>
+  </data>
+  <data name="StudentTerms.FileEmpty" xml:space="preserve">
+    <value>File contains no valid data to import.</value>
+  </data>
+  <data name="StudentTerms.FileInvalidTemplate" xml:space="preserve">
+    <value>File does not match the required template. Please download the import template and fill it in correctly.</value>
+  </data>
+  <data name="StudentTerms.RowStudentCodeDuplicate" xml:space="preserve">
+    <value>Student code is duplicated within the file.</value>
+  </data>
+  <data name="StudentTerms.RowEmailDuplicate" xml:space="preserve">
+    <value>Email is duplicated within the file.</value>
+  </data>
+  <data name="StudentTerms.RowAlreadyEnrolled" xml:space="preserve">
+    <value>Student is already enrolled in this term.</value>
+  </data>
+  <data name="StudentTerms.RowNameInvalid" xml:space="preserve">
+    <value>Full name is invalid.</value>
+  </data>
+  <data name="StudentTerms.RowStudentCodeInvalid" xml:space="preserve">
+    <value>Student code is invalid.</value>
+  </data>
+  <data name="StudentTerms.RowEmailInvalid" xml:space="preserve">
+    <value>Email is invalid.</value>
+  </data>
+  <data name="StudentTerms.RowPhoneInvalid" xml:space="preserve">
+    <value>Phone number is invalid.</value>
+  </data>
+  <data name="StudentTerms.RowDobInvalid" xml:space="preserve">
+    <value>Date of birth is invalid or student is under 15 years old.</value>
+  </data>
+  <data name="StudentTerms.PlacedButNoEnterprise" xml:space="preserve">
+    <value>Status "Placed" requires selecting an enterprise.</value>
+  </data>
+  <data name="StudentTerms.EnrollmentDateRequired" xml:space="preserve">
+    <value>Enrollment date is required.</value>
+  </data>
+  <data name="StudentTerms.WithdrawFailedPlaced" xml:space="preserve">
+    <value>Cannot withdraw a student who has been placed at an enterprise.</value>
+  </data>
+  <data name="StudentTerms.AlreadyWithdrawn" xml:space="preserve">
+    <value>Student has already been withdrawn from this term.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawAllPlaced" xml:space="preserve">
+    <value>Cannot withdraw: all selected students are currently placed at an enterprise.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawEmptyList" xml:space="preserve">
+    <value>The list of students to withdraw cannot be empty.</value>
+  </data>
+  <data name="StudentTerms.NotWithdrawn" xml:space="preserve">
+    <value>Student has not been withdrawn and cannot be restored.</value>
+  </data>
+  <data name="StudentTerms.FullNameRequired" xml:space="preserve">
+    <value>Full name is required.</value>
+  </data>
+  <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
+    <value>Full name may only contain letters and spaces.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeRequired" xml:space="preserve">
+    <value>Student code is required.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
+    <value>Student code may only contain letters, numbers, hyphens, underscores, or dots.</value>
+  </data>
+  <data name="StudentTerms.EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="StudentTerms.EmailInvalid" xml:space="preserve">
+    <value>Email address is not valid.</value>
+  </data>
+  <data name="StudentTerms.PhoneInvalid" xml:space="preserve">
+    <value>Phone number is invalid. Valid formats: 0xxxxxxxxx or +84xxxxxxxxx.</value>
+  </data>
+  <data name="StudentTerms.DobInvalid" xml:space="preserve">
+    <value>Date of birth is invalid or student is under 15 years old.</value>
+  </data>
 </root>

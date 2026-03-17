@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -471,5 +471,84 @@
             public const string CannotSubmitInCompletedCycle = "Evaluation.CannotSubmitInCompletedCycle";
             public const string CannotPublishInCompletedCycle = "Evaluation.CannotPublishInCompletedCycle";
         }
+
+        public static class StudentTerms
+        {
+            // Common
+            public const string NotFound = "StudentTerms.NotFound";
+            public const string TermNotFound = "StudentTerms.TermNotFound";
+            public const string StudentNotFound = "StudentTerms.StudentNotFound";
+            public const string EnterpriseNotFound = "StudentTerms.EnterpriseNotFound";
+            public const string AccessDenied = "StudentTerms.AccessDenied";
+            public const string TermEndedOrClosed = "StudentTerms.TermEndedOrClosed";
+
+            // Add Manual
+            public const string AddSuccess = "StudentTerms.AddSuccess";
+            public const string AlreadyEnrolledInThisTerm = "StudentTerms.AlreadyEnrolledInThisTerm";
+            public const string AlreadyEnrolledInActiveTerm = "StudentTerms.AlreadyEnrolledInActiveTerm";
+            public const string StudentCodeExistsInUniversity = "StudentTerms.StudentCodeExistsInUniversity";
+            public const string EmailExistsInSystem = "StudentTerms.EmailExistsInSystem";
+
+            // Import
+            public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
+            public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
+            public const string ImportPartialSuccess = "StudentTerms.ImportPartialSuccess";
+            public const string FileInvalidFormat = "StudentTerms.FileInvalidFormat";
+            public const string FileSizeExceeded = "StudentTerms.FileSizeExceeded";
+            public const string FileRowLimitExceeded = "StudentTerms.FileRowLimitExceeded";
+            public const string FileEmpty = "StudentTerms.FileEmpty";
+            public const string FileInvalidTemplate = "StudentTerms.FileInvalidTemplate";
+            public const string RowStudentCodeDuplicate = "StudentTerms.RowStudentCodeDuplicate";
+            public const string RowEmailDuplicate = "StudentTerms.RowEmailDuplicate";
+            public const string RowAlreadyEnrolled = "StudentTerms.RowAlreadyEnrolled";
+            public const string RowNameInvalid = "StudentTerms.RowNameInvalid";
+            public const string RowStudentCodeInvalid = "StudentTerms.RowStudentCodeInvalid";
+            public const string RowEmailInvalid = "StudentTerms.RowEmailInvalid";
+            public const string RowPhoneInvalid = "StudentTerms.RowPhoneInvalid";
+            public const string RowDobInvalid = "StudentTerms.RowDobInvalid";
+
+            // Update
+            public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
+            public const string PlacedButNoEnterprise = "StudentTerms.PlacedButNoEnterprise";
+            public const string EnrollmentDateRequired = "StudentTerms.EnrollmentDateRequired";
+
+            // Withdraw
+            public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
+            public const string WithdrawFailedPlaced = "StudentTerms.WithdrawFailedPlaced";
+            public const string AlreadyWithdrawn = "StudentTerms.AlreadyWithdrawn";
+
+            // Bulk Withdraw
+            public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
+            public const string BulkWithdrawAllPlaced = "StudentTerms.BulkWithdrawAllPlaced";
+            public const string BulkWithdrawEmptyList = "StudentTerms.BulkWithdrawEmptyList";
+
+            // Restore
+            public const string RestoreSuccess = "StudentTerms.RestoreSuccess";
+            public const string NotWithdrawn = "StudentTerms.NotWithdrawn";
+
+            // Validation
+            public const string FullNameRequired = "StudentTerms.FullNameRequired";
+            public const string FullNameInvalid = "StudentTerms.FullNameInvalid";
+            public const string StudentCodeRequired = "StudentTerms.StudentCodeRequired";
+            public const string StudentCodeInvalid = "StudentTerms.StudentCodeInvalid";
+            public const string EmailRequired = "StudentTerms.EmailRequired";
+            public const string EmailInvalid = "StudentTerms.EmailInvalid";
+            public const string PhoneInvalid = "StudentTerms.PhoneInvalid";
+            public const string DobInvalid = "StudentTerms.DobInvalid";
+
+            // Log keys
+            public const string LogAdded = "StudentTerms.Log.Added";
+            public const string LogImported = "StudentTerms.Log.Imported";
+            public const string LogUpdated = "StudentTerms.Log.Updated";
+            public const string LogWithdrawn = "StudentTerms.Log.Withdrawn";
+            public const string LogRestored = "StudentTerms.Log.Restored";
+            public const string LogError = "StudentTerms.Log.Error";
+
+            // Notification emails
+            public const string NotifyWithdrawSubject = "StudentTerms.NotifyWithdraw.Subject";
+            public const string NotifyWithdrawBody = "StudentTerms.NotifyWithdraw.Body";
+            public const string NotifyRestoreSubject = "StudentTerms.NotifyRestore.Subject";
+            public const string NotifyRestoreBody = "StudentTerms.NotifyRestore.Body";
+        }
     }
-}
+}

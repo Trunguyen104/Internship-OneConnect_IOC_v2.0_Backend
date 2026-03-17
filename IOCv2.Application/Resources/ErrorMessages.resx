@@ -931,4 +931,120 @@
   <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Không thể công bố điểm đánh giá khi chu kỳ đã hoàn thành.</value>
   </data>
+
+  <!-- StudentTerms -->
+  <data name="StudentTerms.NotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin đăng ký học kỳ của sinh viên.</value>
+  </data>
+  <data name="StudentTerms.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy học kỳ.</value>
+  </data>
+  <data name="StudentTerms.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên.</value>
+  </data>
+  <data name="StudentTerms.EnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp.</value>
+  </data>
+  <data name="StudentTerms.AccessDenied" xml:space="preserve">
+    <value>Bạn không có quyền thực hiện thao tác này trên học kỳ của trường khác.</value>
+  </data>
+  <data name="StudentTerms.TermEndedOrClosed" xml:space="preserve">
+    <value>Học kỳ đã kết thúc hoặc không ở trạng thái mở, không thể thêm sinh viên.</value>
+  </data>
+  <data name="StudentTerms.AlreadyEnrolledInThisTerm" xml:space="preserve">
+    <value>Sinh viên đã được đăng ký vào học kỳ này.</value>
+  </data>
+  <data name="StudentTerms.AlreadyEnrolledInActiveTerm" xml:space="preserve">
+    <value>Sinh viên đang được đăng ký trong một học kỳ đang hoạt động khác.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeExistsInUniversity" xml:space="preserve">
+    <value>Mã sinh viên đã tồn tại trong trường này.</value>
+  </data>
+  <data name="StudentTerms.EmailExistsInSystem" xml:space="preserve">
+    <value>Email đã được sử dụng trong hệ thống.</value>
+  </data>
+  <data name="StudentTerms.FileInvalidFormat" xml:space="preserve">
+    <value>File không đúng định dạng. Chỉ chấp nhận file .xlsx hoặc .xls.</value>
+  </data>
+  <data name="StudentTerms.FileSizeExceeded" xml:space="preserve">
+    <value>File vượt quá kích thước cho phép (tối đa 5MB).</value>
+  </data>
+  <data name="StudentTerms.FileRowLimitExceeded" xml:space="preserve">
+    <value>File vượt quá số hàng cho phép (tối đa 1000 sinh viên).</value>
+  </data>
+  <data name="StudentTerms.FileEmpty" xml:space="preserve">
+    <value>File không có dữ liệu hợp lệ để import.</value>
+  </data>
+  <data name="StudentTerms.FileInvalidTemplate" xml:space="preserve">
+    <value>File không đúng mẫu. Vui lòng tải mẫu import và điền đúng định dạng.</value>
+  </data>
+  <data name="StudentTerms.RowStudentCodeDuplicate" xml:space="preserve">
+    <value>Mã sinh viên bị trùng trong file.</value>
+  </data>
+  <data name="StudentTerms.RowEmailDuplicate" xml:space="preserve">
+    <value>Email bị trùng trong file.</value>
+  </data>
+  <data name="StudentTerms.RowAlreadyEnrolled" xml:space="preserve">
+    <value>Sinh viên đã được đăng ký vào học kỳ này.</value>
+  </data>
+  <data name="StudentTerms.RowNameInvalid" xml:space="preserve">
+    <value>Họ và tên không hợp lệ.</value>
+  </data>
+  <data name="StudentTerms.RowStudentCodeInvalid" xml:space="preserve">
+    <value>Mã sinh viên không hợp lệ.</value>
+  </data>
+  <data name="StudentTerms.RowEmailInvalid" xml:space="preserve">
+    <value>Email không hợp lệ.</value>
+  </data>
+  <data name="StudentTerms.RowPhoneInvalid" xml:space="preserve">
+    <value>Số điện thoại không hợp lệ.</value>
+  </data>
+  <data name="StudentTerms.RowDobInvalid" xml:space="preserve">
+    <value>Ngày sinh không hợp lệ hoặc sinh viên chưa đủ 15 tuổi.</value>
+  </data>
+  <data name="StudentTerms.PlacedButNoEnterprise" xml:space="preserve">
+    <value>Trạng thái "Đã xếp chỗ" yêu cầu phải chọn doanh nghiệp.</value>
+  </data>
+  <data name="StudentTerms.EnrollmentDateRequired" xml:space="preserve">
+    <value>Ngày đăng ký là bắt buộc.</value>
+  </data>
+  <data name="StudentTerms.WithdrawFailedPlaced" xml:space="preserve">
+    <value>Không thể rút sinh viên đã được xếp chỗ tại doanh nghiệp.</value>
+  </data>
+  <data name="StudentTerms.AlreadyWithdrawn" xml:space="preserve">
+    <value>Sinh viên đã bị rút khỏi học kỳ này trước đó.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawAllPlaced" xml:space="preserve">
+    <value>Không thể rút: tất cả sinh viên được chọn đều đã được xếp chỗ tại doanh nghiệp.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawEmptyList" xml:space="preserve">
+    <value>Danh sách sinh viên cần rút không được để trống.</value>
+  </data>
+  <data name="StudentTerms.NotWithdrawn" xml:space="preserve">
+    <value>Sinh viên này chưa bị rút, không thể thực hiện khôi phục.</value>
+  </data>
+  <data name="StudentTerms.FullNameRequired" xml:space="preserve">
+    <value>Họ và tên là bắt buộc.</value>
+  </data>
+  <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
+    <value>Họ và tên chỉ được chứa chữ cái và khoảng trắng.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeRequired" xml:space="preserve">
+    <value>Mã sinh viên là bắt buộc.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
+    <value>Mã sinh viên chỉ được chứa chữ cái, số, dấu gạch ngang, gạch dưới hoặc dấu chấm.</value>
+  </data>
+  <data name="StudentTerms.EmailRequired" xml:space="preserve">
+    <value>Email là bắt buộc.</value>
+  </data>
+  <data name="StudentTerms.EmailInvalid" xml:space="preserve">
+    <value>Địa chỉ email không hợp lệ.</value>
+  </data>
+  <data name="StudentTerms.PhoneInvalid" xml:space="preserve">
+    <value>Số điện thoại không hợp lệ. Định dạng hợp lệ: 0xxxxxxxxx hoặc +84xxxxxxxxx.</value>
+  </data>
+  <data name="StudentTerms.DobInvalid" xml:space="preserve">
+    <value>Ngày sinh không hợp lệ hoặc sinh viên chưa đủ 15 tuổi.</value>
+  </data>
 </root>
