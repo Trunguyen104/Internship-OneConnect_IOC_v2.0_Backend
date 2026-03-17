@@ -252,4 +252,16 @@
   <data name="File.FileNotFound" xml:space="preserve">
     <value>The file you are trying to access could not be found on the server. It may have been moved, renamed, or deleted. Please verify the file path and try again.</value>
   </data>
+  <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
+    <value>You do not have permission to delete this enterprise.</value>
+  </data>
+  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <value>You do not have permission to restore this enterprise.</value>
+  </data>
+  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <value>The enterprise has not been deleted and cannot be restored.</value>
+  </data>
+  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <value>You do not have permission to view this enterprise.</value>
+  </data>
 </root>

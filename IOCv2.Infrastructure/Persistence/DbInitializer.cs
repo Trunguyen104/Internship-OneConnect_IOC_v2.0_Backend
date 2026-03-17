@@ -40,22 +40,8 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 var universities = new List<University>
                 {
-                    new University
-                    {
-                        UniversityId = Guid.NewGuid(),
-                        Code = "FPTU",
-                        Name = "FPT University",
-                        Address = "Hoa Lac Hi-Tech Park, Hanoi",
-                        Status = 1
-                    },
-                    new University
-                    {
-                        UniversityId = Guid.NewGuid(),
-                        Code = "FPTU-CT",
-                        Name = "FPT University Can Tho",
-                        Address = "600 Nguyen Van Cu, Ninh Kieu, Can Tho",
-                        Status = 1
-                    }
+                    University.Create("FPTU", "FPT University", "Hoa Lac Hi-Tech Park, Hanoi", null),
+                    University.Create("FPTU-CT", "FPT University Can Tho", "600 Nguyen Van Cu, Ninh Kieu, Can Tho", null)
                 };
                 await _context.Universities.AddRangeAsync(universities);
                 await _context.SaveChangesAsync();
@@ -76,7 +62,7 @@ namespace IOCv2.Infrastructure.Persistence
                         Industry = "Information Technology",
                         Address = "Hồ Chí Minh",
                         IsVerified = true,
-                        Status = 1
+                        Status = (short)EnterpriseStatus.Active
                     },
                     new Enterprise
                     {
@@ -86,7 +72,7 @@ namespace IOCv2.Infrastructure.Persistence
                         Industry = "Information Technology",
                         Address = "Hồ Chí Minh",
                         IsVerified = true,
-                        Status = 1
+                        Status = (short)EnterpriseStatus.Active
                     }
                 };
                 await _context.Enterprises.AddRangeAsync(enterprises);

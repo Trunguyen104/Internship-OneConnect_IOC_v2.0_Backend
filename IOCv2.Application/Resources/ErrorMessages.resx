@@ -957,4 +957,10 @@
   <data name="File.FileGetError" xml:space="preserve">
     <value>Lỗi khi lấy thông tin tệp: {FileUrl}</value>
   </data>
+  <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
+    <value>Khôi phục doanh nghiệp thất bại. EnterpriseId: {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.RestoreFailed" xml:space="preserve">
+    <value>Khôi phục doanh nghiệp thất bại.</value>
+  </data>
 </root>

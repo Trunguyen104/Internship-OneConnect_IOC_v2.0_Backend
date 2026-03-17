@@ -901,4 +901,10 @@
   <data name="File.FileGetError" xml:space="preserve">
     <value>Lỗi khi lấy thông tin tệp: {FileUrl}</value>
   </data>
+  <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
+    <value>Failed to restore enterprise. EnterpriseId: {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.RestoreFailed" xml:space="preserve">
+    <value>Failed to restore enterprise.</value>
+  </data>
 </root>

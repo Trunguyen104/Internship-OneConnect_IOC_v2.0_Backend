@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource;
 using IOCv2.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;

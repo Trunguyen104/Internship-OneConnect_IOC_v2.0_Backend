@@ -142,6 +142,33 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền xóa doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_DeletePermissionDenied {
+            get {
+                return ResourceManager.GetString("Enterprise.DeletePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền xem thông tin doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_GetByIDPermissionsNotAllowed {
+            get {
+                return ResourceManager.GetString("Enterprise.GetByIDPermissionsNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Doanh nghiệp chưa bị xóa nên không thể khôi phục..
+        /// </summary>
+        internal static string Enterprise_NotDeleted {
+            get {
+                return ResourceManager.GetString("Enterprise.NotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to getByHR_enterprise_attempt:{0}.
         /// </summary>
         internal static string Enterprise_RateLimitGetByHRAttempt {
@@ -183,6 +210,15 @@ namespace IOCv2.Application.Resources {
         internal static string Enterprise_RequestManyTimes {
             get {
                 return ResourceManager.GetString("Enterprise.RequestManyTimes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền khôi phục doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_RestorePermissionDenied {
+            get {
+                return ResourceManager.GetString("Enterprise.RestorePermissionDenied", resourceCulture);
             }
         }
         

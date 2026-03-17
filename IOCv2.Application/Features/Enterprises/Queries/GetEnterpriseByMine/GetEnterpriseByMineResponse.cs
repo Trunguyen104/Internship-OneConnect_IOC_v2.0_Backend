@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
 {
-    public class GetEnterpriseByHRResponse : IMapFrom<Domain.Entities.Enterprise>
+    public class GetEnterpriseByMineResponse : IMapFrom<Domain.Entities.Enterprise>
     {
         public Guid EnterpriseId { get; set; }
         public string? TaxCode { get; set; }
@@ -23,10 +23,10 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
         public string? LogoUrl { get; set; }
         public string? BackgroundUrl { get; set; }
         public bool IsVerified { get; set; } = false;
-        public EnterpriseStatus Status { get; set; } = EnterpriseStatus.Active; // 0=Inactive, 1=Active, 2=Suspended
+        public EnterpriseStatus Status { get; set; } = EnterpriseStatus.Active; // 1=Inactive, 2=Active, 3=Suspended
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<Enterprise, GetEnterpriseByHRResponse>()
+            profile.CreateMap<Enterprise, GetEnterpriseByMineResponse>()
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => (EnterpriseStatus)src.Status));
         }
