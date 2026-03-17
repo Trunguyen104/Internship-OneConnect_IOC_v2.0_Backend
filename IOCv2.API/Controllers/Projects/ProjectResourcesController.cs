@@ -42,7 +42,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
     /// <returns>Paginated result with project resources or an error response.</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetAllProjectResourcesResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetAllProjectResourcesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -89,7 +89,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
     /// <returns>File content or an error response handled by application layer.</returns>
     [HttpGet("{resourceId:guid}/read")]
-    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetReadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetReadProjectResourceById(
         [FromRoute] Guid resourceId,
@@ -108,7 +108,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// <returns>Created resource information or an error response.</returns>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -151,7 +151,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token provided by the framework.</param>
     /// <returns>Result indicating success or the appropriate error response.</returns>
     [HttpDelete("{resourceId:guid}")]
-    [ProducesResponseType(typeof(Result<DeleteProjectResourceResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
