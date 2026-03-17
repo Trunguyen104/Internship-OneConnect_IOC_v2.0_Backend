@@ -1,4 +1,12 @@
-﻿using AutoMapper;
+﻿/*
+Pseudocode:
+1. Identify the NotFound return in Handle method.
+2. Replace the empty NotFound() call with NotFound(message) where message is retrieved via:
+   _messageService.GetMessage(MessageKeys.ViolationReportKey.NotFound)
+3. Keep other logic unchanged.
+*/
+
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -46,7 +54,7 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
                     .Where(x => x.ViolationReportId == request.ViolationReportId);
 
                 // Role filter
-                if (ViolationReportParam.InternshipGroupInternalViewer.Contains(_currentUserService.Role))
+                if (ViolationReportParam.MentorRole.Equals(_currentUserService.Role!))
                 {
                     var userId = Guid.Parse(_currentUserService.UserId!);
 
@@ -59,7 +67,8 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (response == null)
-                    return Result<GetViolationReportDetailResponse>.NotFound("Not Found");
+                    return Result<GetViolationReportDetailResponse>.NotFound(
+                        _messageService.GetMessage(MessageKeys.ViolationReportKey.NotFound));
 
                 return Result<GetViolationReportDetailResponse>.Success(response);
             }

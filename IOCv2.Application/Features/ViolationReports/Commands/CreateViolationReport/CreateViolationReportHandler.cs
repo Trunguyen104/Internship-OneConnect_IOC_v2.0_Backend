@@ -61,7 +61,7 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.CreateViolationRe
                 var studentTerm = await _unitOfWork.Repository<StudentTerm>().Query().FirstOrDefaultAsync(x=>x.StudentId == request.StudentId,cancellationToken);
                 DateOnly termStart = await _unitOfWork.Repository<Term>().Query().Where(x => x.TermId == studentTerm!.TermId).Select(x=>x.StartDate).FirstOrDefaultAsync(cancellationToken);
                 if (request.OccurredDate > DateTime.UtcNow.Date) return Result<CreateViolationReportResponse>.Failure("Ngày xảy ra vi phạm không được là ngày trong tương lai.");
-                if (request.OccurredDate < (DateTime) termStart) 
+                if (request.OccurredDate < (DateTime)termStart) 
                 // Tạo report và lưu vào database
 
 

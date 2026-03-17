@@ -13,22 +13,19 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
     public record GetViolationReportsQuery : IRequest<Result<PaginatedResult<GetViolationReportsResponse>>>
     {
         // Search
-        public string? SearchTerm { get; set; } // Tên sinh viên hoặc MSSV
+        public string? SearchTerm { get; set; }
 
         // Filters
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ViolationType? ViolationType { get; set; }        // Loại vi phạm
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ViolationSeverity? SeverityLevel { get; set; }        // Mức độ
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ViolationStatus? ProcessingStatus { get; set; }     // Trạng thái xử lý
-        public Guid? CreatedById { get; set; }            // Người tạo
-        public DateOnly? OccurredFrom { get; set; }       // Khoảng thời gian - ngày bắt đầu
-        public DateOnly? OccurredTo { get; set; }         // Khoảng thời gian - ngày kết thúc
-        public Guid? GroupId { get; set; }                // Nhóm
+        public Guid? CreatedById { get; set; }         
+        public DateOnly? OccurredFrom { get; set; }     
+        public DateOnly? OccurredTo { get; set; }      
+        public Guid? GroupId { get; set; }            
 
         // Pagination
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+
+        // Sorting: default newest first (CreatedAt desc). Client can toggle this.
+        public bool OrderByCreatedAscending { get; set; } = false;
     }
 }

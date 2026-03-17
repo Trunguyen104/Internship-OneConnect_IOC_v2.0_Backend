@@ -16,10 +16,12 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         public string StudentName { get; set; } = string.Empty!;
         public string StudentCode { get; set; } = string.Empty!;
         public string InternshipGroupName { get; set; } = string.Empty!;
-        public DateOnly OccurredDate { get; set; }
+        public string? MentorName { get; set; }
         public Guid CreatedBy { get; set; }
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ViolationStatus ViolationStatus { get; set; }
+        public DateOnly OccurredDate { get; set; }
+        public string Description { get; set; } = string.Empty!;
+        public DateTime CreatedAt { get; set; }
+
         public void Mapping(Profile profile) {
             profile.CreateMap<ViolationReport, GetViolationReportsResponse>()
                 .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.User.FullName))
@@ -27,7 +29,8 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
                 .ForMember(dest => dest.InternshipGroupName, opt => opt.MapFrom(src => src.InternshipGroup.GroupName))
                 .ForMember(dest => dest.OccurredDate, opt => opt.MapFrom(src => src.OccurredDate))
                 .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.CreatedBy))
-                .ForMember(dest => dest.ViolationStatus, opt => opt.MapFrom(src => src.Status));
+                .ForMember(dest => dest.MentorName, opt => opt.MapFrom(src => src.InternshipGroup.Mentor != null ? src.InternshipGroup.Mentor.User.FullName : null))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
         }
     }
 }
