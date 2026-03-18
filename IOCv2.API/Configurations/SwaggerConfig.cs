@@ -1,4 +1,4 @@
-﻿﻿using Asp.Versioning.ApiExplorer;
+﻿using Asp.Versioning.ApiExplorer;
 using Microsoft.OpenApi.Models;
 
 namespace IOCv2.API.Configurations;
@@ -14,7 +14,7 @@ public static class SwaggerConfig
             // Use full type names for schema IDs to avoid conflicts
             c.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
 
-            c.SchemaFilter<EnumSchemaFilter>();
+            // c.SchemaFilter<EnumSchemaFilter>();
 
             // Config JWT in Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

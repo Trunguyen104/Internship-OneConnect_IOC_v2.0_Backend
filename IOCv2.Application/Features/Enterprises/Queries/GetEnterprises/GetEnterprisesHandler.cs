@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.Enterprises;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -97,27 +98,27 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
             if (string.IsNullOrWhiteSpace(sortColumn))
                 return query.OrderByDescending(e => e.Name);
 
-            var isDesc = sortOrder?.ToLower() == "desc";
+            var isDesc = sortOrder?.ToLower() == EnterpriseParams.Filter.Desc;
 
             return sortColumn.ToLower() switch
             {
-                "name" => isDesc
+                EnterpriseParams.Filter.Name => isDesc
                     ? query.OrderByDescending(e => e.Name)
                     : query.OrderBy(e => e.Name),
 
-                "taxcode" => isDesc
+                EnterpriseParams.Filter.TaxCode => isDesc
                     ? query.OrderByDescending(e => e.TaxCode)
                     : query.OrderBy(e => e.TaxCode),
 
-                "industry" => isDesc
+                EnterpriseParams.Filter.Industry => isDesc
                     ? query.OrderByDescending(e => e.Industry)
                     : query.OrderBy(e => e.Industry),
 
-                "status" => isDesc
+                EnterpriseParams.Filter.Status => isDesc
                     ? query.OrderByDescending(e => e.Status)
                     : query.OrderBy(e => e.Status),
 
-                "isverified" => isDesc
+                EnterpriseParams.Filter.IsVerified => isDesc
                     ? query.OrderByDescending(e => e.IsVerified)
                     : query.OrderBy(e => e.IsVerified),
 
