@@ -1,7 +1,5 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Enterprises.Commands.AcceptApplication;
-using IOCv2.Application.Features.Enterprises.Commands.AssignMentor;
-using IOCv2.Application.Features.Enterprises.Commands.AssignProject;
 using IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.RejectApplication;
@@ -193,48 +191,6 @@ public class EnterprisesController : ApiControllerBase
     public async Task<IActionResult> RejectApplication(
         [FromRoute] Guid applicationId,
         [FromBody] RejectApplicationCommand body,
-        CancellationToken cancellationToken)
-    {
-        var command = body with { ApplicationId = applicationId };
-        var result = await _mediator.Send(command, cancellationToken);
-        return HandleResult(result);
-    }
-
-    /// <summary>
-    /// [HR/EnterpriseAdmin] Gán Mentor cho sinh viên sau khi Accept đơn.
-    /// Tự động tạo Group mới nếu Mentor chưa có nhóm trong kỳ này.
-    /// </summary>
-    [HttpPatch("me/applications/{applicationId:guid}/assign")]
-    [Authorize(Roles = "HR,EnterpriseAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<AssignMentorResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> AssignMentor(
-        [FromRoute] Guid applicationId,
-        [FromBody] AssignMentorCommand body,
-        CancellationToken cancellationToken)
-    {
-        var command = body with { ApplicationId = applicationId };
-        var result = await _mediator.Send(command, cancellationToken);
-        return HandleResult(result);
-    }
-
-    /// <summary>
-    /// [Mentor] Gán Project vào nhóm của mình. Mentor chỉ được gán project
-    /// cho sinh viên đã được HR assign vào nhóm của mình.
-    /// </summary>
-    [HttpPatch("me/applications/{applicationId:guid}/assign-project")]
-    [Authorize(Roles = "Mentor")]
-    [ProducesResponseType(typeof(ApiResponse<AssignProjectResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> AssignProject(
-        [FromRoute] Guid applicationId,
-        [FromBody] AssignProjectCommand body,
         CancellationToken cancellationToken)
     {
         var command = body with { ApplicationId = applicationId };

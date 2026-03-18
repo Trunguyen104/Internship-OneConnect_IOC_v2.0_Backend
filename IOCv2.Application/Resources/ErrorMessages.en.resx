@@ -766,6 +766,18 @@
   <data name="InternshipGroup.NotFound" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
+  <data name="InternshipGroup.HasStudents" xml:space="preserve">
+    <value>Cannot delete a group that still has students. Please move all students to another group first.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Enterprise user record not found for the current user.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotApproved" xml:space="preserve">
+    <value>Student {0} does not have an approved application for this enterprise.</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
+    <value>Student {0} does not have an approved application for enterprise {1}</value>
+  </data>
   <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
     <value>Term not found for ID: {TermId}</value>
   </data>

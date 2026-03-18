@@ -823,6 +823,18 @@
   <data name="InternshipGroup.NotFound" xml:space="preserve">
     <value>Không tìm thấy nhóm thực tập.</value>
   </data>
+  <data name="InternshipGroup.HasStudents" xml:space="preserve">
+    <value>Không thể xóa nhóm còn sinh viên. Vui lòng chuyển toàn bộ sinh viên sang nhóm khác trước.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin nhân viên doanh nghiệp của người dùng hiện tại.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotApproved" xml:space="preserve">
+    <value>Sinh viên {0} chưa được phê duyệt vào doanh nghiệp này hoặc không có đơn ứng tuyển hợp lệ.</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
+    <value>Student {0} does not have an approved application for enterprise {1}</value>
+  </data>
   <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ với ID: {TermId}</value>
   </data>

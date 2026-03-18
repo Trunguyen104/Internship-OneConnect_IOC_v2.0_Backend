@@ -1,4 +1,4 @@
-﻿﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -150,6 +150,11 @@
             public const string MentorNotFound = "InternshipGroup.MentorNotFound";
             public const string StudentNotFound = "InternshipGroup.StudentNotFound";
             public const string NotFound = "InternshipGroup.NotFound";
+            public const string HasStudents = "InternshipGroup.HasStudents";
+            public const string EnterpriseUserNotFound = "InternshipGroup.EnterpriseUserNotFound";
+            public const string StudentNotApproved = "InternshipGroup.StudentNotApproved";
+            public const string LogStudentNotApproved = "InternshipGroup.LogStudentNotApproved";
+
 
             // Logger Keys
             public const string LogTermNotFound = "InternshipGroup.LogTermNotFound";
