@@ -36,7 +36,6 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
                 request.Address,
                 request.LogoUrl);
 
-            university.CreatedBy = _currentUserService.UserId != null ? Guid.Parse(_currentUserService.UserId) : null;
 
             await _unitOfWork.Repository<University>().AddAsync(university);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
