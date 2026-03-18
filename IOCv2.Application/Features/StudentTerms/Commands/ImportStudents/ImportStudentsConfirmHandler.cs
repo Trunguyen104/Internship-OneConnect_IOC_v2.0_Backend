@@ -13,6 +13,7 @@ namespace IOCv2.Application.Features.StudentTerms.Commands.ImportStudents;
 public class ImportStudentsConfirmHandler
     : IRequestHandler<ImportStudentsConfirmCommand, Result<ImportStudentsConfirmResponse>>
 {
+    private readonly IBackgroundEmailSender _emailSender;
     private readonly ICurrentUserService _currentUserService;
     private readonly ILogger<ImportStudentsConfirmHandler> _logger;
     private readonly IMessageService _messageService;
@@ -24,13 +25,15 @@ public class ImportStudentsConfirmHandler
         IMessageService messageService,
         IPasswordService passwordService,
         ILogger<ImportStudentsConfirmHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IBackgroundEmailSender emailSender)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _passwordService = passwordService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _emailSender = emailSender;
     }
 
     public async Task<Result<ImportStudentsConfirmResponse>> Handle(
@@ -203,6 +206,14 @@ public class ImportStudentsConfirmHandler
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            // Send account creation emails to new students (fire-and-forget via background channel)
+            foreach (var entry in passwordEntries)
+            {
+                await _emailSender.EnqueueAccountCreationEmailAsync(
+                    entry.Email, entry.Name, entry.Email, "Student", entry.Password,
+                    cancellationToken: cancellationToken);
+            }
 
             // Generate a password Excel file in memory
             byte[]? fileContent = null;

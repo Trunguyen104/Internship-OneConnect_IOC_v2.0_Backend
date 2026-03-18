@@ -1,4 +1,4 @@
-﻿﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -488,6 +488,7 @@
             public const string AlreadyEnrolledInActiveTerm = "StudentTerms.AlreadyEnrolledInActiveTerm";
             public const string StudentCodeExistsInUniversity = "StudentTerms.StudentCodeExistsInUniversity";
             public const string EmailExistsInSystem = "StudentTerms.EmailExistsInSystem";
+            public const string PhoneExistsInSystem = "StudentTerms.PhoneExistsInSystem";
 
             // Import
             public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
