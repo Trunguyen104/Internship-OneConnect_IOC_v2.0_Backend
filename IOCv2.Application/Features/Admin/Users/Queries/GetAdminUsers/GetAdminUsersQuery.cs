@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
 
 namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
@@ -16,12 +17,12 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
         /// <summary>
         /// (Optional) Filter by role.
         /// </summary>
-        public string? Role { get; init; }
+        public UserRole? Role { get; init; }
 
         /// <summary>
         /// (Optional) Filter by status.
         /// </summary>
-        public string? Status { get; init; }
+        public UserStatus? Status { get; init; }
         
         /// <summary>
         /// Page number (starting from 1).

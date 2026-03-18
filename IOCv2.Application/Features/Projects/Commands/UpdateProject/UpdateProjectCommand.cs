@@ -15,6 +15,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
         /// <summary>
         /// Identity of the project to be updated.
         /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
         public Guid ProjectId { get; set; }
 
         /// <summary>

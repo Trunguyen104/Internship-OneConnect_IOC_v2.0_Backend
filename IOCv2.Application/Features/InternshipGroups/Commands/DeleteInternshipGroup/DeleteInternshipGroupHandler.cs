@@ -3,6 +3,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using IOCv2.Application.Constants;
 using AutoMapper;
@@ -14,47 +15,71 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
+        private readonly ILogger<DeleteInternshipGroupHandler> _logger;
 
-        public DeleteInternshipGroupHandler(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
+        public DeleteInternshipGroupHandler(
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
+            IMapper mapper,
+            ILogger<DeleteInternshipGroupHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<DeleteInternshipGroupResponse>> Handle(DeleteInternshipGroupCommand request, CancellationToken cancellationToken)
         {
-            var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
-                .Include(g => g.Members) // Đi kèm dữ liệu sinh viên để dọn rác
-                .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleting), request.InternshipId);
 
-            if (entity == null)
+            try
             {
-                return Result<DeleteInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
-            }
+                var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .Include(g => g.Members)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
-            // Entity Framework Core có thể tự Cascade Delete nếu config chuẩn. 
-            // Nếu không chuẩn, mình xóa chay trước các dữ liệu con Members
-            if (entity.Members.Any())
-            {
-                var memberRepo = _unitOfWork.Repository<InternshipStudent>();
-                foreach (var member in entity.Members.ToList())
+                if (entity == null)
                 {
-                    await memberRepo.DeleteAsync(member);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNotFound), request.InternshipId);
+                    return Result<DeleteInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
+
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+                // Delete members first (manual cascade if not handled by DB)
+                if (entity.Members.Any())
+                {
+                    var memberRepo = _unitOfWork.Repository<InternshipStudent>();
+                    foreach (var member in entity.Members.ToList())
+                    {
+                        await memberRepo.DeleteAsync(member);
+                    }
+                }
+
+                await _unitOfWork.Repository<InternshipGroup>().DeleteAsync(entity);
+                var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                if (saved > 0)
+                {
+                    await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDeletedSuccess), request.InternshipId);
+
+                    var response = _mapper.Map<DeleteInternshipGroupResponse>(entity);
+                    return Result<DeleteInternshipGroupResponse>.Success(response);
+                }
+
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteFailed));
+                return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
             }
-
-            // Xóa Nhóm cha
-            await _unitOfWork.Repository<InternshipGroup>().DeleteAsync(entity);
-            var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-            if (saved > 0)
+            catch (Exception ex)
             {
-                var response = _mapper.Map<DeleteInternshipGroupResponse>(entity);
-                return Result<DeleteInternshipGroupResponse>.Success(response);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteError), request.InternshipId);
+                return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
-
-            return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError));
         }
     }
 }

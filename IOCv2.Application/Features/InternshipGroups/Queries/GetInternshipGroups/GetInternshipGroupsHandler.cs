@@ -24,6 +24,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 .Include(ig => ig.Enterprise)
                 .Include(ig => ig.Mentor!).ThenInclude(m => m.User!)
                 .Include(ig => ig.Members)
+                .Include(ig => ig.Term)
                 .AsNoTracking();
 
             // Lọc theo GroupName hoặc EnterpriseName nếu có SearchTerm
@@ -37,7 +38,19 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             // Lọc theo Status
             if (request.Status.HasValue)
             {
-                query = query.Where(x => (short)x.Status == request.Status.Value);
+                query = query.Where(x => x.Status == request.Status.Value);
+            }
+
+            // Lọc theo UniversityId
+            if (request.UniversityId.HasValue)
+            {
+                query = query.Where(x => x.Term.UniversityId == request.UniversityId.Value);
+            }
+
+            // Lọc theo EnterpriseId
+            if (request.EnterpriseId.HasValue)
+            {
+                query = query.Where(x => x.EnterpriseId == request.EnterpriseId.Value);
             }
 
             // Sắp xếp mặc định theo ngày bắt đầu giảm dần hoặc tên

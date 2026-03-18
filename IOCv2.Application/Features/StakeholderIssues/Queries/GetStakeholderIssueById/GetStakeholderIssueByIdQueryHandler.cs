@@ -33,7 +33,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
         {
             _logger.LogInformation("Getting StakeholderIssue {Id}", request.Id);
 
-            var issue = await _unitOfWork.Repository<StakeholderIssue>()
+            try
+            {
+                var issue = await _unitOfWork.Repository<StakeholderIssue>()
                 .Query()
                 .AsNoTracking()
                 .ProjectTo<GetStakeholderIssueByIdResponse>(_mapper.ConfigurationProvider)
@@ -48,6 +50,12 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
 
             _logger.LogInformation("Successfully retrieved StakeholderIssue {Id}", request.Id);
             return Result<GetStakeholderIssueByIdResponse>.Success(issue);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting StakeholderIssue {Id}", request.Id);
+                return Result<GetStakeholderIssueByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            }
         }
     }
 }

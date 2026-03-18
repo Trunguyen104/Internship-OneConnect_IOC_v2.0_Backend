@@ -33,7 +33,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
             if (resource == null)
             {
                 _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ResourceId);
-                return Result<DeleteProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound));
+                return Result<DeleteProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound), ResultErrorType.NotFound);
             }
             try
             {
@@ -53,7 +53,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Failed to delete project resource: {ResourceId}", request.ResourceId);
-                throw;
+                return Result<DeleteProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

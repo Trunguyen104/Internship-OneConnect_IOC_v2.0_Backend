@@ -1,10 +1,6 @@
 ﻿using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetAllProjectResources
 {
@@ -12,8 +8,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
     {
         // Filters
         public Guid? ProjectId { get; init; }
-        /// <summary>Type of file: DocumentFile, Image, Video, Other</summary>
-        public string? ResourceType { get; init; }
+        public FileType? ResourceType { get; init; }
         public string? SearchTerm { get; init; }
 
         // Pagination

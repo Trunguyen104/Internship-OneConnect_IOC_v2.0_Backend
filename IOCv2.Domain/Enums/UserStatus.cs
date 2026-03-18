@@ -8,8 +8,8 @@ namespace IOCv2.Domain.Enums
 {
     public enum UserStatus : short
     {
-        Inactive = 0,
-        Active = 1,
-        Suspended = 2,
+        Inactive = 1,
+        Active = 2,
+        Suspended = 3,
     }
 }

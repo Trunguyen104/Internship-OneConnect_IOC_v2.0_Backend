@@ -6,7 +6,6 @@ namespace IOCv2.Application.Features.Epics.Commands.UpdateEpic;
 
 public record UpdateEpicCommand : IRequest<Result<UpdateEpicResponse>>
 {
-    [JsonIgnore]
     public Guid ProjectId { get; init; }
 
     [JsonIgnore]

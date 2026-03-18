@@ -6,6 +6,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using IOCv2.Application.Constants;
 
+using Microsoft.Extensions.Logging;
+
 namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById
 {
     public class GetInternshipGroupByIdHandler : IRequestHandler<GetInternshipGroupByIdQuery, Result<GetInternshipGroupByIdResponse>>
@@ -13,16 +15,19 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
+        private readonly ILogger<GetInternshipGroupByIdHandler> _logger;
 
-        public GetInternshipGroupByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService)
+        public GetInternshipGroupByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ILogger<GetInternshipGroupByIdHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
+            _logger = logger;
         }
 
         public async Task<Result<GetInternshipGroupByIdResponse>> Handle(GetInternshipGroupByIdQuery request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Querying internship group with ID: {Id}", request.InternshipId);
             var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(ig => ig.Enterprise)
                 .Include(ig => ig.Mentor!).ThenInclude(m => m.User!)
@@ -40,7 +45,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             // Sắp xếp lại danh sách theo Leader lên đầu
             if (result.Members != null && result.Members.Any())
             {
-                result.Members = result.Members.OrderByDescending(m => m.Role == Domain.Enums.InternshipRole.Leader.ToString()).ToList();
+                result.Members = result.Members.OrderByDescending(m => m.Role == Domain.Enums.InternshipRole.Leader).ToList();
             }
 
             return Result<GetInternshipGroupByIdResponse>.Success(result);

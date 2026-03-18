@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using IOCv2.Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 {
@@ -15,19 +16,22 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
         private readonly ICurrentUserService _currentUserService;
         private readonly IRateLimiter _rateLimiter;
         private readonly IMessageService _messageService;
+        private readonly ILogger<ChangePasswordHandler> _logger;
 
         public ChangePasswordHandler(
             IUnitOfWork unitOfWork,
             IPasswordService passwordService,
             ICurrentUserService currentUserService,
             IRateLimiter rateLimiter,
-            IMessageService messageService)
+            IMessageService messageService,
+            ILogger<ChangePasswordHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _passwordService = passwordService;
             _currentUserService = currentUserService;
             _rateLimiter = rateLimiter;
             _messageService = messageService;
+            _logger = logger;
         }
 
         public async Task<Result<string>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
@@ -35,6 +39,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             var userId = _currentUserService.UserId;
             if (string.IsNullOrEmpty(userId))
             {
+                _logger.LogWarning("ChangePassword attempt without valid user ID");
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Auth.UserNotLoggedIn));
             }
 
@@ -44,11 +49,13 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 
             if (user == null)
             {
+                _logger.LogWarning("ChangePassword attempt for non-existent user ID {UserId}", userId);
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Auth.InvalidAction));
             }
 
             if (user.Status != UserStatus.Active)
             {
+                _logger.LogWarning("ChangePassword attempt for inactive user ID {UserId}", userId);
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Auth.InvalidAction));
             }
 
@@ -67,6 +74,10 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 
             // All validations passed - reset fail count
             await _rateLimiter.ResetAsync(key, cancellationToken);
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             // Update password using rich domain method
             user.UpdatePassword(_passwordService.HashPassword(request.NewPassword));
@@ -96,8 +107,18 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             });
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            _logger.LogInformation("Successfully changed password for user ID {UserId}", userId);
 
             return Result<string>.Success(_messageService.GetMessage(MessageKeys.Auth.PasswordChangedSuccess));
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error changing password for user ID {UserId}", userId);
+                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError));
+            }
         }
 
         private async Task RegisterFailedAttempt(string key, CancellationToken cancellationToken)

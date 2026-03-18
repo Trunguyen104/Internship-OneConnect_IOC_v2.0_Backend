@@ -7,18 +7,16 @@ using IOCv2.Application.Features.Sprints.Commands.StartSprint;
 using IOCv2.Application.Features.Sprints.Commands.UpdateSprint;
 using IOCv2.Application.Features.Sprints.Queries.GetSprintById;
 using IOCv2.Application.Features.Sprints.Queries.GetSprints;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IOCv2.API.Controllers.ProductBacklog;
 
-/// <summary>
-/// Product Backlog — Sprints management for a project.
-/// </summary>
 [Tags("Product Backlog - Sprints")]
 [Authorize]
-[Route("api/projects/{projectId:guid}/sprints")]
 public class SprintsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -29,12 +27,10 @@ public class SprintsController : ApiControllerBase
     /// Get all sprints for a project with optional status filter.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(Result<PaginatedResult<GetSprintsResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetSprintsResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSprints(
-        [FromRoute] Guid projectId,
-        [FromQuery] string? status,
+        [FromQuery] Guid projectId,
+        [FromQuery] SprintStatus? status,
         [FromQuery] PaginationParams pagination,
         CancellationToken cancellationToken = default)
     {
@@ -46,14 +42,12 @@ public class SprintsController : ApiControllerBase
     /// <summary>
     /// Get a single sprint by ID.
     /// </summary>
-    [HttpGet("{sprintId:guid}")]
-    [ProducesResponseType(typeof(Result<GetSprintByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [HttpGet("{sprintId:guid}", Name = "GetSprintById")]
+    [ProducesResponseType(typeof(ApiResponse<GetSprintByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSprintById(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
+        [FromQuery] Guid projectId,
         CancellationToken cancellationToken = default)
     {
         var query = new GetSprintByIdQuery(projectId, sprintId);
@@ -65,35 +59,29 @@ public class SprintsController : ApiControllerBase
     /// Create a new sprint for a project.
     /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(Result<CreateSprintResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<CreateSprintResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateSprint(
-        [FromRoute] Guid projectId,
         [FromBody] CreateSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { ProjectId = projectId }, cancellationToken);
-        return HandleCreatedResult(result);
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleCreateResult(result, nameof(GetSprintById), new { sprintId = result.Data?.SprintId, projectId = command.ProjectId, version = "1" });
     }
 
     /// <summary>
     /// Update an existing sprint.
     /// </summary>
     [HttpPut("{sprintId:guid}")]
-    [ProducesResponseType(typeof(Result<UpdateSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
         [FromBody] UpdateSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -101,18 +89,15 @@ public class SprintsController : ApiControllerBase
     /// Delete a sprint. Only sprints with Planned status can be deleted.
     /// </summary>
     [HttpDelete("{sprintId:guid}")]
-    [ProducesResponseType(typeof(Result<DeleteSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<DeleteSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
+        [FromBody] DeleteSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteSprintCommand(projectId, sprintId);
-        var result = await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -120,18 +105,15 @@ public class SprintsController : ApiControllerBase
     /// Start a sprint — transitions status from Planned to Active.
     /// </summary>
     [HttpPost("{sprintId:guid}/start")]
-    [ProducesResponseType(typeof(Result<StartSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<StartSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> StartSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
         [FromBody] StartSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -139,18 +121,15 @@ public class SprintsController : ApiControllerBase
     /// Complete a sprint — transitions status from Active to Completed.
     /// </summary>
     [HttpPost("{sprintId:guid}/complete")]
-    [ProducesResponseType(typeof(Result<CompleteSprintResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<CompleteSprintResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CompleteSprint(
-        [FromRoute] Guid projectId,
         [FromRoute] Guid sprintId,
         [FromBody] CompleteSprintCommand command,
         CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command with { SprintId = sprintId, ProjectId = projectId }, cancellationToken);
+        var result = await _mediator.Send(command with { SprintId = sprintId }, cancellationToken);
         return HandleResult(result);
     }
 }

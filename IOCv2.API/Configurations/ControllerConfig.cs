@@ -12,10 +12,17 @@ public static class ControllerConfig
         })
         .AddJsonOptions(options =>
         {
-            // ACV-3: Global Enum → String serialization for all API boundaries.
-            // Enums are serialized as their string names (e.g. "Pending") not integers (e.g. 0).
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            // By default, enums are serialized as integers. 
+            // If you want them as strings, uncomment the line below:
+            // options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
+
+        services.Configure<RouteOptions>(options =>
+        {
+            options.LowercaseUrls = true;
+            options.LowercaseQueryStrings = true;
+        });
+
         return services;
     }
 }

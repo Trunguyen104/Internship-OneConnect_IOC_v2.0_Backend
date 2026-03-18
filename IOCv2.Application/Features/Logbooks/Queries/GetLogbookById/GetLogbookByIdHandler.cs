@@ -43,8 +43,10 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbookById
                 .AsNoTracking()
                 .Include(x => x.Student!)
                     .ThenInclude(s => s.User!)
-                .Include(x => x.WorkItem)
+                .Include(x => x.WorkItems)
+
                 .FirstOrDefaultAsync(x => x.LogbookId == request.LogbookId, cancellationToken);
+
 
             if (logbook == null)
             {

@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
@@ -20,25 +21,20 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
         /// </summary>
         public string Email { get; init; } = null!;
 
-        /// <summary>
-        /// Initial password for the user.
-        /// </summary>
-        public string Password { get; init; } = null!;
+        ///// <summary>
+        ///// Initial password for the user.
+        ///// </summary>
+        //public string Password { get; init; } = null!;
 
         /// <summary>
         /// Role to be assigned (e.g., SchoolAdmin, EnterpriseAdmin).
         /// </summary>
-        public string Role { get; init; } = null!;
+        public UserRole Role { get; init; }
 
         /// <summary>
         /// (Optional) Phone number.
         /// </summary>
         public string? PhoneNumber { get; init; }
-
-        /// <summary>
-        /// (Optional) Avatar URL.
-        /// </summary>
-        public string? AvatarUrl { get; init; }
 
         /// <summary>
         /// (Optional) ID of the linked University or Enterprise.

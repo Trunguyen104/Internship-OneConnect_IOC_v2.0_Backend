@@ -64,8 +64,11 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
 
             try
             {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
                 await _unitOfWork.Repository<StakeholderIssue>().AddAsync(issue, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 _logger.LogInformation("Successfully created StakeholderIssue {Id} for Stakeholder {StakeholderId}", 
                     issue.Id, request.StakeholderId);
@@ -78,8 +81,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Error occurred while creating StakeholderIssue for Stakeholder {StakeholderId}", request.StakeholderId);
-                throw; // ExceptionMiddleware will handle it
+                return Result<CreateStakeholderIssueResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
             }
         }
     }

@@ -61,7 +61,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
                 return Result<UpdateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.NotFound));
             }
 
-            if (user.Status == UserStatus.Inactive && !request.Status?.Equals("Active", StringComparison.OrdinalIgnoreCase) == true)
+            if (user.Status == UserStatus.Inactive && request.Status != UserStatus.Active)
             {
                 _logger.LogWarning("Attempted to update inactive user {UserId} without activation", request.UserId);
                 return Result<UpdateAdminUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.NotActive));
@@ -70,13 +70,6 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Prepare update data
-                UserGender? parsedGender = null;
-                if (!string.IsNullOrWhiteSpace(request.Gender) && Enum.TryParse<UserGender>(request.Gender, true, out var genderVal))
-                {
-                    parsedGender = genderVal;
-                }
-
                 DateOnly? parsedDob = null;
                 if (!string.IsNullOrWhiteSpace(request.DateOfBirth) && DateOnly.TryParse(request.DateOfBirth, out var dobVal))
                 {
@@ -88,14 +81,14 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
                     request.FullName,
                     request.PhoneNumber,
                     request.AvatarUrl,
-                    parsedGender,
+                    request.Gender,
                     parsedDob
                 );
 
                 // Update Status if provided
-                if (!string.IsNullOrWhiteSpace(request.Status) && Enum.TryParse<UserStatus>(request.Status, true, out var parsedStatus))
+                if (request.Status.HasValue)
                 {
-                    user.SetStatus(parsedStatus);
+                    user.SetStatus(request.Status.Value);
                 }
 
                 // Update Student fields if applicable

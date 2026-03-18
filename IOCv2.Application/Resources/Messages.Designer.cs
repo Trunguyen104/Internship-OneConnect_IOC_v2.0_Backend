@@ -142,6 +142,87 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền xóa doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_DeletePermissionDenied {
+            get {
+                return ResourceManager.GetString("Enterprise.DeletePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền xem thông tin doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_GetByIDPermissionsNotAllowed {
+            get {
+                return ResourceManager.GetString("Enterprise.GetByIDPermissionsNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Doanh nghiệp chưa bị xóa nên không thể khôi phục..
+        /// </summary>
+        internal static string Enterprise_NotDeleted {
+            get {
+                return ResourceManager.GetString("Enterprise.NotDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to getByHR_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitGetByHRAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitGetByHRAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to getByID_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitGetByIDAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitGetByIDAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to getEnterprises_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitGetEnterprisesAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitGetEnterprisesAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to update_enterprise_attempt:{0}.
+        /// </summary>
+        internal static string Enterprise_RateLimitUpdateAttempt {
+            get {
+                return ResourceManager.GetString("Enterprise.RateLimitUpdateAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn đã gửi request quá nhiều lần..
+        /// </summary>
+        internal static string Enterprise_RequestManyTimes {
+            get {
+                return ResourceManager.GetString("Enterprise.RequestManyTimes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền khôi phục doanh nghiệp này..
+        /// </summary>
+        internal static string Enterprise_RestorePermissionDenied {
+            get {
+                return ResourceManager.GetString("Enterprise.RestorePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tạo Epic thành công..
         /// </summary>
         internal static string Epic_CreatedSuccess {
@@ -165,6 +246,96 @@ namespace IOCv2.Application.Resources {
         internal static string Epic_UpdatedSuccess {
             get {
                 return ResourceManager.GetString("Epic.UpdatedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã thêm thành công {Count} sinh viên vào nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogAddedStudentsSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogAddedStudentsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang thêm sinh viên vào nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogAddingStudents {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogAddingStudents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tạo nhóm thực tập thành công: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogCreatedSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogCreatedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang tạo nhóm thực tập mới: {GroupName} cho kỳ: {TermId}.
+        /// </summary>
+        internal static string InternshipGroup_LogCreating {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogCreating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xóa nhóm thực tập thành công: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogDeletedSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogDeletedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang xóa nhóm thực tập: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogDeleting {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogDeleting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã xóa thành công sinh viên khỏi nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogRemovedStudentsSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogRemovedStudentsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang xóa sinh viên khỏi nhóm: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogRemovingStudents {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogRemovingStudents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cập nhật nhóm thực tập thành công: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogUpdatedSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogUpdatedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang cập nhật nhóm thực tập: {InternshipId}.
+        /// </summary>
+        internal static string InternshipGroup_LogUpdating {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogUpdating", resourceCulture);
             }
         }
         

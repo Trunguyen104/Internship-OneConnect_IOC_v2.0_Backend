@@ -1,5 +1,7 @@
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+
 
 namespace IOCv2.Application.Features.Sprints.Queries.GetSprintById;
 
@@ -11,7 +13,8 @@ public class GetSprintByIdResponse : IMapFrom<Sprint>
     public string? Goal { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public SprintStatus Status { get; set; }
+
     public int TotalWorkItems { get; set; }
     public int CompletedWorkItems { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -19,6 +22,7 @@ public class GetSprintByIdResponse : IMapFrom<Sprint>
     public void Mapping(MappingProfile profile)
     {
         profile.CreateMap<Sprint, GetSprintByIdResponse>()
-            .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
+            .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status));
+
     }
 }

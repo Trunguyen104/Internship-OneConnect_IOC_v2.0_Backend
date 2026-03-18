@@ -5,7 +5,7 @@ namespace IOCv2.Domain.Entities
     public class Stakeholder : BaseEntity
     {
         public Guid Id { get; private set; }
-        public Guid ProjectId { get; private set; }
+        public Guid InternshipId { get; private set; }
         public string Name { get; private set; } = null!;
         public StakeholderType Type { get; private set; } = StakeholderType.Real;
         public string? Role { get; private set; }
@@ -13,7 +13,7 @@ namespace IOCv2.Domain.Entities
         public string Email { get; private set; } = null!;
         public string? PhoneNumber { get; private set; }
 
-        public virtual Project Project { get; private set; } = null!;
+        public virtual InternshipGroup InternshipGroup { get; private set; } = null!;
         public virtual ICollection<StakeholderIssue> Issues { get; private set; } = new List<StakeholderIssue>();
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace IOCv2.Domain.Entities
         /// Initializes a new instance of the Stakeholder entity.
         /// </summary>
         public Stakeholder(
-            Guid projectId,
+            Guid internshipId,
             string name,
             StakeholderType type,
             string email,
@@ -34,7 +34,7 @@ namespace IOCv2.Domain.Entities
             string? phoneNumber = null)
         {
             Id = Guid.NewGuid();
-            ProjectId = projectId;
+            InternshipId = internshipId;
             Name = name;
             Type = type;
             Email = email;

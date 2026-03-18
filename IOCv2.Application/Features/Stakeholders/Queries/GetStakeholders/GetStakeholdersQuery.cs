@@ -9,9 +9,10 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
     public record GetStakeholdersQuery : IRequest<Result<PaginatedResult<GetStakeholdersResponse>>>
     {
         /// <summary>
-        /// The ID of the project to get stakeholders for.
+        /// The ID of the internship group to get stakeholders for.
         /// </summary>
-        public Guid ProjectId { get; init; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public Guid InternshipId { get; init; }
 
         /// <summary>
         /// Optional search term to filter stakeholders by Name, Email, or Role.
