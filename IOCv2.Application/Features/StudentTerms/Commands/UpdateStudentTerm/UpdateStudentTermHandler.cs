@@ -81,11 +81,23 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
                         _messageService.GetMessage(MessageKeys.StudentTerms.EmailExistsInSystem), ResultErrorType.Conflict);
             }
 
+            // Check phone uniqueness if changed (phone has UNIQUE index)
+            if (!string.IsNullOrWhiteSpace(request.Phone) &&
+                !request.Phone.Trim().Equals(studentTerm.Student.User.PhoneNumber, StringComparison.OrdinalIgnoreCase))
+            {
+                var phoneTaken = await _unitOfWork.Repository<User>().Query()
+                    .AnyAsync(u => u.PhoneNumber == request.Phone.Trim() &&
+                                   u.UserId != studentTerm.Student.UserId, cancellationToken);
+                if (phoneTaken)
+                    return Result<UpdateStudentTermResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.StudentTerms.PhoneExistsInSystem), ResultErrorType.Conflict);
+            }
+
             // Persist email change if provided and passed uniqueness check
             if (!string.IsNullOrWhiteSpace(request.Email))
                 studentTerm.Student.User.UpdateEmail(request.Email.Trim().ToLower());
 
-            // Snapshot counter contribution BEFORE any changes
+            // Snapshot counter-contribution BEFORE any changes
             var wasActive = studentTerm.EnrollmentStatus == EnrollmentStatus.Active;
             var wasUnplaced = wasActive && studentTerm.PlacementStatus == PlacementStatus.Unplaced;
             var wasPlaced = wasActive && studentTerm.PlacementStatus == PlacementStatus.Placed;
@@ -118,7 +130,7 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
             if (request.EnterpriseId.HasValue && studentTerm.PlacementStatus == PlacementStatus.Placed)
                 studentTerm.EnterpriseId = request.EnterpriseId.Value;
 
-            // Recalculate counter deltas based on new state (Bug 3 fix: covers EnrollmentStatus changes too)
+            // Recalculate counter-deltas based on the new state (Bug 3 fix: covers EnrollmentStatus changes too)
             var isNowActive = studentTerm.EnrollmentStatus == EnrollmentStatus.Active;
             var isNowUnplaced = isNowActive && studentTerm.PlacementStatus == PlacementStatus.Unplaced;
             var isNowPlaced = isNowActive && studentTerm.PlacementStatus == PlacementStatus.Placed;

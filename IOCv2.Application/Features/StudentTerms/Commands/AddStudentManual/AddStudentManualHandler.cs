@@ -70,12 +70,22 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
                 universityId = universityUser.UniversityId;
             }
 
-            // Check email uniqueness in system
+            // Check email uniqueness in a system
             var emailExists = await _unitOfWork.Repository<User>().Query()
                 .AnyAsync(u => u.Email.ToLower() == request.Email.Trim().ToLower(), cancellationToken);
             if (emailExists)
                 return Result<AddStudentManualResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.StudentTerms.EmailExistsInSystem), ResultErrorType.Conflict);
+
+            // Check phone uniqueness in a system (phone has UNIQUE index)
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+            {
+                var phoneExists = await _unitOfWork.Repository<User>().Query()
+                    .AnyAsync(u => u.PhoneNumber == request.Phone.Trim(), cancellationToken);
+                if (phoneExists)
+                    return Result<AddStudentManualResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.StudentTerms.PhoneExistsInSystem), ResultErrorType.Conflict);
+            }
 
             // Check studentCode uniqueness within this university (across all terms of this university)
             var codeExists = await _unitOfWork.Repository<StudentTerm>().Query()
@@ -85,7 +95,7 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
                 return Result<AddStudentManualResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeExistsInUniversity), ResultErrorType.Conflict);
 
-            // Check student not already enrolled in active/upcoming term
+            // Check a student isn't already enrolled in active/upcoming term
             // (Open term whose end date is >= today or start date > today)
             var alreadyInActiveTerm = await _unitOfWork.Repository<StudentTerm>().Query()
                 .Include(st => st.Student).ThenInclude(s => s.User)
@@ -128,7 +138,7 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
             };
             await _unitOfWork.Repository<Student>().AddAsync(newStudent, cancellationToken);
 
-            // Create enrollment record
+            // Create an enrollment record
             var enrollment = new StudentTerm
             {
                 StudentTermId = Guid.NewGuid(),

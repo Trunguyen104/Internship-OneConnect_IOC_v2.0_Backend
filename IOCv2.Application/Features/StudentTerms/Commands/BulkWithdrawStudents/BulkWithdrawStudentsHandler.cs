@@ -96,7 +96,7 @@ public class BulkWithdrawStudentsHandler
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            // Fire-and-forget notifications to withdrawn students (mirrors WithdrawStudentHandler pattern)
+            // Fire-and-forget notifications to withdraw students (mirrors WithdrawStudentHandler pattern)
             foreach (var st in withdrawable)
             {
                 var studentEmail = st.Student?.User?.Email;

@@ -25,9 +25,8 @@ public record ImportStudentsConfirmResponse
     public int SkippedCount { get; init; }
 
     /// <summary>
-    /// Base64-encoded Excel file containing MSSV, Họ tên, Email, Password for new accounts.
-    /// BE generates in-memory and returns here; not persisted to disk.
+    /// In-memory Excel file containing MSSV, Họ tên, Email, Password for new accounts.
     /// </summary>
-    public string? PasswordFileBase64 { get; init; }
+    public byte[]? PasswordFileContent { get; init; }
     public string? PasswordFileFileName { get; init; }
 }

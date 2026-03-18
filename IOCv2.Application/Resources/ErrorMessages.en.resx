@@ -906,6 +906,9 @@
   <data name="StudentTerms.EmailExistsInSystem" xml:space="preserve">
     <value>Email is already used in the system.</value>
   </data>
+  <data name="StudentTerms.PhoneExistsInSystem" xml:space="preserve">
+    <value>Phone number is already used in the system.</value>
+  </data>
   <data name="StudentTerms.FileInvalidFormat" xml:space="preserve">
     <value>Invalid file format. Only .xlsx or .xls files are accepted.</value>
   </data>

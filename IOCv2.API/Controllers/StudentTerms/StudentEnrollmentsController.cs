@@ -114,7 +114,24 @@ public class StudentEnrollmentsController : ApiControllerBase
         [FromBody] ImportStudentsConfirmCommand command,
         CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(command with { TermId = termId }, cancellationToken));
+        var result = await _mediator.Send(command with { TermId = termId }, cancellationToken);
+        if (!result.IsSuccess) return HandleResult(result);
+
+        var data = result.Data!;
+
+        // If there is a password file, return it as a downloadable Excel file
+        if (data.PasswordFileContent != null && data.PasswordFileContent.Length > 0)
+        {
+            Response.Headers.Append("X-Imported-Count", data.ImportedCount.ToString());
+            Response.Headers.Append("X-Skipped-Count", data.SkippedCount.ToString());
+            Response.Headers.Append("X-Import-Message", Uri.EscapeDataString(result.Message ?? ""));
+            return File(data.PasswordFileContent,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                data.PasswordFileFileName ?? "student_passwords.xlsx");
+        }
+
+        // No new accounts created — return normal JSON
+        return HandleResult(result);
     }
 
     /// <summary>

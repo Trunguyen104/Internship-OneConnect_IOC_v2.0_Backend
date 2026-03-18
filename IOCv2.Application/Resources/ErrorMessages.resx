@@ -963,6 +963,9 @@
   <data name="StudentTerms.EmailExistsInSystem" xml:space="preserve">
     <value>Email đã được sử dụng trong hệ thống.</value>
   </data>
+  <data name="StudentTerms.PhoneExistsInSystem" xml:space="preserve">
+    <value>Số điện thoại đã được sử dụng trong hệ thống.</value>
+  </data>
   <data name="StudentTerms.FileInvalidFormat" xml:space="preserve">
     <value>File không đúng định dạng. Chỉ chấp nhận file .xlsx hoặc .xls.</value>
   </data>

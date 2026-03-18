@@ -74,7 +74,7 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogWithdrawn),
                 request.StudentTermId, userId);
 
-            // Fire-and-forget notification to student
+            // Fire-and-forget notification to a student
             var studentEmail = studentTerm.Student?.User?.Email;
             var termName = studentTerm.Term?.Name;
             if (!string.IsNullOrEmpty(studentEmail) && !string.IsNullOrEmpty(termName))

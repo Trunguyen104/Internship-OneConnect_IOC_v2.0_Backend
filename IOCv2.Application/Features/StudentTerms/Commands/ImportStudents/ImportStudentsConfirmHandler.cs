@@ -1,4 +1,3 @@
-using System.Text;
 using ClosedXML.Excel;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -87,7 +86,7 @@ public class ImportStudentsConfirmHandler
                 if (existingCodes.Contains(record.StudentCode) || existingEmails.Contains(record.Email.ToLower()))
                 { skipped++; continue; }
 
-                // Check if user already exists in system
+                // Check if a user already exists in a system
                 var existingUser = await _unitOfWork.Repository<User>().Query()
                     .Include(u => u.Student)
                     .FirstOrDefaultAsync(u => u.UserCode == record.StudentCode || 
@@ -98,9 +97,17 @@ public class ImportStudentsConfirmHandler
 
                 if (existingUser != null && existingUser.Student == null)
                 {
-                    // User exists but is not a Student (e.g. SchoolAdmin) — skip to avoid duplicate key crash
+                    // User exists but is not a Student (e.g., SchoolAdmin) — skip to avoid a duplicate key crash
                     skipped++;
                     continue;
+                }
+
+                // Check phone uniqueness if provided (phone has UNIQUE index)
+                if (!string.IsNullOrWhiteSpace(record.Phone) && existingUser == null)
+                {
+                    var phoneTaken = await _unitOfWork.Repository<User>().Query()
+                        .AnyAsync(u => u.PhoneNumber == record.Phone.Trim(), cancellationToken);
+                    if (phoneTaken) { skipped++; continue; }
                 }
 
                 if (existingUser?.Student != null)
@@ -110,7 +117,7 @@ public class ImportStudentsConfirmHandler
                 }
                 else
                 {
-                    // Create new User + Student
+                    // Create a new User + Student
                     plainPassword = _passwordService.GenerateRandomPassword();
                     var passwordHash = _passwordService.HashPassword(plainPassword);
                     var newUserId = Guid.NewGuid();
@@ -144,7 +151,7 @@ public class ImportStudentsConfirmHandler
                     passwordEntries.Add((record.StudentCode, record.FullName, record.Email, plainPassword));
                 }
 
-                // Bug E: cross-term race condition check — student may have been enrolled in another active term
+                // Bug E: cross-term race condition check — a student may have been enrolled in another active term
                 // between Preview and Confirm steps
                 var inOtherActiveTerm = await _unitOfWork.Repository<StudentTerm>().Query()
                     .AnyAsync(st =>
@@ -155,7 +162,7 @@ public class ImportStudentsConfirmHandler
                         st.TermId != request.TermId, cancellationToken);
                 if (inOtherActiveTerm) { skipped++; continue; }
 
-                // Bug A: check for existing record in this term (covers re-import of Withdrawn student)
+                // Bug A: check for existing record in this term (covers re-import of a Withdrawn student)
                 var existingRecord = await _unitOfWork.Repository<StudentTerm>().Query()
                     .FirstOrDefaultAsync(st => st.StudentId == studentId && st.TermId == request.TermId, cancellationToken);
 
@@ -164,7 +171,7 @@ public class ImportStudentsConfirmHandler
                     if (existingRecord.EnrollmentStatus == EnrollmentStatus.Active)
                     { skipped++; continue; }
 
-                    // Re-activate withdrawn record instead of inserting a duplicate
+                    // Re-activate a withdrawn record instead of inserting a duplicate
                     existingRecord.EnrollmentStatus = EnrollmentStatus.Active;
                     existingRecord.PlacementStatus = PlacementStatus.Unplaced;
                     existingRecord.EnterpriseId = null;
@@ -197,8 +204,8 @@ public class ImportStudentsConfirmHandler
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-            // Generate password Excel file in memory
-            string? fileBase64 = null;
+            // Generate a password Excel file in memory
+            byte[]? fileContent = null;
             string? fileName = null;
             if (passwordEntries.Count > 0)
             {
@@ -219,7 +226,7 @@ public class ImportStudentsConfirmHandler
 
                 using var ms = new MemoryStream();
                 wb.SaveAs(ms);
-                fileBase64 = Convert.ToBase64String(ms.ToArray());
+                fileContent = ms.ToArray();
                 fileName = $"student_passwords_{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
             }
 
@@ -234,7 +241,7 @@ public class ImportStudentsConfirmHandler
                 {
                     ImportedCount = imported,
                     SkippedCount = skipped,
-                    PasswordFileBase64 = fileBase64,
+                    PasswordFileContent = fileContent,
                     PasswordFileFileName = fileName
                 }, message);
         }
