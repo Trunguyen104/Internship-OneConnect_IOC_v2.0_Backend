@@ -136,7 +136,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 user.UpdateProfile(
                     request.FullName,
                     request.PhoneNumber,
-                    request.AvatarUrl,
+                    null,
                     null,
                     null
                 );

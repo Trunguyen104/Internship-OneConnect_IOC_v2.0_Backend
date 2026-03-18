@@ -39,8 +39,7 @@ public class CreateUniversityHandlerTests
         {
             Code = "TEST",
             Name = "Test University",
-            Address = "Test Address",
-            LogoUrl = "http://test.com/logo.png"
+            Address = "Test Address"
         };
 
         _mockCurrentUserService.Setup(s => s.UserId).Returns(Guid.NewGuid().ToString());

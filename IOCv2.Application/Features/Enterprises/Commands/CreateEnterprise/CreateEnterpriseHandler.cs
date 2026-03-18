@@ -49,8 +49,6 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                     Description = request.Description,
                     Address = request.Address,
                     Website = request.Website,
-                    LogoUrl = request.LogoUrl,
-                    BackgroundUrl = request.BackgroundUrl,
                     IsVerified = request.IsVerified,
                     Status = (short)EnterpriseStatus.Active
                 };

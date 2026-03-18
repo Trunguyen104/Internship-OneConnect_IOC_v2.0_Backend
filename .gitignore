@@ -50,3 +50,4 @@ docker-compose.yml
 
 # Others
 .DS_Store
+.gitnexus
