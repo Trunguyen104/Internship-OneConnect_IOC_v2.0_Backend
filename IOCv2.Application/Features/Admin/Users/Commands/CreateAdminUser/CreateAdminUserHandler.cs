@@ -6,6 +6,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using IOCv2.Application.Common.Exceptions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
@@ -90,6 +91,17 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
             {
                 _logger.LogWarning("Email Conflict: {Email} already exists", request.Email);
                 throw new BusinessException(_messageService.GetMessage(MessageKeys.Users.EmailConflict));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                var phoneExists = await _unitOfWork.Repository<User>()
+                    .ExistsAsync(u => u.PhoneNumber == request.PhoneNumber, cancellationToken);
+                if (phoneExists)
+                {
+                    _logger.LogWarning("Phone Conflict: {PhoneNumber} already exists", request.PhoneNumber);
+                    throw new BusinessException(_messageService.GetMessage(MessageKeys.Profile.PhoneExists));
+                }
             }
 
             // Validate unit exists for role that requires it
@@ -209,9 +221,25 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 var response = _mapper.Map<CreateAdminUserResponse>(user);
                 return Result<CreateAdminUserResponse>.Success(response);
             }
-            catch (Exception)
+            catch (DbUpdateException dbEx)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+
+                var dbMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                _logger.LogError(dbEx, "Database error while creating admin user {Email}. Detail: {Detail}", request.Email, dbMessage);
+
+                if (dbMessage.Contains("ix_users_phone_number", StringComparison.OrdinalIgnoreCase))
+                    throw new BusinessException(_messageService.GetMessage(MessageKeys.Profile.PhoneExists));
+
+                if (dbMessage.Contains("ix_users_email", StringComparison.OrdinalIgnoreCase))
+                    throw new BusinessException(_messageService.GetMessage(MessageKeys.Users.EmailConflict));
+
+                throw new BusinessException(_messageService.GetMessage(MessageKeys.Common.DatabaseConflict));
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Unexpected error while creating admin user {Email}", request.Email);
                 throw; // Rethrow to let global handler deal with it
             }
         }

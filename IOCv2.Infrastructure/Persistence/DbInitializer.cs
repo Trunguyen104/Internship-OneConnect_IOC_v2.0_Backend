@@ -85,11 +85,14 @@ namespace IOCv2.Infrastructure.Persistence
             var passHash = _passwordService.HashPassword("Admin@123");
             var universityList = await _context.Universities.ToListAsync();
             var enterpriseList = await _context.Enterprises.ToListAsync();
-            var existingEmails = await _context.Users.Select(u => u.Email).ToHashSetAsync();
+            var existingEmails = await _context.Users
+                .IgnoreQueryFilters()
+                .Select(u => u.Email)
+                .ToHashSetAsync();
             CancellationToken cancellationToken = default;
 
             // 1. Super Admin
-            if (!await _context.Users.AnyAsync(u => u.Role == UserRole.SuperAdmin))
+            if (!await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Role == UserRole.SuperAdmin))
             {
                 var userId = Guid.NewGuid();
                 var userCode = await _userService.GenerateUserCodeAsync(UserRole.SuperAdmin, cancellationToken);
@@ -106,6 +109,7 @@ namespace IOCv2.Infrastructure.Persistence
                 superAdmin.UpdateProfile("Super Administrator", null, null, UserGender.Other, null);
                 
                 _context.Users.Add(superAdmin);
+                existingEmails.Add(superAdmin.Email);
             }
             // Enterprise Admins
             foreach (var ent in enterpriseList)
@@ -128,6 +132,7 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
 
                     _context.Users.Add(user);
+                    existingEmails.Add(email);
 
                     _context.EnterpriseUsers.Add(new EnterpriseUser
                     {
@@ -160,6 +165,7 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
 
                     _context.Users.Add(user);
+                    existingEmails.Add(email);
 
                     _context.EnterpriseUsers.Add(new EnterpriseUser
                     {
@@ -187,6 +193,7 @@ namespace IOCv2.Infrastructure.Persistence
                 );
                 user.SetStatus(UserStatus.Active);
                 _context.Users.Add(user);
+                existingEmails.Add(testStudentEmail);
                 
                 var uni = universityList.FirstOrDefault(u => u.Code == "FPTU") ?? universityList.First();
                 _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId });
@@ -221,6 +228,7 @@ namespace IOCv2.Infrastructure.Persistence
                         );
                         user.SetStatus(UserStatus.Active);
                         _context.Users.Add(user);
+                        existingEmails.Add(email);
                         _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId });
                         _context.Students.Add(new Student
                         {
@@ -253,6 +261,7 @@ namespace IOCv2.Infrastructure.Persistence
                     );
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
+                    existingEmails.Add(email);
                     _context.EnterpriseUsers.Add(new EnterpriseUser
                     {
                         EnterpriseUserId = Guid.NewGuid(),
