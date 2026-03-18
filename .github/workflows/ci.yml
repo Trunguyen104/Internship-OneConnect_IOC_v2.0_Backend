@@ -73,6 +73,6 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/iocv2
+            cd ~/ioc
             docker compose --env-file .env -f docker-compose.yml pull
             docker compose --env-file .env -f docker-compose.yml up -d
