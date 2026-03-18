@@ -74,5 +74,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/ioc
-            docker compose --env-file .env -f docker-compose.yml pull
-            docker compose --env-file .env -f docker-compose.yml up -d
+            docker compose pull
+            docker compose up -d
