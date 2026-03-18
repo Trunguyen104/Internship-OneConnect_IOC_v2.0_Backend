@@ -5,8 +5,8 @@
 /// </summary>
 public enum TermDisplayStatus
 {
-    Upcoming = 0,
-    Active = 1,
-    Ended = 2,
-    Closed = 3
+    Upcoming = 1,
+    Active = 2,
+    Ended = 3,
+    Closed = 4
 }

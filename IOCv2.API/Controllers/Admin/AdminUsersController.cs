@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.Admin;
 /// Admin &amp; Operations Management — manage administrative accounts across the system.
 /// </summary>
 [Tags("Admin - User Management")]
-[Authorize]
+[Route("api/v{version:apiVersion}/admin-users")]
 public class AdminUsersController : ApiControllerBase
 {
     private readonly IMediator _mediator;

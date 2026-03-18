@@ -365,4 +365,16 @@
   <data name="StudentTerms.NotifyRestore.Body" xml:space="preserve">
     <value>Bạn đã được khôi phục vào kỳ thực tập &lt;b&gt;{0}&lt;/b&gt;. Hãy đăng nhập để xem thông tin chi tiết.</value>
   </data>
+  <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
+    <value>Bạn không có quyền xóa doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <value>Bạn không có quyền khôi phục doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <value>Doanh nghiệp chưa bị xóa nên không thể khôi phục.</value>
+  </data>
+  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <value>Bạn không có quyền xem thông tin doanh nghiệp này.</value>
+  </data>
 </root>

@@ -2,6 +2,6 @@ namespace IOCv2.Domain.Enums;
 
 public enum MemberStatus : short
 {
-    INACTIVE = 0,
-    ACTIVE = 1
+    INACTIVE = 1,
+    ACTIVE = 2
 }

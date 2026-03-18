@@ -76,10 +76,24 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
                 .Select(group => group.First())
                 .ToDictionaryAsync(project => project.InternshipId, cancellationToken);
 
+        var termIds = groups.Select(group => group.TermId).Distinct().ToList();
+        var evaluationCycleLookup = termIds.Count == 0
+            ? new Dictionary<Guid, int>()
+            : await _unitOfWork.Repository<EvaluationCycle>()
+                .Query()
+                .Where(cycle => termIds.Contains(cycle.TermId))
+                .GroupBy(cycle => cycle.TermId)
+                .Select(group => new { TermId = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(x => x.TermId, x => x.Count, cancellationToken);
+
         var response = groups
-            .Select(group => GetMyInternshipGroupsResponse.FromEntity(
-                group,
-                projectLookup.GetValueOrDefault(group.InternshipId)))
+            .Select(group => {
+                var res = GetMyInternshipGroupsResponse.FromEntity(
+                    group,
+                    projectLookup.GetValueOrDefault(group.InternshipId));
+                res.EvaluationCount = evaluationCycleLookup.GetValueOrDefault(group.TermId);
+                return res;
+            })
             .ToList();
 
         _logger.LogInformation("Completed mine internship groups query with {Count} groups.", response.Count);

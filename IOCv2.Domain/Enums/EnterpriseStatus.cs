@@ -8,8 +8,8 @@ namespace IOCv2.Domain.Enums
 {
     public enum EnterpriseStatus
     {
-        Inactive,
-        Active,
-        Suspended
+        Inactive = 1,
+        Active = 2,
+        Suspended = 3
     }
 }

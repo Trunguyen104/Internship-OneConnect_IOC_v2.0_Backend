@@ -299,4 +299,16 @@
   <data name="StudentTerms.NotifyRestore.Body" xml:space="preserve">
     <value>You have been restored to the internship term &lt;b&gt;{0}&lt;/b&gt;. Please log in to view your details.</value>
   </data>
+  <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
+    <value>You do not have permission to delete this enterprise.</value>
+  </data>
+  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <value>You do not have permission to restore this enterprise.</value>
+  </data>
+  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <value>The enterprise has not been deleted and cannot be restored.</value>
+  </data>
+  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <value>You do not have permission to view this enterprise.</value>
+  </data>
 </root>

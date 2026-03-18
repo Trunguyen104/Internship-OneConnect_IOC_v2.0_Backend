@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using IOCv2.Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
