@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -486,6 +486,14 @@
         public static class File
         {
             
+        }
+
+        public static class Notifications
+        {
+            public const string NotFound = "Notifications.NotFound";
+            public const string AccessDenied = "Notifications.AccessDenied";
+            public const string MarkReadSuccess = "Notifications.MarkReadSuccess";
+            public const string MarkAllReadSuccess = "Notifications.MarkAllReadSuccess";
         }
     }
 }

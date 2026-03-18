@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -49,6 +49,9 @@ public partial class AppDbContext : DbContext
     public DbSet<EvaluationCriteria> EvaluationCriteria { get; set; } = null!;
     public DbSet<Evaluation> Evaluations { get; set; } = null!;
     public DbSet<EvaluationDetail> EvaluationDetails { get; set; } = null!;
+
+    // Notifications
+    public DbSet<Notification> Notifications { get; set; } = null!;
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
