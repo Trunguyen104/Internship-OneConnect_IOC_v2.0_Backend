@@ -10,7 +10,6 @@ namespace IOCv2.API.Controllers.Uploads;
 
 [Tags("Upload Management")]
 [Authorize]
-[Route("api/v{version:apiVersion}/uploads")]
 public class UploadsController : ApiControllerBase
 {
     private readonly IMediator _mediator;

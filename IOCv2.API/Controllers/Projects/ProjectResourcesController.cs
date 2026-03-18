@@ -55,7 +55,7 @@ public class ProjectResourcesController : ApiControllerBase
 
         if (!result.IsSuccess || result.Data?.Content == null)
         {
-            return HandleResult(result, );
+            return HandleResult(result);
         }
 
         return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
