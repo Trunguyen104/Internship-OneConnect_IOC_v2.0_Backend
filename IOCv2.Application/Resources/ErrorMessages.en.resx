@@ -222,6 +222,24 @@
   <data name="Enterprise.NotFound" xml:space="preserve">
     <value>No enterprise information found.</value>
   </data>
+  <data name="InternshipGroup.NameRequired" xml:space="preserve">
+    <value>Internship group name is required.</value>
+  </data>
+  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
+    <value>Internship group name cannot exceed 255 characters.</value>
+  </data>
+  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
+    <value>Term ID is required.</value>
+  </data>
+  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
+    <value>Start date must be before end date.</value>
+  </data>
+  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
+    <value>Student list is required.</value>
+  </data>
+  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
+    <value>List of students to remove is required.</value>
+  </data>
   <data name="Projects.LogDeleteError" xml:space="preserve">
     <value>Error deleting project {0}</value>
   </data>
@@ -415,138 +433,6 @@
   <data name="Internships.NotFound" xml:space="preserve">
     <value>No internship found with ID: {0}</value>
   </data>
-  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
-    <value>Error while retrieving enterprises</value>
-  </data>
-  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
-    <value>Error occurred while getting enterprise by id</value>
-  </data>
-  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
-    <value>The tax identification number already exists in the system.</value>
-  </data>
-  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
-    <value>The business with tax code '{TaxCode}' already exists.</value>
-  </data>
-  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
-    <value>An error occurred while creating the business.</value>
-  </data>
-  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
-    <value>The tax identification number is not in the correct format.</value>
-  </data>
-  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
-    <value>Name is required.</value>
-  </data>
-  <data name="Enterprise.NameMaxLength" xml:space="preserve">
-    <value>Name must not exceed {0} characters.</value>
-  </data>
-  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
-    <value>Website must start with http or https.</value>
-  </data>
-  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
-    <value>LogoUrl must start with http or https.</value>
-  </data>
-  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
-    <value>BackgroundUrl must start with http or https.</value>
-  </data>
-  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
-    <value>You are not allowed to modify this enterprise.</value>
-  </data>
-  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
-    <value>Error: No permission to edit enterprise {enterpriseId}.</value>
-  </data>
-  <data name="Enterprise.LogNotFound" xml:space="preserve">
-    <value>Enterprise {enterpriseId} not found</value>
-  </data>
-  <data name="Enterprise.LogUpdateEnterpriseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
-    <value>Updating the tax code is not allowed.</value>
-  </data>
-  <data name="Enterprise.LogDeleteError" xml:space="preserve">
-    <value>Error occurred while deleting enterprise with ID {EnterpriseId}</value>
-  </data>
-  <data name="Enterprise.DeleteError" xml:space="preserve">
-    <value>An error occurred while deleting the enterprise. Please try again later.</value>
-  </data>
-  <data name="Password.NotEmpty" xml:space="preserve">
-    <value>Password cannot be empty.</value>
-  </data>
-  <data name="CannotIdentifyManager" xml:space="preserve">
-    <value>Cannot identify the manager performing the reset.</value>
-  </data>
-  <data name="OnlyManagerCanReset" xml:space="preserve">
-    <value>Only managers are allowed to reset passwords.</value>
-  </data>
-  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
-    <value>Password can only be reset for active accounts.</value>
-  </data>
-  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
-    <value>Employee ID is required.</value>
-  </data>
-  <data name="ResetStatusNoEmail" xml:space="preserve">
-    <value>Password reset successful. However, the email could not be sent.</value>
-  </data>
-  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
-    <value>Cannot update information for inactive employees.</value>
-  </data>
-  <data name="Profile.EmployeeIdRequired" xml:space="preserve">
-    <value>EmployeeId cannot be empty.</value>
-  </data>
-  <data name="Profile.FullNameRequired" xml:space="preserve">
-    <value>Full name cannot be empty.</value>
-  </data>
-  <data name="Profile.FullNameMaxLength" xml:space="preserve">
-    <value>Full name cannot exceed 100 characters.</value>
-  </data>
-  <data name="Profile.EmailRequired" xml:space="preserve">
-    <value>Email cannot be empty.</value>
-  </data>
-  <data name="Profile.EmailInvalid" xml:space="preserve">
-    <value>Invalid email format.</value>
-  </data>
-  <data name="Profile.PhoneRequired" xml:space="preserve">
-    <value>Phone number cannot be empty.</value>
-  </data>
-  <data name="Profile.PhoneInvalid" xml:space="preserve">
-    <value>Invalid phone number format.</value>
-  </data>
-  <data name="Employee.CodeInvalidFormat" xml:space="preserve">
-    <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
-  </data>
-  <data name="Auth.TokenRequired" xml:space="preserve">
-    <value>Token is required.</value>
-  </data>
-  <data name="Auth.NewPasswordRequired" xml:space="preserve">
-    <value>New password is required.</value>
-  </data>
-  <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
-    <value>Confirm password is required.</value>
-  </data>
-  <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
-    <value>Confirm password does not match new password.</value>
-  </data>
-  <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
-    <value>Employee code is required.</value>
-  </data>
-  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
-    <value>If an account exists for that employee code, a reset email has been sent.</value>
-  </data>
-  <data name="EmployeeNotActive" xml:space="preserve">
-    <value>Employee is not active.</value>
-  </data>
-  <data name="CannotPromoteToManager" xml:space="preserve">
-    <value>Cannot promote to Manager directly.</value>
-  </data>
-  <data name="NewRoleMustBeDifferent" xml:space="preserve">
-    <value>New role must be different from current role.</value>
-  </data>
-  <data name="DatabaseUpdateError" xml:space="preserve">
-    <value>An error occurred while updating the database.</value>
-  </data>
-  <data name="RoleChangedButEmailFailed" xml:space="preserve">
-    <value>Role changed successfully for {0}, but notification email failed to send.</value>
-  </data>
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Term not found.</value>
   </data>
@@ -691,6 +577,60 @@
   <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
     <value>Error retrieving term {0}</value>
   </data>
+  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
+    <value>Error while retrieving enterprises</value>
+  </data>
+  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
+    <value>Error occurred while getting enterprise by id</value>
+  </data>
+  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>The tax identification number already exists in the system.</value>
+  </data>
+  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <value>The business with tax code '{TaxCode}' already exists.</value>
+  </data>
+  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
+    <value>An error occurred while creating the business.</value>
+  </data>
+  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
+    <value>The tax identification number is not in the correct format.</value>
+  </data>
+  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
+    <value>Name is required.</value>
+  </data>
+  <data name="Enterprise.NameMaxLength" xml:space="preserve">
+    <value>Name must not exceed {0} characters.</value>
+  </data>
+  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
+    <value>Website must start with http or https.</value>
+  </data>
+  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
+    <value>LogoUrl must start with http or https.</value>
+  </data>
+  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
+    <value>BackgroundUrl must start with http or https.</value>
+  </data>
+  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>You are not allowed to modify this enterprise.</value>
+  </data>
+  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
+    <value>Error: No permission to edit enterprise {enterpriseId}.</value>
+  </data>
+  <data name="Enterprise.LogNotFound" xml:space="preserve">
+    <value>Enterprise {enterpriseId} not found</value>
+  </data>
+  <data name="Enterprise.LogUpdateEnterpriseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+    <value>Updating the tax code is not allowed.</value>
+  </data>
+  <data name="Enterprise.LogDeleteError" xml:space="preserve">
+    <value>Error occurred while deleting enterprise with ID {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.DeleteError" xml:space="preserve">
+    <value>An error occurred while deleting the enterprise. Please try again later.</value>
+  </data>
   <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
     <value>You are not associated with any enterprise as an HR.</value>
   </data>
@@ -729,24 +669,6 @@
   </data>
   <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
     <value>Error occurred while removing students from group</value>
-  </data>
-  <data name="InternshipGroup.NameRequired" xml:space="preserve">
-    <value>Internship group name is required.</value>
-  </data>
-  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
-    <value>Internship group name cannot exceed 255 characters.</value>
-  </data>
-  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
-    <value>Term ID is required.</value>
-  </data>
-  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
-    <value>Start date must be before end date.</value>
-  </data>
-  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
-    <value>Student list is required.</value>
-  </data>
-  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
-    <value>List of students to remove is required.</value>
   </data>
   <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
     <value>Invalid student ID.</value>
@@ -978,5 +900,89 @@
   </data>
   <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid</value>
+  </data>
+  <data name="Password.NotEmpty" xml:space="preserve">
+    <value>Password cannot be empty.</value>
+  </data>
+  <data name="CannotIdentifyManager" xml:space="preserve">
+    <value>Cannot identify the manager performing the reset.</value>
+  </data>
+  <data name="OnlyManagerCanReset" xml:space="preserve">
+    <value>Only managers are allowed to reset passwords.</value>
+  </data>
+  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Password can only be reset for active accounts.</value>
+  </data>
+  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
+    <value>Employee ID is required.</value>
+  </data>
+  <data name="ResetStatusNoEmail" xml:space="preserve">
+    <value>Password reset successful. However, the email could not be sent.</value>
+  </data>
+  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
+    <value>Cannot update information for inactive employees.</value>
+  </data>
+  <data name="Profile.EmployeeIdRequired" xml:space="preserve">
+    <value>EmployeeId cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameRequired" xml:space="preserve">
+    <value>Full name cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameMaxLength" xml:space="preserve">
+    <value>Full name cannot exceed 100 characters.</value>
+  </data>
+  <data name="Profile.EmailRequired" xml:space="preserve">
+    <value>Email cannot be empty.</value>
+  </data>
+  <data name="Profile.EmailInvalid" xml:space="preserve">
+    <value>Invalid email format.</value>
+  </data>
+  <data name="Profile.PhoneRequired" xml:space="preserve">
+    <value>Phone number cannot be empty.</value>
+  </data>
+  <data name="Profile.PhoneInvalid" xml:space="preserve">
+    <value>Invalid phone number format.</value>
+  </data>
+  <data name="Employee.CodeInvalidFormat" xml:space="preserve">
+    <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
+  </data>
+  <data name="Auth.TokenRequired" xml:space="preserve">
+    <value>Token is required.</value>
+  </data>
+  <data name="Auth.NewPasswordRequired" xml:space="preserve">
+    <value>New password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
+    <value>Confirm password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
+    <value>Confirm password does not match new password.</value>
+  </data>
+  <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
+    <value>Employee code is required.</value>
+  </data>
+  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <value>If an account exists for that employee code, a reset email has been sent.</value>
+  </data>
+  <data name="EmployeeNotActive" xml:space="preserve">
+    <value>Employee is not active.</value>
+  </data>
+  <data name="CannotPromoteToManager" xml:space="preserve">
+    <value>Cannot promote to Manager directly.</value>
+  </data>
+  <data name="NewRoleMustBeDifferent" xml:space="preserve">
+    <value>New role must be different from current role.</value>
+  </data>
+  <data name="DatabaseUpdateError" xml:space="preserve">
+    <value>An error occurred while updating the database.</value>
+  </data>
+  <data name="RoleChangedButEmailFailed" xml:space="preserve">
+    <value>Role changed successfully for {0}, but notification email failed to send.</value>
+  </data>
+  <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
+    <value>Failed to restore enterprise. EnterpriseId: {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.RestoreFailed" xml:space="preserve">
+    <value>Failed to restore enterprise.</value>
   </data>
 </root>

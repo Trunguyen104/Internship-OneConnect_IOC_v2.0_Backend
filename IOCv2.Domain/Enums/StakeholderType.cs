@@ -2,8 +2,8 @@
 {
     public enum StakeholderType : short
     {
-        Real    = 0,
-        Persona = 1
+        Real    = 1,
+        Persona = 2
     }
 }
 

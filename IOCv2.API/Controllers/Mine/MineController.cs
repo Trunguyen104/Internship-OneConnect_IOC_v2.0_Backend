@@ -1,3 +1,4 @@
+using IOCv2.API.Attributes;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetMyInternshipGroups;
 using MediatR;
@@ -15,6 +16,7 @@ public class MineController : ApiControllerBase
     public MineController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
+    [RateLimit(maxRequests: 10, windowMinutes: 10, blockMinutes: 5)]
     [ProducesResponseType(typeof(ApiResponse<List<GetMyInternshipGroupsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]

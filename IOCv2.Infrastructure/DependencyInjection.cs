@@ -64,7 +64,33 @@ namespace IOCv2.Infrastructure
             services.AddScoped<ICacheService, RedisCacheService>();
 
             // File
-            services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            services.AddHttpClient();
+
+            var fileStorageProvider = configuration["FileStorage:Provider"]?.Trim().ToLowerInvariant();
+            var cloudinaryCloudName = configuration["Cloudinary:CloudName"];
+            var cloudinaryApiKey = configuration["Cloudinary:ApiKey"];
+            var cloudinaryApiSecret = configuration["Cloudinary:ApiSecret"];
+            var cloudinaryConfigured = !string.IsNullOrWhiteSpace(cloudinaryCloudName)
+                                     && !string.IsNullOrWhiteSpace(cloudinaryApiKey)
+                                     && !string.IsNullOrWhiteSpace(cloudinaryApiSecret);
+
+            if (string.Equals(fileStorageProvider, "cloudinary", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!cloudinaryConfigured)
+                {
+                    throw new InvalidOperationException("FileStorage Provider is set to Cloudinary but Cloudinary credentials are missing.");
+                }
+
+                services.AddScoped<IFileStorageService, CloudinaryFileStorageService>();
+            }
+            else if (cloudinaryConfigured && !string.Equals(fileStorageProvider, "local", StringComparison.OrdinalIgnoreCase))
+            {
+                services.AddScoped<IFileStorageService, CloudinaryFileStorageService>();
+            }
+            else
+            {
+                services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            }
 
             return services;
         }

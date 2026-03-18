@@ -16,8 +16,6 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
         public string? Description { get; set; }
         public string? Address { get; set; }
         public string? Website { get; set; }
-        public string? LogoUrl { get; set; }
-        public string? BackgroundUrl { get; set; }
         public bool IsVerified { get; set; } = false;
     }
 }

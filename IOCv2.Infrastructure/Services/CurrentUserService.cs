@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 

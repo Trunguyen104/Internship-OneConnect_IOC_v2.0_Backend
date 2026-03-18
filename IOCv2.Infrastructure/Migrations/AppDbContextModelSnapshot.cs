@@ -1182,7 +1182,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Type")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasDefaultValue((short)0)
+                        .HasDefaultValue((short)1)
                         .HasColumnName("type");
 
                     b.Property<DateTime?>("UpdatedAt")

@@ -121,6 +121,15 @@
             public const string RateLimitGetEnterprisesAttempt = "Enterprise.RateLimitGetEnterprisesAttempt";
             public const string HRNotAssociatedWithEnterprise = "Enterprise.HR.NotAssociatedWithEnterprise";
             public const string EnterpriseNotFoundCurrentHR = "Enterprise.NotFoundCurrentHR";
+            public const string DeletePermissionDenied = "Enterprise.DeletePermissionDenied";
+            // Restore
+            public const string RestorePermissionDenied = "Enterprise.RestorePermissionDenied";
+            public const string NotDeleted = "Enterprise.NotDeleted";
+            public const string LogRestoreFailed = "Enterprise.LogRestoreFailed";
+            public const string RestoreFailed = "Enterprise.RestoreFailed";
+            // GetByID
+            public const string GetByIDPermissionsNotAllowed = "Enterprise.GetByIDPermissionsNotAllowed";
+
         }
 
         public static class Profile
@@ -292,6 +301,8 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
+
+            public const string LogUploadAutoSetFileTypeError = "ProjectResources.LogUploadAutoSetFileTypeError";
         }
 
         public static class Internships
@@ -521,6 +532,10 @@
             public const string LogAssignProjectSuccess = "InternshipApplication.Log.AssignProjectSuccess";
             public const string LogAssignProjectError = "InternshipApplication.Log.AssignProjectError";
             public const string LogInvalidUserId = "InternshipApplication.Log.InvalidUserId";
+        }
+        public static class File
+        {
+            
         }
     }
 }

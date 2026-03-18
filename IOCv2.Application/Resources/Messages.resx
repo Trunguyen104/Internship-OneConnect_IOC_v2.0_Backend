@@ -329,4 +329,16 @@
   <data name="InternshipApplication.AssignProjectSuccess" xml:space="preserve">
     <value>Đã gán dự án vào nhóm thực tập thành công.</value>
   </data>
+  <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
+    <value>Bạn không có quyền xóa doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <value>Bạn không có quyền khôi phục doanh nghiệp này.</value>
+  </data>
+  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <value>Doanh nghiệp chưa bị xóa nên không thể khôi phục.</value>
+  </data>
+  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <value>Bạn không có quyền xem thông tin doanh nghiệp này.</value>
+  </data>
 </root>

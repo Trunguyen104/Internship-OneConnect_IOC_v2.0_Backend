@@ -73,7 +73,13 @@ app.UseAuthorization();
 
 app.UseMiddleware<SerilogUserEnricherMiddleware>();
 app.UseSerilogRequestLogging();
-
+var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "Uploads");
+Directory.CreateDirectory(uploadsPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
 app.MapControllers();
 
 app.Run();

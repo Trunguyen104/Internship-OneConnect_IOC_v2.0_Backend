@@ -711,7 +711,6 @@
   <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
     <value>Error retrieving term {0}</value>
   </data>
-
   <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
     <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
   </data>
@@ -1035,5 +1034,11 @@
   </data>
   <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid</value>
+  </data>
+  <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
+    <value>Khôi phục doanh nghiệp thất bại. EnterpriseId: {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.RestoreFailed" xml:space="preserve">
+    <value>Khôi phục doanh nghiệp thất bại.</value>
   </data>
 </root>
