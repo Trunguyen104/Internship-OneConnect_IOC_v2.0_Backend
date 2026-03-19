@@ -23,13 +23,15 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
         private readonly IFileStorageService _fileStorageService;
-        public GetDownloadProjectResourceByIdHandler(IMapper mapper, IUnitOfWork unitOfWork, ILogger<GetDownloadProjectResourceByIdHandler> logger, IMessageService messageService, IFileStorageService fileStorageService)
+        private readonly ICurrentUserService _currentUserService;
+        public GetDownloadProjectResourceByIdHandler(IMapper mapper, IUnitOfWork unitOfWork, ILogger<GetDownloadProjectResourceByIdHandler> logger, IMessageService messageService, IFileStorageService fileStorageService, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
             _messageService = messageService;
             _fileStorageService = fileStorageService;
+            _currentUserService = currentUserService;
         }
         public async Task<Result<GetDownloadProjectResourceByIdResponse>> Handle(GetDownloadProjectResourceByIdQuery request, CancellationToken cancellationToken)
         {
@@ -44,8 +46,17 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
                         ResultErrorType.NotFound);
                 }
+
+                var hasAccess = await HasProjectAccessAsync(resource.ProjectId, cancellationToken);
+                if (!hasAccess)
+                {
+                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
+
                 // get stream from storage
-                var stream = await _fileStorageService.GetFileAsync(resource.ResourceUrl);
+                var stream = await _fileStorageService.GetFileAsync(resource.ResourceUrl, cancellationToken);
                 if (stream == null)
                 {
                     _logger.LogWarning("File not found in storage for resource: {ResourceId}", request.ProjectResourceId);
@@ -55,11 +66,14 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 }
 
                 var extension = Path.GetExtension(resource.ResourceUrl);
+                var safeResourceName = string.IsNullOrWhiteSpace(resource.ResourceName)
+                    ? request.ProjectResourceId.ToString("N")
+                    : resource.ResourceName;
                 var response = new GetDownloadProjectResourceByIdResponse
                 {
                     Content = stream,
-                    ContentType = FileValidationHelper.GetMimeType(resource.ResourceName),
-                    FileName = $"{resource.ResourceName}{extension}"
+                    ContentType = FileValidationHelper.GetMimeType(safeResourceName),
+                    FileName = $"{safeResourceName}{extension}"
                 };
 
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ProjectResourceId);
@@ -70,6 +84,46 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdError), request.ProjectResourceId);
                 return Result<GetDownloadProjectResourceByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
+        }
+
+        private async Task<bool> HasProjectAccessAsync(Guid projectId, CancellationToken cancellationToken)
+        {
+            if (string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(_currentUserService.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+            {
+                return false;
+            }
+
+            var studentId = await _unitOfWork.Repository<Domain.Entities.Student>().Query()
+                .AsNoTracking()
+                .Where(s => s.UserId == currentUserId)
+                .Select(s => s.StudentId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (studentId == Guid.Empty)
+            {
+                return false;
+            }
+
+            var internshipId = await _unitOfWork.Repository<Domain.Entities.Project>().Query()
+                .AsNoTracking()
+                .Where(p => p.ProjectId == projectId)
+                .Select(p => p.InternshipId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (internshipId == Guid.Empty)
+            {
+                return false;
+            }
+
+            return await _unitOfWork.Repository<Domain.Entities.InternshipStudent>().Query()
+                .AsNoTracking()
+                .AnyAsync(m => m.InternshipId == internshipId && m.StudentId == studentId, cancellationToken);
         }
     }
 }

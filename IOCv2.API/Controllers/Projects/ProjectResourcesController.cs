@@ -9,7 +9,6 @@ using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace IOCv2.API.Controllers.Projects;
 
@@ -18,6 +17,7 @@ namespace IOCv2.API.Controllers.Projects;
 /// </summary>
 [Tags("Project Resources")]
 [Route("api/v{version:apiVersion}/project-resources")]
+[Authorize]
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -62,7 +62,7 @@ public class ProjectResourcesController : ApiControllerBase
     }
 
     [HttpGet("{resourceId:guid}/read")]
-    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<GetReadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetReadProjectResourceById(
         [FromRoute] Guid resourceId,
@@ -78,7 +78,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// </summary>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
