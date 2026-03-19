@@ -43,24 +43,27 @@ app.UseExceptionHandler();
 app.UseMiddleware<RateLimitingMiddleware>();
 app.UseMiddleware<CorrelationIdMiddleware>();
 
+// Database Migration & Seeding — chạy mọi môi trường (kể cả Production)
+await DatabaseConfig.ApplyMigrations(app);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerConfig();
-
-    // Database Migration & Seeding
-    await DatabaseConfig.ApplyMigrations(app);
 }
-// redirect / → /swagger
-app.Use(async (context, next) =>
+// Redirect / → /swagger chỉ trên Development
+if (app.Environment.IsDevelopment())
 {
-    if (context.Request.Path == "/")
+    app.Use(async (context, next) =>
     {
-        context.Response.Redirect("/swagger");
-        return;
-    }
+        if (context.Request.Path == "/")
+        {
+            context.Response.Redirect("/swagger");
+            return;
+        }
 
-    await next();
-});
+        await next();
+    });
+}
 app.UseCors("AllowReact");
 
 if (!app.Environment.IsDevelopment())
