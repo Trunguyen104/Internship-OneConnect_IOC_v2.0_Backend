@@ -6,6 +6,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,15 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound),
                         ResultErrorType.NotFound);
                 }
+
+                var hasAccess = await HasProjectAccessAsync(request.ProjectId, cancellationToken);
+                if (!hasAccess)
+                {
+                    return Result<UploadProjectResourceResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
+
                 // Start database transaction
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
                 string? fileUrl = null;
@@ -132,6 +142,46 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadError), request.ProjectId);
                 return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
+        }
+
+        private async Task<bool> HasProjectAccessAsync(Guid projectId, CancellationToken cancellationToken)
+        {
+            if (string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(_currentUserService.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+            {
+                return false;
+            }
+
+            var studentId = await _unitOfWork.Repository<Student>().Query()
+                .AsNoTracking()
+                .Where(s => s.UserId == currentUserId)
+                .Select(s => s.StudentId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (studentId == Guid.Empty)
+            {
+                return false;
+            }
+
+            var internshipId = await _unitOfWork.Repository<Project>().Query()
+                .AsNoTracking()
+                .Where(p => p.ProjectId == projectId)
+                .Select(p => p.InternshipId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (internshipId == Guid.Empty)
+            {
+                return false;
+            }
+
+            return await _unitOfWork.Repository<InternshipStudent>().Query()
+                .AsNoTracking()
+                .AnyAsync(m => m.InternshipId == internshipId && m.StudentId == studentId, cancellationToken);
         }
 
     }
