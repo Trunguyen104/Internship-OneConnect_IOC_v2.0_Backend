@@ -75,26 +75,21 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                 try
                 {
                     // Generate a unique file name to avoid collisions
-                    var fileName = FileConstants.GetFileName(request.File.FileName);
+                    var fileName = FileParams.GetFileName(request.File.FileName);
                     // Upload file to storage service (local, S3, etc.)
                     fileUrl = await _fileStorageService.UploadFileAsync(
                         request.File,
-                        FileConstants.GetFolder(request.ProjectId),
+                        FileParams.GetFolder(request.ProjectId),
                         fileName,
                         cancellationToken);
-                    FileType fileType;
-                    try
+                    // Automatically detect file type based on file extension
+                    var detectedType = FileValidationHelper.GetFileType(fileUrl);
+                    if (detectedType == null)
                     {
-                        // Automatically detect file type based on file extension
-                        fileType = AutoSetFileType(fileUrl);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log error if file type detection fails
-                        _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadAutoSetFileTypeError), fileUrl);
-                        // Reject unsupported file types
+                        _logger.LogWarning("Unsupported file type for uploaded file: {FileUrl}", fileUrl);
                         return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"), ResultErrorType.BadRequest);
                     }
+                    var fileType = detectedType.Value;
                     // Create ProjectResources entity
                     var resource = new Domain.Entities.ProjectResources(
                         request.ProjectId,
@@ -139,21 +134,5 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             }
         }
 
-        private FileType AutoSetFileType(string filePath)
-        {
-            var extension = System.IO.Path.GetExtension(filePath).ToLower();
-            return extension switch
-            {
-                FileConstants.PdfExtension => FileType.PDF,
-                FileConstants.DocxExtension => FileType.DOCX,
-                FileConstants.PptxExtension => FileType.PPTX,
-                FileConstants.ZipExtension => FileType.ZIP,
-                FileConstants.RarExtension => FileType.RAR,
-                FileConstants.JpgExtension => FileType.JPG,
-                FileConstants.JpegExtension => FileType.JPG,
-                FileConstants.PngExtension => FileType.PNG,
-                _ => throw new InvalidOperationException(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"))
-            };
-        }
     }
 }

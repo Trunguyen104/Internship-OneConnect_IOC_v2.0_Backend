@@ -23,7 +23,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById
         public string? LogoUrl { get; set; }
         public string? BackgroundUrl { get; set; }
         public bool IsVerified { get; set; } = false;
-        public EnterpriseStatus Status { get; set; } = EnterpriseStatus.Active; // 0=Inactive, 1=Active, 2=Suspended
+        public EnterpriseStatus Status { get; set; } = EnterpriseStatus.Active; // 1=Inactive, 2=Active, 3=Suspended
         public void Mapping(Profile profile)
         {
             profile.CreateMap<Enterprise, GetEnterpriseByIdResponse>()

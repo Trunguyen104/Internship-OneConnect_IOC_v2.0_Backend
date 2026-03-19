@@ -711,7 +711,6 @@
   <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
     <value>Error retrieving term {0}</value>
   </data>
-
   <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
     <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
   </data>
@@ -930,5 +929,11 @@
   </data>
   <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Không thể công bố điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+  <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
+    <value>Khôi phục doanh nghiệp thất bại. EnterpriseId: {EnterpriseId}</value>
+  </data>
+  <data name="Enterprise.RestoreFailed" xml:space="preserve">
+    <value>Khôi phục doanh nghiệp thất bại.</value>
   </data>
 </root>

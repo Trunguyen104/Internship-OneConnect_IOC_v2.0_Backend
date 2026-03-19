@@ -1,15 +1,18 @@
 ﻿using IOCv2.Application.Interfaces;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Infrastructure.Services.RateLimiting
 {
     public class RedisRateLimiter : IRateLimiter
     {
         private readonly IDatabase _db;
+        private readonly ILogger<RedisRateLimiter> _logger;
 
-        public RedisRateLimiter(IConnectionMultiplexer redis)
+        public RedisRateLimiter(IConnectionMultiplexer redis, ILogger<RedisRateLimiter> logger)
         {
             _db = redis.GetDatabase();
+            _logger = logger;
         }
 
         private static string FailKey(string key) => $"fail:{key}";
@@ -17,9 +20,15 @@ namespace IOCv2.Infrastructure.Services.RateLimiting
 
         public async Task<bool> IsBlockedAsync(string key, CancellationToken ct)
         {
-            // StackExchange.Redis không dùng ct trực tiếp cho mọi lệnh,
-            // nhưng vẫn ok về mặt logic.
-            return await _db.KeyExistsAsync(BlockKey(key));
+            try
+            {
+                return await _db.KeyExistsAsync(BlockKey(key));
+            }
+            catch (RedisException ex)
+            {
+                _logger.LogWarning(ex, "Redis unavailable while checking block key {RateLimitKey}. Falling back to not blocked.", key);
+                return false;
+            }
         }
 
         public async Task<int> RegisterFailAsync(
@@ -29,30 +38,45 @@ namespace IOCv2.Infrastructure.Services.RateLimiting
             TimeSpan blockFor,
             CancellationToken ct)
         {
-            var failKey = FailKey(key);
-
-            // 1) tăng count (atomic)
-            var count = (int)await _db.StringIncrementAsync(failKey);
-
-            // 2) nếu là lần đầu, set TTL cho cửa sổ thời gian
-            if (count == 1)
+            try
             {
-                await _db.KeyExpireAsync(failKey, window);
-            }
+                var failKey = FailKey(key);
 
-            // 3) nếu vượt ngưỡng -> block
-            if (count >= limit)
+                // 1) tăng count (atomic)
+                var count = (int)await _db.StringIncrementAsync(failKey);
+
+                // 2) nếu là lần đầu, set TTL cho cửa sổ thời gian
+                if (count == 1)
+                {
+                    await _db.KeyExpireAsync(failKey, window);
+                }
+
+                // 3) nếu vượt ngưỡng -> block
+                if (count >= limit)
+                {
+                    await _db.StringSetAsync(BlockKey(key), "1", blockFor);
+                }
+
+                return count;
+            }
+            catch (RedisException ex)
             {
-                await _db.StringSetAsync(BlockKey(key), "1", blockFor);
+                _logger.LogWarning(ex, "Redis unavailable while registering failed login for key {RateLimitKey}.", key);
+                return 0;
             }
-
-            return count;
         }
 
         public async Task ResetAsync(string key, CancellationToken ct)
         {
-            await _db.KeyDeleteAsync(FailKey(key));
-            await _db.KeyDeleteAsync(BlockKey(key));
+            try
+            {
+                await _db.KeyDeleteAsync(FailKey(key));
+                await _db.KeyDeleteAsync(BlockKey(key));
+            }
+            catch (RedisException ex)
+            {
+                _logger.LogWarning(ex, "Redis unavailable while resetting rate-limit key {RateLimitKey}.", key);
+            }
         }
     }
 }

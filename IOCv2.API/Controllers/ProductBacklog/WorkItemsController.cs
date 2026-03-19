@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.ProductBacklog;
 /// Manage Work Items (User Story, Task, Subtask) in the Product Backlog and Sprint Backlog.
 /// </summary>
 [Tags("WorkItems")]
-[Authorize]
+[Route("api/v{version:apiVersion}/work-items")]
 public class WorkItemsController : ApiControllerBase
 {
     private readonly IMediator _mediator;

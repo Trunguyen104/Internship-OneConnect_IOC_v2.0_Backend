@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectResource;
 using IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource;
 using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource;
@@ -17,16 +17,13 @@ namespace IOCv2.API.Controllers.Projects;
 /// Project Resources — manage files and resources attached to projects.
 /// </summary>
 [Tags("Project Resources")]
-[Authorize]
-[Route("api/project-resources")]
+[Route("api/v{version:apiVersion}/project-resources")]
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IFileStorageService _fileStorageService;
 
-    public ProjectResourcesController(IMediator mediator, IFileStorageService fileStorageService)
+    public ProjectResourcesController(IMediator mediator)
     {
-        _fileStorageService = fileStorageService;
         _mediator = mediator;
     }
 
@@ -53,31 +50,15 @@ public class ProjectResourcesController : ApiControllerBase
        [FromRoute] Guid resourceId,
        CancellationToken cancellationToken)
     {
-        // First, retrieve the resource metadata to get the file path
-        var query = new GetDownloadProjectResourceByIdQuery
-        {
-            ProjectResourceId = resourceId
-        };
-
+        var query = new GetDownloadProjectResourceByIdQuery { ProjectResourceId = resourceId };
         var result = await _mediator.Send(query, cancellationToken);
 
-        // If the resource metadata retrieval failed, return the appropriate error response
-        if (!result.IsSuccess || result.Data == null)
+        if (!result.IsSuccess || result.Data?.Content == null)
         {
             return HandleResult(result);
         }
 
-        // Attempt to retrieve the file stream from storage
-        var stream = await _fileStorageService.GetFileAsync(result.Data.FilePath);
-
-        // If the file stream is null, it means the file was not found in storage
-        if (stream == null)
-        {
-            return NotFound("File not found.");
-        }
-
-        // Return the file stream with the appropriate content type and file name for download
-        return File(stream, "application/octet-stream", result.Data.FileName);
+        return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
     }
 
     [HttpGet("{resourceId:guid}/read")]

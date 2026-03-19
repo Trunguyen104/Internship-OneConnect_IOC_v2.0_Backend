@@ -2,6 +2,7 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -48,10 +49,8 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                     Description = request.Description,
                     Address = request.Address,
                     Website = request.Website,
-                    LogoUrl = request.LogoUrl,
-                    BackgroundUrl = request.BackgroundUrl,
                     IsVerified = request.IsVerified,
-                    Status = 1 // Active by default
+                    Status = (short)EnterpriseStatus.Active
                 };
                 var response = _mapper.Map<CreateEnterpriseResponse>(enterprise);
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().AddAsync(enterprise);

@@ -614,7 +614,7 @@ namespace IOCv2.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     internship_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    type = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)0),
+                    type = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
                     role = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),

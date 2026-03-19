@@ -2,9 +2,9 @@ namespace IOCv2.Domain.Enums;
 
 public enum LogbookStatus
 {
-    SUBMITTED = 0,
-    APPROVED = 1,
-    NEEDS_REVISION = 2,
-    PUNCTUAL = 3,
-    LATE = 4
+    SUBMITTED = 1,
+    APPROVED = 2,
+    NEEDS_REVISION = 3,
+    PUNCTUAL = 4,
+    LATE = 5
 }

@@ -33,17 +33,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                 .Must(BeValidUrl)
                 .When(x => !string.IsNullOrEmpty(x.Website))
                 .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.WebsiteNotValid));
-            RuleFor(x => x.LogoUrl)
-                .MaximumLength(255)
-                .Must(BeValidUrl)
-                .When(x => !string.IsNullOrEmpty(x.LogoUrl))
-                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.logoUrlNotValid));
-            RuleFor(x => x.BackgroundUrl)
-                .MaximumLength(255)
-                .Must(BeValidUrl)
-                .When(x => !string.IsNullOrEmpty(x.BackgroundUrl))
-                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.BackgroundUrlNotValid));
-                
+
 
         }
         private bool BeValidUrl(string? url)
