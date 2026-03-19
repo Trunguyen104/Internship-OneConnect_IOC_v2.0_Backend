@@ -63,7 +63,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
 
                 await _cacheService.RemoveAsync(ProjectResourceCacheKeys.Read(resource.ProjectResourceId), cancellationToken);
                 await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(resource.ProjectId), cancellationToken);
-                await _cacheService.RemoveByPatternAsync("project-resource:list", cancellationToken);
+                await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(null), cancellationToken);
 
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogDeleteSuccess), request.ResourceId);
                 var response = _mapper.Map<DeleteProjectResourceResponse>(resource);
@@ -73,7 +73,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Failed to delete project resource: {ResourceId}", request.ResourceId);
-                return Result<DeleteProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<DeleteProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
 

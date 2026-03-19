@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Admin.Users.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -214,7 +215,8 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
                 
-                await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
+                await _cacheService.RemoveByPatternAsync(AdminUserCacheKeys.UserListPattern(), cancellationToken);
+                await _cacheService.RemoveAsync(AdminUserCacheKeys.User(user.UserId), cancellationToken);
 
                 _logger.LogInformation("Successfully created Admin User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 

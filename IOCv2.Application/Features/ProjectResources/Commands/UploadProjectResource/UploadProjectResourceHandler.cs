@@ -149,7 +149,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         request.File?.FileName ?? request.ExternalUrl, request.ProjectId);
 
                     await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(request.ProjectId), cancellationToken);
-                    await _cacheService.RemoveByPatternAsync("project-resource:list", cancellationToken);
+                    await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(null), cancellationToken);
 
                     return Result<UploadProjectResourceResponse>.Success(response);
                 }

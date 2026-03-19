@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,17 +17,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
         private readonly ILogger<AddStudentsToGroupHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public AddStudentsToGroupHandler(
             IUnitOfWork unitOfWork,
             IMessageService messageService,
             IMapper mapper,
-            ILogger<AddStudentsToGroupHandler> logger)
+            ILogger<AddStudentsToGroupHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<AddStudentsToGroupResponse>> Handle(AddStudentsToGroupCommand request, CancellationToken cancellationToken)
@@ -72,6 +76,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 if (saved >= 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(group.InternshipId), cancellationToken);
+                    await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAddedStudentsSuccess), studentIds.Count, request.InternshipId);
 
                     var response = _mapper.Map<AddStudentsToGroupResponse>(group);
@@ -86,7 +92,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogAddStudentsError));
-                return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<AddStudentsToGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

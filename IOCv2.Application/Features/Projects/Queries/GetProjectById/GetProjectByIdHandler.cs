@@ -1,6 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,16 +20,25 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         private readonly IMapper _mapper;
         private readonly ILogger<GetProjectByIdHandler> _logger;
         private readonly IMessageService _message;
-        public GetProjectByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetProjectByIdHandler> logger, IMessageService message)
+        private readonly ICacheService _cacheService;
+        public GetProjectByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetProjectByIdHandler> logger, IMessageService message, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _message = message;
+            _cacheService = cacheService;
         }
         public async Task<Result<GetProjectByIdResponse>> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Retrieving project by ID: {ProjectId}", request.ProjectId);
+
+            var cacheKey = ProjectCacheKeys.Project(request.ProjectId);
+            var cached = await _cacheService.GetAsync<GetProjectByIdResponse>(cacheKey, cancellationToken);
+            if (cached != null)
+            {
+                return Result<GetProjectByIdResponse>.Success(cached);
+            }
 
             var project = await _unitOfWork.Repository<Domain.Entities.Project>()
                 .Query()
@@ -45,6 +55,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
             }
 
             var response = _mapper.Map<GetProjectByIdResponse>(project);
+            await _cacheService.SetAsync(cacheKey, response, ProjectCacheKeys.Expiration.Project, cancellationToken);
             return Result<GetProjectByIdResponse>.Success(response);
         }
     }

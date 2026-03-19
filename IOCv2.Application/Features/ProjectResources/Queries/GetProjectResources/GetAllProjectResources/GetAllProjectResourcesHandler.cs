@@ -134,7 +134,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetAllError));
                 return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.InternalError),
-                    ResultErrorType.Conflict);
+                    ResultErrorType.InternalServerError);
             }
         }
 

@@ -72,7 +72,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
 
                 await _cacheService.RemoveAsync(ProjectResourceCacheKeys.Read(projectResource.ProjectResourceId), cancellationToken);
                 await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(projectResource.ProjectId), cancellationToken);
-                await _cacheService.RemoveByPatternAsync("project-resource:list", cancellationToken);
+                await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(null), cancellationToken);
 
                 var response = _mapper.Map<UpdateProjectResourceResponse>(projectResource);
                 return Result<UpdateProjectResourceResponse>.Success(response);
@@ -81,7 +81,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUpdateError), request.ProjectResourceId);
-                return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.UpdateError), ResultErrorType.Conflict);
+                return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.UpdateError), ResultErrorType.InternalServerError);
             }
         }
 

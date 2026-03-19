@@ -88,7 +88,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             catch (Exception ex)
             {
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.GetByStuIdEr), studentId);
-                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
 
