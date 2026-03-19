@@ -65,12 +65,13 @@ if (app.Environment.IsDevelopment())
         await next();
     });
 }
+// /health phải map TRƯỚC auth — healthcheck không cần JWT
+app.UseHealthChecksConfig();
+
 app.UseCors("AllowReact");
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+// KHÔNG dùng UseHttpsRedirection — backend chạy sau nginx proxy (HTTP nội bộ)
+// nginx đã xử lý SSL termination. Redirect HTTPS ở đây sẽ gây vòng lặp 301.
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -85,6 +86,5 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 app.MapControllers();
-app.UseHealthChecksConfig();
 
 app.Run();
