@@ -32,6 +32,7 @@ builder.Services.AddSecurityConfig(builder.Configuration);
 builder.Services.AddRedisConfig(builder.Configuration);
 builder.Services.AddForwardedHeadersConfig();
 builder.Services.AddLocalizationConfig();
+builder.Services.AddHealthChecksConfig(builder.Configuration);
 
 var app = builder.Build();
 
@@ -84,5 +85,6 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 app.MapControllers();
+app.UseHealthChecksConfig();
 
 app.Run();
