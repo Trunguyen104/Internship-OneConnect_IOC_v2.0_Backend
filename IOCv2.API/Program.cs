@@ -32,6 +32,7 @@ builder.Services.AddSecurityConfig(builder.Configuration);
 builder.Services.AddRedisConfig(builder.Configuration);
 builder.Services.AddForwardedHeadersConfig();
 builder.Services.AddLocalizationConfig();
+builder.Services.AddHealthChecksConfig(builder.Configuration);
 
 var app = builder.Build();
 
@@ -43,24 +44,27 @@ app.UseExceptionHandler();
 app.UseMiddleware<RateLimitingMiddleware>();
 app.UseMiddleware<CorrelationIdMiddleware>();
 
+// Database Migration & Seeding — chạy mọi môi trường (kể cả Production)
+await DatabaseConfig.ApplyMigrations(app);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerConfig();
-
-    // Database Migration & Seeding
-    await DatabaseConfig.ApplyMigrations(app);
 }
-// redirect / → /swagger
-app.Use(async (context, next) =>
+// Redirect / → /swagger chỉ trên Development
+if (app.Environment.IsDevelopment())
 {
-    if (context.Request.Path == "/")
+    app.Use(async (context, next) =>
     {
-        context.Response.Redirect("/swagger");
-        return;
-    }
+        if (context.Request.Path == "/")
+        {
+            context.Response.Redirect("/swagger");
+            return;
+        }
 
-    await next();
-});
+        await next();
+    });
+}
 app.UseCors("AllowReact");
 
 if (!app.Environment.IsDevelopment())
@@ -73,11 +77,14 @@ app.UseAuthorization();
 
 app.UseMiddleware<SerilogUserEnricherMiddleware>();
 app.UseSerilogRequestLogging();
+var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "Uploads");
+Directory.CreateDirectory(uploadsPath);
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "Uploads")),
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
 app.MapControllers();
+app.UseHealthChecksConfig();
 
 app.Run();
