@@ -610,6 +610,24 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy sinh viên này..
+        /// </summary>
+        internal static string Student_NotFound {
+            get {
+                return ResourceManager.GetString("Student.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ID sinh viên là bắt buộc..
+        /// </summary>
+        internal static string Student_StudentIdRequired {
+            get {
+                return ResourceManager.GetString("Student.StudentIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Không xác định được người thực hiện thao tác..
         /// </summary>
         internal static string Users_InvalidAuditor {
@@ -637,6 +655,60 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đã tạo báo cáo vi phạm thành công.
+        /// </summary>
+        internal static string ViolationReport_CreateViolationReportSuccess {
+            get {
+                return ResourceManager.GetString("ViolationReport.CreateViolationReportSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn chỉ có thể xóa báo cáo vi phạm do mình tạo..
+        /// </summary>
+        internal static string ViolationReport_DeleteNotOwner {
+            get {
+                return ResourceManager.GetString("ViolationReport.DeleteNotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mô tả là bắt buộc, không được để trống..
+        /// </summary>
+        internal static string ViolationReport_DescriptionIsRequired {
+            get {
+                return ResourceManager.GetString("ViolationReport.DescriptionIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mô tả không được vượt quá {0} ký tự..
+        /// </summary>
+        internal static string ViolationReport_DescriptionMaxLength {
+            get {
+                return ResourceManager.GetString("ViolationReport.DescriptionMaxLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mô tả phải có ít nhất {0} ký tự..
+        /// </summary>
+        internal static string ViolationReport_DescriptionMinLength {
+            get {
+                return ResourceManager.GetString("ViolationReport.DescriptionMinLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể cập nhật báo cáo vi phạm {0}..
+        /// </summary>
+        internal static string ViolationReport_FailedToUpdateViolationReport {
+            get {
+                return ResourceManager.GetString("ViolationReport.FailedToUpdateViolationReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Không tìm thấy báo cáo phù hợp.
         /// </summary>
         internal static string ViolationReport_FilteredNotFound {
@@ -646,11 +718,164 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Kỳ thực tập đã kết thúc..
+        /// </summary>
+        internal static string ViolationReport_InternshipHasEnded {
+            get {
+                return ResourceManager.GetString("ViolationReport.InternshipHasEnded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Người hướng dẫn {UserId} đã cố gắng xóa một báo cáo mà họ không sở hữu: {ViolationReportId}.
+        /// </summary>
+        internal static string ViolationReport_LogDeleteNotOwner {
+            get {
+                return ResourceManager.GetString("ViolationReport.LogDeleteNotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy báo cáo vi phạm: {ViolationReportId}.
+        /// </summary>
+        internal static string ViolationReport_LogNotFound {
+            get {
+                return ResourceManager.GetString("ViolationReport.LogNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không được phép báo cáo về học sinh này..
+        /// </summary>
+        internal static string ViolationReport_NotAllowedToReport {
+            get {
+                return ResourceManager.GetString("ViolationReport.NotAllowedToReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không được phép cập nhật báo cáo này..
+        /// </summary>
+        internal static string ViolationReport_NotAllowedToUpdateThisReport {
+            get {
+                return ResourceManager.GetString("ViolationReport.NotAllowedToUpdateThisReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chưa có báo cáo vi phạm nào..
         /// </summary>
         internal static string ViolationReport_NotFound {
             get {
                 return ResourceManager.GetString("ViolationReport.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày xảy ra không được trước ngày bắt đầu thực tập..
+        /// </summary>
+        internal static string ViolationReport_OccurredDateBeforeInternshipStart {
+            get {
+                return ResourceManager.GetString("ViolationReport.OccurredDateBeforeInternshipStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chương trình thực tập đã kết thúc..
+        /// </summary>
+        internal static string ViolationReport_OccurredDateCannotBeAfterInternshipEnd {
+            get {
+                return ResourceManager.GetString("ViolationReport.OccurredDateCannotBeAfterInternshipEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày xảy ra sự việc không được trước ngày bắt đầu thực tập..
+        /// </summary>
+        internal static string ViolationReport_OccurredDateCannotBeBeforeInternshipStart {
+            get {
+                return ResourceManager.GetString("ViolationReport.OccurredDateCannotBeBeforeInternshipStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày xảy ra không được lớn hơn thời điểm hiện tại..
+        /// </summary>
+        internal static string ViolationReport_OccurredDateInFuture {
+            get {
+                return ResourceManager.GetString("ViolationReport.OccurredDateInFuture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày xảy ra sự việc là bắt buộc..
+        /// </summary>
+        internal static string ViolationReport_OccurredDateIsRequired {
+            get {
+                return ResourceManager.GetString("ViolationReport.OccurredDateIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang cập nhật báo cáo vi phạm {0} bởi người dùng {1}..
+        /// </summary>
+        internal static string ViolationReport_UpdatingViolationReportByUser {
+            get {
+                return ResourceManager.GetString("ViolationReport.UpdatingViolationReportByUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Người dùng {0} không được phép cập nhật báo cáo vi phạm {1}..
+        /// </summary>
+        internal static string ViolationReport_UserNotAllowedToUpdateViolationReport {
+            get {
+                return ResourceManager.GetString("ViolationReport.UserNotAllowedToUpdateViolationReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Báo cáo vi phạm {0} đã được xóa thành công..
+        /// </summary>
+        internal static string ViolationReport_ViolationReportDeletedSuccessfully {
+            get {
+                return ResourceManager.GetString("ViolationReport.ViolationReportDeletedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ViolationReportId là bắt buộc..
+        /// </summary>
+        internal static string ViolationReport_ViolationReportIdIsRequired {
+            get {
+                return ResourceManager.GetString("ViolationReport.ViolationReportIdIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy báo cáo vi phạm {0}..
+        /// </summary>
+        internal static string ViolationReport_ViolationReportNotFound {
+            get {
+                return ResourceManager.GetString("ViolationReport.ViolationReportNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Báo cáo vi phạm đã được cập nhật bởi người dùng khác vào lúc {0}..
+        /// </summary>
+        internal static string ViolationReport_ViolationReportUpdatedByAnotherUser {
+            get {
+                return ResourceManager.GetString("ViolationReport.ViolationReportUpdatedByAnotherUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Báo cáo đã được cập nhật thành công..
+        /// </summary>
+        internal static string ViolationReport_ViolationReportUpdatedSuccessfully {
+            get {
+                return ResourceManager.GetString("ViolationReport.ViolationReportUpdatedSuccessfully", resourceCulture);
             }
         }
     }

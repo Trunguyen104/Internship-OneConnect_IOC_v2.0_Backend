@@ -5,6 +5,7 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.ViolationReport;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,9 +19,13 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReports
 {
     /// <summary>
-    /// Handler for GetViolationReportsQuery.
-    /// Builds and executes an EF query with search, filters, role-based access,
-    /// sorting and pagination, then projects to GetViolationReportsResponse.
+    /// Handles queries to retrieve a paginated list of violation reports.
+    /// Responsibilities:
+    /// - Build EF query with required Includes for mapping/filtering
+    /// - Apply role-based access control (Mentor scoping)
+    /// - Apply search and filter criteria
+    /// - Compute total count before pagination
+    /// - Apply sorting, pagination and project to DTO
     /// </summary>
     public class GetViolationReportsHandler : IRequestHandler<GetViolationReportsQuery, Result<PaginatedResult<GetViolationReportsResponse>>>
     {
@@ -40,56 +45,50 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         }
 
         /// <summary>
-        /// Handle GetViolationReportsQuery:
-        /// - Compose base query with required includes (student, user, internship group, mentor.user)
-        /// - Apply role-based restriction for Mentors
-        /// - Apply search and filter criteria (createdBy, occurred date range, group)
-        /// - Count total results (before pagination)
-        /// - Return an empty paginated result when no items (so frontend can render empty state)
-        /// - Apply sorting (CreatedAt DESC by default, toggleable via request.OrderByCreatedAscending)
-        /// - Apply pagination and projection to DTO
-        /// - Return success or mapped failure on exception
+        /// Compose and execute the query, returning a paginated result of GetViolationReportsResponse DTOs.
+        /// Steps:
+        /// 1. Build base query with includes required by mappings and filters.
+        /// 2. Apply Mentor scoping (if current user is a Mentor).
+        /// 3. Apply search term and filters (created by, occurred date range, group).
+        /// 4. Calculate total count (before pagination).
+        /// 5. Return empty paginated result if no items.
+        /// 6. Apply sorting, pagination and projection to DTOs.
+        /// 7. Return success or an internal server error on exception.
         /// </summary>
         public async Task<Result<PaginatedResult<GetViolationReportsResponse>>> Handle(GetViolationReportsQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                // Base query: include student -> user and internshipGroup -> mentor -> user for mapping & filtering.
+                // 1) Base query: include navigation properties used for filtering/mapping.
                 var query = _unitOfWork.Repository<ViolationReport>().Query()
                     .Include(x => x.Student).ThenInclude(s => s.User)
                     .Include(x => x.InternshipGroup).ThenInclude(g => g.Mentor).ThenInclude(m => m.User)
                     .AsNoTracking();
 
-                // Role-based access:
-                // If the current user is a Mentor, limit reports to groups that the mentor manages.
-                if (ViolationReportParam.MentorRole.Equals(_currentUserService.Role))
+                // 2) Role-based access: Mentors only see reports for their groups.
+                if (UserRole.Mentor.ToString().Equals(_currentUserService.Role))
                 {
                     var currentUserId = Guid.Parse(_currentUserService.UserId!);
-                    // Ensure InternshipGroup.Mentor exists and matches current user id
                     query = query.Where(x => x.InternshipGroup.Mentor != null && x.InternshipGroup.Mentor.UserId == currentUserId);
                 }
 
-                // Search: match student full name or student code (case-insensitive)
+                // 3) Search: match student full name or user code (case-insensitive).
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm))
                 {
                     var term = request.SearchTerm.Trim().ToLower();
                     query = query.Where(x => x.Student.User.FullName.ToLower().Contains(term) || x.Student.User.UserCode.ToLower().Contains(term));
                 }
 
-                // Filters: CreatedBy, Occurred date range, GroupId
+                // 4) Filters: CreatedBy, Occurred date range, GroupId.
                 if (request.CreatedById.HasValue) query = query.Where(x => x.CreatedBy == request.CreatedById.Value);
-
                 if (request.OccurredFrom.HasValue) query = query.Where(x => x.OccurredDate >= request.OccurredFrom.Value);
-
                 if (request.OccurredTo.HasValue) query = query.Where(x => x.OccurredDate <= request.OccurredTo.Value);
-
                 if (request.GroupId.HasValue) query = query.Where(x => x.InternshipGroupId == request.GroupId.Value);
 
-                // Total count BEFORE pagination so frontend can show total number ("Tổng cộng X báo cáo").
+                // 5) Total count before pagination so frontend can show total items.
                 var totalCount = await query.CountAsync(cancellationToken);
 
-                // If no results, return an empty paginated result (frontend will render empty state).
-                // Returning NotFound here would prevent rendering an empty list with pagination/summary.
+                // 6) If no results, return an empty paginated object (frontend expects pagination fields).
                 if (totalCount == 0)
                 {
                     var emptyResponse = PaginatedResult<GetViolationReportsResponse>.Create(
@@ -101,13 +100,12 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
                     return Result<PaginatedResult<GetViolationReportsResponse>>.Success(emptyResponse);
                 }
 
-                // Sorting: default newest first (CreatedAt DESC).
-                // Client may toggle via request.OrderByCreatedAscending.
+                // 7) Sorting: newest by default, client may request ascending creation ordering.
                 var orderedQuery = request.OrderByCreatedAscending
                     ? query.OrderBy(x => x.CreatedAt)
                     : query.OrderByDescending(x => x.CreatedAt);
 
-                // Pagination + Projection: apply Skip/Take, then ProjectTo DTO using AutoMapper configuration.
+                // 8) Pagination + projection to DTO using AutoMapper.
                 var items = await orderedQuery
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
@@ -125,7 +123,7 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
             }
             catch (Exception ex)
             {
-                // Log and return a generic internal server error key so client can display a localized message.
+                // Log and return a generic internal server error key so client can localize the message.
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ViolationReportKey.GetViolationReportsError));
                 return Result<PaginatedResult<GetViolationReportsResponse>>.Failure(MessageKeys.ViolationReportKey.GetViolationReportsError, ResultErrorType.InternalServerError);
             }

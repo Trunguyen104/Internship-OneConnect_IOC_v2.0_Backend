@@ -1,12 +1,4 @@
-﻿/*
-Pseudocode:
-1. Identify the NotFound return in Handle method.
-2. Replace the empty NotFound() call with NotFound(message) where message is retrieved via:
-   _messageService.GetMessage(MessageKeys.ViolationReportKey.NotFound)
-3. Keep other logic unchanged.
-*/
-
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -14,6 +6,7 @@ using IOCv2.Application.Extensions.ViolationReport;
 using IOCv2.Application.Features.ViolationReports.Queries.GetViolationReports;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,6 +18,11 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReportDetail
 {
+    /// <summary>
+    /// Handler to retrieve a single violation report detail by id.
+    /// Applies Mentor scoping to ensure mentors can only access reports for their groups.
+    /// Projects the EF query to GetViolationReportDetailResponse DTO using AutoMapper.
+    /// </summary>
     public class GetViolationReportDetailHandler : IRequestHandler<GetViolationReportDetailQuery, Result<GetViolationReportDetailResponse>>
     {
         private readonly IMapper _mapper;
@@ -42,39 +40,38 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
             _currentUserService = currentUserService;
         }
 
-        public async Task<Result<GetViolationReportDetailResponse>> Handle(
-    GetViolationReportDetailQuery request,
-    CancellationToken cancellationToken)
+        /// <summary>
+        /// Handle retrieval:
+        /// - Build base query and apply Mentor role filter
+        /// - Project to DTO and return NotFound if missing
+        /// - Catch exceptions and log an internal server error
+        /// </summary>
+        public async Task<Result<GetViolationReportDetailResponse>> Handle( GetViolationReportDetailQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<ViolationReport>()
-                    .Query()
-                    .AsNoTracking()
-                    .Where(x => x.ViolationReportId == request.ViolationReportId);
+                // Base query for the requested violation report id.
+                var query = _unitOfWork.Repository<ViolationReport>().Query().AsNoTracking().Where(x => x.ViolationReportId == request.ViolationReportId);
 
-                // Role filter
-                if (ViolationReportParam.MentorRole.Equals(_currentUserService.Role!))
+                // If current user is Mentor, restrict to reports belonging to mentor's groups.
+                if (UserRole.Mentor.ToString().Equals(_currentUserService.Role!))
                 {
                     var userId = Guid.Parse(_currentUserService.UserId!);
-
-                    query = query.Where(x =>
-                        x.InternshipGroup.Mentor!.UserId == userId);
+                    query = query.Where(x => x.InternshipGroup.Mentor!.UserId == userId);
                 }
 
-                var response = await query
-                    .ProjectTo<GetViolationReportDetailResponse>(_mapper.ConfigurationProvider)
-                    .FirstOrDefaultAsync(cancellationToken);
+                // Project to DTO and execute.
+                var response = await query.ProjectTo<GetViolationReportDetailResponse>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
 
                 if (response == null)
-                    return Result<GetViolationReportDetailResponse>.NotFound(
-                        _messageService.GetMessage(MessageKeys.ViolationReportKey.NotFound));
+                    return Result<GetViolationReportDetailResponse>.NotFound(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotFound));
 
                 return Result<GetViolationReportDetailResponse>.Success(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while getting violation report detail");
+                // Log details and return internal server error to client.
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ViolationReportKey.ErrorWhileGettingViolationReportDetail));
 
                 return Result<GetViolationReportDetailResponse>.Failure(
                     ex.Message,

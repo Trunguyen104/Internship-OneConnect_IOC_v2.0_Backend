@@ -315,4 +315,79 @@
   <data name="ViolationReport.NotFound" xml:space="preserve">
     <value>Chưa có báo cáo vi phạm nào.</value>
   </data>
+  <data name="Student.NotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên này.</value>
+  </data>
+  <data name="ViolationReport.NotAllowedToReport" xml:space="preserve">
+    <value>Bạn không được phép báo cáo về học sinh này.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateCannotBeBeforeInternshipStart" xml:space="preserve">
+    <value>Ngày xảy ra sự việc không được trước ngày bắt đầu thực tập.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateCannotBeAfterInternshipEnd" xml:space="preserve">
+    <value>Chương trình thực tập đã kết thúc.</value>
+  </data>
+  <data name="ViolationReport.CreateViolationReportSuccess" xml:space="preserve">
+    <value>Đã tạo báo cáo vi phạm thành công</value>
+  </data>
+  <data name="ViolationReport.LogNotFound" xml:space="preserve">
+    <value>Không tìm thấy báo cáo vi phạm: {ViolationReportId}</value>
+  </data>
+  <data name="Student.StudentIdRequired" xml:space="preserve">
+    <value>ID sinh viên là bắt buộc.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateIsRequired" xml:space="preserve">
+    <value>Ngày xảy ra sự việc là bắt buộc.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateInFuture" xml:space="preserve">
+    <value>Ngày xảy ra không được lớn hơn thời điểm hiện tại.</value>
+  </data>
+  <data name="ViolationReport.DescriptionIsRequired" xml:space="preserve">
+    <value>Mô tả là bắt buộc, không được để trống.</value>
+  </data>
+  <data name="ViolationReport.DescriptionMinLength" xml:space="preserve">
+    <value>Mô tả phải có ít nhất {0} ký tự.</value>
+  </data>
+  <data name="ViolationReport.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả không được vượt quá {0} ký tự.</value>
+  </data>
+  <data name="ViolationReport.LogDeleteNotOwner" xml:space="preserve">
+    <value>Người hướng dẫn {UserId} đã cố gắng xóa một báo cáo mà họ không sở hữu: {ViolationReportId}</value>
+  </data>
+  <data name="ViolationReport.DeleteNotOwner" xml:space="preserve">
+    <value>Bạn chỉ có thể xóa báo cáo vi phạm do mình tạo.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportDeletedSuccessfully" xml:space="preserve">
+    <value>Báo cáo vi phạm {0} đã được xóa thành công.</value>
+  </data>
+  <data name="ViolationReport.UpdatingViolationReportByUser" xml:space="preserve">
+    <value>Đang cập nhật báo cáo vi phạm {0} bởi người dùng {1}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportNotFound" xml:space="preserve">
+    <value>Không tìm thấy báo cáo vi phạm {0}.</value>
+  </data>
+  <data name="ViolationReport.UserNotAllowedToUpdateViolationReport" xml:space="preserve">
+    <value>Người dùng {0} không được phép cập nhật báo cáo vi phạm {1}.</value>
+  </data>
+  <data name="ViolationReport.NotAllowedToUpdateThisReport" xml:space="preserve">
+    <value>Bạn không được phép cập nhật báo cáo này.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateBeforeInternshipStart" xml:space="preserve">
+    <value>Ngày xảy ra không được trước ngày bắt đầu thực tập.</value>
+  </data>
+  <data name="ViolationReport.InternshipHasEnded" xml:space="preserve">
+    <value>Kỳ thực tập đã kết thúc.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportUpdatedByAnotherUser" xml:space="preserve">
+    <value>Báo cáo vi phạm đã được cập nhật bởi người dùng khác vào lúc {0}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportUpdatedSuccessfully" xml:space="preserve">
+    <value>Báo cáo đã được cập nhật thành công.</value>
+  </data>
+  <data name="ViolationReport.FailedToUpdateViolationReport" xml:space="preserve">
+    <value>Không thể cập nhật báo cáo vi phạm {0}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportIdIsRequired" xml:space="preserve">
+    <value>ViolationReportId là bắt buộc.</value>
+  </data>
 </root>

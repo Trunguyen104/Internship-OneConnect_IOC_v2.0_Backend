@@ -8,6 +8,7 @@ namespace IOCv2.Application.Extensions.ViolationReport
 {
     public static class ViolationReportParam
     {
-        public const string MentorRole = "Mentor";
+
+        public const int MinDescriptionLength = 10;
     }
 }

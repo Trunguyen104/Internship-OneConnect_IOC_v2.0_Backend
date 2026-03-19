@@ -565,6 +565,12 @@
   <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
+  <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
+    <value>Error getting violation reports</value>
+  </data>
+  <data name="ViolationReport.CreateViolationReportError" xml:space="preserve">
+    <value>An error occurred while generating the violation report.</value>
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -643,7 +649,13 @@
   <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role changed successfully for {0}, but notification email failed to send.</value>
   </data>
-  <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
-    <value>Error getting violation reports</value>
+  <data name="ViolationReport.ErrorOccurredWhileDeletingViolationReport" xml:space="preserve">
+    <value>An error occurred while deleting violation report {0}.</value>
+  </data>
+  <data name="ViolationReport.ErrorOccurredWhileUpdatingViolationReport" xml:space="preserve">
+    <value>An error occurred while updating the report. Please try again.</value>
+  </data>
+  <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
+    <value>An error occurred while retrieving violation report details.</value>
   </data>
 </root>

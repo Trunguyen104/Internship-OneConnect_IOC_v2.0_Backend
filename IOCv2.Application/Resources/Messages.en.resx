@@ -249,4 +249,79 @@
   <data name="ViolationReport.NotFound" xml:space="preserve">
     <value>No violation reports available</value>
   </data>
+  <data name="Student.NotFound" xml:space="preserve">
+    <value>Student not found.</value>
+  </data>
+  <data name="ViolationReport.NotAllowedToReport" xml:space="preserve">
+    <value>You are not allowed to report for this student.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateCannotBeBeforeInternshipStart" xml:space="preserve">
+    <value>Occurred date cannot be before internship start.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateCannotBeAfterInternshipEnd" xml:space="preserve">
+    <value>Internship has ended.</value>
+  </data>
+  <data name="ViolationReport.CreateViolationReportSuccess" xml:space="preserve">
+    <value>Violation report successfully created.</value>
+  </data>
+  <data name="ViolationReport.LogNotFound" xml:space="preserve">
+    <value>Violation report not found: {ViolationReportId}</value>
+  </data>
+  <data name="Student.StudentIdRequired" xml:space="preserve">
+    <value>Student ID is required.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateIsRequired" xml:space="preserve">
+    <value>Occurred date is required.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateInFuture" xml:space="preserve">
+    <value>The occurred date must not be later than the current date and time.</value>
+  </data>
+  <data name="ViolationReport.DescriptionIsRequired" xml:space="preserve">
+    <value>Description is required and cannot be empty.</value>
+  </data>
+  <data name="ViolationReport.DescriptionMinLength" xml:space="preserve">
+    <value>Description must be at least {0} characters long.</value>
+  </data>
+  <data name="ViolationReport.DescriptionMaxLength" xml:space="preserve">
+    <value>Description must not exceed {0} characters.</value>
+  </data>
+  <data name="ViolationReport.LogDeleteNotOwner" xml:space="preserve">
+    <value>Mentor {UserId} attempted to delete a report they don't own: {ViolationReportId}</value>
+  </data>
+  <data name="ViolationReport.DeleteNotOwner" xml:space="preserve">
+    <value>You can only delete violation reports that you created yourself.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportDeletedSuccessfully" xml:space="preserve">
+    <value>Violation report {0} deleted successfully</value>
+  </data>
+  <data name="ViolationReport.UpdatingViolationReportByUser" xml:space="preserve">
+    <value>Updating violation report {0} by user {1}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportNotFound" xml:space="preserve">
+    <value>Violation report {0} was not found.</value>
+  </data>
+  <data name="ViolationReport.UserNotAllowedToUpdateViolationReport" xml:space="preserve">
+    <value>User {0} is not allowed to update violation report {1}.</value>
+  </data>
+  <data name="ViolationReport.NotAllowedToUpdateThisReport" xml:space="preserve">
+    <value>You are not allowed to update this report.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateBeforeInternshipStart" xml:space="preserve">
+    <value>Occurred date cannot be before internship start.</value>
+  </data>
+  <data name="ViolationReport.InternshipHasEnded" xml:space="preserve">
+    <value>Internship has ended.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportUpdatedByAnotherUser" xml:space="preserve">
+    <value>Violation report has been updated by another user at {0}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportUpdatedSuccessfully" xml:space="preserve">
+    <value>Violation report has been updated successfully.</value>
+  </data>
+  <data name="ViolationReport.FailedToUpdateViolationReport" xml:space="preserve">
+    <value>Failed to update violation report {0}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportIdIsRequired" xml:space="preserve">
+    <value>ViolationReportId is required.</value>
+  </data>
 </root>

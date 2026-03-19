@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Application.Features.ViolationReports.Commands.UpdateViolationReport;
 using IOCv2.Domain.Entities;
-using IOCv2.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReportDetail
+namespace IOCv2.Application.Features.ViolationReports.Commands.DeleteViolationReport
 {
-    public class GetViolationReportDetailResponse : IMapFrom<ViolationReport>
+    public class DeleteViolationReportResponse : IMapFrom<ViolationReport>
     {
         public string StudentName { get; set; } = string.Empty!;
         public string StudentCode { get; set; } = string.Empty!;
@@ -18,11 +18,9 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         public string MentorName { get; set; } = string.Empty!;
         public string Description { get; set; } = string.Empty!;
         public DateOnly OccurredDate { get; set; }
-        public DateOnly CreatedAt { get; set; }
-        public Guid CreatedBy { get; set; }
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<ViolationReport, GetViolationReportDetailResponse>()
+            profile.CreateMap<ViolationReport, DeleteViolationReportResponse>()
                 .ForMember(d => d.StudentName,
                     opt => opt.MapFrom(s => s.Student.User.FullName))
                 .ForMember(d => d.StudentCode,

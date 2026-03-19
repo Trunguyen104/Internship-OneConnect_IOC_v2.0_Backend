@@ -702,4 +702,16 @@
   <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi lấy danh sách báo cáo vi phạm.</value>
   </data>
+  <data name="ViolationReport.CreateViolationReportError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi tạo báo cáo vi phạm.</value>
+  </data>
+  <data name="ViolationReport.ErrorOccurredWhileDeletingViolationReport" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi xóa báo cáo vi phạm {0}.</value>
+  </data>
+  <data name="ViolationReport.ErrorOccurredWhileUpdatingViolationReport" xml:space="preserve">
+    <value>Đã có lỗi xảy ra khi cập nhật báo cáo. Vui lòng thử lại.</value>
+  </data>
+  <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi lấy chi tiết báo cáo vi phạm.</value>
+  </data>
 </root>
