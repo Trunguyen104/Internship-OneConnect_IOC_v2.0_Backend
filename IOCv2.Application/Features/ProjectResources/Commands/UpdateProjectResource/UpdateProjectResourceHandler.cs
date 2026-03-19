@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.ProjectResources.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Enums;
 using MediatR;
@@ -21,14 +22,16 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
-        public UpdateProjectResourceHandler(ILogger<UpdateProjectResourceHandler> logger, IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ICurrentUserService currentUserService)
+        public UpdateProjectResourceHandler(ILogger<UpdateProjectResourceHandler> logger, IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ICurrentUserService currentUserService, ICacheService cacheService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
         public async Task<Result<UpdateProjectResourceResponse>> Handle(UpdateProjectResourceCommand request, CancellationToken cancellationToken)
         {
@@ -66,6 +69,10 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveAsync(ProjectResourceCacheKeys.Read(projectResource.ProjectResourceId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(projectResource.ProjectId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync("project-resource:list", cancellationToken);
 
                 var response = _mapper.Map<UpdateProjectResourceResponse>(projectResource);
                 return Result<UpdateProjectResourceResponse>.Success(response);

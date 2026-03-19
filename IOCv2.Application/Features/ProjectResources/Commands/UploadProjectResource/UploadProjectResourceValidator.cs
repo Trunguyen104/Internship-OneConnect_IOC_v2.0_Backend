@@ -21,16 +21,36 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             RuleFor(x => x.ProjectId)
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectIdRequired));
 
-            RuleFor(x => x.File)
-                .NotNull().WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileRequired));
+            RuleFor(x => x)
+                .Must(x => x.File != null || !string.IsNullOrWhiteSpace(x.ExternalUrl))
+                .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileOrLinkRequired));
 
-            RuleFor(x => x.File.FileName)
-                .Must(fileName => FileValidationHelper.IsFileExtensionAllowed(fileName))
-                .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType, FileValidationHelper.GetAllowedExtensionsString()));
+            RuleFor(x => x)
+                .Must(x => !(x.File != null && !string.IsNullOrWhiteSpace(x.ExternalUrl)))
+                .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileAndLinkMutuallyExclusive));
 
-            RuleFor(x => x.File.Length)
-                .Must((command, fileSize) => FileValidationHelper.IsFileSizeValid(command.File.FileName, fileSize))
-                .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileSizeExceeded));
+            When(x => x.File != null, () =>
+            {
+                RuleFor(x => x.File!.FileName)
+                    .Must(fileName => FileValidationHelper.IsFileExtensionAllowed(fileName))
+                    .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType, FileValidationHelper.GetAllowedExtensionsString()));
+
+                RuleFor(x => x.File!.Length)
+                    .Must((command, fileSize) => command.File != null && FileValidationHelper.IsFileSizeValid(command.File.FileName, fileSize))
+                    .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileSizeExceeded));
+            });
+
+            When(x => !string.IsNullOrWhiteSpace(x.ExternalUrl), () =>
+            {
+                RuleFor(x => x.ExternalUrl!)
+                    .Must(url => Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                                 && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+                    .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidExternalUrl));
+
+                RuleFor(x => x.ResourceType)
+                    .Must(type => type == FileType.LINK)
+                    .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LinkTypeRequired));
+            });
         }
     }
 

@@ -36,7 +36,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.ResourceUrl)
                 .HasColumnName("resource_url")
-                .HasMaxLength(512);
+                .HasMaxLength(2048);
 
             // Audit fields from BaseEntity
             builder.Property(x => x.CreatedAt)

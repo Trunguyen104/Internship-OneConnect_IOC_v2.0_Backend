@@ -14,6 +14,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
     {
         public Guid ProjectId { get; init; }
         public string ResourceName { get; init; } = string.Empty;
-        public IFormFile File { get; init; } = null!;
+        public FileType? ResourceType { get; init; }
+        public IFormFile? File { get; init; }
+        public string? ExternalUrl { get; init; }
     }
 }
