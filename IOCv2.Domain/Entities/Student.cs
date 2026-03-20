@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
@@ -21,5 +23,8 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
         public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
+
+        // Added: job applications by this student
+        public virtual ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
     }
 }

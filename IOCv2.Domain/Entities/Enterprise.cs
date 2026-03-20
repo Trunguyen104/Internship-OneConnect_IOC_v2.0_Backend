@@ -17,5 +17,6 @@ namespace IOCv2.Domain.Entities
         public short Status { get; set; } = (short)EnterpriseStatus.Active;
         public virtual ICollection<EnterpriseUser> EnterpriseUsers { get; set; } = new List<EnterpriseUser>();
         public virtual ICollection<InternshipGroup> InternshipGroups { get; set; } = new List<InternshipGroup>();
+        public virtual ICollection<Job> Job { get; set; } = new List<Job>();
     }
 }
