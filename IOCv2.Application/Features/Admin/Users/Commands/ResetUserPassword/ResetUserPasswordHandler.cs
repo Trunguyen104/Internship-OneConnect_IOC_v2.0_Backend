@@ -6,7 +6,6 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
@@ -82,14 +81,18 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
 
                 await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
 
-                // Revoke refresh tokens (Bulk update)
-                await _unitOfWork.Repository<RefreshToken>()
+                // Revoke refresh tokens
+                var activeTokens = await _unitOfWork.Repository<RefreshToken>()
                     .Query()
                     .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
-                    .ExecuteUpdateAsync(s => s
-                        .SetProperty(rt => rt.IsRevoked, true)
-                        .SetProperty(rt => rt.UpdatedAt, DateTime.UtcNow), 
-                        cancellationToken);
+                    .ToListAsync(cancellationToken);
+
+                foreach (var token in activeTokens)
+                {
+                    token.IsRevoked = true;
+                    token.UpdatedAt = DateTime.UtcNow;
+                    await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
+                }
 
                 var auditLog = new AuditLog
                 {
