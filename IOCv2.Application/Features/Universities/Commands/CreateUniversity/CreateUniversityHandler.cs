@@ -34,7 +34,7 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
                 request.Code,
                 request.Name,
                 request.Address,
-                request.LogoUrl);
+                null);
 
 
             await _unitOfWork.Repository<University>().AddAsync(university);

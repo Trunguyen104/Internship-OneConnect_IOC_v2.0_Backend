@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Admin.Users.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -79,8 +80,8 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
-                await _cacheService.RemoveAsync($"user:{user.UserId}", cancellationToken);
+                await _cacheService.RemoveByPatternAsync(AdminUserCacheKeys.UserListPattern(), cancellationToken);
+                await _cacheService.RemoveAsync(AdminUserCacheKeys.User(user.UserId), cancellationToken);
 
                 _logger.LogInformation("Successfully deleted Admin User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 
@@ -91,7 +92,9 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser
             {
                 _logger.LogError(ex, "Failed to delete Admin User {UserId}", request.UserId);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                throw;
+                return Result<DeleteAdminUserResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.InternalError),
+                    ResultErrorType.InternalServerError);
             }
         }
     }

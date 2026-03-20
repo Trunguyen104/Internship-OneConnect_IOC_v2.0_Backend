@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,9 +21,10 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMessageService _messageService;
+        private readonly ILogger<RequestPasswordResetHandler> _logger;
 
         public RequestPasswordResetHandler(IUnitOfWork unitOfWork, IBackgroundEmailSender emailSender,
-            IRateLimiter rateLimiter, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMessageService messageService)
+            IRateLimiter rateLimiter, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMessageService messageService, ILogger<RequestPasswordResetHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _emailSender = emailSender;
@@ -30,10 +32,13 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _messageService = messageService;
+            _logger = logger;
         }
 
         public async Task<Result<string>> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Requesting password reset for email {Email}", request.Email);
+
             // Get IP address for rate limiting
             var ipAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "unknown";
             var rateLimitKey = $"pr:{ipAddress}:{request.Email}";
@@ -41,6 +46,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
             // Check rate limiting (3 requests per 10 minutes)
             if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
             {
+                _logger.LogWarning("Password reset rate limited for email {Email} from IP {IpAddress}", request.Email, ipAddress);
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Auth.ResetRequestLimit));
             }
 
@@ -62,6 +68,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
 
             if (user == null || user.Status != Domain.Enums.UserStatus.Active)
             {
+                _logger.LogInformation("Password reset requested for non-existing or inactive account {Email}", request.Email);
                 return Result<string>.Success(genericMessage);
             }
 
@@ -102,6 +109,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.RequestPasswordRese
                 user.UserId,
                 null, // No PerformedBy info for seft-service
                 cancellationToken);
+
+            _logger.LogInformation("Password reset link generated and queued for email {Email}", user.Email);
 
             return Result<string>.Success(genericMessage);
 

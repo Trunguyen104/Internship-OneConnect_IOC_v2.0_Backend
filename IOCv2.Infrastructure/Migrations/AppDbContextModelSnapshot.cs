@@ -148,7 +148,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
+                        .HasDefaultValue((short)2)
                         .HasColumnName("status");
 
                     b.Property<string>("TaxCode")
@@ -924,8 +924,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<string>("ResourceUrl")
                         .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
                         .HasColumnName("resource_url");
 
                     b.Property<DateTime?>("UpdatedAt")

@@ -2,10 +2,12 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.ProjectResources.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
         private readonly IFileStorageService _fileStorageService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
+        private readonly ICacheService _cacheService;
 
         public UploadProjectResourceHandler(
             IUnitOfWork unitOfWork,
@@ -31,7 +34,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             ILogger<UploadProjectResourceHandler> logger,
             IFileStorageService fileStorageService,
             ICurrentUserService currentUserService,
-            IMessageService messageService)
+            IMessageService messageService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -39,6 +43,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             _fileStorageService = fileStorageService;
             _currentUserService = currentUserService;
             _messageService = messageService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<UploadProjectResourceResponse>> Handle(
@@ -47,17 +52,30 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
         {
             try
             {
-                // Validate file name and file size before processing upload
-                var fileValidation = FileValidationHelper.ValidateFile(
-                    request.File.FileName,
-                    request.File.Length);
+                var isLinkUpload = !string.IsNullOrWhiteSpace(request.ExternalUrl);
 
-                if (!fileValidation.IsValid)
+                // Validate file name and file size before processing upload
+                FileValidationResult? fileValidation = null;
+                if (!isLinkUpload)
                 {
-                    // Return BadRequest if file validation fails
-                    return Result<UploadProjectResourceResponse>.Failure(
-                        fileValidation.ErrorMessage!,
-                        ResultErrorType.BadRequest);
+                    if (request.File == null)
+                    {
+                        return Result<UploadProjectResourceResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileOrLinkRequired),
+                            ResultErrorType.BadRequest);
+                    }
+
+                    fileValidation = FileValidationHelper.ValidateFile(
+                        request.File.FileName,
+                        request.File.Length);
+
+                    if (!fileValidation.IsValid)
+                    {
+                        // Return BadRequest if file validation fails
+                        return Result<UploadProjectResourceResponse>.Failure(
+                            fileValidation.ErrorMessage!,
+                            ResultErrorType.BadRequest);
+                    }
                 }
 
                 // Check if the target project exists in the database
@@ -69,31 +87,53 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound),
                         ResultErrorType.NotFound);
                 }
+
+                var hasAccess = await HasProjectAccessAsync(request.ProjectId, cancellationToken);
+                if (!hasAccess)
+                {
+                    return Result<UploadProjectResourceResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
+
                 // Start database transaction
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
                 string? fileUrl = null;
                 try
                 {
-                    // Generate a unique file name to avoid collisions
-                    var fileName = FileParams.GetFileName(request.File.FileName);
-                    // Upload file to storage service (local, S3, etc.)
-                    fileUrl = await _fileStorageService.UploadFileAsync(
-                        request.File,
-                        FileParams.GetFolder(request.ProjectId),
-                        fileName,
-                        cancellationToken);
-                    // Automatically detect file type based on file extension
-                    var detectedType = FileValidationHelper.GetFileType(fileUrl);
-                    if (detectedType == null)
+                    FileType fileType;
+                    if (isLinkUpload)
                     {
-                        _logger.LogWarning("Unsupported file type for uploaded file: {FileUrl}", fileUrl);
-                        return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage("MessageKeys.ProjectResourcesKey.UnsupportedFileType"), ResultErrorType.BadRequest);
+                        fileUrl = request.ExternalUrl!.Trim();
+                        fileType = FileType.LINK;
                     }
-                    var fileType = detectedType.Value;
+                    else
+                    {
+                        // Generate a unique file name to avoid collisions
+                        var fileName = FileParams.GetFileName(request.File!.FileName);
+                        // Upload file to storage service (local, S3, etc.)
+                        fileUrl = await _fileStorageService.UploadFileAsync(
+                            request.File,
+                            FileParams.GetFolder(request.ProjectId),
+                            fileName,
+                            cancellationToken);
+                        // Automatically detect file type based on file extension
+                        var detectedType = FileValidationHelper.GetFileType(fileUrl);
+                        if (detectedType == null)
+                        {
+                            _logger.LogWarning("Unsupported file type for uploaded file: {FileUrl}", fileUrl);
+                            return Result<UploadProjectResourceResponse>.Failure(
+                                _messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType),
+                                ResultErrorType.BadRequest);
+                        }
+
+                        fileType = detectedType.Value;
+                    }
+
                     // Create ProjectResources entity
                     var resource = new Domain.Entities.ProjectResources(
                         request.ProjectId,
-                        request.ResourceName ?? request.File.FileName,
+                        request.ResourceName ?? request.File?.FileName ?? fileUrl,
                         fileType,
                         fileUrl);
 
@@ -106,7 +146,11 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     var response = _mapper.Map<UploadProjectResourceResponse>(resource);
                     // Log successful upload
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadSuccess),
-                        request.File.FileName, request.ProjectId);
+                        request.File?.FileName ?? request.ExternalUrl, request.ProjectId);
+
+                    await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(request.ProjectId), cancellationToken);
+                    await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(null), cancellationToken);
+
                     return Result<UploadProjectResourceResponse>.Success(response);
                 }
                 catch (Exception ex)
@@ -117,7 +161,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     // Compensating action:
                     // If the file was uploaded but database operation failed,
                     // delete the uploaded file to prevent orphaned files in storage
-                    if (!string.IsNullOrEmpty(fileUrl))
+                    if (!string.IsNullOrEmpty(fileUrl) && !isLinkUpload)
                     {
                         await _fileStorageService.DeleteFileAsync(fileUrl, cancellationToken);
                     }
@@ -132,6 +176,46 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadError), request.ProjectId);
                 return Result<UploadProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
+        }
+
+        private async Task<bool> HasProjectAccessAsync(Guid projectId, CancellationToken cancellationToken)
+        {
+            if (string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(_currentUserService.Role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+            {
+                return false;
+            }
+
+            var studentId = await _unitOfWork.Repository<Student>().Query()
+                .AsNoTracking()
+                .Where(s => s.UserId == currentUserId)
+                .Select(s => s.StudentId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (studentId == Guid.Empty)
+            {
+                return false;
+            }
+
+            var internshipId = await _unitOfWork.Repository<Project>().Query()
+                .AsNoTracking()
+                .Where(p => p.ProjectId == projectId)
+                .Select(p => p.InternshipId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (internshipId == Guid.Empty)
+            {
+                return false;
+            }
+
+            return await _unitOfWork.Repository<InternshipStudent>().Query()
+                .AsNoTracking()
+                .AnyAsync(m => m.InternshipId == internshipId && m.StudentId == studentId, cancellationToken);
         }
 
     }

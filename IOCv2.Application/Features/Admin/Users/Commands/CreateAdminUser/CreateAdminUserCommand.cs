@@ -37,11 +37,6 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
         public string? PhoneNumber { get; init; }
 
         /// <summary>
-        /// (Optional) Avatar URL.
-        /// </summary>
-        public string? AvatarUrl { get; init; }
-
-        /// <summary>
         /// (Optional) ID of the linked University or Enterprise.
         /// </summary>
         public Guid? UnitId { get; init; }

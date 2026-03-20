@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -15,17 +16,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
         private readonly ILogger<RemoveStudentsFromGroupHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public RemoveStudentsFromGroupHandler(
             IUnitOfWork unitOfWork,
             IMessageService messageService,
             IMapper mapper,
-            ILogger<RemoveStudentsFromGroupHandler> logger)
+            ILogger<RemoveStudentsFromGroupHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<RemoveStudentsFromGroupResponse>> Handle(RemoveStudentsFromGroupCommand request, CancellationToken cancellationToken)
@@ -58,6 +62,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                 if (saved >= 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(group.InternshipId), cancellationToken);
+                    await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemovedStudentsSuccess), request.InternshipId);
 
                     var response = _mapper.Map<RemoveStudentsFromGroupResponse>(group);
@@ -72,7 +78,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogRemoveStudentsError));
-                return Result<RemoveStudentsFromGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<RemoveStudentsFromGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

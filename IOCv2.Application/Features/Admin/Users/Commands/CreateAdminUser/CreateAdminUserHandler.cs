@@ -1,11 +1,13 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Admin.Users.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using IOCv2.Application.Common.Exceptions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
@@ -92,6 +94,17 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 throw new BusinessException(_messageService.GetMessage(MessageKeys.Users.EmailConflict));
             }
 
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                var phoneExists = await _unitOfWork.Repository<User>()
+                    .ExistsAsync(u => u.PhoneNumber == request.PhoneNumber, cancellationToken);
+                if (phoneExists)
+                {
+                    _logger.LogWarning("Phone Conflict: {PhoneNumber} already exists", request.PhoneNumber);
+                    throw new BusinessException(_messageService.GetMessage(MessageKeys.Profile.PhoneExists));
+                }
+            }
+
             // Validate unit exists for role that requires it
             if ((parsedRole == UserRole.SchoolAdmin || parsedRole == UserRole.Student) && request.UnitId.HasValue)
             {
@@ -136,7 +149,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 user.UpdateProfile(
                     request.FullName,
                     request.PhoneNumber,
-                    request.AvatarUrl,
+                    null,
                     null,
                     null
                 );
@@ -202,16 +215,33 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
                 
-                await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
+                await _cacheService.RemoveByPatternAsync(AdminUserCacheKeys.UserListPattern(), cancellationToken);
+                await _cacheService.RemoveAsync(AdminUserCacheKeys.User(user.UserId), cancellationToken);
 
                 _logger.LogInformation("Successfully created Admin User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 
                 var response = _mapper.Map<CreateAdminUserResponse>(user);
                 return Result<CreateAdminUserResponse>.Success(response);
             }
-            catch (Exception)
+            catch (DbUpdateException dbEx)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+
+                var dbMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                _logger.LogError(dbEx, "Database error while creating admin user {Email}. Detail: {Detail}", request.Email, dbMessage);
+
+                if (dbMessage.Contains("ix_users_phone_number", StringComparison.OrdinalIgnoreCase))
+                    throw new BusinessException(_messageService.GetMessage(MessageKeys.Profile.PhoneExists));
+
+                if (dbMessage.Contains("ix_users_email", StringComparison.OrdinalIgnoreCase))
+                    throw new BusinessException(_messageService.GetMessage(MessageKeys.Users.EmailConflict));
+
+                throw new BusinessException(_messageService.GetMessage(MessageKeys.Common.DatabaseConflict));
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Unexpected error while creating admin user {Email}", request.Email);
                 throw; // Rethrow to let global handler deal with it
             }
         }

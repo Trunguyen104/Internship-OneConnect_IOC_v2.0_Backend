@@ -1,4 +1,4 @@
-﻿﻿﻿namespace IOCv2.Application.Constants
+﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
