@@ -829,7 +829,13 @@
     <value>Không tìm thấy thông tin nhân viên doanh nghiệp của người dùng hiện tại.</value>
   </data>
   <data name="InternshipGroup.StudentNotApproved" xml:space="preserve">
-    <value>Sinh viên {0} chưa được phê duyệt vào doanh nghiệp này hoặc không có đơn ứng tuyển hợp lệ.</value>
+    <value>Sinh viên {0} chưa được duyệt vào doanh nghiệp này.</value>
+  </data>
+  <data name="InternshipGroup.AtLeastOneStudentRequired" xml:space="preserve">
+    <value>Nhóm thực tập phải có ít nhất 1 sinh viên.</value>
+  </data>
+  <data name="InternshipGroup.StudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Sinh viên đã tham gia một nhóm khác trong kỳ này.</value>
   </data>
   <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
     <value>Student {0} does not have an approved application for enterprise {1}</value>

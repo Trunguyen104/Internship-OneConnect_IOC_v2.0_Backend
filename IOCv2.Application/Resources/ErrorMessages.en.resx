@@ -697,6 +697,12 @@
   <data name="InternshipGroup.StudentNotApproved" xml:space="preserve">
     <value>Student {0} does not have an approved application for this enterprise.</value>
   </data>
+  <data name="InternshipGroup.AtLeastOneStudentRequired" xml:space="preserve">
+    <value>The internship group must have at least 1 student.</value>
+  </data>
+  <data name="InternshipGroup.StudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Student is already in another active group in this term.</value>
+  </data>
   <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
     <value>Student {0} does not have an approved application for enterprise {1}</value>
   </data>

@@ -118,13 +118,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 // ── 6. Bắt buộc ít nhất 1 sinh viên ───────────────────────────────
                 if (request.Students == null || !request.Students.Any())
                 {
-                    _logger.LogWarning("Create group {GroupName} failed: No students provided.", request.GroupName);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNoStudentsProvided), request.GroupName);
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                     return Result<CreateInternshipGroupResponse>.Failure(
-                        "Nhóm thực tập phải có ít nhất 1 sinh viên.",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.AtLeastOneStudentRequired),
                         ResultErrorType.BadRequest);
                 }
 
+                // ── 7. Xử lý thêm sinh viên ───────────────────────────────
                 var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
 
                     // 6a. Kiểm tra sinh viên tồn tại trong hệ thống
@@ -178,10 +179,10 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     if (alreadyInGroup.Any())
                     {
                         var firstInGroup = alreadyInGroup.First();
-                        _logger.LogWarning("Student {StudentId} is already in an active group in term {TermId}", firstInGroup, request.TermId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentAlreadyInActiveGroup), firstInGroup, request.TermId);
                         await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                         return Result<CreateInternshipGroupResponse>.Failure(
-                            "Sinh viên đã tham gia một nhóm khác trong kỳ này.",
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.StudentAlreadyInActiveGroup),
                             ResultErrorType.BadRequest);
                     }
 

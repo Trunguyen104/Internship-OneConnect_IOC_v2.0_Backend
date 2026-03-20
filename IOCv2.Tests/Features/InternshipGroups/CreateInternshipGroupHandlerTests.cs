@@ -72,7 +72,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
         }
 
         [Fact]
-        public async Task Handle_ValidRequest_NoStudents_ShouldReturnSuccess()
+        public async Task Handle_Request_NoStudents_ShouldReturnBadRequest()
         {
             // Arrange
             var termId = Guid.NewGuid();
@@ -80,7 +80,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
             {
                 TermId = termId,
                 GroupName = "Test Group",
-                EnterpriseId = _enterpriseId
+                EnterpriseId = _enterpriseId,
+                Students = new List<CreateInternshipStudentDto>() // Rỗng
             };
 
             _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
@@ -95,16 +96,13 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            _mockMapper.Setup(x => x.Map<CreateInternshipGroupResponse>(It.IsAny<InternshipGroup>()))
-                .Returns(new CreateInternshipGroupResponse { GroupName = "Test Group" });
-
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
-            _mockUnitOfWork.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
-            _mockUnitOfWork.Verify(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorType.Should().Be(ResultErrorType.BadRequest);
+            _mockUnitOfWork.Verify(x => x.RollbackTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -144,6 +142,9 @@ namespace IOCv2.Tests.Features.InternshipGroups
             };
             _mockUnitOfWork.Setup(x => x.Repository<IOCv2.Domain.Entities.InternshipApplication>().Query())
                 .Returns(approvedApps.AsQueryable().BuildMock());
+
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
+                .Returns(new List<InternshipGroup>().AsQueryable().BuildMock());
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().AddAsync(It.IsAny<InternshipGroup>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((InternshipGroup g, CancellationToken c) => g);
