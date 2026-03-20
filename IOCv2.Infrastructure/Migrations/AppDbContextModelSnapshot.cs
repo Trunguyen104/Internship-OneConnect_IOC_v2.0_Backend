@@ -1338,13 +1338,50 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.StudentTerm", b =>
                 {
-                    b.Property<Guid>("StudentId")
+                    b.Property<Guid>("StudentTermId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("student_id");
+                        .HasColumnName("student_term_id")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<Guid>("TermId")
                         .HasColumnType("uuid")
                         .HasColumnName("term_id");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("student_id");
+
+                    b.Property<Guid?>("EnterpriseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<short>("EnrollmentStatus")
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)IOCv2.Domain.Enums.EnrollmentStatus.Active)
+                        .HasColumnName("enrollment_status");
+
+                    b.Property<short>("PlacementStatus")
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)IOCv2.Domain.Enums.PlacementStatus.Unplaced)
+                        .HasColumnName("placement_status");
+
+                    b.Property<DateOnly>("EnrollmentDate")
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("CURRENT_DATE")
+                        .HasColumnName("enrollment_date");
+
+                    b.Property<string?>("EnrollmentNote")
+                        .HasColumnType("text")
+                        .HasColumnName("enrollment_note");
+
+                    b.Property<string?>("MidtermFeedback")
+                        .HasColumnType("text")
+                        .HasColumnName("midterm_feedback");
+
+                    b.Property<string?>("FinalFeedback")
+                        .HasColumnType("text")
+                        .HasColumnName("final_feedback");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -1356,14 +1393,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamptz")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<short?>("Status")
-                        .HasColumnType("smallint")
-                        .HasColumnName("status");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("updated_at");
@@ -1372,11 +1401,27 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
-                    b.HasKey("StudentId", "TermId")
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.HasKey("StudentTermId")
                         .HasName("pk_student_terms");
 
                     b.HasIndex("TermId")
-                        .HasDatabaseName("ix_student_terms_term_id");
+                        .HasDatabaseName("idx_student_terms_term_id");
+
+                    b.HasIndex("TermId", "PlacementStatus", "EnrollmentStatus")
+                        .HasDatabaseName("idx_student_terms_statuses");
+
+                    b.HasIndex("StudentId", "TermId")
+                        .IsUnique()
+                        .HasDatabaseName("uq_student_term")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("student_terms", (string)null);
                 });
@@ -2174,20 +2219,28 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasOne("IOCv2.Domain.Entities.Student", "Student")
                         .WithMany("StudentTerms")
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_student_terms_students_student_id");
 
                     b.HasOne("IOCv2.Domain.Entities.Term", "Term")
                         .WithMany("StudentTerms")
                         .HasForeignKey("TermId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_student_terms_terms_term_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
+                        .WithMany()
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_student_terms_enterprises_enterprise_id");
 
                     b.Navigation("Student");
 
                     b.Navigation("Term");
+
+                    b.Navigation("Enterprise");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Term", b =>

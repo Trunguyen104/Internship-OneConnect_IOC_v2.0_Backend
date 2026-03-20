@@ -17,6 +17,8 @@ public class StudentTerm : BaseEntity
     public string? MidtermFeedback { get; set; }
     public string? FinalFeedback { get; set; }
 
+    public Guid? DeletedBy { get; set; }
+
     public virtual Term Term { get; set; } = null!;
     public virtual Student Student { get; set; } = null!;
     public virtual Enterprise? Enterprise { get; set; }
