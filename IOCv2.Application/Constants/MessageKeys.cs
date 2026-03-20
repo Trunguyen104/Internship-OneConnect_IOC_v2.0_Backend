@@ -1,4 +1,4 @@
-﻿﻿namespace IOCv2.Application.Constants
+﻿﻿﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -93,7 +93,7 @@
             public const string Inactive = "University.Inactive";
         }
 
-              public static class Enterprise
+        public static class Enterprise
         {
             public const string NotFound = "Enterprise.NotFound";
             public const string LogNotFound = "Enterprise.LogNotFound";
@@ -131,7 +131,6 @@
             public const string GetByIDPermissionsNotAllowed = "Enterprise.GetByIDPermissionsNotAllowed";
 
         }
-
 
         public static class Profile
         {
@@ -297,6 +296,13 @@
             public const string GetAllError = "ProjectResources.GetAllError";
             public const string GetByIdSuccess = "ProjectResources.GetByIdSuccess";
             public const string GetByIdError = "ProjectResources.GetByIdError";
+
+            public const string LogUploadAutoSetFileTypeError = "ProjectResources.LogUploadAutoSetFileTypeError";
+            public const string FileOrLinkRequired = "ProjectResources.FileOrLinkRequired";
+            public const string FileAndLinkMutuallyExclusive = "ProjectResources.FileAndLinkMutuallyExclusive";
+            public const string InvalidExternalUrl = "ProjectResources.InvalidExternalUrl";
+            public const string LinkTypeRequired = "ProjectResources.LinkTypeRequired";
+            public const string LinkDownloadNotSupported = "ProjectResources.LinkDownloadNotSupported";
         }
 
         public static class Internships
@@ -482,7 +488,7 @@
             public const string CannotPublishInCompletedCycle = "Evaluation.CannotPublishInCompletedCycle";
         }
 
-        public static class StudentTerms
+	 public static class StudentTerms
         {
             // Common
             public const string NotFound = "StudentTerms.NotFound";
@@ -560,6 +566,12 @@
             public const string NotifyWithdrawBody = "StudentTerms.NotifyWithdraw.Body";
             public const string NotifyRestoreSubject = "StudentTerms.NotifyRestore.Subject";
             public const string NotifyRestoreBody = "StudentTerms.NotifyRestore.Body";
+        }	
+
+
+        public static class File
+        {
+            
         }
     }
 }
