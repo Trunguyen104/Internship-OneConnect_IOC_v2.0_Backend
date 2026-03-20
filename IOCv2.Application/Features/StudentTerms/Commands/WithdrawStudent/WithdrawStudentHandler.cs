@@ -1,3 +1,4 @@
+using IOCv2.Application.Common.Exceptions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -62,7 +63,7 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
                 _messageService.GetMessage(MessageKeys.StudentTerms.AlreadyWithdrawn));
 
         if (studentTerm.PlacementStatus == PlacementStatus.Placed)
-            return Result<WithdrawStudentResponse>.Failure(
+            throw new DomainViolationException(
                 _messageService.GetMessage(MessageKeys.StudentTerms.CannotWithdrawPlaced));
 
         // Withdraw
@@ -82,8 +83,8 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
         // Fire-and-forget email
         _ = _emailSender.EnqueueEmailAsync(
             studentTerm.Student.User.Email,
-            "Thông báo rút khỏi đợt thực tập",
-            $"Bạn đã bị rút khỏi đợt thực tập '{term.Name}'. Vui lòng liên hệ nhà trường nếu có thắc mắc.",
+            _messageService.GetMessage(MessageKeys.StudentTerms.EmailSubjectWithdraw),
+            _messageService.GetMessage(MessageKeys.StudentTerms.EmailBodyWithdraw, term.Name),
             studentTerm.StudentTermId,
             userId,
             CancellationToken.None);

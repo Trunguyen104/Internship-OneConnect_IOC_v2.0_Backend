@@ -20,7 +20,7 @@ namespace IOCv2.API.Controllers.Terms;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/terms/{termId:guid}/enrollments")]
-[Authorize(Roles = "SchoolAdmin,SuperAdmin")]
+[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor")]
 public class StudentEnrollmentsController : Controllers.ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -28,7 +28,7 @@ public class StudentEnrollmentsController : Controllers.ApiControllerBase
     public StudentEnrollmentsController(IMediator mediator) => _mediator = mediator;
 
     /// <summary>
-    /// Get paginated list of students enrolled in a term
+    /// Get a paginated list of students enrolled in a term
     /// </summary>
     [HttpGet]
     [RateLimit(maxRequests: 60, windowMinutes: 1)]
@@ -48,7 +48,7 @@ public class StudentEnrollmentsController : Controllers.ApiControllerBase
     /// Add a student manually to a term
     /// </summary>
     [HttpPost]
-    [RateLimit(maxRequests: 30, windowMinutes: 1)]
+    [RateLimit(maxRequests: 20, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<AddStudentManualResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
@@ -79,10 +79,10 @@ public class StudentEnrollmentsController : Controllers.ApiControllerBase
     }
 
     /// <summary>
-    /// Preview import from Excel file (validate only, no DB write)
+    /// Preview import from an Excel file (validate only, no DB write)
     /// </summary>
     [HttpPost("import-preview")]
-    [RateLimit(maxRequests: 20, windowMinutes: 1)]
+    [RateLimit(maxRequests: 5, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<ImportStudentsPreviewResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ImportPreview(

@@ -1,30 +1,32 @@
 using FluentValidation;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.StudentTerms.Commands.UpdateStudentTerm;
 
 public class UpdateStudentTermValidator : AbstractValidator<UpdateStudentTermCommand>
 {
-    public UpdateStudentTermValidator()
+    public UpdateStudentTermValidator(IMessageService messageService)
     {
         RuleFor(x => x.FullName)
-            .Matches(@"^[\p{L}\s]+$").WithMessage("Họ và tên chỉ chứa chữ cái và khoảng trắng")
+            .Matches(@"^[\p{L}\s]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.FullNameInvalid))
             .When(x => !string.IsNullOrWhiteSpace(x.FullName));
 
         RuleFor(x => x.Email)
-            .EmailAddress().WithMessage("Email không đúng định dạng")
+            .EmailAddress().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.EmailInvalid))
             .When(x => !string.IsNullOrWhiteSpace(x.Email));
 
         RuleFor(x => x.Phone)
-            .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage("Số điện thoại không hợp lệ")
+            .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.PhoneInvalid))
             .When(x => !string.IsNullOrWhiteSpace(x.Phone));
 
         RuleFor(x => x.DateOfBirth)
             .Must(dob => !dob.HasValue || IsAtLeast15(dob.Value))
-            .WithMessage("Sinh viên phải đủ 15 tuổi");
+            .WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.DateOfBirthMinAge));
 
         RuleFor(x => x.EnterpriseId)
-            .NotNull().WithMessage("Phải chọn doanh nghiệp khi xếp chỗ")
+            .NotNull().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.EnterpriseIdRequiredWhenPlaced))
             .When(x => x.PlacementStatus == PlacementStatus.Placed);
     }
 

@@ -86,8 +86,8 @@ public class RestoreStudentHandler : IRequestHandler<RestoreStudentCommand, Resu
         // Fire-and-forget email
         _ = _emailSender.EnqueueEmailAsync(
             studentTerm.Student.User.Email,
-            "Thông báo khôi phục ghi danh đợt thực tập",
-            $"Bạn đã được khôi phục vào đợt thực tập '{term.Name}'.",
+            _messageService.GetMessage(MessageKeys.StudentTerms.EmailSubjectRestore),
+            _messageService.GetMessage(MessageKeys.StudentTerms.EmailBodyRestore, term.Name),
             studentTerm.StudentTermId,
             userId,
             CancellationToken.None);

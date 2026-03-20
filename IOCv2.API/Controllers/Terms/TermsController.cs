@@ -16,7 +16,7 @@ namespace IOCv2.API.Controllers.Terms;
 /// Terms Management — Manage internship terms (create, view, update, close, delete)
 /// </summary>
 [Tags("Terms Management")]
-[Authorize(Roles = "SchoolAdmin,SuperAdmin,Student")]
+[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor")]
 public class TermsController : ApiControllerBase
 {
     private readonly IMediator _mediator;

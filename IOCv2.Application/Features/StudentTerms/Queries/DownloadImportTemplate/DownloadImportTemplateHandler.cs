@@ -49,10 +49,19 @@ public class DownloadImportTemplateHandler : IRequestHandler<DownloadImportTempl
         }
 
         using var workbook = new XLWorkbook();
-        var worksheet = workbook.Worksheets.Add("Danh sách sinh viên");
+        var worksheet = workbook.Worksheets.Add(
+            _messageService.GetMessage(MessageKeys.StudentTerms.ExcelWorksheetStudentList));
 
         // Headers
-        var headers = new[] { "Mã sinh viên", "Họ và tên", "Email", "Số điện thoại", "Ngày sinh", "Chuyên ngành" };
+        var headers = new[]
+        {
+            _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderStudentCode),
+            _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderFullName),
+            _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderEmail),
+            _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderPhone),
+            _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderDateOfBirth),
+            _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderMajor),
+        };
         for (int i = 0; i < headers.Length; i++)
         {
             var cell = worksheet.Cell(1, i + 1);

@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.Terms;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/student-terms")]
-[Authorize(Roles = "SchoolAdmin,SuperAdmin")]
+[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor")]
 public class StudentTermsController : Controllers.ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -58,7 +58,7 @@ public class StudentTermsController : Controllers.ApiControllerBase
     }
 
     /// <summary>
-    /// Withdraw a student from their term enrollment (must be Active + Unplaced)
+    /// Withdraw a student from their term enrollment (must be Active and Unplaced)
     /// </summary>
     [HttpPatch("{id:guid}/withdraw")]
     [RateLimit(maxRequests: 30, windowMinutes: 1)]

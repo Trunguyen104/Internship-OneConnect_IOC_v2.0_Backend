@@ -495,6 +495,7 @@
 
         public static class StudentTerms
         {
+            // Domain errors
             public const string NotFound = "StudentTerms.NotFound";
             public const string TermNotOpen = "StudentTerms.TermNotOpen";
             public const string EmailConflict = "StudentTerms.EmailConflict";
@@ -510,6 +511,51 @@
             public const string FileTooLarge = "StudentTerms.FileTooLarge";
             public const string InvalidExcelHeaders = "StudentTerms.InvalidExcelHeaders";
             public const string TooManyRows = "StudentTerms.TooManyRows";
+
+            // Validation — TermId / StudentTermId
+            public const string TermIdRequired = "StudentTerms.TermIdRequired";
+            public const string StudentTermIdRequired = "StudentTerms.StudentTermIdRequired";
+            public const string StudentTermIdListRequired = "StudentTerms.StudentTermIdListRequired";
+            public const string StudentTermIdListMinCount = "StudentTerms.StudentTermIdListMinCount";
+            public const string ValidRecordsRequired = "StudentTerms.ValidRecordsRequired";
+            public const string ValidRecordsMinCount = "StudentTerms.ValidRecordsMinCount";
+
+            // Validation — File
+            public const string FileRequired = "StudentTerms.FileRequired";
+            public const string FileEmpty = "StudentTerms.FileEmpty";
+
+            // Validation — FullName
+            public const string FullNameRequired = "StudentTerms.FullNameRequired";
+            public const string FullNameInvalid = "StudentTerms.FullNameInvalid";
+
+            // Validation — StudentCode
+            public const string StudentCodeRequired = "StudentTerms.StudentCodeRequired";
+            public const string StudentCodeInvalid = "StudentTerms.StudentCodeInvalid";
+            public const string StudentCodeInvalidDetail = "StudentTerms.StudentCodeInvalidDetail";
+            public const string StudentCodeDuplicateInFile = "StudentTerms.StudentCodeDuplicateInFile";
+            public const string StudentCodeAlreadyInTerm = "StudentTerms.StudentCodeAlreadyInTerm";
+            public const string StudentCodeInOtherTerm = "StudentTerms.StudentCodeInOtherTerm";
+
+            // Validation — Email
+            public const string EmailRequired = "StudentTerms.EmailRequired";
+            public const string EmailInvalid = "StudentTerms.EmailInvalid";
+            public const string EmailDuplicateInFile = "StudentTerms.EmailDuplicateInFile";
+            public const string EmailAlreadyInTerm = "StudentTerms.EmailAlreadyInTerm";
+            public const string EmailInOtherTerm = "StudentTerms.EmailInOtherTerm";
+
+            // Validation — Phone
+            public const string PhoneInvalid = "StudentTerms.PhoneInvalid";
+
+            // Validation — DateOfBirth
+            public const string DateOfBirthInvalidFormat = "StudentTerms.DateOfBirthInvalidFormat";
+            public const string DateOfBirthMinAge = "StudentTerms.DateOfBirthMinAge";
+
+            // Validation — List query
+            public const string SearchTermMaxLength = "StudentTerms.SearchTermMaxLength";
+            public const string SortByAllowedValues = "StudentTerms.SortByAllowedValues";
+            public const string SortOrderAllowedValues = "StudentTerms.SortOrderAllowedValues";
+
+            // Success messages
             public const string AddSuccess = "StudentTerms.AddSuccess";
             public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
             public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
@@ -517,6 +563,23 @@
             public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
             public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
             public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
+
+            // Email notifications
+            public const string EmailSubjectWithdraw = "StudentTerms.Email.SubjectWithdraw";
+            public const string EmailBodyWithdraw = "StudentTerms.Email.BodyWithdraw";
+            public const string EmailSubjectRestore = "StudentTerms.Email.SubjectRestore";
+            public const string EmailBodyRestore = "StudentTerms.Email.BodyRestore";
+
+            // Excel headers
+            public const string ExcelHeaderStudentCode = "StudentTerms.Excel.HeaderStudentCode";
+            public const string ExcelHeaderFullName = "StudentTerms.Excel.HeaderFullName";
+            public const string ExcelHeaderEmail = "StudentTerms.Excel.HeaderEmail";
+            public const string ExcelHeaderPhone = "StudentTerms.Excel.HeaderPhone";
+            public const string ExcelHeaderDateOfBirth = "StudentTerms.Excel.HeaderDateOfBirth";
+            public const string ExcelHeaderMajor = "StudentTerms.Excel.HeaderMajor";
+            public const string ExcelHeaderTempPassword = "StudentTerms.Excel.HeaderTempPassword";
+            public const string ExcelWorksheetStudentList = "StudentTerms.Excel.WorksheetStudentList";
+            public const string ExcelWorksheetTempPassword = "StudentTerms.Excel.WorksheetTempPassword";
 
             // Logging
             public const string LogAdded = "StudentTerms.Log.Added";

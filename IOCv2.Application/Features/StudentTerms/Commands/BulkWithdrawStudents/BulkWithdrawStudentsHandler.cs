@@ -99,12 +99,14 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
         await _unitOfWork.SaveChangeAsync(cancellationToken);
 
         // Fire-and-forget emails
+        var emailSubject = _messageService.GetMessage(MessageKeys.StudentTerms.EmailSubjectWithdraw);
+        var emailBody = _messageService.GetMessage(MessageKeys.StudentTerms.EmailBodyWithdraw, term.Name);
         foreach (var st in withdrawable)
         {
             _ = _emailSender.EnqueueEmailAsync(
                 st.Student.User.Email,
-                "Thông báo rút khỏi đợt thực tập",
-                $"Bạn đã bị rút khỏi đợt thực tập '{term.Name}'. Vui lòng liên hệ nhà trường nếu có thắc mắc.",
+                emailSubject,
+                emailBody,
                 st.StudentTermId,
                 userId,
                 CancellationToken.None);

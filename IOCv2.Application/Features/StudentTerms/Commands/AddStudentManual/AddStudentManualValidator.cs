@@ -9,24 +9,24 @@ public class AddStudentManualValidator : AbstractValidator<AddStudentManualComma
     public AddStudentManualValidator(IMessageService messageService)
     {
         RuleFor(x => x.FullName)
-            .NotEmpty().WithMessage("Họ và tên không được để trống")
-            .Matches(@"^[\p{L}\s]+$").WithMessage("Họ và tên chỉ chứa chữ cái và khoảng trắng");
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.FullNameRequired))
+            .Matches(@"^[\p{L}\s]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.FullNameInvalid));
 
         RuleFor(x => x.StudentCode)
-            .NotEmpty().WithMessage("Mã sinh viên không được để trống")
-            .Matches(@"^[a-zA-Z0-9\-_\.]+$").WithMessage("Mã sinh viên không hợp lệ");
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeRequired))
+            .Matches(@"^[a-zA-Z0-9\-_\.]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInvalid));
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email không được để trống")
-            .EmailAddress().WithMessage("Email không đúng định dạng");
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.EmailRequired))
+            .EmailAddress().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.EmailInvalid));
 
         RuleFor(x => x.Phone)
-            .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage("Số điện thoại không hợp lệ")
+            .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.PhoneInvalid))
             .When(x => !string.IsNullOrWhiteSpace(x.Phone));
 
         RuleFor(x => x.DateOfBirth)
             .Must(dob => !dob.HasValue || IsAtLeast15(dob.Value))
-            .WithMessage("Sinh viên phải đủ 15 tuổi");
+            .WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.DateOfBirthMinAge));
     }
 
     private static bool IsAtLeast15(DateOnly dob)

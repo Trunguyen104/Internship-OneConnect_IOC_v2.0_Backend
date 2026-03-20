@@ -12,7 +12,6 @@ namespace IOCv2.Application.Features.StudentTerms.Commands.ImportStudentsPreview
 
 public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPreviewCommand, Result<ImportStudentsPreviewResponse>>
 {
-    private static readonly string[] RequiredHeaders = { "Mã sinh viên", "Họ và tên", "Email", "Số điện thoại", "Ngày sinh" };
     private static readonly Regex StudentCodeRegex = new(@"^[a-zA-Z0-9\-_\.]+$", RegexOptions.Compiled);
     private static readonly Regex FullNameRegex = new(@"^[\p{L}\s]+$", RegexOptions.Compiled);
     private static readonly Regex PhoneRegex = new(@"^(\+84|0)[0-9]{9,10}$", RegexOptions.Compiled);
@@ -22,6 +21,7 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
+    private readonly string[] _requiredHeaders;
 
     public ImportStudentsPreviewHandler(
         IUnitOfWork unitOfWork,
@@ -31,6 +31,15 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
+
+        _requiredHeaders = new[]
+        {
+            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderStudentCode),
+            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderFullName),
+            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderEmail),
+            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderPhone),
+            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderDateOfBirth),
+        };
     }
 
     public async Task<Result<ImportStudentsPreviewResponse>> Handle(ImportStudentsPreviewCommand request, CancellationToken cancellationToken)
@@ -65,7 +74,7 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
 
         // Validate file
         var ext = Path.GetExtension(request.File.FileName).ToLowerInvariant();
-        if (ext != ".xlsx" && ext != ".xls")
+        if (ext != ".xlsx")
             return Result<ImportStudentsPreviewResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.InvalidFileFormat));
 
@@ -79,13 +88,13 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
         var worksheet = workbook.Worksheets.First();
 
         // Validate headers
-        var headers = Enumerable.Range(1, RequiredHeaders.Length)
+        var headers = Enumerable.Range(1, _requiredHeaders.Length)
             .Select(col => worksheet.Cell(1, col).GetValue<string>().Trim())
             .ToArray();
 
-        for (int i = 0; i < RequiredHeaders.Length; i++)
+        for (int i = 0; i < _requiredHeaders.Length; i++)
         {
-            if (!string.Equals(headers[i], RequiredHeaders[i], StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(headers[i], _requiredHeaders[i], StringComparison.OrdinalIgnoreCase))
                 return Result<ImportStudentsPreviewResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.StudentTerms.InvalidExcelHeaders));
         }
@@ -137,45 +146,45 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
 
             // Validate StudentCode
             if (string.IsNullOrWhiteSpace(studentCode))
-                errors.Add("Mã sinh viên không được để trống");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeRequired));
             else if (!StudentCodeRegex.IsMatch(studentCode))
-                errors.Add("Mã sinh viên không hợp lệ (chỉ cho phép a-z, 0-9, -, _, .)");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInvalidDetail));
             else if (codesInFile.Contains(studentCode.ToLower()))
-                errors.Add("Mã sinh viên bị trùng trong file");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeDuplicateInFile));
             else if (existingCodesInTerm.Contains(studentCode.ToLower()))
-                errors.Add("Mã sinh viên đã được ghi danh vào đợt này");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeAlreadyInTerm));
             else if (crossTermCodes.Contains(studentCode.ToLower()))
-                errors.Add("Sinh viên đang ghi danh vào đợt khác");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInOtherTerm));
 
             // Validate FullName
             if (string.IsNullOrWhiteSpace(fullName))
-                errors.Add("Họ và tên không được để trống");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.FullNameRequired));
             else if (!FullNameRegex.IsMatch(fullName))
-                errors.Add("Họ và tên chỉ chứa chữ cái và khoảng trắng");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.FullNameInvalid));
 
             // Validate Email
             if (string.IsNullOrWhiteSpace(email))
-                errors.Add("Email không được để trống");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.EmailRequired));
             else if (!IsValidEmail(email))
-                errors.Add("Email không đúng định dạng");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.EmailInvalid));
             else if (emailsInFile.Contains(email.ToLower()))
-                errors.Add("Email bị trùng trong file");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.EmailDuplicateInFile));
             else if (existingEmailsInTerm.Contains(email.ToLower()))
-                errors.Add("Email đã được ghi danh vào đợt này");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.EmailAlreadyInTerm));
             else if (crossTermEmails.Contains(email.ToLower()))
-                errors.Add("Email đang ghi danh vào đợt khác");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.EmailInOtherTerm));
 
             // Validate Phone (optional)
             if (!string.IsNullOrWhiteSpace(phone) && !PhoneRegex.IsMatch(phone))
-                errors.Add("Số điện thoại không hợp lệ");
+                errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.PhoneInvalid));
 
             // Validate DOB (optional)
             if (!string.IsNullOrWhiteSpace(dob))
             {
                 if (!TryParseDob(dob, out var dobDate))
-                    errors.Add("Ngày sinh không đúng định dạng (dd/MM/yyyy)");
+                    errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.DateOfBirthInvalidFormat));
                 else if (!IsAtLeast15(dobDate))
-                    errors.Add("Sinh viên phải đủ 15 tuổi");
+                    errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.DateOfBirthMinAge));
             }
 
             if (!string.IsNullOrWhiteSpace(studentCode))

@@ -14,7 +14,7 @@ public class GetStudentsValidator : AbstractValidator<GetStudentsQuery>
     public GetStudentsValidator(IMessageService messageService)
     {
         RuleFor(x => x.TermId)
-            .NotEmpty().WithMessage("TermId không được để trống");
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.TermIdRequired));
 
         RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)
@@ -25,17 +25,19 @@ public class GetStudentsValidator : AbstractValidator<GetStudentsQuery>
             .WithMessage(messageService.GetMessage(MessageKeys.Common.PageSizeInvalid));
 
         RuleFor(x => x.SearchTerm)
-            .MaximumLength(100).WithMessage("Từ khóa tìm kiếm không vượt quá 100 ký tự")
+            .MaximumLength(100)
+            .WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.SearchTermMaxLength))
             .When(x => !string.IsNullOrWhiteSpace(x.SearchTerm));
 
         RuleFor(x => x.SortBy)
             .Must(s => AllowedSortBy.Contains(s.ToLower()))
-            .WithMessage($"SortBy phải là một trong: {string.Join(", ", AllowedSortBy)}")
+            .WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.SortByAllowedValues,
+                string.Join(", ", AllowedSortBy)))
             .When(x => !string.IsNullOrWhiteSpace(x.SortBy));
 
         RuleFor(x => x.SortOrder)
             .Must(s => AllowedSortOrder.Contains(s.ToLower()))
-            .WithMessage("SortOrder phải là 'asc' hoặc 'desc'")
+            .WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.SortOrderAllowedValues))
             .When(x => !string.IsNullOrWhiteSpace(x.SortOrder));
     }
 }

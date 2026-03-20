@@ -309,6 +309,49 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Đã xóa thành công sinh viên khỏi nhóm: {InternshipId}</value>
   </data>
+  <!-- StudentTerms — Email notifications -->
+  <data name="StudentTerms.Email.SubjectWithdraw" xml:space="preserve">
+    <value>Thông báo rút khỏi đợt thực tập</value>
+  </data>
+  <data name="StudentTerms.Email.BodyWithdraw" xml:space="preserve">
+    <value>Bạn đã bị rút khỏi đợt thực tập '{0}'. Vui lòng liên hệ nhà trường nếu có thắc mắc.</value>
+  </data>
+  <data name="StudentTerms.Email.SubjectRestore" xml:space="preserve">
+    <value>Thông báo khôi phục ghi danh đợt thực tập</value>
+  </data>
+  <data name="StudentTerms.Email.BodyRestore" xml:space="preserve">
+    <value>Bạn đã được khôi phục vào đợt thực tập '{0}'.</value>
+  </data>
+
+  <!-- StudentTerms — Excel headers -->
+  <data name="StudentTerms.Excel.HeaderStudentCode" xml:space="preserve">
+    <value>Mã sinh viên</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderFullName" xml:space="preserve">
+    <value>Họ và tên</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderPhone" xml:space="preserve">
+    <value>Số điện thoại</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderDateOfBirth" xml:space="preserve">
+    <value>Ngày sinh</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderMajor" xml:space="preserve">
+    <value>Chuyên ngành</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderTempPassword" xml:space="preserve">
+    <value>Mật khẩu tạm</value>
+  </data>
+  <data name="StudentTerms.Excel.WorksheetStudentList" xml:space="preserve">
+    <value>Danh sách sinh viên</value>
+  </data>
+  <data name="StudentTerms.Excel.WorksheetTempPassword" xml:space="preserve">
+    <value>Mật khẩu tạm</value>
+  </data>
+
   <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
     <value>Bạn không có quyền xóa doanh nghiệp này.</value>
   </data>

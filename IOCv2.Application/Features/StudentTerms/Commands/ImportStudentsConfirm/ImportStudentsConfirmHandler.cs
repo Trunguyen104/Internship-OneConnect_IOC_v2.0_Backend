@@ -221,11 +221,12 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
             if (newPasswordEntries.Count > 0)
             {
                 using var wb = new XLWorkbook();
-                var ws = wb.Worksheets.Add("Mật khẩu tạm");
-                ws.Cell(1, 1).Value = "Mã sinh viên";
-                ws.Cell(1, 2).Value = "Họ và tên";
-                ws.Cell(1, 3).Value = "Email";
-                ws.Cell(1, 4).Value = "Mật khẩu tạm";
+                var ws = wb.Worksheets.Add(
+                    _messageService.GetMessage(MessageKeys.StudentTerms.ExcelWorksheetTempPassword));
+                ws.Cell(1, 1).Value = _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderStudentCode);
+                ws.Cell(1, 2).Value = _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderFullName);
+                ws.Cell(1, 3).Value = _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderEmail);
+                ws.Cell(1, 4).Value = _messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderTempPassword);
                 ws.Row(1).Style.Font.Bold = true;
 
                 for (int i = 0; i < newPasswordEntries.Count; i++)

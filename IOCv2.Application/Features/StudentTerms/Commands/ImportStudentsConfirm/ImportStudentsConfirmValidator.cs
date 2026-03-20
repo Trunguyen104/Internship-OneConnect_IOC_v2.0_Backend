@@ -1,34 +1,36 @@
 using FluentValidation;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.StudentTerms.Commands.ImportStudentsConfirm;
 
 public class ImportStudentsConfirmValidator : AbstractValidator<ImportStudentsConfirmCommand>
 {
-    public ImportStudentsConfirmValidator()
+    public ImportStudentsConfirmValidator(IMessageService messageService)
     {
         RuleFor(x => x.TermId)
-            .NotEmpty().WithMessage("TermId không được để trống");
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.TermIdRequired));
 
         RuleFor(x => x.ValidRecords)
-            .NotNull().WithMessage("Danh sách bản ghi không được null")
-            .Must(r => r != null && r.Count > 0).WithMessage("Phải có ít nhất 1 bản ghi hợp lệ");
+            .NotNull().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.ValidRecordsRequired))
+            .Must(r => r != null && r.Count > 0).WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.ValidRecordsMinCount));
 
         RuleForEach(x => x.ValidRecords).ChildRules(record =>
         {
             record.RuleFor(r => r.StudentCode)
-                .NotEmpty().WithMessage("Mã sinh viên không được để trống")
-                .Matches(@"^[a-zA-Z0-9\-_\.]+$").WithMessage("Mã sinh viên không hợp lệ");
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeRequired))
+                .Matches(@"^[a-zA-Z0-9\-_\.]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInvalid));
 
             record.RuleFor(r => r.FullName)
-                .NotEmpty().WithMessage("Họ và tên không được để trống")
-                .Matches(@"^[\p{L}\s]+$").WithMessage("Họ và tên chỉ chứa chữ cái và khoảng trắng");
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.FullNameRequired))
+                .Matches(@"^[\p{L}\s]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.FullNameInvalid));
 
             record.RuleFor(r => r.Email)
-                .NotEmpty().WithMessage("Email không được để trống")
-                .EmailAddress().WithMessage("Email không đúng định dạng");
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.EmailRequired))
+                .EmailAddress().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.EmailInvalid));
 
             record.RuleFor(r => r.Phone)
-                .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage("Số điện thoại không hợp lệ")
+                .Matches(@"^(\+84|0)[0-9]{9,10}$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.PhoneInvalid))
                 .When(r => !string.IsNullOrWhiteSpace(r.Phone));
         });
     }

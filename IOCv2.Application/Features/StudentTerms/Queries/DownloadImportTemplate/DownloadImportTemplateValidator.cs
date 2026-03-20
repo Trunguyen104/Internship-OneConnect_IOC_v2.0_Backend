@@ -1,12 +1,14 @@
 using FluentValidation;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.StudentTerms.Queries.DownloadImportTemplate;
 
 public class DownloadImportTemplateValidator : AbstractValidator<DownloadImportTemplateQuery>
 {
-    public DownloadImportTemplateValidator()
+    public DownloadImportTemplateValidator(IMessageService messageService)
     {
         RuleFor(x => x.TermId)
-            .NotEmpty().WithMessage("TermId không được để trống");
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.TermIdRequired));
     }
 }
