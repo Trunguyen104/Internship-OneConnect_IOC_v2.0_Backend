@@ -10,5 +10,13 @@ namespace IOCv2.Domain.Entities
         public Guid UserId { get; set; }
         public virtual User User { get; set; } = null!;
         public string? Position { get; set; }
+        public string? Bio { get; private set; }
+        public string? Department { get; private set; }
+
+        public void UpdateMetadata(string? bio, string? department)
+        {
+            Bio = bio;
+            Department = department;
+        }
     }
 }
