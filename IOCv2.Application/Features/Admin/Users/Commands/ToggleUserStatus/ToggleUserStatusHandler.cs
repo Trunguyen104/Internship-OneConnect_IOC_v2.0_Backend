@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Admin.Users.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -85,8 +86,8 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
-            await _cacheService.RemoveAsync($"user:{user.UserId}", cancellationToken);
+            await _cacheService.RemoveByPatternAsync(AdminUserCacheKeys.UserListPattern(), cancellationToken);
+            await _cacheService.RemoveAsync(AdminUserCacheKeys.User(user.UserId), cancellationToken);
 
             _logger.LogInformation("Successfully toggled status for User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 
@@ -97,7 +98,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Failed to toggle status for User {UserId}", request.UserId);
-                return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

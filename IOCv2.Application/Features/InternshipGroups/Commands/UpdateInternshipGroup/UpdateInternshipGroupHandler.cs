@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,17 +17,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
         private readonly ILogger<UpdateInternshipGroupHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public UpdateInternshipGroupHandler(
             IUnitOfWork unitOfWork,
             IMessageService messageService,
             IMapper mapper,
-            ILogger<UpdateInternshipGroupHandler> logger)
+            ILogger<UpdateInternshipGroupHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<UpdateInternshipGroupResponse>> Handle(UpdateInternshipGroupCommand request, CancellationToken cancellationToken)
@@ -104,6 +108,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 if (saved > 0 || !_unitOfWork.Repository<InternshipGroup>().Query().Any(x => x.InternshipId == request.InternshipId))
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(entity.InternshipId), cancellationToken);
+                    await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdatedSuccess), entity.InternshipId);
 
                     var response = _mapper.Map<UpdateInternshipGroupResponse>(entity);
@@ -118,7 +124,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdateError));
-                return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

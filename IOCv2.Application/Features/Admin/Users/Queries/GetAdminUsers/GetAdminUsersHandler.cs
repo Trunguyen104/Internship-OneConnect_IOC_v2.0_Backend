@@ -1,6 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Admin.Users.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,18 +17,35 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<GetAdminUsersHandler> _logger;
+        private readonly ICacheService _cacheService;
 
-        public GetAdminUsersHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAdminUsersHandler> logger)
+        public GetAdminUsersHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetAdminUsersHandler> logger, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<PaginatedResult<GetAdminUsersResponse>>> Handle(GetAdminUsersQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Getting paginated Admin Users (Search: {SearchTerm}, Role: {Role}, Status: {Status})", 
                 request.SearchTerm, request.Role, request.Status);
+
+            var cacheKey = AdminUserCacheKeys.UserList(
+                request.SearchTerm,
+                request.Role.HasValue ? (int)request.Role.Value : null,
+                request.Status.HasValue ? (int)request.Status.Value : null,
+                request.PageNumber,
+                request.PageSize,
+                request.SortColumn,
+                request.SortOrder);
+
+            var cached = await _cacheService.GetAsync<PaginatedResult<GetAdminUsersResponse>>(cacheKey, cancellationToken);
+            if (cached != null)
+            {
+                return Result<PaginatedResult<GetAdminUsersResponse>>.Success(cached);
+            }
 
             var query = _unitOfWork.Repository<User>().Query()
                 .Include(u => u.UniversityUser).ThenInclude(uu => uu!.University)
@@ -79,6 +97,9 @@ namespace IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers
             _logger.LogInformation("Successfully retrieved {Count} Admin Users", users.Count);
 
             var result = PaginatedResult<GetAdminUsersResponse>.Create(users, totalCount, request.PageNumber, request.PageSize);
+
+            await _cacheService.SetAsync(cacheKey, result, AdminUserCacheKeys.Expiration.UserList, cancellationToken);
+
             return Result<PaginatedResult<GetAdminUsersResponse>>.Success(result);
         }
     }

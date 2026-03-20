@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -20,16 +21,22 @@ namespace IOCv2.Tests.Features.InternshipGroups
     {
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IMapper> _mockMapper;
+        private readonly Mock<ICacheService> _mockCacheService;
+        private readonly Mock<ILogger<GetInternshipGroupsHandler>> _mockLogger;
         private readonly GetInternshipGroupsHandler _handler;
 
         public GetInternshipGroupsHandlerTests()
         {
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
+            _mockCacheService = new Mock<ICacheService>();
+            _mockLogger = new Mock<ILogger<GetInternshipGroupsHandler>>();
 
             _handler = new GetInternshipGroupsHandler(
                 _mockUnitOfWork.Object,
-                _mockMapper.Object);
+                _mockMapper.Object,
+                _mockCacheService.Object,
+                _mockLogger.Object);
         }
 
         [Fact]

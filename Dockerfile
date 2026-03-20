@@ -22,7 +22,11 @@ RUN dotnet publish "IOCv2.API.csproj" -c Release -o /app/publish /p:UseAppHost=f
 # Stage 3: Final
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
+# Cài curl để Docker healthcheck dùng HTTP check (aspnet slim không có sẵn wget/curl)
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 COPY --from=publish /app/publish .
+# Copy production settings (nếu chưa được include bởi dotnet publish)
+COPY --from=build /src/IOCv2.API/appsettings.Production.json ./appsettings.Production.json
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "IOCv2.API.dll"]
+CMD ["dotnet", "IOCv2.API.dll"]

@@ -21,6 +21,12 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         public Guid? UniversityId { get; set; }
         public Guid? EnterpriseId { get; set; }
 
+        public string? PortfolioUrl { get; set; }
+        public string? Bio { get; set; }
+        public string? Expertise { get; set; }
+        public string? Department { get; set; }
+        public string? Position { get; set; }
+
         public void Mapping(Profile profile)
         {
             profile.CreateMap<User, GetMyProfileResponse>()
@@ -28,7 +34,16 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.Student != null ? src.Student.StudentId : (Guid?)null))
                 .ForMember(dest => dest.UniversityId, opt => opt.MapFrom(src => src.UniversityUser != null ? src.UniversityUser.UniversityId : (Guid?)null))
-                .ForMember(dest => dest.EnterpriseId, opt => opt.MapFrom(src => src.EnterpriseUser != null ? src.EnterpriseUser.EnterpriseId : (Guid?)null));
+                .ForMember(dest => dest.EnterpriseId, opt => opt.MapFrom(src => src.EnterpriseUser != null ? src.EnterpriseUser.EnterpriseId : (Guid?)null))
+                .ForMember(dest => dest.PortfolioUrl, opt => opt.MapFrom(src => src.Student != null ? src.Student.PortfolioUrl : null))
+                .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => 
+                    src.EnterpriseUser != null ? src.EnterpriseUser.Bio : 
+                    src.UniversityUser != null ? src.UniversityUser.Bio : null))
+                .ForMember(dest => dest.Expertise, opt => opt.MapFrom(src => src.EnterpriseUser != null ? src.EnterpriseUser.Expertise : null))
+                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.UniversityUser != null ? src.UniversityUser.Department : null))
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => 
+                    src.EnterpriseUser != null ? src.EnterpriseUser.Position : 
+                    src.UniversityUser != null ? src.UniversityUser.Position : null));
         }
     }
 }

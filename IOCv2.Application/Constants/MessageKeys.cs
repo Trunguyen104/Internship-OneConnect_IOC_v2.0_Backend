@@ -312,6 +312,11 @@
             public const string GetByIdError = "ProjectResources.GetByIdError";
 
             public const string LogUploadAutoSetFileTypeError = "ProjectResources.LogUploadAutoSetFileTypeError";
+            public const string FileOrLinkRequired = "ProjectResources.FileOrLinkRequired";
+            public const string FileAndLinkMutuallyExclusive = "ProjectResources.FileAndLinkMutuallyExclusive";
+            public const string InvalidExternalUrl = "ProjectResources.InvalidExternalUrl";
+            public const string LinkTypeRequired = "ProjectResources.LinkTypeRequired";
+            public const string LinkDownloadNotSupported = "ProjectResources.LinkDownloadNotSupported";
         }
 
         public static class Internships

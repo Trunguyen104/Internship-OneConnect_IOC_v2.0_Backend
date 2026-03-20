@@ -26,6 +26,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<ILogger<RemoveStudentsFromGroupHandler>> _mockLogger;
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockGroupRepository;
         private readonly Mock<IGenericRepository<InternshipStudent>> _mockInternshipStudentRepository;
+        private readonly Mock<ICacheService> _mockCacheService;
         private readonly RemoveStudentsFromGroupHandler _handler;
 
         public RemoveStudentsFromGroupHandlerTests()
@@ -36,15 +37,16 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockLogger = new Mock<ILogger<RemoveStudentsFromGroupHandler>>();
             _mockGroupRepository = new Mock<IGenericRepository<InternshipGroup>>();
             _mockInternshipStudentRepository = new Mock<IGenericRepository<InternshipStudent>>();
-
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>()).Returns(_mockGroupRepository.Object);
             _mockUnitOfWork.Setup(x => x.Repository<InternshipStudent>()).Returns(_mockInternshipStudentRepository.Object);
+            _mockCacheService = new Mock<ICacheService>();
 
             _handler = new RemoveStudentsFromGroupHandler(
                 _mockUnitOfWork.Object,
                 _mockMessageService.Object,
                 _mockMapper.Object,
-                _mockLogger.Object);
+                _mockLogger.Object,
+                _mockCacheService.Object);
         }
 
         [Fact]
@@ -72,6 +74,11 @@ namespace IOCv2.Tests.Features.InternshipGroups
             
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
+
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
             
             _mockMapper.Setup(x => x.Map<RemoveStudentsFromGroupResponse>(It.IsAny<InternshipGroup>()))
                 .Returns(new RemoveStudentsFromGroupResponse { InternshipId = internshipId });
