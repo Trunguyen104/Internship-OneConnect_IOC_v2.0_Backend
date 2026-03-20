@@ -1,4 +1,4 @@
-﻿using IOCv2.API.Attributes;
+using IOCv2.API.Attributes;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Authentication.Commands.ChangePassword;
 using IOCv2.Application.Features.Authentication.Commands.Login;
@@ -6,6 +6,7 @@ using IOCv2.Application.Features.Authentication.Commands.RefreshTokens;
 using IOCv2.Application.Features.Authentication.Commands.RequestPasswordReset;
 using IOCv2.Application.Features.Authentication.Commands.ResetPassword;
 using IOCv2.Application.Features.Authentication.Commands.RevokeToken;
+using IOCv2.Application.Features.Users.Commands.UpdateMyProfile;
 using IOCv2.Application.Features.Users.Queries.GetMyProfile;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -165,6 +166,23 @@ public class AuthController : ApiControllerBase
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
         _logger.LogInformation("Password reset execution.");
+        var result = await _mediator.Send(command);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Update the currently authenticated user's profile information.
+    /// </summary>
+    /// <param name="command">User profile update details</param>
+    /// <returns>Unit result</returns>
+    [HttpPut("me")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse<Unit>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateMyProfileCommand command)
+    {
+        _logger.LogInformation("Profile update requested for current user.");
         var result = await _mediator.Send(command);
         return HandleResult(result);
     }

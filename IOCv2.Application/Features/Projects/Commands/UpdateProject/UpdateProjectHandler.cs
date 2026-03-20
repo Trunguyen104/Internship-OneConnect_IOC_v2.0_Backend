@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Features.Projects.Commands.CreateProject;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -21,14 +22,16 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
         private readonly ILogger<UpdateProjectHandler> _logger;
         private readonly IMessageService _messageService;
         private readonly ICurrentUserService _currentUser;
+        private readonly ICacheService _cacheService;
 
-        public UpdateProjectHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateProjectHandler> logger, IMessageService messageService, ICurrentUserService currentUser)
+        public UpdateProjectHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateProjectHandler> logger, IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _messageService = messageService;
             _currentUser = currentUser;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<UpdateProjectResponse>> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
@@ -101,6 +104,9 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+                await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
+
                 _logger.LogInformation("Successfully updated project {ProjectId}", request.ProjectId);
 
                 // 4. Mapping & Response (outside transaction ideally, but fine here after commit)
@@ -111,7 +117,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Transaction failed while updating project {ProjectId}", request.ProjectId);
-                return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

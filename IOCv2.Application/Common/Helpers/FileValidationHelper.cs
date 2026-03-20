@@ -152,6 +152,7 @@ namespace IOCv2.Application.Common.Helpers
                 FileType.RAR => "application/x-rar-compressed",
                 FileType.JPG => "image/jpeg",
                 FileType.PNG => "image/png",
+                FileType.LINK => "text/html",
                 _ => "application/octet-stream"
             };
         }
@@ -167,6 +168,7 @@ namespace IOCv2.Application.Common.Helpers
                 FileType.RAR => ".rar",
                 FileType.JPG => ".jpg",
                 FileType.PNG => ".png",
+                FileType.LINK => string.Empty,
                 _ => string.Empty
             };
         }
@@ -182,6 +184,7 @@ namespace IOCv2.Application.Common.Helpers
                 FileType.RAR => "RAR Archive",
                 FileType.JPG => "JPEG Image",
                 FileType.PNG => "PNG Image",
+                FileType.LINK => "External Link",
                 _ => fileType.ToString()
             };
         }

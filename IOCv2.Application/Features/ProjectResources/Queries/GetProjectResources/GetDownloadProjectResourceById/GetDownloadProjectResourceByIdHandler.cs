@@ -5,6 +5,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Application.Services;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -53,6 +54,13 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                     return Result<GetDownloadProjectResourceByIdResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.Common.Forbidden),
                         ResultErrorType.Forbidden);
+                }
+
+                if (resource.ResourceType == FileType.LINK)
+                {
+                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LinkDownloadNotSupported),
+                        ResultErrorType.BadRequest);
                 }
 
                 // get stream from storage

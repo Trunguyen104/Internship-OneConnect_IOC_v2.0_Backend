@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.ProjectResources.Common;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,7 +23,8 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         private readonly IMessageService _messageService;
         private readonly IFileStorageService _fileStorageService;
         private readonly ICurrentUserService _currentUserService;
-        public GetReadProjectResourceByIdHandler(IMapper mapper, IUnitOfWork unitOfWork, ILogger<GetReadProjectResourceByIdHandler> logger, IMessageService messageService, IFileStorageService fileStorageService, ICurrentUserService currentUserService)
+        private readonly ICacheService _cacheService;
+        public GetReadProjectResourceByIdHandler(IMapper mapper, IUnitOfWork unitOfWork, ILogger<GetReadProjectResourceByIdHandler> logger, IMessageService messageService, IFileStorageService fileStorageService, ICurrentUserService currentUserService, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
@@ -29,11 +32,27 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             _messageService = messageService;
             _fileStorageService = fileStorageService;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
         public async Task<Result<GetReadProjectResourceByIdResponse>> Handle(GetReadProjectResourceByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
+                var cacheKey = ProjectResourceCacheKeys.Read(request.ResourceId);
+                var cached = await _cacheService.GetAsync<GetReadProjectResourceByIdResponse>(cacheKey, cancellationToken);
+                if (cached != null)
+                {
+                    var hasCachedAccess = await HasProjectAccessAsync(cached.ProjectId, cancellationToken);
+                    if (!hasCachedAccess)
+                    {
+                        return Result<GetReadProjectResourceByIdResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                            ResultErrorType.Forbidden);
+                    }
+
+                    return Result<GetReadProjectResourceByIdResponse>.Success(cached);
+                }
+
                 var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query()
                     .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.ProjectResourceId == request.ResourceId, cancellationToken);
@@ -53,8 +72,15 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                         ResultErrorType.Forbidden);
                 }
 
-                resource.ResourceUrl = _fileStorageService.GetDomainUrl() + resource.ResourceUrl;
+                if (resource.ResourceType != FileType.LINK && !Uri.IsWellFormedUriString(resource.ResourceUrl, UriKind.Absolute))
+                {
+                    resource.ResourceUrl = _fileStorageService.GetDomainUrl() + resource.ResourceUrl;
+                }
+
                 var response = _mapper.Map<GetReadProjectResourceByIdResponse>(resource);
+
+                await _cacheService.SetAsync(cacheKey, response, ProjectResourceCacheKeys.Expiration.Read, cancellationToken);
+
                 _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ResourceId);
                 return Result<GetReadProjectResourceByIdResponse>.Success(response);
             }

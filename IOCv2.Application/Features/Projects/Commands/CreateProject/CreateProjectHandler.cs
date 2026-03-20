@@ -1,6 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -19,12 +20,14 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         private readonly IMapper _mapper;
         private readonly ILogger<CreateProjectHandler> _logger;
         private readonly IMessageService _message;
-        public CreateProjectHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CreateProjectHandler> logger, ICurrentUserService currentUserService, IMessageService message)
+        private readonly ICacheService _cacheService;
+        public CreateProjectHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<CreateProjectHandler> logger, IMessageService message, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _message = message;
+            _cacheService = cacheService;
         }
         public async Task<Result<CreateProjectResponse>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
         {
@@ -69,6 +72,8 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+                await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
+
                 // 4. Mapping & Response (FFA-FLW)
                 _logger.LogInformation("Successfully created project {ProjectId} for Internship {InternshipId}", project.ProjectId, request.InternshipId);
                 
@@ -79,7 +84,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogCreateError));
-                return Result<CreateProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<CreateProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

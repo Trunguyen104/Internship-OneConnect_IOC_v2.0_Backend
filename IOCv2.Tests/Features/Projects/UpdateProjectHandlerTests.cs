@@ -18,6 +18,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<ILogger<UpdateProjectHandler>> _mockLogger;
         private readonly Mock<IMessageService> _mockMessageService;
         private readonly Mock<ICurrentUserService> _mockCurrentUser;
+        private readonly Mock<ICacheService> _mockCacheService;
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepo;
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipRepo;
         private readonly UpdateProjectHandler _handler;
@@ -29,6 +30,7 @@ namespace IOCv2.Tests.Features.Projects
             _mockLogger = new Mock<ILogger<UpdateProjectHandler>>();
             _mockMessageService = new Mock<IMessageService>();
             _mockCurrentUser = new Mock<ICurrentUserService>();
+            _mockCacheService = new Mock<ICacheService>();
             
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
             _mockInternshipRepo = new Mock<IGenericRepository<InternshipGroup>>();
@@ -41,7 +43,8 @@ namespace IOCv2.Tests.Features.Projects
                 _mockMapper.Object,
                 _mockLogger.Object,
                 _mockMessageService.Object,
-                _mockCurrentUser.Object);
+                _mockCurrentUser.Object,
+                _mockCacheService.Object);
         }
 
         [Fact]
@@ -60,6 +63,11 @@ namespace IOCv2.Tests.Features.Projects
             
             _mockMapper.Setup(x => x.Map<UpdateProjectResponse>(It.IsAny<Project>()))
                 .Returns(new UpdateProjectResponse { ProjectId = projectId, ProjectName = "Updated Name" });
+
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);

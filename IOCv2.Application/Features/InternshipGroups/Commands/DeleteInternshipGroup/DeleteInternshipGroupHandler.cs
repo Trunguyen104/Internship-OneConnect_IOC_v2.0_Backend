@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -16,17 +17,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
         private readonly ILogger<DeleteInternshipGroupHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public DeleteInternshipGroupHandler(
             IUnitOfWork unitOfWork,
             IMessageService messageService,
             IMapper mapper,
-            ILogger<DeleteInternshipGroupHandler> logger)
+            ILogger<DeleteInternshipGroupHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<DeleteInternshipGroupResponse>> Handle(DeleteInternshipGroupCommand request, CancellationToken cancellationToken)
@@ -64,6 +68,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                 if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.InternshipId), cancellationToken);
+                    await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDeletedSuccess), request.InternshipId);
 
                     var response = _mapper.Map<DeleteInternshipGroupResponse>(entity);
@@ -78,7 +84,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteError), request.InternshipId);
-                return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

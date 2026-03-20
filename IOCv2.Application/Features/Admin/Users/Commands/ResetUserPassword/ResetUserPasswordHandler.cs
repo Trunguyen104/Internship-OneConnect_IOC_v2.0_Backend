@@ -1,11 +1,11 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Admin.Users.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
@@ -17,6 +17,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
         private readonly IBackgroundEmailSender _emailSender;
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
+        private readonly ICacheService _cacheService;
         private readonly ILogger<ResetUserPasswordHandler> _logger;
 
         public ResetUserPasswordHandler(
@@ -25,6 +26,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
             IBackgroundEmailSender emailSender,
             ICurrentUserService currentUserService,
             IMessageService messageService,
+            ICacheService cacheService,
             ILogger<ResetUserPasswordHandler> logger)
         {
             _unitOfWork = unitOfWork;
@@ -32,6 +34,7 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
             _emailSender = emailSender;
             _currentUserService = currentUserService;
             _messageService = messageService;
+            _cacheService = cacheService;
             _logger = logger;
         }
 
@@ -78,14 +81,18 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
 
                 await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
 
-                // Revoke refresh tokens (Bulk update)
-                await _unitOfWork.Repository<RefreshToken>()
+                // Revoke refresh tokens
+                var activeTokens = await _unitOfWork.Repository<RefreshToken>()
                     .Query()
                     .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
-                    .ExecuteUpdateAsync(s => s
-                        .SetProperty(rt => rt.IsRevoked, true)
-                        .SetProperty(rt => rt.UpdatedAt, DateTime.UtcNow), 
-                        cancellationToken);
+                    .ToListAsync(cancellationToken);
+
+                foreach (var token in activeTokens)
+                {
+                    token.IsRevoked = true;
+                    token.UpdatedAt = DateTime.UtcNow;
+                    await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
+                }
 
                 var auditLog = new AuditLog
                 {
@@ -112,6 +119,9 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+                await _cacheService.RemoveAsync(AdminUserCacheKeys.User(user.UserId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(AdminUserCacheKeys.UserListPattern(), cancellationToken);
+
                 _logger.LogInformation("Successfully reset password for User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 
                 var response = new ResetUserPasswordResponse
@@ -129,7 +139,9 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword
             {
                 _logger.LogError(ex, "Failed to reset password for user {UserId}", request.UserId);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                throw;
+                return Result<ResetUserPasswordResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.InternalError),
+                    ResultErrorType.InternalServerError);
             }
         }
     }

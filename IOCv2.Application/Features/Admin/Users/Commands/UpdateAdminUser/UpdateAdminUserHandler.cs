@@ -1,6 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Admin.Users.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -119,8 +120,8 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 // Clear cache
-                await _cacheService.RemoveAsync($"user:{user.UserId}");
-                await _cacheService.RemoveByPatternAsync("user:list", cancellationToken);
+                await _cacheService.RemoveAsync(AdminUserCacheKeys.User(user.UserId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(AdminUserCacheKeys.UserListPattern(), cancellationToken);
 
                 _logger.LogInformation("Successfully updated Admin User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 
@@ -131,7 +132,9 @@ namespace IOCv2.Application.Features.Admin.Users.Commands.UpdateAdminUser
             {
                 _logger.LogError(ex, "Failed to update Admin User {UserId}", request.UserId);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                throw;
+                return Result<UpdateAdminUserResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.InternalError),
+                    ResultErrorType.InternalServerError);
             }
         }
     }

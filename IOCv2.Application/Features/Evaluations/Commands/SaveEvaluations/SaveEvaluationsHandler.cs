@@ -5,6 +5,7 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Evaluations.Commands.SaveEvaluations;
 
@@ -12,26 +13,34 @@ public class SaveEvaluationsHandler : IRequestHandler<SaveEvaluationsCommand, Re
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
+    private readonly ILogger<SaveEvaluationsHandler> _logger;
 
-    public SaveEvaluationsHandler(IUnitOfWork unitOfWork, IMessageService messageService)
+    public SaveEvaluationsHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<SaveEvaluationsHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
+        _logger = logger;
     }
 
     public async Task<Result<List<SaveEvaluationsResponse>>> Handle(
         SaveEvaluationsCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Saving evaluations for cycle {CycleId}, internship {InternshipId}, evaluator {EvaluatorId}", request.CycleId, request.InternshipId, request.EvaluatorId);
+
         // 1. Validate Cycle
         var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
             .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
         if (cycle is null)
+        {
+            _logger.LogWarning("Cannot save evaluations because cycle {CycleId} was not found", request.CycleId);
             return Result<List<SaveEvaluationsResponse>>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.CycleNotFound),
                 ResultErrorType.NotFound);
+        }
 
         if (cycle.Status == EvaluationCycleStatus.Completed)
         {
+            _logger.LogWarning("Cannot save evaluations because cycle {CycleId} is completed", request.CycleId);
             return Result<List<SaveEvaluationsResponse>>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.CannotSaveInCompletedCycle),
                 ResultErrorType.BadRequest);
@@ -42,9 +51,12 @@ public class SaveEvaluationsHandler : IRequestHandler<SaveEvaluationsCommand, Re
             .Include(i => i.Members)
             .FirstOrDefaultAsync(i => i.InternshipId == request.InternshipId, cancellationToken);
         if (internship is null)
+        {
+            _logger.LogWarning("Cannot save evaluations because internship {InternshipId} was not found", request.InternshipId);
             return Result<List<SaveEvaluationsResponse>>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.InternshipNotFound),
                 ResultErrorType.NotFound);
+        }
 
         // 3. Pre-load check data
         var existingEvaluations = await _unitOfWork.Repository<Evaluation>().Query()
@@ -230,12 +242,17 @@ public class SaveEvaluationsHandler : IRequestHandler<SaveEvaluationsCommand, Re
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+            _logger.LogInformation("Successfully saved {Count} evaluations for cycle {CycleId}, internship {InternshipId}", results.Count, request.CycleId, request.InternshipId);
+
             return Result<List<SaveEvaluationsResponse>>.Success(results);
         }
-        catch
+        catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
+            _logger.LogError(ex, "Error while saving evaluations for cycle {CycleId}, internship {InternshipId}", request.CycleId, request.InternshipId);
+            return Result<List<SaveEvaluationsResponse>>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

@@ -12,8 +12,14 @@ namespace IOCv2.Domain.Entities
         public string? Major { get; set; }
         public decimal? Gpa { get; set; }
         public string? HighestDegree { get; set; }
+        public string? PortfolioUrl { get; private set; }
 
         public StudentStatus InternshipStatus { get; set; }
+
+        public void UpdatePortfolio(string? portfolioUrl)
+        {
+            PortfolioUrl = portfolioUrl;
+        }
 
         // Navigation properties
         public virtual ICollection<StudentTerm> StudentTerms { get; set; } = new List<StudentTerm>();

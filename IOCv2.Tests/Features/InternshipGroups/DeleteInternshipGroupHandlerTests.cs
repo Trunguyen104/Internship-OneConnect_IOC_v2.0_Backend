@@ -24,6 +24,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<IMessageService> _mockMessageService;
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ILogger<DeleteInternshipGroupHandler>> _mockLogger;
+        private readonly Mock<ICacheService> _mockCacheService;
         private readonly DeleteInternshipGroupHandler _handler;
 
         public DeleteInternshipGroupHandlerTests()
@@ -32,12 +33,14 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockMessageService = new Mock<IMessageService>();
             _mockMapper = new Mock<IMapper>();
             _mockLogger = new Mock<ILogger<DeleteInternshipGroupHandler>>();
+            _mockCacheService = new Mock<ICacheService>();
 
             _handler = new DeleteInternshipGroupHandler(
                 _mockUnitOfWork.Object,
                 _mockMessageService.Object,
                 _mockMapper.Object,
-                _mockLogger.Object);
+                _mockLogger.Object,
+                _mockCacheService.Object);
         }
 
         [Fact]
@@ -53,6 +56,11 @@ namespace IOCv2.Tests.Features.InternshipGroups
             
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
+
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
             
             _mockMapper.Setup(x => x.Map<DeleteInternshipGroupResponse>(It.IsAny<InternshipGroup>()))
                 .Returns(new DeleteInternshipGroupResponse { InternshipId = internshipId });
