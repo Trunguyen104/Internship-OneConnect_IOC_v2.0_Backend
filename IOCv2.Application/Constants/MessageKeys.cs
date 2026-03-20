@@ -490,7 +490,41 @@
 
         public static class File
         {
-            
+
+        }
+
+        public static class StudentTerms
+        {
+            public const string NotFound = "StudentTerms.NotFound";
+            public const string TermNotOpen = "StudentTerms.TermNotOpen";
+            public const string EmailConflict = "StudentTerms.EmailConflict";
+            public const string StudentCodeConflict = "StudentTerms.StudentCodeConflict";
+            public const string AlreadyEnrolled = "StudentTerms.AlreadyEnrolled";
+            public const string AlreadyWithdrawn = "StudentTerms.AlreadyWithdrawn";
+            public const string NotWithdrawn = "StudentTerms.NotWithdrawn";
+            public const string CannotWithdrawPlaced = "StudentTerms.CannotWithdrawPlaced";
+            public const string EnterpriseIdRequiredWhenPlaced = "StudentTerms.EnterpriseIdRequiredWhenPlaced";
+            public const string EnterpriseNotFound = "StudentTerms.EnterpriseNotFound";
+            public const string AllStudentsPlaced = "StudentTerms.AllStudentsPlaced";
+            public const string InvalidFileFormat = "StudentTerms.InvalidFileFormat";
+            public const string FileTooLarge = "StudentTerms.FileTooLarge";
+            public const string InvalidExcelHeaders = "StudentTerms.InvalidExcelHeaders";
+            public const string TooManyRows = "StudentTerms.TooManyRows";
+            public const string AddSuccess = "StudentTerms.AddSuccess";
+            public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
+            public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
+            public const string RestoreSuccess = "StudentTerms.RestoreSuccess";
+            public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
+            public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
+            public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
+
+            // Logging
+            public const string LogAdded = "StudentTerms.Log.Added";
+            public const string LogUpdated = "StudentTerms.Log.Updated";
+            public const string LogWithdrawn = "StudentTerms.Log.Withdrawn";
+            public const string LogRestored = "StudentTerms.Log.Restored";
+            public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
+            public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
         }
     }
 }
