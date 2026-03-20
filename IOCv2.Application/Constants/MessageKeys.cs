@@ -1,4 +1,4 @@
-﻿﻿namespace IOCv2.Application.Constants
+﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -163,6 +163,15 @@
             public const string EnterpriseUserNotFound = "InternshipGroup.EnterpriseUserNotFound";
             public const string StudentNotApproved = "InternshipGroup.StudentNotApproved";
             public const string LogStudentNotApproved = "InternshipGroup.LogStudentNotApproved";
+            
+            // Move & Archive keys
+            public const string MustBelongToYourEnterprise = "InternshipGroup.MustBelongToYourEnterprise";
+            public const string MustBeInSameTerm = "InternshipGroup.MustBeInSameTerm";
+            public const string MustBeActive = "InternshipGroup.MustBeActive";
+            public const string StudentsNotInSourceGroup = "InternshipGroup.StudentsNotInSourceGroup";
+            public const string MoveSuccess = "InternshipGroup.MoveSuccess";
+            public const string ArchiveSuccess = "InternshipGroup.ArchiveSuccess";
+            public const string GroupAlreadyArchived = "InternshipGroup.GroupAlreadyArchived";
 
 
             // Logger Keys

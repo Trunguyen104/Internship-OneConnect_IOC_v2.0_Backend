@@ -1041,4 +1041,19 @@
   <data name="Enterprise.RestoreFailed" xml:space="preserve">
     <value>Khôi phục doanh nghiệp thất bại.</value>
   </data>
+  <data name="InternshipGroup.MustBelongToYourEnterprise" xml:space="preserve">
+    <value>Nhóm phải thuộc doanh nghiệp của bạn.</value>
+  </data>
+  <data name="InternshipGroup.MustBeInSameTerm" xml:space="preserve">
+    <value>Hai nhóm phải thuộc cùng một kỳ thực tập.</value>
+  </data>
+  <data name="InternshipGroup.MustBeActive" xml:space="preserve">
+    <value>Chỉ có thể chuyển sinh viên hoặc chỉnh sửa các nhóm đang hoạt động (Active).</value>
+  </data>
+  <data name="InternshipGroup.StudentsNotInSourceGroup" xml:space="preserve">
+    <value>Một hoặc nhiều sinh viên không nằm trong nhóm gốc.</value>
+  </data>
+  <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
+    <value>Nhóm đã được lưu trữ (Archived) từ trước.</value>
+  </data>
 </root>

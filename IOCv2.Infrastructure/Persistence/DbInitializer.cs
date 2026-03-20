@@ -302,6 +302,11 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedInternshipGroups()
         {
+            if (await _context.InternshipGroups.AnyAsync())
+            {
+                return;
+            }
+
             var testStudentEmail = "trunguyen.104@gmail.com";
             var studentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == testStudentEmail);
             
@@ -334,12 +339,13 @@ namespace IOCv2.Infrastructure.Persistence
                     var group = InternshipGroup.Create(
                         term.TermId,
                         "Nhom OJT .NET WebCore",
+                        null,
                         fpt.EnterpriseId,
                         mentor.EnterpriseUserId,
                         DateTime.UtcNow.AddMonths(-1),
                         DateTime.UtcNow.AddMonths(3)
                     );
-                    group.UpdateStatus(InternshipStatus.InProgress);
+                    group.UpdateStatus(GroupStatus.Active);
                     _context.InternshipGroups.Add(group);
 
                     // Application 1: student1 - Approved
@@ -397,7 +403,7 @@ namespace IOCv2.Infrastructure.Persistence
 
                  if (term != null && ent != null && mentor != null && student != null)
                  {
-                    var group = InternshipGroup.Create(term.TermId, "Nhóm Thực Tập Mẫu", ent.EnterpriseId, mentor.EnterpriseUserId, DateTime.UtcNow, DateTime.UtcNow.AddMonths(3));
+                    var group = InternshipGroup.Create(term.TermId, "Nhóm Thực Tập Mẫu", null, ent.EnterpriseId, mentor.EnterpriseUserId, DateTime.UtcNow, DateTime.UtcNow.AddMonths(3));
                     _context.InternshipGroups.Add(group);
                     _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group.InternshipId, StudentId = student.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress });
                     await _context.SaveChangesAsync();

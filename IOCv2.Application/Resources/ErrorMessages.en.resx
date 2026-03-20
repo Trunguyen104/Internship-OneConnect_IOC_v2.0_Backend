@@ -985,4 +985,19 @@
   <data name="Enterprise.RestoreFailed" xml:space="preserve">
     <value>Failed to restore enterprise.</value>
   </data>
+  <data name="InternshipGroup.MustBelongToYourEnterprise" xml:space="preserve">
+    <value>The group must belong to your enterprise.</value>
+  </data>
+  <data name="InternshipGroup.MustBeInSameTerm" xml:space="preserve">
+    <value>The groups must belong to the same internship term.</value>
+  </data>
+  <data name="InternshipGroup.MustBeActive" xml:space="preserve">
+    <value>Action can only be performed on active groups.</value>
+  </data>
+  <data name="InternshipGroup.StudentsNotInSourceGroup" xml:space="preserve">
+    <value>One or more students are not in the source group.</value>
+  </data>
+  <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
+    <value>The group has already been archived.</value>
+  </data>
 </root>

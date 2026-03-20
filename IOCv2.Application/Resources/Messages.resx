@@ -341,4 +341,10 @@
   <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
     <value>Bạn không có quyền xem thông tin doanh nghiệp này.</value>
   </data>
+  <data name="InternshipGroup.MoveSuccess" xml:space="preserve">
+    <value>Chuyển sinh viên thành công.</value>
+  </data>
+  <data name="InternshipGroup.ArchiveSuccess" xml:space="preserve">
+    <value>Lưu trữ nhóm thành công.</value>
+  </data>
 </root>

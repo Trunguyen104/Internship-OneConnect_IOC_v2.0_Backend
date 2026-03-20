@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -52,6 +53,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                         request.InternshipId, entity.Members.Count);
                     return Result<DeleteInternshipGroupResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.InternshipGroups.HasStudents),
+                        ResultErrorType.BadRequest);
+                }
+
+                if (entity.Status != GroupStatus.Active)
+                {
+                    _logger.LogWarning("Attempted to delete group {InternshipId} which is not Active.", request.InternshipId);
+                    return Result<DeleteInternshipGroupResponse>.Failure(
+                        "Nhóm đã kết thúc hoặc lưu trữ, không thể xóa.",
                         ResultErrorType.BadRequest);
                 }
 

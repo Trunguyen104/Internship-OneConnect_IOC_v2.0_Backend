@@ -275,4 +275,10 @@
   <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
     <value>You do not have permission to view this enterprise.</value>
   </data>
+  <data name="InternshipGroup.MoveSuccess" xml:space="preserve">
+    <value>Moved students successfully.</value>
+  </data>
+  <data name="InternshipGroup.ArchiveSuccess" xml:space="preserve">
+    <value>Archived group successfully.</value>
+  </data>
 </root>

@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -43,6 +44,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNotFound), request.InternshipId);
                     return Result<RemoveStudentsFromGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
+                }
+
+                if (group.Status != GroupStatus.Active)
+                {
+                    _logger.LogWarning("Cannot remove students from group. Group {GroupId} is not Active.", group.InternshipId);
+                    return Result<RemoveStudentsFromGroupResponse>.Failure(
+                        "Chỉ có thể xóa sinh viên khỏi nhóm đang hoạt động (Active).",
+                        ResultErrorType.BadRequest);
                 }
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);

@@ -104,17 +104,24 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 var newGroup = InternshipGroup.Create(
                     request.TermId,
                     request.GroupName,
+                    request.Description,
                     request.EnterpriseId,
                     request.MentorId,
                     request.StartDate,
                     request.EndDate
                 );
 
-                // ── 6. Nếu có sinh viên → kiểm tra tồn tại + đã được Approved ────
-                // (Students là tuỳ chọn — có thể tạo nhóm trống rồi thêm sau)
-                if (request.Students != null && request.Students.Any())
+                // ── 6. Bắt buộc ít nhất 1 sinh viên ───────────────────────────────
+                if (request.Students == null || !request.Students.Any())
                 {
-                    var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
+                    _logger.LogWarning("Create group {GroupName} failed: No students provided.", request.GroupName);
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    return Result<CreateInternshipGroupResponse>.Failure(
+                        "Nhóm thực tập phải có ít nhất 1 sinh viên.",
+                        ResultErrorType.BadRequest);
+                }
+
+                var studentIds = request.Students.Select(s => s.StudentId).Distinct().ToList();
 
                     // 6a. Kiểm tra sinh viên tồn tại trong hệ thống
                     var existingStudents = await _unitOfWork.Repository<Student>()
@@ -154,11 +161,30 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                             ResultErrorType.BadRequest);
                     }
 
+                    // 6c. Kiểm tra sinh viên đã nằm trong nhóm Active nào khác trong cùng kỳ chưa
+                    var alreadyInGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
+                        .AsNoTracking()
+                        .Include(g => g.Members)
+                        .Where(g => g.TermId == request.TermId && g.Status == GroupStatus.Active)
+                        .SelectMany(g => g.Members)
+                        .Where(m => studentIds.Contains(m.StudentId))
+                        .Select(m => m.StudentId)
+                        .ToListAsync(cancellationToken);
+
+                    if (alreadyInGroup.Any())
+                    {
+                        var firstInGroup = alreadyInGroup.First();
+                        _logger.LogWarning("Student {StudentId} is already in an active group in term {TermId}", firstInGroup, request.TermId);
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<CreateInternshipGroupResponse>.Failure(
+                            "Sinh viên đã tham gia một nhóm khác trong kỳ này.",
+                            ResultErrorType.BadRequest);
+                    }
+
                     foreach (var studentRef in request.Students)
                     {
                         newGroup.AddMember(studentRef.StudentId, studentRef.Role);
                     }
-                }
 
                 await _unitOfWork.Repository<InternshipGroup>().AddAsync(newGroup);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
