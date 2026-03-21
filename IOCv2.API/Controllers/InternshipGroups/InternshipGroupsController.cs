@@ -6,6 +6,7 @@ using IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGro
 using IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
+using IOCv2.Application.Features.InternshipGroups.Queries.GetDashboard;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -145,5 +146,20 @@ public class InternshipGroupsController : ApiControllerBase
     {
         _logger.LogInformation("Request to remove {Count} students from internship group {Id}", command.StudentIds.Count, command.InternshipId);
         return HandleResult(await _mediator.Send(command, cancellationToken));
+    }
+
+    /// <summary>
+    /// Get dashboard statistics for an internship group.
+    /// </summary>
+    /// <param name="id">Internship group ID.</param>
+    [HttpGet("{id:guid}/dashboard")]
+    [ProducesResponseType(typeof(ApiResponse<GetInternshipGroupDashboardResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetInternshipGroupDashboard(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Request to get dashboard for internship group ID: {Id}", id);
+        return HandleResult(await _mediator.Send(new GetInternshipGroupDashboardQuery(id), cancellationToken));
     }
 }
