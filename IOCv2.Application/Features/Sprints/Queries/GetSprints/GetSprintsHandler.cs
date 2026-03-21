@@ -23,8 +23,8 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<Paginat
     private readonly ILogger<GetSprintsHandler> _logger;
 
     public GetSprintsHandler(
-        IUnitOfWork unitOfWork, 
-        IMapper mapper, 
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
         ICacheService cacheService,
         IMessageService messageService,
         ILogger<GetSprintsHandler> logger)
@@ -39,7 +39,7 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<Paginat
     public async Task<Result<PaginatedResult<GetSprintsResponse>>> Handle(
         GetSprintsQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Getting sprints for project {ProjectId} with status filter {StatusFilter}", 
+        _logger.LogInformation("Getting sprints for project {ProjectId} with status filter {StatusFilter}",
             request.ProjectId, request.StatusFilter);
 
         var cacheKey = SprintCacheKeys.SprintList(
@@ -57,50 +57,42 @@ public class GetSprintsHandler : IRequestHandler<GetSprintsQuery, Result<Paginat
             return Result<PaginatedResult<GetSprintsResponse>>.Success(cachedResult);
         }
 
-        try
+        // Build IQueryable — filter at DB level
+        var query = _unitOfWork.Repository<Sprint>().Query()
+            .AsNoTracking()
+            .Where(s => s.ProjectId == request.ProjectId);
+
+        if (request.StatusFilter.HasValue)
         {
-            // Build IQueryable — filter at DB level
-            var query = _unitOfWork.Repository<Sprint>().Query()
-                .AsNoTracking()
-                .Where(s => s.ProjectId == request.ProjectId);
-
-            if (request.StatusFilter.HasValue)
-            {
-                query = query.Where(s => s.Status == request.StatusFilter.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Pagination.Search))
-            {
-                var search = request.Pagination.Search.ToLower();
-                query = query.Where(s =>
-                    (s.Name != null && s.Name.ToLower().Contains(search)) ||
-                    (s.Goal != null && s.Goal.ToLower().Contains(search)));
-            }
-
-            query = string.IsNullOrWhiteSpace(request.Pagination.OrderBy) ||
-                    request.Pagination.OrderBy.ToLower().StartsWith("startdate")
-                ? query.OrderBy(s => s.StartDate)
-                : request.Pagination.OrderBy.ToLower().StartsWith("enddate")
-                    ? query.OrderBy(s => s.EndDate)
-                    : request.Pagination.OrderBy.ToLower().StartsWith("name")
-                        ? query.OrderBy(s => s.Name)
-                        : query.OrderBy(s => s.StartDate);
-
-            var result = await query
-                .ProjectTo<GetSprintsResponse>(_mapper.ConfigurationProvider)
-                .ToPaginatedResultAsync(request.Pagination.PageIndex, request.Pagination.PageSize, cancellationToken);
-
-            await _cacheService.SetAsync(cacheKey, result, SprintCacheKeys.Expiration.SprintList, cancellationToken);
-
-            _logger.LogInformation("Successfully retrieved {Count} sprints for project {ProjectId}", 
-                result.Items.Count, request.ProjectId);
-
-            return Result<PaginatedResult<GetSprintsResponse>>.Success(result);
+            query = query.Where(s => s.Status == request.StatusFilter.Value);
         }
-        catch (Exception ex)
+
+        if (!string.IsNullOrWhiteSpace(request.Pagination.Search))
         {
-            _logger.LogError(ex, "Error occurred while getting sprints for project {ProjectId}", request.ProjectId);
-            return Result<PaginatedResult<GetSprintsResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+            var search = request.Pagination.Search.ToLower();
+            query = query.Where(s =>
+                (s.Name != null && s.Name.ToLower().Contains(search)) ||
+                (s.Goal != null && s.Goal.ToLower().Contains(search)));
         }
+
+        query = string.IsNullOrWhiteSpace(request.Pagination.OrderBy) ||
+                request.Pagination.OrderBy.ToLower().StartsWith("startdate")
+            ? query.OrderBy(s => s.StartDate)
+            : request.Pagination.OrderBy.ToLower().StartsWith("enddate")
+                ? query.OrderBy(s => s.EndDate)
+                : request.Pagination.OrderBy.ToLower().StartsWith("name")
+                    ? query.OrderBy(s => s.Name)
+                    : query.OrderBy(s => s.StartDate);
+
+        var result = await query
+            .ProjectTo<GetSprintsResponse>(_mapper.ConfigurationProvider)
+            .ToPaginatedResultAsync(request.Pagination.PageIndex, request.Pagination.PageSize, cancellationToken);
+
+        await _cacheService.SetAsync(cacheKey, result, SprintCacheKeys.Expiration.SprintList, cancellationToken);
+
+        _logger.LogInformation("Successfully retrieved {Count} sprints for project {ProjectId}",
+            result.Items.Count, request.ProjectId);
+
+        return Result<PaginatedResult<GetSprintsResponse>>.Success(result);
     }
 }

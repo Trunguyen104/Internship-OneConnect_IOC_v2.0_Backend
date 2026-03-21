@@ -28,9 +28,6 @@ public class GetEvaluationCriteriaHandler
         GetEvaluationCriteriaQuery request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Getting EvaluationCriteria for Cycle {CycleId}", request.CycleId);
-
-        try
-        {
             var criteria = await _unitOfWork.Repository<Domain.Entities.EvaluationCriteria>().Query()
                 .AsNoTracking()
                 .Where(c => c.CycleId == request.CycleId)
@@ -49,11 +46,5 @@ public class GetEvaluationCriteriaHandler
             .ToListAsync(cancellationToken);
 
             return Result<List<GetEvaluationCriteriaResponse>>.Success(criteria);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting EvaluationCriteria for Cycle {CycleId}", request.CycleId);
-            return Result<List<GetEvaluationCriteriaResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
     }
 }

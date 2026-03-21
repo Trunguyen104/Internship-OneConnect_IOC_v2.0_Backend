@@ -19,8 +19,8 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
         private readonly ICurrentUserService _currentUserService;
 
         public GetStakeholderByIdHandler(
-            IUnitOfWork unitOfWork, 
-            IMapper mapper, 
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
             IMessageService messageService,
             ILogger<GetStakeholderByIdHandler> logger,
             ICurrentUserService currentUserService)
@@ -36,8 +36,6 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
         {
             _logger.LogInformation("Getting stakeholder {Id}", request.StakeholderId);
 
-            try
-            {
 
             var stakeholder = await _unitOfWork.Repository<Stakeholder>()
                 .Query()
@@ -79,12 +77,7 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
             _logger.LogInformation("Successfully retrieved stakeholder {Id}", request.StakeholderId);
             var response = _mapper.Map<GetStakeholderByIdResponse>(stakeholder);
             return Result<GetStakeholderByIdResponse>.Success(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting stakeholder {Id}", request.StakeholderId);
-                return Result<GetStakeholderByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-            }
+
         }
     }
 }

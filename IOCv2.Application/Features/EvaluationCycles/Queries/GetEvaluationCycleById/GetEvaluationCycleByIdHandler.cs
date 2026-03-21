@@ -16,7 +16,7 @@ public class GetEvaluationCycleByIdHandler
     private readonly ILogger<GetEvaluationCycleByIdHandler> _logger;
 
     public GetEvaluationCycleByIdHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
         ILogger<GetEvaluationCycleByIdHandler> logger)
     {
@@ -30,21 +30,19 @@ public class GetEvaluationCycleByIdHandler
     {
         _logger.LogInformation("Getting EvaluationCycle {CycleId}", request.CycleId);
 
-        try
-        {
-            var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
-                .AsNoTracking()
-                .Include(c => c.Term)
-                .Include(c => c.Criteria)
-                .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
+        var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .AsNoTracking()
+            .Include(c => c.Term)
+            .Include(c => c.Criteria)
+            .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
-            if (cycle is null)
-            {
-                _logger.LogWarning("EvaluationCycle {CycleId} not found", request.CycleId);
-                return Result<GetEvaluationCycleByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
-                    ResultErrorType.NotFound);
-            }
+        if (cycle is null)
+        {
+            _logger.LogWarning("EvaluationCycle {CycleId} not found", request.CycleId);
+            return Result<GetEvaluationCycleByIdResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
+                ResultErrorType.NotFound);
+        }
 
         var response = new GetEvaluationCycleByIdResponse
         {
@@ -71,12 +69,6 @@ public class GetEvaluationCycleByIdHandler
                 .ToList()
         };
 
-            return Result<GetEvaluationCycleByIdResponse>.Success(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting EvaluationCycle {CycleId}", request.CycleId);
-            return Result<GetEvaluationCycleByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
+        return Result<GetEvaluationCycleByIdResponse>.Success(response);
     }
 }

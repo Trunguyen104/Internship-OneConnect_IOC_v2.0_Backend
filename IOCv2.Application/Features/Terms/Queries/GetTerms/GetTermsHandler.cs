@@ -37,8 +37,7 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
     public async Task<Result<PaginatedResult<GetTermsResponse>>> Handle(GetTermsQuery request,
         CancellationToken cancellationToken)
     {
-        try
-        {
+    
             var userId = Guid.Parse(_currentUserService.UserId!);
             var isSuperAdmin =
                 string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
@@ -123,12 +122,7 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
                 universityId);
 
             return Result<PaginatedResult<GetTermsResponse>>.Success(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorRetrievingTerms));
-            throw;
-        }
+    
     }
 
     private IQueryable<Term> ApplySorting(IQueryable<Term> query, string? sortColumn, string? sortOrder)

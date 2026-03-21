@@ -16,7 +16,7 @@ public class MoveWorkItemToSprintHandler
     private readonly ILogger<MoveWorkItemToSprintHandler> _logger;
 
     public MoveWorkItemToSprintHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
         ILogger<MoveWorkItemToSprintHandler> logger)
     {
@@ -33,67 +33,67 @@ public class MoveWorkItemToSprintHandler
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        var workItemExists = await _unitOfWork.Repository<WorkItem>()
-            .ExistsAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
-        if (!workItemExists)
-            return Result<MoveWorkItemToSprintResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.WorkItem.NotFound), ResultErrorType.NotFound);
+            var workItemExists = await _unitOfWork.Repository<WorkItem>()
+                .ExistsAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
+            if (!workItemExists)
+                return Result<MoveWorkItemToSprintResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.WorkItem.NotFound), ResultErrorType.NotFound);
 
-        var sprintExists = await _unitOfWork.Repository<Sprint>()
-            .ExistsAsync(s => s.SprintId == request.TargetSprintId, cancellationToken);
-        if (!sprintExists)
-            return Result<MoveWorkItemToSprintResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
+            var sprintExists = await _unitOfWork.Repository<Sprint>()
+                .ExistsAsync(s => s.SprintId == request.TargetSprintId, cancellationToken);
+            if (!sprintExists)
+                return Result<MoveWorkItemToSprintResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
 
-        // Lấy thông tin record hiện tại (nếu có)
-        var existing = await _unitOfWork.Repository<SprintWorkItem>()
-            .Query()
-            .FirstOrDefaultAsync(swi => swi.WorkItemId == request.WorkItemId, cancellationToken);
+            // Lấy thông tin record hiện tại (nếu có)
+            var existing = await _unitOfWork.Repository<SprintWorkItem>()
+                .Query()
+                .FirstOrDefaultAsync(swi => swi.WorkItemId == request.WorkItemId, cancellationToken);
 
-        // Calculate new BoardOrder using midpoint algorithm
-        var boardOrder = await CalculateBoardOrderAsync(request.TargetSprintId, request.AfterWorkItemId, cancellationToken);
+            // Calculate new BoardOrder using midpoint algorithm
+            var boardOrder = await CalculateBoardOrderAsync(request.TargetSprintId, request.AfterWorkItemId, cancellationToken);
 
-        if (existing is null)
-        {
-            // Task chưa thuộc sprint nào -> Thêm mới hoàn toàn
-            var sprintWorkItem = new SprintWorkItem
+            if (existing is null)
             {
-                SprintId = request.TargetSprintId,
-                WorkItemId = request.WorkItemId,
-                BoardOrder = boardOrder
-            };
-            await _unitOfWork.Repository<SprintWorkItem>().AddAsync(sprintWorkItem, cancellationToken);
-        }
-        else if (existing.SprintId == request.TargetSprintId)
-        {
-            // Task di chuyển vị trí TRONG CÙNG 1 SPRINT -> Chỉ sửa thuộc tính BoardOrder (không sửa PK)
-            existing.BoardOrder = boardOrder;
-            await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(existing, cancellationToken);
-        }
-        else
-        {
-            // Task ĐỔI TỪ SPRINT A SANG SPRINT B -> Xóa cũ + Tạo mới (tránh trùng lặp Primary Key)
-            await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(existing, cancellationToken);
-            
-            var newSprintWorkItem = new SprintWorkItem
+                // Task chưa thuộc sprint nào -> Thêm mới hoàn toàn
+                var sprintWorkItem = new SprintWorkItem
+                {
+                    SprintId = request.TargetSprintId,
+                    WorkItemId = request.WorkItemId,
+                    BoardOrder = boardOrder
+                };
+                await _unitOfWork.Repository<SprintWorkItem>().AddAsync(sprintWorkItem, cancellationToken);
+            }
+            else if (existing.SprintId == request.TargetSprintId)
             {
-                SprintId = request.TargetSprintId,
+                // Task di chuyển vị trí TRONG CÙNG 1 SPRINT -> Chỉ sửa thuộc tính BoardOrder (không sửa PK)
+                existing.BoardOrder = boardOrder;
+                await _unitOfWork.Repository<SprintWorkItem>().UpdateAsync(existing, cancellationToken);
+            }
+            else
+            {
+                // Task ĐỔI TỪ SPRINT A SANG SPRINT B -> Xóa cũ + Tạo mới (tránh trùng lặp Primary Key)
+                await _unitOfWork.Repository<SprintWorkItem>().DeleteAsync(existing, cancellationToken);
+
+                var newSprintWorkItem = new SprintWorkItem
+                {
+                    SprintId = request.TargetSprintId,
+                    WorkItemId = request.WorkItemId,
+                    BoardOrder = boardOrder
+                };
+                await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newSprintWorkItem, cancellationToken);
+            }
+
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            _logger.LogInformation("Successfully moved work item {WorkItemId} to sprint {TargetSprintId}", request.WorkItemId, request.TargetSprintId);
+            return Result<MoveWorkItemToSprintResponse>.Success(new MoveWorkItemToSprintResponse
+            {
                 WorkItemId = request.WorkItemId,
+                SprintId = request.TargetSprintId,
                 BoardOrder = boardOrder
-            };
-            await _unitOfWork.Repository<SprintWorkItem>().AddAsync(newSprintWorkItem, cancellationToken);
-        }
-
-        await _unitOfWork.SaveChangeAsync(cancellationToken);
-        await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-        _logger.LogInformation("Successfully moved work item {WorkItemId} to sprint {TargetSprintId}", request.WorkItemId, request.TargetSprintId);
-        return Result<MoveWorkItemToSprintResponse>.Success(new MoveWorkItemToSprintResponse
-        {
-            WorkItemId = request.WorkItemId,
-            SprintId = request.TargetSprintId,
-            BoardOrder = boardOrder
-        });
+            });
         }
         catch (Exception ex)
         {

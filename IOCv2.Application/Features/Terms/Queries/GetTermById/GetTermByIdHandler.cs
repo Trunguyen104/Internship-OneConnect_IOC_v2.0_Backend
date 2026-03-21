@@ -34,8 +34,7 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
 
     public async Task<Result<GetTermByIdResponse>> Handle(GetTermByIdQuery request, CancellationToken cancellationToken)
     {
-        try
-        {
+      
             var userId = Guid.Parse(_currentUserService.UserId!);
             var isSuperAdmin =
                 string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
@@ -82,11 +81,6 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
             }
 
             return Result<GetTermByIdResponse>.Success(term);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorRetrievingTerm), request.TermId);
-            throw;
-        }
+    
     }
 }

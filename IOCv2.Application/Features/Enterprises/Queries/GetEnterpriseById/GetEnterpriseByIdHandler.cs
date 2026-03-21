@@ -39,8 +39,6 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById
         }
         public async Task<Result<GetEnterpriseByIdResponse>> Handle(GetEnterpriseByIdQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
                 var userId = Guid.Parse(_currentUserService.UserId!);
                 // Each user has own key counting invalid turn
                 var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetByIDAttempt, _currentUserService.UserId!);
@@ -75,15 +73,6 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById
                 }
                 var response = _mapper.Map<GetEnterpriseByIdResponse>(enterprise);
                 return Result<GetEnterpriseByIdResponse>.Success(response);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Enterprise.GetEnterpriseByIdError));
-                return Result<GetEnterpriseByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Enterprise.GetEnterpriseByIdError),
-                    ResultErrorType.InternalServerError);
-            }
         }
     }
 }

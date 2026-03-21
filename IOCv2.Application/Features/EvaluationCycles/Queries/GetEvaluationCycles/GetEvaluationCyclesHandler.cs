@@ -30,8 +30,6 @@ public class GetEvaluationCyclesHandler
     {
         _logger.LogInformation("Getting EvaluationCycles for Term {TermId}", request.TermId);
 
-        try
-        {
             var cycles = await _unitOfWork.Repository<EvaluationCycle>().Query()
                 .AsNoTracking()
                 .Where(c => c.TermId == request.TermId)
@@ -51,11 +49,5 @@ public class GetEvaluationCyclesHandler
             .ToListAsync(cancellationToken);
 
             return Result<List<GetEvaluationCyclesResponse>>.Success(cycles);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting EvaluationCycles for Term {TermId}", request.TermId);
-            return Result<List<GetEvaluationCyclesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
     }
 }

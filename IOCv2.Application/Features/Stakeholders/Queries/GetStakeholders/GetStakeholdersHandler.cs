@@ -1,4 +1,4 @@
-﻿﻿using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -19,8 +19,8 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
         private readonly ICurrentUserService _currentUserService;
 
         public GetStakeholdersHandler(
-            IUnitOfWork unitOfWork, 
-            IMapper mapper, 
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
             IMessageService messageService,
             ILogger<GetStakeholdersHandler> logger,
             ICurrentUserService currentUserService)
@@ -36,8 +36,6 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
         {
             _logger.LogInformation("Getting paginated stakeholders for internship {InternshipId}", request.InternshipId);
 
-            try
-            {
 
             // Check internship exists
             var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
@@ -93,13 +91,13 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
             // Sorting
             query = (request.SortColumn?.ToLower(), request.SortOrder?.ToLower()) switch
             {
-                ("name", "desc")        => query.OrderByDescending(s => s.Name),
-                ("name", _)             => query.OrderBy(s => s.Name),
-                ("email", "desc")       => query.OrderByDescending(s => s.Email),
-                ("email", _)            => query.OrderBy(s => s.Email),
-                ("createdat", "desc")   => query.OrderByDescending(s => s.CreatedAt),
-                ("createdat", _)        => query.OrderBy(s => s.CreatedAt),
-                _                       => query.OrderBy(s => s.CreatedAt)
+                ("name", "desc") => query.OrderByDescending(s => s.Name),
+                ("name", _) => query.OrderBy(s => s.Name),
+                ("email", "desc") => query.OrderByDescending(s => s.Email),
+                ("email", _) => query.OrderBy(s => s.Email),
+                ("createdat", "desc") => query.OrderByDescending(s => s.CreatedAt),
+                ("createdat", _) => query.OrderBy(s => s.CreatedAt),
+                _ => query.OrderBy(s => s.CreatedAt)
             };
 
             var totalCount = await query.CountAsync(cancellationToken);
@@ -114,12 +112,7 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
 
             var result = PaginatedResult<GetStakeholdersResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
             return Result<PaginatedResult<GetStakeholdersResponse>>.Success(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting stakeholders for internship {InternshipId}", request.InternshipId);
-                return Result<PaginatedResult<GetStakeholdersResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-            }
+
         }
     }
 }

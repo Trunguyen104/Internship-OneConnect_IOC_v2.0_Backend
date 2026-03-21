@@ -32,12 +32,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
 
         public async Task<IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>> Handle(GetStakeholderIssuesQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting paginated StakeholderIssues for Internship: {InternshipId}, Stakeholder: {StakeholderId}", 
+            _logger.LogInformation("Getting paginated StakeholderIssues for Internship: {InternshipId}, Stakeholder: {StakeholderId}",
                 request.InternshipId, request.StakeholderId);
 
-            try
-            {
-                // Build base query
             var query = _unitOfWork.Repository<StakeholderIssue>()
                 .Query()
                 .Include(si => si.Stakeholder)
@@ -97,19 +94,13 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
             _logger.LogInformation("Successfully retrieved {Count} StakeholderIssues", items.Count);
 
             var paginatedResult = IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>.Create(
-                items, 
-                totalCount, 
-                request.Pagination.PageIndex, 
+                items,
+                totalCount,
+                request.Pagination.PageIndex,
                 request.Pagination.PageSize);
 
             return IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>.Success(paginatedResult);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting StakeholderIssues for Internship: {InternshipId}, Stakeholder: {StakeholderId}", 
-                    request.InternshipId, request.StakeholderId);
-                return IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>.Failure("An error occurred while getting stakeholder issues", ResultErrorType.Conflict);
-            }
+
         }
     }
 }

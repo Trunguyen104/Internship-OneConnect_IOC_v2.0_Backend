@@ -16,7 +16,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
     private readonly ILogger<GetBacklogHandler> _logger;
 
     public GetBacklogHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
         ILogger<GetBacklogHandler> logger)
     {
@@ -30,8 +30,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
     {
         _logger.LogInformation("Getting backlog for project {ProjectId}", request.ProjectId);
 
-        try
-        {
+
         // BacklogOnly=true: bỏ qua Sprints, chỉ lấy Product Backlog
         List<Sprint> sprints;
         HashSet<Guid> assignedIds;
@@ -147,12 +146,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         };
 
         return Result<GetBacklogResponse>.Success(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting backlog for project {ProjectId}", request.ProjectId);
-            return Result<GetBacklogResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
+
     }
 
     private static bool MatchFilters(WorkItem w, GetBacklogQuery req)

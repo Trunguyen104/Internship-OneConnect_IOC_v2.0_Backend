@@ -33,8 +33,6 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
     {
         _logger.LogInformation("Getting work item {WorkItemId} for project {ProjectId}", request.WorkItemId, request.ProjectId);
 
-        try
-        {
         var workItem = await _unitOfWork.Repository<WorkItem>()
             .Query()
             .AsNoTracking()
@@ -49,11 +47,6 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
         }
 
         return Result<GetWorkItemByIdResponse>.Success(_mapper.Map<GetWorkItemByIdResponse>(workItem));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting work item {WorkItemId}", request.WorkItemId);
-            return Result<GetWorkItemByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
+
     }
 }
