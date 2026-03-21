@@ -42,6 +42,13 @@ public class TermConfiguration : IEntityTypeConfiguration<Term>
             .WithMany(u => u.Terms)
             .HasForeignKey(x => x.UniversityId)
             .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false);
+            .IsRequired();
+
+        // ===== Audit columns =====
+        builder.Property(x => x.CreatedAt).HasColumnName("created_at");
+        builder.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+        builder.Property(x => x.DeletedAt).HasColumnName("deleted_at");
+        builder.Property(x => x.CreatedBy).HasColumnName("created_by");
+        builder.Property(x => x.UpdatedBy).HasColumnName("updated_by");
     }
 }

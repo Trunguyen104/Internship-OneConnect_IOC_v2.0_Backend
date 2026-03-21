@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 request.PageSize,
                 request.SearchTerm,
                 request.Status.HasValue ? (int)request.Status.Value : null,
-                request.UniversityId,
+                request.TermId,
+                request.IncludeArchived,
                 request.EnterpriseId);
 
             var cached = await _cacheService.GetAsync<PaginatedResult<GetInternshipGroupsResponse>>(cacheKey, cancellationToken);
@@ -55,16 +57,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                                         (x.Enterprise != null && x.Enterprise.Name.ToLower().Contains(lowerSearch)));
             }
 
-            // Lọc theo Status
+            // Lọc theo Status & IncludeArchived
             if (request.Status.HasValue)
             {
                 query = query.Where(x => x.Status == request.Status.Value);
             }
-
-            // Lọc theo UniversityId
-            if (request.UniversityId.HasValue)
+            else if (!request.IncludeArchived)
             {
-                query = query.Where(x => x.Term.UniversityId == request.UniversityId.Value);
+                query = query.Where(x => x.Status != GroupStatus.Archived);
+            }
+
+            // Lọc theo TermId
+            if (request.TermId.HasValue)
+            {
+                query = query.Where(x => x.TermId == request.TermId.Value);
             }
 
             // Lọc theo EnterpriseId

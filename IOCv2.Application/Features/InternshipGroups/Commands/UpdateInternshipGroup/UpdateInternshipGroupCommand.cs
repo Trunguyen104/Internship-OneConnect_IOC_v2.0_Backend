@@ -26,6 +26,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         public string GroupName { get; init; } = string.Empty;
 
         /// <summary>
+        /// Updated description.
+        /// </summary>
+        public string? Description { get; init; }
+
+        /// <summary>
         /// Updated enterprise identity.
         /// </summary>
         public Guid? EnterpriseId { get; init; }

@@ -17,7 +17,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public string? MentorName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public InternshipStatus Status { get; set; }
+        public GroupStatus Status { get; set; }
 
         /// <summary>
         /// Total number of students assigned to this group.

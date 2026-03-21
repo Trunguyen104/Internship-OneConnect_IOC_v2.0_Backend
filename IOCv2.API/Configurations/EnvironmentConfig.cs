@@ -42,10 +42,18 @@ public static class EnvironmentConfig
         var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
         if (!string.IsNullOrEmpty(dbHost) && !string.IsNullOrEmpty(dbPassword))
         {
-            var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5433";
+            var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
             var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "IOCV2Db";
             var dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
-            builder.Configuration["ConnectionStrings:DefaultConnection"] = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
+            
+            var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
+            builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
+            
+            Log.Information("Environment Variable Mapping: Database configured via environment variables. Port: {Port}", dbPort);
+        }
+        else
+        {
+            Log.Warning("Environment Variable Mapping: DB_HOST or DB_PASSWORD is missing. Using appsettings.json ConnectionStrings if provided.");
         }
 
         // Map Redis
@@ -54,6 +62,7 @@ public static class EnvironmentConfig
         {
             builder.Configuration["ConnectionStrings:Redis"] = redisConnection;
             builder.Configuration["Redis:ConnectionString"] = redisConnection;
+            Log.Information("Environment Variable Mapping: Redis configured via environment variables.");
         }
 
         var redisInstance = Environment.GetEnvironmentVariable("REDIS_INSTANCE_NAME");
@@ -87,6 +96,8 @@ public static class EnvironmentConfig
         var logLevelDefault = Environment.GetEnvironmentVariable("LOG_LEVEL_DEFAULT");
         if (!string.IsNullOrEmpty(logLevelDefault))
             builder.Configuration["Logging:LogLevel:Default"] = logLevelDefault;
+            
+        Log.Information("Environment Variable Mapping: Completed.");
     }
 
     /// <summary>
