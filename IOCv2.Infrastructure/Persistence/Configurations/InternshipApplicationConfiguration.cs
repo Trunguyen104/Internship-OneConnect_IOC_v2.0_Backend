@@ -24,9 +24,15 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
 
         builder.Property(x => x.RejectReason).HasColumnName("reject_reason").HasMaxLength(500);
 
-        builder.Property(x => x.AppliedAt).HasColumnName("applied_at").HasColumnType("timestamptz").HasDefaultValueSql("now()");
+        builder.Property(x => x.AppliedAt).HasColumnName("created_at").HasColumnType("timestamptz").HasDefaultValueSql("now()");
         builder.Property(x => x.ReviewedAt).HasColumnName("reviewed_at").HasColumnType("timestamptz");
         builder.Property(x => x.ReviewedBy).HasColumnName("reviewed_by");
+
+        // ===== Audit columns =====
+        builder.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+        builder.Property(x => x.DeletedAt).HasColumnName("deleted_at");
+        builder.Property(x => x.CreatedBy).HasColumnName("created_by");
+        builder.Property(x => x.UpdatedBy).HasColumnName("updated_by");
 
         builder.HasOne(x => x.Enterprise)
             .WithMany(e => e.InternshipApplications)

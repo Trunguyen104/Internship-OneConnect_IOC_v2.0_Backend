@@ -35,6 +35,13 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(e => e.JoinedAt)
                 .HasColumnName("joined_at")
                 .IsRequired();
+
+            // ===== Audit columns =====
+            builder.Property(e => e.CreatedAt).HasColumnName("created_at");
+            builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            builder.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            builder.Property(e => e.CreatedBy).HasColumnName("created_by");
+            builder.Property(e => e.UpdatedBy).HasColumnName("updated_by");
         }
     }
 }

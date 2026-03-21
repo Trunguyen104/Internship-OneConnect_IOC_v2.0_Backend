@@ -3,20 +3,17 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Migrations
+namespace IOCv2.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260321101106_InitialMigration")]
-    partial class InitialMigration
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -517,7 +514,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<DateTime>("AppliedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamptz")
-                        .HasColumnName("applied_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
 
                     b.Property<DateTime>("CreatedAt")
@@ -592,7 +589,11 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_internship_applications_student_id_term_id_enterprise_id");
 
-                    b.ToTable("internship_applications", (string)null);
+                    b.ToTable("internship_applications", null, t =>
+                        {
+                            t.Property("CreatedAt")
+                                .HasColumnName("created_at1");
+                        });
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
@@ -2087,6 +2088,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithMany("InternshipGroups")
                         .HasForeignKey("TermId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_internship_groups_terms_term_id");
 
                     b.Navigation("Enterprise");
@@ -2245,6 +2247,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithOne("Student")
                         .HasForeignKey("IOCv2.Domain.Entities.Student", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_students_users_user_id");
 
                     b.Navigation("User");
@@ -2285,6 +2288,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithMany("Terms")
                         .HasForeignKey("UniversityId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_terms_universities_university_id");
 
                     b.Navigation("University");
