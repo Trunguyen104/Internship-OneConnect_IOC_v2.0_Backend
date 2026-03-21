@@ -4,6 +4,8 @@ using IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource
 using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetAllProjectResources;
 using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById;
+using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetReadProjectResourceById;
+using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +16,16 @@ namespace IOCv2.API.Controllers.Projects;
 /// Project Resources — manage files and resources attached to projects.
 /// </summary>
 [Tags("Project Resources")]
+[Route("api/v{version:apiVersion}/project-resources")]
 [Authorize]
-[Route("api/project-resources")]
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
 
-    public ProjectResourcesController(IMediator mediator) => _mediator = mediator;
+    public ProjectResourcesController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
 
     /// <summary>
     /// Get paginated list of project resources with optional filters.
@@ -38,25 +43,34 @@ public class ProjectResourcesController : ApiControllerBase
         return HandleResult(result);
     }
 
-    /// <summary>
-    /// Get a single project resource by ID.
-    /// </summary>
     [HttpGet("{resourceId:guid}/download")]
-    [ProducesResponseType(typeof(Result<GetProjectResourceByIdResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetProjectResourceById(
+    public async Task<IActionResult> GetDownloadProjectResourceById(
+       [FromRoute] Guid resourceId,
+       CancellationToken cancellationToken)
+    {
+        var query = new GetDownloadProjectResourceByIdQuery { ProjectResourceId = resourceId };
+        var result = await _mediator.Send(query, cancellationToken);
+
+        if (!result.IsSuccess || result.Data?.Content == null)
+        {
+            return HandleResult(result);
+        }
+
+        return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
+    }
+
+    [HttpGet("{resourceId:guid}/read")]
+    [ProducesResponseType(typeof(Result<GetReadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetReadProjectResourceById(
         [FromRoute] Guid resourceId,
         CancellationToken cancellationToken)
     {
-        var query = new GetProjectResourceByIdQuery { ProjectResourceId = resourceId };
-        var result = await _mediator.Send(query, cancellationToken);
-        if (result.ErrorType == ResultErrorType.Forbidden) return StatusCode(StatusCodes.Status403Forbidden, result);
-        if (result.ErrorType == ResultErrorType.NotFound) return NotFound(result);
-        var stream = System.IO.File.OpenRead(result.Data.FilePath);
-
-        return File(stream, "application/octet-stream", result.Data.FileName);
+        var command = new GetReadProjectResourceByIdQuery { ResourceId = resourceId };
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
     }
 
     /// <summary>
@@ -64,14 +78,14 @@ public class ProjectResourcesController : ApiControllerBase
     /// </summary>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UploadProjectResource(
-        [FromForm] UploadProjectResourceCommand command,
-        CancellationToken cancellationToken)
+    [FromForm] UploadProjectResourceCommand command,
+    CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
@@ -81,7 +95,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// Update metadata of an existing project resource.
     /// </summary>
     [HttpPut("{resourceId:guid}")]
-    [ProducesResponseType(typeof(Result<UpdateProjectResourceResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<UpdateProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

@@ -2,115 +2,135 @@
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetAllProjectResources
+namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 {
-    public class GetAllProjectResourcesHandler : IRequestHandler<GetAllProjectResourcesQuery, Result<PaginatedResult<GetAllProjectResourcesResponse>>>
+    public class GetAllProjectsHandler : IRequestHandler<GetAllProjectsQuery, Result<PaginatedResult<GetAllProjectsResponse>>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<GetAllProjectResourcesHandler> _logger;
+        private readonly ILogger<GetAllProjectsHandler> _logger;
         private readonly IMessageService _messageService;
-        public GetAllProjectResourcesHandler(
+        private readonly ICacheService _cacheService;
+
+        public GetAllProjectsHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ILogger<GetAllProjectResourcesHandler> logger,
-            IMessageService messageService)
+            ILogger<GetAllProjectsHandler> logger,
+            IMessageService messageService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _messageService = messageService;
+            _cacheService = cacheService;
         }
 
-        public async Task<Result<PaginatedResult<GetAllProjectResourcesResponse>>> Handle(
-            GetAllProjectResourcesQuery request,
+        public async Task<Result<PaginatedResult<GetAllProjectsResponse>>> Handle(
+            GetAllProjectsQuery request,
             CancellationToken cancellationToken)
         {
-            try
+            _logger.LogInformation("Retrieving all projects with SearchTerm: {SearchTerm}, Status: {Status}", request.SearchTerm, request.Status);
+
+            var cacheKey = ProjectCacheKeys.ProjectList(
+                request.SearchTerm,
+                request.Status.HasValue ? (int)request.Status.Value : null,
+                request.FromDate,
+                request.ToDate,
+                request.InternshipId,
+                request.StudentId,
+                request.PageNumber,
+                request.PageSize,
+                request.SortColumn,
+                request.SortOrder);
+
+            var cached = await _cacheService.GetAsync<PaginatedResult<GetAllProjectsResponse>>(cacheKey, cancellationToken);
+            if (cached != null)
             {
-                
-
-                // Build query
-                var query = _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query()
-                    .AsNoTracking();
-
-                // Apply search term if provided
-                if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-                {
-                    var term = request.SearchTerm.Trim().ToLower();
-                    query = query.Where(x => x.ResourceName != null &&
-                        x.ResourceName.ToLower().Contains(term));
-                }
-
-                // Apply project filter if provided
-                if (request.ProjectId.HasValue)
-                {
-                    query = query.Where(x => x.ProjectId == request.ProjectId.Value);
-                }
-
-                // Apply resource type filter if provided
-                if (request.ResourceType.HasValue)
-                {
-                    query = query.Where(x => x.ResourceType == request.ResourceType.Value);
-                }
-
-                // Get total count
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                // Apply sorting
-                query = ApplySorting(query, request.SortColumn, request.SortOrder);
-
-                // Apply pagination
-                var items = await query
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ProjectTo<GetAllProjectResourcesResponse>(_mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken);
-
-                // Create paginated result
-                var result = PaginatedResult<GetAllProjectResourcesResponse>.Create(
-                    items, totalCount, request.PageNumber, request.PageSize);
-                _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetAllSuccess), items.Count);
-           
-
-                return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Success(result);
+                return Result<PaginatedResult<GetAllProjectsResponse>>.Success(cached);
             }
-            catch (Exception ex)
+
+            // 1. Build base query
+            var query = _unitOfWork.Repository<Project>().Query().AsNoTracking();
+
+            // 2. Apply Filters (FFA-FLW)
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetAllError));
-                return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                var term = request.SearchTerm.Trim().ToLower();
+                query = query.Where(p =>
+                    p.ProjectName.ToLower().Contains(term) ||
+                    (p.Description != null && p.Description.ToLower().Contains(term)));
             }
+
+            if (request.Status.HasValue)
+            {
+                query = query.Where(p => p.Status == request.Status.Value);
+            }
+
+
+            if (request.FromDate.HasValue)
+            {
+                query = query.Where(p => p.StartDate >= request.FromDate.Value);
+            }
+
+            if (request.ToDate.HasValue)
+            {
+                query = query.Where(p => p.EndDate <= request.ToDate.Value);
+            }
+
+            // 3. Get Total Count
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            // 4. Sorting
+            query = ApplySorting(query, request.SortColumn, request.SortOrder);
+
+            // 5. Pagination & Mapping
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ProjectTo<GetAllProjectsResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+            var result = PaginatedResult<GetAllProjectsResponse>.Create(
+                items, totalCount, request.PageNumber, request.PageSize);
+
+            _logger.LogInformation("Successfully retrieved {Count} projects", items.Count);
+
+            await _cacheService.SetAsync(cacheKey, result, ProjectCacheKeys.Expiration.ProjectList, cancellationToken);
+
+            return Result<PaginatedResult<GetAllProjectsResponse>>.Success(result);
         }
 
-        private IQueryable<Domain.Entities.ProjectResources> ApplySorting(
-            IQueryable<Domain.Entities.ProjectResources> query,
-            string? sortColumn,
-            string? sortOrder)
+        private IQueryable<Project> ApplySorting(IQueryable<Project> query, string? sortColumn, string? sortOrder)
         {
             var isDescending = sortOrder?.ToLower() == "desc";
 
             return (sortColumn?.ToLower(), isDescending) switch
             {
-                ("resourcename", true) => query.OrderByDescending(x => x.ResourceName),
-                ("resourcename", false) => query.OrderBy(x => x.ResourceName),
-
-                ("resourcetype", true) => query.OrderByDescending(x => x.ResourceType),
-                ("resourcetype", false) => query.OrderBy(x => x.ResourceType),
-
-                ("createdat", true) => query.OrderByDescending(x => x.CreatedAt),
-                ("createdat", false) => query.OrderBy(x => x.CreatedAt),
-
-                _ => query.OrderByDescending(x => x.CreatedAt)
+                ("projectname", true) => query.OrderByDescending(p => p.ProjectName),
+                ("projectname", false) => query.OrderBy(p => p.ProjectName),
+                ("startdate", true) => query.OrderByDescending(p => p.StartDate),
+                ("startdate", false) => query.OrderBy(p => p.StartDate),
+                ("enddate", true) => query.OrderByDescending(p => p.EndDate),
+                ("enddate", false) => query.OrderBy(p => p.EndDate),
+                ("status", true) => query.OrderByDescending(p => p.Status),
+                ("status", false) => query.OrderBy(p => p.Status),
+                ("createdat", true) => query.OrderByDescending(p => p.CreatedAt),
+                ("createdat", false) => query.OrderBy(p => p.CreatedAt),
+                _ => query.OrderByDescending(p => p.CreatedAt)
             };
         }
     }
