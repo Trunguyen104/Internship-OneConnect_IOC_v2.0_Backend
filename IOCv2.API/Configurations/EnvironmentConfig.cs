@@ -1,4 +1,4 @@
-﻿
+
 using DotNetEnv;
 using Serilog;
 
@@ -42,8 +42,8 @@ public static class EnvironmentConfig
         var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
         if (!string.IsNullOrEmpty(dbHost) && !string.IsNullOrEmpty(dbPassword))
         {
-            var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
-            var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "IOCv2";
+            var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? "5433";
+            var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? "IOCV2Db";
             var dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
             builder.Configuration["ConnectionStrings:DefaultConnection"] = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
         }

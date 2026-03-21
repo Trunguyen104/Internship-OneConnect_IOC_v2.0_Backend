@@ -17,6 +17,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<ILogger<DeleteProjectHandler>> _mockLogger;
         private readonly Mock<IMessageService> _mockMessageService;
         private readonly Mock<ICurrentUserService> _mockCurrentUser;
+        private readonly Mock<ICacheService> _mockCacheService;
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepo;
         private readonly DeleteProjectHandler _handler;
 
@@ -26,6 +27,7 @@ namespace IOCv2.Tests.Features.Projects
             _mockLogger = new Mock<ILogger<DeleteProjectHandler>>();
             _mockMessageService = new Mock<IMessageService>();
             _mockCurrentUser = new Mock<ICurrentUserService>();
+            _mockCacheService = new Mock<ICacheService>();
             
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
 
@@ -35,7 +37,8 @@ namespace IOCv2.Tests.Features.Projects
                 _mockUnitOfWork.Object,
                 _mockLogger.Object,
                 _mockMessageService.Object,
-                _mockCurrentUser.Object);
+                _mockCurrentUser.Object,
+                _mockCacheService.Object);
         }
 
         [Fact]
@@ -52,6 +55,10 @@ namespace IOCv2.Tests.Features.Projects
                 .ReturnsAsync(project);
             
             _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Delete successful");
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);

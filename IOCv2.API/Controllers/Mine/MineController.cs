@@ -1,6 +1,6 @@
 using IOCv2.API.Attributes;
 using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.InternshipGroups.Queries.GetMyInternshipGroups;
+using IOCv2.Application.Features.InternshipGroups.Queries.GetMyInternshipTerms;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +15,12 @@ public class MineController : ApiControllerBase
 
     public MineController(IMediator mediator) => _mediator = mediator;
 
-    [HttpGet]
-    [RateLimit(maxRequests: 10, windowMinutes: 10, blockMinutes: 5)]
-    [ProducesResponseType(typeof(ApiResponse<List<GetMyInternshipGroupsResponse>>), StatusCodes.Status200OK)]
+    [HttpGet("internship-terms")]
+    [RateLimit(maxRequests: 20, windowMinutes: 1, blockMinutes: 5)]
+    [ProducesResponseType(typeof(ApiResponse<List<GetMyInternshipTermsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetMine(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetMyTerms(CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(new GetMyInternshipGroupsQuery(), cancellationToken));
+        return HandleResult(await _mediator.Send(new GetMyInternshipTermsQuery(), cancellationToken));
     }
 }

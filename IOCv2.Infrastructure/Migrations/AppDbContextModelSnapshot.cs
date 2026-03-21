@@ -148,7 +148,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
+                        .HasDefaultValue((short)2)
                         .HasColumnName("status");
 
                     b.Property<string>("TaxCode")
@@ -189,6 +189,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_user_id");
 
+                    b.Property<string>("Bio")
+                        .HasColumnType("text")
+                        .HasColumnName("bio");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -206,6 +210,10 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_id");
+
+                    b.Property<string>("Expertise")
+                        .HasColumnType("text")
+                        .HasColumnName("expertise");
 
                     b.Property<string>("Position")
                         .HasMaxLength(100)
@@ -924,8 +932,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<string>("ResourceUrl")
                         .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
                         .HasColumnName("resource_url");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1302,6 +1310,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("major");
 
+                    b.Property<string>("PortfolioUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("portfolio_url");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("updated_at");
@@ -1532,6 +1544,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("uni_user_id");
 
+                    b.Property<string>("Bio")
+                        .HasColumnType("text")
+                        .HasColumnName("bio");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -1545,6 +1561,10 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("deleted_at");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("text")
+                        .HasColumnName("department");
 
                     b.Property<string>("Position")
                         .HasColumnType("text")

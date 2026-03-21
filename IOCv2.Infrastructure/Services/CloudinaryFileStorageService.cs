@@ -4,6 +4,7 @@ using IOCv2.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace IOCv2.Infrastructure.Services;
 
@@ -140,9 +141,37 @@ public class CloudinaryFileStorageService : IFileStorageService
     public async Task<Stream> GetFileAsync(string fileUrl, CancellationToken cancellationToken = default)
     {
         var client = _httpClientFactory.CreateClient();
+
         var response = await client.GetAsync(fileUrl, cancellationToken);
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadAsStreamAsync(cancellationToken);
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+            response.StatusCode == System.Net.HttpStatusCode.Forbidden ||
+            response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            var signedUrls = TryBuildSignedDownloadUrls(fileUrl);
+            foreach (var signedUrl in signedUrls)
+            {
+                response.Dispose();
+                response = await client.GetAsync(signedUrl, cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStreamAsync(cancellationToken);
+                }
+            }
+        }
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        _logger.LogError(
+            "Cloudinary download failed. Status: {StatusCode}, Url: {Url}, Body: {Body}",
+            (int)response.StatusCode,
+            fileUrl,
+            body);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStreamAsync(cancellationToken);
+        throw new InvalidOperationException("Cloudinary download failed.");
     }
 
     public async Task<FileInfo?> GetFileInfoAsync(string fileUrl, CancellationToken cancellationToken = default)
@@ -230,5 +259,97 @@ public class CloudinaryFileStorageService : IFileStorageService
         publicIdParts[^1] = lastWithoutExtension;
 
         return (string.Join('/', publicIdParts), resourceType);
+    }
+
+    private IEnumerable<string> TryBuildSignedDownloadUrls(string fileUrl)
+    {
+        var (resourceType, defaultDeliveryType, publicIdWithoutExtension, publicIdWithExtension) =
+            ExtractResourceInfo(fileUrl);
+
+        if (string.IsNullOrWhiteSpace(publicIdWithoutExtension) && string.IsNullOrWhiteSpace(publicIdWithExtension))
+        {
+            yield break;
+        }
+
+        var resourceTypeValue = resourceType == ResourceType.Raw ? "raw" : "image";
+        var deliveryTypeCandidates = new[]
+        {
+            defaultDeliveryType,
+            "upload",
+            "authenticated",
+            "private"
+        }
+        .Where(t => !string.IsNullOrWhiteSpace(t))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray();
+
+        var publicIdCandidates = new[]
+        {
+            publicIdWithoutExtension,
+            publicIdWithExtension
+        }
+        .Where(id => !string.IsNullOrWhiteSpace(id))
+        .Distinct(StringComparer.Ordinal)
+        .ToArray();
+
+        foreach (var deliveryType in deliveryTypeCandidates)
+        {
+            foreach (var publicId in publicIdCandidates)
+            {
+                yield return _cloudinary.DownloadPrivate(publicId!, true, null, deliveryType, null, resourceTypeValue);
+            }
+        }
+    }
+
+    private static (ResourceType resourceType, string deliveryType, string publicIdWithoutExtension, string publicIdWithExtension)
+        ExtractResourceInfo(string fileUrl)
+    {
+        if (!Uri.TryCreate(fileUrl, UriKind.Absolute, out var uri))
+        {
+            return (ResourceType.Image, "upload", string.Empty, string.Empty);
+        }
+
+        var path = uri.AbsolutePath;
+        var resourceType = path.Contains("/raw/", StringComparison.OrdinalIgnoreCase)
+            ? ResourceType.Raw
+            : ResourceType.Image;
+
+        var deliveryType = "upload";
+        if (path.Contains("/authenticated/", StringComparison.OrdinalIgnoreCase))
+        {
+            deliveryType = "authenticated";
+        }
+        else if (path.Contains("/private/", StringComparison.OrdinalIgnoreCase))
+        {
+            deliveryType = "private";
+        }
+
+        var match = Regex.Match(path,
+            @"/(?:image|video|raw)/(?:upload|authenticated|private)/(?:v\d+/)?(?<publicId>.+)$",
+            RegexOptions.IgnoreCase);
+
+        if (!match.Success)
+        {
+            return (resourceType, deliveryType, string.Empty, string.Empty);
+        }
+
+        var publicIdWithExtension = match.Groups["publicId"].Value.Trim('/');
+        var publicIdWithoutExtension = publicIdWithExtension;
+
+        var slashIndex = publicIdWithExtension.LastIndexOf('/');
+        var lastPart = slashIndex >= 0
+            ? publicIdWithExtension[(slashIndex + 1)..]
+            : publicIdWithExtension;
+
+        var lastPartWithoutExtension = Path.GetFileNameWithoutExtension(lastPart);
+        if (!string.IsNullOrWhiteSpace(lastPartWithoutExtension) &&
+            !string.Equals(lastPart, lastPartWithoutExtension, StringComparison.Ordinal))
+        {
+            publicIdWithoutExtension = slashIndex >= 0
+                ? $"{publicIdWithExtension[..(slashIndex + 1)]}{lastPartWithoutExtension}"
+                : lastPartWithoutExtension;
+        }
+
+        return (resourceType, deliveryType, publicIdWithoutExtension, publicIdWithExtension);
     }
 }

@@ -17,7 +17,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ILogger<CreateProjectHandler>> _mockLogger;
         private readonly Mock<IMessageService> _mockMessage;
-        private readonly Mock<ICurrentUserService> _mockCurrentUserService;
+        private readonly Mock<ICacheService> _mockCacheService;
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipRepo;
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepo;
         private readonly CreateProjectHandler _handler;
@@ -28,7 +28,7 @@ namespace IOCv2.Tests.Features.Projects
             _mockMapper = new Mock<IMapper>();
             _mockLogger = new Mock<ILogger<CreateProjectHandler>>();
             _mockMessage = new Mock<IMessageService>();
-            _mockCurrentUserService = new Mock<ICurrentUserService>();
+            _mockCacheService = new Mock<ICacheService>();
             
             _mockInternshipRepo = new Mock<IGenericRepository<InternshipGroup>>();
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
@@ -40,8 +40,8 @@ namespace IOCv2.Tests.Features.Projects
                 _mockUnitOfWork.Object,
                 _mockMapper.Object,
                 _mockLogger.Object,
-                _mockCurrentUserService.Object,
-                _mockMessage.Object);
+                _mockMessage.Object,
+                _mockCacheService.Object);
         }
 
         [Fact]
@@ -56,6 +56,9 @@ namespace IOCv2.Tests.Features.Projects
             
             _mockProjectRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Project, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
+
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             _mockMapper.Setup(x => x.Map<CreateProjectResponse>(It.IsAny<Project>()))
                 .Returns(new CreateProjectResponse { ProjectName = "New Project" });
