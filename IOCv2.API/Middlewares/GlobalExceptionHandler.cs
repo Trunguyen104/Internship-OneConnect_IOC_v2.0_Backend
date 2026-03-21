@@ -23,16 +23,34 @@ namespace IOCv2.API.Middlewares
         {
             _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
+            // ValidationException — trả về field-keyed errors
+            if (exception is ValidationException validationException)
+            {
+                var validationErrors = validationException.Errors
+                    .GroupBy(e => ToCamelCase(e.PropertyName))
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToList());
+
+                var validationResponse = new ErrorResponse(
+                    (int)HttpStatusCode.BadRequest,
+                    "Validation Error",
+                    validationErrors);
+
+                httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await httpContext.Response.WriteAsJsonAsync(validationResponse, cancellationToken);
+                return true;
+            }
+
             var statusCode = (int)HttpStatusCode.InternalServerError;
             var message = "An unexpected error occurred.";
             List<string>? errors = null;
 
             switch (exception)
             {
-                case ValidationException validationException:
+                case DomainViolationException domainEx:
                     statusCode = (int)HttpStatusCode.BadRequest;
-                    message = "Validation Error";
-                    errors = validationException.Errors.Select(x => x.ErrorMessage).ToList();
+                    message = domainEx.Message;
                     break;
                 case BusinessException businessException:
                     statusCode = (int)HttpStatusCode.BadRequest;
@@ -56,6 +74,12 @@ namespace IOCv2.API.Middlewares
             httpContext.Response.StatusCode = statusCode;
             await httpContext.Response.WriteAsJsonAsync(errorResponse, cancellationToken);
             return true;
+        }
+
+        private static string ToCamelCase(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)) return "general";
+            return char.ToLowerInvariant(propertyName[0]) + propertyName[1..];
         }
     }
 }

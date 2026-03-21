@@ -294,7 +294,15 @@ namespace IOCv2.Infrastructure.Persistence
                 var students = await _context.Students.Take(2).ToListAsync();
                 foreach (var s in students)
                 {
-                    _context.StudentTerms.Add(new StudentTerm { StudentId = s.StudentId, TermId = term.TermId, Status = 1 });
+                    _context.StudentTerms.Add(new StudentTerm
+                    {
+                        StudentTermId = Guid.NewGuid(),
+                        StudentId = s.StudentId,
+                        TermId = term.TermId,
+                        EnrollmentStatus = IOCv2.Domain.Enums.EnrollmentStatus.Active,
+                        PlacementStatus = IOCv2.Domain.Enums.PlacementStatus.Unplaced,
+                        EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow)
+                    });
                 }
                 await _context.SaveChangesAsync();
             }
