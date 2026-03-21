@@ -1,12 +1,13 @@
+using AutoMapper;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using IOCv2.Application.Constants;
-using AutoMapper;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGroup
 {
@@ -38,9 +39,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
             try
             {
+                // Không dùng AsNoTracking — cần EF track để xóa InternshipStudent
                 var group = await _unitOfWork.Repository<InternshipGroup>().Query()
                     .Include(g => g.Members)
-                    .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (group == null)
@@ -49,14 +50,27 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                     return Result<RemoveStudentsFromGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
-                await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
-                foreach (var sId in request.StudentIds)
+                if (group.Status != GroupStatus.Active)
                 {
-                    group.RemoveMember(sId);
+                    _logger.LogWarning("Cannot remove students from group. Group {GroupId} is not Active.", group.InternshipId);
+                    return Result<RemoveStudentsFromGroupResponse>.Failure(
+                        "Chỉ có thể xóa sinh viên khỏi nhóm đang hoạt động (Active).",
+                        ResultErrorType.BadRequest);
                 }
 
-                await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+                // Xóa trực tiếp các InternshipStudent record thay vì UpdateAsync group
+                var membersToRemove = group.Members
+                    .Where(m => request.StudentIds.Contains(m.StudentId))
+                    .ToList();
+
+                var memberRepo = _unitOfWork.Repository<InternshipStudent>();
+                foreach (var member in membersToRemove)
+                {
+                    await memberRepo.DeleteAsync(member);
+                }
+
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 if (saved >= 0)
@@ -66,7 +80,13 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                     await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemovedStudentsSuccess), request.InternshipId);
 
-                    var response = _mapper.Map<RemoveStudentsFromGroupResponse>(group);
+                    // Reload group sau khi xóa để response đúng
+                    var updatedGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
+                        .Include(g => g.Members)
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
+
+                    var response = _mapper.Map<RemoveStudentsFromGroupResponse>(updatedGroup);
                     return Result<RemoveStudentsFromGroupResponse>.Success(response);
                 }
 

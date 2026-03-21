@@ -13,22 +13,32 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
         builder.HasKey(x => x.ApplicationId);
 
         builder.Property(x => x.ApplicationId).HasColumnName("application_id");
-        builder.Property(x => x.InternshipId).HasColumnName("internship_id");
-        builder.Property(x => x.StudentId).HasColumnName("student_id");
+        builder.Property(x => x.EnterpriseId).HasColumnName("enterprise_id").IsRequired();
+        builder.Property(x => x.TermId).HasColumnName("term_id").IsRequired();
+        builder.Property(x => x.StudentId).HasColumnName("student_id").IsRequired();
 
         builder.Property(x => x.Status)
             .HasColumnName("status")
             .HasConversion<short>()
             .HasColumnType("smallint");
 
+        builder.Property(x => x.RejectReason).HasColumnName("reject_reason").HasMaxLength(500);
+
         builder.Property(x => x.AppliedAt).HasColumnName("applied_at").HasColumnType("timestamptz").HasDefaultValueSql("now()");
         builder.Property(x => x.ReviewedAt).HasColumnName("reviewed_at").HasColumnType("timestamptz");
         builder.Property(x => x.ReviewedBy).HasColumnName("reviewed_by");
 
-        builder.HasOne(x => x.InternshipGroup)
-            .WithMany(ig => ig.InternshipApplications)
-            .HasForeignKey(x => x.InternshipId)
-            .IsRequired(false);
+        builder.HasOne(x => x.Enterprise)
+            .WithMany(e => e.InternshipApplications)
+            .HasForeignKey(x => x.EnterpriseId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
+
+        builder.HasOne(x => x.Term)
+            .WithMany(t => t.InternshipApplications)
+            .HasForeignKey(x => x.TermId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
 
         builder.HasOne(x => x.Student)
             .WithMany(s => s.InternshipApplications)
@@ -41,6 +51,6 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
 
-        builder.HasIndex(x => new { x.InternshipId, x.StudentId }).IsUnique();
+        builder.HasIndex(x => new { x.StudentId, x.TermId, x.EnterpriseId }).IsUnique();
     }
 }

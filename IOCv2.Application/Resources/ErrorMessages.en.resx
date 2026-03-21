@@ -433,6 +433,189 @@
   <data name="Internships.NotFound" xml:space="preserve">
     <value>No internship found with ID: {0}</value>
   </data>
+  <!-- StudentTerms — Validation: TermId / StudentTermId -->
+  <data name="StudentTerms.TermIdRequired" xml:space="preserve">
+    <value>TermId is required.</value>
+  </data>
+  <data name="StudentTerms.StudentTermIdRequired" xml:space="preserve">
+    <value>StudentTermId is required.</value>
+  </data>
+  <data name="StudentTerms.StudentTermIdListRequired" xml:space="preserve">
+    <value>Student ID list must not be empty.</value>
+  </data>
+  <data name="StudentTerms.StudentTermIdListMinCount" xml:space="preserve">
+    <value>At least 1 student must be selected.</value>
+  </data>
+  <data name="StudentTerms.ValidRecordsRequired" xml:space="preserve">
+    <value>Valid records list must not be null.</value>
+  </data>
+  <data name="StudentTerms.ValidRecordsMinCount" xml:space="preserve">
+    <value>At least 1 valid record is required.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: File -->
+  <data name="StudentTerms.FileRequired" xml:space="preserve">
+    <value>File is required.</value>
+  </data>
+  <data name="StudentTerms.FileEmpty" xml:space="preserve">
+    <value>File must not be empty.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: FullName -->
+  <data name="StudentTerms.FullNameRequired" xml:space="preserve">
+    <value>Full name is required.</value>
+  </data>
+  <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
+    <value>Full name must contain only letters and spaces.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: StudentCode -->
+  <data name="StudentTerms.StudentCodeRequired" xml:space="preserve">
+    <value>Student code is required.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
+    <value>Student code is invalid.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInvalidDetail" xml:space="preserve">
+    <value>Student code is invalid (only a-z, 0-9, -, _, . are allowed).</value>
+  </data>
+  <data name="StudentTerms.StudentCodeDuplicateInFile" xml:space="preserve">
+    <value>Duplicate student code found in file.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeAlreadyInTerm" xml:space="preserve">
+    <value>Student code is already enrolled in this term.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInOtherTerm" xml:space="preserve">
+    <value>Student is already enrolled in another term.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: Email -->
+  <data name="StudentTerms.EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="StudentTerms.EmailInvalid" xml:space="preserve">
+    <value>Email format is invalid.</value>
+  </data>
+  <data name="StudentTerms.EmailDuplicateInFile" xml:space="preserve">
+    <value>Duplicate email found in file.</value>
+  </data>
+  <data name="StudentTerms.EmailAlreadyInTerm" xml:space="preserve">
+    <value>Email is already enrolled in this term.</value>
+  </data>
+  <data name="StudentTerms.EmailInOtherTerm" xml:space="preserve">
+    <value>Email is already enrolled in another term.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: Phone -->
+  <data name="StudentTerms.PhoneInvalid" xml:space="preserve">
+    <value>Phone number is invalid.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: DateOfBirth -->
+  <data name="StudentTerms.DateOfBirthInvalidFormat" xml:space="preserve">
+    <value>Date of birth format is invalid (dd/MM/yyyy).</value>
+  </data>
+  <data name="StudentTerms.DateOfBirthMinAge" xml:space="preserve">
+    <value>Student must be at least 15 years old.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: List query -->
+  <data name="StudentTerms.SearchTermMaxLength" xml:space="preserve">
+    <value>Search term must not exceed 100 characters.</value>
+  </data>
+  <data name="StudentTerms.SortByAllowedValues" xml:space="preserve">
+    <value>SortBy must be one of: {0}.</value>
+  </data>
+  <data name="StudentTerms.SortOrderAllowedValues" xml:space="preserve">
+    <value>SortOrder must be 'asc' or 'desc'.</value>
+  </data>
+
+  <!-- StudentTerms Messages -->
+  <data name="StudentTerms.NotFound" xml:space="preserve">
+    <value>Student term enrollment record not found.</value>
+  </data>
+  <data name="StudentTerms.TermNotOpen" xml:space="preserve">
+    <value>The term is not open or has been closed. Cannot add students.</value>
+  </data>
+  <data name="StudentTerms.EmailConflict" xml:space="preserve">
+    <value>This email is already used in the current term.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeConflict" xml:space="preserve">
+    <value>Student code already exists in the system.</value>
+  </data>
+  <data name="StudentTerms.AlreadyEnrolled" xml:space="preserve">
+    <value>Student is already enrolled in this term.</value>
+  </data>
+  <data name="StudentTerms.AlreadyWithdrawn" xml:space="preserve">
+    <value>Student has already been withdrawn from this term.</value>
+  </data>
+  <data name="StudentTerms.NotWithdrawn" xml:space="preserve">
+    <value>Student has not been withdrawn from this term.</value>
+  </data>
+  <data name="StudentTerms.CannotWithdrawPlaced" xml:space="preserve">
+    <value>Student is currently placed. Please cancel the placement before withdrawing.</value>
+  </data>
+  <data name="StudentTerms.EnterpriseIdRequiredWhenPlaced" xml:space="preserve">
+    <value>An enterprise must be specified when placing a student.</value>
+  </data>
+  <data name="StudentTerms.EnterpriseNotFound" xml:space="preserve">
+    <value>The specified enterprise was not found.</value>
+  </data>
+  <data name="StudentTerms.AllStudentsPlaced" xml:space="preserve">
+    <value>All selected students are already placed.</value>
+  </data>
+  <data name="StudentTerms.InvalidFileFormat" xml:space="preserve">
+    <value>Only Excel XLSX files are supported.</value>
+  </data>
+  <data name="StudentTerms.FileTooLarge" xml:space="preserve">
+    <value>File must not exceed 5MB.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaders" xml:space="preserve">
+    <value>Excel file has invalid headers. Please use the provided template.</value>
+  </data>
+  <data name="StudentTerms.TooManyRows" xml:space="preserve">
+    <value>File contains too many rows. Maximum 1000 rows per import.</value>
+  </data>
+  <data name="StudentTerms.AddSuccess" xml:space="preserve">
+    <value>Student added to term successfully.</value>
+  </data>
+  <data name="StudentTerms.UpdateSuccess" xml:space="preserve">
+    <value>Student term enrollment updated successfully.</value>
+  </data>
+  <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
+    <value>Student withdrawn from term successfully.</value>
+  </data>
+  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
+    <value>Student enrollment restored successfully.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
+    <value>Bulk withdrawal completed successfully.</value>
+  </data>
+  <data name="StudentTerms.ImportPreviewSuccess" xml:space="preserve">
+    <value>Import preview generated successfully.</value>
+  </data>
+  <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
+    <value>Students imported into term successfully.</value>
+  </data>
+  <data name="StudentTerms.Log.Added" xml:space="preserve">
+    <value>Student {0} added to term {1} by {2}.</value>
+  </data>
+  <data name="StudentTerms.Log.Updated" xml:space="preserve">
+    <value>Enrollment record {0} updated by {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
+    <value>Student {0} withdrawn from term by {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.Restored" xml:space="preserve">
+    <value>Student {0} restored to term by {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
+    <value>{0} students withdrawn from term by {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
+    <value>{0} students imported into term {1} by {2}.</value>
+  </data>
+
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Term not found.</value>
   </data>
@@ -688,6 +871,24 @@
   <data name="InternshipGroup.NotFound" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
+  <data name="InternshipGroup.HasStudents" xml:space="preserve">
+    <value>Cannot delete a group that still has students. Please move all students to another group first.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Enterprise user record not found for the current user.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotApproved" xml:space="preserve">
+    <value>Student {0} does not have an approved application for this enterprise.</value>
+  </data>
+  <data name="InternshipGroup.AtLeastOneStudentRequired" xml:space="preserve">
+    <value>The internship group must have at least 1 student.</value>
+  </data>
+  <data name="InternshipGroup.StudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Student is already in another active group in this term.</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
+    <value>Student {0} does not have an approved application for enterprise {1}</value>
+  </data>
   <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
     <value>Term not found for ID: {TermId}</value>
   </data>
@@ -796,6 +997,99 @@
   <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Cannot publish evaluation scores in an already completed evaluation cycle.</value>
   </data>
+
+  <!-- ── InternshipApplication: Validation ── -->
+  <data name="InternshipApplication.ApplicationIdRequired" xml:space="preserve">
+    <value>Application ID is required.</value>
+  </data>
+  <data name="InternshipApplication.MentorIdRequired" xml:space="preserve">
+    <value>Mentor ID is required.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonRequired" xml:space="preserve">
+    <value>Rejection reason is required.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonMaxLength" xml:space="preserve">
+    <value>Rejection reason cannot exceed 500 characters.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameRequired" xml:space="preserve">
+    <value>Project name is required.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameMaxLength" xml:space="preserve">
+    <value>Project name cannot exceed 255 characters.</value>
+  </data>
+  <data name="InternshipApplication.ProjectDescriptionMaxLength" xml:space="preserve">
+    <value>Project description cannot exceed 1000 characters.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Business Errors ── -->
+  <data name="InternshipApplication.NotFound" xml:space="preserve">
+    <value>Application not found.</value>
+  </data>
+  <data name="InternshipApplication.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Enterprise user record not found for the current user.</value>
+  </data>
+  <data name="InternshipApplication.MentorNotBelongToEnterprise" xml:space="preserve">
+    <value>The selected mentor does not belong to your enterprise.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToAccept" xml:space="preserve">
+    <value>Only applications with Pending status can be accepted.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToReject" xml:space="preserve">
+    <value>Only applications with Pending status can be rejected.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBeApprovedToAssign" xml:space="preserve">
+    <value>A mentor can only be assigned to an Approved application.</value>
+  </data>
+  <data name="InternshipApplication.StudentAlreadyInGroup" xml:space="preserve">
+    <value>The student has already been assigned to an internship group in this term.</value>
+  </data>
+  <data name="InternshipApplication.StudentNotInMentorGroup" xml:space="preserve">
+    <value>The student is not in your group. Please contact HR to assign a mentor first.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameExistsInGroup" xml:space="preserve">
+    <value>A project with this name already exists in the group.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Log Keys ── -->
+  <data name="InternshipApplication.Log.Accepting" xml:space="preserve">
+    <value>Accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptSuccess" xml:space="preserve">
+    <value>Application {0} accepted successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptError" xml:space="preserve">
+    <value>Error accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.Rejecting" xml:space="preserve">
+    <value>Rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectSuccess" xml:space="preserve">
+    <value>Application {0} rejected successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectError" xml:space="preserve">
+    <value>Error rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningMentor" xml:space="preserve">
+    <value>Assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorError" xml:space="preserve">
+    <value>Error assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningProject" xml:space="preserve">
+    <value>Assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectSuccess" xml:space="preserve">
+    <value>Project assigned successfully for application {0}, project: {1}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectError" xml:space="preserve">
+    <value>Error assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
+    <value>Current user identity is missing or invalid</value>
+  </data>
   <data name="Password.NotEmpty" xml:space="preserve">
     <value>Password cannot be empty.</value>
   </data>
@@ -879,5 +1173,20 @@
   </data>
   <data name="Enterprise.RestoreFailed" xml:space="preserve">
     <value>Failed to restore enterprise.</value>
+  </data>
+  <data name="InternshipGroup.MustBelongToYourEnterprise" xml:space="preserve">
+    <value>The group must belong to your enterprise.</value>
+  </data>
+  <data name="InternshipGroup.MustBeInSameTerm" xml:space="preserve">
+    <value>The groups must belong to the same internship term.</value>
+  </data>
+  <data name="InternshipGroup.MustBeActive" xml:space="preserve">
+    <value>Action can only be performed on active groups.</value>
+  </data>
+  <data name="InternshipGroup.StudentsNotInSourceGroup" xml:space="preserve">
+    <value>One or more students are not in the source group.</value>
+  </data>
+  <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
+    <value>The group has already been archived.</value>
   </data>
 </root>

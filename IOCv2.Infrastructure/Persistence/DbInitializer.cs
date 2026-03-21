@@ -294,7 +294,15 @@ namespace IOCv2.Infrastructure.Persistence
                 var students = await _context.Students.Take(2).ToListAsync();
                 foreach (var s in students)
                 {
-                    _context.StudentTerms.Add(new StudentTerm { StudentId = s.StudentId, TermId = term.TermId, Status = 1 });
+                    _context.StudentTerms.Add(new StudentTerm
+                    {
+                        StudentTermId = Guid.NewGuid(),
+                        StudentId = s.StudentId,
+                        TermId = term.TermId,
+                        EnrollmentStatus = IOCv2.Domain.Enums.EnrollmentStatus.Active,
+                        PlacementStatus = IOCv2.Domain.Enums.PlacementStatus.Unplaced,
+                        EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow)
+                    });
                 }
                 await _context.SaveChangesAsync();
             }
@@ -302,6 +310,11 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedInternshipGroups()
         {
+            if (await _context.InternshipGroups.AnyAsync())
+            {
+                return;
+            }
+
             var testStudentEmail = "trunguyen.104@gmail.com";
             var studentUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == testStudentEmail);
             
@@ -309,49 +322,81 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 var student = await _context.Students.Include(s => s.InternshipStudents).FirstOrDefaultAsync(s => s.UserId == studentUser.UserId);
                 
-                if (student != null && !student.InternshipStudents.Any())
+                var mentorUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor.fpt@iocv2.com")
+                                 ?? await _context.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Mentor);
+                
+                var mentor = await _context.EnterpriseUsers.FirstOrDefaultAsync(eu => mentorUser != null && eu.UserId == mentorUser.UserId);
+
+                var student1User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "trunguyen.104@gmail.com")
+                                   ?? await _context.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Student);
+                var student1 = await _context.Students.FirstOrDefaultAsync(s => student1User != null && s.UserId == student1User.UserId);
+
+                var student2User = await _context.Users.Where(u => u.Role == UserRole.Student).Skip(1).FirstOrDefaultAsync();
+                var student2 = await _context.Students.FirstOrDefaultAsync(s => student2User != null && s.UserId == student2User.UserId);
+
+                var student3User = await _context.Users.Where(u => u.Role == UserRole.Student).Skip(2).FirstOrDefaultAsync();
+                var student3 = await _context.Students.FirstOrDefaultAsync(s => student3User != null && s.UserId == student3User.UserId);
+
+
+                var term = await _context.Terms.OrderByDescending(t => t.StartDate).FirstOrDefaultAsync();
+                var fpt  = await _context.Enterprises.FirstOrDefaultAsync(e => e.Name.Contains("FPT"))
+                          ?? await _context.Enterprises.FirstOrDefaultAsync();
+
+                if (term != null && fpt != null && mentor != null && student1 != null)
                 {
-                    var term = await _context.Terms.OrderByDescending(t => t.StartDate).FirstOrDefaultAsync();
-                    var fpt = await _context.Enterprises.FirstOrDefaultAsync(e => e.Name.Contains("FPT")) 
-                              ?? await _context.Enterprises.FirstOrDefaultAsync();
-                    var mentor = await _context.EnterpriseUsers.FirstOrDefaultAsync(eu => 
-                                        eu.Position != null && (eu.Position.Contains("Senior") || eu.Position.Contains("Mentor")))
-                                   ?? await _context.EnterpriseUsers.FirstOrDefaultAsync();
+                    var group = InternshipGroup.Create(
+                        term.TermId,
+                        "Nhom OJT .NET WebCore",
+                        null,
+                        fpt.EnterpriseId,
+                        mentor.EnterpriseUserId,
+                        DateTime.UtcNow.AddMonths(-1),
+                        DateTime.UtcNow.AddMonths(3)
+                    );
+                    group.UpdateStatus(GroupStatus.Active);
+                    _context.InternshipGroups.Add(group);
 
-                    if (term != null && fpt != null && mentor != null)
+                    // Application 1: student1 - Approved
+                    _context.InternshipApplications.Add(new InternshipApplication
                     {
-                        var group = InternshipGroup.Create(
-                            term.TermId,
-                            "Nhóm OJT .NET WebCore - Rikkeisoft",
-                            fpt.EnterpriseId,
-                            mentor.EnterpriseUserId,
-                            DateTime.UtcNow.AddMonths(-1),
-                            DateTime.UtcNow.AddMonths(3)
-                        );
-                        group.UpdateStatus(InternshipStatus.InProgress);
-                        _context.InternshipGroups.Add(group);
+                        ApplicationId = Guid.NewGuid(),
+                        EnterpriseId  = fpt.EnterpriseId,
+                        TermId        = term.TermId,
+                        StudentId     = student1.StudentId,
+                        Status        = InternshipApplicationStatus.Approved,
+                        AppliedAt     = DateTime.UtcNow.AddDays(-40)
+                    });
 
-                        var member = new InternshipStudent
-                        {
-                            InternshipId = group.InternshipId,
-                            StudentId = student.StudentId,
-                            Role = InternshipRole.Leader,
-                            Status = InternshipStatus.InProgress,
-                            JoinedAt = DateTime.UtcNow.AddMonths(-1)
-                        };
-                        _context.InternshipStudents.Add(member);
-                        
-                         _context.InternshipApplications.Add(new InternshipApplication
+                    if (student2 != null)
+                    {
+                        _context.InternshipApplications.Add(new InternshipApplication
                         {
                             ApplicationId = Guid.NewGuid(),
-                            InternshipId = group.InternshipId,
-                            StudentId = student.StudentId,
-                            Status = InternshipApplicationStatus.Approved,
-                            AppliedAt = DateTime.UtcNow.AddDays(-40)
+                            EnterpriseId  = fpt.EnterpriseId,
+                            TermId        = term.TermId,
+                            StudentId     = student2.StudentId,
+                            Status        = InternshipApplicationStatus.Pending,
+                            AppliedAt     = DateTime.UtcNow.AddDays(-10)
                         });
+                    }
 
+                    if (student3 != null)
+                    {
+                        _context.InternshipApplications.Add(new InternshipApplication
+                        {
+                            ApplicationId = Guid.NewGuid(),
+                            EnterpriseId  = fpt.EnterpriseId,
+                            TermId        = term.TermId,
+                            StudentId     = student3.StudentId,
+                            Status        = InternshipApplicationStatus.Pending,
+                            AppliedAt     = DateTime.UtcNow.AddDays(-5)
+                        });
+                    }
+
+                    if (_context.ChangeTracker.HasChanges())
+                    {
                         await _context.SaveChangesAsync();
-                        System.Console.WriteLine($"Seeded Internship Group for {testStudentEmail}");
+                        System.Console.WriteLine("Seeded Internship Group for " + testStudentEmail);
                     }
                 }
             }
@@ -366,7 +411,7 @@ namespace IOCv2.Infrastructure.Persistence
 
                  if (term != null && ent != null && mentor != null && student != null)
                  {
-                    var group = InternshipGroup.Create(term.TermId, "Nhóm Thực Tập Mẫu", ent.EnterpriseId, mentor.EnterpriseUserId, DateTime.UtcNow, DateTime.UtcNow.AddMonths(3));
+                    var group = InternshipGroup.Create(term.TermId, "Nhóm Thực Tập Mẫu", null, ent.EnterpriseId, mentor.EnterpriseUserId, DateTime.UtcNow, DateTime.UtcNow.AddMonths(3));
                     _context.InternshipGroups.Add(group);
                     _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group.InternshipId, StudentId = student.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress });
                     await _context.SaveChangesAsync();

@@ -12,15 +12,17 @@ public static class InternshipGroupCacheKeys
         int pageSize,
         string? searchTerm,
         int? status,
-        Guid? universityId,
+        Guid? termId,
+        bool includeArchived,
         Guid? enterpriseId)
     {
         var searchPart = string.IsNullOrWhiteSpace(searchTerm) ? "none" : searchTerm.Trim().ToLowerInvariant();
         var statusPart = status?.ToString() ?? "all";
-        var universityPart = universityId?.ToString() ?? "all";
+        var termPart = termId?.ToString() ?? "all";
+        var archivedPart = includeArchived.ToString().ToLowerInvariant();
         var enterprisePart = enterpriseId?.ToString() ?? "all";
 
-        return $"{GroupListPrefix}:status:{statusPart}:search:{searchPart}:university:{universityPart}:enterprise:{enterprisePart}:page:{pageNumber}:size:{pageSize}";
+        return $"{GroupListPrefix}:status:{statusPart}:search:{searchPart}:term:{termPart}:archived:{archivedPart}:enterprise:{enterprisePart}:page:{pageNumber}:size:{pageSize}";
     }
 
     public static string GroupListPattern() => $"{GroupListPrefix}:*";

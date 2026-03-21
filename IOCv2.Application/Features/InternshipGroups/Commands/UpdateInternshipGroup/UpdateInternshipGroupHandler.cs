@@ -2,6 +2,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -48,6 +49,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     return Result<UpdateInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
+                if (entity.Status != GroupStatus.Active)
+                {
+                    _logger.LogWarning("Cannot update info. Group {GroupId} is not Active.", entity.InternshipId);
+                    return Result<UpdateInternshipGroupResponse>.Failure(
+                        "Chỉ có thể cập nhật thông tin nhóm đang hoạt động (Active).",
+                        ResultErrorType.BadRequest);
+                }
+
                 // Validate TermId
                 var termExists = await _unitOfWork.Repository<Term>()
                     .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
@@ -85,6 +94,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
 
                 entity.UpdateInfo(
                     request.GroupName,
+                    request.Description,
                     request.TermId,
                     request.EnterpriseId,
                     request.MentorId,

@@ -6,7 +6,13 @@ using IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGro
 using IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
+<<<<<<< HEAD
 using IOCv2.Application.Features.InternshipGroups.Queries.GetDashboard;
+=======
+using IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents;
+using IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetweenGroups;
+using IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternshipGroup;
+>>>>>>> b17ae5488721fd75b3cb01a2dc93f9ab9408772b
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -64,14 +70,17 @@ public class InternshipGroupsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Create a new internship group.
+    /// Create a new internship group. Chỉ HR hoặc EnterpriseAdmin mới được tạo nhóm thực tập.
     /// </summary>
     /// <param name="command">Group creation data.</param>
     /// <returns code="201">Returns the created group details.</returns>
     /// <returns code="400">Invalid data.</returns>
+    /// <returns code="403">Forbidden — only HR or EnterpriseAdmin can create groups.</returns>
     [HttpPost]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<CreateInternshipGroupResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateInternshipGroup(
         [FromBody] CreateInternshipGroupCommand command,
         CancellationToken cancellationToken = default)
@@ -85,9 +94,9 @@ public class InternshipGroupsController : ApiControllerBase
     /// Update an existing internship group.
     /// </summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<UpdateInternshipGroupResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateInternshipGroup(
@@ -104,8 +113,9 @@ public class InternshipGroupsController : ApiControllerBase
     /// Delete an internship group and its associated student list.
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<DeleteInternshipGroupResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteInternshipGroup(
@@ -120,8 +130,9 @@ public class InternshipGroupsController : ApiControllerBase
     /// Add a list of students to an internship group.
     /// </summary>
     [HttpPost("students")]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<AddStudentsToGroupResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AddStudentsToGroup(
@@ -136,8 +147,9 @@ public class InternshipGroupsController : ApiControllerBase
     /// Remove students from an internship group.
     /// </summary>
     [HttpDelete("students")]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<RemoveStudentsFromGroupResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemoveStudentsFromGroup(
@@ -161,5 +173,52 @@ public class InternshipGroupsController : ApiControllerBase
     {
         _logger.LogInformation("Request to get dashboard for internship group ID: {Id}", id);
         return HandleResult(await _mediator.Send(new GetInternshipGroupDashboardQuery(id), cancellationToken));
+    /// Get placed students for the specific term and HR enterprise.
+    /// </summary>
+    [HttpGet("placed-students")]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetPlacedStudentsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetPlacedStudents(
+        [FromQuery] GetPlacedStudentsQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Request to get placed students with query: {@Query}", query);
+        return HandleResult(await _mediator.Send(query, cancellationToken));
+    }
+
+    /// <summary>
+    /// Move students between internship groups.
+    /// </summary>
+    [HttpPost("move-students")]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
+    [ProducesResponseType(typeof(ApiResponse<MoveStudentsBetweenGroupsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> MoveStudentsBetweenGroups(
+        [FromBody] MoveStudentsBetweenGroupsCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Request to move students between groups: from {FromGroupId} to {ToGroupId}", command.FromGroupId, command.ToGroupId);
+        return HandleResult(await _mediator.Send(command, cancellationToken));
+    }
+
+    /// <summary>
+    /// Archive an internship group.
+    /// </summary>
+    [HttpPatch("{id:guid}/archive")]
+    [Authorize(Roles = "HR,EnterpriseAdmin")]
+    [ProducesResponseType(typeof(ApiResponse<ArchiveInternshipGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ArchiveInternshipGroup(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Request to archive internship group: {Id}", id);
+        return HandleResult(await _mediator.Send(new ArchiveInternshipGroupCommand { InternshipGroupId = id }, cancellationToken));
     }
 }
