@@ -27,5 +27,6 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
         public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
+        public virtual ICollection<ViolationReport> ViolationReports { get; set; } = new List<ViolationReport>();
     }
 }
