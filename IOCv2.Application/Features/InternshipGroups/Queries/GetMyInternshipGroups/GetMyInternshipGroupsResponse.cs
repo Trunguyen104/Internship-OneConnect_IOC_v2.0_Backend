@@ -10,7 +10,7 @@ public class GetMyInternshipGroupsResponse
     public Guid? EnterpriseId { get; set; }
     public Guid SchoolId { get; set; }
     public Guid TermId { get; set; }
-    public InternshipStatus GroupStatus { get; set; }
+    public GroupStatus GroupStatus { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Description { get; set; } = string.Empty;
@@ -41,7 +41,7 @@ public class GetMyInternshipGroupsResponse
             GroupStatus = group.Status,
             StartDate = group.StartDate,
             EndDate = group.EndDate,
-            Description = string.Empty,
+            Description = group.Description ?? string.Empty,
             AllowLecturerView = false,
             CreatedAt = group.CreatedAt,
             UpdatedAt = group.UpdatedAt,

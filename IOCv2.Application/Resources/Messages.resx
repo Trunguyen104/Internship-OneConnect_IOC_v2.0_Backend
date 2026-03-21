@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -352,6 +352,26 @@
     <value>Mật khẩu tạm</value>
   </data>
 
+
+  <!-- ── InternshipApplication: Success Messages ── -->
+  <data name="InternshipApplication.AcceptSuccess" xml:space="preserve">
+    <value>Đơn ứng tuyển đã được chấp nhận thành công.</value>
+  </data>
+  <data name="InternshipApplication.RejectSuccess" xml:space="preserve">
+    <value>Đơn ứng tuyển đã bị từ chối.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorSuccess" xml:space="preserve">
+    <value>Đã gán Mentor thành công.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorNewGroupSuccess" xml:space="preserve">
+    <value>Đã gán Mentor và tạo nhóm thực tập mới thành công.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorExistingGroupSuccess" xml:space="preserve">
+    <value>Đã gán Mentor và thêm sinh viên vào nhóm hiện có thành công.</value>
+  </data>
+  <data name="InternshipApplication.AssignProjectSuccess" xml:space="preserve">
+    <value>Đã gán dự án vào nhóm thực tập thành công.</value>
+  </data>
   <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
     <value>Bạn không có quyền xóa doanh nghiệp này.</value>
   </data>
@@ -363,5 +383,11 @@
   </data>
   <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
     <value>Bạn không có quyền xem thông tin doanh nghiệp này.</value>
+  </data>
+  <data name="InternshipGroup.MoveSuccess" xml:space="preserve">
+    <value>Chuyển sinh viên thành công.</value>
+  </data>
+  <data name="InternshipGroup.ArchiveSuccess" xml:space="preserve">
+    <value>Lưu trữ nhóm thành công.</value>
   </data>
 </root>

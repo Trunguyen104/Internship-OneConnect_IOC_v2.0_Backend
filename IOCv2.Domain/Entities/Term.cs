@@ -30,4 +30,5 @@ public class Term : BaseEntity
     public virtual University University { get; set; } = null!;
     public virtual ICollection<StudentTerm> StudentTerms { get; set; } = new List<StudentTerm>();
     public virtual ICollection<InternshipGroup> InternshipGroups { get; set; } = new List<InternshipGroup>();
+    public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
 }

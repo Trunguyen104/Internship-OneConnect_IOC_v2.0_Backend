@@ -62,11 +62,11 @@ public class GetMyInternshipGroupsHandlerTests
         var term = new Term { TermId = termId, UniversityId = schoolId, Name = "FU Cần Thơ - Mùa xuân 2026", University = university };
         var mentorUser = new User(Guid.NewGuid(), "MENTOR001", "mentor@rikkei.vn", "Mentor Name", IOCv2.Domain.Enums.UserRole.Mentor, "hash");
         var mentor = new EnterpriseUser { EnterpriseUserId = mentorId, EnterpriseId = enterpriseId, UserId = Guid.NewGuid(), User = mentorUser };
-        var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
+        var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", null, enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
         group.Enterprise = new Enterprise { EnterpriseId = enterpriseId, Name = "Rikasoft" };
         group.Term = term;
         group.Mentor = mentor;
-        group.UpdateStatus(IOCv2.Domain.Enums.InternshipStatus.InProgress);
+        group.UpdateStatus(IOCv2.Domain.Enums.GroupStatus.Active);
         group.AddMember(studentId, IOCv2.Domain.Enums.InternshipRole.Leader);
 
         typeof(InternshipGroup).GetProperty(nameof(InternshipGroup.InternshipId))!.SetValue(group, internshipId);
@@ -99,7 +99,7 @@ public class GetMyInternshipGroupsHandlerTests
         result.Data[0].ProjectId.Should().Be(projectId);
         result.Data[0].Project!.Name.Should().Be("IOC Version 2");
         result.Data[0].StudentCount.Should().Be(1);
-        result.Data[0].GroupStatus.Should().Be(IOCv2.Domain.Enums.InternshipStatus.InProgress);
+        result.Data[0].GroupStatus.Should().Be(IOCv2.Domain.Enums.GroupStatus.Active);
     }
 
     [Fact]

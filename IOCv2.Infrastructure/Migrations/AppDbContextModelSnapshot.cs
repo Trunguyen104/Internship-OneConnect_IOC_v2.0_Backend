@@ -529,9 +529,18 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<Guid>("InternshipId")
+                    b.Property<Guid>("EnterpriseId")
                         .HasColumnType("uuid")
-                        .HasColumnName("internship_id");
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<Guid?>("InternshipGroupInternshipId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_group_internship_id");
+
+                    b.Property<string>("RejectReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("reject_reason");
 
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("timestamptz")
@@ -549,6 +558,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("student_id");
 
+                    b.Property<Guid>("TermId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("term_id");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -560,15 +573,21 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasKey("ApplicationId")
                         .HasName("pk_internship_applications");
 
+                    b.HasIndex("EnterpriseId")
+                        .HasDatabaseName("ix_internship_applications_enterprise_id");
+
+                    b.HasIndex("InternshipGroupInternshipId")
+                        .HasDatabaseName("ix_internship_applications_internship_group_internship_id");
+
                     b.HasIndex("ReviewedBy")
                         .HasDatabaseName("ix_internship_applications_reviewed_by");
 
-                    b.HasIndex("StudentId")
-                        .HasDatabaseName("ix_internship_applications_student_id");
+                    b.HasIndex("TermId")
+                        .HasDatabaseName("ix_internship_applications_term_id");
 
-                    b.HasIndex("InternshipId", "StudentId")
+                    b.HasIndex("StudentId", "TermId", "EnterpriseId")
                         .IsUnique()
-                        .HasDatabaseName("ix_internship_applications_internship_id_student_id");
+                        .HasDatabaseName("ix_internship_applications_student_id_term_id_enterprise_id");
 
                     b.ToTable("internship_applications", (string)null);
                 });
@@ -591,6 +610,10 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone")
@@ -2005,10 +2028,17 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipApplication", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
+                    b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
                         .WithMany("InternshipApplications")
-                        .HasForeignKey("InternshipId")
-                        .HasConstraintName("fk_internship_applications_internship_groups_internship_id");
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_applications_enterprises_enterprise_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", null)
+                        .WithMany("InternshipApplications")
+                        .HasForeignKey("InternshipGroupInternshipId")
+                        .HasConstraintName("fk_internship_applications_internship_groups_internship_group_");
 
                     b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "Reviewer")
                         .WithMany("ReviewedApplications")
@@ -2021,11 +2051,20 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasForeignKey("StudentId")
                         .HasConstraintName("fk_internship_applications_students_student_id");
 
-                    b.Navigation("InternshipGroup");
+                    b.HasOne("IOCv2.Domain.Entities.Term", "Term")
+                        .WithMany("InternshipApplications")
+                        .HasForeignKey("TermId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_applications_terms_term_id");
+
+                    b.Navigation("Enterprise");
 
                     b.Navigation("Reviewer");
 
                     b.Navigation("Student");
+
+                    b.Navigation("Term");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
@@ -2327,6 +2366,8 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     b.Navigation("EnterpriseUsers");
 
+                    b.Navigation("InternshipApplications");
+
                     b.Navigation("InternshipGroups");
                 });
 
@@ -2394,6 +2435,8 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Term", b =>
                 {
+                    b.Navigation("InternshipApplications");
+
                     b.Navigation("InternshipGroups");
 
                     b.Navigation("StudentTerms");

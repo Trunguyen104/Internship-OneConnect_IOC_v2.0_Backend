@@ -24,6 +24,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<IMessageService> _mockMessageService;
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ILogger<RemoveStudentsFromGroupHandler>> _mockLogger;
+        private readonly Mock<IGenericRepository<InternshipGroup>> _mockGroupRepository;
+        private readonly Mock<IGenericRepository<InternshipStudent>> _mockInternshipStudentRepository;
         private readonly Mock<ICacheService> _mockCacheService;
         private readonly RemoveStudentsFromGroupHandler _handler;
 
@@ -33,6 +35,10 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockMessageService = new Mock<IMessageService>();
             _mockMapper = new Mock<IMapper>();
             _mockLogger = new Mock<ILogger<RemoveStudentsFromGroupHandler>>();
+            _mockGroupRepository = new Mock<IGenericRepository<InternshipGroup>>();
+            _mockInternshipStudentRepository = new Mock<IGenericRepository<InternshipStudent>>();
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>()).Returns(_mockGroupRepository.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipStudent>()).Returns(_mockInternshipStudentRepository.Object);
             _mockCacheService = new Mock<ICacheService>();
 
             _handler = new RemoveStudentsFromGroupHandler(
@@ -59,8 +65,12 @@ namespace IOCv2.Tests.Features.InternshipGroups
 
             group.AddMember(studentId, IOCv2.Domain.Enums.InternshipRole.Member);
             
-            _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
+            _mockGroupRepository.Setup(x => x.Query())
                 .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
+            
+            _mockInternshipStudentRepository
+                .Setup(x => x.DeleteAsync(It.IsAny<InternshipStudent>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
             
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
@@ -78,7 +88,10 @@ namespace IOCv2.Tests.Features.InternshipGroups
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            group.Members.Should().BeEmpty();
+            // Verify DeleteAsync was called once for the student member
+            _mockInternshipStudentRepository.Verify(
+                x => x.DeleteAsync(It.Is<InternshipStudent>(m => m.StudentId == studentId), It.IsAny<CancellationToken>()),
+                Times.Once);
             _mockUnitOfWork.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
             _mockUnitOfWork.Verify(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
