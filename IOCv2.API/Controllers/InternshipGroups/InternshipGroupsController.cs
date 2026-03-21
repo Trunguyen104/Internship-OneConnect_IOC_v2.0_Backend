@@ -1,18 +1,15 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGroup;
+using IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipGroup;
+using IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetweenGroups;
 using IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup;
+using IOCv2.Application.Features.InternshipGroups.Queries.GetDashboard;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
-<<<<<<< HEAD
-using IOCv2.Application.Features.InternshipGroups.Queries.GetDashboard;
-=======
 using IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents;
-using IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetweenGroups;
-using IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternshipGroup;
->>>>>>> b17ae5488721fd75b3cb01a2dc93f9ab9408772b
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -161,18 +158,6 @@ public class InternshipGroupsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get dashboard statistics for an internship group.
-    /// </summary>
-    /// <param name="id">Internship group ID.</param>
-    [HttpGet("{id:guid}/dashboard")]
-    [ProducesResponseType(typeof(ApiResponse<GetInternshipGroupDashboardResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetInternshipGroupDashboard(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Request to get dashboard for internship group ID: {Id}", id);
-        return HandleResult(await _mediator.Send(new GetInternshipGroupDashboardQuery(id), cancellationToken));
     /// Get placed students for the specific term and HR enterprise.
     /// </summary>
     [HttpGet("placed-students")]
@@ -220,5 +205,20 @@ public class InternshipGroupsController : ApiControllerBase
     {
         _logger.LogInformation("Request to archive internship group: {Id}", id);
         return HandleResult(await _mediator.Send(new ArchiveInternshipGroupCommand { InternshipGroupId = id }, cancellationToken));
+    }
+
+    /// <summary>
+    /// Get dashboard statistics for an internship group.
+    /// </summary>
+    /// <param name="id">Internship group ID.</param>
+    [HttpGet("{id:guid}/dashboard")]
+    [ProducesResponseType(typeof(ApiResponse<GetInternshipGroupDashboardResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetInternshipGroupDashboard(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Request to get dashboard for internship group ID: {Id}", id);
+        return HandleResult(await _mediator.Send(new GetInternshipGroupDashboardQuery(id), cancellationToken));
     }
 }
