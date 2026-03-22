@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Exceptions;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Universities.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -12,15 +13,18 @@ public class DeleteUniversityHandler : IRequestHandler<DeleteUniversityCommand, 
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<DeleteUniversityHandler> _logger;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ICacheService _cacheService;
 
     public DeleteUniversityHandler(
         IUnitOfWork unitOfWork,
         ILogger<DeleteUniversityHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<bool>> Handle(DeleteUniversityCommand request, CancellationToken cancellationToken)
@@ -44,6 +48,9 @@ public class DeleteUniversityHandler : IRequestHandler<DeleteUniversityCommand, 
             await _unitOfWork.Repository<University>().UpdateAsync(university);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync();
+
+            await _cacheService.RemoveByPatternAsync(UniversityCacheKeys.UniversityListPattern(), cancellationToken);
+            await _cacheService.RemoveAsync(UniversityCacheKeys.University(request.UniversityId), cancellationToken);
 
             _logger.LogInformation("Successfully deleted university: {UniversityId}", university.UniversityId);
 

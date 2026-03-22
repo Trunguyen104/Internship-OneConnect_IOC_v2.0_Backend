@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,17 +17,20 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly ILogger<CreateWorkItemHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public CreateWorkItemHandler(
-        IUnitOfWork unitOfWork, 
-        IMapper mapper, 
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
         IMessageService messageService,
-        ILogger<CreateWorkItemHandler> logger)
+        ILogger<CreateWorkItemHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<CreateWorkItemResponse>> Handle(
@@ -93,8 +97,10 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+        await _cacheService.RemoveByPatternAsync(WorkItemCacheKeys.BacklogPattern(request.ProjectId), cancellationToken);
+
         var response = _mapper.Map<CreateWorkItemResponse>(workItem);
-        
+
         _logger.LogInformation("Successfully created work item {WorkItemId}", workItem.WorkItemId);
         return Result<CreateWorkItemResponse>.Success(response);
         }

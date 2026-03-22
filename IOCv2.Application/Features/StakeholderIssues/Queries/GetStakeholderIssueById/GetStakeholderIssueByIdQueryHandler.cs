@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.StakeholderIssues.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -16,28 +17,36 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
         private readonly ILogger<GetStakeholderIssueByIdQueryHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public GetStakeholderIssueByIdQueryHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IMessageService messageService,
-            ILogger<GetStakeholderIssueByIdQueryHandler> logger)
+            ILogger<GetStakeholderIssueByIdQueryHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<GetStakeholderIssueByIdResponse>> Handle(GetStakeholderIssueByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Getting StakeholderIssue {Id}", request.Id);
 
-            var issue = await _unitOfWork.Repository<StakeholderIssue>()
-            .Query()
-            .AsNoTracking()
-            .ProjectTo<GetStakeholderIssueByIdResponse>(_mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync(si => si.Id == request.Id, cancellationToken);
+                var cacheKey = StakeholderIssueCacheKeys.Issue(request.Id);
+                var cached = await _cacheService.GetAsync<GetStakeholderIssueByIdResponse>(cacheKey, cancellationToken);
+                if (cached is not null)
+                    return Result<GetStakeholderIssueByIdResponse>.Success(cached);
+
+                var issue = await _unitOfWork.Repository<StakeholderIssue>()
+                .Query()
+                .AsNoTracking()
+                .ProjectTo<GetStakeholderIssueByIdResponse>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(si => si.Id == request.Id, cancellationToken);
 
             if (issue == null)
             {
@@ -47,6 +56,7 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
             }
 
             _logger.LogInformation("Successfully retrieved StakeholderIssue {Id}", request.Id);
+            await _cacheService.SetAsync(cacheKey, issue, StakeholderIssueCacheKeys.Expiration.Issue, cancellationToken);
             return Result<GetStakeholderIssueByIdResponse>.Success(issue);
 
         }

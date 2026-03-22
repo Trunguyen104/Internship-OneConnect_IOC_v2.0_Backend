@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById
 {
-    public class GetEnterpriseByIdHandler : MediatR.IRequestHandler<GetEnterpriseByIdQuery, Common.Models.Result<GetEnterpriseByIdResponse>>
+    public class GetEnterpriseByIdHandler : MediatR.IRequestHandler<GetEnterpriseByIdQuery, Result<GetEnterpriseByIdResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMessageService _messageService;

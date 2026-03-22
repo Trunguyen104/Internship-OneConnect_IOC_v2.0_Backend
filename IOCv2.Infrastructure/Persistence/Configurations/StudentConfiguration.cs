@@ -35,7 +35,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .WithOne(u => u.Student)
                 .HasForeignKey<Student>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired(false);
+                .IsRequired();
         }
     }
 }

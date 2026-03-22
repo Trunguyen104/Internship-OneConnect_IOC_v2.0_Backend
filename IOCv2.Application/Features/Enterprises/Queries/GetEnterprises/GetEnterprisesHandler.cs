@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.Enterprises;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -25,14 +26,15 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
         private readonly IMapper _mapper;
         private readonly IRateLimiter _rateLimiter;
         private readonly ICurrentUserService _currentUserService;
-        public GetEnterprisesHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<GetEnterprisesHandler> logger, IMapper mapper, ICurrentUserService currentUserService, IRateLimiter rateLimiter)
-        {
+        private readonly ICacheService _cacheService;
+        public GetEnterprisesHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<GetEnterprisesHandler> logger, IMapper mapper, ICurrentUserService currentUserService, IRateLimiter rateLimiter, ICacheService cacheService) {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _logger = logger;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _rateLimiter = rateLimiter;
+            _cacheService = cacheService;
         }
         public async Task<Result<PaginatedResult<GetEnterprisesResponse>>> Handle(GetEnterprisesQuery request, CancellationToken cancellationToken)
         {

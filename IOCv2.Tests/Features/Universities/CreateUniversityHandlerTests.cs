@@ -14,6 +14,7 @@ public class CreateUniversityHandlerTests
     private readonly Mock<ILogger<CreateUniversityHandler>> _mockLogger;
     private readonly Mock<ICurrentUserService> _mockCurrentUserService;
     private readonly Mock<IGenericRepository<University>> _mockUniversityRepository;
+    private readonly Mock<ICacheService> _mockCacheService;
     private readonly CreateUniversityHandler _handler;
 
     public CreateUniversityHandlerTests()
@@ -22,13 +23,15 @@ public class CreateUniversityHandlerTests
         _mockLogger = new Mock<ILogger<CreateUniversityHandler>>();
         _mockCurrentUserService = new Mock<ICurrentUserService>();
         _mockUniversityRepository = new Mock<IGenericRepository<University>>();
+        _mockCacheService = new Mock<ICacheService>();
 
         _mockUnitOfWork.Setup(u => u.Repository<University>()).Returns(_mockUniversityRepository.Object);
 
         _handler = new CreateUniversityHandler(
-            _mockUnitOfWork.Object, 
-            _mockLogger.Object, 
-            _mockCurrentUserService.Object);
+            _mockUnitOfWork.Object,
+            _mockLogger.Object,
+            _mockCurrentUserService.Object,
+            _mockCacheService.Object);
     }
 
     [Fact]

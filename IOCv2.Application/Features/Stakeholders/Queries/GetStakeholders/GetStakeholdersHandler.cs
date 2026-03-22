@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Stakeholders.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -17,19 +18,22 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
         private readonly IMessageService _messageService;
         private readonly ILogger<GetStakeholdersHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
         public GetStakeholdersHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IMessageService messageService,
             ILogger<GetStakeholdersHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<PaginatedResult<GetStakeholdersResponse>>> Handle(GetStakeholdersQuery request, CancellationToken cancellationToken)
@@ -72,6 +76,18 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
                 }
             }
 
+            var cacheKey = StakeholderCacheKeys.StakeholderList(
+                request.InternshipId,
+                request.SearchTerm,
+                request.SortColumn,
+                request.SortOrder,
+                request.PageNumber,
+                request.PageSize);
+
+            var cached = await _cacheService.GetAsync<PaginatedResult<GetStakeholdersResponse>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<PaginatedResult<GetStakeholdersResponse>>.Success(cached);
+
             // Build base query
             var query = _unitOfWork.Repository<Stakeholder>()
                 .Query()
@@ -111,6 +127,7 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
             _logger.LogInformation("Successfully retrieved {Count} stakeholders for internship {InternshipId}", items.Count, request.InternshipId);
 
             var result = PaginatedResult<GetStakeholdersResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
+            await _cacheService.SetAsync(cacheKey, result, StakeholderCacheKeys.Expiration.StakeholderList, cancellationToken);
             return Result<PaginatedResult<GetStakeholdersResponse>>.Success(result);
 
         }

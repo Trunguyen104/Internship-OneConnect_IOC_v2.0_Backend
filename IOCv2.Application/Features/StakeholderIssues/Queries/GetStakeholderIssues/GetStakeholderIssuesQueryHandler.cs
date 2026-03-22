@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.Pagination;
 using IOCv2.Application.Extensions.Query;
+using IOCv2.Application.Features.StakeholderIssues.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -19,15 +20,18 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<GetStakeholderIssuesQueryHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public GetStakeholderIssuesQueryHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ILogger<GetStakeholderIssuesQueryHandler> logger)
+            ILogger<GetStakeholderIssuesQueryHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>> Handle(GetStakeholderIssuesQuery request, CancellationToken cancellationToken)
@@ -35,6 +39,21 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
             _logger.LogInformation("Getting paginated StakeholderIssues for Internship: {InternshipId}, Stakeholder: {StakeholderId}",
                 request.InternshipId, request.StakeholderId);
 
+
+                var cacheKey = StakeholderIssueCacheKeys.IssueList(
+                    request.InternshipId,
+                    request.StakeholderId,
+                    (int?)request.Status,
+                    request.Pagination.Search,
+                    request.Pagination.OrderBy,
+                    request.Pagination.PageIndex,
+                    request.Pagination.PageSize);
+
+                var cached = await _cacheService.GetAsync<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>(cacheKey, cancellationToken);
+                if (cached is not null)
+                    return IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>.Success(cached);
+
+                // Build base query
             var query = _unitOfWork.Repository<StakeholderIssue>()
                 .Query()
                 .Include(si => si.Stakeholder)
@@ -99,6 +118,7 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
                 request.Pagination.PageIndex,
                 request.Pagination.PageSize);
 
+            await _cacheService.SetAsync(cacheKey, paginatedResult, StakeholderIssueCacheKeys.Expiration.IssueList, cancellationToken);
             return IOCv2.Application.Common.Models.Result<IOCv2.Application.Common.Models.PaginatedResult<GetStakeholderIssuesResponse>>.Success(paginatedResult);
 
         }

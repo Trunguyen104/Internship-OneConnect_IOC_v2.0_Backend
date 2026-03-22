@@ -61,7 +61,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .WithMany(t => t.InternshipGroups)
                 .HasForeignKey(e => e.TermId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired(false);
+                .IsRequired();
 
             builder.HasOne(e => e.Enterprise)
                 .WithMany(ent => ent.InternshipGroups)
@@ -78,6 +78,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasMany(e => e.Members)
                 .WithOne(ist => ist.InternshipGroup)
                 .HasForeignKey(ist => ist.InternshipId);
+
+            builder.Navigation(e => e.Members)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

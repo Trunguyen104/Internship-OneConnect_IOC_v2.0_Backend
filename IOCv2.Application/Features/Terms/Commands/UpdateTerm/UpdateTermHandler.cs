@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -18,19 +19,22 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public UpdateTermHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IMessageService messageService,
         ILogger<UpdateTermHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<UpdateTermResponse>> Handle(UpdateTermCommand request, CancellationToken cancellationToken)
@@ -139,6 +143,9 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermUpdated), term.TermId, userId);
 

@@ -16,7 +16,7 @@ namespace IOCv2.API.Controllers.Terms;
 /// Terms Management — Manage internship terms (create, view, update, close, delete)
 /// </summary>
 [Tags("Terms Management")]
-[Authorize(Roles = "SchoolAdmin,SuperAdmin,Student")]
+[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor")]
 public class TermsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -49,7 +49,6 @@ public class TermsController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Term details</returns>
     [HttpGet("{id:guid}", Name = "GetTermById")]
-    [Authorize(Roles = "Student")]
     [RateLimit(maxRequests: 60, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<GetTermByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]

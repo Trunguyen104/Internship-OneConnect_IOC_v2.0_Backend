@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCycles.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -14,15 +15,18 @@ public class GetEvaluationCycleByIdHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<GetEvaluationCycleByIdHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public GetEvaluationCycleByIdHandler(
         IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<GetEvaluationCycleByIdHandler> logger)
+        ILogger<GetEvaluationCycleByIdHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<GetEvaluationCycleByIdResponse>> Handle(
@@ -30,11 +34,16 @@ public class GetEvaluationCycleByIdHandler
     {
         _logger.LogInformation("Getting EvaluationCycle {CycleId}", request.CycleId);
 
-        var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
-            .AsNoTracking()
-            .Include(c => c.Term)
-            .Include(c => c.Criteria)
-            .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
+            var cacheKey = EvaluationCycleCacheKeys.Cycle(request.CycleId);
+            var cached = await _cacheService.GetAsync<GetEvaluationCycleByIdResponse>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<GetEvaluationCycleByIdResponse>.Success(cached);
+
+            var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+                .AsNoTracking()
+                .Include(c => c.Term)
+                .Include(c => c.Criteria)
+                .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
         if (cycle is null)
         {
@@ -69,6 +78,8 @@ public class GetEvaluationCycleByIdHandler
                 .ToList()
         };
 
-        return Result<GetEvaluationCycleByIdResponse>.Success(response);
+            await _cacheService.SetAsync(cacheKey, response, EvaluationCycleCacheKeys.Expiration.Cycle, cancellationToken);
+
+            return Result<GetEvaluationCycleByIdResponse>.Success(response);
     }
 }
