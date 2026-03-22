@@ -34,8 +34,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
     {
         _logger.LogInformation("Getting backlog for project {ProjectId}", request.ProjectId);
 
-        try
-        {
+
         var cacheKey = WorkItemCacheKeys.Backlog(
             request.ProjectId,
             request.BacklogOnly,
@@ -167,12 +166,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         await _cacheService.SetAsync(cacheKey, response, WorkItemCacheKeys.Expiration.Backlog, cancellationToken);
 
         return Result<GetBacklogResponse>.Success(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting backlog for project {ProjectId}", request.ProjectId);
-            return Result<GetBacklogResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
+
     }
 
     private static bool MatchFilters(WorkItem w, GetBacklogQuery req)

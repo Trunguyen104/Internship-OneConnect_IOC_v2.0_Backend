@@ -41,39 +41,39 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        var workItem = await _unitOfWork.Repository<WorkItem>()
-            .Query()
-            .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
+            var workItem = await _unitOfWork.Repository<WorkItem>()
+                .Query()
+                .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
 
-        if (workItem is null)
-            return Result<UpdateWorkItemResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.WorkItem.NotFound), ResultErrorType.NotFound);
+            if (workItem is null)
+                return Result<UpdateWorkItemResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.WorkItem.NotFound), ResultErrorType.NotFound);
 
-        if (request.Title is not null)
-            workItem.Title = request.Title;
+            if (request.Title is not null)
+                workItem.Title = request.Title;
 
-        if (request.Description is not null)
-            workItem.Description = request.Description;
+            if (request.Description is not null)
+                workItem.Description = request.Description;
 
-        if (request.StoryPoint.HasValue)
-            workItem.StoryPoint = request.StoryPoint;
+            if (request.StoryPoint.HasValue)
+                workItem.StoryPoint = request.StoryPoint;
 
-        if (request.AssigneeId.HasValue)
-            workItem.AssigneeId = request.AssigneeId;
+            if (request.AssigneeId.HasValue)
+                workItem.AssigneeId = request.AssigneeId;
 
-        if (request.DueDate.HasValue)
-            workItem.DueDate = request.DueDate;
+            if (request.DueDate.HasValue)
+                workItem.DueDate = request.DueDate;
 
-        if (request.Priority.HasValue)
-            workItem.Priority = request.Priority.Value;
+            if (request.Priority.HasValue)
+                workItem.Priority = request.Priority.Value;
 
-        if (request.Status.HasValue)
-            workItem.Status = request.Status.Value;
+            if (request.Status.HasValue)
+                workItem.Status = request.Status.Value;
 
-        workItem.UpdatedAt = DateTime.UtcNow;
-        await _unitOfWork.Repository<WorkItem>().UpdateAsync(workItem, cancellationToken);
-        await _unitOfWork.SaveChangeAsync(cancellationToken);
-        await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            workItem.UpdatedAt = DateTime.UtcNow;
+            await _unitOfWork.Repository<WorkItem>().UpdateAsync(workItem, cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
         await _cacheService.RemoveByPatternAsync(WorkItemCacheKeys.BacklogPattern(request.ProjectId), cancellationToken);
         await _cacheService.RemoveAsync(WorkItemCacheKeys.WorkItem(request.WorkItemId), cancellationToken);

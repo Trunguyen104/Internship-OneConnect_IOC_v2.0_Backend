@@ -34,8 +34,6 @@ public class GetEvaluationCycleByIdHandler
     {
         _logger.LogInformation("Getting EvaluationCycle {CycleId}", request.CycleId);
 
-        try
-        {
             var cacheKey = EvaluationCycleCacheKeys.Cycle(request.CycleId);
             var cached = await _cacheService.GetAsync<GetEvaluationCycleByIdResponse>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -47,13 +45,13 @@ public class GetEvaluationCycleByIdHandler
                 .Include(c => c.Criteria)
                 .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
-            if (cycle is null)
-            {
-                _logger.LogWarning("EvaluationCycle {CycleId} not found", request.CycleId);
-                return Result<GetEvaluationCycleByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
-                    ResultErrorType.NotFound);
-            }
+        if (cycle is null)
+        {
+            _logger.LogWarning("EvaluationCycle {CycleId} not found", request.CycleId);
+            return Result<GetEvaluationCycleByIdResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
+                ResultErrorType.NotFound);
+        }
 
         var response = new GetEvaluationCycleByIdResponse
         {
@@ -83,11 +81,5 @@ public class GetEvaluationCycleByIdHandler
             await _cacheService.SetAsync(cacheKey, response, EvaluationCycleCacheKeys.Expiration.Cycle, cancellationToken);
 
             return Result<GetEvaluationCycleByIdResponse>.Success(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting EvaluationCycle {CycleId}", request.CycleId);
-            return Result<GetEvaluationCycleByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
     }
 }

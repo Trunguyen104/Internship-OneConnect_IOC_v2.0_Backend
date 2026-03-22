@@ -40,8 +40,6 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
         {
             _logger.LogInformation("Getting stakeholder {Id}", request.StakeholderId);
 
-            try
-            {
 
             var stakeholder = await _unitOfWork.Repository<Stakeholder>()
                 .Query()
@@ -89,12 +87,7 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
             var response = _mapper.Map<GetStakeholderByIdResponse>(stakeholder);
             await _cacheService.SetAsync(cacheKey, response, StakeholderCacheKeys.Expiration.Stakeholder, cancellationToken);
             return Result<GetStakeholderByIdResponse>.Success(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting stakeholder {Id}", request.StakeholderId);
-                return Result<GetStakeholderByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-            }
+
         }
     }
 }

@@ -40,6 +40,7 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
     {
         try
         {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var userId = Guid.Parse(_currentUserService.UserId!);
             var isSuperAdmin =
                 string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
@@ -133,6 +134,7 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
 
             await _unitOfWork.Repository<Term>().AddAsync(term, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
 
@@ -142,17 +144,10 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
             return Result<CreateTermResponse>.Success(response,
                 _messageService.GetMessage(MessageKeys.Terms.CreateSuccess));
         }
-        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key") == true || 
-                                            ex.InnerException?.Message.Contains("UNIQUE constraint") == true ||
-                                            ex.InnerException?.Message.Contains("IX_Terms_Name") == true)
-        {
-            _logger.LogWarning(_messageService.GetMessage(MessageKeys.Terms.LogDuplicateTermName), ex.Message);
-            return Result<CreateTermResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Terms.NameExists),
-                ResultErrorType.Conflict);
-        }
+        
         catch (Exception ex)
         {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorCreatingTerm));
             throw;
         }
