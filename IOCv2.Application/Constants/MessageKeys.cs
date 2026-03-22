@@ -165,7 +165,7 @@ namespace IOCv2.Application.Constants
             public const string LogStudentNotApproved = "InternshipGroup.LogStudentNotApproved";
             public const string AtLeastOneStudentRequired = "InternshipGroup.AtLeastOneStudentRequired";
             public const string StudentAlreadyInActiveGroup = "InternshipGroup.StudentAlreadyInActiveGroup";
-            
+
             // Move & Archive keys
             public const string MustBelongToYourEnterprise = "InternshipGroup.MustBelongToYourEnterprise";
             public const string MustBeInSameTerm = "InternshipGroup.MustBeInSameTerm";
@@ -244,7 +244,7 @@ namespace IOCv2.Application.Constants
             public const string CloseReasonRequired = "Terms.CloseReasonRequired";
             public const string CloseReasonMinLength = "Terms.CloseReasonMinLength";
             public const string CloseReasonMaxLength = "Terms.CloseReasonMaxLength";
-            
+
             // Logging messages
             public const string LogTermCreated = "Terms.Log.TermCreated";
             public const string LogTermUpdated = "Terms.Log.TermUpdated";
@@ -653,5 +653,52 @@ namespace IOCv2.Application.Constants
             public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
             public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
         }
+        public static class ViolationReportKey
+        {
+            // Validator
+            public const string OccurredDateIsRequired = "ViolationReport.OccurredDateIsRequired";
+            public const string OccurredDateInFuture = "ViolationReport.OccurredDateInFuture";
+            public const string DescriptionIsRequired = "ViolationReport.DescriptionIsRequired";
+            public const string DescriptionMinLength = "ViolationReport.DescriptionMinLength";
+            public const string DescriptionMaxLength = "ViolationReport.DescriptionMaxLength";
+            // Get All
+            public const string GetViolationReportsError = "ViolationReport.GetViolationReportsError";
+            public const string FilteredNotFound = "ViolationReport.FilteredNotFound";
+            public const string NotFound = "ViolationReport.NotFound";
+            // Create
+            public const string NotAllowedToReport = "ViolationReport.NotAllowedToReport";
+            public const string OccurredDateCannotBeBeforeInternshipStart = "ViolationReport.OccurredDateCannotBeBeforeInternshipStart";
+            public const string OccurredDateCannotBeAfterInternshipEnd = "ViolationReport.OccurredDateCannotBeAfterInternshipEnd";
+            public const string CreateViolationReportSuccess = "ViolationReport.CreateViolationReportSuccess";
+            public const string CreateViolationReportError = "ViolationReport.CreateViolationReportError";
+            public const string ViolationReportLogNotFound = "ViolationReport.LogNotFound";
+            // Delete
+            public const string LogDeleteNotOwner = "ViolationReport.LogDeleteNotOwner";
+            public const string DeleteNotOwner = "ViolationReport.DeleteNotOwner";
+            public const string ViolationReportDeletedSuccessfully = "ViolationReport.ViolationReportDeletedSuccessfully";
+            public const string ErrorOccurredWhileDeletingViolationReport = "ViolationReport.ErrorOccurredWhileDeletingViolationReport";
+            // Update
+            public const string UpdatingViolationReportByUser = "ViolationReport.UpdatingViolationReportByUser";
+            public const string ViolationReportNotFound = "ViolationReport.ViolationReportNotFound";
+            public const string UserNotAllowedToUpdateViolationReport = "ViolationReport.UserNotAllowedToUpdateViolationReport";
+            public const string NotAllowedToUpdateThisReport = "ViolationReport.NotAllowedToUpdateThisReport";
+            public const string OccurredDateBeforeInternshipStart = "ViolationReport.OccurredDateBeforeInternshipStart";
+            public const string InternshipHasEnded = "ViolationReport.InternshipHasEnded";
+            public const string ViolationReportUpdatedByAnotherUser = "ViolationReport.ViolationReportUpdatedByAnotherUser";
+            public const string ViolationReportUpdatedSuccessfully = "ViolationReport.ViolationReportUpdatedSuccessfully";
+            public const string FailedToUpdateViolationReport = "ViolationReport.FailedToUpdateViolationReport";
+            public const string ErrorOccurredWhileUpdatingViolationReport = "ViolationReport.ErrorOccurredWhileUpdatingViolationReport";
+            public const string ViolationReportIdIsRequired = "ViolationReport.ViolationReportIdIsRequired";
+            public const string ErrorWhileGettingViolationReportDetail = "ViolationReport.ErrorWhileGettingViolationReportDetail";
+        }
+
+        public static class StudentMessageKey
+        {
+            //validator
+            public const string StudentIdRequired = "Student.StudentIdRequired";
+            //create
+            public const string StudentNotFound = "Student.NotFound";
+        }
     }
 }
+
