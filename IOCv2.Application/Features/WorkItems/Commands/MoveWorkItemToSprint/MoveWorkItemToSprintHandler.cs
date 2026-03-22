@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -14,15 +15,18 @@ public class MoveWorkItemToSprintHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<MoveWorkItemToSprintHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public MoveWorkItemToSprintHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<MoveWorkItemToSprintHandler> logger)
+        ILogger<MoveWorkItemToSprintHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<MoveWorkItemToSprintResponse>> Handle(
@@ -86,6 +90,9 @@ public class MoveWorkItemToSprintHandler
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(WorkItemCacheKeys.BacklogPattern(request.ProjectId), cancellationToken);
+        await _cacheService.RemoveAsync(WorkItemCacheKeys.WorkItem(request.WorkItemId), cancellationToken);
 
         _logger.LogInformation("Successfully moved work item {WorkItemId} to sprint {TargetSprintId}", request.WorkItemId, request.TargetSprintId);
         return Result<MoveWorkItemToSprintResponse>.Success(new MoveWorkItemToSprintResponse

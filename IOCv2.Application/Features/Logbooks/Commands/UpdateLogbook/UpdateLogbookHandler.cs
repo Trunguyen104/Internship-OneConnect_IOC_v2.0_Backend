@@ -2,6 +2,7 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
+using IOCv2.Application.Features.Logbooks.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -22,14 +23,16 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly ILogger<UpdateLogbookHandler> _logger;
+        private readonly ICacheService _cacheService;
 
-        public UpdateLogbookHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, IMessageService messageService, ILogger<UpdateLogbookHandler> logger)
+        public UpdateLogbookHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, IMessageService messageService, ILogger<UpdateLogbookHandler> logger, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<UpdateLogbookResponse>> Handle(UpdateLogbookCommand request, CancellationToken cancellationToken)
@@ -96,6 +99,9 @@ namespace IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveByPatternAsync(LogbookCacheKeys.LogbookListPattern(logbook.InternshipId), cancellationToken);
+                await _cacheService.RemoveAsync(LogbookCacheKeys.Logbook(logbook.LogbookId), cancellationToken);
 
                 _logger.LogInformation("Logbook {LogbookId} updated successfully", logbook.LogbookId);
 

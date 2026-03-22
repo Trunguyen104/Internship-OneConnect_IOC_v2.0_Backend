@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,17 +17,20 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly ILogger<UpdateWorkItemHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public UpdateWorkItemHandler(
-        IUnitOfWork unitOfWork, 
-        IMapper mapper, 
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
         IMessageService messageService,
-        ILogger<UpdateWorkItemHandler> logger)
+        ILogger<UpdateWorkItemHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<UpdateWorkItemResponse>> Handle(
@@ -70,6 +74,9 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
         await _unitOfWork.Repository<WorkItem>().UpdateAsync(workItem, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(WorkItemCacheKeys.BacklogPattern(request.ProjectId), cancellationToken);
+        await _cacheService.RemoveAsync(WorkItemCacheKeys.WorkItem(request.WorkItemId), cancellationToken);
 
         _logger.LogInformation("Successfully updated work item {WorkItemId}", request.WorkItemId);
         return Result<UpdateWorkItemResponse>.Success(_mapper.Map<UpdateWorkItemResponse>(workItem));

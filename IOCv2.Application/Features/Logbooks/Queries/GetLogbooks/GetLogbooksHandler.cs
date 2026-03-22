@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Logbooks.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -22,26 +23,40 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
         private readonly ILogger<GetLogbooksHandler> _logger;
+        private readonly ICacheService _cacheService;
 
-        public GetLogbooksHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ILogger<GetLogbooksHandler> logger)
+        public GetLogbooksHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ILogger<GetLogbooksHandler> logger, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<PaginatedResult<GetLogbooksResponse>>> Handle(GetLogbooksQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Fetching logbooks for internship {InternshipId} (Page: {Page}, Size: {Size})", request.InternshipId, request.PageNumber, request.PageSize);
-            
+
             var internship = await _unitOfWork.Repository<InternshipGroup>().GetByIdAsync(request.InternshipId, cancellationToken);
-            
+
             if (internship == null)
             {
                 _logger.LogWarning("Internship not found: {InternshipId}", request.InternshipId);
                 return Result<PaginatedResult<GetLogbooksResponse>>.Failure("Internship group not found", ResultErrorType.NotFound);
             }
+
+            var cacheKey = LogbookCacheKeys.LogbookList(
+                request.InternshipId,
+                request.PageNumber,
+                request.PageSize,
+                (int?)request.Status,
+                request.SortColumn,
+                request.SortOrder);
+
+            var cached = await _cacheService.GetAsync<PaginatedResult<GetLogbooksResponse>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<PaginatedResult<GetLogbooksResponse>>.Success(cached);
 
             var query = _unitOfWork.Repository<Logbook>()
                         .Query()
@@ -78,6 +93,9 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
             _logger.LogInformation("Retrieved {Count} logbooks for internship {InternshipId}", logbooks.Count, request.InternshipId);
 
             var result = PaginatedResult<GetLogbooksResponse>.Create(logbooks, totalCount, request.PageNumber, request.PageSize);
+
+            await _cacheService.SetAsync(cacheKey, result, LogbookCacheKeys.Expiration.LogbookList, cancellationToken);
+
             return Result<PaginatedResult<GetLogbooksResponse>>.Success(result);
         }
 

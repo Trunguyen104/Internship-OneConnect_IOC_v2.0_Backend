@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Interfaces;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCriteria.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,15 +14,18 @@ public class GetEvaluationCriteriaHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<GetEvaluationCriteriaHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public GetEvaluationCriteriaHandler(
         IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<GetEvaluationCriteriaHandler> logger)
+        ILogger<GetEvaluationCriteriaHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<List<GetEvaluationCriteriaResponse>>> Handle(
@@ -31,6 +35,11 @@ public class GetEvaluationCriteriaHandler
 
         try
         {
+            var cacheKey = EvaluationCriteriaCacheKeys.CriteriaList(request.CycleId);
+            var cached = await _cacheService.GetAsync<List<GetEvaluationCriteriaResponse>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<List<GetEvaluationCriteriaResponse>>.Success(cached);
+
             var criteria = await _unitOfWork.Repository<Domain.Entities.EvaluationCriteria>().Query()
                 .AsNoTracking()
                 .Where(c => c.CycleId == request.CycleId)
@@ -47,6 +56,8 @@ public class GetEvaluationCriteriaHandler
                 UpdatedAt = c.UpdatedAt
             })
             .ToListAsync(cancellationToken);
+
+            await _cacheService.SetAsync(cacheKey, criteria, EvaluationCriteriaCacheKeys.Expiration.CriteriaList, cancellationToken);
 
             return Result<List<GetEvaluationCriteriaResponse>>.Success(criteria);
         }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -17,19 +18,22 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public CreateTermHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IMessageService messageService,
         ILogger<CreateTermHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<CreateTermResponse>> Handle(CreateTermCommand request, CancellationToken cancellationToken)
@@ -129,6 +133,8 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
 
             await _unitOfWork.Repository<Term>().AddAsync(term, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermCreated), term.TermId, userId);
 

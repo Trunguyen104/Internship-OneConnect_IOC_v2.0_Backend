@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.Enterprises;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -25,13 +26,15 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
         private readonly IMapper _mapper;
         private readonly IRateLimiter _rateLimiter;
         private readonly ICurrentUserService _currentUserService;
-        public GetEnterprisesHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<GetEnterprisesHandler> logger, IMapper mapper, ICurrentUserService currentUserService, IRateLimiter rateLimiter) {
+        private readonly ICacheService _cacheService;
+        public GetEnterprisesHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<GetEnterprisesHandler> logger, IMapper mapper, ICurrentUserService currentUserService, IRateLimiter rateLimiter, ICacheService cacheService) {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _logger = logger;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _rateLimiter = rateLimiter;
+            _cacheService = cacheService;
         }
         public async Task<Result<PaginatedResult<GetEnterprisesResponse>>> Handle(GetEnterprisesQuery request, CancellationToken cancellationToken)
         {
@@ -51,6 +54,15 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
                     window: TimeSpan.FromMinutes(1),
                     blockFor: TimeSpan.FromMinutes(1),
                     cancellationToken);
+
+                var cacheKey = EnterpriseCacheKeys.EnterpriseList(
+                    request.SearchTerm, request.TaxCode, request.Name, request.Industry,
+                    request.IsVerified, (int?)request.Status, request.SortColumn, request.SortOrder,
+                    request.PageNumber, request.PageSize);
+                var cached = await _cacheService.GetAsync<PaginatedResult<GetEnterprisesResponse>>(cacheKey, cancellationToken);
+                if (cached is not null)
+                    return Result<PaginatedResult<GetEnterprisesResponse>>.Success(cached);
+
                 // Log the incoming request parameters
                 var query = _unitOfWork.Repository<Enterprise>()
                     .Query()
@@ -82,6 +94,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
                 var items = await query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize)
                     .ProjectTo<GetEnterprisesResponse>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
                 var result = PaginatedResult<GetEnterprisesResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
+                await _cacheService.SetAsync(cacheKey, result, EnterpriseCacheKeys.Expiration.EnterpriseList, cancellationToken);
                 return Result<PaginatedResult<GetEnterprisesResponse>>.Success(result);
             }
             catch (Exception ex)

@@ -49,7 +49,6 @@ public class TermsController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Term details</returns>
     [HttpGet("{id:guid}", Name = "GetTermById")]
-    [Authorize(Roles = "Student")]
     [RateLimit(maxRequests: 60, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<GetTermByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
