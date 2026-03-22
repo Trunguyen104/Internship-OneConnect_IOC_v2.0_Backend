@@ -1,9 +1,11 @@
 using IOCv2.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace IOCv2.Domain.Entities;
 
 public class EvaluationCycle : BaseEntity
 {
+    [Key]
     public Guid CycleId { get; set; }
 
     public Guid TermId { get; set; }

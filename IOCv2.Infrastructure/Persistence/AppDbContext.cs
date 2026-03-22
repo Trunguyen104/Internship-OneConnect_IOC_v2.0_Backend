@@ -82,8 +82,12 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<SprintWorkItem>()
+        .HasKey(x => new { x.SprintId, x.WorkItemId });
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         OnModelCreatingPartial(modelBuilder);
+        base.OnModelCreating(modelBuilder);
 
         ApplyGlobalFilters(modelBuilder);
     }
