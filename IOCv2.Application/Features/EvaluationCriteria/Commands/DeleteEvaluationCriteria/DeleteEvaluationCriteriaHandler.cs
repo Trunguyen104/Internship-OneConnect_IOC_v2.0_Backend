@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCriteria.Common;
 using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -13,15 +14,18 @@ public class DeleteEvaluationCriteriaHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<DeleteEvaluationCriteriaHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public DeleteEvaluationCriteriaHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<DeleteEvaluationCriteriaHandler> logger)
+        ILogger<DeleteEvaluationCriteriaHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<bool>> Handle(
@@ -60,6 +64,8 @@ public class DeleteEvaluationCriteriaHandler
         await _unitOfWork.Repository<Domain.Entities.EvaluationCriteria>().UpdateAsync(criteria, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(EvaluationCriteriaCacheKeys.CriteriaListPattern(), cancellationToken);
 
         _logger.LogInformation("Successfully deleted EvaluationCriteria {CriteriaId}", request.CriteriaId);
 

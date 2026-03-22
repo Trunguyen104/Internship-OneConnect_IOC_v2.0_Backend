@@ -13,6 +13,7 @@ namespace IOCv2.Domain.Entities
         public decimal? Gpa { get; set; }
         public string? HighestDegree { get; set; }
         public string? PortfolioUrl { get; private set; }
+        public string? CvUrl { get; private set; }
 
         public StudentStatus InternshipStatus { get; set; }
 
@@ -21,11 +22,17 @@ namespace IOCv2.Domain.Entities
             PortfolioUrl = portfolioUrl;
         }
 
+        public void UpdateCv(string? cvUrl)
+        {
+            CvUrl = cvUrl;
+        }
+
         // Navigation properties
         public virtual ICollection<StudentTerm> StudentTerms { get; set; } = new List<StudentTerm>();
         public virtual ICollection<InternshipStudent> InternshipStudents { get; set; } = new List<InternshipStudent>();
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
         public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
+        public virtual ICollection<ViolationReport> ViolationReports { get; set; } = new List<ViolationReport>();
     }
 }

@@ -33,6 +33,15 @@ namespace IOCv2.Infrastructure.Security
                 claims.Add(new Claim(JwtRegisteredClaimNames.UniqueName, user.UserCode));
             }
 
+            if (user.UniversityUser != null)
+            {
+                claims.Add(new Claim("UnitId", user.UniversityUser.UniversityId.ToString()));
+            }
+            else if (user.EnterpriseUser != null)
+            {
+                claims.Add(new Claim("UnitId", user.EnterpriseUser.EnterpriseId.ToString()));
+            }
+
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
 

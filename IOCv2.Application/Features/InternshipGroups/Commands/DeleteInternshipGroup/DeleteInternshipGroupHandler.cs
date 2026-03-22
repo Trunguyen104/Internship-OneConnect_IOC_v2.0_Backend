@@ -1,13 +1,13 @@
+using AutoMapper;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
-using IOCv2.Application.Constants;
-using AutoMapper;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipGroup
 {
@@ -50,17 +50,25 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                     return Result<DeleteInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
-                await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
-                // Delete members first (manual cascade if not handled by DB)
+                // Chặn xóa nếu nhóm còn sinh viên
                 if (entity.Members.Any())
                 {
-                    var memberRepo = _unitOfWork.Repository<InternshipStudent>();
-                    foreach (var member in entity.Members.ToList())
-                    {
-                        await memberRepo.DeleteAsync(member);
-                    }
+                    _logger.LogWarning("Attempted to delete group {InternshipId} which still has {Count} student(s).",
+                        request.InternshipId, entity.Members.Count);
+                    return Result<DeleteInternshipGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.HasStudents),
+                        ResultErrorType.BadRequest);
                 }
+
+                if (entity.Status != GroupStatus.Active)
+                {
+                    _logger.LogWarning("Attempted to delete group {InternshipId} which is not Active.", request.InternshipId);
+                    return Result<DeleteInternshipGroupResponse>.Failure(
+                        "Nhóm đã kết thúc hoặc lưu trữ, không thể xóa.",
+                        ResultErrorType.BadRequest);
+                }
+
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 await _unitOfWork.Repository<InternshipGroup>().DeleteAsync(entity);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);

@@ -1,939 +1,1264 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
+    <!--
+      Microsoft ResX Schema
 
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
+      Version 2.0
+
+      The primary goals of this format is to allow a simple XML format
+      that is mostly human readable. The generation and parsing of the
+      various data types are done through the TypeConverter classes
+      associated with the data types.
+
+      Example:
+
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+
+      There are any number of "resheader" rows that contain simple
+      name/value pairs.
+
+      Each data row contains a name, and value. The row also contains a
+      type or mimetype. Type corresponds to a .NET class that support
+      text/value conversion through the TypeConverter architecture.
+      Classes that don't support this are serialized and stored with the
+      mimetype set.
+
+      The mimetype is used for serialized objects, and tells the
+      ResXResourceReader how to depersist the object. This is currently not
+      extensible. For a given mimetype the value must be set accordingly:
+
+      Note - application/x-microsoft.net.object.binary.base64 is the format
+      that the ResXResourceWriter will generate, however the reader can
+      read any of the formats listed below.
+
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+        <xsd:element name="root" msdata:IsDataSet="true">
             <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string" />
+                            <xsd:attribute name="type" type="xsd:string" />
+                            <xsd:attribute name="mimetype" type="xsd:string" />
+                            <xsd:attribute ref="xml:space" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string" />
+                            <xsd:attribute name="name" type="xsd:string" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+                            <xsd:attribute ref="xml:space" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" />
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
             </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="Common.DatabaseConflict" xml:space="preserve">
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Common.DatabaseConflict" xml:space="preserve">
     <value>Có xung đột dữ liệu trong hệ thống. Vui lòng thử lại sau vài giây.</value>
   </data>
-  <data name="Common.DatabaseUpdateError" xml:space="preserve">
+    <data name="Common.DatabaseUpdateError" xml:space="preserve">
     <value>Có lỗi xảy ra khi cập nhật dữ liệu. Vui lòng thử lại.</value>
   </data>
-  <data name="Common.OperationCancelled" xml:space="preserve">
+    <data name="Common.OperationCancelled" xml:space="preserve">
     <value>Thao tác bị hủy do timeout. Vui lòng thử lại.</value>
   </data>
-  <data name="Common.PageNumberInvalid" xml:space="preserve">
+    <data name="Common.PageNumberInvalid" xml:space="preserve">
     <value>Số trang phải lớn hơn 0.</value>
   </data>
-  <data name="Common.PageSizeInvalid" xml:space="preserve">
+    <data name="Common.PageSizeInvalid" xml:space="preserve">
     <value>Kích thước trang phải lớn hơn 0.</value>
   </data>
-  <data name="Common.PageSizeTooLarge" xml:space="preserve">
+    <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Kích thước trang không được vượt quá 100.</value>
   </data>
-  <data name="Common.IdMismatch" xml:space="preserve">
+    <data name="Common.IdMismatch" xml:space="preserve">
     <value>ID trong URL không khớp với ID trong body.</value>
   </data>
-  <data name="InvalidUserId" xml:space="preserve">
+    <data name="InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid.</value>
   </data>
-  <data name="Common.Unauthorized" xml:space="preserve">
+    <data name="Common.Unauthorized" xml:space="preserve">
     <value>Bạn không có quyền thực hiện thao tác này.</value>
   </data>
-  <data name="Common.NoPermission" xml:space="preserve">
+    <data name="Common.NoPermission" xml:space="preserve">
     <value>Bạn không có quyền thực hiện hành động này</value>
   </data>
-  <data name="Users.InvalidAuditor" xml:space="preserve">
+    <data name="Users.InvalidAuditor" xml:space="preserve">
     <value>Không thể xác định Manager thực hiện thao tác</value>
   </data>
-  <data name="ResetPassword.OnlyManagerCanReset" xml:space="preserve">
+    <data name="ResetPassword.OnlyManagerCanReset" xml:space="preserve">
     <value>Chỉ Manager mới có quyền reset password</value>
   </data>
-  <data name="ResetPassword.OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <data name="ResetPassword.OnlyActiveEmployeeCanReset" xml:space="preserve">
     <value>Chỉ có thể reset password cho tài khoản đang hoạt động</value>
   </data>
-  <data name="Password.MinLength" xml:space="preserve">
+    <data name="Password.MinLength" xml:space="preserve">
     <value>Mật khẩu phải có ít nhất 8 ký tự</value>
   </data>
-  <data name="Password.RequireUppercase" xml:space="preserve">
+    <data name="Password.RequireUppercase" xml:space="preserve">
     <value>Mật khẩu phải có ít nhất 1 chữ hoa</value>
   </data>
-  <data name="Password.RequireLowercase" xml:space="preserve">
+    <data name="Password.RequireLowercase" xml:space="preserve">
     <value>Mật khẩu phải có ít nhất 1 chữ thường</value>
   </data>
-  <data name="Password.RequireDigit" xml:space="preserve">
+    <data name="Password.RequireDigit" xml:space="preserve">
     <value>Mật khẩu phải có ít nhất 1 số</value>
   </data>
-  <data name="Password.RequireSpecial" xml:space="preserve">
+    <data name="Password.RequireSpecial" xml:space="preserve">
     <value>Mật khẩu phải có ít nhất 1 ký tự đặc biệt</value>
   </data>
-  <data name="ResetPassword.UserIdRequired" xml:space="preserve">
+    <data name="ResetPassword.UserIdRequired" xml:space="preserve">
     <value>Id người dùng không được để trống</value>
   </data>
-  <data name="ResetPassword.ReasonRequired" xml:space="preserve">
+    <data name="ResetPassword.ReasonRequired" xml:space="preserve">
     <value>Lý do reset password là bắt buộc</value>
   </data>
-  <data name="ResetPassword.ReasonMinLength" xml:space="preserve">
+    <data name="ResetPassword.ReasonMinLength" xml:space="preserve">
     <value>Lý do reset phải có ít nhất 10 ký tự</value>
   </data>
-  <data name="ResetPassword.ReasonMaxLength" xml:space="preserve">
+    <data name="ResetPassword.ReasonMaxLength" xml:space="preserve">
     <value>Lý do reset không được quá 500 ký tự</value>
   </data>
-  <data name="Auth.InvalidCredentials" xml:space="preserve">
+    <data name="Auth.InvalidCredentials" xml:space="preserve">
     <value>Email hoặc mật khẩu không chính xác.</value>
   </data>
-  <data name="Auth.AccountInactive" xml:space="preserve">
+    <data name="Auth.AccountInactive" xml:space="preserve">
     <value>Tài khoản hiện đang bị khóa hoặc chưa kích hoạt.</value>
   </data>
-  <data name="Auth.AccountBlocked" xml:space="preserve">
+    <data name="Auth.AccountBlocked" xml:space="preserve">
     <value>Tài khoản bị tạm khóa do nhập sai quá nhiều lần. Vui lòng thử lại sau.</value>
   </data>
-  <data name="Auth.InvalidToken" xml:space="preserve">
+    <data name="Auth.InvalidToken" xml:space="preserve">
     <value>Token không hợp lệ hoặc đã hết hạn.</value>
   </data>
-  <data name="Auth.RefreshTokenNotFound" xml:space="preserve">
+    <data name="Auth.RefreshTokenNotFound" xml:space="preserve">
     <value>Refresh token không tồn tại.</value>
   </data>
-  <data name="Auth.RefreshTokenExpired" xml:space="preserve">
+    <data name="Auth.RefreshTokenExpired" xml:space="preserve">
     <value>Refresh token đã hết hạn.</value>
   </data>
-  <data name="Auth.RefreshTokenRevoked" xml:space="preserve">
+    <data name="Auth.RefreshTokenRevoked" xml:space="preserve">
     <value>Token làm mới đã bị thu hồi.</value>
   </data>
-  <data name="Auth.AccountCreationEmailFailed" xml:space="preserve">
+    <data name="Auth.AccountCreationEmailFailed" xml:space="preserve">
     <value>Tạo tài khoản thất bại: Không thể gửi email thông báo. Vui lòng kiểm tra lại địa chỉ email.</value>
   </data>
-  <data name="Auth.ResetRequestLimit" xml:space="preserve">
+    <data name="Auth.ResetRequestLimit" xml:space="preserve">
     <value>Quá nhiều yêu cầu reset mật khẩu. Vui lòng thử lại sau.</value>
   </data>
-  <data name="Auth.InvalidResetLink" xml:space="preserve">
+    <data name="Auth.InvalidResetLink" xml:space="preserve">
     <value>Link không hợp lệ hoặc đã hết hạn.</value>
   </data>
-  <data name="Auth.UserNotLoggedIn" xml:space="preserve">
+    <data name="Auth.UserNotLoggedIn" xml:space="preserve">
     <value>Người dùng chưa đăng nhập.</value>
   </data>
-  <data name="Auth.InvalidAction" xml:space="preserve">
+    <data name="Auth.InvalidAction" xml:space="preserve">
     <value>Thao tác không hợp lệ.</value>
   </data>
-  <data name="Auth.TooManyAttempts" xml:space="preserve">
+    <data name="Auth.TooManyAttempts" xml:space="preserve">
     <value>Quá nhiều lần thử sai. Vui lòng thử lại sau.</value>
   </data>
-  <data name="Password.ConfirmationMismatch" xml:space="preserve">
+    <data name="Password.ConfirmationMismatch" xml:space="preserve">
     <value>Mật khẩu xác nhận không khớp.</value>
   </data>
-  <data name="Password.MustBeDifferent" xml:space="preserve">
+    <data name="Password.MustBeDifferent" xml:space="preserve">
     <value>Mật khẩu mới phải khác mật khẩu hiện tại.</value>
   </data>
-  <data name="Password.IncorrectCurrent" xml:space="preserve">
+    <data name="Password.IncorrectCurrent" xml:space="preserve">
     <value>Mật khẩu hiện tại không chính xác.</value>
   </data>
-  <data name="Profile.PhoneExists" xml:space="preserve">
+    <data name="Profile.PhoneExists" xml:space="preserve">
     <value>Số điện thoại đã được sử dụng bởi người khác.</value>
   </data>
-  <data name="Profile.EmailExists" xml:space="preserve">
+    <data name="Profile.EmailExists" xml:space="preserve">
     <value>Email đã được sử dụng bởi người khác.</value>
   </data>
-  <data name="Users.CannotUpdateInactive" xml:space="preserve">
+    <data name="Users.CannotUpdateInactive" xml:space="preserve">
     <value>Không thể cập nhật thông tin cho tài khoản đang ngừng hoạt động.</value>
   </data>
-  <data name="Users.EmailConflict" xml:space="preserve">
+    <data name="Users.EmailConflict" xml:space="preserve">
     <value>Email này đã tồn tại trong hệ thống.</value>
   </data>
-  <data name="Users.NotFound" xml:space="preserve">
+    <data name="Users.NotFound" xml:space="preserve">
     <value>Không tìm thấy người dùng.</value>
   </data>
-  <data name="University.NotFound" xml:space="preserve">
+    <data name="University.NotFound" xml:space="preserve">
     <value>Không tìm thấy thông tin trường học.</value>
   </data>
-  <data name="Enterprise.NotFound" xml:space="preserve">
+    <data name="Enterprise.NotFound" xml:space="preserve">
     <value>Không tìm thấy thông tin doanh nghiệp.</value>
   </data>
-  <data name="Common.Forbidden" xml:space="preserve">
+    <data name="Common.Forbidden" xml:space="preserve">
     <value>Bạn không có quyền thực hiện hành động này.</value>
   </data>
-  <data name="Common.AccessDenied" xml:space="preserve">
+    <data name="Common.AccessDenied" xml:space="preserve">
     <value>Truy cập bị từ chối.</value>
   </data>
-  <data name="Common.NotFound" xml:space="preserve">
+    <data name="Common.NotFound" xml:space="preserve">
     <value>Không tìm thấy bản ghi tương ứng.</value>
   </data>
-  <data name="InternshipGroup.NameRequired" xml:space="preserve">
+    <data name="InternshipGroup.NameRequired" xml:space="preserve">
     <value>Tên nhóm không được để trống.</value>
   </data>
-  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
+    <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
     <value>Tên nhóm không được vượt quá 255 ký tự.</value>
   </data>
-  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
+    <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
     <value>Kỳ thực tập không được để trống.</value>
   </data>
-  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
+    <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
     <value>Ngày bắt đầu phải trước ngày kết thúc.</value>
   </data>
-  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
+    <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
     <value>Danh sách sinh viên không được trống.</value>
   </data>
-  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
+    <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
     <value>Danh sách sinh viên cần xóa không được trống.</value>
   </data>
-  <data name="Projects.LogDeleteError" xml:space="preserve">
+    <data name="Projects.LogDeleteError" xml:space="preserve">
     <value>Lỗi khi xóa dự án {0}</value>
   </data>
-  <data name="ProjectResources.ProjectIdRequired" xml:space="preserve">
+    <data name="ProjectResources.ProjectIdRequired" xml:space="preserve">
     <value>Mã định danh tài nguyên dự án (Project Resource ID) là bắt buộc.</value>
   </data>
-  <data name="ProjectResources.ResourceNameMaxLength" xml:space="preserve">
+    <data name="ProjectResources.ResourceNameMaxLength" xml:space="preserve">
     <value>Tên tài nguyên không được vượt quá 500 ký tự.</value>
   </data>
-  <data name="Projects.ProjectIdRequired" xml:space="preserve">
+    <data name="Projects.ProjectIdRequired" xml:space="preserve">
     <value>ID dự án là bắt buộc</value>
   </data>
-  <data name="ProjectResources.LogNotFound" xml:space="preserve">
+    <data name="ProjectResources.LogNotFound" xml:space="preserve">
     <value>Không tìm thấy tài nguyên dự án có ID {0}</value>
   </data>
-  <data name="ProjectResources.NotFound" xml:space="preserve">
+    <data name="ProjectResources.NotFound" xml:space="preserve">
     <value>Không tìm thấy tài nguyên dự án</value>
   </data>
-  <data name="Projects.LogNotFound" xml:space="preserve">
+    <data name="Projects.LogNotFound" xml:space="preserve">
     <value>Không tìm thấy dự án có ID {0}</value>
   </data>
-  <data name="Projects.NotFound" xml:space="preserve">
+    <data name="Projects.NotFound" xml:space="preserve">
     <value>Dự án không tìm thấy</value>
   </data>
-  <data name="ProjectResources.LogUpdateError" xml:space="preserve">
+    <data name="ProjectResources.LogUpdateError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi cập nhật tài nguyên dự án có ID {0}</value>
   </data>
-  <data name="ProjectResources.UpdateError" xml:space="preserve">
+    <data name="ProjectResources.UpdateError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình cập nhật tài nguyên dự án.</value>
   </data>
-  <data name="ProjectResources.LogUploadError" xml:space="preserve">
+    <data name="ProjectResources.LogUploadError" xml:space="preserve">
     <value>Lỗi khi tải tệp lên dự án {0}</value>
   </data>
-  <data name="ProjectResources.FileRequired" xml:space="preserve">
+    <data name="ProjectResources.FileRequired" xml:space="preserve">
     <value>Tập tin là bắt buộc</value>
   </data>
-  <data name="ProjectResources.InvalidFileType" xml:space="preserve">
+    <data name="ProjectResources.InvalidFileType" xml:space="preserve">
     <value>Loại tệp không hợp lệ. Các loại được cho phép: {0}</value>
   </data>
-  <data name="ProjectResources.FileSizeExceeded" xml:space="preserve">
+    <data name="ProjectResources.FileSizeExceeded" xml:space="preserve">
     <value>Kích thước tệp vượt quá kích thước tối đa cho phép.</value>
   </data>
-  <data name="ProjectResources.GetAllError" xml:space="preserve">
+    <data name="ProjectResources.GetAllError" xml:space="preserve">
     <value>Lỗi khi lấy tất cả tài nguyên dự án</value>
   </data>
-  <data name="ProjectResources.GetByIdError" xml:space="preserve">
+    <data name="ProjectResources.GetByIdError" xml:space="preserve">
     <value>Lỗi khi truy xuất tài nguyên dự án theo ID: {0}</value>
   </data>
-  <data name="Projects.ProjectNameExistsInternship" xml:space="preserve">
+    <data name="Projects.ProjectNameExistsInternship" xml:space="preserve">
     <value>Tên dự án cho chương trình thực tập này đã tồn tại.</value>
   </data>
-  <data name="Projects.LogCreateError" xml:space="preserve">
+    <data name="Projects.LogCreateError" xml:space="preserve">
     <value>Lỗi khi tạo dự án thực tập {0}</value>
   </data>
-  <data name="Projects.InternshipIdRequired" xml:space="preserve">
+    <data name="Projects.InternshipIdRequired" xml:space="preserve">
     <value>Cần có mã số thực tập.</value>
   </data>
-  <data name="Projects.ProjectNameRequired" xml:space="preserve">
+    <data name="Projects.ProjectNameRequired" xml:space="preserve">
     <value>Tên dự án là bắt buộc.</value>
   </data>
-  <data name="Projects.ProjectNameMaxLength" xml:space="preserve">
+    <data name="Projects.ProjectNameMaxLength" xml:space="preserve">
     <value>Tên dự án không được vượt quá 255 ký tự.</value>
   </data>
-  <data name="Projects.DescriptionMaxLength" xml:space="preserve">
+    <data name="Projects.DescriptionMaxLength" xml:space="preserve">
     <value>Phần mô tả không được vượt quá 2000 ký tự.</value>
   </data>
-  <data name="Projects.StartDateInvalidRange" xml:space="preserve">
+    <data name="Projects.StartDateInvalidRange" xml:space="preserve">
     <value>Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.</value>
   </data>
-  <data name="Projects.EndDateInvalidRange" xml:space="preserve">
+    <data name="Projects.EndDateInvalidRange" xml:space="preserve">
     <value>Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.</value>
   </data>
-  <data name="Projects.UpdateError" xml:space="preserve">
+    <data name="Projects.UpdateError" xml:space="preserve">
     <value>Lỗi khi cập nhật dự án {0}</value>
   </data>
-  <data name="Projects.GetAllError" xml:space="preserve">
+    <data name="Projects.GetAllError" xml:space="preserve">
     <value>Lỗi nhận tất cả các dự án</value>
   </data>
-  <data name="Projects.GetByStudentIdError" xml:space="preserve">
+    <data name="Projects.GetByStudentIdError" xml:space="preserve">
     <value>Lỗi khi lấy dự án cho sinh viên {0}</value>
   </data>
-  <data name="Internships.InternshipIdRequired" xml:space="preserve">
+    <data name="Internships.InternshipIdRequired" xml:space="preserve">
     <value>Internship ID is required.</value>
   </data>
-  <data name="Epic.ProjectIdRequired" xml:space="preserve">
+    <data name="Epic.ProjectIdRequired" xml:space="preserve">
     <value>ID dự án không được để trống.</value>
   </data>
-  <data name="Epic.NameRequired" xml:space="preserve">
+    <data name="Epic.NameRequired" xml:space="preserve">
     <value>Tên Epic không được để trống.</value>
   </data>
-  <data name="Epic.NameMaxLength" xml:space="preserve">
+    <data name="Epic.NameMaxLength" xml:space="preserve">
     <value>Tên Epic không được vượt quá 255 ký tự.</value>
   </data>
-  <data name="Epic.DescriptionMaxLength" xml:space="preserve">
+    <data name="Epic.DescriptionMaxLength" xml:space="preserve">
     <value>Mô tả không được vượt quá 2000 ký tự.</value>
   </data>
-  <data name="Epic.NotFound" xml:space="preserve">
+    <data name="Epic.NotFound" xml:space="preserve">
     <value>Không tìm thấy Epic.</value>
   </data>
-  <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
+    <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
     <value>Không thể xóa Epic khi còn Story/Task con. Vui lòng xóa hoặc di chuyển tất cả item con trước.</value>
   </data>
-  <data name="Epic.ProjectNotFound" xml:space="preserve">
+    <data name="Epic.ProjectNotFound" xml:space="preserve">
     <value>Không tìm thấy dự án.</value>
   </data>
-  <data name="Sprint.ProjectIdRequired" xml:space="preserve">
+    <data name="Sprint.ProjectIdRequired" xml:space="preserve">
     <value>ID dự án không được để trống.</value>
   </data>
-  <data name="Sprint.NameRequired" xml:space="preserve">
+    <data name="Sprint.NameRequired" xml:space="preserve">
     <value>Tên Sprint không được để trống.</value>
   </data>
-  <data name="Sprint.NameMaxLength" xml:space="preserve">
+    <data name="Sprint.NameMaxLength" xml:space="preserve">
     <value>Tên Sprint không được vượt quá 200 ký tự.</value>
   </data>
-  <data name="Sprint.GoalMaxLength" xml:space="preserve">
+    <data name="Sprint.GoalMaxLength" xml:space="preserve">
     <value>Mục tiêu Sprint không được vượt quá 1000 ký tự.</value>
   </data>
-  <data name="Sprint.StartDateRequired" xml:space="preserve">
+    <data name="Sprint.StartDateRequired" xml:space="preserve">
     <value>Ngày bắt đầu không được để trống.</value>
   </data>
-  <data name="Sprint.EndDateRequired" xml:space="preserve">
+    <data name="Sprint.EndDateRequired" xml:space="preserve">
     <value>Ngày kết thúc không được để trống.</value>
   </data>
-  <data name="Sprint.EndDateMustBeAfterStart" xml:space="preserve">
+    <data name="Sprint.EndDateMustBeAfterStart" xml:space="preserve">
     <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
   </data>
-  <data name="Sprint.DurationTooShort" xml:space="preserve">
+    <data name="Sprint.DurationTooShort" xml:space="preserve">
     <value>Sprint phải kéo dài ít nhất 7 ngày (1 tuần).</value>
   </data>
-  <data name="Sprint.DurationTooLong" xml:space="preserve">
+    <data name="Sprint.DurationTooLong" xml:space="preserve">
     <value>Sprint không được vượt quá 28 ngày (4 tuần).</value>
   </data>
-  <data name="Sprint.NotFound" xml:space="preserve">
+    <data name="Sprint.NotFound" xml:space="preserve">
     <value>Không tìm thấy Sprint.</value>
   </data>
-  <data name="Sprint.CannotDeleteActive" xml:space="preserve">
+    <data name="Sprint.CannotDeleteActive" xml:space="preserve">
     <value>Không thể xóa Sprint đang hoạt động hoặc đã hoàn thành.</value>
   </data>
-  <data name="Sprint.CannotDeleteWithItems" xml:space="preserve">
+    <data name="Sprint.CannotDeleteWithItems" xml:space="preserve">
     <value>Không thể xóa Sprint khi còn WorkItem. Vui lòng di chuyển tất cả item trước.</value>
   </data>
-  <data name="Sprint.AlreadyActive" xml:space="preserve">
+    <data name="Sprint.AlreadyActive" xml:space="preserve">
     <value>Sprint đã được bắt đầu.</value>
   </data>
-  <data name="Sprint.NotPlanned" xml:space="preserve">
+    <data name="Sprint.NotPlanned" xml:space="preserve">
     <value>Sprint phải ở trạng thái Planned mới có thể bắt đầu</value>
   </data>
-  <data name="Sprint.ActiveSprintExists" xml:space="preserve">
+    <data name="Sprint.ActiveSprintExists" xml:space="preserve">
     <value>Dự án đã có một Sprint đang Active. Chỉ được phép một Sprint Active tại một thời điểm</value>
   </data>
-  <data name="Sprint.NotActive" xml:space="preserve">
+    <data name="Sprint.NotActive" xml:space="preserve">
     <value>Sprint phải ở trạng thái Active mới có thể hoàn thành</value>
   </data>
-  <data name="Sprint.CannotEditCompleted" xml:space="preserve">
+    <data name="Sprint.CannotEditCompleted" xml:space="preserve">
     <value>Không thể chỉnh sửa Sprint đã hoàn thành</value>
   </data>
-  <data name="Sprint.IdRequired" xml:space="preserve">
+    <data name="Sprint.IdRequired" xml:space="preserve">
     <value>Sprint ID là bắt buộc</value>
   </data>
-  <data name="Sprint.CannotDeleteActiveSprint" xml:space="preserve">
+    <data name="Sprint.CannotDeleteActiveSprint" xml:space="preserve">
     <value>Không thể xóa Sprint đang Active hoặc đã Completed. Chỉ có thể xóa Sprint ở trạng thái Planned</value>
   </data>
-  <data name="Sprint.CannotDeleteWithWorkItems" xml:space="preserve">
+    <data name="Sprint.CannotDeleteWithWorkItems" xml:space="preserve">
     <value>Không thể xóa Sprint đang chứa Work Items. Vui lòng di chuyển hoặc xóa các Work Items trước</value>
   </data>
-  <data name="Sprint.DatesRequiredToStart" xml:space="preserve">
+    <data name="Sprint.DatesRequiredToStart" xml:space="preserve">
     <value>Sprint phải có Ngày bắt đầu và Ngày kết thúc trước khi bắt đầu. Vui lòng cập nhật Sprint trước.</value>
   </data>
-  <data name="Sprint.TargetSprintNotFound" xml:space="preserve">
+    <data name="Sprint.TargetSprintNotFound" xml:space="preserve">
     <value>Không tìm thấy Sprint đích được chỉ định.</value>
   </data>
-  <data name="Sprint.InvalidIncompleteItemsOption" xml:space="preserve">
+    <data name="Sprint.InvalidIncompleteItemsOption" xml:space="preserve">
     <value>Tùy chọn xử lý các item chưa hoàn thành không hợp lệ.</value>
   </data>
-  <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
+    <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
     <value>Sprint đích là bắt buộc khi chọn chuyển sang Sprint có sẵn.</value>
   </data>
-  <data name="WorkItem.TitleRequired" xml:space="preserve">
+    <data name="WorkItem.TitleRequired" xml:space="preserve">
     <value>Tiêu đề công việc không được để trống.</value>
   </data>
-  <data name="WorkItem.TitleMaxLength" xml:space="preserve">
+    <data name="WorkItem.TitleMaxLength" xml:space="preserve">
     <value>Tiêu đề không được vượt quá 255 ký tự.</value>
   </data>
-  <data name="WorkItem.TypeRequired" xml:space="preserve">
+    <data name="WorkItem.TypeRequired" xml:space="preserve">
     <value>Loại công việc không được để trống.</value>
   </data>
-  <data name="WorkItem.TypeInvalid" xml:space="preserve">
+    <data name="WorkItem.TypeInvalid" xml:space="preserve">
     <value>Loại công việc không hợp lệ. Giá trị hợp lệ: Epic, UserStory, Task, Subtask.</value>
   </data>
-  <data name="WorkItem.PriorityInvalid" xml:space="preserve">
+    <data name="WorkItem.PriorityInvalid" xml:space="preserve">
     <value>Độ ưu tiên không hợp lệ. Giá trị hợp lệ: Low, Medium, High, Critical.</value>
   </data>
-  <data name="WorkItem.StatusInvalid" xml:space="preserve">
+    <data name="WorkItem.StatusInvalid" xml:space="preserve">
     <value>Trạng thái không hợp lệ. Giá trị hợp lệ: Todo, InProgress, Review, Done, Cancelled.</value>
   </data>
-  <data name="WorkItem.StoryPointInvalid" xml:space="preserve">
+    <data name="WorkItem.StoryPointInvalid" xml:space="preserve">
     <value>Story Point phải lớn hơn hoặc bằng 0.</value>
   </data>
-  <data name="WorkItem.NotFound" xml:space="preserve">
+    <data name="WorkItem.NotFound" xml:space="preserve">
     <value>Không tìm thấy công việc.</value>
   </data>
-  <data name="Stakeholder.NotFound" xml:space="preserve">
+    <data name="Stakeholder.NotFound" xml:space="preserve">
     <value>Không tìm thấy stakeholder.</value>
   </data>
-  <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
+    <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
     <value>Không tìm thấy dự án tương ứng.</value>
   </data>
-  <data name="Stakeholder.EmailExists" xml:space="preserve">
+    <data name="Stakeholder.EmailExists" xml:space="preserve">
     <value>Email này đã tồn tại trong dự án.</value>
   </data>
-  <data name="Stakeholder.IdRequired" xml:space="preserve">
+    <data name="Stakeholder.IdRequired" xml:space="preserve">
     <value>Id stakeholder không được để trống.</value>
   </data>
-  <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
+    <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
     <value>Id dự án không được để trống.</value>
   </data>
-  <data name="Stakeholder.NameRequired" xml:space="preserve">
+    <data name="Stakeholder.NameRequired" xml:space="preserve">
     <value>Tên stakeholder không được để trống.</value>
   </data>
-  <data name="Stakeholder.NameMaxLength" xml:space="preserve">
+    <data name="Stakeholder.NameMaxLength" xml:space="preserve">
     <value>Tên stakeholder không được vượt quá 200 ký tự.</value>
   </data>
-  <data name="Stakeholder.EmailRequired" xml:space="preserve">
+    <data name="Stakeholder.EmailRequired" xml:space="preserve">
     <value>Email không được để trống.</value>
   </data>
-  <data name="Stakeholder.EmailInvalid" xml:space="preserve">
+    <data name="Stakeholder.EmailInvalid" xml:space="preserve">
     <value>Email không đúng định dạng.</value>
   </data>
-  <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
+    <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
     <value>Email không được vượt quá 150 ký tự.</value>
   </data>
-  <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
+    <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
     <value>Vai trò không được vượt quá 100 ký tự.</value>
   </data>
-  <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
+    <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
     <value>Mô tả không được vượt quá 500 ký tự.</value>
   </data>
-  <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
+    <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
     <value>Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại đúng định dạng.</value>
   </data>
-  <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
+    <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
     <value>Số điện thoại không được vượt quá 15 ký tự.</value>
   </data>
-  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <data name="Stakeholder.CreateSuccess" xml:space="preserve">
     <value>Tạo stakeholder thành công.</value>
   </data>
-  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật stakeholder thành công.</value>
   </data>
-  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Xóa stakeholder thành công.</value>
   </data>
-  <data name="Issue.NotFound" xml:space="preserve">
+    <data name="Issue.NotFound" xml:space="preserve">
     <value>Không tìm thấy issue.</value>
   </data>
-  <data name="Issue.StakeholderNotFound" xml:space="preserve">
+    <data name="Issue.StakeholderNotFound" xml:space="preserve">
     <value>Không tìm thấy stakeholder.</value>
   </data>
-  <data name="Issue.TitleRequired" xml:space="preserve">
+    <data name="Issue.TitleRequired" xml:space="preserve">
     <value>Tiêu đề là bắt buộc.</value>
   </data>
-  <data name="Issue.DescriptionRequired" xml:space="preserve">
+    <data name="Issue.DescriptionRequired" xml:space="preserve">
     <value>Mô tả là bắt buộc.</value>
   </data>
-  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+    <data name="Issue.StakeholderIdRequired" xml:space="preserve">
     <value>Stakeholder ID là bắt buộc.</value>
   </data>
-  <data name="Issue.InvalidStatus" xml:space="preserve">
+    <data name="Issue.InvalidStatus" xml:space="preserve">
     <value>Trạng thái không hợp lệ. Vui lòng chọn: Open, InProgress, Resolved, hoặc Closed.</value>
   </data>
-  <data name="Issue.CreateFailed" xml:space="preserve">
+    <data name="Issue.CreateFailed" xml:space="preserve">
     <value>Tạo issue thất bại.</value>
   </data>
-  <data name="Issue.UpdateFailed" xml:space="preserve">
+    <data name="Issue.UpdateFailed" xml:space="preserve">
     <value>Cập nhật issue thất bại.</value>
   </data>
-  <data name="Issue.DeleteFailed" xml:space="preserve">
+    <data name="Issue.DeleteFailed" xml:space="preserve">
     <value>Xóa issue thất bại.</value>
   </data>
-  <data name="Projects.LogGetByIdError" xml:space="preserve">
+    <data name="Projects.LogGetByIdError" xml:space="preserve">
     <value>Lỗi khi lấy ID dự án: {0}</value>
   </data>
-  <data name="Projects.LogGetByInternshipIdErr" xml:space="preserve">
+    <data name="Projects.LogGetByInternshipIdErr" xml:space="preserve">
     <value>Lỗi khi lấy dự án theo ID thực tập: {0}</value>
   </data>
-  <data name="Internships.NotFound" xml:space="preserve">
+    <data name="Internships.NotFound" xml:space="preserve">
     <value>Không tìm thấy Internship với ID: {0}</value>
   </data>
+  <!-- StudentTerms — Validation: TermId / StudentTermId -->
+  <data name="StudentTerms.TermIdRequired" xml:space="preserve">
+    <value>TermId không được để trống.</value>
+  </data>
+  <data name="StudentTerms.StudentTermIdRequired" xml:space="preserve">
+    <value>StudentTermId không được để trống.</value>
+  </data>
+  <data name="StudentTerms.StudentTermIdListRequired" xml:space="preserve">
+    <value>Danh sách ID không được để trống.</value>
+  </data>
+  <data name="StudentTerms.StudentTermIdListMinCount" xml:space="preserve">
+    <value>Phải chọn ít nhất 1 sinh viên.</value>
+  </data>
+  <data name="StudentTerms.ValidRecordsRequired" xml:space="preserve">
+    <value>Danh sách bản ghi không được null.</value>
+  </data>
+  <data name="StudentTerms.ValidRecordsMinCount" xml:space="preserve">
+    <value>Phải có ít nhất 1 bản ghi hợp lệ.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: File -->
+  <data name="StudentTerms.FileRequired" xml:space="preserve">
+    <value>File không được để trống.</value>
+  </data>
+  <data name="StudentTerms.FileEmpty" xml:space="preserve">
+    <value>File không được rỗng.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: FullName -->
+  <data name="StudentTerms.FullNameRequired" xml:space="preserve">
+    <value>Họ và tên không được để trống.</value>
+  </data>
+  <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
+    <value>Họ và tên chỉ chứa chữ cái và khoảng trắng.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: StudentCode -->
+  <data name="StudentTerms.StudentCodeRequired" xml:space="preserve">
+    <value>Mã sinh viên không được để trống.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
+    <value>Mã sinh viên không hợp lệ.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInvalidDetail" xml:space="preserve">
+    <value>Mã sinh viên không hợp lệ (chỉ cho phép a-z, 0-9, -, _, .).</value>
+  </data>
+  <data name="StudentTerms.StudentCodeDuplicateInFile" xml:space="preserve">
+    <value>Mã sinh viên bị trùng trong file.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeAlreadyInTerm" xml:space="preserve">
+    <value>Mã sinh viên đã được ghi danh vào đợt này.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeInOtherTerm" xml:space="preserve">
+    <value>Sinh viên đang ghi danh vào đợt khác.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: Email -->
+  <data name="StudentTerms.EmailRequired" xml:space="preserve">
+    <value>Email không được để trống.</value>
+  </data>
+  <data name="StudentTerms.EmailInvalid" xml:space="preserve">
+    <value>Email không đúng định dạng.</value>
+  </data>
+  <data name="StudentTerms.EmailDuplicateInFile" xml:space="preserve">
+    <value>Email bị trùng trong file.</value>
+  </data>
+  <data name="StudentTerms.EmailAlreadyInTerm" xml:space="preserve">
+    <value>Email đã được ghi danh vào đợt này.</value>
+  </data>
+  <data name="StudentTerms.EmailInOtherTerm" xml:space="preserve">
+    <value>Email đang ghi danh vào đợt khác.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: Phone -->
+  <data name="StudentTerms.PhoneInvalid" xml:space="preserve">
+    <value>Số điện thoại không hợp lệ.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: DateOfBirth -->
+  <data name="StudentTerms.DateOfBirthInvalidFormat" xml:space="preserve">
+    <value>Ngày sinh không đúng định dạng (dd/MM/yyyy).</value>
+  </data>
+  <data name="StudentTerms.DateOfBirthMinAge" xml:space="preserve">
+    <value>Sinh viên phải đủ 15 tuổi.</value>
+  </data>
+
+  <!-- StudentTerms — Validation: List query -->
+  <data name="StudentTerms.SearchTermMaxLength" xml:space="preserve">
+    <value>Từ khóa tìm kiếm không vượt quá 100 ký tự.</value>
+  </data>
+  <data name="StudentTerms.SortByAllowedValues" xml:space="preserve">
+    <value>SortBy phải là một trong: {0}.</value>
+  </data>
+  <data name="StudentTerms.SortOrderAllowedValues" xml:space="preserve">
+    <value>SortOrder phải là 'asc' hoặc 'desc'.</value>
+  </data>
+
+  <!-- StudentTerms Messages -->
+  <data name="StudentTerms.NotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin đăng ký thực tập.</value>
+  </data>
+  <data name="StudentTerms.TermNotOpen" xml:space="preserve">
+    <value>Kỳ thực tập chưa mở hoặc đã đóng, không thể thêm sinh viên.</value>
+  </data>
+  <data name="StudentTerms.EmailConflict" xml:space="preserve">
+    <value>Email đã được sử dụng trong kỳ thực tập này.</value>
+  </data>
+  <data name="StudentTerms.StudentCodeConflict" xml:space="preserve">
+    <value>Mã sinh viên đã tồn tại trong hệ thống.</value>
+  </data>
+  <data name="StudentTerms.AlreadyEnrolled" xml:space="preserve">
+    <value>Sinh viên đã được đăng ký trong kỳ thực tập này.</value>
+  </data>
+  <data name="StudentTerms.AlreadyWithdrawn" xml:space="preserve">
+    <value>Sinh viên đã rút khỏi kỳ thực tập trước đó.</value>
+  </data>
+  <data name="StudentTerms.NotWithdrawn" xml:space="preserve">
+    <value>Sinh viên chưa rút khỏi kỳ thực tập.</value>
+  </data>
+  <data name="StudentTerms.CannotWithdrawPlaced" xml:space="preserve">
+    <value>Sinh viên đang được xếp vị trí, vui lòng huỷ placement trước khi rút.</value>
+  </data>
+  <data name="StudentTerms.EnterpriseIdRequiredWhenPlaced" xml:space="preserve">
+    <value>Cần chỉ định doanh nghiệp khi xếp vị trí cho sinh viên.</value>
+  </data>
+  <data name="StudentTerms.EnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin doanh nghiệp được chỉ định.</value>
+  </data>
+  <data name="StudentTerms.AllStudentsPlaced" xml:space="preserve">
+    <value>Tất cả sinh viên được chọn đã được xếp vị trí.</value>
+  </data>
+  <data name="StudentTerms.InvalidFileFormat" xml:space="preserve">
+    <value>Chỉ hỗ trợ file Excel XLSX.</value>
+  </data>
+  <data name="StudentTerms.FileTooLarge" xml:space="preserve">
+    <value>File không được vượt quá 5MB.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaders" xml:space="preserve">
+    <value>File Excel không đúng định dạng header. Vui lòng sử dụng template được cung cấp.</value>
+  </data>
+  <data name="StudentTerms.TooManyRows" xml:space="preserve">
+    <value>File chứa quá nhiều dòng. Tối đa 1000 dòng dữ liệu mỗi lần import.</value>
+  </data>
+  <data name="StudentTerms.AddSuccess" xml:space="preserve">
+    <value>Thêm sinh viên vào kỳ thực tập thành công.</value>
+  </data>
+  <data name="StudentTerms.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật thông tin đăng ký thực tập thành công.</value>
+  </data>
+  <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
+    <value>Rút sinh viên khỏi kỳ thực tập thành công.</value>
+  </data>
+  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
+    <value>Khôi phục đăng ký thực tập thành công.</value>
+  </data>
+  <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
+    <value>Rút hàng loạt sinh viên thành công.</value>
+  </data>
+  <data name="StudentTerms.ImportPreviewSuccess" xml:space="preserve">
+    <value>Xem trước danh sách import thành công.</value>
+  </data>
+  <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
+    <value>Import sinh viên vào kỳ thực tập thành công.</value>
+  </data>
+  <data name="StudentTerms.Log.Added" xml:space="preserve">
+    <value>Sinh viên {0} đã được thêm vào kỳ thực tập {1} bởi {2}.</value>
+  </data>
+  <data name="StudentTerms.Log.Updated" xml:space="preserve">
+    <value>Thông tin đăng ký {0} đã được cập nhật bởi {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
+    <value>Sinh viên {0} đã bị rút khỏi kỳ thực tập bởi {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.Restored" xml:space="preserve">
+    <value>Sinh viên {0} đã được khôi phục vào kỳ thực tập bởi {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
+    <value>Đã rút {0} sinh viên khỏi kỳ thực tập bởi {1}.</value>
+  </data>
+  <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
+    <value>Đã import {0} sinh viên vào kỳ thực tập {1} bởi {2}.</value>
+  </data>
+
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Không tìm thấy kỳ thực tập.</value>
   </data>
-  <data name="Terms.UniversityIdRequired" xml:space="preserve">
+    <data name="Terms.UniversityIdRequired" xml:space="preserve">
     <value>SuperAdmin phải chỉ định UniversityId khi tạo kỳ thực tập.</value>
   </data>
-  <data name="Terms.NameRequired" xml:space="preserve">
+    <data name="Terms.NameRequired" xml:space="preserve">
     <value>Tên kỳ thực tập là bắt buộc.</value>
   </data>
-  <data name="Terms.NameMaxLength" xml:space="preserve">
+    <data name="Terms.NameMaxLength" xml:space="preserve">
     <value>Tên kỳ thực tập không được vượt quá 255 ký tự.</value>
   </data>
-  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
+    <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
     <value>Tên kỳ thực tập chứa ký tự không hợp lệ hoặc nguy hiểm.</value>
   </data>
-  <data name="Terms.NameExists" xml:space="preserve">
+    <data name="Terms.NameExists" xml:space="preserve">
     <value>Tên kỳ thực tập đã tồn tại, vui lòng chọn tên khác.</value>
   </data>
-  <data name="Terms.StartDateRequired" xml:space="preserve">
+    <data name="Terms.StartDateRequired" xml:space="preserve">
     <value>Ngày bắt đầu là bắt buộc.</value>
   </data>
-  <data name="Terms.EndDateRequired" xml:space="preserve">
+    <data name="Terms.EndDateRequired" xml:space="preserve">
     <value>Ngày kết thúc là bắt buộc.</value>
   </data>
-  <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
+    <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
     <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
   </data>
-  <data name="Terms.StartDateInPast" xml:space="preserve">
+    <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Ngày bắt đầu không được là ngày trong quá khứ.</value>
   </data>
-  <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
+    <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
     <value>Ngày bắt đầu không được là hôm nay. Vui lòng chọn ngày ít nhất 1 tuần sau hôm nay hoặc ngày trước đó.</value>
   </data>
-  <data name="Terms.InvalidDateFormat" xml:space="preserve">
+    <data name="Terms.InvalidDateFormat" xml:space="preserve">
     <value>Ngày không hợp lệ, vui lòng nhập đúng định dạng dd/mm/yyyy.</value>
   </data>
-  <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
+    <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
     <value>Khoảng thời gian này trùng với kỳ thực tập [{0}] đang diễn ra.</value>
   </data>
-  <data name="Terms.CreateSuccess" xml:space="preserve">
+    <data name="Terms.CreateSuccess" xml:space="preserve">
     <value>Tạo kỳ thực tập thành công.</value>
   </data>
-  <data name="Terms.UpdateSuccess" xml:space="preserve">
+    <data name="Terms.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật kỳ thực tập thành công.</value>
   </data>
-  <data name="Terms.CloseSuccess" xml:space="preserve">
+    <data name="Terms.CloseSuccess" xml:space="preserve">
     <value>Kỳ thực tập [{0}] đã được đóng thành công.</value>
   </data>
-  <data name="Terms.DeleteSuccess" xml:space="preserve">
+    <data name="Terms.DeleteSuccess" xml:space="preserve">
     <value>Xóa kỳ thực tập thành công.</value>
   </data>
-  <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
+    <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
     <value>Chỉ có thể đóng kỳ thực tập đang ở trạng thái Active.</value>
   </data>
-  <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
+    <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
     <value>Không thể xóa kỳ thực tập đang diễn ra, đã kết thúc hoặc đã đóng. Vui lòng sử dụng chức năng Đóng kỳ nếu cần.</value>
   </data>
-  <data name="Terms.VersionConflict" xml:space="preserve">
+    <data name="Terms.VersionConflict" xml:space="preserve">
     <value>Kỳ thực tập này vừa được cập nhật bởi người khác. Vui lòng tải lại trang để xem thông tin mới nhất trước khi chỉnh sửa.</value>
   </data>
-  <data name="Terms.StatusChanged" xml:space="preserve">
+    <data name="Terms.StatusChanged" xml:space="preserve">
     <value>Không thể xóa kỳ thực tập này vì trạng thái vừa thay đổi. Vui lòng tải lại trang để xem thông tin mới nhất.</value>
   </data>
-  <data name="Terms.AlreadyDeleted" xml:space="preserve">
+    <data name="Terms.AlreadyDeleted" xml:space="preserve">
     <value>Kỳ thực tập này đã được xóa trước đó. Vui lòng tải lại trang.</value>
   </data>
-  <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
+    <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
     <value>Kỳ thực tập hiện còn {0} sinh viên chưa được gán công ty. Bạn có chắc chắn muốn đóng kỳ?</value>
   </data>
-  <data name="Terms.HasRelatedData" xml:space="preserve">
+    <data name="Terms.HasRelatedData" xml:space="preserve">
     <value>Cảnh báo: Kỳ thực tập này đang có dữ liệu liên quan</value>
   </data>
-  <data name="Terms.StartDateLocked" xml:space="preserve">
+    <data name="Terms.StartDateLocked" xml:space="preserve">
     <value>Ngày bắt đầu không thể thay đổi sau khi kỳ thực tập đã diễn ra.</value>
   </data>
-  <data name="Terms.YearInvalidRange" xml:space="preserve">
+    <data name="Terms.YearInvalidRange" xml:space="preserve">
     <value>Năm phải nằm trong khoảng từ 2000 đến 2100.</value>
   </data>
-  <data name="Terms.CloseReasonRequired" xml:space="preserve">
+    <data name="Terms.CloseReasonRequired" xml:space="preserve">
     <value>Lý do đóng kỳ là bắt buộc.</value>
   </data>
-  <data name="Terms.CloseReasonMinLength" xml:space="preserve">
+    <data name="Terms.CloseReasonMinLength" xml:space="preserve">
     <value>Lý do đóng kỳ phải có ít nhất 10 ký tự.</value>
   </data>
-  <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
+    <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
     <value>Lý do đóng kỳ không được vượt quá 500 ký tự.</value>
   </data>
-  <data name="Terms.Log.TermCreated" xml:space="preserve">
+    <data name="Terms.Log.TermCreated" xml:space="preserve">
     <value>Term {0} created successfully by user {1}</value>
   </data>
-  <data name="Terms.Log.TermUpdated" xml:space="preserve">
+    <data name="Terms.Log.TermUpdated" xml:space="preserve">
     <value>Term {0} updated successfully by user {1}</value>
   </data>
-  <data name="Terms.Log.TermClosed" xml:space="preserve">
+    <data name="Terms.Log.TermClosed" xml:space="preserve">
     <value>Term {0} closed by user {1}</value>
   </data>
-  <data name="Terms.Log.TermDeleted" xml:space="preserve">
+    <data name="Terms.Log.TermDeleted" xml:space="preserve">
     <value>Term {0} soft-deleted by user {1}</value>
   </data>
-  <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
+    <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
     <value>Retrieved {0} terms for university {1}</value>
   </data>
-  <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
+    <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
     <value>User {0} is not associated with any university</value>
   </data>
-  <data name="Terms.Log.TermNotFound" xml:space="preserve">
+    <data name="Terms.Log.TermNotFound" xml:space="preserve">
     <value>Term {0} not found</value>
   </data>
-  <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
+    <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
     <value>Term {0} not found or access denied for user {1}</value>
   </data>
-  <data name="Terms.Log.VersionConflict" xml:space="preserve">
+    <data name="Terms.Log.VersionConflict" xml:space="preserve">
     <value>Version conflict for term {0}</value>
   </data>
-  <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
+    <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
     <value>Version conflict for term {0}. Expected: {1}, Got: {2}</value>
   </data>
-  <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
+    <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
     <value>Duplicate term name detected: {0}</value>
   </data>
-  <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
+    <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
     <value>Concurrency conflict updating term {0}</value>
   </data>
-  <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
+    <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
     <value>Concurrency conflict closing term {0}</value>
   </data>
-  <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
+    <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
     <value>Error creating term</value>
   </data>
-  <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
+    <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
     <value>Error updating term {0}</value>
   </data>
-  <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
+    <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
     <value>Lỗi khi đóng kỳ thực tập {0}</value>
   </data>
-  <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
+    <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
     <value>Error deleting term {0}</value>
   </data>
-  <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
+    <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
     <value>Error retrieving terms</value>
   </data>
-  <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
+    <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
     <value>Error retrieving term {0}</value>
   </data>
-  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
+    <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
     <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
   </data>
-  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
+    <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi truy xuất thông tin doanh nghiệp theo ID.</value>
   </data>
-  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
     <value>Mã số thuế đã tồn tại trong hệ thống.</value>
   </data>
-  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
+    <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
     <value>Doanh nghiệp với mã số thuế '{TaxCode}' đã tồn tại.</value>
   </data>
-  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
+    <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
     <value>Đã xảy ra lỗi khi tạo doanh nghiệp.</value>
   </data>
-  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
+    <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
     <value>Mã số thuế không đúng định dạng.</value>
   </data>
-  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
+    <data name="Enterprise.NameNotEmpty" xml:space="preserve">
     <value>Tên là bắt buộc.</value>
   </data>
-  <data name="Enterprise.NameMaxLength" xml:space="preserve">
+    <data name="Enterprise.NameMaxLength" xml:space="preserve">
     <value>Tên không được vượt quá {0} ký tự</value>
   </data>
-  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
+    <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
     <value>Trang web phải bắt đầu bằng http hoặc https.</value>
   </data>
-  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
+    <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
     <value>LogoUrl phải bắt đầu bằng http hoặc https.</value>
   </data>
-  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
+    <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
     <value>BackgroundUrl phải bắt đầu bằng http hoặc https.</value>
   </data>
-  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
+    <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
     <value>Bạn không được phép chỉnh sửa doanh nghiệp này.</value>
   </data>
-  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
+    <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
     <value>Lỗi: Không có quyền chỉnh sửa doanh nghiệp {enterpriseId}.</value>
   </data>
-  <data name="Enterprise.LogNotFound" xml:space="preserve">
+    <data name="Enterprise.LogNotFound" xml:space="preserve">
     <value>Không tìm thấy Enterprise {enterpriseId}</value>
   </data>
-  <data name="Enterprise.LogUpdateEnterpriseError" xml:space="preserve">
+    <data name="Enterprise.LogUpdateEnterpriseError" xml:space="preserve">
     <value>Unexpected error while updating enterprise.</value>
   </data>
-  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+    <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
     <value>Không được phép cập nhật mã số thuế.</value>
   </data>
-  <data name="Enterprise.LogDeleteError" xml:space="preserve">
+    <data name="Enterprise.LogDeleteError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi xóa doanh nghiệp có ID {EnterpriseId}</value>
   </data>
-  <data name="Enterprise.DeleteError" xml:space="preserve">
+    <data name="Enterprise.DeleteError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình xóa doanh nghiệp. Vui lòng thử lại sau.</value>
   </data>
-  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+    <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
     <value>Bạn không liên kết với bất kỳ doanh nghiệp nào với tư cách là nhân sự.</value>
   </data>
-  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+    <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
     <value>Không tìm thấy doanh nghiệp cho bộ phận Nhân sự hiện tại.</value>
   </data>
-  <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
+    <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
     <value>Lưu nhóm thực tập vào cơ sở dữ liệu thất bại</value>
   </data>
-  <data name="InternshipGroup.LogCreationError" xml:space="preserve">
+    <data name="InternshipGroup.LogCreationError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình tạo nhóm thực tập</value>
   </data>
-  <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
+    <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
     <value>Cập nhật nhóm thực tập trong cơ sở dữ liệu thất bại</value>
   </data>
-  <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
+    <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình cập nhật nhóm thực tập</value>
   </data>
-  <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
+    <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
     <value>Xóa nhóm thực tập khỏi cơ sở dữ liệu thất bại</value>
   </data>
-  <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
+    <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình xóa nhóm thực tập: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
+    <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
     <value>Một số mã sinh viên không hợp lệ hoặc không được tìm thấy</value>
   </data>
-  <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
+    <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
     <value>Cập nhật thành viên nhóm trong cơ sở dữ liệu thất bại</value>
   </data>
-  <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
+    <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình thêm sinh viên vào nhóm</value>
   </data>
-  <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
+    <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
     <value>Cập nhật nhóm trong cơ sở dữ liệu thất bại</value>
   </data>
-  <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
+    <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình xóa sinh viên khỏi nhóm</value>
   </data>
-  <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
+    <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
     <value>Mã sinh viên không hợp lệ.</value>
   </data>
-  <data name="InternshipGroup.TermNotFound" xml:space="preserve">
+    <data name="InternshipGroup.TermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ.</value>
   </data>
-  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+    <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
     <value>Không tìm thấy doanh nghiệp.</value>
   </data>
-  <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
+    <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
     <value>Không tìm thấy người hướng dẫn.</value>
   </data>
-  <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
+    <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
     <value>Không tìm thấy sinh viên.</value>
   </data>
-  <data name="InternshipGroup.NotFound" xml:space="preserve">
+    <data name="InternshipGroup.NotFound" xml:space="preserve">
     <value>Không tìm thấy nhóm thực tập.</value>
+  </data>
+  <data name="InternshipGroup.HasStudents" xml:space="preserve">
+    <value>Không thể xóa nhóm còn sinh viên. Vui lòng chuyển toàn bộ sinh viên sang nhóm khác trước.</value>
+  </data>
+  <data name="InternshipGroup.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin nhân viên doanh nghiệp của người dùng hiện tại.</value>
+  </data>
+  <data name="InternshipGroup.StudentNotApproved" xml:space="preserve">
+    <value>Sinh viên {0} chưa được duyệt vào doanh nghiệp này.</value>
+  </data>
+  <data name="InternshipGroup.AtLeastOneStudentRequired" xml:space="preserve">
+    <value>Nhóm thực tập phải có ít nhất 1 sinh viên.</value>
+  </data>
+  <data name="InternshipGroup.StudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Sinh viên đã tham gia một nhóm khác trong kỳ này.</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
+    <value>Student {0} does not have an approved application for enterprise {1}</value>
   </data>
   <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ với ID: {TermId}</value>
   </data>
-  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+    <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
     <value>Không tìm thấy doanh nghiệp với ID: {EnterpriseId}</value>
   </data>
-  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+    <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
     <value>Không tìm thấy người hướng dẫn với ID: {MentorId}</value>
   </data>
-  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+    <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
     <value>Không tìm thấy sinh viên với ID: {StudentId}</value>
   </data>
-  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+    <data name="InternshipGroup.LogNotFound" xml:space="preserve">
     <value>Không tìm thấy nhóm thực tập với ID: {InternshipId}</value>
   </data>
-  <data name="Logbooks.StudentNotFound" xml:space="preserve">
+    <data name="Logbooks.StudentNotFound" xml:space="preserve">
     <value>Không tìm thấy hồ sơ sinh viên cho người dùng hiện tại. Vui lòng đảm bảo bạn đăng nhập bằng tài khoản Sinh viên.</value>
   </data>
-  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
+    <data name="Logbooks.UpdateForbidden" xml:space="preserve">
     <value>Bạn không có quyền cập nhật nhật ký thực tập này.</value>
   </data>
-  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
+    <data name="Logbooks.DeleteForbidden" xml:space="preserve">
     <value>Bạn không có quyền xóa nhật ký thực tập này.</value>
   </data>
-  <data name="Logbooks.InvalidInternship" xml:space="preserve">
+    <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Nhóm thực tập không hợp lệ hoặc không được tìm thấy.</value>
   </data>
-  <data name="EvaluationCycle.NotFound" xml:space="preserve">
+    <data name="EvaluationCycle.NotFound" xml:space="preserve">
     <value>Không tìm thấy chu kỳ đánh giá.</value>
   </data>
-  <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
+    <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ tương ứng.</value>
   </data>
-  <data name="EvaluationCycle.NameRequired" xml:space="preserve">
+    <data name="EvaluationCycle.NameRequired" xml:space="preserve">
     <value>Tên chu kỳ đánh giá là bắt buộc.</value>
   </data>
-  <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
+    <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
     <value>Thời gian bắt đầu là bắt buộc.</value>
   </data>
-  <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
+    <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
     <value>Thời gian kết thúc là bắt buộc.</value>
   </data>
-  <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
+    <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
     <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
   </data>
-  <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
+    <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
     <value>Không thể xóa chu kỳ đánh giá đã có bộ tiêu chí.</value>
   </data>
-  <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
+    <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
     <value>Không thể cập nhật chu kỳ đánh giá đã hoàn thành.</value>
   </data>
-  <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
+    <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
     <value>Chu kỳ đánh giá này đã được hoàn thành hoặc hủy bỏ trước đó.</value>
   </data>
-  <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
+    <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
     <value>Không thể hoàn thành chu kỳ đánh giá chưa có bất kỳ tiêu chí nào.</value>
   </data>
-  <data name="EvaluationCriteria.NotFound" xml:space="preserve">
+    <data name="EvaluationCriteria.NotFound" xml:space="preserve">
     <value>Không tìm thấy tiêu chí đánh giá.</value>
   </data>
-  <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
+    <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
     <value>Không tìm thấy chu kỳ đánh giá tương ứng.</value>
   </data>
-  <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
+    <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
     <value>Không thể thêm tiêu chí mới khi chu kỳ đánh giá đã hoàn thành.</value>
   </data>
-  <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
     <value>Không thể cập nhật tiêu chí khi chu kỳ đánh giá đã hoàn thành.</value>
   </data>
-  <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
+    <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
     <value>Không thể xóa tiêu chí khi chu kỳ đánh giá đã hoàn thành.</value>
   </data>
-  <data name="Evaluation.NotFound" xml:space="preserve">
+    <data name="Evaluation.NotFound" xml:space="preserve">
     <value>Không tìm thấy kết quả đánh giá.</value>
   </data>
-  <data name="Evaluation.CycleNotFound" xml:space="preserve">
+    <data name="Evaluation.CycleNotFound" xml:space="preserve">
     <value>Không tìm thấy chu kỳ đánh giá tương ứng.</value>
   </data>
-  <data name="Evaluation.InternshipNotFound" xml:space="preserve">
+    <data name="Evaluation.InternshipNotFound" xml:space="preserve">
     <value>Không tìm thấy nhóm thực tập.</value>
   </data>
-  <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
+    <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
     <value>Không thể cập nhật bài đánh giá báo cáo đã nộp hoặc số điểm đã công bố.</value>
   </data>
-  <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
+    <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
     <value>Không tồn tại một số tiêu chí trong bản đánh giá.</value>
   </data>
-  <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
+    <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
     <value>Số điểm đánh giá không được vượt quá điểm tối đa của tiêu chí.</value>
   </data>
-  <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
+    <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
     <value>Tất cả các thành viên trong nhóm đã được nộp điểm đánh giá.</value>
   </data>
-  <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
+    <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
     <value>Không thể công bố nếu nhóm thực tập vẫn còn sinh viên chưa được phê duyệt đánh giá.</value>
   </data>
-  <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
+    <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
     <value>Không thể lưu điểm đánh giá khi chu kỳ đã hoàn thành.</value>
   </data>
-  <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
+    <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
     <value>Không thể cập nhật điểm đánh giá khi chu kỳ đã hoàn thành.</value>
   </data>
-  <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
+    <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
     <value>Không thể nộp điểm đánh giá khi chu kỳ đã hoàn thành.</value>
   </data>
-  <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
+    <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Không thể công bố điểm đánh giá khi chu kỳ đã hoàn thành.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Validation ── -->
+  <data name="InternshipApplication.ApplicationIdRequired" xml:space="preserve">
+    <value>Mã đơn ứng tuyển không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.MentorIdRequired" xml:space="preserve">
+    <value>Mã Mentor không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonRequired" xml:space="preserve">
+    <value>Lý do từ chối không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.RejectReasonMaxLength" xml:space="preserve">
+    <value>Lý do từ chối không được vượt quá 500 ký tự.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameRequired" xml:space="preserve">
+    <value>Tên dự án không được để trống.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameMaxLength" xml:space="preserve">
+    <value>Tên dự án không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="InternshipApplication.ProjectDescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả dự án không được vượt quá 1000 ký tự.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Business Errors ── -->
+  <data name="InternshipApplication.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đơn ứng tuyển.</value>
+  </data>
+  <data name="InternshipApplication.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin nhân viên doanh nghiệp của người dùng hiện tại.</value>
+  </data>
+  <data name="InternshipApplication.MentorNotBelongToEnterprise" xml:space="preserve">
+    <value>Mentor không thuộc doanh nghiệp của bạn.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToAccept" xml:space="preserve">
+    <value>Chỉ có thể chấp nhận đơn đang ở trạng thái Chờ duyệt.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBePendingToReject" xml:space="preserve">
+    <value>Chỉ có thể từ chối đơn đang ở trạng thái Chờ duyệt.</value>
+  </data>
+  <data name="InternshipApplication.StatusMustBeApprovedToAssign" xml:space="preserve">
+    <value>Chỉ có thể gán Mentor cho đơn đã được chấp nhận (Approved).</value>
+  </data>
+  <data name="InternshipApplication.StudentAlreadyInGroup" xml:space="preserve">
+    <value>Sinh viên đã được gán vào một nhóm thực tập trong kỳ này.</value>
+  </data>
+  <data name="InternshipApplication.StudentNotInMentorGroup" xml:space="preserve">
+    <value>Sinh viên không thuộc nhóm của bạn. Vui lòng liên hệ HR để gán Mentor trước.</value>
+  </data>
+  <data name="InternshipApplication.ProjectNameExistsInGroup" xml:space="preserve">
+    <value>Tên dự án đã tồn tại trong nhóm này.</value>
+  </data>
+
+  <!-- ── InternshipApplication: Log Keys (dùng trong Logger, tiếng Anh) ── -->
+  <data name="InternshipApplication.Log.Accepting" xml:space="preserve">
+    <value>Accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptSuccess" xml:space="preserve">
+    <value>Application {0} accepted successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.AcceptError" xml:space="preserve">
+    <value>Error accepting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.Rejecting" xml:space="preserve">
+    <value>Rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectSuccess" xml:space="preserve">
+    <value>Application {0} rejected successfully</value>
+  </data>
+  <data name="InternshipApplication.Log.RejectError" xml:space="preserve">
+    <value>Error rejecting application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningMentor" xml:space="preserve">
+    <value>Assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignMentorError" xml:space="preserve">
+    <value>Error assigning mentor for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssigningProject" xml:space="preserve">
+    <value>Assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectSuccess" xml:space="preserve">
+    <value>Project assigned successfully for application {0}, project: {1}</value>
+  </data>
+  <data name="InternshipApplication.Log.AssignProjectError" xml:space="preserve">
+    <value>Error assigning project for application {0}</value>
+  </data>
+  <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
+    <value>Current user identity is missing or invalid</value>
   </data>
   <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
     <value>Khôi phục doanh nghiệp thất bại. EnterpriseId: {EnterpriseId}</value>
   </data>
-  <data name="Enterprise.RestoreFailed" xml:space="preserve">
+    <data name="Enterprise.RestoreFailed" xml:space="preserve">
     <value>Khôi phục doanh nghiệp thất bại.</value>
+  </data>
+  <data name="InternshipGroup.MustBelongToYourEnterprise" xml:space="preserve">
+    <value>Nhóm phải thuộc doanh nghiệp của bạn.</value>
+  </data>
+  <data name="InternshipGroup.MustBeInSameTerm" xml:space="preserve">
+    <value>Hai nhóm phải thuộc cùng một kỳ thực tập.</value>
+  </data>
+  <data name="InternshipGroup.MustBeActive" xml:space="preserve">
+    <value>Chỉ có thể chuyển sinh viên hoặc chỉnh sửa các nhóm đang hoạt động (Active).</value>
+  </data>
+  <data name="InternshipGroup.StudentsNotInSourceGroup" xml:space="preserve">
+    <value>Một hoặc nhiều sinh viên không nằm trong nhóm gốc.</value>
+  </data>
+  <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
+    <value>Nhóm đã được lưu trữ (Archived) từ trước.</value>
+  </data>
+
+    <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi lấy danh sách báo cáo vi phạm.</value>
+  </data>
+    <data name="ViolationReport.CreateViolationReportError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi tạo báo cáo vi phạm.</value>
+  </data>
+    <data name="ViolationReport.ErrorOccurredWhileDeletingViolationReport" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi xóa báo cáo vi phạm {0}.</value>
+  </data>
+    <data name="ViolationReport.ErrorOccurredWhileUpdatingViolationReport" xml:space="preserve">
+    <value>Đã có lỗi xảy ra khi cập nhật báo cáo. Vui lòng thử lại.</value>
+  </data>
+    <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi lấy chi tiết báo cáo vi phạm.</value>
   </data>
 </root>

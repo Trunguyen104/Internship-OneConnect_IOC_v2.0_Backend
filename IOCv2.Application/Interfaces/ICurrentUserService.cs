@@ -1,4 +1,4 @@
-﻿namespace IOCv2.Application.Interfaces
+namespace IOCv2.Application.Interfaces
 {
     public interface ICurrentUserService
     {
@@ -6,5 +6,6 @@
         string? UserCode { get; }
         string? Role { get; }
         string? IpAddress { get; }
+        string? UnitId { get; }
     }
 }

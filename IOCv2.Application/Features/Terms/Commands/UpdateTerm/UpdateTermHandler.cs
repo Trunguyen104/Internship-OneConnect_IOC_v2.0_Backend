@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -18,25 +19,29 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public UpdateTermHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IMessageService messageService,
         ILogger<UpdateTermHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<UpdateTermResponse>> Handle(UpdateTermCommand request, CancellationToken cancellationToken)
     {
         try
         {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var userId = Guid.Parse(_currentUserService.UserId!);
             var isSuperAdmin =
                 string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
@@ -137,6 +142,10 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
 
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermUpdated), term.TermId, userId);
 
@@ -144,25 +153,9 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
             return Result<UpdateTermResponse>.Success(response,
                 _messageService.GetMessage(MessageKeys.Terms.UpdateSuccess));
         }
-        catch (DbUpdateConcurrencyException ex)
-        {
-            _logger.LogWarning(ex, _messageService.GetMessage(MessageKeys.Terms.LogConcurrencyConflictUpdating),
-                request.TermId);
-            return Result<UpdateTermResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Terms.VersionConflict),
-                ResultErrorType.Conflict);
-        }
-        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key") == true || 
-                                            ex.InnerException?.Message.Contains("UNIQUE constraint") == true ||
-                                            ex.InnerException?.Message.Contains("IX_Terms_Name") == true)
-        {
-            _logger.LogWarning(_messageService.GetMessage(MessageKeys.Terms.LogDuplicateTermName), ex.Message);
-            return Result<UpdateTermResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Terms.NameExists),
-                ResultErrorType.Conflict);
-        }
         catch (Exception ex)
         {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorUpdatingTerm), request.TermId);
             throw;
         }

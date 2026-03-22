@@ -6,6 +6,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using IOCv2.Application.Features.Admin.UserManagement.Common;
 
 namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
 {
@@ -13,15 +14,21 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
     {
         private readonly ICurrentUserService _currentUserService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICacheService _cacheService;
+        private readonly IFileStorageService _fileStorageService;
         private readonly ILogger<UpdateMyProfileHandler> _logger;
 
         public UpdateMyProfileHandler(
             ICurrentUserService currentUserService,
             IUnitOfWork unitOfWork,
+            ICacheService cacheService,
+            IFileStorageService fileStorageService,
             ILogger<UpdateMyProfileHandler> logger)
         {
             _currentUserService = currentUserService;
             _unitOfWork = unitOfWork;
+            _cacheService = cacheService;
+            _fileStorageService = fileStorageService;
             _logger = logger;
         }
 
@@ -48,36 +55,59 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
                 throw new NotFoundException(nameof(User), userId);
             }
 
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             // FFA-CAG: Business logic within Entity method
             user.UpdateProfile(
                 request.FullName,
                 request.PhoneNumber,
                 request.AvatarUrl,
                 request.Gender,
-                request.DateOfBirth);
+                request.DateOfBirth,
+                request.Address);
 
             // FFA-FLW: Role-based Metadata Handling
-            UpdateMetadata(user, request);
+            await UpdateMetadataAsync(user, request, cancellationToken);
 
             try
             {
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                
+                // FFA-LOG: Cache invalidation
+                await _cacheService.RemoveAsync(UserManagementCacheKeys.User(userId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(UserManagementCacheKeys.UserListPattern(), cancellationToken);
+
                 _logger.LogInformation("[SUCCESS] Profile updated for User: {UserId}", userId);
                 return Result<Unit>.Success(Unit.Value);
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "[ERROR] Failed to update profile for User: {UserId}", userId);
                 return Result<Unit>.Failure("Common.InternalError", ResultErrorType.InternalServerError);
             }
         }
 
-        private void UpdateMetadata(User user, UpdateMyProfileCommand request)
+        private async Task UpdateMetadataAsync(User user, UpdateMyProfileCommand request, CancellationToken cancellationToken)
         {
             switch (user.Role)
             {
                 case UserRole.Student when user.Student != null:
                     user.Student.UpdatePortfolio(request.PortfolioUrl);
+                    
+                    // Handle CV File Upload
+                    if (request.CvFile != null)
+                    {
+                        var cvUrl = await _fileStorageService.UploadFileAsync(request.CvFile, "CVs", cancellationToken: cancellationToken);
+                        user.Student.UpdateCv(cvUrl);
+                    }
+                    else
+                    {
+                        user.Student.UpdateCv(request.CvUrl);
+                    }
+                    
+                    if (!string.IsNullOrWhiteSpace(request.Major)) user.Student.Major = request.Major;
+                    if (!string.IsNullOrWhiteSpace(request.ClassName)) user.Student.ClassName = request.ClassName;
                     break;
 
                 case UserRole.Mentor:

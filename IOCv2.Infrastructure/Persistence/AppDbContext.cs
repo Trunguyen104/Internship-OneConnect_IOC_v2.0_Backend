@@ -49,7 +49,9 @@ public partial class AppDbContext : DbContext
     public DbSet<EvaluationCriteria> EvaluationCriteria { get; set; } = null!;
     public DbSet<Evaluation> Evaluations { get; set; } = null!;
     public DbSet<EvaluationDetail> EvaluationDetails { get; set; } = null!;
-    
+    //Violation Reports
+    public DbSet<ViolationReport> ViolationReports { get; set; } = null!;
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;

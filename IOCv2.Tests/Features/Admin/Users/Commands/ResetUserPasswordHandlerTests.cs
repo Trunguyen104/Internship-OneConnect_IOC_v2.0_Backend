@@ -1,5 +1,5 @@
 using FluentAssertions;
-using IOCv2.Application.Features.Admin.Users.Commands.ResetUserPassword;
+using IOCv2.Application.Features.Admin.UserManagement.Commands.ResetUserPassword;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -8,7 +8,7 @@ using Moq;
 using MockQueryable;
 using MockQueryable.Moq;
 
-namespace IOCv2.Tests.Features.Admin.Users.Commands;
+namespace IOCv2.Tests.Features.Admin.UserManagement.Commands;
 
 public class ResetUserPasswordHandlerTests
 {
@@ -18,7 +18,7 @@ public class ResetUserPasswordHandlerTests
         var user = new User(Guid.NewGuid(), "SA0099", "sa@ioc.com", "Super A", UserRole.SuperAdmin, "old-hash");
 
         var userRepo = new Mock<IGenericRepository<User>>();
-        userRepo.Setup(x => x.GetByIdAsync(user.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        userRepo.Setup(x => x.Query()).Returns(new List<User> { user }.AsQueryable().BuildMock());
         userRepo.Setup(x => x.UpdateAsync(It.IsAny<User>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var refreshRepo = new Mock<IGenericRepository<RefreshToken>>();
@@ -37,6 +37,8 @@ public class ResetUserPasswordHandlerTests
 
         var currentUser = new Mock<ICurrentUserService>();
         currentUser.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
+        currentUser.Setup(x => x.Role).Returns("SuperAdmin");
+        currentUser.Setup(x => x.UnitId).Returns(Guid.NewGuid().ToString());
 
         var passwordService = new Mock<IPasswordService>();
         passwordService.Setup(x => x.GenerateRandomPassword()).Returns("NewPass@123");
