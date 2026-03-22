@@ -48,6 +48,7 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
                 throw new NotFoundException(nameof(User), userId);
             }
 
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             // FFA-CAG: Business logic within Entity method
             user.UpdateProfile(
                 request.FullName,
@@ -62,11 +63,13 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
             try
             {
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
                 _logger.LogInformation("[SUCCESS] Profile updated for User: {UserId}", userId);
                 return Result<Unit>.Success(Unit.Value);
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "[ERROR] Failed to update profile for User: {UserId}", userId);
                 return Result<Unit>.Failure("Common.InternalError", ResultErrorType.InternalServerError);
             }

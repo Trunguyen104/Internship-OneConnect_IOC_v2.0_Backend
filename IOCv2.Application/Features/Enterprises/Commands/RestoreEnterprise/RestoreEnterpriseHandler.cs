@@ -60,16 +60,19 @@ namespace IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise
                         _messageService.GetMessage(MessageKeys.Enterprise.NotDeleted)
                     );
                 }
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 // Restore enterprise
                 enterprise.DeletedAt = null;
                 var response = _mapper.Map<RestoreEnterpriseResponse>(enterprise);
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().UpdateAsync(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
                 await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
                 return Result<RestoreEnterpriseResponse>.Success(response);
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Enterprise.LogRestoreFailed), request.EnterpriseId);
                 return Result<RestoreEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RestoreFailed), ResultErrorType.InternalServerError);
             }

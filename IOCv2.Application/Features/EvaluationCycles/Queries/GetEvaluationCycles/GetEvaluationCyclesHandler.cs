@@ -34,8 +34,7 @@ public class GetEvaluationCyclesHandler
     {
         _logger.LogInformation("Getting EvaluationCycles for Term {TermId}", request.TermId);
 
-        try
-        {
+      
             var cacheKey = EvaluationCycleCacheKeys.CycleList(request.TermId);
             var cached = await _cacheService.GetAsync<List<GetEvaluationCyclesResponse>>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -62,11 +61,5 @@ public class GetEvaluationCyclesHandler
             await _cacheService.SetAsync(cacheKey, cycles, EvaluationCycleCacheKeys.Expiration.CycleList, cancellationToken);
 
             return Result<List<GetEvaluationCyclesResponse>>.Success(cycles);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting EvaluationCycles for Term {TermId}", request.TermId);
-            return Result<List<GetEvaluationCyclesResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
     }
 }

@@ -22,17 +22,11 @@ public class UploadImageHandler : IRequestHandler<UploadImageCommand, Result<str
     {
         _logger.LogInformation("Start UploadImage: {FileName} to {Folder}", request.File.FileName, request.Folder);
 
-        try
-        {
-            var url = await _fileStorageService.UploadFileAsync(request.File, request.Folder, null, cancellationToken);
-            
-            _logger.LogInformation("Upload success: {Url}", url);
-            return Result<string>.Success(url);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex, "Upload failure: {Message}", ex.Message);
-            return Result<string>.Failure(ex.Message);
-        }
+
+        var url = await _fileStorageService.UploadFileAsync(request.File, request.Folder, null, cancellationToken);
+
+        _logger.LogInformation("Upload success: {Url}", url);
+        return Result<string>.Success(url);
+
     }
 }
