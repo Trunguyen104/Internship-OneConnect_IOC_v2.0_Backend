@@ -28,7 +28,7 @@ public class GetUsersHandlerTests
             Mock.Of<IMapper>(),
             Mock.Of<ILogger<GetUsersHandler>>(),
             cache.Object,
-            Mock.Of<ICurrentUserService>());
+            GetMockCurrentUserService().Object);
 
         var result = await handler.Handle(new GetUsersQuery(), CancellationToken.None);
 
@@ -60,12 +60,21 @@ public class GetUsersHandlerTests
             mapper,
             Mock.Of<ILogger<GetUsersHandler>>(),
             cache.Object,
-            Mock.Of<ICurrentUserService>());
+            GetMockCurrentUserService().Object);
 
         var result = await handler.Handle(new GetUsersQuery { PageNumber = 1, PageSize = 10 }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Data!.Items.Should().HaveCount(1);
         cache.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<IOCv2.Application.Common.Models.PaginatedResult<GetUsersResponse>>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    private Mock<ICurrentUserService> GetMockCurrentUserService()
+    {
+        var mock = new Mock<ICurrentUserService>();
+        mock.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
+        mock.Setup(x => x.Role).Returns("SuperAdmin");
+        mock.Setup(x => x.UnitId).Returns(Guid.NewGuid().ToString());
+        return mock;
     }
 }

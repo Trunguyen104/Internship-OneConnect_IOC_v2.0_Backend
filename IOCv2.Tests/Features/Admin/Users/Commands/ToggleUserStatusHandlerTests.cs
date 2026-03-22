@@ -6,6 +6,8 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
+using MockQueryable;
+using MockQueryable.Moq;
 
 namespace IOCv2.Tests.Features.Admin.UserManagement.Commands;
 
@@ -17,7 +19,7 @@ public class ToggleUserStatusHandlerTests
         var user = new User(Guid.NewGuid(), "SA0002", "user@ioc.com", "User A", UserRole.SuperAdmin, "hash");
 
         var userRepo = new Mock<IGenericRepository<User>>();
-        userRepo.Setup(x => x.GetByIdAsync(user.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        userRepo.Setup(x => x.Query()).Returns(new List<User> { user }.AsQueryable().BuildMock());
         userRepo.Setup(x => x.UpdateAsync(It.IsAny<User>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var auditRepo = new Mock<IGenericRepository<AuditLog>>();
@@ -32,6 +34,8 @@ public class ToggleUserStatusHandlerTests
 
         var currentUser = new Mock<ICurrentUserService>();
         currentUser.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
+        currentUser.Setup(x => x.Role).Returns("SuperAdmin");
+        currentUser.Setup(x => x.UnitId).Returns(Guid.NewGuid().ToString());
 
         var cache = new Mock<ICacheService>();
         cache.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);

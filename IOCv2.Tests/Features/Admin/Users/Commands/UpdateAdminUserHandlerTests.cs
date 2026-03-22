@@ -34,6 +34,8 @@ public class UpdateUserHandlerTests
 
         var currentUser = new Mock<ICurrentUserService>();
         currentUser.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
+        currentUser.Setup(x => x.Role).Returns("SuperAdmin");
+        currentUser.Setup(x => x.UnitId).Returns(Guid.NewGuid().ToString());
 
         var cache = new Mock<ICacheService>();
         cache.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);

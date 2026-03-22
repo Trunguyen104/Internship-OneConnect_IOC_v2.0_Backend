@@ -25,7 +25,7 @@ public class GetUserByIdHandlerTests
             Mock.Of<IMapper>(),
             Mock.Of<IMessageService>(),
             cache.Object,
-            Mock.Of<ICurrentUserService>(),
+            GetMockCurrentUserService().Object,
             Mock.Of<ILogger<GetUserByIdHandler>>());
 
         var result = await handler.Handle(new GetUserByIdQuery { UserId = Guid.NewGuid() }, CancellationToken.None);
@@ -58,12 +58,21 @@ public class GetUserByIdHandlerTests
             mapper,
             message.Object,
             cache.Object,
-            Mock.Of<ICurrentUserService>(),
+            GetMockCurrentUserService().Object,
             Mock.Of<ILogger<GetUserByIdHandler>>());
 
         var result = await handler.Handle(new GetUserByIdQuery { UserId = Guid.NewGuid() }, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
         result.ErrorType.Should().Be(IOCv2.Application.Common.Models.ResultErrorType.NotFound);
+    }
+
+    private Mock<ICurrentUserService> GetMockCurrentUserService()
+    {
+        var mock = new Mock<ICurrentUserService>();
+        mock.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
+        mock.Setup(x => x.Role).Returns("SuperAdmin");
+        mock.Setup(x => x.UnitId).Returns(Guid.NewGuid().ToString());
+        return mock;
     }
 }
