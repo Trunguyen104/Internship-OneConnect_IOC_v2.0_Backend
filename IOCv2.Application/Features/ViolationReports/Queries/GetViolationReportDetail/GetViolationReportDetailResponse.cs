@@ -18,7 +18,7 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         public string MentorName { get; set; } = string.Empty!;
         public string Description { get; set; } = string.Empty!;
         public DateOnly OccurredDate { get; set; }
-        public DateOnly CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         public Guid CreatedBy { get; set; }
         public void Mapping(Profile profile)
         {
