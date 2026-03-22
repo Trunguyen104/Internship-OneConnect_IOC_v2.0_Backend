@@ -1,13 +1,13 @@
 using AutoMapper;
 using FluentAssertions;
-using IOCv2.Application.Features.Admin.Users.Commands.ToggleUserStatus;
+using IOCv2.Application.Features.Admin.UserManagement.Commands.ToggleUserStatus;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace IOCv2.Tests.Features.Admin.Users.Commands;
+namespace IOCv2.Tests.Features.Admin.UserManagement.Commands;
 
 public class ToggleUserStatusHandlerTests
 {

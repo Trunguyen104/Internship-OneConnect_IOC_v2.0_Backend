@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser;
+using IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser;
 using IOCv2.Application.Interfaces;
 using System;
 using System.Collections.Generic;

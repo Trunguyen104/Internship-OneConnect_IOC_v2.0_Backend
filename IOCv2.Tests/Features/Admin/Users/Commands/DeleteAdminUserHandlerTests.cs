@@ -1,15 +1,15 @@
 using AutoMapper;
 using FluentAssertions;
-using IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser;
+using IOCv2.Application.Features.Admin.UserManagement.Commands.DeleteUser;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace IOCv2.Tests.Features.Admin.Users.Commands;
+namespace IOCv2.Tests.Features.Admin.UserManagement.Commands;
 
-public class DeleteAdminUserHandlerTests
+public class DeleteUserHandlerTests
 {
     [Fact]
     public async Task Handle_DeletesUserAndClearsCache()
@@ -38,18 +38,18 @@ public class DeleteAdminUserHandlerTests
         cache.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var mapper = new Mock<IMapper>();
-        mapper.Setup(x => x.Map<DeleteAdminUserResponse>(It.IsAny<User>()))
-            .Returns((User src) => new DeleteAdminUserResponse { UserId = src.UserId, FullName = src.FullName, Email = src.Email });
+        mapper.Setup(x => x.Map<DeleteUserResponse>(It.IsAny<User>()))
+            .Returns((User src) => new DeleteUserResponse { UserId = src.UserId, FullName = src.FullName, Email = src.Email });
 
-        var handler = new DeleteAdminUserHandler(
+        var handler = new DeleteUserHandler(
             uow.Object,
             mapper.Object,
             currentUser.Object,
             Mock.Of<IMessageService>(),
             cache.Object,
-            Mock.Of<ILogger<DeleteAdminUserHandler>>());
+            Mock.Of<ILogger<DeleteUserHandler>>());
 
-        var result = await handler.Handle(new DeleteAdminUserCommand { UserId = user.UserId }, CancellationToken.None);
+        var result = await handler.Handle(new DeleteUserCommand { UserId = user.UserId }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         cache.Verify(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);

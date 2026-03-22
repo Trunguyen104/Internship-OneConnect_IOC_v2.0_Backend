@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Features.Admin.Users.Queries.GetAdminUserById;
+using IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById;
 using IOCv2.Application.Features.Logbooks.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;

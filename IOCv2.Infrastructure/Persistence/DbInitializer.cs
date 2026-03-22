@@ -10,6 +10,31 @@ namespace IOCv2.Infrastructure.Persistence
         private readonly AppDbContext _context;
         private readonly IPasswordService _passwordService;
         private readonly IUserServices _userService;
+        
+        private static class SeedIds
+        {
+            public static readonly Guid SuperAdminId = new Guid("00000000-0000-0000-0000-000000000001");
+            public static readonly Guid FptuId = new Guid("11111111-1111-1111-1111-111111111111");
+            public static readonly Guid FptuCtId = new Guid("11111111-1111-1111-1111-111111111112");
+            public static readonly Guid FptSoftwareId = new Guid("22222222-2222-2222-2222-222222222201");
+            public static readonly Guid RikkeisoftId = new Guid("22222222-2222-2222-2222-222222222202");
+
+            public static readonly Guid SchoolAdminFptId = new Guid("33333333-3333-3333-3333-333333330001");
+            public static readonly Guid EntAdminFptId = new Guid("44444444-4444-4444-4444-444444440001");
+            public static readonly Guid MentorFptId = new Guid("55555555-5555-5555-5555-555555550001");
+            public static readonly Guid SchoolAdminFptCtId = new Guid("33333333-3333-3333-3333-333333330002");
+            public static readonly Guid EntAdminRikkeisoftId = new Guid("44444444-4444-4444-4444-444444440002");
+            public static readonly Guid MentorRikkeisoftId = new Guid("55555555-5555-5555-5555-555555550002");
+            
+            public static readonly List<Guid> StudentIds = new()
+            {
+                new Guid("66666666-6666-6666-6666-666666660001"),
+                new Guid("66666666-6666-6666-6666-666666660002"),
+                new Guid("66666666-6666-6666-6666-666666660003"),
+                new Guid("66666666-6666-6666-6666-666666660004"),
+                new Guid("66666666-6666-6666-6666-666666660005")
+            };
+        }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
         {
@@ -57,21 +82,25 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     new Enterprise
                     {
-                        EnterpriseId = Guid.NewGuid(),
+                        EnterpriseId = SeedIds.FptSoftwareId,
                         Name = "FPT Software",
-                        TaxCode = "0101248141",
-                        Industry = "Information Technology",
-                        Address = "Hồ Chí Minh",
+                        TaxCode = "0102100740",
+                        Industry = "Công nghệ thông tin",
+                        Address = "Khu Công nghệ cao Hòa Lạc, Thạch Thất, Hà Nội",
+                        Website = "https://www.fpt-software.com",
+                        Description = "Tập đoàn công nghệ hàng đầu Việt Nam",
                         IsVerified = true,
                         Status = (short)EnterpriseStatus.Active
                     },
                     new Enterprise
                     {
-                        EnterpriseId = Guid.NewGuid(),
+                        EnterpriseId = SeedIds.RikkeisoftId,
                         Name = "Rikkeisoft",
-                        TaxCode = "0100109106",
-                        Industry = "Information Technology",
-                        Address = "Hồ Chí Minh",
+                        TaxCode = "0105844895",
+                        Industry = "Phát triển phần mềm",
+                        Address = "Tầng 21, Tòa nhà Handico, Phạm Hùng, Nam Từ Liêm, Hà Nội",
+                        Website = "https://rikkeisoft.com",
+                        Description = "Đối tác tin cậy về chuyển đổi số",
                         IsVerified = true,
                         Status = (short)EnterpriseStatus.Active
                     }
@@ -95,7 +124,7 @@ namespace IOCv2.Infrastructure.Persistence
             // 1. Super Admin
             if (!await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Role == UserRole.SuperAdmin))
             {
-                var userId = Guid.NewGuid();
+                var userId = SeedIds.SuperAdminId;
                 var userCode = await _userService.GenerateUserCodeAsync(UserRole.SuperAdmin, cancellationToken);
                 var superAdmin = new User(userId, userCode, "admin@iocv2.com", "Super Administrator", UserRole.SuperAdmin, passHash);
                 superAdmin.SetStatus(UserStatus.Active);
@@ -106,12 +135,28 @@ namespace IOCv2.Infrastructure.Persistence
             // 2. Enterprise Admins & Mentors
             foreach (var ent in enterpriseList)
             {
+                Guid adminId, mentorId;
+                if (ent.EnterpriseId == SeedIds.FptSoftwareId)
+                {
+                    adminId = SeedIds.EntAdminFptId;
+                    mentorId = SeedIds.MentorFptId;
+                }
+                else if (ent.EnterpriseId == SeedIds.RikkeisoftId)
+                {
+                    adminId = SeedIds.EntAdminRikkeisoftId;
+                    mentorId = SeedIds.MentorRikkeisoftId;
+                }
+                else
+                {
+                    adminId = Guid.NewGuid();
+                    mentorId = Guid.NewGuid();
+                }
+
                 var adminEmail = $"admin@{ent.Name.Replace(" ", "").ToLower()}.com";
                 if (!existingEmails.Contains(adminEmail))
                 {
-                    var userId = Guid.NewGuid();
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.EnterpriseAdmin, cancellationToken);
-                    var user = new User(userId, userCode, adminEmail, $"Admin of {ent.Name}", UserRole.EnterpriseAdmin, passHash);
+                    var user = new User(adminId, userCode, adminEmail, $"Admin of {ent.Name}", UserRole.EnterpriseAdmin, passHash);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(adminEmail);
@@ -121,9 +166,8 @@ namespace IOCv2.Infrastructure.Persistence
                 var mentorEmail = $"mentor@{ent.Name.Replace(" ", "").ToLower()}.com";
                 if (!existingEmails.Contains(mentorEmail))
                 {
-                    var userId = Guid.NewGuid();
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
-                    var user = new User(userId, userCode, mentorEmail, $"Mentor {ent.Name}", UserRole.Mentor, passHash);
+                    var user = new User(mentorId, userCode, mentorEmail, $"Mentor {ent.Name}", UserRole.Mentor, passHash);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(mentorEmail);
@@ -147,7 +191,7 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 if (!existingEmails.Contains(studentEmails[i]))
                 {
-                    var userId = Guid.NewGuid();
+                    var userId = SeedIds.StudentIds[i];
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                     var user = new User(userId, userCode, studentEmails[i], studentNames[i], UserRole.Student, passHash);
                     user.SetStatus(UserStatus.Active);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +18,7 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
 
         public string Email { get; set; } = string.Empty;
         public UserRole Role { get; set; }
+        public Guid? UnitId { get; set; }
         public double RefreshTokenExpiresIn { get; set; } // Duration in Seconds
         public int ExpiresIn { get; set; } // Access Token Duration in Seconds
     }

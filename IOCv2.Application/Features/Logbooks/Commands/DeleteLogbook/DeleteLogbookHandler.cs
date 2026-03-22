@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser;
+using IOCv2.Application.Features.Admin.UserManagement.Commands.DeleteUser;
 using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
 using IOCv2.Application.Features.Logbooks.Common;
 using IOCv2.Application.Interfaces;
