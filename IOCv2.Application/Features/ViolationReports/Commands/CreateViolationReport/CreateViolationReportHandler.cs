@@ -73,9 +73,12 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.CreateViolationRe
                     return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.NotFound), ResultErrorType.NotFound);
 
                 // Authorization: mentors are only allowed to report for students in their own group.
-                if (UserRole.Mentor.ToString().Equals(_currentUserService.Role) && group.Mentor!.UserId != Guid.Parse(_currentUserService.UserId!))
-                    return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotAllowedToReport), ResultErrorType.Forbidden);
+                
+                if (UserRole.Mentor.ToString().Equals(_currentUserService.Role))
+                {
+                    if (group.Mentor!.UserId != Guid.Parse(_currentUserService.UserId!)) return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotAllowedToReport), ResultErrorType.NotFound);
 
+                }
                 // Validate OccurredDate against internship start date (if set).
                 if (group.StartDate.HasValue && request.OccurredDate < group.Term.StartDate)
                     return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.OccurredDateCannotBeBeforeInternshipStart), ResultErrorType.BadRequest);
