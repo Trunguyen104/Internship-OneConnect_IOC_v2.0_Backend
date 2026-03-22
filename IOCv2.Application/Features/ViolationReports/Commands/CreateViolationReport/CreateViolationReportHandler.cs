@@ -76,7 +76,7 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.CreateViolationRe
                 
                 if (UserRole.Mentor.ToString().Equals(_currentUserService.Role))
                 {
-                    if (group.Mentor!.UserId != Guid.Parse(_currentUserService.UserId!)) return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotAllowedToReport), ResultErrorType.NotFound);
+                    if (group.Mentor!.UserId != Guid.Parse(_currentUserService.UserId!)) return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotAllowedToReport), ResultErrorType.Forbidden);
 
                 }
                 // Validate OccurredDate against internship start date (if set).
