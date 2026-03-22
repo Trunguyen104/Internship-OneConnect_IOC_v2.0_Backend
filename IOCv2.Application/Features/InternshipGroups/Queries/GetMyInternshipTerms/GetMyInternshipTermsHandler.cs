@@ -82,8 +82,8 @@ public class GetMyInternshipTermsHandler : IRequestHandler<GetMyInternshipTermsQ
 
             var displayStatus = CalculateDisplayStatus(term, nowDateOnly);
             
-            // EnrollmentStatus mapping (Default to Active if null)
-            var enrollmentStatus = (EnrollmentStatus)(st.Status ?? (short)EnrollmentStatus.Active);
+            // EnrollmentStatus mapping
+            var enrollmentStatus = st.EnrollmentStatus;
 
             int journeyStep = CalculateJourneyStep(displayStatus, group != null);
 

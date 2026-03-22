@@ -1,5 +1,6 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Application.Constants;
 using IOCv2.Domain.Entities;
@@ -15,17 +16,20 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly ILogger<GetWorkItemByIdHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public GetWorkItemByIdHandler(
-        IUnitOfWork unitOfWork, 
-        IMapper mapper, 
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
         IMessageService messageService,
-        ILogger<GetWorkItemByIdHandler> logger)
+        ILogger<GetWorkItemByIdHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<GetWorkItemByIdResponse>> Handle(
@@ -35,6 +39,11 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
 
         try
         {
+        var cacheKey = WorkItemCacheKeys.WorkItem(request.WorkItemId);
+        var cached = await _cacheService.GetAsync<GetWorkItemByIdResponse>(cacheKey, cancellationToken);
+        if (cached is not null)
+            return Result<GetWorkItemByIdResponse>.Success(cached);
+
         var workItem = await _unitOfWork.Repository<WorkItem>()
             .Query()
             .AsNoTracking()
@@ -48,7 +57,9 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
                 _messageService.GetMessage(MessageKeys.Error.WorkItemNotFound, request.WorkItemId));
         }
 
-        return Result<GetWorkItemByIdResponse>.Success(_mapper.Map<GetWorkItemByIdResponse>(workItem));
+        var response = _mapper.Map<GetWorkItemByIdResponse>(workItem);
+        await _cacheService.SetAsync(cacheKey, response, WorkItemCacheKeys.Expiration.WorkItem, cancellationToken);
+        return Result<GetWorkItemByIdResponse>.Success(response);
         }
         catch (Exception ex)
         {

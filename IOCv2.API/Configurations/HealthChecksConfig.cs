@@ -28,6 +28,13 @@ public static class HealthChecksConfig
                 failureStatus: HealthStatus.Degraded,
                 tags: ["cache", "infrastructure"]);
 
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            // We use a dummy check or similar to avoid crashing if DB is intentionally not set,
+            // but in this app it's required for health.
+            // Logging is already handled in EnvironmentConfig.
+        }
+
         return services;
     }
 

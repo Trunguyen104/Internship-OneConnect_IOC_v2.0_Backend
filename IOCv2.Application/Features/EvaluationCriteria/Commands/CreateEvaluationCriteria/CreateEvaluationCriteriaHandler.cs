@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCriteria.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -14,15 +15,18 @@ public class CreateEvaluationCriteriaHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<CreateEvaluationCriteriaHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public CreateEvaluationCriteriaHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<CreateEvaluationCriteriaHandler> logger)
+        ILogger<CreateEvaluationCriteriaHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<CreateEvaluationCriteriaResponse>> Handle(
@@ -70,6 +74,8 @@ public class CreateEvaluationCriteriaHandler
         await _unitOfWork.Repository<Domain.Entities.EvaluationCriteria>().AddAsync(criteria, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(EvaluationCriteriaCacheKeys.CriteriaListPattern(), cancellationToken);
 
         _logger.LogInformation("Successfully created EvaluationCriteria {CriteriaId}", criteria.CriteriaId);
 

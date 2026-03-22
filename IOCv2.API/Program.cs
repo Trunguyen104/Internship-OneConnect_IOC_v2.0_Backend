@@ -37,6 +37,9 @@ builder.Services.AddHealthChecksConfig(builder.Configuration);
 var app = builder.Build();
 
 // Configure Middleware Pipeline
+// /health phải map TRƯỚC các middleware logic (auth, rate limit, etc.)
+app.UseHealthChecksConfig();
+
 app.UseLocalizationConfig();
 app.UseForwardedHeaders();
 
@@ -65,9 +68,6 @@ if (app.Environment.IsDevelopment())
         await next();
     });
 }
-// /health phải map TRƯỚC auth — healthcheck không cần JWT
-app.UseHealthChecksConfig();
-
 app.UseCors("AllowReact");
 
 // KHÔNG dùng UseHttpsRedirection — backend chạy sau nginx proxy (HTTP nội bộ)

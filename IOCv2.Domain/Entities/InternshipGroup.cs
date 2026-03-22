@@ -9,6 +9,7 @@ namespace IOCv2.Domain.Entities
         public Guid InternshipId { get; private set; }
         public Guid TermId { get; private set; }
         public string GroupName { get; private set; } = string.Empty;
+        public string? Description { get; private set; }
 
         public Guid? EnterpriseId { get; private set; }
         public virtual Enterprise? Enterprise { get; set; }
@@ -18,7 +19,7 @@ namespace IOCv2.Domain.Entities
 
         public DateTime? StartDate { get; private set; }
         public DateTime? EndDate { get; private set; }
-        public InternshipStatus Status { get; private set; }
+        public GroupStatus Status { get; private set; }
 
         // Navigation properties
         public virtual Term Term { get; set; } = null!;
@@ -29,12 +30,14 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
         public virtual ICollection<Stakeholder> Stakeholders { get; set; } = new List<Stakeholder>();
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
+        public virtual ICollection<ViolationReport> ViolationReports { get; set; } = new List<ViolationReport>();
 
         protected InternshipGroup() { }
 
         public static InternshipGroup Create(
             Guid termId,
             string groupName,
+            string? description = null,
             Guid? enterpriseId = null,
             Guid? mentorId = null,
             DateTime? startDate = null,
@@ -45,16 +48,18 @@ namespace IOCv2.Domain.Entities
                 InternshipId = Guid.NewGuid(),
                 TermId = termId,
                 GroupName = groupName,
+                Description = description,
                 EnterpriseId = enterpriseId,
                 MentorId = mentorId,
                 StartDate = startDate,
                 EndDate = endDate,
-                Status = InternshipStatus.Registered
+                Status = GroupStatus.Active
             };
         }
 
         public void UpdateInfo(
             string groupName,
+            string? description,
             Guid termId,
             Guid? enterpriseId,
             Guid? mentorId,
@@ -62,6 +67,7 @@ namespace IOCv2.Domain.Entities
             DateTime? endDate)
         {
             GroupName = groupName;
+            Description = description;
             TermId = termId;
             EnterpriseId = enterpriseId;
             MentorId = mentorId;
@@ -91,7 +97,7 @@ namespace IOCv2.Domain.Entities
                 _members.Remove(member);
             }
         }
-        public void UpdateStatus(InternshipStatus status)
+        public void UpdateStatus(GroupStatus status)
         {
             Status = status;
         }

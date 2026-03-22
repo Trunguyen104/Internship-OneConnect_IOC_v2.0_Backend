@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Stakeholders.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -17,19 +18,22 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
         private readonly IMessageService _messageService;
         private readonly ILogger<GetStakeholderByIdHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
         public GetStakeholderByIdHandler(
-            IUnitOfWork unitOfWork, 
-            IMapper mapper, 
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
             IMessageService messageService,
             ILogger<GetStakeholderByIdHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<GetStakeholderByIdResponse>> Handle(GetStakeholderByIdQuery request, CancellationToken cancellationToken)
@@ -76,8 +80,14 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholderById
                 }
             }
 
+            var cacheKey = StakeholderCacheKeys.Stakeholder(request.StakeholderId);
+            var cached = await _cacheService.GetAsync<GetStakeholderByIdResponse>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<GetStakeholderByIdResponse>.Success(cached);
+
             _logger.LogInformation("Successfully retrieved stakeholder {Id}", request.StakeholderId);
             var response = _mapper.Map<GetStakeholderByIdResponse>(stakeholder);
+            await _cacheService.SetAsync(cacheKey, response, StakeholderCacheKeys.Expiration.Stakeholder, cancellationToken);
             return Result<GetStakeholderByIdResponse>.Success(response);
             }
             catch (Exception ex)

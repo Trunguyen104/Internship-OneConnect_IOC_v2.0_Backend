@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Logbooks.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -21,14 +22,16 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly ILogger<CreateLogbookHandler> _logger;
+        private readonly ICacheService _cacheService;
 
-        public CreateLogbookHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, IMessageService messageService, ILogger<CreateLogbookHandler> logger)
+        public CreateLogbookHandler(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, IMessageService messageService, ILogger<CreateLogbookHandler> logger, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<CreateLogbookResponse>> Handle(CreateLogbookCommand request, CancellationToken cancellationToken)
@@ -93,7 +96,9 @@ namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
-                
+
+                await _cacheService.RemoveByPatternAsync(LogbookCacheKeys.LogbookListPattern(request.InternshipId), cancellationToken);
+
                 _logger.LogInformation("Logbook {LogbookId} created successfully for student {StudentId}", logbook.LogbookId, student.StudentId);
 
                 // 6. Return response

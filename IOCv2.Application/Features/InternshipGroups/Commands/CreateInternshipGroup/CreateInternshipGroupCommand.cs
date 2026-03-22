@@ -20,6 +20,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
         public string GroupName { get; init; } = string.Empty;
 
         /// <summary>
+        /// Optional description of the internship group.
+        /// </summary>
+        public string? Description { get; init; }
+
+        /// <summary>
         /// Optional identity of the associated enterprise.
         /// </summary>
         public Guid? EnterpriseId { get; init; }

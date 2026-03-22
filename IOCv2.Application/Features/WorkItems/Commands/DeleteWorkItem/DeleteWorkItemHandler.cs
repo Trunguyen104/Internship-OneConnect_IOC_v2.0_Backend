@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -13,15 +14,18 @@ public class DeleteWorkItemHandler : IRequestHandler<DeleteWorkItemCommand, Resu
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<DeleteWorkItemHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public DeleteWorkItemHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<DeleteWorkItemHandler> logger)
+        ILogger<DeleteWorkItemHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<DeleteWorkItemResponse>> Handle(
@@ -43,6 +47,9 @@ public class DeleteWorkItemHandler : IRequestHandler<DeleteWorkItemCommand, Resu
         await _unitOfWork.Repository<WorkItem>().DeleteAsync(workItem, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(WorkItemCacheKeys.BacklogPattern(request.ProjectId), cancellationToken);
+        await _cacheService.RemoveAsync(WorkItemCacheKeys.WorkItem(request.WorkItemId), cancellationToken);
 
         _logger.LogInformation("Successfully deleted work item {WorkItemId}", request.WorkItemId);
         return Result<DeleteWorkItemResponse>.Success(new DeleteWorkItemResponse

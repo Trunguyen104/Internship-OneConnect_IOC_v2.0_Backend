@@ -1,324 +1,475 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
+    <!--
+      Microsoft ResX Schema
 
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
+      Version 2.0
+
+      The primary goals of this format is to allow a simple XML format
+      that is mostly human readable. The generation and parsing of the
+      various data types are done through the TypeConverter classes
+      associated with the data types.
+
+      Example:
+
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+
+      There are any number of "resheader" rows that contain simple
+      name/value pairs.
+
+      Each data row contains a name, and value. The row also contains a
+      type or mimetype. Type corresponds to a .NET class that support
+      text/value conversion through the TypeConverter architecture.
+      Classes that don't support this are serialized and stored with the
+      mimetype set.
+
+      The mimetype is used for serialized objects, and tells the
+      ResXResourceReader how to depersist the object. This is currently not
+      extensible. For a given mimetype the value must be set accordingly:
+
+      Note - application/x-microsoft.net.object.binary.base64 is the format
+      that the ResXResourceWriter will generate, however the reader can
+      read any of the formats listed below.
+
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+        <xsd:element name="root" msdata:IsDataSet="true">
             <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string" />
+                            <xsd:attribute name="type" type="xsd:string" />
+                            <xsd:attribute name="mimetype" type="xsd:string" />
+                            <xsd:attribute ref="xml:space" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string" />
+                            <xsd:attribute name="name" type="xsd:string" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+                            <xsd:attribute ref="xml:space" />
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" />
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
             </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="CannotPromoteToManager" xml:space="preserve">
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="CannotPromoteToManager" xml:space="preserve">
     <value>Bạn không thể cho người khác thành quản lí</value>
   </data>
-  <data name="NewRoleMustBeDifferent" xml:space="preserve">
+    <data name="NewRoleMustBeDifferent" xml:space="preserve">
     <value>Vị trí mới phải khác vị trí hiện tại</value>
   </data>
-  <data name="Users.NotFound" xml:space="preserve">
+    <data name="Users.NotFound" xml:space="preserve">
     <value>Không tìm thấy người dùng với mã và role hiện tại.</value>
   </data>
-  <data name="Users.NotActive" xml:space="preserve">
+    <data name="Users.NotActive" xml:space="preserve">
     <value>Tài khoản người dùng hiện tại không còn hoạt động.</value>
   </data>
-  <data name="Users.InvalidAuditor" xml:space="preserve">
+    <data name="Users.InvalidAuditor" xml:space="preserve">
     <value>Không xác định được người thực hiện thao tác.</value>
   </data>
-  <data name="RoleChangedSuccessfully" xml:space="preserve">
+    <data name="RoleChangedSuccessfully" xml:space="preserve">
     <value>Role đã được thay đổi thành công</value>
   </data>
-  <data name="RoleChangedButEmailFailed" xml:space="preserve">
+    <data name="RoleChangedButEmailFailed" xml:space="preserve">
     <value>Role đã được thay đổi thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng về mã nhân viên mới: {0}</value>
   </data>
-  <data name="AccountCreatedSuccessfully" xml:space="preserve">
+    <data name="AccountCreatedSuccessfully" xml:space="preserve">
     <value>Tài khoản đã được tạo thành công</value>
   </data>
-  <data name="AccountCreatedButEmailFailed" xml:space="preserve">
+    <data name="AccountCreatedButEmailFailed" xml:space="preserve">
     <value>Tài khoản đã được tạo thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mã: {0}, Mật khẩu: {1}</value>
   </data>
-  <data name="ResetPassword.SuccessWithEmail" xml:space="preserve">
+    <data name="ResetPassword.SuccessWithEmail" xml:space="preserve">
     <value>Mật khẩu đã được reset thành công. Email thông báo đã được gửi tới {0}</value>
   </data>
-  <data name="ResetPassword.SuccessNoEmail" xml:space="preserve">
+    <data name="ResetPassword.SuccessNoEmail" xml:space="preserve">
     <value>Mật khẩu đã được reset thành công nhưng email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng. Mật khẩu mới: {0}</value>
   </data>
-  <data name="ResetPassword.StatusNoEmail" xml:space="preserve">
+    <data name="ResetPassword.StatusNoEmail" xml:space="preserve">
     <value>Email thông báo không được gửi. Vui lòng thông báo trực tiếp cho người dùng.</value>
   </data>
-  <data name="Auth.LoginSuccess" xml:space="preserve">
+    <data name="Auth.LoginSuccess" xml:space="preserve">
     <value>Đăng nhập thành công</value>
   </data>
-  <data name="Auth.LogoutSuccess" xml:space="preserve">
+    <data name="Auth.LogoutSuccess" xml:space="preserve">
     <value>Đăng xuất thành công</value>
   </data>
-  <data name="Auth.PasswordResetLinkSent" xml:space="preserve">
+    <data name="Auth.PasswordResetLinkSent" xml:space="preserve">
     <value>Link reset mật khẩu đã được gửi vào email của bạn.</value>
   </data>
-  <data name="Auth.PasswordChangedSuccess" xml:space="preserve">
+    <data name="Auth.PasswordChangedSuccess" xml:space="preserve">
     <value>Mật khẩu đã được thay đổi thành công.</value>
   </data>
-  <data name="Auth.PasswordResetSuccess" xml:space="preserve">
+    <data name="Auth.PasswordResetSuccess" xml:space="preserve">
     <value>Mật khẩu đã được reset thành công.</value>
   </data>
-  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
     <value>Nếu tài khoản hợp lệ, hệ thống sẽ gửi link reset mật khẩu qua email.</value>
   </data>
-  <data name="Profile.UpdateSuccess" xml:space="preserve">
+    <data name="Profile.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật thông tin thành công.</value>
   </data>
-  <data name="PageNumber.MinValue" xml:space="preserve">
+    <data name="PageNumber.MinValue" xml:space="preserve">
     <value>Page number must be greater than or equal to 1</value>
   </data>
-  <data name="PageSize.MinValue" xml:space="preserve">
+    <data name="PageSize.MinValue" xml:space="preserve">
     <value>Page size must be greater than or equal to 1</value>
   </data>
-  <data name="PageSize.MaxValue" xml:space="preserve">
+    <data name="PageSize.MaxValue" xml:space="preserve">
     <value>Page size must not exceed 100</value>
   </data>
-  <data name="SearchTerm.MaxLength" xml:space="preserve">
+    <data name="SearchTerm.MaxLength" xml:space="preserve">
     <value>Search term cannot exceed 200 characters</value>
   </data>
-  <data name="SortColumn.AllowedValues" xml:space="preserve">
+    <data name="SortColumn.AllowedValues" xml:space="preserve">
     <value>Sort column must be one of: projectname, startdate, enddate, status, createdat</value>
   </data>
-  <data name="SortOrder.AllowedValues" xml:space="preserve">
+    <data name="SortOrder.AllowedValues" xml:space="preserve">
     <value>Sort order must be either 'asc' or 'desc'</value>
   </data>
-  <data name="Projects.NotFound" xml:space="preserve">
+    <data name="Projects.NotFound" xml:space="preserve">
     <value>Dự án không tìm thấy</value>
   </data>
-  <data name="Projects.DeleteSuccess" xml:space="preserve">
+    <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Xóa dự án thành công</value>
   </data>
-  <data name="Projects.LogDelete" xml:space="preserve">
+    <data name="Projects.LogDelete" xml:space="preserve">
     <value>Dự án đã bị xóa {ProjectId}</value>
   </data>
-  <data name="ProjectResources.LogUploadSuccess" xml:space="preserve">
+    <data name="ProjectResources.LogUploadSuccess" xml:space="preserve">
     <value>Đã tải tệp {FileName} lên dự án {ProjectId}</value>
   </data>
-  <data name="ProjectResources.GetAllSuccess" xml:space="preserve">
+    <data name="ProjectResources.GetAllSuccess" xml:space="preserve">
     <value>Đã truy xuất thành công {Count} tài nguyên dự án</value>
   </data>
-  <data name="ProjectResources.GetByIdSuccess" xml:space="preserve">
+    <data name="ProjectResources.GetByIdSuccess" xml:space="preserve">
     <value>Đã truy xuất thành công tài nguyên dự án: {ResourceId}</value>
   </data>
-  <data name="Projects.LogCreateSuccess" xml:space="preserve">
+    <data name="Projects.LogCreateSuccess" xml:space="preserve">
     <value>Đã tạo dự án {ProjectId} cho chương trình thực tập {InternshipId}.</value>
   </data>
-  <data name="Projects.UpdateSuccess" xml:space="preserve">
+    <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Dự án đã được cập nhật {ProjectId}</value>
   </data>
-  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
+    <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
     <value>Successfully retrieved {Count} projects for internship ID: {InternshipId}</value>
   </data>
-  <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
+    <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
     <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
-  <data name="Epic.CreatedSuccess" xml:space="preserve">
+    <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Tạo Epic thành công.</value>
   </data>
-  <data name="Epic.UpdatedSuccess" xml:space="preserve">
+    <data name="Epic.UpdatedSuccess" xml:space="preserve">
     <value>Cập nhật Epic thành công.</value>
   </data>
-  <data name="Epic.DeletedSuccess" xml:space="preserve">
+    <data name="Epic.DeletedSuccess" xml:space="preserve">
     <value>Xóa Epic thành công.</value>
   </data>
-  <data name="Sprint.CreatedSuccess" xml:space="preserve">
+    <data name="Sprint.CreatedSuccess" xml:space="preserve">
     <value>Tạo Sprint thành công.</value>
   </data>
-  <data name="Sprint.UpdatedSuccess" xml:space="preserve">
+    <data name="Sprint.UpdatedSuccess" xml:space="preserve">
     <value>Cập nhật Sprint thành công.</value>
   </data>
-  <data name="Sprint.DeletedSuccess" xml:space="preserve">
+    <data name="Sprint.DeletedSuccess" xml:space="preserve">
     <value>Xóa Sprint thành công.</value>
   </data>
-  <data name="Sprint.StartedSuccess" xml:space="preserve">
+    <data name="Sprint.StartedSuccess" xml:space="preserve">
     <value>Bắt đầu Sprint thành công.</value>
   </data>
-  <data name="Sprint.CompletedSuccess" xml:space="preserve">
+    <data name="Sprint.CompletedSuccess" xml:space="preserve">
     <value>Sprint đã được hoàn thành thành công. {0} item đã hoàn thành, {1} item đã được di chuyển.</value>
   </data>
-  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+    <data name="Stakeholder.CreateSuccess" xml:space="preserve">
     <value>Tạo stakeholder thành công.</value>
   </data>
-  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+    <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật stakeholder thành công.</value>
   </data>
-  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+    <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Xóa stakeholder thành công.</value>
   </data>
-  <data name="Issue.CreateSuccess" xml:space="preserve">
+    <data name="Issue.CreateSuccess" xml:space="preserve">
     <value>Tạo issue thành công.</value>
   </data>
-  <data name="Issue.UpdateStatusSuccess" xml:space="preserve">
+    <data name="Issue.UpdateStatusSuccess" xml:space="preserve">
     <value>Cập nhật trạng thái issue thành công.</value>
   </data>
-  <data name="Issue.DeleteSuccess" xml:space="preserve">
+    <data name="Issue.DeleteSuccess" xml:space="preserve">
     <value>Xóa issue thành công.</value>
   </data>
-  <data name="Enterprise.RequestManyTimes" xml:space="preserve">
+    <data name="Enterprise.RequestManyTimes" xml:space="preserve">
     <value>Bạn đã gửi request quá nhiều lần.</value>
   </data>
-  <data name="Enterprise.RateLimitUpdateAttempt" xml:space="preserve">
+    <data name="Enterprise.RateLimitUpdateAttempt" xml:space="preserve">
     <value>update_enterprise_attempt:{0}</value>
   </data>
-  <data name="Enterprise.RateLimitGetByHRAttempt" xml:space="preserve">
+    <data name="Enterprise.RateLimitGetByHRAttempt" xml:space="preserve">
     <value>getByHR_enterprise_attempt:{0}</value>
   </data>
-  <data name="Enterprise.RateLimitGetByIDAttempt" xml:space="preserve">
+    <data name="Enterprise.RateLimitGetByIDAttempt" xml:space="preserve">
     <value>getByID_enterprise_attempt:{0}</value>
   </data>
-  <data name="Enterprise.RateLimitGetEnterprisesAttempt" xml:space="preserve">
+    <data name="Enterprise.RateLimitGetEnterprisesAttempt" xml:space="preserve">
     <value>getEnterprises_enterprise_attempt:{0}</value>
   </data>
-  <data name="InternshipGroup.LogCreating" xml:space="preserve">
+    <data name="InternshipGroup.LogCreating" xml:space="preserve">
     <value>Đang tạo nhóm thực tập mới: {GroupName} cho kỳ: {TermId}</value>
   </data>
-  <data name="InternshipGroup.LogCreatedSuccess" xml:space="preserve">
+    <data name="InternshipGroup.LogCreatedSuccess" xml:space="preserve">
     <value>Tạo nhóm thực tập thành công: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogUpdating" xml:space="preserve">
+    <data name="InternshipGroup.LogUpdating" xml:space="preserve">
     <value>Đang cập nhật nhóm thực tập: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogUpdatedSuccess" xml:space="preserve">
+    <data name="InternshipGroup.LogUpdatedSuccess" xml:space="preserve">
     <value>Cập nhật nhóm thực tập thành công: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogDeleting" xml:space="preserve">
+    <data name="InternshipGroup.LogDeleting" xml:space="preserve">
     <value>Đang xóa nhóm thực tập: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogDeletedSuccess" xml:space="preserve">
+    <data name="InternshipGroup.LogDeletedSuccess" xml:space="preserve">
     <value>Xóa nhóm thực tập thành công: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogAddingStudents" xml:space="preserve">
+    <data name="InternshipGroup.LogAddingStudents" xml:space="preserve">
     <value>Đang thêm sinh viên vào nhóm: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogAddedStudentsSuccess" xml:space="preserve">
+    <data name="InternshipGroup.LogAddedStudentsSuccess" xml:space="preserve">
     <value>Đã thêm thành công {Count} sinh viên vào nhóm: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogRemovingStudents" xml:space="preserve">
+    <data name="InternshipGroup.LogRemovingStudents" xml:space="preserve">
     <value>Đang xóa sinh viên khỏi nhóm: {InternshipId}</value>
   </data>
-  <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
+    <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Đã xóa thành công sinh viên khỏi nhóm: {InternshipId}</value>
+  </data>
+  <!-- StudentTerms — Email notifications -->
+  <data name="StudentTerms.Email.SubjectWithdraw" xml:space="preserve">
+    <value>Thông báo rút khỏi đợt thực tập</value>
+  </data>
+  <data name="StudentTerms.Email.BodyWithdraw" xml:space="preserve">
+    <value>Bạn đã bị rút khỏi đợt thực tập '{0}'. Vui lòng liên hệ nhà trường nếu có thắc mắc.</value>
+  </data>
+  <data name="StudentTerms.Email.SubjectRestore" xml:space="preserve">
+    <value>Thông báo khôi phục ghi danh đợt thực tập</value>
+  </data>
+  <data name="StudentTerms.Email.BodyRestore" xml:space="preserve">
+    <value>Bạn đã được khôi phục vào đợt thực tập '{0}'.</value>
+  </data>
+
+  <!-- StudentTerms — Excel headers -->
+  <data name="StudentTerms.Excel.HeaderStudentCode" xml:space="preserve">
+    <value>Mã sinh viên</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderFullName" xml:space="preserve">
+    <value>Họ và tên</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderPhone" xml:space="preserve">
+    <value>Số điện thoại</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderDateOfBirth" xml:space="preserve">
+    <value>Ngày sinh</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderMajor" xml:space="preserve">
+    <value>Chuyên ngành</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderTempPassword" xml:space="preserve">
+    <value>Mật khẩu tạm</value>
+  </data>
+  <data name="StudentTerms.Excel.WorksheetStudentList" xml:space="preserve">
+    <value>Danh sách sinh viên</value>
+  </data>
+  <data name="StudentTerms.Excel.WorksheetTempPassword" xml:space="preserve">
+    <value>Mật khẩu tạm</value>
+  </data>
+
+
+  <!-- ── InternshipApplication: Success Messages ── -->
+  <data name="InternshipApplication.AcceptSuccess" xml:space="preserve">
+    <value>Đơn ứng tuyển đã được chấp nhận thành công.</value>
+  </data>
+  <data name="InternshipApplication.RejectSuccess" xml:space="preserve">
+    <value>Đơn ứng tuyển đã bị từ chối.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorSuccess" xml:space="preserve">
+    <value>Đã gán Mentor thành công.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorNewGroupSuccess" xml:space="preserve">
+    <value>Đã gán Mentor và tạo nhóm thực tập mới thành công.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorExistingGroupSuccess" xml:space="preserve">
+    <value>Đã gán Mentor và thêm sinh viên vào nhóm hiện có thành công.</value>
+  </data>
+  <data name="InternshipApplication.AssignProjectSuccess" xml:space="preserve">
+    <value>Đã gán dự án vào nhóm thực tập thành công.</value>
   </data>
   <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
     <value>Bạn không có quyền xóa doanh nghiệp này.</value>
   </data>
-  <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
+    <data name="Enterprise.RestorePermissionDenied" xml:space="preserve">
     <value>Bạn không có quyền khôi phục doanh nghiệp này.</value>
   </data>
-  <data name="Enterprise.NotDeleted" xml:space="preserve">
+    <data name="Enterprise.NotDeleted" xml:space="preserve">
     <value>Doanh nghiệp chưa bị xóa nên không thể khôi phục.</value>
   </data>
-  <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
+    <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
     <value>Bạn không có quyền xem thông tin doanh nghiệp này.</value>
+  </data>
+
+    <data name="ViolationReport.FilteredNotFound" xml:space="preserve">
+    <value>Không tìm thấy báo cáo phù hợp</value>
+  </data>
+    <data name="ViolationReport.NotFound" xml:space="preserve">
+    <value>Chưa có báo cáo vi phạm nào.</value>
+  </data>
+    <data name="Student.NotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên này.</value>
+  </data>
+    <data name="ViolationReport.NotAllowedToReport" xml:space="preserve">
+    <value>Bạn không được phép báo cáo về học sinh này.</value>
+  </data>
+    <data name="ViolationReport.OccurredDateCannotBeBeforeInternshipStart" xml:space="preserve">
+    <value>Ngày xảy ra sự việc không được trước ngày bắt đầu thực tập.</value>
+  </data>
+    <data name="ViolationReport.OccurredDateCannotBeAfterInternshipEnd" xml:space="preserve">
+    <value>Chương trình thực tập đã kết thúc.</value>
+  </data>
+    <data name="ViolationReport.CreateViolationReportSuccess" xml:space="preserve">
+    <value>Đã tạo báo cáo vi phạm thành công</value>
+  </data>
+    <data name="ViolationReport.LogNotFound" xml:space="preserve">
+    <value>Không tìm thấy báo cáo vi phạm: {ViolationReportId}</value>
+  </data>
+    <data name="Student.StudentIdRequired" xml:space="preserve">
+    <value>ID sinh viên là bắt buộc.</value>
+  </data>
+    <data name="ViolationReport.OccurredDateIsRequired" xml:space="preserve">
+    <value>Ngày xảy ra sự việc là bắt buộc.</value>
+  </data>
+    <data name="ViolationReport.OccurredDateInFuture" xml:space="preserve">
+    <value>Ngày xảy ra không được lớn hơn thời điểm hiện tại.</value>
+  </data>
+    <data name="ViolationReport.DescriptionIsRequired" xml:space="preserve">
+    <value>Mô tả là bắt buộc, không được để trống.</value>
+  </data>
+    <data name="ViolationReport.DescriptionMinLength" xml:space="preserve">
+    <value>Mô tả phải có ít nhất {0} ký tự.</value>
+  </data>
+    <data name="ViolationReport.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả không được vượt quá {0} ký tự.</value>
+  </data>
+    <data name="ViolationReport.LogDeleteNotOwner" xml:space="preserve">
+    <value>Người hướng dẫn {UserId} đã cố gắng xóa một báo cáo mà họ không sở hữu: {ViolationReportId}</value>
+  </data>
+    <data name="ViolationReport.DeleteNotOwner" xml:space="preserve">
+    <value>Bạn chỉ có thể xóa báo cáo vi phạm do mình tạo.</value>
+  </data>
+    <data name="ViolationReport.ViolationReportDeletedSuccessfully" xml:space="preserve">
+    <value>Báo cáo vi phạm {0} đã được xóa thành công.</value>
+  </data>
+    <data name="ViolationReport.UpdatingViolationReportByUser" xml:space="preserve">
+    <value>Đang cập nhật báo cáo vi phạm {0} bởi người dùng {1}.</value>
+  </data>
+    <data name="ViolationReport.ViolationReportNotFound" xml:space="preserve">
+    <value>Không tìm thấy báo cáo vi phạm {0}.</value>
+  </data>
+    <data name="ViolationReport.UserNotAllowedToUpdateViolationReport" xml:space="preserve">
+    <value>Người dùng {0} không được phép cập nhật báo cáo vi phạm {1}.</value>
+  </data>
+    <data name="ViolationReport.NotAllowedToUpdateThisReport" xml:space="preserve">
+    <value>Bạn không được phép cập nhật báo cáo này.</value>
+  </data>
+    <data name="ViolationReport.OccurredDateBeforeInternshipStart" xml:space="preserve">
+    <value>Ngày xảy ra không được trước ngày bắt đầu thực tập.</value>
+  </data>
+    <data name="ViolationReport.InternshipHasEnded" xml:space="preserve">
+    <value>Kỳ thực tập đã kết thúc.</value>
+  </data>
+    <data name="ViolationReport.ViolationReportUpdatedByAnotherUser" xml:space="preserve">
+    <value>Báo cáo vi phạm đã được cập nhật bởi người dùng khác vào lúc {0}.</value>
+  </data>
+    <data name="ViolationReport.ViolationReportUpdatedSuccessfully" xml:space="preserve">
+    <value>Báo cáo đã được cập nhật thành công.</value>
+  </data>
+    <data name="ViolationReport.FailedToUpdateViolationReport" xml:space="preserve">
+    <value>Không thể cập nhật báo cáo vi phạm {0}.</value>
+  </data>
+    <data name="ViolationReport.ViolationReportIdIsRequired" xml:space="preserve">
+    <value>ViolationReportId là bắt buộc.</value>
+  </data>
+  <data name="InternshipGroup.MoveSuccess" xml:space="preserve">
+    <value>Chuyển sinh viên thành công.</value>
+  </data>
+  <data name="InternshipGroup.ArchiveSuccess" xml:space="preserve">
+    <value>Lưu trữ nhóm thành công.</value>
   </data>
 </root>

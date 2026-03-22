@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.StakeholderIssues.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -16,19 +17,22 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
         private readonly IMessageService _messageService;
         private readonly ILogger<DeleteStakeholderIssueCommandHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
         public DeleteStakeholderIssueCommandHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IMessageService messageService,
             ILogger<DeleteStakeholderIssueCommandHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<DeleteStakeholderIssueResponse>> Handle(DeleteStakeholderIssueCommand request, CancellationToken cancellationToken)
@@ -53,6 +57,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
                 await _unitOfWork.Repository<StakeholderIssue>().HardDeleteAsync(issue, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveByPatternAsync(StakeholderIssueCacheKeys.IssueListPattern(), cancellationToken);
+                await _cacheService.RemoveAsync(StakeholderIssueCacheKeys.Issue(request.Id), cancellationToken);
 
                 _logger.LogInformation("Successfully deleted StakeholderIssue {Id}", request.Id);
 
