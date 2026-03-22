@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCycles.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -15,15 +16,18 @@ public class CreateEvaluationCycleHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<CreateEvaluationCycleHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public CreateEvaluationCycleHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<CreateEvaluationCycleHandler> logger)
+        ILogger<CreateEvaluationCycleHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<CreateEvaluationCycleResponse>> Handle(
@@ -83,6 +87,8 @@ public class CreateEvaluationCycleHandler
         await _unitOfWork.Repository<EvaluationCycle>().AddAsync(cycle, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(EvaluationCycleCacheKeys.CycleListPattern(), cancellationToken);
 
         _logger.LogInformation("Successfully created EvaluationCycle {CycleId}", cycle.CycleId);
 

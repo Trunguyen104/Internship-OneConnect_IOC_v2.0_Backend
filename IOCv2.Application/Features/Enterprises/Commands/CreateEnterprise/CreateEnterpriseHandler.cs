@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -18,13 +19,15 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
         private readonly IMessageService _messageService;
         private readonly ILogger<CreateEnterpriseHandler> _logger;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public CreateEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<CreateEnterpriseHandler> logger, IMapper mapper)
+        public CreateEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<CreateEnterpriseHandler> logger, IMapper mapper, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _logger = logger;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<CreateEnterpriseResponse>> Handle(CreateEnterpriseCommand request, CancellationToken cancellationToken)
@@ -56,6 +59,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().AddAsync(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
                 return Result<CreateEnterpriseResponse>.Success(response);
             }
             catch (Exception ex)

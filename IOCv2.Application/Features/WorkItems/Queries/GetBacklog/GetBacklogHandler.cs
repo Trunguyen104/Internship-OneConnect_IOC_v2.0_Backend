@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -14,15 +15,18 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<GetBacklogHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public GetBacklogHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<GetBacklogHandler> logger)
+        ILogger<GetBacklogHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<GetBacklogResponse>> Handle(
@@ -32,6 +36,20 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
 
         try
         {
+        var cacheKey = WorkItemCacheKeys.Backlog(
+            request.ProjectId,
+            request.BacklogOnly,
+            request.EpicId,
+            request.SearchTerm,
+            (int?)request.Type,
+            (int?)request.Priority,
+            (int?)request.Status,
+            request.AssigneeId);
+
+        var cached = await _cacheService.GetAsync<GetBacklogResponse>(cacheKey, cancellationToken);
+        if (cached is not null)
+            return Result<GetBacklogResponse>.Success(cached);
+
         // BacklogOnly=true: bỏ qua Sprints, chỉ lấy Product Backlog
         List<Sprint> sprints;
         HashSet<Guid> assignedIds;
@@ -145,6 +163,8 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
                 Items = backlogDtos
             }
         };
+
+        await _cacheService.SetAsync(cacheKey, response, WorkItemCacheKeys.Expiration.Backlog, cancellationToken);
 
         return Result<GetBacklogResponse>.Success(response);
         }

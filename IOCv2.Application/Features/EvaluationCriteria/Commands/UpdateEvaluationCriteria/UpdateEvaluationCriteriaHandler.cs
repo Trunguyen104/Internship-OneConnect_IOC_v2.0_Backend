@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCriteria.Common;
 using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -13,15 +14,18 @@ public class UpdateEvaluationCriteriaHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<UpdateEvaluationCriteriaHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public UpdateEvaluationCriteriaHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<UpdateEvaluationCriteriaHandler> logger)
+        ILogger<UpdateEvaluationCriteriaHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<UpdateEvaluationCriteriaResponse>> Handle(
@@ -65,6 +69,8 @@ public class UpdateEvaluationCriteriaHandler
         await _unitOfWork.Repository<Domain.Entities.EvaluationCriteria>().UpdateAsync(criteria, cancellationToken);
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(EvaluationCriteriaCacheKeys.CriteriaListPattern(), cancellationToken);
 
         _logger.LogInformation("Successfully updated EvaluationCriteria {CriteriaId}", request.CriteriaId);
 

@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Admin.Users.Commands.DeleteAdminUser;
 using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
+using IOCv2.Application.Features.Logbooks.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -94,8 +95,8 @@ namespace IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 // 5. Post-Commit Actions (Cache clearing)
-                await _cacheService.RemoveByPatternAsync("logbook:list", cancellationToken);
-                await _cacheService.RemoveAsync($"logbook:{logbook.LogbookId}", cancellationToken);
+                await _cacheService.RemoveByPatternAsync(LogbookCacheKeys.LogbookListPattern(logbook.InternshipId), cancellationToken);
+                await _cacheService.RemoveAsync(LogbookCacheKeys.Logbook(logbook.LogbookId), cancellationToken);
 
                 _logger.LogInformation("Logbook {LogbookId} deleted successfully", logbook.LogbookId);
 

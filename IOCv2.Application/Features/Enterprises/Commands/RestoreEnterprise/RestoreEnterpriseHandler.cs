@@ -2,6 +2,7 @@
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Enums;
 using MediatR;
@@ -22,14 +23,16 @@ namespace IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise
         private readonly ILogger<RestoreEnterpriseHandler> _logger;
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
-        public RestoreEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<RestoreEnterpriseHandler> logger, IMapper mapper, ICurrentUserService currentUserService)
+        public RestoreEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<RestoreEnterpriseHandler> logger, IMapper mapper, ICurrentUserService currentUserService, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _logger = logger;
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<RestoreEnterpriseResponse>> Handle(RestoreEnterpriseCommand request, CancellationToken cancellationToken)
@@ -62,6 +65,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise
                 var response = _mapper.Map<RestoreEnterpriseResponse>(enterprise);
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().UpdateAsync(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
                 return Result<RestoreEnterpriseResponse>.Success(response);
             }
             catch (Exception ex)
