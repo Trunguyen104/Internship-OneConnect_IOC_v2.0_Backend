@@ -38,37 +38,30 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
 
         public async Task<Result<GetEnterpriseByMineResponse>> Handle(GetEnterpriseByMineCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                // Each user has own key counting invalid turn
-                var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetByHRAttempt, _currentUserService.UserId ?? string.Empty);
-                // Check if user is blocked due to too many failed attempts
-                if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
-                {
-                    return Result<GetEnterpriseByMineResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes), ResultErrorType.BadRequest);
-                }
-                // Register failed attempt (block after 30 attempts in 1 mins)
-                await _rateLimiter.RegisterFailAsync(
-                    rateLimitKey,
-                    limit: 30,
-                    window: TimeSpan.FromMinutes(1),
-                    blockFor: TimeSpan.FromMinutes(1),
-                    cancellationToken);
-                var userId = Guid.Parse(_currentUserService.UserId!);
-                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query().Select(x => x).FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
-                if (enterpriseUser == null) return Result<GetEnterpriseByMineResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise));
-                var enterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>().GetByIdAsync(enterpriseUser!.EnterpriseId, cancellationToken);
-                if (enterprise == null) return Result<GetEnterpriseByMineResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseNotFoundCurrentHR));
-                var response = _mapper.Map<GetEnterpriseByMineResponse>(enterprise);
-                await _unitOfWork.CommitTransactionAsync();
-                return Result<GetEnterpriseByMineResponse>.Success(response);
 
-            }
-            catch (Exception ex)
+            // Each user has own key counting invalid turn
+            var rateLimitKey = _messageService.GetMessage(MessageKeys.Enterprise.RateLimitGetByHRAttempt, _currentUserService.UserId ?? string.Empty);
+            // Check if user is blocked due to too many failed attempts
+            if (await _rateLimiter.IsBlockedAsync(rateLimitKey, cancellationToken))
             {
-                _logger.LogError(ex.Message);
-                return Result<GetEnterpriseByMineResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
+                return Result<GetEnterpriseByMineResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RequestManyTimes), ResultErrorType.BadRequest);
             }
+            // Register failed attempt (block after 30 attempts in 1 mins)
+            await _rateLimiter.RegisterFailAsync(
+                rateLimitKey,
+                limit: 30,
+                window: TimeSpan.FromMinutes(1),
+                blockFor: TimeSpan.FromMinutes(1),
+                cancellationToken);
+            var userId = Guid.Parse(_currentUserService.UserId!);
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query().Select(x => x).FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+            if (enterpriseUser == null) return Result<GetEnterpriseByMineResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise));
+            var enterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>().GetByIdAsync(enterpriseUser!.EnterpriseId, cancellationToken);
+            if (enterprise == null) return Result<GetEnterpriseByMineResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseNotFoundCurrentHR));
+            var response = _mapper.Map<GetEnterpriseByMineResponse>(enterprise);
+            await _unitOfWork.CommitTransactionAsync();
+            return Result<GetEnterpriseByMineResponse>.Success(response);
+
         }
     }
 }

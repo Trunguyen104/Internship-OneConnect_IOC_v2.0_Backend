@@ -37,8 +37,6 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
         {
             _logger.LogInformation("Getting StakeholderIssue {Id}", request.Id);
 
-            try
-            {
                 var cacheKey = StakeholderIssueCacheKeys.Issue(request.Id);
                 var cached = await _cacheService.GetAsync<GetStakeholderIssueByIdResponse>(cacheKey, cancellationToken);
                 if (cached is not null)
@@ -60,12 +58,7 @@ namespace IOCv2.Application.Features.StakeholderIssues.Queries.GetStakeholderIss
             _logger.LogInformation("Successfully retrieved StakeholderIssue {Id}", request.Id);
             await _cacheService.SetAsync(cacheKey, issue, StakeholderIssueCacheKeys.Expiration.Issue, cancellationToken);
             return Result<GetStakeholderIssueByIdResponse>.Success(issue);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting StakeholderIssue {Id}", request.Id);
-                return Result<GetStakeholderIssueByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-            }
+
         }
     }
 }
