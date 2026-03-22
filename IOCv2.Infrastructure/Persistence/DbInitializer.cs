@@ -25,6 +25,10 @@ namespace IOCv2.Infrastructure.Persistence
             public static readonly Guid SchoolAdminFptCtId = new Guid("33333333-3333-3333-3333-333333330002");
             public static readonly Guid EntAdminRikkeisoftId = new Guid("44444444-4444-4444-4444-444444440002");
             public static readonly Guid MentorRikkeisoftId = new Guid("55555555-5555-5555-5555-555555550002");
+
+            // Added HR seed ids for deterministic seeding
+            public static readonly Guid HrFptId = new Guid("77777777-7777-7777-7777-777777770001");
+            public static readonly Guid HrRikkeisoftId = new Guid("77777777-7777-7777-7777-777777770002");
             
             public static readonly List<Guid> StudentIds = new()
             {
@@ -132,27 +136,32 @@ namespace IOCv2.Infrastructure.Persistence
                 existingEmails.Add(superAdmin.Email);
             }
 
-            // 2. Enterprise Admins & Mentors
+            // 2. Enterprise Admins, HRs & Mentors
             foreach (var ent in enterpriseList)
             {
-                Guid adminId, mentorId;
+                Guid adminId, mentorId, hrId;
                 if (ent.EnterpriseId == SeedIds.FptSoftwareId)
                 {
                     adminId = SeedIds.EntAdminFptId;
                     mentorId = SeedIds.MentorFptId;
+                    hrId = SeedIds.HrFptId;
                 }
                 else if (ent.EnterpriseId == SeedIds.RikkeisoftId)
                 {
                     adminId = SeedIds.EntAdminRikkeisoftId;
                     mentorId = SeedIds.MentorRikkeisoftId;
+                    hrId = SeedIds.HrRikkeisoftId;
                 }
                 else
                 {
                     adminId = Guid.NewGuid();
                     mentorId = Guid.NewGuid();
+                    hrId = Guid.NewGuid();
                 }
 
-                var adminEmail = $"admin@{ent.Name.Replace(" ", "").ToLower()}.com";
+                var baseName = ent.Name.Replace(" ", "").ToLower();
+
+                var adminEmail = $"admin@{baseName}.com";
                 if (!existingEmails.Contains(adminEmail))
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.EnterpriseAdmin, cancellationToken);
@@ -163,7 +172,7 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Enterprise Administrator" });
                 }
 
-                var mentorEmail = $"mentor@{ent.Name.Replace(" ", "").ToLower()}.com";
+                var mentorEmail = $"mentor@{baseName}.com";
                 if (!existingEmails.Contains(mentorEmail))
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
@@ -172,6 +181,18 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.Users.Add(user);
                     existingEmails.Add(mentorEmail);
                     _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
+                }
+
+                // HR account (new)
+                var hrEmail = $"hr@{baseName}.com";
+                if (!existingEmails.Contains(hrEmail))
+                {
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.HR, cancellationToken);
+                    var user = new User(hrId, userCode, hrEmail, $"HR {ent.Name}", UserRole.HR, passHash);
+                    user.SetStatus(UserStatus.Active);
+                    _context.Users.Add(user);
+                    existingEmails.Add(hrEmail);
+                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "HR" });
                 }
             }
 
