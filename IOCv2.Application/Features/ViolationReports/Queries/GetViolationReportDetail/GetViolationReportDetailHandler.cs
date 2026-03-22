@@ -49,7 +49,7 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         public async Task<Result<GetViolationReportDetailResponse>> Handle(GetViolationReportDetailQuery request, CancellationToken cancellationToken)
         {
             // Base query for the requested violation report id.
-            var query = _unitOfWork.Repository<ViolationReport>().Query().AsNoTracking().Where(x => x.ViolationReportId == request.ViolationReportId);
+            var query = _unitOfWork.Repository<ViolationReport>().Query().AsNoTracking().Include(x=>x.InternshipGroup).ThenInclude(x=>x.Mentor).Where(x => x.ViolationReportId == request.ViolationReportId);
 
             // If current user is Mentor, restrict to reports belonging to mentor's groups.
             if (UserRole.Mentor.ToString().Equals(_currentUserService.Role!))
