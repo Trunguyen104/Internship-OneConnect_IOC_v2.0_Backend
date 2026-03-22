@@ -57,76 +57,67 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         /// </summary>
         public async Task<Result<PaginatedResult<GetViolationReportsResponse>>> Handle(GetViolationReportsQuery request, CancellationToken cancellationToken)
         {
-            try
+            // 1) Base query: include navigation properties used for filtering/mapping.
+            var query = _unitOfWork.Repository<ViolationReport>().Query()
+                .Include(x => x.Student).ThenInclude(s => s.User)
+                .Include(x => x.InternshipGroup).ThenInclude(g => g.Mentor).ThenInclude(m => m.User)
+                .AsNoTracking();
+
+            // 2) Role-based access: Mentors only see reports for their groups.
+            if (UserRole.Mentor.ToString().Equals(_currentUserService.Role))
             {
-                // 1) Base query: include navigation properties used for filtering/mapping.
-                var query = _unitOfWork.Repository<ViolationReport>().Query()
-                    .Include(x => x.Student).ThenInclude(s => s.User)
-                    .Include(x => x.InternshipGroup).ThenInclude(g => g.Mentor).ThenInclude(m => m.User)
-                    .AsNoTracking();
+                var currentUserId = Guid.Parse(_currentUserService.UserId!);
+                query = query.Where(x => x.InternshipGroup.Mentor != null && x.InternshipGroup.Mentor.UserId == currentUserId);
+            }
 
-                // 2) Role-based access: Mentors only see reports for their groups.
-                if (UserRole.Mentor.ToString().Equals(_currentUserService.Role))
-                {
-                    var currentUserId = Guid.Parse(_currentUserService.UserId!);
-                    query = query.Where(x => x.InternshipGroup.Mentor != null && x.InternshipGroup.Mentor.UserId == currentUserId);
-                }
+            // 3) Search: match student full name or user code (case-insensitive).
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var term = request.SearchTerm.Trim().ToLower();
+                query = query.Where(x => x.Student.User.FullName.ToLower().Contains(term) || x.Student.User.UserCode.ToLower().Contains(term));
+            }
 
-                // 3) Search: match student full name or user code (case-insensitive).
-                if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-                {
-                    var term = request.SearchTerm.Trim().ToLower();
-                    query = query.Where(x => x.Student.User.FullName.ToLower().Contains(term) || x.Student.User.UserCode.ToLower().Contains(term));
-                }
+            // 4) Filters: CreatedBy, Occurred date range, GroupId.
+            if (request.CreatedById.HasValue) query = query.Where(x => x.CreatedBy == request.CreatedById.Value);
+            if (request.OccurredFrom.HasValue) query = query.Where(x => x.OccurredDate >= request.OccurredFrom.Value);
+            if (request.OccurredTo.HasValue) query = query.Where(x => x.OccurredDate <= request.OccurredTo.Value);
+            if (request.GroupId.HasValue) query = query.Where(x => x.InternshipGroupId == request.GroupId.Value);
 
-                // 4) Filters: CreatedBy, Occurred date range, GroupId.
-                if (request.CreatedById.HasValue) query = query.Where(x => x.CreatedBy == request.CreatedById.Value);
-                if (request.OccurredFrom.HasValue) query = query.Where(x => x.OccurredDate >= request.OccurredFrom.Value);
-                if (request.OccurredTo.HasValue) query = query.Where(x => x.OccurredDate <= request.OccurredTo.Value);
-                if (request.GroupId.HasValue) query = query.Where(x => x.InternshipGroupId == request.GroupId.Value);
+            // 5) Total count before pagination so frontend can show total items.
+            var totalCount = await query.CountAsync(cancellationToken);
 
-                // 5) Total count before pagination so frontend can show total items.
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                // 6) If no results, return an empty paginated object (frontend expects pagination fields).
-                if (totalCount == 0)
-                {
-                    var emptyResponse = PaginatedResult<GetViolationReportsResponse>.Create(
-                        new List<GetViolationReportsResponse>(),
-                        0,
-                        request.PageNumber,
-                        request.PageSize
-                    );
-                    return Result<PaginatedResult<GetViolationReportsResponse>>.Success(emptyResponse);
-                }
-
-                // 7) Sorting: newest by default, client may request ascending creation ordering.
-                var orderedQuery = request.OrderByCreatedAscending
-                    ? query.OrderBy(x => x.CreatedAt)
-                    : query.OrderByDescending(x => x.CreatedAt);
-
-                // 8) Pagination + projection to DTO using AutoMapper.
-                var items = await orderedQuery
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ProjectTo<GetViolationReportsResponse>(_mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken);
-
-                var response = PaginatedResult<GetViolationReportsResponse>.Create(
-                    items,
-                    totalCount,
+            // 6) If no results, return an empty paginated object (frontend expects pagination fields).
+            if (totalCount == 0)
+            {
+                var emptyResponse = PaginatedResult<GetViolationReportsResponse>.Create(
+                    new List<GetViolationReportsResponse>(),
+                    0,
                     request.PageNumber,
                     request.PageSize
                 );
+                return Result<PaginatedResult<GetViolationReportsResponse>>.Success(emptyResponse);
+            }
 
-                return Result<PaginatedResult<GetViolationReportsResponse>>.Success(response);
-            }
-            catch (Exception ex)
-            {
-                // Log and return a generic internal server error key so client can localize the message.
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ViolationReportKey.GetViolationReportsError));
-                return Result<PaginatedResult<GetViolationReportsResponse>>.Failure(MessageKeys.ViolationReportKey.GetViolationReportsError, ResultErrorType.InternalServerError);
-            }
+            // 7) Sorting: newest by default, client may request ascending creation ordering.
+            var orderedQuery = request.OrderByCreatedAscending
+                ? query.OrderBy(x => x.CreatedAt)
+                : query.OrderByDescending(x => x.CreatedAt);
+
+            // 8) Pagination + projection to DTO using AutoMapper.
+            var items = await orderedQuery
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ProjectTo<GetViolationReportsResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+            var response = PaginatedResult<GetViolationReportsResponse>.Create(
+                items,
+                totalCount,
+                request.PageNumber,
+                request.PageSize
+            );
+
+            return Result<PaginatedResult<GetViolationReportsResponse>>.Success(response);
         }
     }
 }
