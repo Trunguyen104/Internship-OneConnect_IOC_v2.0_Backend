@@ -40,5 +40,10 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser
         /// (Optional) ID of the linked University or Enterprise.
         /// </summary>
         public Guid? UnitId { get; init; }
+
+        /// <summary>
+        /// (Optional) Home address.
+        /// </summary>
+        public string? Address { get; init; }
     }
 }

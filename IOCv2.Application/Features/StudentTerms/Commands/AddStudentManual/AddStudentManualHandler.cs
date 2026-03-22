@@ -111,7 +111,7 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
 
             var newUserId = Guid.NewGuid();
             var user = new User(newUserId, request.StudentCode, request.Email, request.FullName, UserRole.Student, passwordHash);
-            user.UpdateProfile(request.FullName, request.Phone, null, null, request.DateOfBirth);
+            user.UpdateProfile(request.FullName, request.Phone, null, null, request.DateOfBirth, null);
             await _unitOfWork.Repository<User>().AddAsync(user, cancellationToken);
 
             var student = new Student

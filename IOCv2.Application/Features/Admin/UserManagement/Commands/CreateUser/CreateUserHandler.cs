@@ -141,7 +141,7 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser
                 var passwordHash = _passwordService.HashPassword(randomPassword);
 
                 var user = new User(userId, userCode, request.Email, request.FullName, targetRole, passwordHash);
-                user.UpdateProfile(request.FullName, request.PhoneNumber, null, null, null);
+                user.UpdateProfile(request.FullName, request.PhoneNumber, null, null, null, request.Address);
                 user.SetStatus(UserStatus.Active);
 
                 await _unitOfWork.Repository<User>().AddAsync(user, cancellationToken);

@@ -59,5 +59,15 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.UpdateUser
         /// (Optional) Student GPA if role is Student.
         /// </summary>
         public decimal? StudentGpa { get; init; }
+
+        /// <summary>
+        /// (Optional) ID of the linked University or Enterprise.
+        /// </summary>
+        public Guid? UnitId { get; init; }
+
+        /// <summary>
+        /// (Optional) Home address.
+        /// </summary>
+        public string? Address { get; init; }
     }
 }

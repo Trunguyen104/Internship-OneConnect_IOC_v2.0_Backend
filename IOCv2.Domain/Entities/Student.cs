@@ -13,12 +13,18 @@ namespace IOCv2.Domain.Entities
         public decimal? Gpa { get; set; }
         public string? HighestDegree { get; set; }
         public string? PortfolioUrl { get; private set; }
+        public string? CvUrl { get; private set; }
 
         public StudentStatus InternshipStatus { get; set; }
 
         public void UpdatePortfolio(string? portfolioUrl)
         {
             PortfolioUrl = portfolioUrl;
+        }
+
+        public void UpdateCv(string? cvUrl)
+        {
+            CvUrl = cvUrl;
         }
 
         // Navigation properties
