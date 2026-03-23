@@ -552,25 +552,141 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedEvaluations()
         {
-            if (await _context.Evaluations.AnyAsync()) return;
+            var now = DateTime.UtcNow;
 
-            var fall2025 = await _context.Terms.FirstAsync(t => t.Name == "Fall 2025");
-            var group5 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
-            var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
-            var mentorUser = await _context.Users.FirstAsync(u => u.Email == "mentor@rikkeisoft.com");
+            static DateTime ToUtc(DateOnly date, int hour, int minute = 0)
+                => DateTime.SpecifyKind(date.ToDateTime(new TimeOnly(hour, minute)), DateTimeKind.Utc);
 
-            var cycle = new EvaluationCycle { CycleId = Guid.NewGuid(), TermId = fall2025.TermId, Name = "Final Evaluation", StartDate = DateTime.UtcNow.AddMonths(-3), EndDate = DateTime.UtcNow.AddMonths(-2), Status = EvaluationCycleStatus.Completed };
-            _context.EvaluationCycles.Add(cycle);
-            await _context.SaveChangesAsync();
+            EvaluationCycleStatus ResolveStatus(DateTime startDate, DateTime endDate)
+            {
+                if (now < startDate) return EvaluationCycleStatus.Pending;
+                if (now <= endDate) return EvaluationCycleStatus.Grading;
+                return EvaluationCycleStatus.Completed;
+            }
 
-            var criteria = new EvaluationCriteria { CriteriaId = Guid.NewGuid(), CycleId = cycle.CycleId, Name = "Technical Skills", Description = "Programming and problem solving", MaxScore = 100m, Weight = 50m };
-            _context.EvaluationCriteria.Add(criteria);
-            await _context.SaveChangesAsync();
+            async Task EnsureCycleAsync(Guid termId, string cycleName, DateTime startDate, DateTime endDate)
+            {
+                var exists = await _context.EvaluationCycles
+                    .AnyAsync(c => c.TermId == termId && c.Name == cycleName);
 
-            var evaluation = new Evaluation { EvaluationId = Guid.NewGuid(), CycleId = cycle.CycleId, InternshipId = group5.InternshipId, StudentId = s5.StudentId, EvaluatorId = mentorUser.UserId, Status = EvaluationStatus.Published, TotalScore = 95m, Note = "Excellent performance throughout the term." }; // Fixed: Completed -> Published
-            _context.Evaluations.Add(evaluation);
-            
-            _context.EvaluationDetails.Add(new EvaluationDetail { DetailId = Guid.NewGuid(), EvaluationId = evaluation.EvaluationId, CriteriaId = criteria.CriteriaId, Score = 95m, Comment = "Strong understanding of legacy code." });
+                if (!exists)
+                {
+                    _context.EvaluationCycles.Add(new EvaluationCycle
+                    {
+                        CycleId = Guid.NewGuid(),
+                        TermId = termId,
+                        Name = cycleName,
+                        StartDate = startDate,
+                        EndDate = endDate,
+                        Status = ResolveStatus(startDate, endDate),
+                        CreatedAt = now
+                    });
+                }
+            }
+
+            var fall2025 = await _context.Terms
+                .Include(t => t.University)
+                .FirstAsync(t => t.Name == "Fall 2025" && t.University.Code == "FPTU");
+
+            var spring2026 = await _context.Terms
+                .Include(t => t.University)
+                .FirstAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU");
+
+            var spring2026Ct = await _context.Terms
+                .Include(t => t.University)
+                .FirstAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU-CT");
+
+            // Active-term deadline data for enterprise timeline APIs.
+            await EnsureCycleAsync(
+                spring2026.TermId,
+                "Midterm Evaluation",
+                ToUtc(spring2026.StartDate.AddDays(30), 8),
+                ToUtc(spring2026.StartDate.AddDays(75), 23, 59));
+
+            await EnsureCycleAsync(
+                spring2026.TermId,
+                "Final Evaluation",
+                ToUtc(spring2026.StartDate.AddDays(90), 8),
+                ToUtc(spring2026.EndDate.AddDays(-2), 23, 59));
+
+            await EnsureCycleAsync(
+                spring2026Ct.TermId,
+                "Midterm Evaluation",
+                ToUtc(spring2026Ct.StartDate.AddDays(20), 8),
+                ToUtc(spring2026Ct.StartDate.AddDays(65), 23, 59));
+
+            await EnsureCycleAsync(
+                spring2026Ct.TermId,
+                "Final Evaluation",
+                ToUtc(spring2026Ct.StartDate.AddDays(80), 8),
+                ToUtc(spring2026Ct.EndDate.AddDays(-2), 23, 59));
+
+            var fallCycle = await _context.EvaluationCycles
+                .FirstOrDefaultAsync(c => c.TermId == fall2025.TermId && c.Name == "Final Evaluation");
+
+            if (fallCycle == null)
+            {
+                fallCycle = new EvaluationCycle
+                {
+                    CycleId = Guid.NewGuid(),
+                    TermId = fall2025.TermId,
+                    Name = "Final Evaluation",
+                    StartDate = ToUtc(fall2025.EndDate.AddDays(-45), 8),
+                    EndDate = ToUtc(fall2025.EndDate.AddDays(-15), 23, 59),
+                    Status = EvaluationCycleStatus.Completed,
+                    CreatedAt = now
+                };
+                _context.EvaluationCycles.Add(fallCycle);
+            }
+
+            var criteria = await _context.EvaluationCriteria
+                .FirstOrDefaultAsync(c => c.CycleId == fallCycle.CycleId && c.Name == "Technical Skills");
+
+            if (criteria == null)
+            {
+                criteria = new EvaluationCriteria
+                {
+                    CriteriaId = Guid.NewGuid(),
+                    CycleId = fallCycle.CycleId,
+                    Name = "Technical Skills",
+                    Description = "Programming and problem solving",
+                    MaxScore = 100m,
+                    Weight = 50m
+                };
+                _context.EvaluationCriteria.Add(criteria);
+            }
+
+            var hasFallEvaluation = await _context.Evaluations
+                .AnyAsync(e => e.CycleId == fallCycle.CycleId);
+
+            if (!hasFallEvaluation)
+            {
+                var group5 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
+                var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
+                var mentorUser = await _context.Users.FirstAsync(u => u.Email == "mentor@rikkeisoft.com");
+
+                var evaluation = new Evaluation
+                {
+                    EvaluationId = Guid.NewGuid(),
+                    CycleId = fallCycle.CycleId,
+                    InternshipId = group5.InternshipId,
+                    StudentId = s5.StudentId,
+                    EvaluatorId = mentorUser.UserId,
+                    Status = EvaluationStatus.Published,
+                    TotalScore = 95m,
+                    Note = "Excellent performance throughout the term."
+                };
+                _context.Evaluations.Add(evaluation);
+
+                _context.EvaluationDetails.Add(new EvaluationDetail
+                {
+                    DetailId = Guid.NewGuid(),
+                    EvaluationId = evaluation.EvaluationId,
+                    CriteriaId = criteria.CriteriaId,
+                    Score = 95m,
+                    Comment = "Strong understanding of legacy code."
+                });
+            }
 
             await _context.SaveChangesAsync();
         }
