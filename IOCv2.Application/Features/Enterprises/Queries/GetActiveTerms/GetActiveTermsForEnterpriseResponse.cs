@@ -20,6 +20,7 @@ public class ActiveTermTimelineResponse
     public int DaysElapsed { get; set; }
     public int DaysRemaining { get; set; }
     public double ProgressPercent { get; set; }
+    public bool HasDeadlinesConfigured { get; set; }
     public List<DeadlineInfo> Deadlines { get; set; } = new();
 }
 

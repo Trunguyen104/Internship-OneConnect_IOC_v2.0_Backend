@@ -5,6 +5,7 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -41,8 +42,12 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
         try
         {
             var userId = Guid.Parse(_currentUserService.UserId!);
-            var isSuperAdmin =
-                string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
+            var role = _currentUserService.Role ?? string.Empty;
+            var isSuperAdmin = string.Equals(role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
+            var isEnterpriseScopedRole =
+                string.Equals(role, "EnterpriseAdmin", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(role, "HR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(role, "Mentor", StringComparison.OrdinalIgnoreCase);
 
             IQueryable<Term> termQuery;
             string cacheKey;
@@ -54,6 +59,49 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
                 var cached = await _cacheService.GetAsync<GetTermByIdResponse>(cacheKey, cancellationToken);
                 if (cached is not null)
                     return Result<GetTermByIdResponse>.Success(cached);
+
+                termQuery = _unitOfWork.Repository<Term>()
+                    .Query()
+                    .Where(t => t.TermId == request.TermId);
+            }
+            else if (isEnterpriseScopedRole)
+            {
+                // EnterpriseAdmin / HR / Mentor: can only view terms linked to their enterprise
+                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(eu => eu.UserId == userId, cancellationToken);
+
+                if (enterpriseUser == null)
+                    return Result<GetTermByIdResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+
+                var eid = enterpriseUser.EnterpriseId;
+
+                cacheKey = TermCacheKeys.Term(request.TermId) + $":enterprise:{eid}";
+                var cached = await _cacheService.GetAsync<GetTermByIdResponse>(cacheKey, cancellationToken);
+                if (cached is not null)
+                    return Result<GetTermByIdResponse>.Success(cached);
+
+                // Verify the term is accessible to this enterprise
+                var termInScope = await _unitOfWork.Repository<Term>()
+                    .Query()
+                    .AsNoTracking()
+                    .Where(t => t.TermId == request.TermId)
+                    .Where(t =>
+                        _unitOfWork.Repository<InternshipApplication>().Query()
+                            .Any(a => a.TermId == t.TermId && a.EnterpriseId == eid) ||
+                        _unitOfWork.Repository<StudentTerm>().Query()
+                            .Any(st => st.TermId == t.TermId && st.EnterpriseId == eid && st.EnrollmentStatus == EnrollmentStatus.Active) ||
+                        _unitOfWork.Repository<InternshipGroup>().Query()
+                            .Any(ig => ig.TermId == t.TermId && ig.EnterpriseId == eid))
+                    .AnyAsync(cancellationToken);
+
+                if (!termInScope)
+                    return Result<GetTermByIdResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Terms.NotFound),
+                        ResultErrorType.NotFound);
 
                 termQuery = _unitOfWork.Repository<Term>()
                     .Query()
