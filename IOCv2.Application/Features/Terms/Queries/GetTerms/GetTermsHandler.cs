@@ -43,16 +43,26 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
     {
     
             var userId = Guid.Parse(_currentUserService.UserId!);
+            var userRole = _currentUserService.Role ?? string.Empty;
             var isSuperAdmin =
-                string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
+                string.Equals(userRole, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
+            var isSchoolAdmin = string.Equals(userRole, "SchoolAdmin", StringComparison.OrdinalIgnoreCase);
+            var isMentor = string.Equals(userRole, "Mentor", StringComparison.OrdinalIgnoreCase);
+            var isEnterpriseScopedRole =
+                string.Equals(userRole, "EnterpriseAdmin", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(userRole, "HR", StringComparison.OrdinalIgnoreCase) ||
+                isMentor;
+
             Guid? universityId = null;
+            Guid? enterpriseId = null;
+            Guid? mentorEnterpriseUserId = null;
 
             if (isSuperAdmin)
             {
                 // SuperAdmin: optionally filter by UniversityId from query param
                 universityId = request.UniversityId;
             }
-            else
+            else if (isSchoolAdmin)
             {
                 // SchoolAdmin: resolve university from UniversityUser table
                 var universityUser = await _unitOfWork.Repository<UniversityUser>()
@@ -71,8 +81,38 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
 
                 universityId = universityUser.UniversityId;
             }
+            else if (isEnterpriseScopedRole)
+            {
+                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(eu => eu.UserId == userId, cancellationToken);
+
+                if (enterpriseUser == null)
+                {
+                    _logger.LogWarning("Enterprise mapping not found for user {UserId} with role {Role}", userId, userRole);
+                    return Result<PaginatedResult<GetTermsResponse>>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
+
+                enterpriseId = enterpriseUser.EnterpriseId;
+                if (isMentor)
+                    mentorEnterpriseUserId = enterpriseUser.EnterpriseUserId;
+            }
+            else
+            {
+                return Result<PaginatedResult<GetTermsResponse>>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                    ResultErrorType.Forbidden);
+            }
 
             var cacheKey = TermCacheKeys.TermList(universityId, request.SearchTerm, (int?)request.Status, request.Year, request.PageNumber, request.PageSize, request.SortColumn, request.SortOrder);
+            if (mentorEnterpriseUserId.HasValue)
+                cacheKey = $"{cacheKey}:mentor:{mentorEnterpriseUserId.Value}";
+            else if (enterpriseId.HasValue)
+                cacheKey = $"{cacheKey}:enterprise:{enterpriseId.Value}";
+
             var cached = await _cacheService.GetAsync<PaginatedResult<GetTermsResponse>>(cacheKey, cancellationToken);
             if (cached is not null)
                 return Result<PaginatedResult<GetTermsResponse>>.Success(cached);
@@ -84,6 +124,28 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
 
             // SuperAdmin without UniversityId filter → all universities; otherwise filter by university
             if (universityId.HasValue) query = query.Where(t => t.UniversityId == universityId.Value);
+
+            // Enterprise scope: filter terms visible to this user's role.
+            if (mentorEnterpriseUserId.HasValue)
+            {
+                // Mentor: only terms where they have an active group as mentor
+                var mid = mentorEnterpriseUserId.Value;
+                query = query.Where(t =>
+                    _unitOfWork.Repository<InternshipGroup>().Query()
+                        .Any(ig => ig.TermId == t.TermId && ig.MentorId == mid));
+            }
+            else if (enterpriseId.HasValue)
+            {
+                // HR / EnterpriseAdmin: all terms related to the enterprise
+                var eid = enterpriseId.Value;
+                query = query.Where(t =>
+                    _unitOfWork.Repository<InternshipApplication>().Query()
+                        .Any(a => a.TermId == t.TermId && a.EnterpriseId == eid) ||
+                    _unitOfWork.Repository<StudentTerm>().Query()
+                        .Any(st => st.TermId == t.TermId && st.EnterpriseId == eid && st.EnrollmentStatus == EnrollmentStatus.Active) ||
+                    _unitOfWork.Repository<InternshipGroup>().Query()
+                        .Any(ig => ig.TermId == t.TermId && ig.EnterpriseId == eid));
+            }
 
             // Apply search filter
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))

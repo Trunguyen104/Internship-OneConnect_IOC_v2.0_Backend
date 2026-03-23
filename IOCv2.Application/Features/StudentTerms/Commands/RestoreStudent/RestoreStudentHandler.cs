@@ -65,6 +65,19 @@ public class RestoreStudentHandler : IRequestHandler<RestoreStudentCommand, Resu
             return Result<RestoreStudentResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.NotWithdrawn));
 
+        // Check if student is already Active in another term (cross-term constraint)
+        var activeElsewhere = await _unitOfWork.Repository<StudentTerm>()
+            .Query()
+            .AnyAsync(st =>
+                st.StudentId == studentTerm.StudentId &&
+                st.StudentTermId != studentTerm.StudentTermId &&
+                st.EnrollmentStatus == EnrollmentStatus.Active,
+                cancellationToken);
+
+        if (activeElsewhere)
+            return Result<RestoreStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.AlreadyEnrolled), ResultErrorType.Conflict);
+
         // Term must be Open and not ended
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         if (studentTerm.Term.Status != TermStatus.Open || studentTerm.Term.EndDate < today)
