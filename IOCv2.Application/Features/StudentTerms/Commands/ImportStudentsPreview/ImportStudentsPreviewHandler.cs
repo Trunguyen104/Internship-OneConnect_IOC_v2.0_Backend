@@ -22,7 +22,9 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
-    private readonly string[] _requiredHeaders;
+    private readonly HeaderRule[] _requiredHeaders;
+
+    private sealed record HeaderRule(int ColumnIndex, string[] AcceptedValues);
 
     public ImportStudentsPreviewHandler(
         IUnitOfWork unitOfWork,
@@ -35,11 +37,11 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
 
         _requiredHeaders = new[]
         {
-            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderStudentCode),
-            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderFullName),
-            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderEmail),
-            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderPhone),
-            messageService.GetMessage(MessageKeys.StudentTerms.ExcelHeaderDateOfBirth),
+            BuildHeaderRule(1, MessageKeys.StudentTerms.ExcelHeaderStudentCode, "Student Code"),
+            BuildHeaderRule(2, MessageKeys.StudentTerms.ExcelHeaderFullName, "Full Name"),
+            BuildHeaderRule(3, MessageKeys.StudentTerms.ExcelHeaderEmail, "Email"),
+            BuildHeaderRule(4, MessageKeys.StudentTerms.ExcelHeaderPhone, "Phone"),
+            BuildHeaderRule(5, MessageKeys.StudentTerms.ExcelHeaderDateOfBirth, "Date Of Birth")
         };
     }
 
@@ -95,15 +97,20 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
 
         for (int i = 0; i < _requiredHeaders.Length; i++)
         {
-            if (!string.Equals(headers[i], _requiredHeaders[i], StringComparison.OrdinalIgnoreCase))
+            var rule = _requiredHeaders[i];
+            var isHeaderMatch = rule.AcceptedValues.Any(v =>
+                string.Equals(headers[i], v, StringComparison.OrdinalIgnoreCase));
+
+            if (!isHeaderMatch)
             {
                 var actualHeader = string.IsNullOrWhiteSpace(headers[i])
                     ? _messageService.GetMessage(MessageKeys.StudentTerms.InvalidExcelHeaderEmpty)
                     : headers[i];
+                var expectedHeaders = string.Join(" / ", rule.AcceptedValues);
                 var detailMsg = string.Format(
                     _messageService.GetMessage(MessageKeys.StudentTerms.InvalidExcelHeaderDetail),
-                    i + 1,
-                    _requiredHeaders[i],
+                    rule.ColumnIndex,
+                    expectedHeaders,
                     actualHeader);
                 return Result<ImportStudentsPreviewResponse>.Failure(detailMsg);
             }
@@ -244,5 +251,40 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         return today >= dob.AddYears(18);
+    }
+
+    private static HeaderRule BuildHeaderRule(int columnIndex, string messageKey, string fallbackEnglish)
+    {
+        var acceptedValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            fallbackEnglish
+        };
+
+        foreach (var culture in GetSupportedHeaderCultures())
+        {
+            AddResourceValue(acceptedValues, IOCv2.Application.Resources.SharedResource.ResourceManager, messageKey, culture);
+            AddResourceValue(acceptedValues, IOCv2.Application.Resources.Messages.ResourceManager, messageKey, culture);
+            AddResourceValue(acceptedValues, IOCv2.Application.Resources.ErrorMessages.ResourceManager, messageKey, culture);
+        }
+
+        return new HeaderRule(columnIndex, acceptedValues.ToArray());
+    }
+
+    private static IEnumerable<CultureInfo> GetSupportedHeaderCultures()
+    {
+        yield return CultureInfo.CurrentUICulture;
+        yield return CultureInfo.GetCultureInfo("en");
+        yield return CultureInfo.GetCultureInfo("vi-VN");
+    }
+
+    private static void AddResourceValue(
+        HashSet<string> acceptedValues,
+        System.Resources.ResourceManager resourceManager,
+        string key,
+        CultureInfo culture)
+    {
+        var value = resourceManager.GetString(key, culture)?.Trim();
+        if (!string.IsNullOrWhiteSpace(value))
+            acceptedValues.Add(value);
     }
 }

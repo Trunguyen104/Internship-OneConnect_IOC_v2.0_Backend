@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -136,6 +137,8 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
 
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
+            // EndDate thay đổi có thể làm term không còn Active → invalidate enterprise cache
+            await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.AllActiveTermsPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermUpdated), term.TermId, userId);
 

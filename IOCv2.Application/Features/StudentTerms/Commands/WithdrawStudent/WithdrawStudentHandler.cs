@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Exceptions;
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Terms.Common;
@@ -62,6 +63,14 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
                     _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
         }
 
+        // Do not allow withdraw when the term is Ended or Closed
+
+        var term = studentTerm.Term;
+        if (TermStatusHelper.IsEnded(term.StartDate, term.EndDate, term.Status) ||
+            TermStatusHelper.IsClosed(term.Status))
+            return Result<WithdrawStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.TermEndedOrClosed));
+
         if (studentTerm.EnrollmentStatus == EnrollmentStatus.Withdrawn)
             return Result<WithdrawStudentResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.AlreadyWithdrawn));
@@ -77,7 +86,6 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
         await _unitOfWork.Repository<StudentTerm>().UpdateAsync(studentTerm, cancellationToken);
 
         // Update counters
-        var term = studentTerm.Term;
         term.TotalEnrolled--;
         term.TotalUnplaced--;
         await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);

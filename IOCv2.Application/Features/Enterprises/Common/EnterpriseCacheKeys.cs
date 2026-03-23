@@ -44,6 +44,9 @@ public static class EnterpriseCacheKeys
     public static string ActiveTermsMentorPattern(Guid enterpriseUserId) =>
         $"{ActiveTermsPrefix}:mentor:{enterpriseUserId}:*";
 
+    /// <summary>Clear all enterprise active-terms cache (used when a term is closed/updated by Uni Admin).</summary>
+    public static string AllActiveTermsPattern() => $"{ActiveTermsPrefix}:*";
+
     public static class Expiration
     {
         public static readonly TimeSpan EnterpriseList = TimeSpan.FromMinutes(5);

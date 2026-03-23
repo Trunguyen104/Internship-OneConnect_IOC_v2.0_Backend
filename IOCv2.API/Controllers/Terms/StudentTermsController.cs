@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.Terms;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/student-terms")]
-[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor")]
+[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor,EnterpriseAdmin")]
 public class StudentTermsController : Controllers.ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -44,6 +44,7 @@ public class StudentTermsController : Controllers.ApiControllerBase
     /// Update student profile and enrollment information
     /// </summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
     [RateLimit(maxRequests: 30, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<UpdateStudentTermResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -61,6 +62,7 @@ public class StudentTermsController : Controllers.ApiControllerBase
     /// Withdraw a student from their term enrollment (must be Active and Unplaced)
     /// </summary>
     [HttpPatch("{id:guid}/withdraw")]
+    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
     [RateLimit(maxRequests: 30, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<WithdrawStudentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -76,6 +78,7 @@ public class StudentTermsController : Controllers.ApiControllerBase
     /// Restore a withdrawn student back to Active/Unplaced (term must still be Open)
     /// </summary>
     [HttpPatch("{id:guid}/restore")]
+    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
     [RateLimit(maxRequests: 30, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<RestoreStudentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
