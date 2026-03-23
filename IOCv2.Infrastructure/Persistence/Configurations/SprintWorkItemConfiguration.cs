@@ -40,6 +40,10 @@ public class SprintWorkItemConfiguration : IEntityTypeConfiguration<SprintWorkIt
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("fk_sprint_work_items_work_items_work_item_id");
 
+        // Match global query filter on WorkItem (soft-delete) to avoid EF Core warning
+        // about required relationship with filtered entity
+        builder.HasQueryFilter(swi => swi.WorkItem!.DeletedAt == null);
+
         // Index for board ordering
         builder.HasIndex(swi => new { swi.SprintId, swi.BoardOrder })
             .HasDatabaseName("ix_sprint_work_items_board_order");
