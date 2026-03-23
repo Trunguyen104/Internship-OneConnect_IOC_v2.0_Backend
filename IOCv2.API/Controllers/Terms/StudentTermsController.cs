@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.Terms;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/student-terms")]
-[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor")]
+[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor,EnterpriseAdmin")]
 public class StudentTermsController : Controllers.ApiControllerBase
 {
     private readonly IMediator _mediator;
