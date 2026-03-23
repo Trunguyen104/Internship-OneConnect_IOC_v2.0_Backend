@@ -581,7 +581,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
             public const string TooManyRows = "StudentTerms.TooManyRows";
 
-            // Validation â€” TermId / StudentTermId
+            // Validation — TermId / StudentTermId
             public const string TermIdRequired = "StudentTerms.TermIdRequired";
             public const string StudentTermIdRequired = "StudentTerms.StudentTermIdRequired";
             public const string StudentTermIdListRequired = "StudentTerms.StudentTermIdListRequired";
@@ -589,15 +589,15 @@ namespace IOCv2.Application.Constants
             public const string ValidRecordsRequired = "StudentTerms.ValidRecordsRequired";
             public const string ValidRecordsMinCount = "StudentTerms.ValidRecordsMinCount";
 
-            // Validation â€” File
+            // Validation — File
             public const string FileRequired = "StudentTerms.FileRequired";
             public const string FileEmpty = "StudentTerms.FileEmpty";
 
-            // Validation â€” FullName
+            // Validation — FullName
             public const string FullNameRequired = "StudentTerms.FullNameRequired";
             public const string FullNameInvalid = "StudentTerms.FullNameInvalid";
 
-            // Validation â€” StudentCode
+            // Validation — StudentCode
             public const string StudentCodeRequired = "StudentTerms.StudentCodeRequired";
             public const string StudentCodeInvalid = "StudentTerms.StudentCodeInvalid";
             public const string StudentCodeInvalidDetail = "StudentTerms.StudentCodeInvalidDetail";
@@ -605,21 +605,21 @@ namespace IOCv2.Application.Constants
             public const string StudentCodeAlreadyInTerm = "StudentTerms.StudentCodeAlreadyInTerm";
             public const string StudentCodeInOtherTerm = "StudentTerms.StudentCodeInOtherTerm";
 
-            // Validation â€” Email
+            // Validation — Email
             public const string EmailRequired = "StudentTerms.EmailRequired";
             public const string EmailInvalid = "StudentTerms.EmailInvalid";
             public const string EmailDuplicateInFile = "StudentTerms.EmailDuplicateInFile";
             public const string EmailAlreadyInTerm = "StudentTerms.EmailAlreadyInTerm";
             public const string EmailInOtherTerm = "StudentTerms.EmailInOtherTerm";
 
-            // Validation â€” Phone
+            // Validation — Phone
             public const string PhoneInvalid = "StudentTerms.PhoneInvalid";
 
-            // Validation â€” DateOfBirth
+            // Validation — DateOfBirth
             public const string DateOfBirthInvalidFormat = "StudentTerms.DateOfBirthInvalidFormat";
             public const string DateOfBirthMinAge = "StudentTerms.DateOfBirthMinAge";
 
-            // Validation â€” List query
+            // Validation — List query
             public const string SearchTermMaxLength = "StudentTerms.SearchTermMaxLength";
             public const string SortByAllowedValues = "StudentTerms.SortByAllowedValues";
             public const string SortOrderAllowedValues = "StudentTerms.SortOrderAllowedValues";
