@@ -556,5 +556,156 @@ namespace IOCv2.Application.Constants
         {
 
         }
+
+        public static class StudentTerms
+        {
+            // Domain errors
+            public const string NotFound = "StudentTerms.NotFound";
+            public const string TermNotOpen = "StudentTerms.TermNotOpen";
+            public const string EmailConflict = "StudentTerms.EmailConflict";
+            public const string StudentCodeConflict = "StudentTerms.StudentCodeConflict";
+            public const string AlreadyEnrolled = "StudentTerms.AlreadyEnrolled";
+            public const string AlreadyWithdrawn = "StudentTerms.AlreadyWithdrawn";
+            public const string NotWithdrawn = "StudentTerms.NotWithdrawn";
+            public const string CannotWithdrawPlaced = "StudentTerms.CannotWithdrawPlaced";
+            public const string EnterpriseIdRequiredWhenPlaced = "StudentTerms.EnterpriseIdRequiredWhenPlaced";
+            public const string EnterpriseNotFound = "StudentTerms.EnterpriseNotFound";
+            public const string AllStudentsPlaced = "StudentTerms.AllStudentsPlaced";
+            public const string InvalidFileFormat = "StudentTerms.InvalidFileFormat";
+            public const string FileTooLarge = "StudentTerms.FileTooLarge";
+            public const string InvalidExcelHeaders = "StudentTerms.InvalidExcelHeaders";
+            public const string TooManyRows = "StudentTerms.TooManyRows";
+
+            // Validation — TermId / StudentTermId
+            public const string TermIdRequired = "StudentTerms.TermIdRequired";
+            public const string StudentTermIdRequired = "StudentTerms.StudentTermIdRequired";
+            public const string StudentTermIdListRequired = "StudentTerms.StudentTermIdListRequired";
+            public const string StudentTermIdListMinCount = "StudentTerms.StudentTermIdListMinCount";
+            public const string ValidRecordsRequired = "StudentTerms.ValidRecordsRequired";
+            public const string ValidRecordsMinCount = "StudentTerms.ValidRecordsMinCount";
+
+            // Validation — File
+            public const string FileRequired = "StudentTerms.FileRequired";
+            public const string FileEmpty = "StudentTerms.FileEmpty";
+
+            // Validation — FullName
+            public const string FullNameRequired = "StudentTerms.FullNameRequired";
+            public const string FullNameInvalid = "StudentTerms.FullNameInvalid";
+
+            // Validation — StudentCode
+            public const string StudentCodeRequired = "StudentTerms.StudentCodeRequired";
+            public const string StudentCodeInvalid = "StudentTerms.StudentCodeInvalid";
+            public const string StudentCodeInvalidDetail = "StudentTerms.StudentCodeInvalidDetail";
+            public const string StudentCodeDuplicateInFile = "StudentTerms.StudentCodeDuplicateInFile";
+            public const string StudentCodeAlreadyInTerm = "StudentTerms.StudentCodeAlreadyInTerm";
+            public const string StudentCodeInOtherTerm = "StudentTerms.StudentCodeInOtherTerm";
+
+            // Validation — Email
+            public const string EmailRequired = "StudentTerms.EmailRequired";
+            public const string EmailInvalid = "StudentTerms.EmailInvalid";
+            public const string EmailDuplicateInFile = "StudentTerms.EmailDuplicateInFile";
+            public const string EmailAlreadyInTerm = "StudentTerms.EmailAlreadyInTerm";
+            public const string EmailInOtherTerm = "StudentTerms.EmailInOtherTerm";
+
+            // Validation — Phone
+            public const string PhoneInvalid = "StudentTerms.PhoneInvalid";
+
+            // Validation — DateOfBirth
+            public const string DateOfBirthInvalidFormat = "StudentTerms.DateOfBirthInvalidFormat";
+            public const string DateOfBirthMinAge = "StudentTerms.DateOfBirthMinAge";
+
+            // Validation — List query
+            public const string SearchTermMaxLength = "StudentTerms.SearchTermMaxLength";
+            public const string SortByAllowedValues = "StudentTerms.SortByAllowedValues";
+            public const string SortOrderAllowedValues = "StudentTerms.SortOrderAllowedValues";
+
+            // Success messages
+            public const string AddSuccess = "StudentTerms.AddSuccess";
+            public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
+            public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
+            public const string RestoreSuccess = "StudentTerms.RestoreSuccess";
+            public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
+            public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
+            public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
+
+            // Email notifications
+            public const string EmailSubjectWithdraw = "StudentTerms.Email.SubjectWithdraw";
+            public const string EmailBodyWithdraw = "StudentTerms.Email.BodyWithdraw";
+            public const string EmailSubjectRestore = "StudentTerms.Email.SubjectRestore";
+            public const string EmailBodyRestore = "StudentTerms.Email.BodyRestore";
+
+            // Excel headers
+            public const string ExcelHeaderStudentCode = "StudentTerms.Excel.HeaderStudentCode";
+            public const string ExcelHeaderFullName = "StudentTerms.Excel.HeaderFullName";
+            public const string ExcelHeaderEmail = "StudentTerms.Excel.HeaderEmail";
+            public const string ExcelHeaderPhone = "StudentTerms.Excel.HeaderPhone";
+            public const string ExcelHeaderDateOfBirth = "StudentTerms.Excel.HeaderDateOfBirth";
+            public const string ExcelHeaderMajor = "StudentTerms.Excel.HeaderMajor";
+            public const string ExcelHeaderTempPassword = "StudentTerms.Excel.HeaderTempPassword";
+            public const string ExcelWorksheetStudentList = "StudentTerms.Excel.WorksheetStudentList";
+            public const string ExcelWorksheetTempPassword = "StudentTerms.Excel.WorksheetTempPassword";
+
+            // Logging
+            public const string LogAdded = "StudentTerms.Log.Added";
+            public const string LogUpdated = "StudentTerms.Log.Updated";
+            public const string LogWithdrawn = "StudentTerms.Log.Withdrawn";
+            public const string LogRestored = "StudentTerms.Log.Restored";
+            public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
+            public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
+        }
+        public static class ViolationReportKey
+        {
+            // Validator
+            public const string OccurredDateIsRequired = "ViolationReport.OccurredDateIsRequired";
+            public const string OccurredDateInFuture = "ViolationReport.OccurredDateInFuture";
+            public const string DescriptionIsRequired = "ViolationReport.DescriptionIsRequired";
+            public const string DescriptionMinLength = "ViolationReport.DescriptionMinLength";
+            public const string DescriptionMaxLength = "ViolationReport.DescriptionMaxLength";
+            // Get All
+            public const string GetViolationReportsError = "ViolationReport.GetViolationReportsError";
+            public const string FilteredNotFound = "ViolationReport.FilteredNotFound";
+            public const string NotFound = "ViolationReport.NotFound";
+            // Create
+            public const string NotAllowedToReport = "ViolationReport.NotAllowedToReport";
+            public const string OccurredDateCannotBeBeforeInternshipStart = "ViolationReport.OccurredDateCannotBeBeforeInternshipStart";
+            public const string OccurredDateCannotBeAfterInternshipEnd = "ViolationReport.OccurredDateCannotBeAfterInternshipEnd";
+            public const string CreateViolationReportSuccess = "ViolationReport.CreateViolationReportSuccess";
+            public const string CreateViolationReportError = "ViolationReport.CreateViolationReportError";
+            public const string ViolationReportLogNotFound = "ViolationReport.LogNotFound";
+            // Delete
+            public const string LogDeleteNotOwner = "ViolationReport.LogDeleteNotOwner";
+            public const string DeleteNotOwner = "ViolationReport.DeleteNotOwner";
+            public const string ViolationReportDeletedSuccessfully = "ViolationReport.ViolationReportDeletedSuccessfully";
+            public const string ErrorOccurredWhileDeletingViolationReport = "ViolationReport.ErrorOccurredWhileDeletingViolationReport";
+            // Update
+            public const string UpdatingViolationReportByUser = "ViolationReport.UpdatingViolationReportByUser";
+            public const string ViolationReportNotFound = "ViolationReport.ViolationReportNotFound";
+            public const string UserNotAllowedToUpdateViolationReport = "ViolationReport.UserNotAllowedToUpdateViolationReport";
+            public const string NotAllowedToUpdateThisReport = "ViolationReport.NotAllowedToUpdateThisReport";
+            public const string OccurredDateBeforeInternshipStart = "ViolationReport.OccurredDateBeforeInternshipStart";
+            public const string InternshipHasEnded = "ViolationReport.InternshipHasEnded";
+            public const string ViolationReportUpdatedByAnotherUser = "ViolationReport.ViolationReportUpdatedByAnotherUser";
+            public const string ViolationReportUpdatedSuccessfully = "ViolationReport.ViolationReportUpdatedSuccessfully";
+            public const string FailedToUpdateViolationReport = "ViolationReport.FailedToUpdateViolationReport";
+            public const string ErrorOccurredWhileUpdatingViolationReport = "ViolationReport.ErrorOccurredWhileUpdatingViolationReport";
+            public const string ViolationReportIdIsRequired = "ViolationReport.ViolationReportIdIsRequired";
+            public const string ErrorWhileGettingViolationReportDetail = "ViolationReport.ErrorWhileGettingViolationReportDetail";
+        }
+
+        public static class StudentMessageKey
+        {
+            //validator
+            public const string StudentIdRequired = "Student.StudentIdRequired";
+            //create
+            public const string StudentNotFound = "Student.NotFound";
+        }
+
+        public static class Notifications
+        {
+            public const string NotFound = "Notifications.NotFound";
+            public const string AccessDenied = "Notifications.AccessDenied";
+            public const string MarkReadSuccess = "Notifications.MarkReadSuccess";
+            public const string MarkAllReadSuccess = "Notifications.MarkAllReadSuccess";
+        }
     }
 }
