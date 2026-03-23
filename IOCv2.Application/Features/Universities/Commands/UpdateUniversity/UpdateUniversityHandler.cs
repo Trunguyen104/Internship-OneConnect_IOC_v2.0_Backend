@@ -42,6 +42,15 @@ public class UpdateUniversityHandler : IRequestHandler<UpdateUniversityCommand, 
         await _unitOfWork.BeginTransactionAsync();
         try
         {
+            // TX-6: Pre-check uniqueness before write
+            var exists = await _unitOfWork.Repository<University>()
+                .ExistsAsync(u => u.Code == request.Code && u.UniversityId != request.UniversityId, cancellationToken);
+            
+            if (exists)
+            {
+                throw new ConflictException("University code already exists", "Code");
+            }
+
             university.UpdateInfo(
                 request.Code,
                 request.Name,

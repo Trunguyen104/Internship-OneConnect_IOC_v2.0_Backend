@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Enterprises.Common;
@@ -32,17 +32,19 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
 
         public async Task<Result<CreateEnterpriseResponse>> Handle(CreateEnterpriseCommand request, CancellationToken cancellationToken)
         {
+            // 1. Pre-validation checks (Before opening transaction)
+            var existingEnterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>()
+                .ExistsAsync(e => e.TaxCode == request.TaxCode, cancellationToken);
+            if (existingEnterprise)
+            {
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.Enterprise.LogEnterpriseWithSameTaxCodeExists), request.TaxCode);
+                return Result<CreateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseWithSameTaxCodeExists), ResultErrorType.Conflict);
+            }
+
+            // 2. Begin Transaction
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Check if an enterprise with the same tax code already exists
-                var existingEnterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>()
-                    .ExistsAsync(e => e.TaxCode == request.TaxCode, cancellationToken);
-                if (existingEnterprise)
-                {
-                    _logger.LogError(_messageService.GetMessage(MessageKeys.Enterprise.LogEnterpriseWithSameTaxCodeExists), request.TaxCode);
-                    return Result<CreateEnterpriseResponse>.Failure(_messageService.GetMessage(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseWithSameTaxCodeExists)), ResultErrorType.Conflict);
-                }
                 var enterprise = new Domain.Entities.Enterprise
                 {
                     EnterpriseId = Guid.NewGuid(),
@@ -55,18 +57,27 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                     IsVerified = request.IsVerified,
                     Status = (short)EnterpriseStatus.Active
                 };
-                var response = _mapper.Map<CreateEnterpriseResponse>(enterprise);
+
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().AddAsync(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                // 3. Post-commit operations (Cache invalidation)
                 await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
-                return Result<CreateEnterpriseResponse>.Success(response);
+
+                return Result<CreateEnterpriseResponse>.Success(_mapper.Map<CreateEnterpriseResponse>(enterprise));
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Enterprise.ErrorCreatingEnterprise));
-                return Result<CreateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.ErrorCreatingEnterprise),ResultErrorType.InternalServerError);
+                
+                // Specific check for duplicate constraint from DB
+                if (ex.InnerException?.Message.Contains("duplicate", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return Result<CreateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.EnterpriseWithSameTaxCodeExists), ResultErrorType.Conflict);
+                }
+
+                throw; // Let GlobalExceptionHandler handle unexpected errors
             }
         }
     }
