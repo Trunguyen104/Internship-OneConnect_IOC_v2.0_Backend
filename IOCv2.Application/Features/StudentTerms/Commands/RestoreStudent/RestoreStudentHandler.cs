@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -15,6 +16,7 @@ public class RestoreStudentHandler : IRequestHandler<RestoreStudentCommand, Resu
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
     private readonly IBackgroundEmailSender _emailSender;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<RestoreStudentHandler> _logger;
 
     public RestoreStudentHandler(
@@ -22,12 +24,14 @@ public class RestoreStudentHandler : IRequestHandler<RestoreStudentCommand, Resu
         ICurrentUserService currentUserService,
         IMessageService messageService,
         IBackgroundEmailSender emailSender,
+        ICacheService cacheService,
         ILogger<RestoreStudentHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
         _emailSender = emailSender;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -61,6 +65,19 @@ public class RestoreStudentHandler : IRequestHandler<RestoreStudentCommand, Resu
             return Result<RestoreStudentResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.NotWithdrawn));
 
+        // Check if student is already Active in another term (cross-term constraint)
+        var activeElsewhere = await _unitOfWork.Repository<StudentTerm>()
+            .Query()
+            .AnyAsync(st =>
+                st.StudentId == studentTerm.StudentId &&
+                st.StudentTermId != studentTerm.StudentTermId &&
+                st.EnrollmentStatus == EnrollmentStatus.Active,
+                cancellationToken);
+
+        if (activeElsewhere)
+            return Result<RestoreStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.AlreadyEnrolled), ResultErrorType.Conflict);
+
         // Term must be Open and not ended
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         if (studentTerm.Term.Status != TermStatus.Open || studentTerm.Term.EndDate < today)
@@ -82,6 +99,9 @@ public class RestoreStudentHandler : IRequestHandler<RestoreStudentCommand, Resu
         await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
         // Fire-and-forget email
         _ = _emailSender.EnqueueEmailAsync(

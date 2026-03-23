@@ -22,7 +22,6 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
         public string? Website { get; set; }
         public string? LogoUrl { get; set; }
         public string? BackgroundUrl { get; set; }
-        public bool IsVerified { get; set; } = false;
         public EnterpriseStatus Status { get; set; }
         public void Mapping(Profile profile)
         {

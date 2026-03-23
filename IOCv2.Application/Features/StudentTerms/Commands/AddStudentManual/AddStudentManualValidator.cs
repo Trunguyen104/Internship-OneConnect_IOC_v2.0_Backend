@@ -25,13 +25,13 @@ public class AddStudentManualValidator : AbstractValidator<AddStudentManualComma
             .When(x => !string.IsNullOrWhiteSpace(x.Phone));
 
         RuleFor(x => x.DateOfBirth)
-            .Must(dob => !dob.HasValue || IsAtLeast15(dob.Value))
+            .Must(dob => !dob.HasValue || IsAtLeast18(dob.Value))
             .WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.DateOfBirthMinAge));
     }
 
-    private static bool IsAtLeast15(DateOnly dob)
+    private static bool IsAtLeast18(DateOnly dob)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        return today.Year - dob.Year >= 15;
+        return today >= dob.AddYears(18);
     }
 }

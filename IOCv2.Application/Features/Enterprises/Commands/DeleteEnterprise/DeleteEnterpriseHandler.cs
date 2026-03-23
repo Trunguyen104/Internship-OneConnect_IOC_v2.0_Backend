@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -36,42 +36,43 @@ namespace IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise
         }
         public async Task<Result<DeleteEnterpriseResponse>> Handle(DeleteEnterpriseCommand request, CancellationToken cancellationToken)
         {
+            // 1. Pre-validation checks
+            var enterprise = await _unitOfWork.Repository<Enterprise>().GetByIdAsync(request.EnterpriseId, cancellationToken);
+            if (enterprise == null)
+            {
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.Enterprise.LogNotFound), request.EnterpriseId);
+                return Result<DeleteEnterpriseResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.NotFound));
+            }
+
+            if (!_currentUserService.Role!.Equals(UserRole.SuperAdmin.ToString()))
+            {
+                bool canDelete = await _unitOfWork.Repository<EnterpriseUser>().ExistsAsync(x => x.UserId == Guid.Parse(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
+                if (!canDelete)
+                {
+                    return Result<DeleteEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.DeletePermissionDenied), ResultErrorType.Forbidden);
+                }
+            }
+
+            // 2. Begin Transaction
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Check Enterprise Exist
-                var enterprise = await _unitOfWork.Repository<Enterprise>().GetByIdAsync(request.EnterpriseId, cancellationToken);
-                if (enterprise == null)
-                {
-                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.Enterprise.LogNotFound), request.EnterpriseId);
-                    return Result<DeleteEnterpriseResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.NotFound));
-                }
-                // Verify that user belong to the target enterprise
-                if (!_currentUserService.Role!.Equals(UserRole.SuperAdmin.ToString()))
-                {
-                    bool canDelete = await _unitOfWork.Repository<EnterpriseUser>().ExistsAsync(x => x.UserId == Guid.Parse(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
-                    if (!canDelete)
-                    {
-                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                        return Result<DeleteEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.DeletePermissionDenied), ResultErrorType.Forbidden);
-                    }
-                }
-                // Soft delete enterprise
                 enterprise.DeletedAt = DateTime.UtcNow;
                 var response = _mapper.Map<DeleteEnterpriseResponse>(enterprise);
+                
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+                // 3. Post-commit operations
                 await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
 
                 return Result<DeleteEnterpriseResponse>.Success(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Enterprise.LogDeleteError), request.EnterpriseId);
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                return Result<DeleteEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.DeleteError), ResultErrorType.InternalServerError);
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Enterprise.LogDeleteError), request.EnterpriseId);
+                throw; // Bubble up to GlobalExceptionHandler
             }
         }
     }

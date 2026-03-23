@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -37,44 +37,51 @@ namespace IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise
 
         public async Task<Result<RestoreEnterpriseResponse>> Handle(RestoreEnterpriseCommand request, CancellationToken cancellationToken)
         {
+            // 1. Pre-validation checks
+            var enterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>().Query()
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.EnterpriseId == request.EnterpriseId, cancellationToken);
+
+            if (enterprise == null)
+            {
+                return Result<RestoreEnterpriseResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.NotFound));
+            }
+
+            if (!_currentUserService.Role!.Equals(UserRole.SuperAdmin.ToString()))
+            {
+                bool canRestore = await _unitOfWork.Repository<Domain.Entities.EnterpriseUser>().ExistsAsync(x => x.UserId == Guid.Parse(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
+                if (!canRestore)
+                {
+                    return Result<RestoreEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RestorePermissionDenied), ResultErrorType.Forbidden);
+                }
+            }
+
+            if (enterprise.DeletedAt == null)
+            {
+                return Result<RestoreEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.NotDeleted));
+            }
+
+            // 2. Begin Transaction
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Check Enterprise Exist
-                var enterprise = await _unitOfWork.Repository<Domain.Entities.Enterprise>().Query().IgnoreQueryFilters().FirstOrDefaultAsync(x => x.EnterpriseId == request.EnterpriseId, cancellationToken);
-                if (enterprise == null)
-                {
-                    return Result<RestoreEnterpriseResponse>.NotFound(_messageService.GetMessage(MessageKeys.Enterprise.NotFound));
-                }
-                // Verify that user belong to the target enterprise
-                if (!_currentUserService.Role!.Equals(UserRole.SuperAdmin.ToString()))
-                {
-                    bool canRestore = await _unitOfWork.Repository<Domain.Entities.EnterpriseUser>().ExistsAsync(x => x.UserId == Guid.Parse(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
-                    if (!canRestore)
-                    {
-                        return Result<RestoreEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RestorePermissionDenied), ResultErrorType.Forbidden);
-                    }
-                }
-                if (enterprise.DeletedAt == null)
-                {
-                    return Result<RestoreEnterpriseResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Enterprise.NotDeleted)
-                    );
-                }
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                // Restore enterprise
                 enterprise.DeletedAt = null;
                 var response = _mapper.Map<RestoreEnterpriseResponse>(enterprise);
+                
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().UpdateAsync(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                // 3. Post-commit operations
                 await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
+
                 return Result<RestoreEnterpriseResponse>.Success(response);
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Enterprise.LogRestoreFailed), request.EnterpriseId);
-                return Result<RestoreEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.RestoreFailed), ResultErrorType.InternalServerError);
+                throw;
             }
         }
     }

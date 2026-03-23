@@ -563,6 +563,8 @@ namespace IOCv2.Application.Constants
             // Domain errors
             public const string NotFound = "StudentTerms.NotFound";
             public const string TermNotOpen = "StudentTerms.TermNotOpen";
+            public const string TermEndedOrClosed = "StudentTerms.TermEndedOrClosed";
+            public const string CannotWithdrawPlacedViaUpdate = "StudentTerms.CannotWithdrawPlacedViaUpdate";
             public const string EmailConflict = "StudentTerms.EmailConflict";
             public const string StudentCodeConflict = "StudentTerms.StudentCodeConflict";
             public const string AlreadyEnrolled = "StudentTerms.AlreadyEnrolled";
@@ -575,6 +577,8 @@ namespace IOCv2.Application.Constants
             public const string InvalidFileFormat = "StudentTerms.InvalidFileFormat";
             public const string FileTooLarge = "StudentTerms.FileTooLarge";
             public const string InvalidExcelHeaders = "StudentTerms.InvalidExcelHeaders";
+            public const string InvalidExcelHeaderDetail = "StudentTerms.InvalidExcelHeaderDetail";
+            public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
             public const string TooManyRows = "StudentTerms.TooManyRows";
 
             // Validation — TermId / StudentTermId
@@ -654,6 +658,17 @@ namespace IOCv2.Application.Constants
             public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
             public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
         }
+        public static class ActiveTerms
+        {
+            public const string InvalidUserId = "ActiveTerms.InvalidUserId";
+            public const string EnterpriseUserNotFound = "ActiveTerms.EnterpriseUserNotFound";
+            public const string NoActiveTermsFoundForEnterprise = "ActiveTerms.NoActiveTermsFoundForEnterprise";
+            public const string NoActiveTermsFoundForMentor = "ActiveTerms.NoActiveTermsFoundForMentor";
+            public const string SystemError = "ActiveTerms.SystemError";
+            public const string LogRetrieved = "ActiveTerms.Log.Retrieved";
+            public const string LogError = "ActiveTerms.Log.Error";
+        }
+
         public static class ViolationReportKey
         {
             // Validator

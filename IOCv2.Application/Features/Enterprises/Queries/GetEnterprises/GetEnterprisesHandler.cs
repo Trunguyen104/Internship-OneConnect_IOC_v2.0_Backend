@@ -75,7 +75,6 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
             if (!string.IsNullOrWhiteSpace(request.TaxCode)) query = query.Where(e => e.TaxCode == request.TaxCode);
             if (!string.IsNullOrWhiteSpace(request.Name)) query = query.Where(e => e.Name.Contains(request.Name));
             if (!string.IsNullOrWhiteSpace(request.Industry)) query = query.Where(e => e.Industry == request.Industry);
-            if (request.IsVerified.HasValue) query = query.Where(e => e.IsVerified == request.IsVerified.Value);
             if (request.Status.HasValue) query = query.Where(e => e.Status == (short)request.Status.Value);
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
             // Get total count before pagination
@@ -114,10 +113,6 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
                 EnterpriseParams.Filter.Status => isDesc
                     ? query.OrderByDescending(e => e.Status)
                     : query.OrderBy(e => e.Status),
-
-                EnterpriseParams.Filter.IsVerified => isDesc
-                    ? query.OrderByDescending(e => e.IsVerified)
-                    : query.OrderBy(e => e.IsVerified),
 
                 _ => query.OrderByDescending(e => e.Name)
             };
