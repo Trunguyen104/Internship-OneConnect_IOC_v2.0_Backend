@@ -535,7 +535,19 @@
     <value>Student term enrollment record not found.</value>
   </data>
   <data name="StudentTerms.TermNotOpen" xml:space="preserve">
-    <value>The term is not open or has been closed. Cannot add students.</value>
+    <value>Operation not allowed. The term has been closed, ended, or is not yet open.</value>
+  </data>
+  <data name="StudentTerms.TermEndedOrClosed" xml:space="preserve">
+    <value>Cannot edit student information because the term has ended or been closed.</value>
+  </data>
+  <data name="StudentTerms.CannotWithdrawPlacedViaUpdate" xml:space="preserve">
+    <value>Cannot set enrollment status to Withdrawn while the student is placed. Please set placement status to Unplaced first.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaderDetail" xml:space="preserve">
+    <value>Column {0} has an incorrect header. Expected: '{1}', found: '{2}'. Please use the provided template.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaderEmpty" xml:space="preserve">
+    <value>(empty)</value>
   </data>
   <data name="StudentTerms.EmailConflict" xml:space="preserve">
     <value>This email is already used in the current term.</value>
@@ -668,7 +680,7 @@
     <value>Term deleted successfully.</value>
   </data>
     <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
-    <value>Only active terms can be closed.</value>
+    <value>Only Active or Ended terms (still open status) can be closed.</value>
   </data>
     <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
     <value>Cannot delete active, ended, or closed terms. Please use Close Term feature if needed.</value>

@@ -562,6 +562,8 @@ namespace IOCv2.Application.Constants
             // Domain errors
             public const string NotFound = "StudentTerms.NotFound";
             public const string TermNotOpen = "StudentTerms.TermNotOpen";
+            public const string TermEndedOrClosed = "StudentTerms.TermEndedOrClosed";
+            public const string CannotWithdrawPlacedViaUpdate = "StudentTerms.CannotWithdrawPlacedViaUpdate";
             public const string EmailConflict = "StudentTerms.EmailConflict";
             public const string StudentCodeConflict = "StudentTerms.StudentCodeConflict";
             public const string AlreadyEnrolled = "StudentTerms.AlreadyEnrolled";
@@ -574,6 +576,8 @@ namespace IOCv2.Application.Constants
             public const string InvalidFileFormat = "StudentTerms.InvalidFileFormat";
             public const string FileTooLarge = "StudentTerms.FileTooLarge";
             public const string InvalidExcelHeaders = "StudentTerms.InvalidExcelHeaders";
+            public const string InvalidExcelHeaderDetail = "StudentTerms.InvalidExcelHeaderDetail";
+            public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
             public const string TooManyRows = "StudentTerms.TooManyRows";
 
             // Validation — TermId / StudentTermId

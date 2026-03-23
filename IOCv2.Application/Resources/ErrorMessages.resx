@@ -669,7 +669,19 @@
     <value>Không tìm thấy thông tin đăng ký thực tập.</value>
   </data>
   <data name="StudentTerms.TermNotOpen" xml:space="preserve">
-    <value>Kỳ thực tập chưa mở hoặc đã đóng, không thể thêm sinh viên.</value>
+    <value>Không thể thực hiện thao tác. Kỳ thực tập đã đóng, đã kết thúc hoặc chưa được mở.</value>
+  </data>
+  <data name="StudentTerms.TermEndedOrClosed" xml:space="preserve">
+    <value>Không thể chỉnh sửa thông tin sinh viên vì kỳ thực tập đã kết thúc hoặc đã đóng.</value>
+  </data>
+  <data name="StudentTerms.CannotWithdrawPlacedViaUpdate" xml:space="preserve">
+    <value>Không thể đặt trạng thái Rút khi sinh viên đang được xếp vị trí. Vui lòng đổi trạng thái xếp vị trí về Chưa xếp trước.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaderDetail" xml:space="preserve">
+    <value>Tiêu đề cột {0} không đúng. Kỳ vọng: '{1}', thực tế: '{2}'. Vui lòng sử dụng template được cung cấp.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaderEmpty" xml:space="preserve">
+    <value>(để trống)</value>
   </data>
   <data name="StudentTerms.EmailConflict" xml:space="preserve">
     <value>Email đã được sử dụng trong kỳ thực tập này.</value>
@@ -802,7 +814,7 @@
     <value>Xóa kỳ thực tập thành công.</value>
   </data>
     <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
-    <value>Chỉ có thể đóng kỳ thực tập đang ở trạng thái Active.</value>
+    <value>Chỉ có thể đóng kỳ thực tập đang ở trạng thái Active hoặc Ended (đã kết thúc nhưng chưa đóng chính thức).</value>
   </data>
     <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
     <value>Không thể xóa kỳ thực tập đang diễn ra, đã kết thúc hoặc đã đóng. Vui lòng sử dụng chức năng Đóng kỳ nếu cần.</value>

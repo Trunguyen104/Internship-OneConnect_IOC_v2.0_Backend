@@ -62,5 +62,10 @@ namespace IOCv2.Domain.Entities
         {
             Email = email;
         }
+
+        public void UpdateUserCode(string userCode)
+        {
+            UserCode = userCode;
+        }
     }
 }
