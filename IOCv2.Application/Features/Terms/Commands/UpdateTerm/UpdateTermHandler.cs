@@ -105,32 +105,22 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
                 return Result<UpdateTermResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Terms.StartDateLocked));
 
-            // Check for overlapping terms (exclude current term)
-            var hasOverlap = await _unitOfWork.Repository<Term>()
+            // Check for overlapping terms (exclude current term, single query)
+            var overlappingTermName = await _unitOfWork.Repository<Term>()
                 .Query()
                 .Where(t => t.UniversityId == universityId && t.TermId != request.TermId)
                 .Where(t => t.Status == TermStatus.Open || t.Status == TermStatus.Closed)
-                .AnyAsync(t =>
-                        (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
-                        (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
-                        (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate),
-                    cancellationToken);
+                .Where(t =>
+                    (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
+                    (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
+                    (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate))
+                .Select(t => (string?)t.Name)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (hasOverlap)
+            if (overlappingTermName != null)
             {
-                var overlappingTerm = await _unitOfWork.Repository<Term>()
-                    .Query()
-                    .Where(t => t.UniversityId == universityId && t.TermId != request.TermId)
-                    .Where(t => t.Status == TermStatus.Open || t.Status == TermStatus.Closed)
-                    .Where(t =>
-                        (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
-                        (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
-                        (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate))
-                    .Select(t => t.Name)
-                    .FirstOrDefaultAsync(cancellationToken);
-
                 return Result<UpdateTermResponse>.Failure(
-                    string.Format(_messageService.GetMessage(MessageKeys.Terms.OverlapWithActiveTerm), overlappingTerm),
+                    string.Format(_messageService.GetMessage(MessageKeys.Terms.OverlapWithActiveTerm), overlappingTermName),
                     ResultErrorType.Conflict);
             }
 

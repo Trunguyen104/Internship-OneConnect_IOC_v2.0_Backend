@@ -84,8 +84,10 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
                     ResultErrorType.Conflict);
             }
 
-            // Check if term is Active using TermStatusHelper
-            if (!TermStatusHelper.IsActive(term.StartDate, term.EndDate, term.Status))
+            // Only Active or Ended terms (still Open status) can be closed
+            var isActiveOrEnded = TermStatusHelper.IsActive(term.StartDate, term.EndDate, term.Status) ||
+                                  TermStatusHelper.IsEnded(term.StartDate, term.EndDate, term.Status);
+            if (!isActiveOrEnded)
                 return Result<CloseTermResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Terms.OnlyActiveCanBeClosed));
 

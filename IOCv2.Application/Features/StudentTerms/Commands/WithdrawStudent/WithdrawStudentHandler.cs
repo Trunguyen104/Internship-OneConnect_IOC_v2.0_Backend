@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Exceptions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,6 +17,7 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
     private readonly IBackgroundEmailSender _emailSender;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<WithdrawStudentHandler> _logger;
 
     public WithdrawStudentHandler(
@@ -23,12 +25,14 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
         ICurrentUserService currentUserService,
         IMessageService messageService,
         IBackgroundEmailSender emailSender,
+        ICacheService cacheService,
         ILogger<WithdrawStudentHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
         _emailSender = emailSender;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -79,6 +83,9 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
         await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
         // Fire-and-forget email
         _ = _emailSender.EnqueueEmailAsync(

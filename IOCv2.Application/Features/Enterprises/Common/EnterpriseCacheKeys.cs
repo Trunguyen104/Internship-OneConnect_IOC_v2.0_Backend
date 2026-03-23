@@ -29,8 +29,24 @@ public static class EnterpriseCacheKeys
 
     public static string EnterpriseListPattern() => $"{EnterpriseListPrefix}:*";
 
+    private const string ActiveTermsPrefix = "enterprise-active-terms";
+
+    public static string ActiveTerms(Guid enterpriseId, Guid enterpriseUserId, bool isMentor, Guid? universityId)
+    {
+        var scopePart = isMentor ? $"mentor:{enterpriseUserId}" : $"enterprise:{enterpriseId}";
+        var univPart = universityId?.ToString() ?? "all";
+        return $"{ActiveTermsPrefix}:{scopePart}:univ:{univPart}";
+    }
+
+    public static string ActiveTermsPattern(Guid enterpriseId) =>
+        $"{ActiveTermsPrefix}:enterprise:{enterpriseId}:*";
+
+    public static string ActiveTermsMentorPattern(Guid enterpriseUserId) =>
+        $"{ActiveTermsPrefix}:mentor:{enterpriseUserId}:*";
+
     public static class Expiration
     {
         public static readonly TimeSpan EnterpriseList = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan ActiveTerms = TimeSpan.FromMinutes(5);
     }
 }

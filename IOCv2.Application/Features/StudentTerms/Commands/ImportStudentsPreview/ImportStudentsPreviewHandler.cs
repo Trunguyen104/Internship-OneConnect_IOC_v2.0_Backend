@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Globalization;
 using ClosedXML.Excel;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -95,8 +96,17 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
         for (int i = 0; i < _requiredHeaders.Length; i++)
         {
             if (!string.Equals(headers[i], _requiredHeaders[i], StringComparison.OrdinalIgnoreCase))
-                return Result<ImportStudentsPreviewResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.StudentTerms.InvalidExcelHeaders));
+            {
+                var actualHeader = string.IsNullOrWhiteSpace(headers[i])
+                    ? _messageService.GetMessage(MessageKeys.StudentTerms.InvalidExcelHeaderEmpty)
+                    : headers[i];
+                var detailMsg = string.Format(
+                    _messageService.GetMessage(MessageKeys.StudentTerms.InvalidExcelHeaderDetail),
+                    i + 1,
+                    _requiredHeaders[i],
+                    actualHeader);
+                return Result<ImportStudentsPreviewResponse>.Failure(detailMsg);
+            }
         }
 
         var lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 1;
@@ -183,7 +193,7 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
             {
                 if (!TryParseDob(dob, out var dobDate))
                     errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.DateOfBirthInvalidFormat));
-                else if (!IsAtLeast15(dobDate))
+                else if (!IsAtLeast18(dobDate))
                     errors.Add(_messageService.GetMessage(MessageKeys.StudentTerms.DateOfBirthMinAge));
             }
 
@@ -226,12 +236,13 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
 
     private static bool TryParseDob(string value, out DateOnly result)
     {
-        return DateOnly.TryParseExact(value, "dd/MM/yyyy", out result);
+        var formats = new[] { "dd/MM/yyyy", "dd/MM/yyyy HH:mm:ss" };
+        return DateOnly.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
     }
 
-    private static bool IsAtLeast15(DateOnly dob)
+    private static bool IsAtLeast18(DateOnly dob)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        return today.Year - dob.Year >= 15;
+        return today >= dob.AddYears(18);
     }
 }
