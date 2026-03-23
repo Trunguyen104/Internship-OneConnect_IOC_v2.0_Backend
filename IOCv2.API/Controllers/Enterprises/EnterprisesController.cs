@@ -5,6 +5,7 @@ using IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.RejectApplication;
 using IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise;
+using IOCv2.Application.Features.Enterprises.Queries.GetActiveTerms;
 using IOCv2.Application.Features.Enterprises.Queries.GetApplicationDetail;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseApplications;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR;
@@ -214,6 +215,28 @@ public class EnterprisesController : ApiControllerBase
     }
 
     // ──────── Issue 77: Enterprise Application Management ────────
+
+    /// <summary>
+    /// Lấy danh sách kỳ thực tập đang hoạt động (Active) của doanh nghiệp hiện tại.
+    /// HR/EnterpriseAdmin thấy tất cả kỳ có nhóm thuộc doanh nghiệp.
+    /// Mentor chỉ thấy kỳ có nhóm mà họ phụ trách.
+    /// Mỗi kỳ trả về timeline, tiến độ và danh sách deadline đánh giá.
+    /// </summary>
+    /// <param name="universityId">Tùy chọn: lọc theo trường đại học.</param>
+    /// <param name="cancellationToken">Token hủy request.</param>
+    [HttpGet("me/active-terms")]
+    [Authorize(Roles = "HR,EnterpriseAdmin,Mentor")]
+    [ProducesResponseType(typeof(ApiResponse<GetActiveTermsForEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetActiveTermsForEnterprise(
+        [FromQuery] Guid? universityId,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetActiveTermsForEnterpriseQuery { UniversityId = universityId };
+        var result = await _mediator.Send(query, cancellationToken);
+        return HandleResult(result);
+    }
 
     /// <summary>
     /// Lấy danh sách đơn ứng tuyển thực tập của doanh nghiệp theo kỳ (phân trang).

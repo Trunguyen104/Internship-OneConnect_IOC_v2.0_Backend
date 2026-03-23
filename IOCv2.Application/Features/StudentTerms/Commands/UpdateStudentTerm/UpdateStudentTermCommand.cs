@@ -7,6 +7,7 @@ namespace IOCv2.Application.Features.StudentTerms.Commands.UpdateStudentTerm;
 public record UpdateStudentTermCommand : IRequest<Result<UpdateStudentTermResponse>>
 {
     public Guid StudentTermId { get; init; }
+    public string? StudentCode { get; init; }
     public string? FullName { get; init; }
     public string? Email { get; init; }
     public string? Phone { get; init; }
