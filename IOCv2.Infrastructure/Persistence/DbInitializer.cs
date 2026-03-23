@@ -56,6 +56,7 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedInternshipGroups();
             await SeedProjectsAndWorkItems();
             await SeedLogbooks();
+            await SeedStakeholdersAndIssues();
             await SeedEvaluations();
 
             if (_context.ChangeTracker.HasChanges())
@@ -550,6 +551,31 @@ namespace IOCv2.Infrastructure.Persistence
             await _context.SaveChangesAsync();
         }
 
+        private async Task SeedStakeholdersAndIssues()
+        {
+            if (await _context.Stakeholders.AnyAsync()) return;
+
+            var group3 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "FPT Software OJT Team");
+            var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
+
+            var customer = new Stakeholder(
+                group3.InternshipId,
+                "John Doe",
+                StakeholderType.Real,
+                "john.doe@globaltech.com",
+                "Product Owner",
+                "Product Owner from Global Tech Corp");
+            _context.Stakeholders.Add(customer);
+
+            _context.StakeholderIssues.Add(new StakeholderIssue(
+                Guid.NewGuid(),
+                customer.Id,
+                "Missing Auth Requirements",
+                "The current requirement for JWT doesn't specify the token expiration policy."));
+
+            await _context.SaveChangesAsync();
+        }
+
         private async Task SeedEvaluations()
         {
             var now = DateTime.UtcNow;
@@ -597,17 +623,37 @@ namespace IOCv2.Infrastructure.Persistence
                 .FirstAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU-CT");
 
             // Active-term deadline data for enterprise timeline APIs.
-            await EnsureCycleAsync(
-                spring2026.TermId,
-                "Midterm Evaluation",
-                ToUtc(spring2026.StartDate.AddDays(30), 8),
-                ToUtc(spring2026.StartDate.AddDays(75), 23, 59));
+            var midtermSpring2026 = await _context.EvaluationCycles.FirstOrDefaultAsync(c => c.TermId == spring2026.TermId && c.Name == "Midterm Evaluation");
+            if (midtermSpring2026 == null)
+            {
+                midtermSpring2026 = new EvaluationCycle
+                {
+                    CycleId = Guid.NewGuid(),
+                    TermId = spring2026.TermId,
+                    Name = "Midterm Evaluation",
+                    StartDate = ToUtc(spring2026.StartDate.AddDays(30), 8),
+                    EndDate = ToUtc(spring2026.StartDate.AddDays(75), 23, 59),
+                    Status = EvaluationCycleStatus.Grading,
+                    CreatedAt = now
+                };
+                _context.EvaluationCycles.Add(midtermSpring2026);
+            }
 
-            await EnsureCycleAsync(
-                spring2026.TermId,
-                "Final Evaluation",
-                ToUtc(spring2026.StartDate.AddDays(90), 8),
-                ToUtc(spring2026.EndDate.AddDays(-2), 23, 59));
+            var springFinalCycle = await _context.EvaluationCycles.FirstOrDefaultAsync(c => c.TermId == spring2026.TermId && c.Name == "Final Evaluation");
+            if (springFinalCycle == null)
+            {
+                springFinalCycle = new EvaluationCycle
+                {
+                    CycleId = Guid.NewGuid(),
+                    TermId = spring2026.TermId,
+                    Name = "Final Evaluation",
+                    StartDate = ToUtc(spring2026.StartDate.AddDays(90), 8),
+                    EndDate = ToUtc(spring2026.EndDate.AddDays(-2), 23, 59),
+                    Status = EvaluationCycleStatus.Pending,
+                    CreatedAt = now
+                };
+                _context.EvaluationCycles.Add(springFinalCycle);
+            }
 
             await EnsureCycleAsync(
                 spring2026Ct.TermId,
@@ -685,6 +731,56 @@ namespace IOCv2.Infrastructure.Persistence
                     CriteriaId = criteria.CriteriaId,
                     Score = 95m,
                     Comment = "Strong understanding of legacy code."
+                });
+            }
+
+            var hasSpringEvaluation = await _context.Evaluations
+                .AnyAsync(e => e.CycleId == midtermSpring2026.CycleId);
+
+            if (!hasSpringEvaluation)
+            {
+                var group3 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "FPT Software OJT Team");
+                var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
+                var mentorUser = await _context.Users.FirstAsync(u => u.Email == "mentor@fptsoftware.com");
+
+                // Get or create technical skill criteria for Midterm
+                var springMidCriteria = await _context.EvaluationCriteria
+                    .FirstOrDefaultAsync(c => c.CycleId == midtermSpring2026.CycleId && c.Name == "Technical Skills");
+                
+                if (springMidCriteria == null)
+                {
+                    springMidCriteria = new EvaluationCriteria
+                    {
+                        CriteriaId = Guid.NewGuid(),
+                        CycleId = midtermSpring2026.CycleId,
+                        Name = "Technical Skills",
+                        Description = "Development ability",
+                        MaxScore = 100m,
+                        Weight = 50m
+                    };
+                    _context.EvaluationCriteria.Add(springMidCriteria);
+                }
+
+                var evaluationS3 = new Evaluation
+                {
+                    EvaluationId = Guid.NewGuid(),
+                    CycleId = midtermSpring2026.CycleId,
+                    InternshipId = group3.InternshipId,
+                    StudentId = s3.StudentId,
+                    EvaluatorId = mentorUser.UserId,
+                    Status = EvaluationStatus.Published,
+                    TotalScore = 88m,
+                    Note = "Great progress in the first half."
+                };
+                _context.Evaluations.Add(evaluationS3);
+
+                _context.EvaluationDetails.Add(new EvaluationDetail
+                {
+                    DetailId = Guid.NewGuid(),
+                    EvaluationId = evaluationS3.EvaluationId,
+                    CriteriaId = springMidCriteria.CriteriaId,
+                    Score = 88m,
+                    Comment = "Good coding practices."
                 });
             }
 
