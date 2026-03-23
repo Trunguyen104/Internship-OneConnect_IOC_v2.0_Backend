@@ -43,53 +43,46 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         {
             var userId = Guid.Parse(_currentUserService.UserId!);
             var studentId = await _unitOfWork.Repository<Student>().Query().Where(s => s.UserId == userId).Select(s => s.StudentId).FirstOrDefaultAsync(cancellationToken);
-            try
+
+            // Build base query
+            var query = _unitOfWork.Repository<Project>().Query()
+                .Where(i => i.InternshipGroup.Members.Any(s => s.StudentId == studentId))
+                .Select(p => p).AsNoTracking();
+
+
+            // Apply status filter
+            if (request.Status.HasValue)
             {
-                // Build base query
-                var query = _unitOfWork.Repository<Project>().Query()
-                    .Where(i => i.InternshipGroup.Members.Any(s => s.StudentId == studentId))
-                    .Select(p => p).AsNoTracking();
-
-
-                // Apply status filter
-                if (request.Status.HasValue)
-                {
-                    query = query.Where(p => p.Status == request.Status.Value);
-                }
-
-                // Apply search term
-                if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-                {
-                    var term = request.SearchTerm.Trim().ToLower();
-                    query = query.Where(p =>
-                        p.ProjectName.ToLower().Contains(term) ||
-                        (p.Description != null && p.Description.ToLower().Contains(term)));
-                }
-
-                // Get total count before pagination
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                // Apply sorting
-                query = ApplySorting(query, request.SortColumn, request.SortOrder);
-
-                // Apply pagination
-                var items = await query
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ProjectTo<GetProjectsByStudentIdResponse>(_mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken);
-
-                // Create paginated result
-                var result = PaginatedResult<GetProjectsByStudentIdResponse>.Create(
-                    items, totalCount, request.PageNumber, request.PageSize);
-
-                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Success(result);
+                query = query.Where(p => p.Status == request.Status.Value);
             }
-            catch (Exception ex)
+
+            // Apply search term
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.GetByStuIdEr), studentId);
-                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
+                var term = request.SearchTerm.Trim().ToLower();
+                query = query.Where(p =>
+                    p.ProjectName.ToLower().Contains(term) ||
+                    (p.Description != null && p.Description.ToLower().Contains(term)));
             }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            // Apply sorting
+            query = ApplySorting(query, request.SortColumn, request.SortOrder);
+
+            // Apply pagination
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ProjectTo<GetProjectsByStudentIdResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+            // Create paginated result
+            var result = PaginatedResult<GetProjectsByStudentIdResponse>.Create(
+                items, totalCount, request.PageNumber, request.PageSize);
+
+            return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Success(result);
         }
 
         private IQueryable<Project> ApplySorting(IQueryable<Project> query, string? sortColumn, string? sortOrder)

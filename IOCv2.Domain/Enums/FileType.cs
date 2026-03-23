@@ -19,6 +19,9 @@ namespace IOCv2.Domain.Enums
 
         // Images
         JPG = 6,
-        PNG = 7
+        PNG = 7,
+
+        // External links (Docs, Figma, ...)
+        LINK = 8
     }
 }

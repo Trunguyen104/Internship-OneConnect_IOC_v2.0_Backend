@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.Enterprises;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -23,13 +24,15 @@ namespace IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise
         private readonly ILogger<DeleteEnterpriseHandler> _logger;
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
-        public DeleteEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<DeleteEnterpriseHandler> logger, IMapper mapper, ICurrentUserService currentUserService)
+        private readonly ICacheService _cacheService;
+        public DeleteEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<DeleteEnterpriseHandler> logger, IMapper mapper, ICurrentUserService currentUserService, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _logger = logger;
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
         public async Task<Result<DeleteEnterpriseResponse>> Handle(DeleteEnterpriseCommand request, CancellationToken cancellationToken)
         {
@@ -59,6 +62,8 @@ namespace IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise
                 var response = _mapper.Map<DeleteEnterpriseResponse>(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
 
                 return Result<DeleteEnterpriseResponse>.Success(response);
             }

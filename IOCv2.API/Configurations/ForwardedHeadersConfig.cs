@@ -11,6 +11,10 @@ public static class ForwardedHeadersConfig
         {
             options.ForwardedHeaders =
                 ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            // Trust tất cả proxy trong Docker bridge network (vd: nginx container)
+            // Mặc định ASP.NET chỉ trust 127.0.0.1 nên cần clear whitelist
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
         });
     }
 }

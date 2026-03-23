@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Interfaces;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,18 +17,26 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
         private readonly ILogger<GetInternshipGroupByIdHandler> _logger;
+        private readonly ICacheService _cacheService;
 
-        public GetInternshipGroupByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ILogger<GetInternshipGroupByIdHandler> logger)
+        public GetInternshipGroupByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ILogger<GetInternshipGroupByIdHandler> logger, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<GetInternshipGroupByIdResponse>> Handle(GetInternshipGroupByIdQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Querying internship group with ID: {Id}", request.InternshipId);
+
+            var cacheKey = InternshipGroupCacheKeys.Group(request.InternshipId);
+            var cached = await _cacheService.GetAsync<GetInternshipGroupByIdResponse>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<GetInternshipGroupByIdResponse>.Success(cached);
+
             var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(ig => ig.Enterprise)
                 .Include(ig => ig.Mentor!).ThenInclude(m => m.User!)
@@ -47,6 +56,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             {
                 result.Members = result.Members.OrderByDescending(m => m.Role == Domain.Enums.InternshipRole.Leader).ToList();
             }
+
+            await _cacheService.SetAsync(cacheKey, result, InternshipGroupCacheKeys.Expiration.Group, cancellationToken);
 
             return Result<GetInternshipGroupByIdResponse>.Success(result);
         }

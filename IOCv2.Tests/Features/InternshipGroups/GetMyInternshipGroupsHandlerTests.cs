@@ -21,6 +21,7 @@ public class GetMyInternshipGroupsHandlerTests
     private readonly Mock<IGenericRepository<Student>> _mockStudentRepository;
     private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipGroupRepository;
     private readonly Mock<IGenericRepository<Project>> _mockProjectRepository;
+    private readonly Mock<IGenericRepository<EvaluationCycle>> _mockEvaluationCycleRepository;
     private readonly GetMyInternshipGroupsHandler _handler;
 
     public GetMyInternshipGroupsHandlerTests()
@@ -32,10 +33,12 @@ public class GetMyInternshipGroupsHandlerTests
         _mockStudentRepository = new Mock<IGenericRepository<Student>>();
         _mockInternshipGroupRepository = new Mock<IGenericRepository<InternshipGroup>>();
         _mockProjectRepository = new Mock<IGenericRepository<Project>>();
+        _mockEvaluationCycleRepository = new Mock<IGenericRepository<EvaluationCycle>>();
 
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Student>()).Returns(_mockStudentRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<InternshipGroup>()).Returns(_mockInternshipGroupRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Project>()).Returns(_mockProjectRepository.Object);
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<EvaluationCycle>()).Returns(_mockEvaluationCycleRepository.Object);
 
         _handler = new GetMyInternshipGroupsHandler(
             _mockUnitOfWork.Object,
@@ -55,14 +58,15 @@ public class GetMyInternshipGroupsHandlerTests
         var mentorId = Guid.NewGuid();
         var internshipId = Guid.NewGuid();
         var projectId = Guid.NewGuid();
-        var university = new University { UniversityId = schoolId, Name = "FU Cần Thơ" };
+        var university = University.Create("FUCT", "FU Cần Thơ", null, null, schoolId);
         var term = new Term { TermId = termId, UniversityId = schoolId, Name = "FU Cần Thơ - Mùa xuân 2026", University = university };
         var mentorUser = new User(Guid.NewGuid(), "MENTOR001", "mentor@rikkei.vn", "Mentor Name", IOCv2.Domain.Enums.UserRole.Mentor, "hash");
         var mentor = new EnterpriseUser { EnterpriseUserId = mentorId, EnterpriseId = enterpriseId, UserId = Guid.NewGuid(), User = mentorUser };
-        var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
+        var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", null, enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
         group.Enterprise = new Enterprise { EnterpriseId = enterpriseId, Name = "Rikasoft" };
         group.Term = term;
         group.Mentor = mentor;
+        group.UpdateStatus(IOCv2.Domain.Enums.GroupStatus.Active);
         group.AddMember(studentId, IOCv2.Domain.Enums.InternshipRole.Leader);
 
         typeof(InternshipGroup).GetProperty(nameof(InternshipGroup.InternshipId))!.SetValue(group, internshipId);
@@ -80,6 +84,8 @@ public class GetMyInternshipGroupsHandlerTests
             .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
         _mockProjectRepository.Setup(repository => repository.Query())
             .Returns(new List<Project> { project }.AsQueryable().BuildMock());
+        _mockEvaluationCycleRepository.Setup(repository => repository.Query())
+            .Returns(new List<EvaluationCycle>().AsQueryable().BuildMock());
 
         var result = await _handler.Handle(new GetMyInternshipGroupsQuery(), CancellationToken.None);
 
@@ -93,7 +99,7 @@ public class GetMyInternshipGroupsHandlerTests
         result.Data[0].ProjectId.Should().Be(projectId);
         result.Data[0].Project!.Name.Should().Be("IOC Version 2");
         result.Data[0].StudentCount.Should().Be(1);
-        result.Data[0].GroupStatus.Should().Be(IOCv2.Domain.Enums.InternshipStatus.InProgress);
+        result.Data[0].GroupStatus.Should().Be(IOCv2.Domain.Enums.GroupStatus.Active);
     }
 
     [Fact]

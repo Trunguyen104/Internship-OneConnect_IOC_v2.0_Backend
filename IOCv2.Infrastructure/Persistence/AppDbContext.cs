@@ -53,6 +53,10 @@ public partial class AppDbContext : DbContext
     // Notifications
     public DbSet<Notification> Notifications { get; set; } = null!;
     
+    //Violation Reports
+    public DbSet<ViolationReport> ViolationReports { get; set; } = null!;
+
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;

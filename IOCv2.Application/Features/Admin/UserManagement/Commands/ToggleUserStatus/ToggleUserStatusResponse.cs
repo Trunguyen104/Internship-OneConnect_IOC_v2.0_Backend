@@ -1,0 +1,22 @@
+using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+
+
+namespace IOCv2.Application.Features.Admin.UserManagement.Commands.ToggleUserStatus
+{
+    public class ToggleUserStatusResponse : IMapFrom<User>
+    {
+        public Guid UserId { get; set; }
+        public UserStatus Status { get; set; }
+
+
+        public void Mapping(Profile profile)
+        {
+            profile.CreateMap<User, ToggleUserStatusResponse>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
+        }
+    }
+}

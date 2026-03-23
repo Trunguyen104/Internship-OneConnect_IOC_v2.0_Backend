@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -34,28 +34,24 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         {
             _logger.LogInformation("Getting profile for User {UserId}", request.UserId);
 
-            try
-            {
-                var user = await _unitOfWork.Repository<User>()
-                    .Query()
-                    .Include(u => u.Student)
-                    .AsNoTracking()
-                    .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
-                    .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
 
-                if (user == null)
-                {
-                    _logger.LogWarning("User {UserId} not found when fetching profile", request.UserId);
-                    return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
-                }
+            var user = await _unitOfWork.Repository<User>()
+                .Query()
+                .Include(u => u.Student)
+                .Include(u => u.UniversityUser)
+                .Include(u => u.EnterpriseUser)
+                .AsNoTracking()
+                .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
 
-                return Result<GetMyProfileResponse>.Success(user);
-            }
-            catch (Exception ex)
+            if (user == null)
             {
-                _logger.LogError(ex, "An error occurred while getting profile for User {UserId}", request.UserId);
-                return Result<GetMyProfileResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError));
+                _logger.LogWarning("User {UserId} not found when fetching profile", request.UserId);
+                return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
             }
+
+            return Result<GetMyProfileResponse>.Success(user);
+
         }
     }
 }

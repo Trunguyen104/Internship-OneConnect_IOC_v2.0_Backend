@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,8 +13,8 @@ namespace IOCv2.Domain.Entities
         public AuditAction Action { get; set; }
         public string EntityType { get; set; } = null!;
         public Guid EntityId { get; set; }
-        public Guid PerformedById { get; set; }
-        public virtual User PerformedBy { get; set; } = null!;
+        public Guid? PerformedById { get; set; }
+        public virtual User? PerformedBy { get; set; }
         public string? Reason { get; set; }
         public string? Metadata { get; set; } // jsonb
     }

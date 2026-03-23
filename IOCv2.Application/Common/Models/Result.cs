@@ -1,26 +1,28 @@
-﻿﻿namespace IOCv2.Application.Common.Models
+﻿namespace IOCv2.Application.Common.Models
 {
     public enum ResultErrorType
     {
-        None,
-        BadRequest,
-        NotFound,
-        Unauthorized,
-        Forbidden,
-        Conflict,
-        InternalServerError,
-        TooManyRequests
+        None = 1,
+        BadRequest = 2,
+        NotFound = 3,
+        Unauthorized = 4,
+        Forbidden = 5,
+        Conflict = 6,
+        InternalServerError = 7,
+        TooManyRequests = 8
     }
 
     public class Result<T>
     {
-        public bool IsSuccess { get; private set; }
-        public T? Data { get; private set; }
-        public string? Error { get; private set; }
-        public ResultErrorType ErrorType { get; private set; }
-        public string? Warning { get; private set; }
-        public string? Message { get; private set; }
+        public bool IsSuccess { get; set; }
+        public T? Data { get; set; }
+        public string? Error { get; set; }
+        public ResultErrorType ErrorType { get; set; }
+        public string? Warning { get; set; }
+        public string? Message { get; set; }
         public bool HasWarning => !string.IsNullOrEmpty(Warning);
+
+        public Result() { }
 
         private Result(bool isSuccess, T? data, string? error, ResultErrorType errorType, string? warning = null, string? message = null)
         {

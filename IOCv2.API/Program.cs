@@ -35,6 +35,7 @@ builder.Services.AddRedisConfig(builder.Configuration);
 builder.Services.AddForwardedHeadersConfig();
 builder.Services.AddLocalizationConfig();
 builder.Services.AddSignalRConfig();
+builder.Services.AddHealthChecksConfig(builder.Configuration);
 
 // Register API-layer services (depend on SignalR Hub, cannot go in Infrastructure)
 builder.Services.AddScoped<INotificationPushService, SignalRNotificationPushService>();
@@ -42,6 +43,9 @@ builder.Services.AddScoped<INotificationPushService, SignalRNotificationPushServ
 var app = builder.Build();
 
 // Configure Middleware Pipeline
+// /health phải map TRƯỚC các middleware logic (auth, rate limit, etc.)
+app.UseHealthChecksConfig();
+
 app.UseLocalizationConfig();
 app.UseForwardedHeaders();
 
@@ -49,39 +53,42 @@ app.UseExceptionHandler();
 app.UseMiddleware<RateLimitingMiddleware>();
 app.UseMiddleware<CorrelationIdMiddleware>();
 
+// Database Migration & Seeding — chạy mọi môi trường (kể cả Production)
+await DatabaseConfig.ApplyMigrations(app);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerConfig();
-
-    // Database Migration & Seeding
-    await DatabaseConfig.ApplyMigrations(app);
 }
-// redirect / → /swagger
-app.Use(async (context, next) =>
+// Redirect / → /swagger chỉ trên Development
+if (app.Environment.IsDevelopment())
 {
-    if (context.Request.Path == "/")
+    app.Use(async (context, next) =>
     {
-        context.Response.Redirect("/swagger");
-        return;
-    }
+        if (context.Request.Path == "/")
+        {
+            context.Response.Redirect("/swagger");
+            return;
+        }
 
-    await next();
-});
+        await next();
+    });
+}
 app.UseCors("AllowReact");
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+// KHÔNG dùng UseHttpsRedirection — backend chạy sau nginx proxy (HTTP nội bộ)
+// nginx đã xử lý SSL termination. Redirect HTTPS ở đây sẽ gây vòng lặp 301.
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<SerilogUserEnricherMiddleware>();
 app.UseSerilogRequestLogging();
+var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "Uploads");
+Directory.CreateDirectory(uploadsPath);
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/app/Uploads"),
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
 app.MapControllers();

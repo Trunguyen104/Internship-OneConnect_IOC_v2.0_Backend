@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -17,34 +18,42 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public GetTermByIdHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IMessageService messageService,
         ILogger<GetTermByIdHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<GetTermByIdResponse>> Handle(GetTermByIdQuery request, CancellationToken cancellationToken)
     {
-        try
-        {
+      
             var userId = Guid.Parse(_currentUserService.UserId!);
             var isSuperAdmin =
                 string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
 
             IQueryable<Term> termQuery;
+            string cacheKey;
 
             if (isSuperAdmin)
             {
                 // SuperAdmin: access any term regardless of university
+                cacheKey = TermCacheKeys.Term(request.TermId);
+                var cached = await _cacheService.GetAsync<GetTermByIdResponse>(cacheKey, cancellationToken);
+                if (cached is not null)
+                    return Result<GetTermByIdResponse>.Success(cached);
+
                 termQuery = _unitOfWork.Repository<Term>()
                     .Query()
                     .Where(t => t.TermId == request.TermId);
@@ -61,6 +70,11 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
                     return Result<GetTermByIdResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.University.NotFound),
                         ResultErrorType.NotFound);
+
+                cacheKey = TermCacheKeys.Term(request.TermId, universityUser.UniversityId);
+                var cached = await _cacheService.GetAsync<GetTermByIdResponse>(cacheKey, cancellationToken);
+                if (cached is not null)
+                    return Result<GetTermByIdResponse>.Success(cached);
 
                 termQuery = _unitOfWork.Repository<Term>()
                     .Query()
@@ -81,12 +95,9 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
                     ResultErrorType.NotFound);
             }
 
+            await _cacheService.SetAsync(cacheKey, term, TermCacheKeys.Expiration.Term, cancellationToken);
+
             return Result<GetTermByIdResponse>.Success(term);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorRetrievingTerm), request.TermId);
-            throw;
-        }
+    
     }
 }

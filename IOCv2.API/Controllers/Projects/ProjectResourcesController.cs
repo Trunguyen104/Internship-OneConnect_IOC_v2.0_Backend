@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectResource;
 using IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource;
 using IOCv2.Application.Features.ProjectResources.Commands.UploadProjectResource;
@@ -9,7 +9,6 @@ using IOCv2.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace IOCv2.API.Controllers.Projects;
 
@@ -17,16 +16,14 @@ namespace IOCv2.API.Controllers.Projects;
 /// Project Resources — manage files and resources attached to projects.
 /// </summary>
 [Tags("Project Resources")]
+[Route("api/v{version:apiVersion}/project-resources")]
 [Authorize]
-[Route("api/project-resources")]
 public class ProjectResourcesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IFileStorageService _fileStorageService;
 
-    public ProjectResourcesController(IMediator mediator, IFileStorageService fileStorageService)
+    public ProjectResourcesController(IMediator mediator)
     {
-        _fileStorageService = fileStorageService;
         _mediator = mediator;
     }
 
@@ -53,35 +50,19 @@ public class ProjectResourcesController : ApiControllerBase
        [FromRoute] Guid resourceId,
        CancellationToken cancellationToken)
     {
-        // First, retrieve the resource metadata to get the file path
-        var query = new GetDownloadProjectResourceByIdQuery
-        {
-            ProjectResourceId = resourceId
-        };
-
+        var query = new GetDownloadProjectResourceByIdQuery { ProjectResourceId = resourceId };
         var result = await _mediator.Send(query, cancellationToken);
 
-        // If the resource metadata retrieval failed, return the appropriate error response
-        if (!result.IsSuccess || result.Data == null)
+        if (!result.IsSuccess || result.Data?.Content == null)
         {
             return HandleResult(result);
         }
 
-        // Attempt to retrieve the file stream from storage
-        var stream = await _fileStorageService.GetFileAsync(result.Data.FilePath);
-
-        // If the file stream is null, it means the file was not found in storage
-        if (stream == null)
-        {
-            return NotFound("File not found.");
-        }
-
-        // Return the file stream with the appropriate content type and file name for download
-        return File(stream, "application/octet-stream", result.Data.FileName);
+        return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
     }
 
     [HttpGet("{resourceId:guid}/read")]
-    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<GetReadProjectResourceByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetReadProjectResourceById(
         [FromRoute] Guid resourceId,
@@ -97,7 +78,7 @@ public class ProjectResourcesController : ApiControllerBase
     /// </summary>
     [HttpPost]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Result<UploadProjectResourceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

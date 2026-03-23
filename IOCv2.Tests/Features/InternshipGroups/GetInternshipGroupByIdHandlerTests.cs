@@ -24,6 +24,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<IMessageService> _mockMessageService;
         private readonly Mock<ILogger<GetInternshipGroupByIdHandler>> _mockLogger;
+        private readonly Mock<ICacheService> _mockCacheService;
         private readonly GetInternshipGroupByIdHandler _handler;
 
         public GetInternshipGroupByIdHandlerTests()
@@ -32,12 +33,14 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockMapper = new Mock<IMapper>();
             _mockMessageService = new Mock<IMessageService>();
             _mockLogger = new Mock<ILogger<GetInternshipGroupByIdHandler>>();
- 
+            _mockCacheService = new Mock<ICacheService>();
+
             _handler = new GetInternshipGroupByIdHandler(
                 _mockUnitOfWork.Object,
                 _mockMapper.Object,
                 _mockMessageService.Object,
-                _mockLogger.Object);
+                _mockLogger.Object,
+                _mockCacheService.Object);
         }
 
         [Fact]

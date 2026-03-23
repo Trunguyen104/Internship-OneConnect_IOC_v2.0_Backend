@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.StakeholderIssues.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -17,19 +18,22 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholde
         private readonly IMessageService _messageService;
         private readonly ILogger<UpdateStakeholderIssueStatusCommandHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
         public UpdateStakeholderIssueStatusCommandHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IMessageService messageService,
             ILogger<UpdateStakeholderIssueStatusCommandHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<UpdateStakeholderIssueStatusResponse>> Handle(UpdateStakeholderIssueStatusCommand request, CancellationToken cancellationToken)
@@ -56,6 +60,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.UpdateStakeholde
                 await _unitOfWork.Repository<StakeholderIssue>().UpdateAsync(issue, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveByPatternAsync(StakeholderIssueCacheKeys.IssueListPattern(), cancellationToken);
+                await _cacheService.RemoveAsync(StakeholderIssueCacheKeys.Issue(request.Id), cancellationToken);
 
                 _logger.LogInformation("Successfully updated StakeholderIssue {Id} status to {Status}", request.Id, request.Status);
 

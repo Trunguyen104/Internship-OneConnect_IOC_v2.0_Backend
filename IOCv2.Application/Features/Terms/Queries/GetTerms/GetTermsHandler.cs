@@ -3,6 +3,7 @@
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -19,26 +20,28 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public GetTermsHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IMessageService messageService,
         ILogger<GetTermsHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<PaginatedResult<GetTermsResponse>>> Handle(GetTermsQuery request,
         CancellationToken cancellationToken)
     {
-        try
-        {
+    
             var userId = Guid.Parse(_currentUserService.UserId!);
             var isSuperAdmin =
                 string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
@@ -68,6 +71,11 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
 
                 universityId = universityUser.UniversityId;
             }
+
+            var cacheKey = TermCacheKeys.TermList(universityId, request.SearchTerm, (int?)request.Status, request.Year, request.PageNumber, request.PageSize, request.SortColumn, request.SortOrder);
+            var cached = await _cacheService.GetAsync<PaginatedResult<GetTermsResponse>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<PaginatedResult<GetTermsResponse>>.Success(cached);
 
             // Build query
             var query = _unitOfWork.Repository<Term>()
@@ -122,13 +130,10 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermsRetrieved), items.Count,
                 universityId);
 
+            await _cacheService.SetAsync(cacheKey, result, TermCacheKeys.Expiration.TermList, cancellationToken);
+
             return Result<PaginatedResult<GetTermsResponse>>.Success(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorRetrievingTerms));
-            throw;
-        }
+    
     }
 
     private IQueryable<Term> ApplySorting(IQueryable<Term> query, string? sortColumn, string? sortOrder)

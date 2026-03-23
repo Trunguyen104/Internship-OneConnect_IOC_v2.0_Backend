@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using IOCv2.Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,6 +59,8 @@ public abstract class ApiControllerBase : ControllerBase
         ResultErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
         ResultErrorType.Forbidden   => StatusCodes.Status403Forbidden,
         ResultErrorType.Conflict    => StatusCodes.Status409Conflict,
+        ResultErrorType.InternalServerError => StatusCodes.Status500InternalServerError,
+        ResultErrorType.TooManyRequests => StatusCodes.Status429TooManyRequests,
         _                           => StatusCodes.Status400BadRequest
     };
 }

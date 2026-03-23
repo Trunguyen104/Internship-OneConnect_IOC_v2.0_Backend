@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Authentication.Commands.Login;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Application.Services;
 using IOCv2.Domain.Entities;
@@ -26,8 +27,9 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
         private readonly IRateLimiter _rateLimiter;
+        private readonly ICacheService _cacheService;
 
-        public UpdateEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<UpdateEnterpriseHandler> logger, IMapper mapper, ICurrentUserService currentUserService, IRateLimiter rateLimiter)
+        public UpdateEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<UpdateEnterpriseHandler> logger, IMapper mapper, ICurrentUserService currentUserService, IRateLimiter rateLimiter, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
@@ -35,6 +37,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
             _mapper = mapper;
             _currentUserService = currentUserService;
             _rateLimiter = rateLimiter;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<UpdateEnterpriseResponse>> Handle(UpdateEnterpriseCommand request, CancellationToken cancellationToken)
@@ -88,6 +91,8 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
 
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
 
                 return Result<UpdateEnterpriseResponse>.Success(response);
             }

@@ -1,4 +1,4 @@
-﻿using IOCv2.Domain.Entities;
+using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -61,7 +61,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             // FK
             builder.HasOne(p => p.InternshipGroup)
-                .WithMany()
+                .WithMany(g => g.Projects)
                 .HasForeignKey(p => p.InternshipId)
                 .OnDelete(DeleteBehavior.Restrict);
 

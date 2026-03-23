@@ -11,4 +11,6 @@ public record PublishEvaluationCommand : IRequest<Result<PublishEvaluationRespon
 
     [JsonIgnore]
     public Guid InternshipId { get; init; }
+
+    public List<Guid>? StudentIds { get; init; }
 }

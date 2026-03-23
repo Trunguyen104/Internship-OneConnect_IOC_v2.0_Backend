@@ -67,14 +67,15 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
 
         var projectLookup = internshipIds.Count == 0
             ? new Dictionary<Guid, Project>()
-            : await _unitOfWork.Repository<Project>()
+            : (await _unitOfWork.Repository<Project>()
                 .Query()
                 .Where(project => project.DeletedAt == null && internshipIds.Contains(project.InternshipId))
                 .OrderByDescending(project => project.CreatedAt)
                 .AsNoTracking()
+                .ToListAsync(cancellationToken))
                 .GroupBy(project => project.InternshipId)
-                .Select(group => group.First())
-                .ToDictionaryAsync(project => project.InternshipId, cancellationToken);
+                .ToDictionary(group => group.Key, group => group.First());
+
 
         var termIds = groups.Select(group => group.TermId).Distinct().ToList();
         var evaluationCycleLookup = termIds.Count == 0

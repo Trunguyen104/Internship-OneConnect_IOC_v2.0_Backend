@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -37,6 +37,8 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
 
             var user = await _unitOfWork.Repository<User>()
                 .Query()
+                .Include(u => u.UniversityUser)
+                .Include(u => u.EnterpriseUser)
                 .FirstOrDefaultAsync(e => e.Email == request.Email, cancellationToken);
 
             if (user == null)
@@ -99,6 +101,11 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
                 RefreshTokenExpiresIn = (expirationDate - DateTime.UtcNow).TotalSeconds,
                 Email = user.Email,
                 Role = user.Role,
+                UnitId = (user.Role == UserRole.SchoolAdmin || user.Role == UserRole.Student)
+                    ? user.UniversityUser?.UniversityId
+                    : (user.Role == UserRole.EnterpriseAdmin || user.Role == UserRole.HR || user.Role == UserRole.Mentor)
+                        ? user.EnterpriseUser?.EnterpriseId
+                        : null,
                 ExpiresIn = expiresIn
             };
 

@@ -11,6 +11,14 @@ namespace IOCv2.Domain.Entities
         public virtual User User { get; set; } = null!;
 
         public string? Position { get; set; }
+        public string? Bio { get; private set; }
+        public string? Expertise { get; private set; }
+
+        public void UpdateMetadata(string? bio, string? expertise)
+        {
+            Bio = bio;
+            Expertise = expertise;
+        }
 
         public virtual ICollection<InternshipGroup> MentoringGroups { get; set; } = new List<InternshipGroup>();
         public virtual ICollection<InternshipApplication> ReviewedApplications { get; set; } = new List<InternshipApplication>();

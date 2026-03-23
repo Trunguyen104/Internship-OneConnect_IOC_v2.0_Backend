@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -22,17 +23,20 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         private readonly IMapper _mapper;
         private readonly ILogger<GetAllProjectsHandler> _logger;
         private readonly IMessageService _messageService;
+        private readonly ICacheService _cacheService;
 
         public GetAllProjectsHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<GetAllProjectsHandler> logger,
-            IMessageService messageService)
+            IMessageService messageService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _messageService = messageService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<PaginatedResult<GetAllProjectsResponse>>> Handle(
@@ -40,6 +44,24 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             CancellationToken cancellationToken)
         {
             _logger.LogInformation("Retrieving all projects with SearchTerm: {SearchTerm}, Status: {Status}", request.SearchTerm, request.Status);
+
+            var cacheKey = ProjectCacheKeys.ProjectList(
+                request.SearchTerm,
+                request.Status.HasValue ? (int)request.Status.Value : null,
+                request.FromDate,
+                request.ToDate,
+                request.InternshipId,
+                request.StudentId,
+                request.PageNumber,
+                request.PageSize,
+                request.SortColumn,
+                request.SortOrder);
+
+            var cached = await _cacheService.GetAsync<PaginatedResult<GetAllProjectsResponse>>(cacheKey, cancellationToken);
+            if (cached != null)
+            {
+                return Result<PaginatedResult<GetAllProjectsResponse>>.Success(cached);
+            }
 
             // 1. Build base query
             var query = _unitOfWork.Repository<Project>().Query().AsNoTracking();
@@ -86,6 +108,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                 items, totalCount, request.PageNumber, request.PageSize);
 
             _logger.LogInformation("Successfully retrieved {Count} projects", items.Count);
+
+            await _cacheService.SetAsync(cacheKey, result, ProjectCacheKeys.Expiration.ProjectList, cancellationToken);
 
             return Result<PaginatedResult<GetAllProjectsResponse>>.Success(result);
         }

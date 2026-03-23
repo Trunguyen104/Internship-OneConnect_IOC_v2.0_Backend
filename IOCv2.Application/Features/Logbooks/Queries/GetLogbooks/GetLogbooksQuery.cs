@@ -1,5 +1,5 @@
-﻿using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers;
+using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Admin.UserManagement.Queries.GetUsers;
 using IOCv2.Domain.Enums;
 using MediatR;
 using System;
