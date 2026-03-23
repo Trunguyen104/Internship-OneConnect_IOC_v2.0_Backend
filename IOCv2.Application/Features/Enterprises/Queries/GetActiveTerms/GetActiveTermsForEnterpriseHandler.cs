@@ -97,6 +97,15 @@ public class GetActiveTermsForEnterpriseHandler
                 .OrderBy(t => t.EndDate)
                 .ToListAsync(cancellationToken);
 
+            if (terms.Count == 0)
+            {
+                var noTermsKey = isMentor
+                    ? MessageKeys.ActiveTerms.NoActiveTermsFoundForMentor
+                    : MessageKeys.ActiveTerms.NoActiveTermsFoundForEnterprise;
+                return Result<GetActiveTermsForEnterpriseResponse>.Failure(
+                    _messageService.GetMessage(noTermsKey), ResultErrorType.NotFound);
+            }
+
             // Lấy EvaluationCycles cho tất cả term tìm được (bỏ qua Cancelled)
             var termIds = terms.Select(t => t.TermId).ToList();
             var cycles = await _unitOfWork.Repository<EvaluationCycle>().Query().AsNoTracking()
