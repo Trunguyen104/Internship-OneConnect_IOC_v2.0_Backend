@@ -871,6 +871,9 @@
     <data name="InternshipGroup.TermNotFound" xml:space="preserve">
     <value>Term not found.</value>
   </data>
+    <data name="InternshipGroup.TermNotActive" xml:space="preserve">
+    <value>The term is not currently active. Internship groups can only be created in an active term.</value>
+  </data>
     <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
     <value>Enterprise not found.</value>
   </data>

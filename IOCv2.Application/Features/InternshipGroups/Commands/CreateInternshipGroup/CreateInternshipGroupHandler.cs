@@ -1,4 +1,5 @@
 using AutoMapper;
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -64,15 +65,26 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         ResultErrorType.Forbidden);
                 }
 
-                // ── 3. Validate TermId ─────────────────────────────────────────────
-                var termExists = await _unitOfWork.Repository<Term>()
-                    .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
-                if (!termExists)
+                // ── 3. Validate TermId & kiểm tra kỳ phải đang Active ─────────────
+                var term = await _unitOfWork.Repository<Term>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.TermId == request.TermId, cancellationToken);
+
+                if (term == null)
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
                     return Result<CreateInternshipGroupResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound),
                         ResultErrorType.NotFound);
+                }
+
+                if (!TermStatusHelper.IsActive(term.StartDate, term.EndDate, term.Status))
+                {
+                    _logger.LogWarning("Term {TermId} is not active (status: {Status}, start: {Start}, end: {End}). Cannot create internship group.",
+                        request.TermId, term.Status, term.StartDate, term.EndDate);
+                    return Result<CreateInternshipGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotActive),
+                        ResultErrorType.BadRequest);
                 }
 
                 // ── 4. Validate EnterpriseId: phải là công ty của HR hiện tại ──────
@@ -88,19 +100,24 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     }
                 }
 
-                // ── 5. Validate MentorId: phải thuộc cùng công ty của HR ────────────
+                // ── 5. Validate MentorId: request truyền UserId của mentor ────────────
+                Guid? resolvedMentorId = null; // EnterpriseUserId lưu vào DB
                 if (request.MentorId.HasValue)
                 {
-                    var mentorBelongsToEnterprise = await _unitOfWork.Repository<EnterpriseUser>()
-                        .ExistsAsync(u => u.EnterpriseUserId == request.MentorId.Value
-                                       && u.EnterpriseId == enterpriseUser.EnterpriseId, cancellationToken);
-                    if (!mentorBelongsToEnterprise)
+                    // Tìm EnterpriseUser theo UserId (frontend truyền UserId, không phải EnterpriseUserId)
+                    var mentor = await _unitOfWork.Repository<EnterpriseUser>()
+                        .Query()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(u => u.UserId == request.MentorId.Value
+                                               && u.EnterpriseId == enterpriseUser.EnterpriseId, cancellationToken);
+                    if (mentor == null)
                     {
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<CreateInternshipGroupResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
                             ResultErrorType.NotFound);
                     }
+                    resolvedMentorId = mentor.EnterpriseUserId; // Lưu EnterpriseUserId vào DB
                 }
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -110,7 +127,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     request.GroupName,
                     request.Description,
                     request.EnterpriseId,
-                    request.MentorId,
+                    resolvedMentorId, // EnterpriseUserId
                     request.StartDate,
                     request.EndDate
                 );

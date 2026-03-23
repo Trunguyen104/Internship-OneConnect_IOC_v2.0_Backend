@@ -76,6 +76,15 @@ namespace IOCv2.Tests.Features.InternshipGroups
         {
             // Arrange
             var termId = Guid.NewGuid();
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var activeTerm = new Term
+            {
+                TermId = termId,
+                StartDate = today.AddDays(-7),
+                EndDate = today.AddDays(7),
+                Status = TermStatus.Open
+            };
+
             var command = new CreateInternshipGroupCommand
             {
                 TermId = termId,
@@ -84,10 +93,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 Students = new List<CreateInternshipStudentDto>() // Rỗng
             };
 
-            _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
-            _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+            _mockUnitOfWork.Setup(x => x.Repository<Term>().Query())
+                .Returns(new List<Term> { activeTerm }.AsQueryable().BuildMock());
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().AddAsync(It.IsAny<InternshipGroup>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((InternshipGroup g, CancellationToken c) => g);
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
@@ -111,6 +118,14 @@ namespace IOCv2.Tests.Features.InternshipGroups
             // Arrange
             var termId = Guid.NewGuid();
             var studentId = Guid.NewGuid();
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var activeTerm = new Term
+            {
+                TermId = termId,
+                StartDate = today.AddDays(-7),
+                EndDate = today.AddDays(7),
+                Status = TermStatus.Open
+            };
 
             var command = new CreateInternshipGroupCommand
             {
@@ -123,10 +138,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 }
             };
 
-            _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
-            _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+            _mockUnitOfWork.Setup(x => x.Repository<Term>().Query())
+                .Returns(new List<Term> { activeTerm }.AsQueryable().BuildMock());
             _mockUnitOfWork.Setup(x => x.Repository<Student>().FindAsync(It.IsAny<Expression<Func<Student, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Student> { new Student { StudentId = studentId, UserId = Guid.NewGuid() } });
 
@@ -181,6 +194,14 @@ namespace IOCv2.Tests.Features.InternshipGroups
             // Arrange
             var termId = Guid.NewGuid();
             var studentId = Guid.NewGuid();
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var activeTerm = new Term
+            {
+                TermId = termId,
+                StartDate = today.AddDays(-7),
+                EndDate = today.AddDays(7),
+                Status = TermStatus.Open
+            };
 
             var command = new CreateInternshipGroupCommand
             {
@@ -193,10 +214,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 }
             };
 
-            _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
-            _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+            _mockUnitOfWork.Setup(x => x.Repository<Term>().Query())
+                .Returns(new List<Term> { activeTerm }.AsQueryable().BuildMock());
             _mockUnitOfWork.Setup(x => x.Repository<Student>().FindAsync(It.IsAny<Expression<Func<Student, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Student> { new Student { StudentId = studentId } });
 
@@ -218,8 +237,9 @@ namespace IOCv2.Tests.Features.InternshipGroups
             // Arrange
             var command = new CreateInternshipGroupCommand { TermId = Guid.NewGuid(), GroupName = "Test" };
 
-            _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
+            // Trả về list rỗng → FirstOrDefaultAsync sẽ ra null
+            _mockUnitOfWork.Setup(x => x.Repository<Term>().Query())
+                .Returns(new List<Term>().AsQueryable().BuildMock());
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);

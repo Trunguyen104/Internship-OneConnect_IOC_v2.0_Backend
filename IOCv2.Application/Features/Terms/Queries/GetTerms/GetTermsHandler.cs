@@ -1,5 +1,4 @@
-
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -41,7 +40,7 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
     public async Task<Result<PaginatedResult<GetTermsResponse>>> Handle(GetTermsQuery request,
         CancellationToken cancellationToken)
     {
-    
+
             var userId = Guid.Parse(_currentUserService.UserId!);
             var userRole = _currentUserService.Role ?? string.Empty;
             var isSuperAdmin =
@@ -195,7 +194,7 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
             await _cacheService.SetAsync(cacheKey, result, TermCacheKeys.Expiration.TermList, cancellationToken);
 
             return Result<PaginatedResult<GetTermsResponse>>.Success(result);
-    
+
     }
 
     private IQueryable<Term> ApplySorting(IQueryable<Term> query, string? sortColumn, string? sortOrder)
@@ -213,4 +212,4 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
             _ => query.OrderByDescending(t => t.CreatedAt)
         };
     }
-}
+}
