@@ -93,7 +93,6 @@ namespace IOCv2.Infrastructure.Persistence
                         Address = "Khu Công nghệ cao Hòa Lạc, Thạch Thất, Hà Nội",
                         Website = "https://www.fpt-software.com",
                         Description = "Tập đoàn công nghệ hàng đầu Việt Nam",
-                        IsVerified = true,
                         Status = (short)EnterpriseStatus.Active
                     },
                     new Enterprise
@@ -105,7 +104,6 @@ namespace IOCv2.Infrastructure.Persistence
                         Address = "Tầng 21, Tòa nhà Handico, Phạm Hùng, Nam Từ Liêm, Hà Nội",
                         Website = "https://rikkeisoft.com",
                         Description = "Đối tác tin cậy về chuyển đổi số",
-                        IsVerified = true,
                         Status = (short)EnterpriseStatus.Active
                     }
                 };
