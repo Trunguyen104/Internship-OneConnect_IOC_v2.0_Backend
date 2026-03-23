@@ -247,38 +247,152 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedTerms()
         {
-            if (!await _context.Terms.AnyAsync())
+            var fptu = await _context.Universities.FirstAsync(u => u.Code == "FPTU");
+            var fptuCt = await _context.Universities.FirstAsync(u => u.Code == "FPTU-CT");
+
+            var fall2025 = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptu.UniversityId && t.Name == "Fall 2025");
+            if (fall2025 == null)
             {
-                var fptu = await _context.Universities.FirstAsync(u => u.Code == "FPTU");
-                
-                var fall2025 = new Term { TermId = Guid.NewGuid(), UniversityId = fptu.UniversityId, Name = "Fall 2025", StartDate = new DateOnly(2025, 9, 1), EndDate = new DateOnly(2025, 12, 31), Status = TermStatus.Closed };
-                var spring2026 = new Term { TermId = Guid.NewGuid(), UniversityId = fptu.UniversityId, Name = "Spring 2026", StartDate = new DateOnly(2026, 1, 1), EndDate = new DateOnly(2026, 4, 30), Status = TermStatus.Open };
-                var summer2026 = new Term { TermId = Guid.NewGuid(), UniversityId = fptu.UniversityId, Name = "Summer 2026", StartDate = new DateOnly(2026, 5, 1), EndDate = new DateOnly(2026, 8, 31), Status = TermStatus.Open };
-
-                _context.Terms.AddRange(fall2025, spring2026, summer2026);
-                await _context.SaveChangesAsync();
-
-                // Enrollment for students
-                var s2 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student2@fptu.edu.vn");
-                var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
-                var s4 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student4@fptu.edu.vn");
-                var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
-
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s2.StudentId, TermId = spring2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Unplaced, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60)) });
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s3.StudentId, TermId = spring2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Placed, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60)) });
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s4.StudentId, TermId = summer2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Unplaced, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)) });
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s5.StudentId, TermId = fall2025.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Placed, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-200)) });
-
-                await _context.SaveChangesAsync();
+                fall2025 = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptu.UniversityId,
+                    Name = "Fall 2025",
+                    StartDate = new DateOnly(2025, 9, 1),
+                    EndDate = new DateOnly(2025, 12, 31),
+                    Status = TermStatus.Closed
+                };
+                _context.Terms.Add(fall2025);
             }
+
+            var spring2026 = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptu.UniversityId && t.Name == "Spring 2026");
+            if (spring2026 == null)
+            {
+                spring2026 = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptu.UniversityId,
+                    Name = "Spring 2026",
+                    StartDate = new DateOnly(2026, 1, 1),
+                    EndDate = new DateOnly(2026, 4, 30),
+                    Status = TermStatus.Open
+                };
+                _context.Terms.Add(spring2026);
+            }
+
+            var summer2026 = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptu.UniversityId && t.Name == "Summer 2026");
+            if (summer2026 == null)
+            {
+                summer2026 = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptu.UniversityId,
+                    Name = "Summer 2026",
+                    StartDate = new DateOnly(2026, 5, 1),
+                    EndDate = new DateOnly(2026, 8, 31),
+                    Status = TermStatus.Open
+                };
+                _context.Terms.Add(summer2026);
+            }
+
+            var spring2026Ct = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptuCt.UniversityId && t.Name == "Spring 2026");
+            if (spring2026Ct == null)
+            {
+                spring2026Ct = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptuCt.UniversityId,
+                    Name = "Spring 2026",
+                    StartDate = new DateOnly(2026, 2, 1),
+                    EndDate = new DateOnly(2026, 5, 31),
+                    Status = TermStatus.Open
+                };
+                _context.Terms.Add(spring2026Ct);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Enrollment for students used by active-term and application test cases
+            var s2 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student2@fptu.edu.vn");
+            var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student4@fptu.edu.vn");
+            var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
+
+            if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == s2.StudentId && st.TermId == spring2026.TermId))
+            {
+                _context.StudentTerms.Add(new StudentTerm
+                {
+                    StudentTermId = Guid.NewGuid(),
+                    StudentId = s2.StudentId,
+                    TermId = spring2026.TermId,
+                    EnrollmentStatus = EnrollmentStatus.Active,
+                    PlacementStatus = PlacementStatus.Unplaced,
+                    EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60))
+                });
+            }
+
+            if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == s3.StudentId && st.TermId == spring2026.TermId))
+            {
+                _context.StudentTerms.Add(new StudentTerm
+                {
+                    StudentTermId = Guid.NewGuid(),
+                    StudentId = s3.StudentId,
+                    TermId = spring2026.TermId,
+                    EnrollmentStatus = EnrollmentStatus.Active,
+                    PlacementStatus = PlacementStatus.Placed,
+                    EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60))
+                });
+            }
+
+            if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == s4.StudentId && st.TermId == summer2026.TermId))
+            {
+                _context.StudentTerms.Add(new StudentTerm
+                {
+                    StudentTermId = Guid.NewGuid(),
+                    StudentId = s4.StudentId,
+                    TermId = summer2026.TermId,
+                    EnrollmentStatus = EnrollmentStatus.Active,
+                    PlacementStatus = PlacementStatus.Unplaced,
+                    EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5))
+                });
+            }
+
+            if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == s4.StudentId && st.TermId == spring2026Ct.TermId))
+            {
+                _context.StudentTerms.Add(new StudentTerm
+                {
+                    StudentTermId = Guid.NewGuid(),
+                    StudentId = s4.StudentId,
+                    TermId = spring2026Ct.TermId,
+                    EnrollmentStatus = EnrollmentStatus.Active,
+                    PlacementStatus = PlacementStatus.Placed,
+                    EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-30))
+                });
+            }
+
+            if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == s5.StudentId && st.TermId == fall2025.TermId))
+            {
+                _context.StudentTerms.Add(new StudentTerm
+                {
+                    StudentTermId = Guid.NewGuid(),
+                    StudentId = s5.StudentId,
+                    TermId = fall2025.TermId,
+                    EnrollmentStatus = EnrollmentStatus.Active,
+                    PlacementStatus = PlacementStatus.Placed,
+                    EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-200))
+                });
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task SeedInternshipGroups()
         {
-            if (await _context.InternshipGroups.AnyAsync()) return;
-
             var spring2026 = await _context.Terms.FirstAsync(t => t.Name == "Spring 2026");
             var fall2025 = await _context.Terms.FirstAsync(t => t.Name == "Fall 2025");
+            var spring2026Ct = await _context.Terms
+                .Include(t => t.University)
+                .FirstOrDefaultAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU-CT");
             var fsoft = await _context.Enterprises.FirstAsync(e => e.Name == "FPT Software");
             var rikkeisoft = await _context.Enterprises.FirstAsync(e => e.Name == "Rikkeisoft");
             var mentorFpt = await _context.EnterpriseUsers.Include(eu => eu.User).FirstAsync(eu => eu.User.Email == "mentor@fptsoftware.com");
@@ -286,27 +400,83 @@ namespace IOCv2.Infrastructure.Persistence
 
             var s2 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student2@fptu.edu.vn");
             var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student4@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
-            // Group for Student 3 (Active)
-            var group3 = InternshipGroup.Create(spring2026.TermId, "FPT Software OJT Team", "Next-gen platform development", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow.AddMonths(3));
-            group3.UpdateStatus(GroupStatus.Active);
-            _context.InternshipGroups.Add(group3);
+            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team");
+            if (group3 == null)
+            {
+                group3 = InternshipGroup.Create(spring2026.TermId, "FPT Software OJT Team", "Next-gen platform development", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow.AddMonths(3));
+                group3.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(group3);
+            }
 
-            // Group for Student 5 (Completed)
-            var group5 = InternshipGroup.Create(fall2025.TermId, "Rikkeisoft CRM Legacy", "Maintenance of legacy CRM", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(-2));
-            group5.UpdateStatus(GroupStatus.Finished); // Fixed: Closed -> Finished
-            _context.InternshipGroups.Add(group5);
+            var group5 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
+            if (group5 == null)
+            {
+                group5 = InternshipGroup.Create(fall2025.TermId, "Rikkeisoft CRM Legacy", "Maintenance of legacy CRM", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(-2));
+                group5.UpdateStatus(GroupStatus.Finished); // Fixed: Closed -> Finished
+                _context.InternshipGroups.Add(group5);
+            }
+
+            var rikkeiActiveGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
+            if (rikkeiActiveGroup == null)
+            {
+                rikkeiActiveGroup = InternshipGroup.Create(spring2026.TermId, "Rikkeisoft Spring 2026 Team", "Backend modernization and internal platform work", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
+                rikkeiActiveGroup.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(rikkeiActiveGroup);
+            }
+
+            InternshipGroup? fptCtGroup = null;
+            if (spring2026Ct != null)
+            {
+                fptCtGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software CT OJT Team");
+                if (fptCtGroup == null)
+                {
+                    fptCtGroup = InternshipGroup.Create(spring2026Ct.TermId, "FPT Software CT OJT Team", "Cross-campus internship squad for FPTU Can Tho", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddDays(-15), DateTime.UtcNow.AddMonths(2));
+                    fptCtGroup.UpdateStatus(GroupStatus.Active);
+                    _context.InternshipGroups.Add(fptCtGroup);
+                }
+            }
 
             await _context.SaveChangesAsync();
 
             // Link Students to Groups
-            _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group3.InternshipId, StudentId = s3.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress, JoinedAt = DateTime.UtcNow.AddMonths(-1) });
-            _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group5.InternshipId, StudentId = s5.StudentId, Role = InternshipRole.Leader, Status = InternshipStatus.Completed, JoinedAt = DateTime.UtcNow.AddMonths(-6) });
+            if (!await _context.InternshipStudents.AnyAsync(x => x.InternshipId == group3.InternshipId && x.StudentId == s3.StudentId))
+            {
+                _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group3.InternshipId, StudentId = s3.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress, JoinedAt = DateTime.UtcNow.AddMonths(-1) });
+            }
+
+            if (!await _context.InternshipStudents.AnyAsync(x => x.InternshipId == group5.InternshipId && x.StudentId == s5.StudentId))
+            {
+                _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group5.InternshipId, StudentId = s5.StudentId, Role = InternshipRole.Leader, Status = InternshipStatus.Completed, JoinedAt = DateTime.UtcNow.AddMonths(-6) });
+            }
+
+            if (!await _context.InternshipStudents.AnyAsync(x => x.InternshipId == rikkeiActiveGroup.InternshipId && x.StudentId == s2.StudentId))
+            {
+                _context.InternshipStudents.Add(new InternshipStudent { InternshipId = rikkeiActiveGroup.InternshipId, StudentId = s2.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress, JoinedAt = DateTime.UtcNow.AddDays(-15) });
+            }
+
+            if (fptCtGroup != null && !await _context.InternshipStudents.AnyAsync(x => x.InternshipId == fptCtGroup.InternshipId && x.StudentId == s3.StudentId))
+            {
+                _context.InternshipStudents.Add(new InternshipStudent { InternshipId = fptCtGroup.InternshipId, StudentId = s3.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress, JoinedAt = DateTime.UtcNow.AddDays(-12) });
+            }
 
             // Seed some applications
-            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, Status = InternshipApplicationStatus.Approved, AppliedAt = DateTime.UtcNow.AddDays(-40) });
-            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-10) });
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s3.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, Status = InternshipApplicationStatus.Approved, AppliedAt = DateTime.UtcNow.AddDays(-40) });
+            }
+
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s2.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Approved, AppliedAt = DateTime.UtcNow.AddDays(-10) });
+            }
+
+            if (spring2026Ct != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026Ct.TermId && a.StudentId == s4.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026Ct.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Approved, AppliedAt = DateTime.UtcNow.AddDays(-8) });
+            }
 
             await _context.SaveChangesAsync();
         }
