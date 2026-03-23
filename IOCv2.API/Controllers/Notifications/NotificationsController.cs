@@ -1,4 +1,6 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Notifications.Commands.BulkDeleteNotifications;
+using IOCv2.Application.Features.Notifications.Commands.DeleteNotification;
 using IOCv2.Application.Features.Notifications.Commands.MarkAllAsRead;
 using IOCv2.Application.Features.Notifications.Commands.MarkAsRead;
 using IOCv2.Application.Features.Notifications.Queries.GetNotifications;
@@ -66,6 +68,31 @@ public class NotificationsController : ApiControllerBase
     public async Task<IActionResult> MarkAllAsRead()
     {
         var result = await _mediator.Send(new MarkAllAsReadCommand());
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Xóa một thông báo (Soft Delete).
+    /// </summary>
+    [HttpDelete]
+    [Route("notifications/{id:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteNotification([FromRoute] Guid id)
+    {
+        var result = await _mediator.Send(new DeleteNotificationCommand(id));
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Xóa nhiều thông báo (Soft Delete).
+    /// </summary>
+    [HttpPost]
+    [Route("notifications/bulk-delete")]
+    [ProducesResponseType(typeof(ApiResponse<int>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> BulkDeleteNotifications([FromBody] BulkDeleteNotificationsCommand command)
+    {
+        var result = await _mediator.Send(command);
         return HandleResult(result);
     }
 }
