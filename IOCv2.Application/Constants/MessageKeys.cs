@@ -581,7 +581,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
             public const string TooManyRows = "StudentTerms.TooManyRows";
 
-            // Validation — TermId / StudentTermId
+            // Validation â€” TermId / StudentTermId
             public const string TermIdRequired = "StudentTerms.TermIdRequired";
             public const string StudentTermIdRequired = "StudentTerms.StudentTermIdRequired";
             public const string StudentTermIdListRequired = "StudentTerms.StudentTermIdListRequired";
@@ -589,15 +589,15 @@ namespace IOCv2.Application.Constants
             public const string ValidRecordsRequired = "StudentTerms.ValidRecordsRequired";
             public const string ValidRecordsMinCount = "StudentTerms.ValidRecordsMinCount";
 
-            // Validation — File
+            // Validation â€” File
             public const string FileRequired = "StudentTerms.FileRequired";
             public const string FileEmpty = "StudentTerms.FileEmpty";
 
-            // Validation — FullName
+            // Validation â€” FullName
             public const string FullNameRequired = "StudentTerms.FullNameRequired";
             public const string FullNameInvalid = "StudentTerms.FullNameInvalid";
 
-            // Validation — StudentCode
+            // Validation â€” StudentCode
             public const string StudentCodeRequired = "StudentTerms.StudentCodeRequired";
             public const string StudentCodeInvalid = "StudentTerms.StudentCodeInvalid";
             public const string StudentCodeInvalidDetail = "StudentTerms.StudentCodeInvalidDetail";
@@ -605,21 +605,21 @@ namespace IOCv2.Application.Constants
             public const string StudentCodeAlreadyInTerm = "StudentTerms.StudentCodeAlreadyInTerm";
             public const string StudentCodeInOtherTerm = "StudentTerms.StudentCodeInOtherTerm";
 
-            // Validation — Email
+            // Validation â€” Email
             public const string EmailRequired = "StudentTerms.EmailRequired";
             public const string EmailInvalid = "StudentTerms.EmailInvalid";
             public const string EmailDuplicateInFile = "StudentTerms.EmailDuplicateInFile";
             public const string EmailAlreadyInTerm = "StudentTerms.EmailAlreadyInTerm";
             public const string EmailInOtherTerm = "StudentTerms.EmailInOtherTerm";
 
-            // Validation — Phone
+            // Validation â€” Phone
             public const string PhoneInvalid = "StudentTerms.PhoneInvalid";
 
-            // Validation — DateOfBirth
+            // Validation â€” DateOfBirth
             public const string DateOfBirthInvalidFormat = "StudentTerms.DateOfBirthInvalidFormat";
             public const string DateOfBirthMinAge = "StudentTerms.DateOfBirthMinAge";
 
-            // Validation — List query
+            // Validation â€” List query
             public const string SearchTermMaxLength = "StudentTerms.SearchTermMaxLength";
             public const string SortByAllowedValues = "StudentTerms.SortByAllowedValues";
             public const string SortOrderAllowedValues = "StudentTerms.SortOrderAllowedValues";
@@ -715,6 +715,18 @@ namespace IOCv2.Application.Constants
             //create
             public const string StudentNotFound = "Student.NotFound";
         }
+        public static class Notifications
+        {
+            public const string NotFound = "Notifications.NotFound";
+            public const string AccessDenied = "Notifications.AccessDenied";
+            public const string MarkReadSuccess = "Notifications.MarkReadSuccess";
+            public const string MarkAllReadSuccess = "Notifications.MarkAllReadSuccess";
+            public const string DeleteSuccess = "Notifications.DeleteSuccess";
+            public const string DeleteError = "Notifications.DeleteError";
+            public const string BulkDeleteSuccess = "Notifications.BulkDeleteSuccess";
+            public const string DeleteNotOwner = "Notifications.DeleteNotOwner";
+            public const string BulkDeleteEmptyIds = "Notifications.BulkDeleteEmptyIds";
+            public const string NotificationIdRequired = "Notifications.NotificationIdRequired";
+        }
     }
 }
-

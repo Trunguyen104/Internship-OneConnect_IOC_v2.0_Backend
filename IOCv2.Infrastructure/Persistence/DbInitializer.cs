@@ -57,6 +57,7 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedProjectsAndWorkItems();
             await SeedLogbooks();
             await SeedEvaluations();
+            await SeedNotifications();
 
             if (_context.ChangeTracker.HasChanges())
             {
@@ -689,6 +690,37 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedNotifications()
+        {
+            if (await _context.Set<Notification>().AnyAsync()) return;
+
+            var s3User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "student3@fptu.edu.vn");
+            var devUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "trunguyen.104@gmail.com");
+
+            var notifications = new List<Notification>();
+
+            if (s3User != null)
+            {
+                notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = s3User.UserId, Title = "Hồ sơ thực tập được duyệt", Content = "Hồ sơ thực tập của bạn tại FPT Software đã được duyệt.", Type = NotificationType.ApplicationAccepted, ReferenceType = "InternshipApplication", IsRead = false });
+                notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = s3User.UserId, Title = "Nhắc nhở nộp báo cáo", Content = "Sắp đến hạn nộp báo cáo định kỳ. Vui lòng cập nhật Logbook.", Type = NotificationType.LogbookFeedback, IsRead = true, ReadAt = DateTime.UtcNow.AddDays(-1) });
+            }
+
+            if (devUser != null)
+            {
+                for (int i = 1; i <= 10; i++)
+                {
+                    notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = devUser.UserId, Title = $"Thông báo Demo số {i}", Content = $"Đây là nội dung chi tiết cho thông báo demo số {i}. Vui lòng kiểm tra chức năng hệ thống.", Type = NotificationType.General, IsRead = (i % 3 == 0), ReadAt = (i % 3 == 0) ? DateTime.UtcNow.AddHours(-i) : null });
+                }
+            }
+
+            if (notifications.Any())
+            {
+                _context.Set<Notification>().AddRange(notifications);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
