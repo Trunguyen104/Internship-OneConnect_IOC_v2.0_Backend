@@ -112,7 +112,7 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.UpdateUser
                     parsedDob = dobVal;
                 }
 
-                user.UpdateProfile(request.FullName, request.PhoneNumber, request.AvatarUrl, request.Gender, parsedDob);
+                user.UpdateProfile(request.FullName, request.PhoneNumber, request.AvatarUrl, request.Gender, parsedDob, request.Address);
 
                 if (request.Status.HasValue)
                 {

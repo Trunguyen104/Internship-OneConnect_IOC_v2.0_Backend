@@ -28,6 +28,17 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
 
             RuleFor(v => v.Department)
                 .MaximumLength(150).WithMessage("Department must not exceed 150 characters.");
+
+            RuleFor(v => v.CvFile)
+                .Must(file => file == null || file.Length <= 10 * 1024 * 1024)
+                .WithMessage("CV file must not exceed 10MB.")
+                .Must(file =>
+                {
+                    if (file == null) return true;
+                    var extension = Path.GetExtension(file.FileName).ToLower();
+                    return extension == ".pdf" || extension == ".doc" || extension == ".docx";
+                })
+                .WithMessage("Only .pdf, .doc, and .docx files are allowed.");
         }
 
         private bool LinkMustBeUrl(string? link)

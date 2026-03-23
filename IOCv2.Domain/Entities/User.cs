@@ -1,4 +1,4 @@
-﻿using IOCv2.Domain.Enums;
+using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
 {
@@ -11,6 +11,7 @@ namespace IOCv2.Domain.Entities
         public string FullName { get; private set; } = null!;
         public string? PhoneNumber { get; private set; }
         public string? AvatarUrl { get; private set; }
+        public string? Address { get; private set; }
         public DateOnly? DateOfBirth { get; private set; }
         public UserGender Gender { get; private set; }
         public UserStatus Status { get; private set; } = UserStatus.Active;
@@ -37,13 +38,14 @@ namespace IOCv2.Domain.Entities
             Status = UserStatus.Active;
         }
 
-        public void UpdateProfile(string fullName, string? phoneNumber, string? avatarUrl, UserGender? gender, DateOnly? dateOfBirth)
+        public void UpdateProfile(string fullName, string? phoneNumber, string? avatarUrl, UserGender? gender, DateOnly? dateOfBirth, string? address)
         {
             FullName = fullName;
             if (phoneNumber != null) PhoneNumber = phoneNumber;
             if (avatarUrl != null) AvatarUrl = avatarUrl;
             if (gender.HasValue) Gender = gender.Value;
             if (dateOfBirth.HasValue) DateOfBirth = dateOfBirth.Value;
+            if (address != null) Address = address;
         }
 
         public void SetStatus(UserStatus status)

@@ -15,6 +15,7 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUsers
         public UserStatus Status { get; set; }
         public string? UnitName { get; set; } // University Name or Enterprise Name
         public Guid? UnitId { get; set; }     // UniversityId or EnterpriseId
+        public string? AvatarUrl { get; set; }
         public DateTime CreatedAt { get; set; }
 
         public void Mapping(Profile profile)
