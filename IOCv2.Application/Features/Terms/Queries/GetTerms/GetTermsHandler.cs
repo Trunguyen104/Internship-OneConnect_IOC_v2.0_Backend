@@ -1,5 +1,5 @@
 
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -41,99 +41,109 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
     public async Task<Result<PaginatedResult<GetTermsResponse>>> Handle(GetTermsQuery request,
         CancellationToken cancellationToken)
     {
-    
-            var userId = Guid.Parse(_currentUserService.UserId!);
-            var isSuperAdmin =
-                string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
-            Guid? universityId = null;
 
-            if (isSuperAdmin)
-            {
-                // SuperAdmin: optionally filter by UniversityId from query param
-                universityId = request.UniversityId;
-            }
-            else
-            {
-                // SchoolAdmin: resolve university from UniversityUser table
-                var universityUser = await _unitOfWork.Repository<UniversityUser>()
-                    .Query()
-                    .Where(uu => uu.UserId == userId)
-                    .FirstOrDefaultAsync(cancellationToken);
+        var userId = Guid.Parse(_currentUserService.UserId!);
+        var isSuperAdmin =
+            string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
+        var isHR =
+            string.Equals(_currentUserService.Role, "HR", StringComparison.OrdinalIgnoreCase);
+        var isMentor =
+            string.Equals(_currentUserService.Role, "Mentor", StringComparison.OrdinalIgnoreCase);
+        Guid? universityId = null;
 
-                if (universityUser == null)
-                {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.Terms.LogUserNotAssociatedWithUniversity),
-                        userId);
-                    return Result<PaginatedResult<GetTermsResponse>>.Failure(
-                        _messageService.GetMessage(MessageKeys.University.NotFound),
-                        ResultErrorType.NotFound);
-                }
-
-                universityId = universityUser.UniversityId;
-            }
-
-            var cacheKey = TermCacheKeys.TermList(universityId, request.SearchTerm, (int?)request.Status, request.Year, request.PageNumber, request.PageSize, request.SortColumn, request.SortOrder);
-            var cached = await _cacheService.GetAsync<PaginatedResult<GetTermsResponse>>(cacheKey, cancellationToken);
-            if (cached is not null)
-                return Result<PaginatedResult<GetTermsResponse>>.Success(cached);
-
-            // Build query
-            var query = _unitOfWork.Repository<Term>()
+        if (isSuperAdmin)
+        {
+            // SuperAdmin: optionally filter by UniversityId from query param
+            universityId = request.UniversityId;
+        }
+        else if (isHR || isMentor)
+        {
+            // HR / Mentor: xem được tất cả các kỳ (không giới hạn theo trường)
+            // universityId giữ null → không filter theo university
+            _logger.LogInformation("User {UserId} (role: {Role}) is viewing all terms.", userId, _currentUserService.Role);
+        }
+        else
+        {
+            // SchoolAdmin: resolve university from UniversityUser table
+            var universityUser = await _unitOfWork.Repository<UniversityUser>()
                 .Query()
-                .AsNoTracking();
+                .Where(uu => uu.UserId == userId)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            // SuperAdmin without UniversityId filter → all universities; otherwise filter by university
-            if (universityId.HasValue) query = query.Where(t => t.UniversityId == universityId.Value);
-
-            // Apply search filter
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            if (universityUser == null)
             {
-                var searchTerm = request.SearchTerm.Trim().ToLower();
-                query = query.Where(t => t.Name.ToLower().Contains(searchTerm));
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.Terms.LogUserNotAssociatedWithUniversity),
+                    userId);
+                return Result<PaginatedResult<GetTermsResponse>>.Failure(
+                    _messageService.GetMessage(MessageKeys.University.NotFound),
+                    ResultErrorType.NotFound);
             }
 
-            // Apply status filter
-            if (request.Status.HasValue)
+            universityId = universityUser.UniversityId;
+        }
+
+        var cacheKey = TermCacheKeys.TermList(universityId, request.SearchTerm, (int?)request.Status, request.Year, request.PageNumber, request.PageSize, request.SortColumn, request.SortOrder);
+        var cached = await _cacheService.GetAsync<PaginatedResult<GetTermsResponse>>(cacheKey, cancellationToken);
+        if (cached is not null)
+            return Result<PaginatedResult<GetTermsResponse>>.Success(cached);
+
+        // Build query
+        var query = _unitOfWork.Repository<Term>()
+            .Query()
+            .AsNoTracking();
+
+        // SuperAdmin without UniversityId filter → all universities; otherwise filter by university
+        if (universityId.HasValue) query = query.Where(t => t.UniversityId == universityId.Value);
+
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            var searchTerm = request.SearchTerm.Trim().ToLower();
+            query = query.Where(t => t.Name.ToLower().Contains(searchTerm));
+        }
+
+        // Apply status filter
+        if (request.Status.HasValue)
+        {
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            query = request.Status.Value switch
             {
-                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                TermDisplayStatus.Upcoming => query.Where(t => t.Status == TermStatus.Open && t.StartDate > today),
+                TermDisplayStatus.Active => query.Where(t =>
+                    t.Status == TermStatus.Open && t.StartDate <= today && t.EndDate >= today),
+                TermDisplayStatus.Ended => query.Where(t => t.Status == TermStatus.Open && t.EndDate < today),
+                TermDisplayStatus.Closed => query.Where(t => t.Status == TermStatus.Closed),
+                _ => query
+            };
+        }
 
-                query = request.Status.Value switch
-                {
-                    TermDisplayStatus.Upcoming => query.Where(t => t.Status == TermStatus.Open && t.StartDate > today),
-                    TermDisplayStatus.Active => query.Where(t =>
-                        t.Status == TermStatus.Open && t.StartDate <= today && t.EndDate >= today),
-                    TermDisplayStatus.Ended => query.Where(t => t.Status == TermStatus.Open && t.EndDate < today),
-                    TermDisplayStatus.Closed => query.Where(t => t.Status == TermStatus.Closed),
-                    _ => query
-                };
-            }
+        // Apply year filter
+        if (request.Year.HasValue) query = query.Where(t => t.StartDate.Year == request.Year.Value);
 
-            // Apply year filter
-            if (request.Year.HasValue) query = query.Where(t => t.StartDate.Year == request.Year.Value);
+        // Get total count
+        var totalCount = await query.CountAsync(cancellationToken);
 
-            // Get total count
-            var totalCount = await query.CountAsync(cancellationToken);
+        // Apply sorting
+        query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-            // Apply sorting
-            query = ApplySorting(query, request.SortColumn, request.SortOrder);
+        // Apply pagination
+        var items = await query
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ProjectTo<GetTermsResponse>(_mapper.ConfigurationProvider)
+            .ToListAsync(cancellationToken);
 
-            // Apply pagination
-            var items = await query
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ProjectTo<GetTermsResponse>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
+        var result =
+            PaginatedResult<GetTermsResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
 
-            var result =
-                PaginatedResult<GetTermsResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermsRetrieved), items.Count,
+            universityId);
 
-            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermsRetrieved), items.Count,
-                universityId);
+        await _cacheService.SetAsync(cacheKey, result, TermCacheKeys.Expiration.TermList, cancellationToken);
 
-            await _cacheService.SetAsync(cacheKey, result, TermCacheKeys.Expiration.TermList, cancellationToken);
+        return Result<PaginatedResult<GetTermsResponse>>.Success(result);
 
-            return Result<PaginatedResult<GetTermsResponse>>.Success(result);
-    
     }
 
     private IQueryable<Term> ApplySorting(IQueryable<Term> query, string? sortColumn, string? sortOrder)

@@ -155,6 +155,7 @@ namespace IOCv2.Application.Constants
             public const string StudentListToRemoveRequired = "InternshipGroup.StudentListToRemoveRequired";
             public const string InvalidStudentId = "InternshipGroup.InvalidStudentId";
             public const string TermNotFound = "InternshipGroup.TermNotFound";
+            public const string TermNotActive = "InternshipGroup.TermNotActive";
             public const string EnterpriseNotFound = "InternshipGroup.EnterpriseNotFound";
             public const string MentorNotFound = "InternshipGroup.MentorNotFound";
             public const string StudentNotFound = "InternshipGroup.StudentNotFound";

@@ -14,7 +14,8 @@ public static class InternshipGroupCacheKeys
         int? status,
         Guid? termId,
         bool includeArchived,
-        Guid? enterpriseId)
+        Guid? enterpriseId,
+        Guid userId)
     {
         var searchPart = string.IsNullOrWhiteSpace(searchTerm) ? "none" : searchTerm.Trim().ToLowerInvariant();
         var statusPart = status?.ToString() ?? "all";
@@ -22,7 +23,7 @@ public static class InternshipGroupCacheKeys
         var archivedPart = includeArchived.ToString().ToLowerInvariant();
         var enterprisePart = enterpriseId?.ToString() ?? "all";
 
-        return $"{GroupListPrefix}:status:{statusPart}:search:{searchPart}:term:{termPart}:archived:{archivedPart}:enterprise:{enterprisePart}:page:{pageNumber}:size:{pageSize}";
+        return $"{GroupListPrefix}:user:{userId}:status:{statusPart}:search:{searchPart}:term:{termPart}:archived:{archivedPart}:enterprise:{enterprisePart}:page:{pageNumber}:size:{pageSize}";
     }
 
     public static string GroupListPattern() => $"{GroupListPrefix}:*";

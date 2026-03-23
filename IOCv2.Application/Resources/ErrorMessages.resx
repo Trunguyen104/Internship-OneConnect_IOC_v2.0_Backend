@@ -993,6 +993,9 @@
     <data name="InternshipGroup.TermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ.</value>
   </data>
+    <data name="InternshipGroup.TermNotActive" xml:space="preserve">
+    <value>Học kỳ này không (đang) trong trạng thái Active. Chỉ có thể tạo nhóm thực tập trong kỳ đang diễn ra.</value>
+  </data>
     <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
     <value>Không tìm thấy doanh nghiệp.</value>
   </data>
