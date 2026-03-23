@@ -666,13 +666,13 @@
 
   <!-- StudentTerms Messages -->
   <data name="StudentTerms.NotFound" xml:space="preserve">
-    <value>Không tìm thấy thông tin đăng ký thực tập.</value>
+    <value>Không tìm thấy bản ghi đăng ký thực tập. Vui lòng kiểm tra lại ID hoặc tải lại trang.</value>
   </data>
   <data name="StudentTerms.TermNotOpen" xml:space="preserve">
-    <value>Không thể thực hiện thao tác. Kỳ thực tập đã đóng, đã kết thúc hoặc chưa được mở.</value>
+    <value>Không thể thực hiện thao tác này. Kỳ thực tập phải đang ở trạng thái Open (chưa đóng, chưa kết thúc và đã được mở).</value>
   </data>
   <data name="StudentTerms.TermEndedOrClosed" xml:space="preserve">
-    <value>Không thể chỉnh sửa thông tin sinh viên vì kỳ thực tập đã kết thúc hoặc đã đóng.</value>
+    <value>Không thể thực hiện thao tác này vì kỳ thực tập đã kết thúc hoặc đã đóng chính thức.</value>
   </data>
   <data name="StudentTerms.CannotWithdrawPlacedViaUpdate" xml:space="preserve">
     <value>Không thể đặt trạng thái Rút khi sinh viên đang được xếp vị trí. Vui lòng đổi trạng thái xếp vị trí về Chưa xếp trước.</value>
@@ -684,31 +684,31 @@
     <value>(để trống)</value>
   </data>
   <data name="StudentTerms.EmailConflict" xml:space="preserve">
-    <value>Email đã được sử dụng trong kỳ thực tập này.</value>
+    <value>Email này đã được đăng ký trong hệ thống. Mỗi email chỉ được gắn với một tài khoản sinh viên duy nhất.</value>
   </data>
   <data name="StudentTerms.StudentCodeConflict" xml:space="preserve">
-    <value>Mã sinh viên đã tồn tại trong hệ thống.</value>
+    <value>Mã sinh viên này đã tồn tại trong hệ thống. Vui lòng kiểm tra lại hoặc liên hệ quản trị viên.</value>
   </data>
   <data name="StudentTerms.AlreadyEnrolled" xml:space="preserve">
-    <value>Sinh viên đã được đăng ký trong kỳ thực tập này.</value>
+    <value>Sinh viên này đã được đăng ký vào kỳ thực tập. Mỗi sinh viên chỉ được đăng ký một lần trong cùng một kỳ.</value>
   </data>
   <data name="StudentTerms.AlreadyWithdrawn" xml:space="preserve">
-    <value>Sinh viên đã rút khỏi kỳ thực tập trước đó.</value>
+    <value>Sinh viên này đã bị rút trước đó. Nếu muốn phục hồi, hãy sử dụng chức năng Khôi phục đăng ký.</value>
   </data>
   <data name="StudentTerms.NotWithdrawn" xml:space="preserve">
-    <value>Sinh viên chưa rút khỏi kỳ thực tập.</value>
+    <value>Không thể khôi phục: sinh viên này chưa bị rút khỏi kỳ thực tập.</value>
   </data>
   <data name="StudentTerms.CannotWithdrawPlaced" xml:space="preserve">
-    <value>Sinh viên đang được xếp vị trí, vui lòng huỷ placement trước khi rút.</value>
+    <value>Không thể rút sinh viên đang có vị trí thực tập (Placed). Vui lòng huỷ xếp vị trí (đặt về Unplaced) trước khi rút.</value>
   </data>
   <data name="StudentTerms.EnterpriseIdRequiredWhenPlaced" xml:space="preserve">
-    <value>Cần chỉ định doanh nghiệp khi xếp vị trí cho sinh viên.</value>
+    <value>Cần chỉ định doanh nghiệp (EnterpriseId) khi đặt trạng thái xếp vị trí (Placed) cho sinh viên.</value>
   </data>
   <data name="StudentTerms.EnterpriseNotFound" xml:space="preserve">
-    <value>Không tìm thấy thông tin doanh nghiệp được chỉ định.</value>
+    <value>Không tìm thấy doanh nghiệp được chỉ định. Vui lòng kiểm tra lại ID doanh nghiệp.</value>
   </data>
   <data name="StudentTerms.AllStudentsPlaced" xml:space="preserve">
-    <value>Tất cả sinh viên được chọn đã được xếp vị trí.</value>
+    <value>Không thể rút hàng loạt: tất cả sinh viên được chọn đều đang có vị trí thực tập (Placed). Vui lòng huỷ xếp vị trí trước.</value>
   </data>
   <data name="StudentTerms.InvalidFileFormat" xml:space="preserve">
     <value>Chỉ hỗ trợ file Excel XLSX.</value>
@@ -735,7 +735,7 @@
     <value>Khôi phục đăng ký thực tập thành công.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
-    <value>Rút hàng loạt sinh viên thành công.</value>
+    <value>Rút hàng loạt sinh viên thành công. Các sinh viên đang có vị trí thực tập đã được bỏ qua tự động.</value>
   </data>
   <data name="StudentTerms.ImportPreviewSuccess" xml:space="preserve">
     <value>Xem trước danh sách import thành công.</value>
@@ -756,7 +756,7 @@
     <value>Sinh viên {0} đã được khôi phục vào kỳ thực tập bởi {1}.</value>
   </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
-    <value>Đã rút {0} sinh viên khỏi kỳ thực tập bởi {1}.</value>
+    <value>Đã rút {0} sinh viên khỏi kỳ thực tập {1} bởi {2}.</value>
   </data>
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>Đã import {0} sinh viên vào kỳ thực tập {1} bởi {2}.</value>
@@ -832,7 +832,7 @@
     <value>Kỳ thực tập hiện còn {0} sinh viên chưa được gán công ty. Bạn có chắc chắn muốn đóng kỳ?</value>
   </data>
     <data name="Terms.HasRelatedData" xml:space="preserve">
-    <value>Cảnh báo: Kỳ thực tập này đang có dữ liệu liên quan</value>
+    <value>Cảnh báo: Kỳ thực tập này đang có dữ liệu liên quan (sinh viên đăng ký, nhóm thực tập hoặc chu kỳ đánh giá). Vui lòng xử lý dữ liệu liên quan trước khi xóa.</value>
   </data>
     <data name="Terms.StartDateLocked" xml:space="preserve">
     <value>Ngày bắt đầu không thể thay đổi sau khi kỳ thực tập đã diễn ra.</value>
@@ -895,7 +895,7 @@
     <value>Error updating term {0}</value>
   </data>
     <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
-    <value>Lỗi khi đóng kỳ thực tập {0}</value>
+    <value>Error closing term {0}</value>
   </data>
     <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
     <value>Error deleting term {0}</value>
@@ -1272,5 +1272,22 @@
   </data>
     <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
     <value>Đã xảy ra lỗi khi lấy chi tiết báo cáo vi phạm.</value>
+  </data>
+
+  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+    <value>Phiên đăng nhập không hợp lệ. Vui lòng đăng xuất và đăng nhập lại.</value>
+  </data>
+  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin nhân viên doanh nghiệp của bạn. Vui lòng liên hệ quản trị viên để kiểm tra tài khoản.</value>
+  </data>
+  <data name="ActiveTerms.SystemError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi tải danh sách kỳ thực tập đang hoạt động. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+    <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
+  </data>
+  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+    <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
 </root>

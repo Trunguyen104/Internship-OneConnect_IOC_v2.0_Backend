@@ -657,6 +657,15 @@ namespace IOCv2.Application.Constants
             public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
             public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
         }
+        public static class ActiveTerms
+        {
+            public const string InvalidUserId = "ActiveTerms.InvalidUserId";
+            public const string EnterpriseUserNotFound = "ActiveTerms.EnterpriseUserNotFound";
+            public const string SystemError = "ActiveTerms.SystemError";
+            public const string LogRetrieved = "ActiveTerms.Log.Retrieved";
+            public const string LogError = "ActiveTerms.Log.Error";
+        }
+
         public static class ViolationReportKey
         {
             // Validator

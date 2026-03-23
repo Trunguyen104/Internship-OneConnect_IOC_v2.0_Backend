@@ -532,13 +532,13 @@
 
   <!-- StudentTerms Messages -->
   <data name="StudentTerms.NotFound" xml:space="preserve">
-    <value>Student term enrollment record not found.</value>
+    <value>Student term enrollment record not found. Please verify the ID or reload the page.</value>
   </data>
   <data name="StudentTerms.TermNotOpen" xml:space="preserve">
-    <value>Operation not allowed. The term has been closed, ended, or is not yet open.</value>
+    <value>This operation is not allowed. The term must be in Open status (not closed, not ended, and already started).</value>
   </data>
   <data name="StudentTerms.TermEndedOrClosed" xml:space="preserve">
-    <value>Cannot edit student information because the term has ended or been closed.</value>
+    <value>This operation cannot be performed because the term has already ended or been officially closed.</value>
   </data>
   <data name="StudentTerms.CannotWithdrawPlacedViaUpdate" xml:space="preserve">
     <value>Cannot set enrollment status to Withdrawn while the student is placed. Please set placement status to Unplaced first.</value>
@@ -550,31 +550,31 @@
     <value>(empty)</value>
   </data>
   <data name="StudentTerms.EmailConflict" xml:space="preserve">
-    <value>This email is already used in the current term.</value>
+    <value>This email is already registered in the system. Each email can only be associated with one student account.</value>
   </data>
   <data name="StudentTerms.StudentCodeConflict" xml:space="preserve">
-    <value>Student code already exists in the system.</value>
+    <value>This student code already exists in the system. Please verify or contact the administrator.</value>
   </data>
   <data name="StudentTerms.AlreadyEnrolled" xml:space="preserve">
-    <value>Student is already enrolled in this term.</value>
+    <value>This student is already enrolled in the term. Each student can only be enrolled once per term.</value>
   </data>
   <data name="StudentTerms.AlreadyWithdrawn" xml:space="preserve">
-    <value>Student has already been withdrawn from this term.</value>
+    <value>This student has already been withdrawn. To re-enroll, please use the Restore Enrollment function.</value>
   </data>
   <data name="StudentTerms.NotWithdrawn" xml:space="preserve">
-    <value>Student has not been withdrawn from this term.</value>
+    <value>Cannot restore: this student has not been withdrawn from the term.</value>
   </data>
   <data name="StudentTerms.CannotWithdrawPlaced" xml:space="preserve">
-    <value>Student is currently placed. Please cancel the placement before withdrawing.</value>
+    <value>Cannot withdraw a student who is currently placed. Please set placement status to Unplaced first before withdrawing.</value>
   </data>
   <data name="StudentTerms.EnterpriseIdRequiredWhenPlaced" xml:space="preserve">
-    <value>An enterprise must be specified when placing a student.</value>
+    <value>An enterprise (EnterpriseId) must be specified when setting a student's placement status to Placed.</value>
   </data>
   <data name="StudentTerms.EnterpriseNotFound" xml:space="preserve">
-    <value>The specified enterprise was not found.</value>
+    <value>The specified enterprise was not found. Please verify the enterprise ID.</value>
   </data>
   <data name="StudentTerms.AllStudentsPlaced" xml:space="preserve">
-    <value>All selected students are already placed.</value>
+    <value>Bulk withdrawal failed: all selected students are currently placed. Please unplace them first.</value>
   </data>
   <data name="StudentTerms.InvalidFileFormat" xml:space="preserve">
     <value>Only Excel XLSX files are supported.</value>
@@ -601,7 +601,7 @@
     <value>Student enrollment restored successfully.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
-    <value>Bulk withdrawal completed successfully.</value>
+    <value>Bulk withdrawal completed successfully. Students who were placed were automatically skipped.</value>
   </data>
   <data name="StudentTerms.ImportPreviewSuccess" xml:space="preserve">
     <value>Import preview generated successfully.</value>
@@ -622,7 +622,7 @@
     <value>Student {0} restored to term by {1}.</value>
   </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
-    <value>{0} students withdrawn from term by {1}.</value>
+    <value>{0} students withdrawn from term {1} by {2}.</value>
   </data>
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>{0} students imported into term {1} by {2}.</value>
@@ -698,7 +698,7 @@
     <value>There are {0} students without company assignments in this term. Are you sure you want to close it?</value>
   </data>
     <data name="Terms.HasRelatedData" xml:space="preserve">
-    <value>Warning: This term has related data</value>
+    <value>Warning: This term has related data (enrolled students, internship groups, or evaluation cycles). Please handle related data before deleting.</value>
   </data>
     <data name="Terms.StartDateLocked" xml:space="preserve">
     <value>Start date cannot be changed after the term has started.</value>
@@ -1216,5 +1216,22 @@
   </data>
     <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
     <value>An error occurred while retrieving violation report details.</value>
+  </data>
+
+  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+    <value>Your session is invalid. Please sign out and sign in again.</value>
+  </data>
+  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Your enterprise employee profile was not found. Please contact the administrator to verify your account.</value>
+  </data>
+  <data name="ActiveTerms.SystemError" xml:space="preserve">
+    <value>An error occurred while loading the active internship terms. Please try again later.</value>
+  </data>
+  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+    <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
+  </data>
+  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+    <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
 </root>

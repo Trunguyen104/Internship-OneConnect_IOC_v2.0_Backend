@@ -49,7 +49,7 @@ public class EnterprisesController : ApiControllerBase
     /// - 500 Internal Server Error for unexpected failures.
     /// </returns>
     [HttpGet]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetEnterprisesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -214,30 +214,31 @@ public class EnterprisesController : ApiControllerBase
         return HandleResult(result);
     }
 
-    // ──────── Issue 77: Enterprise Application Management ────────
+    // ──────── Issue 68: Active Term Timeline for HR/Mentor ────────
 
     /// <summary>
-    /// Lấy danh sách kỳ thực tập đang hoạt động (Active) của doanh nghiệp hiện tại.
-    /// HR/EnterpriseAdmin thấy tất cả kỳ có nhóm thuộc doanh nghiệp.
-    /// Mentor chỉ thấy kỳ có nhóm mà họ phụ trách.
-    /// Mỗi kỳ trả về timeline, tiến độ và danh sách deadline đánh giá.
+    /// Retrieves the list of ongoing (Active) internship terms for the enterprise.
+    /// HR/EnterpriseAdmin can view all terms in which the enterprise has internship groups.
+    /// Mentors can only view terms in which they have an InternshipGroup.
+    /// Returns timeline information and evaluation/grading deadlines.
     /// </summary>
-    /// <param name="universityId">Tùy chọn: lọc theo trường đại học.</param>
-    /// <param name="cancellationToken">Token hủy request.</param>
-    [HttpGet("me/active-terms")]
+    /// <param name="query">UniversityId (optional): filters by a specific university.</param>
+    [HttpGet("me/terms/active")]
     [Authorize(Roles = "HR,EnterpriseAdmin,Mentor")]
     [ProducesResponseType(typeof(ApiResponse<GetActiveTermsForEnterpriseResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetActiveTermsForEnterprise(
-        [FromQuery] Guid? universityId,
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetActiveTerms(
+        [FromQuery] GetActiveTermsForEnterpriseQuery query,
         CancellationToken cancellationToken)
     {
-        var query = new GetActiveTermsForEnterpriseQuery { UniversityId = universityId };
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
 
+    // ──────── Issue 77: Enterprise Application Management ────────
+    
     /// <summary>
     /// Lấy danh sách đơn ứng tuyển thực tập của doanh nghiệp theo kỳ (phân trang).
     /// HR/EnterpriseAdmin xem tất cả. Mentor chỉ xem sinh viên trong nhóm của mình.
