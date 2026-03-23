@@ -146,7 +146,7 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
         // 9. Update User profile
         var user = studentTerm.Student.User;
         var newFullName = request.FullName ?? user.FullName;
-        user.UpdateProfile(newFullName, request.Phone ?? user.PhoneNumber, user.AvatarUrl, (IOCv2.Domain.Enums.UserGender?)user.Gender, request.DateOfBirth ?? user.DateOfBirth);
+        user.UpdateProfile(newFullName, request.Phone ?? user.PhoneNumber, user.AvatarUrl, (IOCv2.Domain.Enums.UserGender?)user.Gender, request.DateOfBirth ?? user.DateOfBirth, null);
         if (!string.IsNullOrWhiteSpace(request.Email) && request.Email != user.Email)
             user.UpdateEmail(request.Email);
         if (!string.IsNullOrWhiteSpace(request.StudentCode) && request.StudentCode != user.UserCode)

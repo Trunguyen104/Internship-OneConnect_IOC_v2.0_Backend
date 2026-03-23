@@ -1,4 +1,4 @@
-﻿namespace IOCv2.Infrastructure.Services
+namespace IOCv2.Infrastructure.Services
 {
     public static class EmailTemplates
     {
@@ -197,7 +197,7 @@
         </div>
         <div class='footer'>
             <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
-            <p>&copy; 2026 FoodHub. All rights reserved.</p>
+            <p>&copy; 2026 Internship OneConnect. All rights reserved.</p>
         </div>
     </div>
 </body>
@@ -260,7 +260,7 @@
         </div>
         <div class='footer'>
             <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
-            <p>&copy; 2026 FoodHub. All rights reserved.</p>
+            <p>&copy; 2026 Internship OneConnect. All rights reserved.</p>
         </div>
     </div>
 </body>

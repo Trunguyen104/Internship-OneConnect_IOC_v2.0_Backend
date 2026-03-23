@@ -47,46 +47,40 @@ public class GetSprintByIdHandler : IRequestHandler<GetSprintByIdQuery, Result<G
             return Result<GetSprintByIdResponse>.Success(cachedResult);
         }
 
-        try
+
+        var sprint = await _unitOfWork.Repository<Sprint>().Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.SprintId == request.SprintId && s.ProjectId == request.ProjectId, cancellationToken);
+
+        if (sprint is null)
         {
-            var sprint = await _unitOfWork.Repository<Sprint>().Query()
-                .AsNoTracking()
-                .FirstOrDefaultAsync(s => s.SprintId == request.SprintId && s.ProjectId == request.ProjectId, cancellationToken);
-
-            if (sprint is null)
-            {
-                _logger.LogWarning("Sprint {SprintId} not found in project {ProjectId}", request.SprintId, request.ProjectId);
-                return Result<GetSprintByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
-            }
-
-            // Load work item stats efficiently — single DB query each
-            var workItemIds = await _unitOfWork.Repository<SprintWorkItem>().Query()
-                .AsNoTracking()
-                .Where(swi => swi.SprintId == request.SprintId)
-                .Select(swi => swi.WorkItemId)
-                .ToListAsync(cancellationToken);
-
-            var completedCount = workItemIds.Any()
-                ? await _unitOfWork.Repository<WorkItem>().Query()
-                    .AsNoTracking()
-                    .CountAsync(w => workItemIds.Contains(w.WorkItemId) && w.Status == WorkItemStatus.Done, cancellationToken)
-                : 0;
-
-            var response = _mapper.Map<GetSprintByIdResponse>(sprint);
-            response.TotalWorkItems = workItemIds.Count;
-            response.CompletedWorkItems = completedCount;
-
-            await _cacheService.SetAsync(cacheKey, response, SprintCacheKeys.Expiration.Sprint, cancellationToken);
-
-            _logger.LogInformation("Successfully retrieved sprint {SprintId}", request.SprintId);
-
-            return Result<GetSprintByIdResponse>.Success(response);
+            _logger.LogWarning("Sprint {SprintId} not found in project {ProjectId}", request.SprintId, request.ProjectId);
+            return Result<GetSprintByIdResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting sprint {SprintId}", request.SprintId);
-            return Result<GetSprintByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
+
+        // Load work item stats efficiently — single DB query each
+        var workItemIds = await _unitOfWork.Repository<SprintWorkItem>().Query()
+            .AsNoTracking()
+            .Where(swi => swi.SprintId == request.SprintId)
+            .Select(swi => swi.WorkItemId)
+            .ToListAsync(cancellationToken);
+
+        var completedCount = workItemIds.Any()
+            ? await _unitOfWork.Repository<WorkItem>().Query()
+                .AsNoTracking()
+                .CountAsync(w => workItemIds.Contains(w.WorkItemId) && w.Status == WorkItemStatus.Done, cancellationToken)
+            : 0;
+
+        var response = _mapper.Map<GetSprintByIdResponse>(sprint);
+        response.TotalWorkItems = workItemIds.Count;
+        response.CompletedWorkItems = completedCount;
+
+        await _cacheService.SetAsync(cacheKey, response, SprintCacheKeys.Expiration.Sprint, cancellationToken);
+
+        _logger.LogInformation("Successfully retrieved sprint {SprintId}", request.SprintId);
+
+        return Result<GetSprintByIdResponse>.Success(response);
+
     }
 }

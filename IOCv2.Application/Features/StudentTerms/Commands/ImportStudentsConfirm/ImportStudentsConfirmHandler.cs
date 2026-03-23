@@ -180,7 +180,7 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
                     var newUserId = Guid.NewGuid();
 
                     var newUser = new User(newUserId, record.StudentCode, record.Email, record.FullName, UserRole.Student, passwordHash);
-                    newUser.UpdateProfile(record.FullName, record.Phone, null, null, ParseDob(record.DateOfBirth));
+                    newUser.UpdateProfile(record.FullName, record.Phone, null, null, ParseDob(record.DateOfBirth), null);
                     await _unitOfWork.Repository<User>().AddAsync(newUser, cancellationToken);
 
                     var universityUserLink = new UniversityUser

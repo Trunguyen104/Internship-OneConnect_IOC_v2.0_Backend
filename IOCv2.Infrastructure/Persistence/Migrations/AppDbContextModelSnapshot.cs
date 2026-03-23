@@ -61,7 +61,7 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("metadata");
 
-                    b.Property<Guid>("PerformedById")
+                    b.Property<Guid?>("PerformedById")
                         .HasColumnType("uuid")
                         .HasColumnName("performed_by");
 
@@ -1307,6 +1307,10 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
+                    b.Property<string>("CvUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("cv_url");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("deleted_at");
@@ -1676,6 +1680,10 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text")
+                        .HasColumnName("address");
 
                     b.Property<string>("AvatarUrl")
                         .HasMaxLength(255)

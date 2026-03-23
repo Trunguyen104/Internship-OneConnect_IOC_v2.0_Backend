@@ -32,9 +32,6 @@ public class GetEvaluationCriteriaHandler
         GetEvaluationCriteriaQuery request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Getting EvaluationCriteria for Cycle {CycleId}", request.CycleId);
-
-        try
-        {
             var cacheKey = EvaluationCriteriaCacheKeys.CriteriaList(request.CycleId);
             var cached = await _cacheService.GetAsync<List<GetEvaluationCriteriaResponse>>(cacheKey, cancellationToken);
             if (cached is not null)
@@ -60,11 +57,5 @@ public class GetEvaluationCriteriaHandler
             await _cacheService.SetAsync(cacheKey, criteria, EvaluationCriteriaCacheKeys.Expiration.CriteriaList, cancellationToken);
 
             return Result<List<GetEvaluationCriteriaResponse>>.Success(criteria);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting EvaluationCriteria for Cycle {CycleId}", request.CycleId);
-            return Result<List<GetEvaluationCriteriaResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
     }
 }

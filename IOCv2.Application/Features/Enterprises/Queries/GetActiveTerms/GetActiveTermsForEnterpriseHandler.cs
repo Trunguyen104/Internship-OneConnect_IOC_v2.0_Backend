@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,17 +17,20 @@ public class GetActiveTermsForEnterpriseHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<GetActiveTermsForEnterpriseHandler> _logger;
 
     public GetActiveTermsForEnterpriseHandler(
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
         IMessageService messageService,
+        ICacheService cacheService,
         ILogger<GetActiveTermsForEnterpriseHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -98,6 +102,42 @@ public class GetActiveTermsForEnterpriseHandler
         if (termIdsInScope.Count == 0)
         {
             var empty = new GetActiveTermsForEnterpriseResponse { Terms = new List<ActiveTermTimelineResponse>() };
+        // Try cache
+        var cacheKey = EnterpriseCacheKeys.ActiveTerms(enterpriseId, enterpriseUser.EnterpriseUserId, isMentor, request.UniversityId);
+        var cached = await _cacheService.GetAsync<GetActiveTermsForEnterpriseResponse>(cacheKey, cancellationToken);
+        if (cached != null)
+            return Result<GetActiveTermsForEnterpriseResponse>.Success(cached);
+
+        // Resolve term IDs in scope for this user — only Active groups count
+        IQueryable<InternshipGroup> groupQuery;
+        if (isMentor)
+        {
+            // Mentor: only active groups where MentorId = this user's EnterpriseUserId
+            groupQuery = _unitOfWork.Repository<InternshipGroup>()
+                .Query()
+                .AsNoTracking()
+                .Where(ig => ig.MentorId == enterpriseUser.EnterpriseUserId
+                             && ig.Status == GroupStatus.Active);
+        }
+        else
+        {
+            // HR / EnterpriseAdmin: all active groups belonging to the enterprise
+            groupQuery = _unitOfWork.Repository<InternshipGroup>()
+                .Query()
+                .AsNoTracking()
+                .Where(ig => ig.EnterpriseId == enterpriseId
+                             && ig.Status == GroupStatus.Active);
+        }
+
+        var termIdsInScope = await groupQuery
+            .Select(ig => ig.TermId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        if (termIdsInScope.Count == 0)
+        {
+            var empty = new GetActiveTermsForEnterpriseResponse { Terms = new List<ActiveTermTimelineResponse>() };
+            await _cacheService.SetAsync(cacheKey, empty, EnterpriseCacheKeys.Expiration.ActiveTerms, cancellationToken);
             return Result<GetActiveTermsForEnterpriseResponse>.Success(empty);
         }
 
@@ -122,6 +162,7 @@ public class GetActiveTermsForEnterpriseHandler
         if (terms.Count == 0)
         {
             var empty = new GetActiveTermsForEnterpriseResponse { Terms = new List<ActiveTermTimelineResponse>() };
+            await _cacheService.SetAsync(cacheKey, empty, EnterpriseCacheKeys.Expiration.ActiveTerms, cancellationToken);
             return Result<GetActiveTermsForEnterpriseResponse>.Success(empty);
         }
 
@@ -191,6 +232,7 @@ public class GetActiveTermsForEnterpriseHandler
         }).ToList();
 
         var response = new GetActiveTermsForEnterpriseResponse { Terms = termResponses };
+        await _cacheService.SetAsync(cacheKey, response, EnterpriseCacheKeys.Expiration.ActiveTerms, cancellationToken);
 
         return Result<GetActiveTermsForEnterpriseResponse>.Success(response);
     }

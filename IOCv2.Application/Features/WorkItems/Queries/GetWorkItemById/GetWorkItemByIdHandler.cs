@@ -37,8 +37,7 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
     {
         _logger.LogInformation("Getting work item {WorkItemId} for project {ProjectId}", request.WorkItemId, request.ProjectId);
 
-        try
-        {
+
         var cacheKey = WorkItemCacheKeys.WorkItem(request.WorkItemId);
         var cached = await _cacheService.GetAsync<GetWorkItemByIdResponse>(cacheKey, cancellationToken);
         if (cached is not null)
@@ -60,11 +59,6 @@ public class GetWorkItemByIdHandler : IRequestHandler<GetWorkItemByIdQuery, Resu
         var response = _mapper.Map<GetWorkItemByIdResponse>(workItem);
         await _cacheService.SetAsync(cacheKey, response, WorkItemCacheKeys.Expiration.WorkItem, cancellationToken);
         return Result<GetWorkItemByIdResponse>.Success(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting work item {WorkItemId}", request.WorkItemId);
-            return Result<GetWorkItemByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
+
     }
 }
