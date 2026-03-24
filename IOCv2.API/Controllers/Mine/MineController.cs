@@ -15,12 +15,12 @@ public class MineController : ApiControllerBase
 
     public MineController(IMediator mediator) => _mediator = mediator;
 
-    [HttpGet("internship-terms")]
+    [HttpGet("internship-phase")]
     [RateLimit(maxRequests: 20, windowMinutes: 1, blockMinutes: 5)]
     [ProducesResponseType(typeof(ApiResponse<List<GetMyInternshipTermsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetMyTerms(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetMyInternshipPhase(CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(new GetMyInternshipTermsQuery(), cancellationToken));
+        return HandleResult(await _mediator.Send(new GetMyInternshipPhaseQuery(), cancellationToken));
     }
 }
