@@ -794,6 +794,7 @@ namespace IOCv2.Infrastructure.Persistence
             if (await _context.Set<Notification>().AnyAsync()) return;
 
             var s3User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "student3@fptu.edu.vn");
+            var s5User = await _context.Users.FirstOrDefaultAsync(u => u.Email == "student5@fptu.edu.vn");
             var devUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "trunguyen.104@gmail.com");
 
             var notifications = new List<Notification>();
@@ -802,6 +803,13 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = s3User.UserId, Title = "Hồ sơ thực tập được duyệt", Content = "Hồ sơ thực tập của bạn tại FPT Software đã được duyệt.", Type = NotificationType.ApplicationAccepted, ReferenceType = "InternshipApplication", IsRead = false });
                 notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = s3User.UserId, Title = "Nhắc nhở nộp báo cáo", Content = "Sắp đến hạn nộp báo cáo định kỳ. Vui lòng cập nhật Logbook.", Type = NotificationType.LogbookFeedback, IsRead = true, ReadAt = DateTime.UtcNow.AddDays(-1) });
+            }
+
+            if (s5User != null)
+            {
+                notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = s5User.UserId, Title = "Đã nhận được báo cáo Logbook", Content = "Mentor đã nhận xét báo cáo số 1 của bạn.", Type = NotificationType.LogbookFeedback, ReferenceType = "Logbook", IsRead = false });
+                notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = s5User.UserId, Title = "Kết quả đánh giá", Content = "Đánh giá thực tập của bạn đã được công bố.", Type = NotificationType.EvaluationPublished, IsRead = true, ReadAt = DateTime.UtcNow.AddDays(-2) });
+                notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = s5User.UserId, Title = "Hoàn thành thực tập", Content = "Chúc mừng bạn đã hoàn thành kỳ thực tập.", Type = NotificationType.General, IsRead = false });
             }
 
             if (devUser != null)
