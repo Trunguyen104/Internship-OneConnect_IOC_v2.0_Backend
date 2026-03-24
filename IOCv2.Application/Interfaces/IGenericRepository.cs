@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace IOCv2.Application.Interfaces
 {
@@ -15,5 +16,13 @@ namespace IOCv2.Application.Interfaces
         Task HardDeleteAsync(T entity, CancellationToken cancellationToken = default);
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Bulk update — dịch trực tiếp ra SQL UPDATE, không load entity vào memory.
+        /// </summary>
+        Task<int> ExecuteUpdateAsync(
+            Expression<Func<T, bool>> predicate,
+            Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls,
+            CancellationToken cancellationToken = default);
     }
 }

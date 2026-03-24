@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using IOCv2.Infrastructure.Persistence;
 using IOCv2.Infrastructure.Persistence.Repositories;
 using IOCv2.Infrastructure.Security;

@@ -715,6 +715,18 @@ namespace IOCv2.Application.Constants
             //create
             public const string StudentNotFound = "Student.NotFound";
         }
+        public static class Notifications
+        {
+            public const string NotFound = "Notifications.NotFound";
+            public const string AccessDenied = "Notifications.AccessDenied";
+            public const string MarkReadSuccess = "Notifications.MarkReadSuccess";
+            public const string MarkAllReadSuccess = "Notifications.MarkAllReadSuccess";
+            public const string DeleteSuccess = "Notifications.DeleteSuccess";
+            public const string DeleteError = "Notifications.DeleteError";
+            public const string BulkDeleteSuccess = "Notifications.BulkDeleteSuccess";
+            public const string DeleteNotOwner = "Notifications.DeleteNotOwner";
+            public const string BulkDeleteEmptyIds = "Notifications.BulkDeleteEmptyIds";
+            public const string NotificationIdRequired = "Notifications.NotificationIdRequired";
+        }
     }
 }
-
