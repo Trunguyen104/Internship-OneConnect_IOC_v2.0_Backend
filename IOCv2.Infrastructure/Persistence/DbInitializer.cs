@@ -51,6 +51,7 @@ namespace IOCv2.Infrastructure.Persistence
         {
             await SeedUniversities();
             await SeedEnterprises();
+            await SeedJobs(); // added: seed test jobs for enterprises
             await SeedUsers();
             await SeedTerms();
             await SeedInternshipGroups();
@@ -110,6 +111,47 @@ namespace IOCv2.Infrastructure.Persistence
                 await _context.Enterprises.AddRangeAsync(enterprises);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        // New: seed a couple of test jobs tied to seeded enterprises
+        private async Task SeedJobs()
+        {
+            if (await _context.Jobs.AnyAsync()) return;
+
+            var job1Id = Guid.NewGuid();
+            var job2Id = Guid.NewGuid();
+
+            var sql = @"
+INSERT INTO jobs (job_id, enterprise_id, title, description, requirements, location, internship_duration, benefit, quantity, expire_date, status, created_at)
+VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
+       ({11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, now())";
+
+            await _context.Database.ExecuteSqlRawAsync(sql,
+                // job 1 - FPT Software
+                job1Id,
+                SeedIds.FptSoftwareId,
+                "Junior .NET Intern",
+                "Assist backend team building APIs for the IOC v2 platform.",
+                "C#, .NET, EF Core, REST",
+                "Hà Nội (Hybrid)",
+                12,
+                "Monthly stipend, mentorship",
+                2,
+                DateTime.UtcNow.AddMonths(1),
+                (short)JobStatus.OPEN,
+                // job 2 - Rikkeisoft
+                job2Id,
+                SeedIds.RikkeisoftId,
+                "Frontend Intern (Angular)",
+                "Work on feature improvements and UI polishing for legacy CRM.",
+                "Angular, TypeScript, HTML/CSS",
+                "Hà Nội (On-site)",
+                12,
+                "Stipend, certificate",
+                1,
+                DateTime.UtcNow.AddMonths(1),
+                (short)JobStatus.OPEN
+            );
         }
 
         private async Task SeedUsers()

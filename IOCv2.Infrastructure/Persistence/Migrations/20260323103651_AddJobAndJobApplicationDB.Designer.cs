@@ -3,6 +3,7 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260323103651_AddJobAndJobApplicationDB")]
+    partial class AddJobAndJobApplicationDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -834,14 +837,6 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("CvId")
                         .HasColumnType("uuid")
                         .HasColumnName("cv_id");
-
-                    b.Property<string>("CvSnapshotFileName")
-                        .HasColumnType("text")
-                        .HasColumnName("cv_snapshot_file_name");
-
-                    b.Property<string>("CvSnapshotUrl")
-                        .HasColumnType("text")
-                        .HasColumnName("cv_snapshot_url");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
