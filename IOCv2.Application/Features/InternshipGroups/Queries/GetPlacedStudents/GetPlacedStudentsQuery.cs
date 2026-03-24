@@ -6,7 +6,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents
 {
     public record GetPlacedStudentsQuery : IRequest<Result<PaginatedResult<GetPlacedStudentsResponse>>>
     {
-        public Guid TermId { get; init; }
+        public Guid? TermId { get; init; }      // null = tự động tìm kỳ Active/Upcoming
         public int PageNumber { get; init; } = 1;
         public int PageSize { get; init; } = 10;
         public string? SearchTerm { get; init; }
