@@ -104,12 +104,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 Guid? resolvedMentorId = null; // EnterpriseUserId lưu vào DB
                 if (request.MentorId.HasValue)
                 {
-                    // Tìm EnterpriseUser theo UserId (frontend truyền UserId, không phải EnterpriseUserId)
+                    // Tìm EnterpriseUser kèm User → kiểm tra role phải là Mentor
                     var mentor = await _unitOfWork.Repository<EnterpriseUser>()
                         .Query()
+                        .Include(eu => eu.User)
                         .AsNoTracking()
-                        .FirstOrDefaultAsync(u => u.UserId == request.MentorId.Value
-                                               && u.EnterpriseId == enterpriseUser.EnterpriseId, cancellationToken);
+                        .FirstOrDefaultAsync(eu => eu.UserId == request.MentorId.Value
+                                               && eu.EnterpriseId == enterpriseUser.EnterpriseId, cancellationToken);
+
                     if (mentor == null)
                     {
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
@@ -117,6 +119,16 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                             _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
                             ResultErrorType.NotFound);
                     }
+
+                    // Chỉ chấp nhận tài khoản có role Mentor
+                    if (mentor.User == null || mentor.User.Role != IOCv2.Domain.Enums.UserRole.Mentor)
+                    {
+                        _logger.LogWarning("User {UserId} is not a Mentor role, cannot be assigned as mentor.", request.MentorId);
+                        return Result<CreateInternshipGroupResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
+                            ResultErrorType.BadRequest);
+                    }
+
                     resolvedMentorId = mentor.EnterpriseUserId; // Lưu EnterpriseUserId vào DB
                 }
 

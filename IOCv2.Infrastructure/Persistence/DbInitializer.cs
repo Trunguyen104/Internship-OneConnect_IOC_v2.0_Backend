@@ -443,6 +443,45 @@ namespace IOCv2.Infrastructure.Persistence
 
             await _context.SaveChangesAsync();
 
+            // ── Thêm nhóm chuyên dùng để test DELETE AC-G09 ───────────────────────
+            // [TEST-DELETE-1] Active + KHÔNG có data thực tế + còn SV → CÓ THỂ XÓA
+            var deleteTestGroup1 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "[TEST] FPT Active - Xóa được");
+            if (deleteTestGroup1 == null)
+            {
+                deleteTestGroup1 = InternshipGroup.Create(spring2026.TermId, "[TEST] FPT Active - Xóa được",
+                    "Nhóm Active, có SV nhưng KHÔNG có logbook/vi phạm/workitem → có thể xóa",
+                    fsoft.EnterpriseId, mentorFpt.EnterpriseUserId,
+                    DateTime.UtcNow.AddDays(-10), DateTime.UtcNow.AddMonths(2));
+                deleteTestGroup1.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(deleteTestGroup1);
+            }
+
+            // [TEST-DELETE-2] Active + CÓ logbook → BỊ CHẶN (có data thực tế)
+            var deleteTestGroup2 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "[TEST] FPT Active - Không xóa được (có data)");
+            if (deleteTestGroup2 == null)
+            {
+                deleteTestGroup2 = InternshipGroup.Create(spring2026.TermId, "[TEST] FPT Active - Không xóa được (có data)",
+                    "Nhóm Active, có logbook → bị chặn khi xóa",
+                    fsoft.EnterpriseId, mentorFpt.EnterpriseUserId,
+                    DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
+                deleteTestGroup2.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(deleteTestGroup2);
+            }
+
+            // [TEST-DELETE-3] Finished → BỊ CHẶN (không phải Active)
+            var deleteTestGroup3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "[TEST] Rikkei Finished - Không xóa được (Finished)");
+            if (deleteTestGroup3 == null)
+            {
+                deleteTestGroup3 = InternshipGroup.Create(spring2026.TermId, "[TEST] Rikkei Finished - Không xóa được (Finished)",
+                    "Nhóm đã Finished → bị chặn khi xóa do không phải Active",
+                    rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId,
+                    DateTime.UtcNow.AddDays(-60), DateTime.UtcNow.AddDays(-5));
+                deleteTestGroup3.UpdateStatus(GroupStatus.Finished);
+                _context.InternshipGroups.Add(deleteTestGroup3);
+            }
+
+            await _context.SaveChangesAsync();
+
             // Link Students to Groups
             if (!await _context.InternshipStudents.AnyAsync(x => x.InternshipId == group3.InternshipId && x.StudentId == s3.StudentId))
             {
@@ -464,7 +503,15 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.InternshipStudents.Add(new InternshipStudent { InternshipId = fptCtGroup.InternshipId, StudentId = s3.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress, JoinedAt = DateTime.UtcNow.AddDays(-12) });
             }
 
-            // Seed some applications
+            // Thêm s4 vào TEST-DELETE-1 (nhóm Active, có SV nhưng không có data → xóa được)
+            if (deleteTestGroup1 != null && !await _context.InternshipStudents.AnyAsync(x => x.InternshipId == deleteTestGroup1.InternshipId && x.StudentId == s4.StudentId))
+            {
+                _context.InternshipStudents.Add(new InternshipStudent { InternshipId = deleteTestGroup1.InternshipId, StudentId = s4.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.Registered, JoinedAt = DateTime.UtcNow.AddDays(-5) });
+            }
+
+            await _context.SaveChangesAsync();
+
+            // ── Các đơn đã Approved (giữ nguyên) ─────────────────────────────────
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s3.StudentId))
             {
                 _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, Status = InternshipApplicationStatus.Approved, AppliedAt = DateTime.UtcNow.AddDays(-40) });
@@ -478,6 +525,50 @@ namespace IOCv2.Infrastructure.Persistence
             if (spring2026Ct != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026Ct.TermId && a.StudentId == s4.StudentId))
             {
                 _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026Ct.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Approved, AppliedAt = DateTime.UtcNow.AddDays(-8) });
+            }
+
+            // ── Đơn Pending: FPT Software - Spring 2026 (FPTU) ──────────────────
+            var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
+
+            if (s1 != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s1.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s1.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-5) });
+            }
+
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s4.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-3) });
+            }
+
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s5.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s5.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-1) });
+            }
+
+            // ── Đơn Pending: Rikkeisoft - Spring 2026 (FPTU) ────────────────────
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s4.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-7) });
+            }
+
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s5.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s5.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-2) });
+            }
+
+            // ── Đơn Pending: FPT Software - Summer 2026 (Upcoming) ───────────────
+            var summer2026 = await _context.Terms
+                .Include(t => t.University)
+                .FirstOrDefaultAsync(t => t.Name == "Summer 2026" && t.University.Code == "FPTU");
+
+            if (summer2026 != null && s1 != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == summer2026.TermId && a.StudentId == s1.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = summer2026.TermId, StudentId = s1.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-2) });
+            }
+
+            if (summer2026 != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == summer2026.TermId && a.StudentId == s2.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = summer2026.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-1) });
             }
 
             await _context.SaveChangesAsync();
@@ -548,7 +639,17 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 _context.Logbooks.Add(Logbook.Create(proj5.InternshipId, s5.StudentId, $"Work report {i}", null, "Continue next task", DateTime.UtcNow.AddMonths(-6 + i)));
             }
-            
+
+            // Thêm logbook cho TEST-DELETE-2 → nhóm này có data thực tế, KHÔNG thể xóa
+            var deleteTestGroup2 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "[TEST] FPT Active - Không xóa được (có data)");
+            if (deleteTestGroup2 != null)
+            {
+                _context.Logbooks.Add(Logbook.Create(
+                    deleteTestGroup2.InternshipId, s3.StudentId,
+                    "Báo cáo test — nhóm này có data, không thể xóa.", null,
+                    "Kiểm tra chức năng chặn xóa nhóm.", DateTime.UtcNow.AddDays(-3)));
+            }
+
             await _context.SaveChangesAsync();
         }
 

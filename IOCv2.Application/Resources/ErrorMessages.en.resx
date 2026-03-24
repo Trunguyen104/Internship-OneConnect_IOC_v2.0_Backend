@@ -1204,6 +1204,12 @@
   <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
     <value>The group has already been archived.</value>
   </data>
+  <data name="InternshipGroup.HasActivityData" xml:space="preserve">
+    <value>The group has existing activity data (logbooks, evaluations, violations, or projects with content) and cannot be deleted. Please use the Archive function to preserve history.</value>
+  </data>
+  <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
+    <value>Only Active groups can be deleted. Finished or Archived groups cannot be deleted.</value>
+  </data>
 
     <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Error getting violation reports</value>
