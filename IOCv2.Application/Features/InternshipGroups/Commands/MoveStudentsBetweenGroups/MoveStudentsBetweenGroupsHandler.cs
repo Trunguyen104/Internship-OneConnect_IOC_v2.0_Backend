@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -15,17 +16,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly ILogger<MoveStudentsBetweenGroupsHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public MoveStudentsBetweenGroupsHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUserService,
             IMessageService messageService,
-            ILogger<MoveStudentsBetweenGroupsHandler> logger)
+            ILogger<MoveStudentsBetweenGroupsHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<MoveStudentsBetweenGroupsResponse>> Handle(MoveStudentsBetweenGroupsCommand request, CancellationToken cancellationToken)
@@ -104,8 +108,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
                 var memberRepo = _unitOfWork.Repository<InternshipStudent>();
                 foreach (var member in membersInFrom)
                 {
-                    // Remove from FromGroup
-                    await memberRepo.DeleteAsync(member);
+                    // Hard-delete: xóa hẳn record khỏi DB thay vì soft-delete
+                    // để tránh conflict composite PK (InternshipId, StudentId) khi move ngược lại
+                    await memberRepo.HardDeleteAsync(member);
 
                     // Add to ToGroup only if not already in it
                     if (!toGroup.Members.Any(m => m.StudentId == member.StudentId))
@@ -117,6 +122,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(toGroup);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                // Xóa cache của cả 2 nhóm để đảm bảo dữ liệu cập nhật đúng
+                await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.FromGroupId), cancellationToken);
+                await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.ToGroupId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
 
                 return Result<MoveStudentsBetweenGroupsResponse>.Success(new MoveStudentsBetweenGroupsResponse
                 {
