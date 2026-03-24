@@ -42,9 +42,9 @@ public class EvaluationsController : ApiControllerBase
     /// </summary>
     [HttpGet("cycles")]
     [ProducesResponseType(typeof(ApiResponse<List<GetEvaluationCyclesResponse>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetEvaluationCycles([FromQuery] Guid termId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetEvaluationCycles([FromQuery] Guid phaseId, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetEvaluationCyclesQuery { TermId = termId }, cancellationToken);
+        var result = await _mediator.Send(new GetEvaluationCyclesQuery { PhaseId = phaseId }, cancellationToken);
         return HandleResult(result);
     }
 

@@ -31,6 +31,7 @@ public partial class AppDbContext : DbContext
 
     // Project Management
     public DbSet<Term> Terms { get; set; } = null!;
+    public DbSet<InternshipPhase> InternshipPhases { get; set; } = null!;
     public DbSet<StudentTerm> StudentTerms { get; set; } = null!;
     public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
     public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;

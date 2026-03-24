@@ -12,14 +12,14 @@ public static class InternshipGroupCacheKeys
         int pageSize,
         string? searchTerm,
         int? status,
-        Guid? termId,
+        Guid? phaseId,
         bool includeArchived,
         Guid? enterpriseId,
         Guid userId)
     {
         var searchPart = string.IsNullOrWhiteSpace(searchTerm) ? "none" : searchTerm.Trim().ToLowerInvariant();
         var statusPart = status?.ToString() ?? "all";
-        var termPart = termId?.ToString() ?? "all";
+        var termPart = phaseId?.ToString() ?? "all";
         var archivedPart = includeArchived.ToString().ToLowerInvariant();
         var enterprisePart = enterpriseId?.ToString() ?? "all";
 
