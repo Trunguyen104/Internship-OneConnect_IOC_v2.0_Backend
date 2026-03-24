@@ -53,7 +53,7 @@ public class GetEnterpriseApplicationsQueryHandler
             if (currentUserRole == UserRole.Mentor.ToString())
             {
                 var mentorStudentIds = await _unitOfWork.Repository<InternshipGroup>().Query().AsNoTracking()
-                    .Where(ig => ig.EnterpriseId == enterpriseId && ig.TermId == request.TermId && ig.MentorId == enterpriseUser.EnterpriseUserId)
+                    .Where(ig => ig.EnterpriseId == enterpriseId && ig.MentorId == enterpriseUser.EnterpriseUserId)
                     .SelectMany(ig => ig.Members)
                     .Select(m => m.StudentId)
                     .ToListAsync(cancellationToken);
@@ -92,8 +92,7 @@ public class GetEnterpriseApplicationsQueryHandler
                 .Include(ms => ms.InternshipGroup).ThenInclude(ig => ig.Mentor).ThenInclude(m => m.User)
                 .Include(ms => ms.InternshipGroup).ThenInclude(ig => ig.Projects)
                 .Where(ms => studentIds.Contains(ms.StudentId) &&
-                             ms.InternshipGroup.EnterpriseId == enterpriseId &&
-                             ms.InternshipGroup.TermId == request.TermId)
+                             ms.InternshipGroup.EnterpriseId == enterpriseId)
                 .ToListAsync(cancellationToken);
 
             var responses = applications.Select(app =>

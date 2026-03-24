@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.StudentEvaluations.Queries.GetStudentEvaluationCycles;
 
-public class GetStudentEvaluationCyclesHandler 
+public class GetStudentEvaluationCyclesHandler
     : IRequestHandler<GetStudentEvaluationCyclesQuery, Result<List<GetStudentEvaluationCyclesResponse>>>
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -24,8 +24,8 @@ public class GetStudentEvaluationCyclesHandler
     private readonly ILogger<GetStudentEvaluationCyclesHandler> _logger;
 
     public GetStudentEvaluationCyclesHandler(
-        IUnitOfWork unitOfWork, 
-        IMapper mapper, 
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
         IMessageService messageService,
         ILogger<GetStudentEvaluationCyclesHandler> logger)
     {
@@ -51,7 +51,7 @@ public class GetStudentEvaluationCyclesHandler
             if (studentId == Guid.Empty)
             {
                 return Result<List<GetStudentEvaluationCyclesResponse>>.Failure(
-                    _messageService.GetMessage(MessageKeys.Common.Forbidden), 
+                    _messageService.GetMessage(MessageKeys.Common.Forbidden),
                     ResultErrorType.Forbidden);
             }
 
@@ -62,28 +62,28 @@ public class GetStudentEvaluationCyclesHandler
             {
                 _logger.LogWarning("Access denied for Student {StudentId} to InternshipGroup {InternshipId}", studentId, request.InternshipId);
                 return Result<List<GetStudentEvaluationCyclesResponse>>.Failure(
-                    _messageService.GetMessage(MessageKeys.Common.Forbidden), 
+                    _messageService.GetMessage(MessageKeys.Common.Forbidden),
                     ResultErrorType.Forbidden);
             }
         }
 
-        // 2. Lấy TermId của nhóm thực tập
-        var termId = await _unitOfWork.Repository<InternshipGroup>().Query()
+        // 2. Lấy PhaseId của nhóm thực tập
+        var phaseId = await _unitOfWork.Repository<InternshipGroup>().Query()
             .Where(ig => ig.InternshipId == request.InternshipId)
-            .Select(ig => ig.TermId)
+            .Select(ig => ig.PhaseId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (termId == Guid.Empty)
+        if (phaseId == Guid.Empty)
         {
             return Result<List<GetStudentEvaluationCyclesResponse>>.Failure(
-                _messageService.GetMessage(MessageKeys.Common.NotFound), 
+                _messageService.GetMessage(MessageKeys.Common.NotFound),
                 ResultErrorType.NotFound);
         }
 
-        // 3. Lấy ra danh sách các đợt đánh giá ứng với Học kỳ đó
+        // 3. Lấy ra danh sách các đợt đánh giá ứng với Đợt thực tập đó
         var cycles = await _unitOfWork.Repository<EvaluationCycle>().Query()
             .AsNoTracking()
-            .Where(c => c.TermId == termId)
+            .Where(c => c.PhaseId == phaseId)
             .OrderBy(c => c.StartDate)
             .ProjectTo<GetStudentEvaluationCyclesResponse>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);

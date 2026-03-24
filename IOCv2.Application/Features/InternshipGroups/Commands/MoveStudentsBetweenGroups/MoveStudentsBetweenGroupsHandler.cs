@@ -75,7 +75,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
                     ResultErrorType.Forbidden);
             }
 
-            if (fromGroup.TermId != toGroup.TermId)
+            if (fromGroup.PhaseId != toGroup.PhaseId)
             {
                 return Result<MoveStudentsBetweenGroupsResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.InternshipGroups.MustBeInSameTerm),

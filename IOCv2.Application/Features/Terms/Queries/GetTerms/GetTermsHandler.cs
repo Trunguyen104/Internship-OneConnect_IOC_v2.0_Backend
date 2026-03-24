@@ -131,7 +131,7 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
                 var mid = mentorEnterpriseUserId.Value;
                 query = query.Where(t =>
                     _unitOfWork.Repository<InternshipGroup>().Query()
-                        .Any(ig => ig.TermId == t.TermId && ig.MentorId == mid));
+                        .Any(ig => ig.EnterpriseId == enterpriseId.Value && ig.MentorId == mid));
             }
             else if (enterpriseId.HasValue)
             {
@@ -141,9 +141,7 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
                     _unitOfWork.Repository<InternshipApplication>().Query()
                         .Any(a => a.TermId == t.TermId && a.EnterpriseId == eid) ||
                     _unitOfWork.Repository<StudentTerm>().Query()
-                        .Any(st => st.TermId == t.TermId && st.EnterpriseId == eid && st.EnrollmentStatus == EnrollmentStatus.Active) ||
-                    _unitOfWork.Repository<InternshipGroup>().Query()
-                        .Any(ig => ig.TermId == t.TermId && ig.EnterpriseId == eid));
+                        .Any(st => st.TermId == t.TermId && st.EnterpriseId == eid && st.EnrollmentStatus == EnrollmentStatus.Active));
             }
 
             // Apply search filter
