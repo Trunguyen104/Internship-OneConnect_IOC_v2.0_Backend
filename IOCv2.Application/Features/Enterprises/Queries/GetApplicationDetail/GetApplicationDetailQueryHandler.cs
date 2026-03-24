@@ -53,7 +53,6 @@ public class GetApplicationDetailQueryHandler : IRequestHandler<GetApplicationDe
             {
                 var mentorStudentIds = await _unitOfWork.Repository<InternshipGroup>().Query().AsNoTracking()
                     .Where(ig => ig.EnterpriseId == enterpriseUser.EnterpriseId &&
-                                 ig.TermId == app.TermId &&
                                  ig.MentorId == enterpriseUser.EnterpriseUserId)
                     .SelectMany(ig => ig.Members)
                     .Select(m => m.StudentId)
@@ -67,8 +66,7 @@ public class GetApplicationDetailQueryHandler : IRequestHandler<GetApplicationDe
                 .Include(ms => ms.InternshipGroup).ThenInclude(ig => ig.Mentor).ThenInclude(m => m.User)
                 .Include(ms => ms.InternshipGroup).ThenInclude(ig => ig.Projects)
                 .FirstOrDefaultAsync(ms => ms.StudentId == app.StudentId &&
-                                            ms.InternshipGroup.EnterpriseId == enterpriseUser.EnterpriseId &&
-                                            ms.InternshipGroup.TermId == app.TermId, cancellationToken);
+                                            ms.InternshipGroup.EnterpriseId == enterpriseUser.EnterpriseId, cancellationToken);
 
             var dto = new GetApplicationDetailResponse
             {

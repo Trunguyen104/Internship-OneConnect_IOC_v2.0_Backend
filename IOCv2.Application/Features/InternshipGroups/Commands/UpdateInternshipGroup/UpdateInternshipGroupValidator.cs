@@ -12,7 +12,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.NameRequired))
                 .MaximumLength(255).WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.NameMaxLength));
 
-            RuleFor(v => v.TermId)
+            RuleFor(v => v.PhaseId)
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.TermIdRequired));
 
             RuleFor(v => v.StartDate)

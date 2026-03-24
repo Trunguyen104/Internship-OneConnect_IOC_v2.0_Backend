@@ -6,7 +6,7 @@ public static class EvaluationCycleCacheKeys
     private const string CycleListPrefix = "evaluation-cycles";
 
     public static string Cycle(Guid cycleId) => $"{CyclePrefix}:{cycleId}";
-    public static string CycleList(Guid termId) => $"{CycleListPrefix}:term:{termId}";
+    public static string CycleList(Guid phaseId) => $"{CycleListPrefix}:phase:{phaseId}";
     public static string CycleListPattern() => $"{CycleListPrefix}:*";
     public static string CyclePattern() => $"{CyclePrefix}:*";
 

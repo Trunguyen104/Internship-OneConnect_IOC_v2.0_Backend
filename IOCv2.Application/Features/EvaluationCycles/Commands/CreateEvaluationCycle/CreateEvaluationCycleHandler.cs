@@ -33,39 +33,39 @@ public class CreateEvaluationCycleHandler
     public async Task<Result<CreateEvaluationCycleResponse>> Handle(
         CreateEvaluationCycleCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating EvaluationCycle {Name} for Term {TermId}", request.Name, request.TermId);
+        _logger.LogInformation("Creating EvaluationCycle {Name} for Phase {PhaseId}", request.Name, request.PhaseId);
 
-        var term = await _unitOfWork.Repository<Term>().Query()
-            .FirstOrDefaultAsync(t => t.TermId == request.TermId, cancellationToken);
+        var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
+            .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId, cancellationToken);
 
-        if (term == null)
+        if (phase == null)
         {
-            _logger.LogWarning("Term {TermId} not found", request.TermId);
+            _logger.LogWarning("InternshipPhase {PhaseId} not found", request.PhaseId);
             return Result<CreateEvaluationCycleResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationCycle.TermNotFound),
                 ResultErrorType.NotFound);
         }
 
         var isDuplicateName = await _unitOfWork.Repository<EvaluationCycle>().Query()
-            .AnyAsync(c => c.TermId == request.TermId && c.Name.ToLower() == request.Name.ToLower(), cancellationToken);
+            .AnyAsync(c => c.PhaseId == request.PhaseId && c.Name.ToLower() == request.Name.ToLower(), cancellationToken);
 
         if (isDuplicateName)
         {
-            _logger.LogWarning("EvaluationCycle {Name} already exists in Term {TermId}", request.Name, request.TermId);
+            _logger.LogWarning("EvaluationCycle {Name} already exists in Phase {PhaseId}", request.Name, request.PhaseId);
             return Result<CreateEvaluationCycleResponse>.Failure(
-                "Tên đợt đánh giá đã tồn tại trong học kỳ này.",
+                "Tên đợt đánh giá đã tồn tại trong đợt thực tập này.",
                 ResultErrorType.Conflict);
         }
 
         var requestStartDate = DateOnly.FromDateTime(request.StartDate);
         var requestEndDate = DateOnly.FromDateTime(request.EndDate);
 
-        if (requestStartDate < term.StartDate || requestEndDate > term.EndDate)
+        if (requestStartDate < phase.StartDate || requestEndDate > phase.EndDate)
         {
-            _logger.LogWarning("EvaluationCycle dates {StartDate} to {EndDate} are out of bounds for Term {TermId} ({TermStart} to {TermEnd})", 
-                request.StartDate, request.EndDate, request.TermId, term.StartDate, term.EndDate);
+            _logger.LogWarning("EvaluationCycle dates {StartDate} to {EndDate} are out of bounds for Phase {PhaseId} ({PhaseStart} to {PhaseEnd})",
+                request.StartDate, request.EndDate, request.PhaseId, phase.StartDate, phase.EndDate);
             return Result<CreateEvaluationCycleResponse>.Failure(
-                $"Thời gian đợt đánh giá phải nằm trong khoảng thời gian của Học kỳ ({term.StartDate:dd/MM/yyyy} - {term.EndDate:dd/MM/yyyy}).",
+                $"Thời gian đợt đánh giá phải nằm trong khoảng thời gian của Đợt thực tập ({phase.StartDate:dd/MM/yyyy} - {phase.EndDate:dd/MM/yyyy}).",
                 ResultErrorType.BadRequest);
         }
 
@@ -76,7 +76,7 @@ public class CreateEvaluationCycleHandler
         var cycle = new EvaluationCycle
         {
             CycleId = Guid.NewGuid(),
-            TermId = request.TermId,
+            PhaseId = request.PhaseId,
             Name = request.Name,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
@@ -95,7 +95,7 @@ public class CreateEvaluationCycleHandler
         return Result<CreateEvaluationCycleResponse>.Success(new CreateEvaluationCycleResponse
         {
             CycleId = cycle.CycleId,
-            TermId = cycle.TermId,
+            PhaseId = cycle.PhaseId,
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,
@@ -107,7 +107,7 @@ public class CreateEvaluationCycleHandler
         catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogError(ex, "Error occurred while creating EvaluationCycle for Term {TermId}", request.TermId);
+            _logger.LogError(ex, "Error occurred while creating EvaluationCycle for Phase {PhaseId}", request.PhaseId);
             return Result<CreateEvaluationCycleResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
         }
     }

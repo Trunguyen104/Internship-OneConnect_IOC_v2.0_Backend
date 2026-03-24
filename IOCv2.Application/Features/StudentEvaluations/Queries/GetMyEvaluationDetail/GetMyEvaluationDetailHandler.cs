@@ -54,7 +54,7 @@ public class GetMyEvaluationDetailHandler
             var mockMember = await _unitOfWork.Repository<InternshipStudent>().Query()
                 .AsNoTracking()
                 .Include(m => m.InternshipGroup)
-                .Where(m => m.InternshipGroup.TermId == cycle.TermId)
+                .Where(m => m.InternshipGroup.PhaseId == cycle.PhaseId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (mockMember == null) return Result<GetMyEvaluationDetailResponse>.Failure("Không có sinh viên nào trong Term này để test", ResultErrorType.Forbidden);
@@ -73,7 +73,7 @@ public class GetMyEvaluationDetailHandler
             var studentGroupMember = await _unitOfWork.Repository<InternshipStudent>().Query()
                 .AsNoTracking()
                 .Include(m => m.InternshipGroup)
-                .Where(m => m.StudentId == currentStudentId && m.InternshipGroup.TermId == cycle.TermId)
+                .Where(m => m.StudentId == currentStudentId && m.InternshipGroup.PhaseId == cycle.PhaseId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (studentGroupMember == null)

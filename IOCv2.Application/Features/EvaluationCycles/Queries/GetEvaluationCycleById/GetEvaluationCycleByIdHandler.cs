@@ -41,7 +41,7 @@ public class GetEvaluationCycleByIdHandler
 
             var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
                 .AsNoTracking()
-                .Include(c => c.Term)
+                .Include(c => c.InternshipPhase)
                 .Include(c => c.Criteria)
                 .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
@@ -56,8 +56,8 @@ public class GetEvaluationCycleByIdHandler
         var response = new GetEvaluationCycleByIdResponse
         {
             CycleId = cycle.CycleId,
-            TermId = cycle.TermId,
-            TermName = cycle.Term.Name,
+            PhaseId = cycle.PhaseId,
+            PhaseName = cycle.InternshipPhase?.Name ?? string.Empty,
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,

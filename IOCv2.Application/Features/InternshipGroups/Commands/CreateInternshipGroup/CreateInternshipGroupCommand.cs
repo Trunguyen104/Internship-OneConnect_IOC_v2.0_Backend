@@ -10,9 +10,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
     public record CreateInternshipGroupCommand : IRequest<Result<CreateInternshipGroupResponse>>
     {
         /// <summary>
-        /// Identity of the academic term.
+        /// Identity of the internship phase.
         /// </summary>
-        public Guid TermId { get; init; }
+        public Guid PhaseId { get; init; }
 
         /// <summary>
         /// Display name of the internship group.

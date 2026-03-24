@@ -57,7 +57,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents
                             .FirstOrDefault(m => m.StudentId == app.StudentId 
                                                  && m.InternshipGroup != null 
                                                  && m.InternshipGroup.EnterpriseId == enterpriseUser.EnterpriseId
-                                                 && m.InternshipGroup.TermId == request.TermId
                                                  && m.InternshipGroup.Status == GroupStatus.Active)
                         
                         select new

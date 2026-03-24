@@ -21,9 +21,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         public string GroupName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Updated term identity.
+        /// Updated phase identity.
         /// </summary>
-        public Guid TermId { get; set; }
+        public Guid PhaseId { get; set; }
 
         /// <summary>
         /// Group status after update.

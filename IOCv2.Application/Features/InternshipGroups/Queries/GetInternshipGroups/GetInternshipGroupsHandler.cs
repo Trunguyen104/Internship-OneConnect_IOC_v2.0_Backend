@@ -115,7 +115,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 request.PageSize,
                 request.SearchTerm,
                 request.Status.HasValue ? (int)request.Status.Value : null,
-                request.TermId,
+                request.PhaseId,
                 request.IncludeArchived,
                 request.EnterpriseId,
                 currentUserId);
@@ -131,7 +131,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 .Include(ig => ig.Enterprise)
                 .Include(ig => ig.Mentor!).ThenInclude(m => m.User!)
                 .Include(ig => ig.Members)
-                .Include(ig => ig.Term)
+                .Include(ig => ig.InternshipPhase)
                 .AsNoTracking();
 
             // Filter bắt buộc theo role
@@ -161,8 +161,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 query = query.Where(x => x.Status != GroupStatus.Archived);
             }
 
-            if (request.TermId.HasValue)
-                query = query.Where(x => x.TermId == request.TermId.Value);
+            if (request.PhaseId.HasValue)
+                query = query.Where(x => x.PhaseId == request.PhaseId.Value);
 
             // EnterpriseId từ request: chỉ áp dụng khi không bị force (SuperAdmin/SchoolAdmin)
             if (request.EnterpriseId.HasValue && forcedEnterpriseId == null && forcedMentorId == null && forcedStudentId == null)
