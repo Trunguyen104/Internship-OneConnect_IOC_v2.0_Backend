@@ -17,8 +17,8 @@ public class EvaluationCycleConfiguration : IEntityTypeConfiguration<EvaluationC
             .HasColumnName("cycle_id")
             .IsRequired();
 
-        builder.Property(e => e.TermId)
-            .HasColumnName("term_id")
+        builder.Property(e => e.PhaseId)
+            .HasColumnName("phase_id")
             .IsRequired();
 
         builder.Property(e => e.Name)
@@ -60,19 +60,14 @@ public class EvaluationCycleConfiguration : IEntityTypeConfiguration<EvaluationC
             .HasColumnName("deleted_at");
 
         // Relationships
-        builder.HasOne(e => e.Term)
-            .WithMany()
-            .HasForeignKey(e => e.TermId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasMany(e => e.Criteria)
             .WithOne(c => c.Cycle)
             .HasForeignKey(c => c.CycleId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Indexes
-        builder.HasIndex(e => e.TermId)
-            .HasDatabaseName("ix_evaluation_cycles_term_id");
+        builder.HasIndex(e => e.PhaseId)
+            .HasDatabaseName("ix_evaluation_cycles_phase_id");
 
         builder.HasIndex(e => e.Status)
             .HasDatabaseName("ix_evaluation_cycles_status");

@@ -1,5 +1,4 @@
 using AutoMapper;
-using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
@@ -39,7 +38,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
 
         public async Task<Result<CreateInternshipGroupResponse>> Handle(CreateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogCreating), request.GroupName, request.TermId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogCreating), request.GroupName, request.PhaseId);
 
             try
             {
@@ -65,25 +64,25 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         ResultErrorType.Forbidden);
                 }
 
-                // ── 3. Validate TermId & kiểm tra kỳ phải đang Active ─────────────
-                var term = await _unitOfWork.Repository<Term>().Query()
+                // ── 3. Validate PhaseId & kiểm tra đợt phải đang Open ─────────────
+                var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(t => t.TermId == request.TermId, cancellationToken);
+                    .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId, cancellationToken);
 
-                if (term == null)
+                if (phase == null)
                 {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.PhaseId);
                     return Result<CreateInternshipGroupResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound),
+                        "Không tìm thấy đợt thực tập.",
                         ResultErrorType.NotFound);
                 }
 
-                if (!TermStatusHelper.IsActive(term.StartDate, term.EndDate, term.Status))
+                if (phase.Status != InternshipPhaseStatus.Open)
                 {
-                    _logger.LogWarning("Term {TermId} is not active (status: {Status}, start: {Start}, end: {End}). Cannot create internship group.",
-                        request.TermId, term.Status, term.StartDate, term.EndDate);
+                    _logger.LogWarning("Phase {PhaseId} is not open (status: {Status}). Cannot create internship group.",
+                        request.PhaseId, phase.Status);
                     return Result<CreateInternshipGroupResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotActive),
+                        "Đợt thực tập không ở trạng thái mở.",
                         ResultErrorType.BadRequest);
                 }
 
@@ -135,7 +134,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 var newGroup = InternshipGroup.Create(
-                    request.TermId,
+                    request.PhaseId,
                     request.GroupName,
                     request.Description,
                     request.EnterpriseId,
@@ -177,8 +176,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         .AsNoTracking()
                         .Where(a => studentIds.Contains(a.StudentId)
                                  && a.EnterpriseId == enterpriseUser.EnterpriseId
-                                 && a.Status == InternshipApplicationStatus.Approved
-                                 && a.TermId == request.TermId)
+                                 && a.Status == InternshipApplicationStatus.Approved)
                         .Select(a => a.StudentId)
                         .ToListAsync(cancellationToken);
 
@@ -199,7 +197,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     var alreadyInGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                         .AsNoTracking()
                         .Include(g => g.Members)
-                        .Where(g => g.TermId == request.TermId && g.Status == GroupStatus.Active)
+                        .Where(g => g.PhaseId == request.PhaseId && g.Status == GroupStatus.Active)
                         .SelectMany(g => g.Members)
                         .Where(m => studentIds.Contains(m.StudentId))
                         .Select(m => m.StudentId)
@@ -208,7 +206,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     if (alreadyInGroup.Any())
                     {
                         var firstInGroup = alreadyInGroup.First();
-                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentAlreadyInActiveGroup), firstInGroup, request.TermId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentAlreadyInActiveGroup), firstInGroup, request.PhaseId);
                         await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                         return Result<CreateInternshipGroupResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.InternshipGroups.StudentAlreadyInActiveGroup),

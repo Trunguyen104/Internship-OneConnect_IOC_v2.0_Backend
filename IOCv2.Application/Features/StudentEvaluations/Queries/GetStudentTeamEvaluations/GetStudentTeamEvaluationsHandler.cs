@@ -54,7 +54,7 @@ public class GetStudentTeamEvaluationsHandler
             var mockMember = await _unitOfWork.Repository<InternshipStudent>().Query()
                 .AsNoTracking()
                 .Include(m => m.InternshipGroup)
-                .Where(m => m.InternshipGroup.TermId == cycle.TermId)
+                .Where(m => m.InternshipGroup.PhaseId == cycle.PhaseId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (mockMember == null) return Result<List<GetStudentTeamEvaluationsResponse>>.Failure("Không có sinh viên nào trong Term này để test", ResultErrorType.Forbidden);
@@ -75,12 +75,12 @@ public class GetStudentTeamEvaluationsHandler
             var studentGroupMember = await _unitOfWork.Repository<InternshipStudent>().Query()
                 .AsNoTracking()
                 .Include(m => m.InternshipGroup)
-                .Where(m => m.StudentId == currentStudentId && m.InternshipGroup.TermId == cycle.TermId)
+                .Where(m => m.StudentId == currentStudentId && m.InternshipGroup.PhaseId == cycle.PhaseId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (studentGroupMember == null)
             {
-                _logger.LogWarning("Access denied: User {UserId} is not in any group for Term {TermId}", request.CurrentUserId, cycle.TermId);
+                _logger.LogWarning("Access denied: User {UserId} is not in any group for Phase {PhaseId}", request.CurrentUserId, cycle.PhaseId);
                 return Result<List<GetStudentTeamEvaluationsResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
             }
             internshipId = studentGroupMember.InternshipId;

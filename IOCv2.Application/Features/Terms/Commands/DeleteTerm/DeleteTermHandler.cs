@@ -96,11 +96,6 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
                 .IgnoreQueryFilters()
                 .CountAsync(st => st.TermId == request.TermId, cancellationToken);
 
-            var internshipGroupsCount = await _unitOfWork.Repository<InternshipGroup>()
-                .Query()
-                .IgnoreQueryFilters()
-                .CountAsync(ig => ig.TermId == request.TermId, cancellationToken);
-
             // Soft delete term
             await _unitOfWork.Repository<Term>().DeleteAsync(term, cancellationToken);
 
@@ -116,17 +111,6 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
                     await _unitOfWork.Repository<StudentTerm>().DeleteAsync(st, cancellationToken);
             }
 
-            if (internshipGroupsCount > 0)
-            {
-                var internshipGroups = await _unitOfWork.Repository<InternshipGroup>()
-                    .Query()
-                    .Where(ig => ig.TermId == request.TermId)
-                    .ToListAsync(cancellationToken);
-
-                foreach (var ig in internshipGroups)
-                    await _unitOfWork.Repository<InternshipGroup>().DeleteAsync(ig, cancellationToken);
-            }
-
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
@@ -138,9 +122,9 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
             var response = new DeleteTermResponse
             {
                 Message = _messageService.GetMessage(MessageKeys.Terms.DeleteSuccess),
-                HasRelatedData = studentTermsCount > 0 || internshipGroupsCount > 0,
+                HasRelatedData = studentTermsCount > 0,
                 RelatedStudentTermsCount = studentTermsCount,
-                RelatedInternshipGroupsCount = internshipGroupsCount
+                RelatedInternshipGroupsCount = 0
             };
 
             return Result<DeleteTermResponse>.Success(response, response.Message);

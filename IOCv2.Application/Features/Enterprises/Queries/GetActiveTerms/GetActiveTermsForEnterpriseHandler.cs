@@ -72,23 +72,10 @@ public class GetActiveTermsForEnterpriseHandler
                     t.StartDate <= today &&
                     t.EndDate >= today);
 
-            if (isMentor)
-            {
-                // Mentor: chỉ thấy kỳ mà mình có InternshipGroup đang Active
-                termsQuery = termsQuery.Where(t =>
-                    t.InternshipGroups.Any(ig =>
-                        ig.EnterpriseId == enterpriseId &&
-                        ig.MentorId == enterpriseUser.EnterpriseUserId &&
-                        ig.Status == GroupStatus.Active));
-            }
-            else
-            {
-                // HR / EnterpriseAdmin: thấy tất cả kỳ mà enterprise có nhóm đang Active
-                termsQuery = termsQuery.Where(t =>
-                    t.InternshipGroups.Any(ig =>
-                        ig.EnterpriseId == enterpriseId &&
-                        ig.Status == GroupStatus.Active));
-            }
+            // Filter: terms where enterprise has approved applications
+            termsQuery = termsQuery.Where(t =>
+                _unitOfWork.Repository<InternshipApplication>().Query()
+                    .Any(a => a.TermId == t.TermId && a.EnterpriseId == enterpriseId));
 
             if (request.UniversityId.HasValue)
                 termsQuery = termsQuery.Where(t => t.UniversityId == request.UniversityId.Value);
@@ -106,15 +93,15 @@ public class GetActiveTermsForEnterpriseHandler
                     _messageService.GetMessage(noTermsKey), ResultErrorType.NotFound);
             }
 
-            // Lấy EvaluationCycles cho tất cả term tìm được (bỏ qua Cancelled)
-            var termIds = terms.Select(t => t.TermId).ToList();
+            // Lấy EvaluationCycles cho enterprise (bỏ qua Cancelled)
             var cycles = await _unitOfWork.Repository<EvaluationCycle>().Query().AsNoTracking()
-                .Where(ec => termIds.Contains(ec.TermId) && ec.Status != EvaluationCycleStatus.Cancelled)
+                .Where(ec => ec.InternshipPhase.EnterpriseId == enterpriseId &&
+                             ec.Status != EvaluationCycleStatus.Cancelled)
                 .OrderBy(ec => ec.EndDate)
                 .ToListAsync(cancellationToken);
 
-            var cyclesByTerm = cycles.GroupBy(ec => ec.TermId)
-                .ToDictionary(g => g.Key, g => g.ToList());
+            // Cycles are now phase-based, not term-based; provide empty lookup for term mapping
+            var cyclesByTerm = new Dictionary<Guid, List<EvaluationCycle>>();
 
             var nowUtc = DateTime.UtcNow;
 

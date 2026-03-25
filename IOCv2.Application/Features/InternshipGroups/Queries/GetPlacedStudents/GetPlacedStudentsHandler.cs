@@ -86,13 +86,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents
 
                         // Tìm nhóm đã được phân công (nếu có) của sinh viên trong cùng enterprise & term
                         let assignedGroupMember = _unitOfWork.Repository<InternshipStudent>().Query()
-                            .Where(m => m.StudentId == app.StudentId
-                                     && m.InternshipGroup != null
-                                     && m.InternshipGroup.EnterpriseId == enterpriseId
-                                     && resolvedTermIds.Contains(m.InternshipGroup.TermId)
-                                     && m.InternshipGroup.Status == GroupStatus.Active)
-                            .FirstOrDefault()
-
+                            .FirstOrDefault(m => m.StudentId == app.StudentId 
+                                                 && m.InternshipGroup != null 
+                                                 && m.InternshipGroup.EnterpriseId == enterpriseUser.EnterpriseId
+                                                 && m.InternshipGroup.Status == GroupStatus.Active)
+                        
                         select new
                         {
                             App = app,

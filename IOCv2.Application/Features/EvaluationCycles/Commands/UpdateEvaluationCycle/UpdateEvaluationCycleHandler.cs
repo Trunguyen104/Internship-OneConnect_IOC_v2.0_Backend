@@ -79,7 +79,7 @@ public class UpdateEvaluationCycleHandler
         return Result<UpdateEvaluationCycleResponse>.Success(new UpdateEvaluationCycleResponse
         {
             CycleId = cycle.CycleId,
-            TermId = cycle.TermId,
+            PhaseId = cycle.PhaseId,
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,

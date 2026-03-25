@@ -57,12 +57,12 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                         ResultErrorType.BadRequest);
                 }
 
-                // Validate TermId
-                var termExists = await _unitOfWork.Repository<Term>()
-                    .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
-                if (!termExists)
+                // Validate PhaseId
+                var phaseExists = await _unitOfWork.Repository<InternshipPhase>()
+                    .ExistsAsync(p => p.PhaseId == request.PhaseId, cancellationToken);
+                if (!phaseExists)
                 {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.PhaseId);
                     return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
 
@@ -112,7 +112,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 entity.UpdateInfo(
                     request.GroupName,
                     request.Description,
-                    request.TermId,
+                    request.PhaseId,
                     request.EnterpriseId,
                     resolvedMentorId, // EnterpriseUserId
                     request.StartDate,

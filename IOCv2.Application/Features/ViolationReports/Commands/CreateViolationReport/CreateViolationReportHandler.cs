@@ -63,9 +63,9 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.CreateViolationRe
                 var internshipStudentId = await _unitOfWork.Repository<InternshipStudent>().Query().Where(s => s.StudentId == request.StudentId)
                     .Select(s => s.InternshipId).FirstOrDefaultAsync(cancellationToken);
 
-                // Load the internship group (include Term for date boundaries).
+                // Load the internship group (include InternshipPhase for date boundaries).
                 var group = await _unitOfWork.Repository<InternshipGroup>().Query().Where(g => g.InternshipId == internshipStudentId)
-                    .Include(g => g.Term).Include(g => g.Mentor)
+                    .Include(g => g.InternshipPhase).Include(g => g.Mentor)
                     .FirstOrDefaultAsync(cancellationToken);
 
                 // If group not found, return NotFound with a localized message.
@@ -94,12 +94,11 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.CreateViolationRe
                             ResultErrorType.Forbidden);
                 }
 
-                // Validate OccurredDate against internship start date (if set).
-                if (group.StartDate.HasValue && request.OccurredDate < group.Term.StartDate)
+                // Validate OccurredDate against internship phase date boundaries (if phase is available).
+                if (group.InternshipPhase != null && request.OccurredDate < group.InternshipPhase.StartDate)
                     return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.OccurredDateCannotBeBeforeInternshipStart), ResultErrorType.BadRequest);
 
-                // Validate OccurredDate against internship end date (if set).
-                if (group.EndDate.HasValue && request.OccurredDate > group.Term.EndDate)
+                if (group.InternshipPhase != null && request.OccurredDate > group.InternshipPhase.EndDate)
                     return Result<CreateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.OccurredDateCannotBeAfterInternshipEnd), ResultErrorType.BadRequest);
 
                 // Build the ViolationReport entity to persist.

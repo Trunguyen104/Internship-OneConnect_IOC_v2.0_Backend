@@ -717,6 +717,88 @@ namespace IOCv2.Application.Constants
             //create
             public const string StudentNotFound = "Student.NotFound";
         }
+        public static class InternshipPhase
+        {
+            // Validator
+            public const string EnterpriseIdRequired = "InternshipPhase.EnterpriseIdRequired";
+            public const string PhaseIdRequired = "InternshipPhase.PhaseIdRequired";
+            public const string NameRequired = "InternshipPhase.NameRequired";
+            public const string NameMaxLength = "InternshipPhase.NameMaxLength";
+            public const string StartDateRequired = "InternshipPhase.StartDateRequired";
+            public const string StartDateNotInPast = "InternshipPhase.StartDateNotInPast";
+            public const string EndDateRequired = "InternshipPhase.EndDateRequired";
+            public const string EndDateAfterStartDate = "InternshipPhase.EndDateAfterStartDate";
+            public const string MaxStudentsGreaterThanZero = "InternshipPhase.MaxStudentsGreaterThanZero";
+            public const string StatusInvalid = "InternshipPhase.StatusInvalid";
+            public const string DescriptionMaxLength = "InternshipPhase.DescriptionMaxLength";
+            public const string PageNumberMinValue = "InternshipPhase.PageNumberMinValue";
+            public const string PageSizeRange = "InternshipPhase.PageSizeRange";
+
+            // Business errors
+            public const string NotFound = "InternshipPhase.NotFound";
+            public const string DuplicateName = "InternshipPhase.DuplicateName";
+            public const string DuplicateNameOnUpdate = "InternshipPhase.DuplicateNameOnUpdate";
+            public const string CannotUpdateClosed = "InternshipPhase.CannotUpdateClosed";
+            public const string InvalidStatusTransition = "InternshipPhase.InvalidStatusTransition";
+            public const string CannotDeleteHasActiveGroups = "InternshipPhase.CannotDeleteHasActiveGroups";
+            public const string CannotDeleteInProgress = "InternshipPhase.CannotDeleteInProgress";
+            public const string UpdateNoChanges = "InternshipPhase.UpdateNoChanges";
+            public const string StudentNotFound = "InternshipPhase.StudentNotFound";
+            public const string NotYourEnterprise = "InternshipPhase.NotYourEnterprise";
+            public const string EnterpriseUserNotFound = "InternshipPhase.EnterpriseUserNotFound";
+            public const string EndDateInPastForActivePhase = "InternshipPhase.EndDateInPastForActivePhase";
+
+            // Log - Ownership
+            public const string LogOwnershipDenied = "InternshipPhase.Log.OwnershipDenied";
+            public const string LogInvalidStatusTransition = "InternshipPhase.Log.InvalidStatusTransition";
+
+            // Success
+            public const string CreateSuccess = "InternshipPhase.CreateSuccess";
+            public const string UpdateSuccess = "InternshipPhase.UpdateSuccess";
+            public const string DeleteSuccess = "InternshipPhase.DeleteSuccess";
+
+            // Log - Create
+            public const string LogCreating = "InternshipPhase.Log.Creating";
+            public const string LogEnterpriseNotFound = "InternshipPhase.Log.EnterpriseNotFound";
+            public const string LogDuplicateName = "InternshipPhase.Log.DuplicateName";
+            public const string LogCreateSuccess = "InternshipPhase.Log.CreateSuccess";
+            public const string LogCreateError = "InternshipPhase.Log.CreateError";
+
+            // Log - Update
+            public const string LogUpdating = "InternshipPhase.Log.Updating";
+            public const string LogUpdateNotFound = "InternshipPhase.Log.UpdateNotFound";
+            public const string LogUpdateClosed = "InternshipPhase.Log.UpdateClosed";
+            public const string LogUpdateDuplicateName = "InternshipPhase.Log.UpdateDuplicateName";
+            public const string LogUpdateSuccess = "InternshipPhase.Log.UpdateSuccess";
+            public const string LogUpdateNoChanges = "InternshipPhase.Log.UpdateNoChanges";
+            public const string LogUpdateError = "InternshipPhase.Log.UpdateError";
+
+            // Log - Delete
+            public const string LogDeleting = "InternshipPhase.Log.Deleting";
+            public const string LogDeleteNotFound = "InternshipPhase.Log.DeleteNotFound";
+            public const string LogDeleteHasActiveGroups = "InternshipPhase.Log.DeleteHasActiveGroups";
+            public const string LogDeleteInProgress = "InternshipPhase.Log.DeleteInProgress";
+            public const string LogDeleteSuccess = "InternshipPhase.Log.DeleteSuccess";
+            public const string LogDeleteNoChanges = "InternshipPhase.Log.DeleteNoChanges";
+            public const string LogDeleteError = "InternshipPhase.Log.DeleteError";
+
+            // Log - Get List
+            public const string LogGettingList = "InternshipPhase.Log.GettingList";
+            public const string LogListFromCache = "InternshipPhase.Log.ListFromCache";
+            public const string LogListSuccess = "InternshipPhase.Log.ListSuccess";
+
+            // Log - Get By Id
+            public const string LogGettingById = "InternshipPhase.Log.GettingById";
+            public const string LogByIdFromCache = "InternshipPhase.Log.ByIdFromCache";
+            public const string LogByIdNotFound = "InternshipPhase.Log.ByIdNotFound";
+            public const string LogByIdSuccess = "InternshipPhase.Log.ByIdSuccess";
+
+            // Log - Get My Phases
+            public const string LogGettingMyPhases = "InternshipPhase.Log.GettingMyPhases";
+            public const string LogStudentNotFound = "InternshipPhase.Log.StudentNotFound";
+            public const string LogMyPhasesSuccess = "InternshipPhase.Log.MyPhasesSuccess";
+        }
+
         public static class Notifications
         {
             public const string NotFound = "Notifications.NotFound";
