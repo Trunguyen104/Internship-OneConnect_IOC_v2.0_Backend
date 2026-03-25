@@ -97,7 +97,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
 
                 // Job status / deadline checks
                 var now = DateTime.UtcNow;
-                if (job.Status != JobStatus.OPEN)
+                if (job.Status != JobStatus.PUBLISHED)
                 {
                     return Result<ApplyJobResponse>.Failure("Vị trí đã đóng", ResultErrorType.BadRequest);
                 }

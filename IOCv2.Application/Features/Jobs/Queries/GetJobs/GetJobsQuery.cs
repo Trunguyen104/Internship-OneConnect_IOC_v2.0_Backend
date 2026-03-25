@@ -1,14 +1,26 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
+using MediatR;
 using System;
+using System.Text.Json.Serialization;
 
 namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
 {
-    public record GetJobsQuery : MediatR.IRequest<Result<PaginatedResult<GetJobsResponse>>>
+    /// <summary>
+    /// Query to retrieve a paginated list of jobs (student + HR views).
+    /// </summary>
+    public record GetJobsQuery : IRequest<Result<PaginatedResult<GetJobsResponse>>>
     {
         /// <summary>
         /// Search by job title or company name.
         /// </summary>
         public string? SearchTerm { get; init; }
+
+        /// <summary>
+        /// Filter by Job status (Draft / Published / Closed).
+        /// Only applied for HR / Enterprise view.
+        /// </summary>
+        public JobStatus? Status { get; init; }
 
         public int PageNumber { get; init; } = 1;
         public int PageSize { get; init; } = 10;

@@ -10,7 +10,7 @@ namespace IOCv2.Domain.Entities
         public Guid StudentId { get; private set; }
         public Guid CvId { get; private set; }
         public string? CoverLetter { get; private set; }
-        public JobApplicationStatus Status { get; private set; }
+        public JobApplicationStatus Status { get; set; }
 
         // Timestamps: AppliedAt stored explicitly; UpdatedAt is inherited from BaseEntity (UpdatedAt)
         public DateTime AppliedAt { get; private set; } = DateTime.UtcNow;

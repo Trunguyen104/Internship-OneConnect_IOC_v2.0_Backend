@@ -6,6 +6,7 @@ using IOCv2.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,11 +77,11 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
                     ApplyDisabledReason = null
                 };
 
-                // Default reasons & checks
+                // Default reasons & checks (student apply logic)
                 var now = DateTime.UtcNow;
                 var hasApplied = student != null && student.JobApplications.Any(a => a.JobId == job.JobId);
                 var isPlaced = student != null && (student.InternshipStatus == StudentStatus.INTERNSHIP_IN_PROGRESS || student.InternshipStatus == StudentStatus.COMPLETED);
-                var jobOpen = job.Status == JobStatus.OPEN;
+                var jobOpen = job.Status == JobStatus.PUBLISHED;
                 var deadlinePassed = job.ExpireDate.HasValue && job.ExpireDate.Value < now;
 
                 if (hasApplied)
@@ -107,6 +108,76 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
                 {
                     resp.CanApply = true;
                 }
+
+                // Compute application counts per status
+                var appCounts = job.JobApplications
+                    .GroupBy(a => a.Status)
+                    .Select(g => new ApplicationStatusCountDto
+                    {
+                        Status = (short)g.Key,
+                        StatusName = g.Key.ToString(),
+                        Count = g.Count()
+                    })
+                    .ToList();
+
+                // Ensure zero counts for statuses that are missing (optional)
+                foreach (JobApplicationStatus status in Enum.GetValues(typeof(JobApplicationStatus)))
+                {
+                    if (!appCounts.Any(c => c.Status == (short)status))
+                    {
+                        appCounts.Add(new ApplicationStatusCountDto
+                        {
+                            Status = (short)status,
+                            StatusName = status.ToString(),
+                            Count = 0
+                        });
+                    }
+                }
+
+                // Sort by enum value for stable ordering
+                resp.ApplicationCounts = appCounts.OrderBy(c => c.Status).ToList();
+
+                // Determine allowed actions for current user
+                var allowedActions = new List<string>();
+
+                // Is current user HR associated with this enterprise?
+                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(eu => eu.UserId == userId && eu.EnterpriseId == job.EnterpriseId, cancellationToken);
+
+                if (enterpriseUser != null)
+                {
+                    // HR actions based on job.Status
+                    switch (job.Status)
+                    {
+                        case JobStatus.DRAFT:
+                            allowedActions.AddRange(new[] { "Edit", "Publish", "Delete", "ViewApplications" });
+                            break;
+                        case JobStatus.PUBLISHED:
+                            allowedActions.AddRange(new[] { "Edit", "Close", "ViewApplications" });
+                            break;
+                        case JobStatus.CLOSED:
+                            allowedActions.AddRange(new[] { "Edit", "Reopen", "Delete", "ViewApplications" });
+                            break;
+                        case JobStatus.DELETED:
+                            allowedActions.AddRange(new[] { "Restore" });
+                            break;
+                        default:
+                            allowedActions.Add("ViewApplications");
+                            break;
+                    }
+                }
+                else
+                {
+                    // Non-HR users (student / others): include Apply if allowed and always allow viewing basic details
+                    if (resp.CanApply)
+                    {
+                        allowedActions.Add("Apply");
+                    }
+                }
+
+                resp.AllowedActions = allowedActions;
 
                 return Result<GetJobByIdResponse>.Success(resp);
             }

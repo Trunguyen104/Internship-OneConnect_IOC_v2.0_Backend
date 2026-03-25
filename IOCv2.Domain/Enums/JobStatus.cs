@@ -2,6 +2,8 @@ namespace IOCv2.Domain.Enums;
 
 public enum JobStatus : short
 {
-    CLOSED = 1,
-    OPEN = 2
+    DRAFT = 1,
+    PUBLISHED = 2,
+    CLOSED = 3,
+    DELETED = 4
 }

@@ -138,7 +138,7 @@ VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
                 "Monthly stipend, mentorship",
                 2,
                 DateTime.UtcNow.AddMonths(1),
-                (short)JobStatus.OPEN,
+                (short)JobStatus.PUBLISHED,
                 // job 2 - Rikkeisoft
                 job2Id,
                 SeedIds.RikkeisoftId,
@@ -150,7 +150,7 @@ VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
                 "Stipend, certificate",
                 1,
                 DateTime.UtcNow.AddMonths(1),
-                (short)JobStatus.OPEN
+                (short)JobStatus.PUBLISHED
             );
         }
 
@@ -284,6 +284,35 @@ VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
                 _context.Students.Add(new Student { StudentId = Guid.NewGuid(), UserId = user.UserId, InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS, Major = "Software Engineering", ClassName = "SE1616" });
             }
 
+            // New: add a sixth seeded student (student6) with a CV for job-apply testing
+            var student6Email = "student6@fptu.edu.vn";
+            if (!existingEmails.Contains(student6Email))
+            {
+                var userId6 = Guid.NewGuid();
+                var userCode6 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user6 = new User(userId6, userCode6, student6Email, "Student Six", UserRole.Student, passHash);
+                user6.SetStatus(UserStatus.Active);
+                _context.Users.Add(user6);
+                existingEmails.Add(student6Email);
+
+                var uni6 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user6.UserId, UniversityId = uni6.UniversityId });
+
+                var student6 = new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user6.UserId,
+                    InternshipStatus = StudentStatus.APPLIED,
+                    Major = "Software Engineering",
+                    ClassName = "SE1616"
+                };
+
+                // Attach CV so student6 can apply to jobs
+                student6.UpdateCv("https://example.com/resumes/student6_cv.pdf");
+
+                _context.Students.Add(student6);
+            }
+
             await _context.SaveChangesAsync();
         }
 
@@ -310,6 +339,21 @@ VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
                 _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s3.StudentId, TermId = spring2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Placed, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60)) });
                 _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s4.StudentId, TermId = summer2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Unplaced, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)) });
                 _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s5.StudentId, TermId = fall2025.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Placed, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-200)) });
+
+                // Ensure seeded student6 is enrolled so they can apply for jobs
+                var maybeS6 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student6@fptu.edu.vn");
+                if (maybeS6 != null)
+                {
+                    _context.StudentTerms.Add(new StudentTerm
+                    {
+                        StudentTermId = Guid.NewGuid(),
+                        StudentId = maybeS6.StudentId,
+                        TermId = spring2026.TermId,
+                        EnrollmentStatus = EnrollmentStatus.Active,
+                        PlacementStatus = PlacementStatus.Unplaced,
+                        EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10))
+                    });
+                }
 
                 await _context.SaveChangesAsync();
             }
