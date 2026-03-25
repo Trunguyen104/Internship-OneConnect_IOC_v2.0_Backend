@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace IOCv2.Domain.Entities;
 
 public class EvaluationDetail : BaseEntity
 {
+    [Key]
     public Guid DetailId { get; set; }
 
     public Guid EvaluationId { get; set; }
