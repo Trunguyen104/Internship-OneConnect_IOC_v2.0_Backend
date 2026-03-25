@@ -577,4 +577,7 @@
   <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
     <value>Rejected status transition of internship phase {0} from '{1}' to '{2}' — invalid transition.</value>
   </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Term name already exists. Please choose a different name.</value>
+  </data>
 </root>

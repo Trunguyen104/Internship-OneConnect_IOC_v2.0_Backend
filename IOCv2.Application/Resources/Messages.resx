@@ -651,4 +651,7 @@
   <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
     <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái InProgress và không thể xóa.</value>
   </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Tên kỳ thực tập đã tồn tại, vui lòng chọn tên khác.</value>
+  </data>
 </root>
