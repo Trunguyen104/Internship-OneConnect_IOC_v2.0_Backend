@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Sprints.Common;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -75,6 +76,8 @@ public class DeleteSprintHandler : IRequestHandler<DeleteSprintCommand, Result<D
             await _cacheService.RemoveAsync(SprintCacheKeys.Sprint(sprint.ProjectId, request.SprintId), cancellationToken);
             await _cacheService.RemoveByPatternAsync(
                 SprintCacheKeys.SprintListPattern(sprint.ProjectId), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(
+                WorkItemCacheKeys.BacklogPattern(sprint.ProjectId), cancellationToken);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

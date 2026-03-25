@@ -85,7 +85,23 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
                 universityId = universityUser.UniversityId;
             }
 
-            // Check for overlapping terms (single query returns name if conflict exists)
+            
+            
+            // Check for duplicate term name within the university
+            var duplicateNameExists = await _unitOfWork.Repository<Term>()
+                .Query()
+                .Where(t => t.UniversityId == universityId && t.Name.ToLower() == request.Name.Trim().ToLower())
+                .AnyAsync(cancellationToken);
+
+            if (duplicateNameExists)
+            {
+                return Result<CreateTermResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Terms.NameExists),
+                    ResultErrorType.Conflict);
+            }
+
+            
+            // Check for overlapping terms (a single query returns the name if conflict exists)
             var overlappingTermName = await _unitOfWork.Repository<Term>()
                 .Query()
                 .Where(t => t.UniversityId == universityId)
