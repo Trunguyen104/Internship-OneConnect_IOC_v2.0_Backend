@@ -21,10 +21,10 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents
         public string? MentorName { get; set; }      // Tên mentor của nhóm đã được phân công
 
         // ── Thông tin kỳ thực tập ─────────────────────────────────────────────
-        public Guid TermId { get; set; }
-        public string TermName { get; set; } = string.Empty;
-        public string TermStatus { get; set; } = string.Empty;  // "Upcoming" | "Active" | "Ended" | "Closed"
-        public DateOnly TermStartDate { get; set; }
-        public DateOnly TermEndDate { get; set; }
+        public Guid PhaseId { get; set; }
+        public string PhaseName { get; set; } = string.Empty;
+        public string PhaseStatus { get; set; } = string.Empty;  // "Upcoming" | "Active" | "Ended" | "Closed"
+        public DateOnly PhaseStartDate { get; set; }
+        public DateOnly PhaseEndDate { get; set; }
     }
 }

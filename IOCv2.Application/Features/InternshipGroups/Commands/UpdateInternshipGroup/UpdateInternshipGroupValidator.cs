@@ -13,7 +13,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 .MaximumLength(255).WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.NameMaxLength));
 
             RuleFor(v => v.PhaseId)
-                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.TermIdRequired));
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.PhaseIdRequired));
 
             RuleFor(v => v.StartDate)
                 .LessThan(v => v.EndDate).When(v => v.StartDate.HasValue && v.EndDate.HasValue)

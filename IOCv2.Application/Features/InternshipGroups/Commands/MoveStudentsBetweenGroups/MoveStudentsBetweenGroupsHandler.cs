@@ -44,7 +44,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
             var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
-            
+
             if (enterpriseUser == null)
             {
                 return Result<MoveStudentsBetweenGroupsResponse>.Failure(

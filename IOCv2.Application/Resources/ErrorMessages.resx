@@ -1260,6 +1260,9 @@
   <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
     <value>Nhóm đã được lưu trữ (Archived) từ trước.</value>
   </data>
+  <data name="InternshipGroups.CannotArchiveNoData" xml:space="preserve">
+    <value>Không hỗ trợ Archive cho nhóm chưa có dữ liệu hoạt động.</value>
+  </data>
   <data name="InternshipGroup.HasActivityData" xml:space="preserve">
     <value>Nhóm đã có dữ liệu hoạt động (logbook, đánh giá, vi phạm hoặc project đã có nội dung), không thể xóa. Vui lòng dùng chức năng Archive để giữ lại lịch sử.</value>
   </data>

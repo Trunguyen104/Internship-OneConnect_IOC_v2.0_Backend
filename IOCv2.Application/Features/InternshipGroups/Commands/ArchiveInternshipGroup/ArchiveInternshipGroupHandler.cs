@@ -70,6 +70,18 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
                     ResultErrorType.BadRequest);
             }
 
+            bool hasData = await _unitOfWork.Repository<Logbook>().Query().AnyAsync(l => l.InternshipId == request.InternshipGroupId, cancellationToken) ||
+                           await _unitOfWork.Repository<Evaluation>().Query().AnyAsync(e => e.InternshipId == request.InternshipGroupId, cancellationToken) ||
+                           await _unitOfWork.Repository<ViolationReport>().Query().AnyAsync(v => v.InternshipGroupId == request.InternshipGroupId, cancellationToken) ||
+                           await _unitOfWork.Repository<Project>().Query().AnyAsync(p => p.InternshipId == request.InternshipGroupId && (p.WorkItems.Any() || p.Sprints.Any() || p.ProjectResources.Any()), cancellationToken);
+
+            if (!hasData)
+            {
+                return Result<ArchiveInternshipGroupResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.InternshipGroups.CannotArchiveNoData),
+                    ResultErrorType.BadRequest);
+            }
+
             group.UpdateStatus(GroupStatus.Archived);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
