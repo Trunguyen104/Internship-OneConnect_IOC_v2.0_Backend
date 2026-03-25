@@ -69,7 +69,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
             
             _mockInternshipStudentRepository
-                .Setup(x => x.DeleteAsync(It.IsAny<InternshipStudent>(), It.IsAny<CancellationToken>()))
+                .Setup(x => x.HardDeleteAsync(It.IsAny<InternshipStudent>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
             
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
@@ -90,7 +90,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
             result.IsSuccess.Should().BeTrue();
             // Verify DeleteAsync was called once for the student member
             _mockInternshipStudentRepository.Verify(
-                x => x.DeleteAsync(It.Is<InternshipStudent>(m => m.StudentId == studentId), It.IsAny<CancellationToken>()),
+                x => x.HardDeleteAsync(It.Is<InternshipStudent>(m => m.StudentId == studentId), It.IsAny<CancellationToken>()),
                 Times.Once);
             _mockUnitOfWork.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
             _mockUnitOfWork.Verify(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
