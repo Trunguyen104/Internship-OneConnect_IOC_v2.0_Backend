@@ -23,6 +23,7 @@ namespace IOCv2.API.Controllers.InternshipGroups;
 /// </summary>
 [Tags("Internship Groups Management")]
 [Route("api/v{version:apiVersion}/internship-groups")]
+[Authorize] // Yêu cầu đăng nhập cho tất cả endpoint
 public class InternshipGroupsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -38,6 +39,7 @@ public class InternshipGroupsController : ApiControllerBase
     /// Get paginated list of internship groups with optional search and filter.
     /// </summary>
     [HttpGet]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor,Student")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetInternshipGroupsResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -56,6 +58,7 @@ public class InternshipGroupsController : ApiControllerBase
     /// <returns code="200">Returns the group details.</returns>
     /// <returns code="404">Group not found.</returns>
     [HttpGet("{id:guid}", Name = "GetInternshipGroupById")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor,Student")]
     [ProducesResponseType(typeof(ApiResponse<GetInternshipGroupByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetInternshipGroupById(
@@ -212,6 +215,7 @@ public class InternshipGroupsController : ApiControllerBase
     /// </summary>
     /// <param name="id">Internship group ID.</param>
     [HttpGet("{id:guid}/dashboard")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor,Student")]
     [ProducesResponseType(typeof(ApiResponse<GetInternshipGroupDashboardResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetInternshipGroupDashboard(

@@ -16,9 +16,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             // ===== Properties =====
 
-            builder.Property(e => e.TermId)
+            builder.Property(e => e.PhaseId)
                 .IsRequired()
-                .HasColumnName("term_id");
+                .HasColumnName("phase_id");
 
             builder.Property(e => e.EnterpriseId)
                 .HasColumnName("enterprise_id");
@@ -45,7 +45,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             // ===== Indexes (FK nên có index) =====
             builder.HasIndex(e => e.InternshipId);
-            builder.HasIndex(e => e.TermId);
+            builder.HasIndex(e => e.PhaseId);
             builder.HasIndex(e => e.EnterpriseId);
             builder.HasIndex(e => e.MentorId);
 
@@ -57,12 +57,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(e => e.UpdatedBy).HasColumnName("updated_by");
 
             // ===== Relationships =====
-            builder.HasOne(e => e.Term)
-                .WithMany(t => t.InternshipGroups)
-                .HasForeignKey(e => e.TermId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
-
             builder.HasOne(e => e.Enterprise)
                 .WithMany(ent => ent.InternshipGroups)
                 .HasForeignKey(e => e.EnterpriseId)

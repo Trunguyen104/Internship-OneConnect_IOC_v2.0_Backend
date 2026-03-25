@@ -13,7 +13,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public int PageSize { get; init; } = 10;
         public string? SearchTerm { get; init; }
         public GroupStatus? Status { get; init; }
-        public Guid? TermId { get; init; }
+        public Guid? PhaseId { get; init; }
         public bool IncludeArchived { get; init; } = false;
         public Guid? EnterpriseId { get; init; }
     }

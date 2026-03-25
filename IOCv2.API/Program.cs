@@ -1,6 +1,8 @@
 using IOCv2.API.Configurations;
 using IOCv2.API.Middlewares;
+using IOCv2.API.Services;
 using IOCv2.Application;
+using IOCv2.Application.Interfaces;
 using IOCv2.Infrastructure;
 using IOCv2.Infrastructure.Services.Logging;
 using Serilog;
@@ -32,7 +34,11 @@ builder.Services.AddSecurityConfig(builder.Configuration);
 builder.Services.AddRedisConfig(builder.Configuration);
 builder.Services.AddForwardedHeadersConfig();
 builder.Services.AddLocalizationConfig();
+builder.Services.AddSignalRConfig();
 builder.Services.AddHealthChecksConfig(builder.Configuration);
+
+// Register API-layer services (depend on SignalR Hub, cannot go in Infrastructure)
+builder.Services.AddScoped<INotificationPushService, SignalRNotificationPushService>();
 
 var app = builder.Build();
 
@@ -86,6 +92,7 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 app.MapControllers();
+app.UseSignalRConfig();
 
 app.Run();
 

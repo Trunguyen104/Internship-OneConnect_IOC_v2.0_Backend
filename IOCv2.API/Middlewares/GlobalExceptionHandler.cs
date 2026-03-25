@@ -61,6 +61,21 @@ namespace IOCv2.API.Middlewares
                     statusCode = (int)HttpStatusCode.NotFound;
                     message = notFoundException.Message;
                     break;
+                case ConflictException conflictException:
+                    statusCode = (int)HttpStatusCode.Conflict;
+                    message = conflictException.Message;
+                    if (!string.IsNullOrEmpty(conflictException.PropertyName))
+                    {
+                        var prop = ToCamelCase(conflictException.PropertyName);
+                        var validationResponse = new ErrorResponse(
+                            statusCode,
+                            message,
+                            new Dictionary<string, List<string>> { { prop, new List<string> { message } } });
+                        httpContext.Response.StatusCode = statusCode;
+                        await httpContext.Response.WriteAsJsonAsync(validationResponse, cancellationToken);
+                        return true;
+                    }
+                    break;
                 case UnauthorizedAccessException unauthorizedEx:
                     statusCode = (int)HttpStatusCode.Unauthorized;
                     message = unauthorizedEx.Message;

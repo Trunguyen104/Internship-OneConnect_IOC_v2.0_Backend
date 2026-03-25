@@ -1,6 +1,8 @@
 using ClosedXML.Excel;
+using System.Globalization;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,6 +18,8 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
     private readonly IPasswordService _passwordService;
+    private readonly IBackgroundEmailSender _emailSender;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<ImportStudentsConfirmHandler> _logger;
 
     public ImportStudentsConfirmHandler(
@@ -23,12 +27,16 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
         ICurrentUserService currentUserService,
         IMessageService messageService,
         IPasswordService passwordService,
+        IBackgroundEmailSender emailSender,
+        ICacheService cacheService,
         ILogger<ImportStudentsConfirmHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
         _passwordService = passwordService;
+        _emailSender = emailSender;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -89,6 +97,29 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
         var crossTermCodes = crossTermActive.Select(x => x.Code).ToHashSet();
         var crossTermEmails = crossTermActive.Select(x => x.Email).ToHashSet();
 
+        // Load all student codes already used in this university (across all terms) to prevent duplicates
+        var allUniversityCodesRaw = await _unitOfWork.Repository<StudentTerm>()
+            .Query()
+            .Include(st => st.Student).ThenInclude(s => s.User)
+            .Include(st => st.Term)
+            .Where(st => st.Term.UniversityId == term.UniversityId)
+            .Select(st => st.Student.User.UserCode.ToLower())
+            .Distinct()
+            .ToListAsync(cancellationToken);
+        var allUniversityCodesUsed = allUniversityCodesRaw.ToHashSet();
+
+        // Batch-load existing users by email for all valid records to avoid N+1 queries
+        var emailsToLookup = request.ValidRecords
+            .Select(r => r.Email.ToLower())
+            .Where(e => !existingEmailsInTerm.Contains(e) && !crossTermEmails.Contains(e))
+            .ToHashSet();
+
+        var existingUsersByEmail = await _unitOfWork.Repository<User>()
+            .Query()
+            .Include(u => u.Student)
+            .Where(u => emailsToLookup.Contains(u.Email.ToLower()))
+            .ToDictionaryAsync(u => u.Email.ToLower(), cancellationToken);
+
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         try
@@ -116,10 +147,8 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
                     continue;
                 }
 
-                // Find or create User + Student
-                var existingUser = await _unitOfWork.Repository<User>()
-                    .Query()
-                    .FirstOrDefaultAsync(u => u.Email == record.Email, cancellationToken);
+                // Find user by email using pre-loaded batch (no per-record DB query)
+                existingUsersByEmail.TryGetValue(emailLower, out var existingUser);
 
                 Guid studentId;
                 string? tempPassword = null;
@@ -127,28 +156,31 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
                 if (existingUser != null)
                 {
                     // User exists - check if Student
-                    var existingStudent = await _unitOfWork.Repository<Student>()
-                        .Query()
-                        .FirstOrDefaultAsync(s => s.UserId == existingUser.UserId, cancellationToken);
-
-                    if (existingStudent == null)
+                    if (existingUser.Student == null)
                     {
                         // User exists but not a student - skip
                         skipped++;
                         continue;
                     }
 
-                    studentId = existingStudent.StudentId;
+                    studentId = existingUser.Student.StudentId;
                 }
                 else
                 {
+                    // Check StudentCode uniqueness within this university before creating
+                    if (allUniversityCodesUsed.Contains(codeLower))
+                    {
+                        skipped++;
+                        continue;
+                    }
+
                     // Create new User + Student
                     tempPassword = _passwordService.GenerateRandomPassword();
                     var passwordHash = _passwordService.HashPassword(tempPassword);
                     var newUserId = Guid.NewGuid();
 
                     var newUser = new User(newUserId, record.StudentCode, record.Email, record.FullName, UserRole.Student, passwordHash);
-                    newUser.UpdateProfile(record.FullName, record.Phone, null, null, ParseDob(record.DateOfBirth));
+                    newUser.UpdateProfile(record.FullName, record.Phone, null, null, ParseDob(record.DateOfBirth), null);
                     await _unitOfWork.Repository<User>().AddAsync(newUser, cancellationToken);
 
                     var universityUserLink = new UniversityUser
@@ -170,6 +202,8 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
 
                     studentId = newStudent.StudentId;
                     newPasswordEntries.Add((record.StudentCode, record.FullName, record.Email, tempPassword));
+                    // Track the new code so subsequent records in same batch don't create duplicate
+                    allUniversityCodesUsed.Add(codeLower);
                 }
 
                 // Check if Withdrawn record exists → re-activate
@@ -211,6 +245,22 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
+
+            foreach (var (_, fullName, email, password) in newPasswordEntries)
+            {
+                await _emailSender.EnqueueAccountCreationEmailAsync(
+                    email,
+                    fullName,
+                    email,
+                    UserRole.Student.ToString(),
+                    password,
+                    null,
+                    userId,
+                    cancellationToken);
+            }
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogImportConfirmed), imported, request.TermId, userId);
 
@@ -266,6 +316,10 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
     private static DateOnly? ParseDob(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
-        return DateOnly.TryParseExact(value, "dd/MM/yyyy", out var result) ? result : null;
+
+        var formats = new[] { "dd/MM/yyyy", "dd/MM/yyyy HH:mm:ss" };
+        return DateOnly.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
+            ? result
+            : null;
     }
 }

@@ -435,30 +435,30 @@
   </data>
   <!-- StudentTerms — Validation: TermId / StudentTermId -->
   <data name="StudentTerms.TermIdRequired" xml:space="preserve">
-    <value>TermId is required.</value>
+    <value>Please select a term before performing this action.</value>
   </data>
   <data name="StudentTerms.StudentTermIdRequired" xml:space="preserve">
-    <value>StudentTermId is required.</value>
+    <value>The enrollment record could not be identified. Please reload the page and try again.</value>
   </data>
   <data name="StudentTerms.StudentTermIdListRequired" xml:space="preserve">
-    <value>Student ID list must not be empty.</value>
+    <value>Please select at least one student to perform this action.</value>
   </data>
   <data name="StudentTerms.StudentTermIdListMinCount" xml:space="preserve">
     <value>At least 1 student must be selected.</value>
   </data>
   <data name="StudentTerms.ValidRecordsRequired" xml:space="preserve">
-    <value>Valid records list must not be null.</value>
+    <value>No valid data found to import. Please check the file and try again.</value>
   </data>
   <data name="StudentTerms.ValidRecordsMinCount" xml:space="preserve">
-    <value>At least 1 valid record is required.</value>
+    <value>No valid rows found in the file. Please fix all errors in the file before importing.</value>
   </data>
 
   <!-- StudentTerms — Validation: File -->
   <data name="StudentTerms.FileRequired" xml:space="preserve">
-    <value>File is required.</value>
+    <value>Please select a file to upload.</value>
   </data>
   <data name="StudentTerms.FileEmpty" xml:space="preserve">
-    <value>File must not be empty.</value>
+    <value>The uploaded file has no content. Please verify and select the correct file.</value>
   </data>
 
   <!-- StudentTerms — Validation: FullName -->
@@ -466,7 +466,7 @@
     <value>Full name is required.</value>
   </data>
   <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
-    <value>Full name must contain only letters and spaces.</value>
+    <value>Full name is invalid. Only letters and spaces are allowed — no numbers or special characters.</value>
   </data>
 
   <!-- StudentTerms — Validation: StudentCode -->
@@ -474,19 +474,19 @@
     <value>Student code is required.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
-    <value>Student code is invalid.</value>
+    <value>Student code is invalid. Only lowercase letters (a-z), digits (0-9), and the characters -, _, . are allowed.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalidDetail" xml:space="preserve">
     <value>Student code is invalid (only a-z, 0-9, -, _, . are allowed).</value>
   </data>
   <data name="StudentTerms.StudentCodeDuplicateInFile" xml:space="preserve">
-    <value>Duplicate student code found in file.</value>
+    <value>This student code appears more than once in the file. Please remove duplicate rows before importing.</value>
   </data>
   <data name="StudentTerms.StudentCodeAlreadyInTerm" xml:space="preserve">
-    <value>Student code is already enrolled in this term.</value>
+    <value>A student with this code is already enrolled in the current term. Each student can only be enrolled once per term.</value>
   </data>
   <data name="StudentTerms.StudentCodeInOtherTerm" xml:space="preserve">
-    <value>Student is already enrolled in another term.</value>
+    <value>This student is already enrolled in another term. Each student can only participate in one term at a time.</value>
   </data>
 
   <!-- StudentTerms — Validation: Email -->
@@ -494,21 +494,21 @@
     <value>Email is required.</value>
   </data>
   <data name="StudentTerms.EmailInvalid" xml:space="preserve">
-    <value>Email format is invalid.</value>
+    <value>Email format is invalid. Please enter a valid address in the format example@domain.com.</value>
   </data>
   <data name="StudentTerms.EmailDuplicateInFile" xml:space="preserve">
-    <value>Duplicate email found in file.</value>
+    <value>This email appears more than once in the file. Please remove duplicate rows before importing.</value>
   </data>
   <data name="StudentTerms.EmailAlreadyInTerm" xml:space="preserve">
-    <value>Email is already enrolled in this term.</value>
+    <value>A student with this email is already enrolled in the current term. Each email can only be enrolled once per term.</value>
   </data>
   <data name="StudentTerms.EmailInOtherTerm" xml:space="preserve">
-    <value>Email is already enrolled in another term.</value>
+    <value>A student with this email is already enrolled in another term. Each student can only participate in one term at a time.</value>
   </data>
 
   <!-- StudentTerms — Validation: Phone -->
   <data name="StudentTerms.PhoneInvalid" xml:space="preserve">
-    <value>Phone number is invalid.</value>
+    <value>Phone number is invalid. Please enter a valid Vietnamese phone number (starting with 0, 10 digits).</value>
   </data>
 
   <!-- StudentTerms — Validation: DateOfBirth -->
@@ -532,37 +532,49 @@
 
   <!-- StudentTerms Messages -->
   <data name="StudentTerms.NotFound" xml:space="preserve">
-    <value>Student term enrollment record not found.</value>
+    <value>Student term enrollment record not found. Please verify the ID or reload the page.</value>
   </data>
   <data name="StudentTerms.TermNotOpen" xml:space="preserve">
-    <value>The term is not open or has been closed. Cannot add students.</value>
+    <value>This operation is not allowed. The term must be in Open status (not closed, not ended, and already started).</value>
+  </data>
+  <data name="StudentTerms.TermEndedOrClosed" xml:space="preserve">
+    <value>This operation cannot be performed because the term has already ended or been officially closed.</value>
+  </data>
+  <data name="StudentTerms.CannotWithdrawPlacedViaUpdate" xml:space="preserve">
+    <value>Cannot set enrollment status to Withdrawn while the student is placed. Please set placement status to Unplaced first.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaderDetail" xml:space="preserve">
+    <value>Column {0} has an incorrect header. Expected: '{1}', found: '{2}'. Please use the provided template.</value>
+  </data>
+  <data name="StudentTerms.InvalidExcelHeaderEmpty" xml:space="preserve">
+    <value>(empty)</value>
   </data>
   <data name="StudentTerms.EmailConflict" xml:space="preserve">
-    <value>This email is already used in the current term.</value>
+    <value>This email is already registered in the system. Each email can only be associated with one student account.</value>
   </data>
   <data name="StudentTerms.StudentCodeConflict" xml:space="preserve">
-    <value>Student code already exists in the system.</value>
+    <value>This student code already exists in the system. Please verify or contact the administrator.</value>
   </data>
   <data name="StudentTerms.AlreadyEnrolled" xml:space="preserve">
-    <value>Student is already enrolled in this term.</value>
+    <value>This student is already enrolled in the term. Each student can only be enrolled once per term.</value>
   </data>
   <data name="StudentTerms.AlreadyWithdrawn" xml:space="preserve">
-    <value>Student has already been withdrawn from this term.</value>
+    <value>This student has already been withdrawn. To re-enroll, please use the Restore Enrollment function.</value>
   </data>
   <data name="StudentTerms.NotWithdrawn" xml:space="preserve">
-    <value>Student has not been withdrawn from this term.</value>
+    <value>Cannot restore: this student has not been withdrawn from the term.</value>
   </data>
   <data name="StudentTerms.CannotWithdrawPlaced" xml:space="preserve">
-    <value>Student is currently placed. Please cancel the placement before withdrawing.</value>
+    <value>Cannot withdraw a student who is currently placed. Please set placement status to Unplaced first before withdrawing.</value>
   </data>
   <data name="StudentTerms.EnterpriseIdRequiredWhenPlaced" xml:space="preserve">
-    <value>An enterprise must be specified when placing a student.</value>
+    <value>An enterprise (EnterpriseId) must be specified when setting a student's placement status to Placed.</value>
   </data>
   <data name="StudentTerms.EnterpriseNotFound" xml:space="preserve">
-    <value>The specified enterprise was not found.</value>
+    <value>The specified enterprise was not found. Please verify the enterprise ID.</value>
   </data>
   <data name="StudentTerms.AllStudentsPlaced" xml:space="preserve">
-    <value>All selected students are already placed.</value>
+    <value>Bulk withdrawal failed: all selected students are currently placed. Please unplace them first.</value>
   </data>
   <data name="StudentTerms.InvalidFileFormat" xml:space="preserve">
     <value>Only Excel XLSX files are supported.</value>
@@ -577,25 +589,25 @@
     <value>File contains too many rows. Maximum 1000 rows per import.</value>
   </data>
   <data name="StudentTerms.AddSuccess" xml:space="preserve">
-    <value>Student added to term successfully.</value>
+    <value>Student has been successfully added to the term and is now pending placement assignment.</value>
   </data>
   <data name="StudentTerms.UpdateSuccess" xml:space="preserve">
     <value>Student term enrollment updated successfully.</value>
   </data>
   <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
-    <value>Student withdrawn from term successfully.</value>
+    <value>Student has been successfully withdrawn from the term and their status has been updated to Withdrawn.</value>
   </data>
   <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
-    <value>Student enrollment restored successfully.</value>
+    <value>Enrollment has been successfully restored. The student is now Active in the term again.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
-    <value>Bulk withdrawal completed successfully.</value>
+    <value>Bulk withdrawal completed successfully. Students with an active placement (Placed) were automatically skipped and remain unaffected.</value>
   </data>
   <data name="StudentTerms.ImportPreviewSuccess" xml:space="preserve">
-    <value>Import preview generated successfully.</value>
+    <value>File analysis complete. Please review the list below, check for any errors, and confirm to finalize the import.</value>
   </data>
   <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
-    <value>Students imported into term successfully.</value>
+    <value>Students imported into the term successfully. All valid students have been enrolled and are ready to begin their internship.</value>
   </data>
   <data name="StudentTerms.Log.Added" xml:space="preserve">
     <value>Student {0} added to term {1} by {2}.</value>
@@ -610,14 +622,14 @@
     <value>Student {0} restored to term by {1}.</value>
   </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
-    <value>{0} students withdrawn from term by {1}.</value>
+    <value>{0} students withdrawn from term {1} by {2}.</value>
   </data>
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>{0} students imported into term {1} by {2}.</value>
   </data>
 
   <data name="Terms.NotFound" xml:space="preserve">
-    <value>Term not found.</value>
+    <value>Term not found. Please verify the ID or reload the page.</value>
   </data>
     <data name="Terms.UniversityIdRequired" xml:space="preserve">
     <value>SuperAdmin must specify a UniversityId when creating a term.</value>
@@ -629,7 +641,7 @@
     <value>Term name cannot exceed 255 characters.</value>
   </data>
     <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
-    <value>Term name contains invalid or dangerous characters.</value>
+    <value>Term name contains disallowed characters. Please avoid using special characters such as &lt; &gt; &amp; " ' ; or script-like content.</value>
   </data>
     <data name="Terms.NameExists" xml:space="preserve">
     <value>Term name already exists. Please choose a different name.</value>
@@ -656,9 +668,9 @@
     <value>This time period overlaps with term [{0}].</value>
   </data>
     <data name="Terms.CreateSuccess" xml:space="preserve">
-    <value>Term created successfully.</value>
+    <value>The term has been created successfully and is currently in Draft status. You can update details and open the term when ready.</value>
   </data>
-    <data name="Terms.UpdateSuccess" xml:space="preserve">
+  <data name="Terms.UpdateSuccess" xml:space="preserve">
     <value>Term updated successfully.</value>
   </data>
     <data name="Terms.CloseSuccess" xml:space="preserve">
@@ -668,7 +680,7 @@
     <value>Term deleted successfully.</value>
   </data>
     <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
-    <value>Only active terms can be closed.</value>
+    <value>Only Active or Ended terms (still open status) can be closed.</value>
   </data>
     <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
     <value>Cannot delete active, ended, or closed terms. Please use Close Term feature if needed.</value>
@@ -686,10 +698,10 @@
     <value>There are {0} students without company assignments in this term. Are you sure you want to close it?</value>
   </data>
     <data name="Terms.HasRelatedData" xml:space="preserve">
-    <value>Warning: This term has related data</value>
+    <value>Warning: This term has related data (enrolled students, internship groups, or evaluation cycles). Please handle related data before deleting.</value>
   </data>
     <data name="Terms.StartDateLocked" xml:space="preserve">
-    <value>Start date cannot be changed after the term has started.</value>
+    <value>The start date cannot be changed because the term has already begun. Only the end date and other details can still be edited.</value>
   </data>
     <data name="Terms.YearInvalidRange" xml:space="preserve">
     <value>Year must be between 2000 and 2100.</value>
@@ -858,6 +870,9 @@
   </data>
     <data name="InternshipGroup.TermNotFound" xml:space="preserve">
     <value>Term not found.</value>
+  </data>
+    <data name="InternshipGroup.TermNotActive" xml:space="preserve">
+    <value>The term is not currently active. Internship groups can only be created in an active term.</value>
   </data>
     <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
     <value>Enterprise not found.</value>
@@ -1204,5 +1219,28 @@
   </data>
     <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
     <value>An error occurred while retrieving violation report details.</value>
+  </data>
+
+  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+    <value>Your session is invalid. Please sign out and sign in again.</value>
+  </data>
+  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Your enterprise employee profile was not found. Please contact the administrator to verify your account.</value>
+  </data>
+  <data name="ActiveTerms.NoActiveTermsFoundForEnterprise" xml:space="preserve">
+    <value>Your enterprise currently has no active internship groups in any ongoing term.</value>
+  </data>
+  <data name="ActiveTerms.NoActiveTermsFoundForMentor" xml:space="preserve">
+    <value>You have not been assigned to any active internship group in the current term.</value>
+  </data>
+  <data name="ActiveTerms.SystemError" xml:space="preserve">
+    <value>An error occurred while loading the active internship terms. Please try again later.</value>
+  </data>
+  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+    <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
+  </data>
+  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+    <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
 </root>

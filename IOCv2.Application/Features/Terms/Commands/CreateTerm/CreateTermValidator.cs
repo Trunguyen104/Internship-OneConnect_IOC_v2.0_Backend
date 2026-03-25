@@ -26,6 +26,8 @@ public class CreateTermValidator : AbstractValidator<CreateTermCommand>
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.StartDateRequired))
             .Must(BeValidDate)
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.InvalidDateFormat))
+            .Must(IsNotInPast)
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.StartDateInPast))
             .Must(BeAtLeastOneWeekAheadOrMore)
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.StartDateMustBeOneWeekAhead));
 
@@ -43,14 +45,17 @@ public class CreateTermValidator : AbstractValidator<CreateTermCommand>
         return date != default;
     }
 
+    private bool IsNotInPast(DateOnly startDate)
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        return startDate >= today;
+    }
+
     private bool BeAtLeastOneWeekAheadOrMore(DateOnly startDate)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        // If startDate is today, return false (not allowed)
-        if (startDate == today)
-            return false;
-        // If startDate is in the future, it must be at least 7 days ahead
+        // Already failed IsNotInPast if in the past — pass this rule to avoid duplicate messages
+        if (startDate < today) return true;
         return startDate >= today.AddDays(7);
     }
 

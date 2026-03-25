@@ -1,5 +1,7 @@
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -15,6 +17,7 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
     private readonly IBackgroundEmailSender _emailSender;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<BulkWithdrawStudentsHandler> _logger;
 
     public BulkWithdrawStudentsHandler(
@@ -22,12 +25,14 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
         ICurrentUserService currentUserService,
         IMessageService messageService,
         IBackgroundEmailSender emailSender,
+        ICacheService cacheService,
         ILogger<BulkWithdrawStudentsHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
         _emailSender = emailSender;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -54,6 +59,12 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
                 return Result<BulkWithdrawStudentsResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
         }
+
+        // Do not allow bulk withdraw when the term is Ended or Closed
+        if (TermStatusHelper.IsEnded(term.StartDate, term.EndDate, term.Status) ||
+            TermStatusHelper.IsClosed(term.Status))
+            return Result<BulkWithdrawStudentsResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.TermEndedOrClosed));
 
         // Load all studentTerms matching the IDs and TermId
         var studentTerms = await _unitOfWork.Repository<StudentTerm>()
@@ -97,6 +108,9 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
         }
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
         // Fire-and-forget emails
         var emailSubject = _messageService.GetMessage(MessageKeys.StudentTerms.EmailSubjectWithdraw);

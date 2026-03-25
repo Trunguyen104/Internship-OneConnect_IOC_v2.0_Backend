@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser;
+using FluentValidation;
+using IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser;
 using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Logbooks.Commands.CreateLogbook

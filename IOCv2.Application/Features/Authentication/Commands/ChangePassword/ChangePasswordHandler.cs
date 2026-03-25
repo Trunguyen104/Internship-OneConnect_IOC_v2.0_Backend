@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -6,6 +6,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using IOCv2.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using FluentValidation.Results;
+using FluentValidation;
 
 namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
 {
@@ -69,7 +71,10 @@ namespace IOCv2.Application.Features.Authentication.Commands.ChangePassword
             if (!_passwordService.VerifyPassword(request.CurrentPassword, user.PasswordHash))
             {
                 await RegisterFailedAttempt(key, cancellationToken);
-                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Password.IncorrectCurrent));
+                throw new FluentValidation.ValidationException(new [] 
+                { 
+                    new FluentValidation.Results.ValidationFailure("CurrentPassword", _messageService.GetMessage(MessageKeys.Password.IncorrectCurrent)) 
+                });
             }
 
             // All validations passed - reset fail count

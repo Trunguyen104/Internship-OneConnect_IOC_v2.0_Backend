@@ -46,37 +46,25 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         /// - Project to DTO and return NotFound if missing
         /// - Catch exceptions and log an internal server error
         /// </summary>
-        public async Task<Result<GetViolationReportDetailResponse>> Handle( GetViolationReportDetailQuery request, CancellationToken cancellationToken)
+        public async Task<Result<GetViolationReportDetailResponse>> Handle(GetViolationReportDetailQuery request, CancellationToken cancellationToken)
         {
-            try
+            // Base query for the requested violation report id.
+            var query = _unitOfWork.Repository<ViolationReport>().Query().AsNoTracking().Include(x=>x.InternshipGroup).ThenInclude(x=>x.Mentor).Where(x => x.ViolationReportId == request.ViolationReportId);
+
+            // If current user is Mentor, restrict to reports belonging to mentor's groups.
+            if (UserRole.Mentor.ToString().Equals(_currentUserService.Role!))
             {
-                // Base query for the requested violation report id.
-                var query = _unitOfWork.Repository<ViolationReport>().Query().AsNoTracking().Where(x => x.ViolationReportId == request.ViolationReportId);
-
-                // If current user is Mentor, restrict to reports belonging to mentor's groups.
-                if (UserRole.Mentor.ToString().Equals(_currentUserService.Role!))
-                {
-                    var userId = Guid.Parse(_currentUserService.UserId!);
-                    query = query.Where(x => x.InternshipGroup.Mentor!.UserId == userId);
-                }
-
-                // Project to DTO and execute.
-                var response = await query.ProjectTo<GetViolationReportDetailResponse>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
-
-                if (response == null)
-                    return Result<GetViolationReportDetailResponse>.NotFound(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotFound));
-
-                return Result<GetViolationReportDetailResponse>.Success(response);
+                var userId = Guid.Parse(_currentUserService.UserId!);
+                query = query.Where(x => x.InternshipGroup.Mentor!.UserId == userId);
             }
-            catch (Exception ex)
-            {
-                // Log details and return internal server error to client.
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ViolationReportKey.ErrorWhileGettingViolationReportDetail));
 
-                return Result<GetViolationReportDetailResponse>.Failure(
-                    ex.Message,
-                    ResultErrorType.InternalServerError);
-            }
+            // Project to DTO and execute.
+            var response = await query.ProjectTo<GetViolationReportDetailResponse>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+
+            if (response == null)
+                return Result<GetViolationReportDetailResponse>.NotFound(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotFound));
+
+            return Result<GetViolationReportDetailResponse>.Success(response);
         }
     }
 }

@@ -85,32 +85,38 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
                 universityId = universityUser.UniversityId;
             }
 
-            // Check for overlapping terms
-            var hasOverlap = await _unitOfWork.Repository<Term>()
+            
+            
+            // Check for duplicate term name within the university
+            var duplicateNameExists = await _unitOfWork.Repository<Term>()
+                .Query()
+                .Where(t => t.UniversityId == universityId && t.Name.ToLower() == request.Name.Trim().ToLower())
+                .AnyAsync(cancellationToken);
+
+            if (duplicateNameExists)
+            {
+                return Result<CreateTermResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Terms.NameExists),
+                    ResultErrorType.Conflict);
+            }
+
+            
+            // Check for overlapping terms (a single query returns the name if conflict exists)
+            var overlappingTermName = await _unitOfWork.Repository<Term>()
                 .Query()
                 .Where(t => t.UniversityId == universityId)
                 .Where(t => t.Status == TermStatus.Open || t.Status == TermStatus.Closed)
-                .AnyAsync(t =>
-                        (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
-                        (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
-                        (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate),
-                    cancellationToken);
+                .Where(t =>
+                    (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
+                    (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
+                    (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate))
+                .Select(t => (string?)t.Name)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (hasOverlap)
+            if (overlappingTermName != null)
             {
-                var overlappingTerm = await _unitOfWork.Repository<Term>()
-                    .Query()
-                    .Where(t => t.UniversityId == universityId)
-                    .Where(t => t.Status == TermStatus.Open || t.Status == TermStatus.Closed)
-                    .Where(t =>
-                        (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
-                        (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
-                        (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate))
-                    .Select(t => t.Name)
-                    .FirstOrDefaultAsync(cancellationToken);
-
                 return Result<CreateTermResponse>.Failure(
-                    string.Format(_messageService.GetMessage(MessageKeys.Terms.OverlapWithActiveTerm), overlappingTerm),
+                    string.Format(_messageService.GetMessage(MessageKeys.Terms.OverlapWithActiveTerm), overlappingTermName),
                     ResultErrorType.Conflict);
             }
 

@@ -1,5 +1,7 @@
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -14,17 +16,20 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<UpdateStudentTermHandler> _logger;
 
     public UpdateStudentTermHandler(
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
         IMessageService messageService,
+        ICacheService cacheService,
         ILogger<UpdateStudentTermHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -44,19 +49,26 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
             return Result<UpdateStudentTermResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.NotFound), ResultErrorType.NotFound);
 
-        // 2. Authorization
+        // 2. Check term is not ended/closed
+        var term = studentTerm.Term;
+        if (TermStatusHelper.IsEnded(term.StartDate, term.EndDate, term.Status) ||
+            TermStatusHelper.IsClosed(term.Status))
+            return Result<UpdateStudentTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.TermEndedOrClosed));
+
+        // 3. Authorization
         if (!isSuperAdmin)
         {
             var universityUser = await _unitOfWork.Repository<UniversityUser>()
                 .Query()
                 .FirstOrDefaultAsync(uu => uu.UserId == userId, cancellationToken);
 
-            if (universityUser == null || universityUser.UniversityId != studentTerm.Term.UniversityId)
+            if (universityUser == null || universityUser.UniversityId != term.UniversityId)
                 return Result<UpdateStudentTermResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
         }
 
-        // 3. Validate PlacementStatus = Placed requires EnterpriseId
+        // 4. Validate PlacementStatus = Placed requires EnterpriseId
         var targetPlacement = request.PlacementStatus ?? studentTerm.PlacementStatus;
         var targetEnterpriseId = request.EnterpriseId ?? studentTerm.EnterpriseId;
 
@@ -84,25 +96,69 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
                     _messageService.GetMessage(MessageKeys.StudentTerms.EmailConflict), ResultErrorType.Conflict);
         }
 
-        // 6. Snapshot old state for counter delta
+        // 6. Check StudentCode conflict within same university (exclude self)
+        if (!string.IsNullOrWhiteSpace(request.StudentCode) && request.StudentCode != studentTerm.Student.User.UserCode)
+        {
+            var codeConflict = await _unitOfWork.Repository<StudentTerm>()
+                .Query()
+                .Include(st => st.Student).ThenInclude(s => s.User)
+                .Include(st => st.Term)
+                .AnyAsync(st =>
+                    st.Student.User.UserCode == request.StudentCode &&
+                    st.Term.UniversityId == term.UniversityId &&
+                    st.StudentId != studentTerm.StudentId,
+                    cancellationToken);
+            if (codeConflict)
+                return Result<UpdateStudentTermResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeConflict), ResultErrorType.Conflict);
+        }
+
+        // 7. Prevent withdrawing a Placed student without also unplacing them
+        var resultingEnrollmentStatus = request.EnrollmentStatus ?? studentTerm.EnrollmentStatus;
+        var resultingPlacementStatus = request.PlacementStatus ?? studentTerm.PlacementStatus;
+        if (resultingEnrollmentStatus == EnrollmentStatus.Withdrawn &&
+            resultingPlacementStatus == PlacementStatus.Placed)
+            return Result<UpdateStudentTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.CannotWithdrawPlacedViaUpdate));
+
+        // 7b. Cross-term check: prevent re-activating a student who is already Active in another term
+        if (studentTerm.EnrollmentStatus == EnrollmentStatus.Withdrawn &&
+            resultingEnrollmentStatus == EnrollmentStatus.Active)
+        {
+            var activeElsewhere = await _unitOfWork.Repository<StudentTerm>()
+                .Query()
+                .AnyAsync(st =>
+                    st.StudentId == studentTerm.StudentId &&
+                    st.StudentTermId != studentTerm.StudentTermId &&
+                    st.EnrollmentStatus == EnrollmentStatus.Active,
+                    cancellationToken);
+
+            if (activeElsewhere)
+                return Result<UpdateStudentTermResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.StudentTerms.AlreadyEnrolled), ResultErrorType.Conflict);
+        }
+
+        // 8. Snapshot old state for counter delta
         var wasActive = studentTerm.EnrollmentStatus == EnrollmentStatus.Active;
         var wasUnplaced = studentTerm.PlacementStatus == PlacementStatus.Unplaced;
         var wasPlaced = studentTerm.PlacementStatus == PlacementStatus.Placed;
 
-        // 7. Update User profile
+        // 9. Update User profile
         var user = studentTerm.Student.User;
         var newFullName = request.FullName ?? user.FullName;
-        user.UpdateProfile(newFullName, request.Phone ?? user.PhoneNumber, user.AvatarUrl, (IOCv2.Domain.Enums.UserGender?)user.Gender, request.DateOfBirth ?? user.DateOfBirth);
+        user.UpdateProfile(newFullName, request.Phone ?? user.PhoneNumber, user.AvatarUrl, (IOCv2.Domain.Enums.UserGender?)user.Gender, request.DateOfBirth ?? user.DateOfBirth, null);
         if (!string.IsNullOrWhiteSpace(request.Email) && request.Email != user.Email)
             user.UpdateEmail(request.Email);
+        if (!string.IsNullOrWhiteSpace(request.StudentCode) && request.StudentCode != user.UserCode)
+            user.UpdateUserCode(request.StudentCode);
         await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
 
-        // 8. Update Student
+        // 10. Update Student
         if (!string.IsNullOrWhiteSpace(request.Major))
             studentTerm.Student.Major = request.Major;
         await _unitOfWork.Repository<Student>().UpdateAsync(studentTerm.Student, cancellationToken);
 
-        // 9. Update StudentTerm
+        // 11. Update StudentTerm
         if (request.EnrollmentDate.HasValue)
             studentTerm.EnrollmentDate = request.EnrollmentDate.Value;
         if (request.EnrollmentStatus.HasValue)
@@ -124,18 +180,21 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
         studentTerm.UpdatedAt = DateTime.UtcNow;
         await _unitOfWork.Repository<StudentTerm>().UpdateAsync(studentTerm, cancellationToken);
 
-        // 10. Recalculate term counter deltas
+        // 12. Recalculate term counter deltas
         var isNowActive = studentTerm.EnrollmentStatus == EnrollmentStatus.Active;
         var isNowUnplaced = studentTerm.PlacementStatus == PlacementStatus.Unplaced;
         var isNowPlaced = studentTerm.PlacementStatus == PlacementStatus.Placed;
 
-        var term = studentTerm.Term;
         term.TotalEnrolled += (isNowActive ? 1 : 0) - (wasActive ? 1 : 0);
         term.TotalUnplaced += (isNowActive && isNowUnplaced ? 1 : 0) - (wasActive && wasUnplaced ? 1 : 0);
         term.TotalPlaced += (isNowActive && isNowPlaced ? 1 : 0) - (wasActive && wasPlaced ? 1 : 0);
         await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+        // 13. Invalidate term cache so totals reflect the update
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
         _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogUpdated), request.StudentTermId, userId);
 

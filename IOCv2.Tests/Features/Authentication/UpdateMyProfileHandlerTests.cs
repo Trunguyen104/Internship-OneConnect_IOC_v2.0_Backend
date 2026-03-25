@@ -19,6 +19,8 @@ namespace IOCv2.Tests.Features.Users.Commands
     {
         private readonly Mock<ICurrentUserService> _currentUserService;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<ICacheService> _cacheService;
+        private readonly Mock<IFileStorageService> _fileStorageService;
         private readonly Mock<ILogger<UpdateMyProfileHandler>> _logger;
         private readonly UpdateMyProfileHandler _handler;
 
@@ -26,11 +28,15 @@ namespace IOCv2.Tests.Features.Users.Commands
         {
             _currentUserService = new Mock<ICurrentUserService>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _cacheService = new Mock<ICacheService>();
+            _fileStorageService = new Mock<IFileStorageService>();
             _logger = new Mock<ILogger<UpdateMyProfileHandler>>();
             
             _handler = new UpdateMyProfileHandler(
                 _currentUserService.Object,
                 _unitOfWork.Object,
+                _cacheService.Object,
+                _fileStorageService.Object,
                 _logger.Object);
         }
 

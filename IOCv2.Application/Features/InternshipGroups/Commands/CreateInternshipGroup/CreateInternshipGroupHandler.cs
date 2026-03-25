@@ -38,7 +38,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
 
         public async Task<Result<CreateInternshipGroupResponse>> Handle(CreateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogCreating), request.GroupName, request.TermId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogCreating), request.GroupName, request.PhaseId);
 
             try
             {
@@ -64,15 +64,26 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         ResultErrorType.Forbidden);
                 }
 
-                // ── 3. Validate TermId ─────────────────────────────────────────────
-                var termExists = await _unitOfWork.Repository<Term>()
-                    .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
-                if (!termExists)
+                // ── 3. Validate PhaseId & kiểm tra đợt phải đang Open ─────────────
+                var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId, cancellationToken);
+
+                if (phase == null)
                 {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.PhaseId);
                     return Result<CreateInternshipGroupResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound),
+                        "Không tìm thấy đợt thực tập.",
                         ResultErrorType.NotFound);
+                }
+
+                if (phase.Status != InternshipPhaseStatus.Open)
+                {
+                    _logger.LogWarning("Phase {PhaseId} is not open (status: {Status}). Cannot create internship group.",
+                        request.PhaseId, phase.Status);
+                    return Result<CreateInternshipGroupResponse>.Failure(
+                        "Đợt thực tập không ở trạng thái mở.",
+                        ResultErrorType.BadRequest);
                 }
 
                 // ── 4. Validate EnterpriseId: phải là công ty của HR hiện tại ──────
@@ -88,29 +99,34 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     }
                 }
 
-                // ── 5. Validate MentorId: phải thuộc cùng công ty của HR ────────────
+                // ── 5. Validate MentorId: request truyền UserId của mentor ────────────
+                Guid? resolvedMentorId = null; // EnterpriseUserId lưu vào DB
                 if (request.MentorId.HasValue)
                 {
-                    var mentorBelongsToEnterprise = await _unitOfWork.Repository<EnterpriseUser>()
-                        .ExistsAsync(u => u.EnterpriseUserId == request.MentorId.Value
-                                       && u.EnterpriseId == enterpriseUser.EnterpriseId, cancellationToken);
-                    if (!mentorBelongsToEnterprise)
+                    // Tìm EnterpriseUser theo UserId (frontend truyền UserId, không phải EnterpriseUserId)
+                    var mentor = await _unitOfWork.Repository<EnterpriseUser>()
+                        .Query()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(u => u.UserId == request.MentorId.Value
+                                               && u.EnterpriseId == enterpriseUser.EnterpriseId, cancellationToken);
+                    if (mentor == null)
                     {
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<CreateInternshipGroupResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
                             ResultErrorType.NotFound);
                     }
+                    resolvedMentorId = mentor.EnterpriseUserId; // Lưu EnterpriseUserId vào DB
                 }
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 var newGroup = InternshipGroup.Create(
-                    request.TermId,
+                    request.PhaseId,
                     request.GroupName,
                     request.Description,
                     request.EnterpriseId,
-                    request.MentorId,
+                    resolvedMentorId, // EnterpriseUserId
                     request.StartDate,
                     request.EndDate
                 );
@@ -148,8 +164,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         .AsNoTracking()
                         .Where(a => studentIds.Contains(a.StudentId)
                                  && a.EnterpriseId == enterpriseUser.EnterpriseId
-                                 && a.Status == InternshipApplicationStatus.Approved
-                                 && a.TermId == request.TermId)
+                                 && a.Status == InternshipApplicationStatus.Approved)
                         .Select(a => a.StudentId)
                         .ToListAsync(cancellationToken);
 
@@ -170,7 +185,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     var alreadyInGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                         .AsNoTracking()
                         .Include(g => g.Members)
-                        .Where(g => g.TermId == request.TermId && g.Status == GroupStatus.Active)
+                        .Where(g => g.PhaseId == request.PhaseId && g.Status == GroupStatus.Active)
                         .SelectMany(g => g.Members)
                         .Where(m => studentIds.Contains(m.StudentId))
                         .Select(m => m.StudentId)
@@ -179,7 +194,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     if (alreadyInGroup.Any())
                     {
                         var firstInGroup = alreadyInGroup.First();
-                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentAlreadyInActiveGroup), firstInGroup, request.TermId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentAlreadyInActiveGroup), firstInGroup, request.PhaseId);
                         await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                         return Result<CreateInternshipGroupResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.InternshipGroups.StudentAlreadyInActiveGroup),

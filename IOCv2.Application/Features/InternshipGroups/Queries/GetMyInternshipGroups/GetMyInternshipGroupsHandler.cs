@@ -38,27 +38,30 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
             throw new UnauthorizedAccessException(_messageService.GetMessage(MessageKeys.Common.Unauthorized));
         }
 
-        var studentId = await _unitOfWork.Repository<Student>()
+        var student = await _unitOfWork.Repository<Student>()
             .Query()
-            .Where(student => student.UserId == userId)
-            .Select(student => (Guid?)student.StudentId)
+            .Include(s => s.User!).ThenInclude(u => u.UniversityUser!).ThenInclude(uu => uu.University)
+            .Where(s => s.UserId == userId)
+            .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (!studentId.HasValue)
+        if (student == null)
         {
             _logger.LogWarning("Mine internship groups query failed because student profile was not found for current user.");
             throw new NotFoundException(_messageService.GetMessage(MessageKeys.Users.NotFound));
         }
+
+        var studentId = student.StudentId;
+        var university = student.User?.UniversityUser?.University;
 
         var groups = await _unitOfWork.Repository<InternshipGroup>()
             .Query()
             .Include(group => group.Enterprise)
             .Include(group => group.Mentor)
                 .ThenInclude(mentor => mentor!.User)
-            .Include(group => group.Term)
-                .ThenInclude(term => term.University)
+            .Include(group => group.InternshipPhase)
             .Include(group => group.Members)
-            .Where(group => group.DeletedAt == null && group.Members.Any(member => member.StudentId == studentId.Value))
+            .Where(group => group.DeletedAt == null && group.Members.Any(member => member.StudentId == studentId))
             .OrderByDescending(group => group.CreatedAt)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
@@ -77,22 +80,23 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
                 .ToDictionary(group => group.Key, group => group.First());
 
 
-        var termIds = groups.Select(group => group.TermId).Distinct().ToList();
-        var evaluationCycleLookup = termIds.Count == 0
+        var phaseIds = groups.Select(group => group.PhaseId).Distinct().ToList();
+        var evaluationCycleLookup = phaseIds.Count == 0
             ? new Dictionary<Guid, int>()
             : await _unitOfWork.Repository<EvaluationCycle>()
                 .Query()
-                .Where(cycle => termIds.Contains(cycle.TermId))
-                .GroupBy(cycle => cycle.TermId)
-                .Select(group => new { TermId = group.Key, Count = group.Count() })
-                .ToDictionaryAsync(x => x.TermId, x => x.Count, cancellationToken);
+                .Where(cycle => phaseIds.Contains(cycle.PhaseId))
+                .GroupBy(cycle => cycle.PhaseId)
+                .Select(group => new { PhaseId = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(x => x.PhaseId, x => x.Count, cancellationToken);
 
         var response = groups
             .Select(group => {
                 var res = GetMyInternshipGroupsResponse.FromEntity(
                     group,
-                    projectLookup.GetValueOrDefault(group.InternshipId));
-                res.EvaluationCount = evaluationCycleLookup.GetValueOrDefault(group.TermId);
+                    projectLookup.GetValueOrDefault(group.InternshipId),
+                    university);
+                res.EvaluationCount = evaluationCycleLookup.GetValueOrDefault(group.PhaseId);
                 return res;
             })
             .ToList();

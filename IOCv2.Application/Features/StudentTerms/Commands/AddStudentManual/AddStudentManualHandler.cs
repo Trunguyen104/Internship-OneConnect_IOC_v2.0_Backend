@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,6 +17,8 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
     private readonly IMessageService _messageService;
     private readonly IPasswordService _passwordService;
     private readonly IUserServices _userServices;
+    private readonly IBackgroundEmailSender _emailSender;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<AddStudentManualHandler> _logger;
 
     public AddStudentManualHandler(
@@ -24,6 +27,8 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
         IMessageService messageService,
         IPasswordService passwordService,
         IUserServices userServices,
+        IBackgroundEmailSender emailSender,
+        ICacheService cacheService,
         ILogger<AddStudentManualHandler> logger)
     {
         _unitOfWork = unitOfWork;
@@ -31,6 +36,8 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
         _messageService = messageService;
         _passwordService = passwordService;
         _userServices = userServices;
+        _emailSender = emailSender;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -111,7 +118,7 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
 
             var newUserId = Guid.NewGuid();
             var user = new User(newUserId, request.StudentCode, request.Email, request.FullName, UserRole.Student, passwordHash);
-            user.UpdateProfile(request.FullName, request.Phone, null, null, request.DateOfBirth);
+            user.UpdateProfile(request.FullName, request.Phone, null, null, request.DateOfBirth, null);
             await _unitOfWork.Repository<User>().AddAsync(user, cancellationToken);
 
             var student = new Student
@@ -151,7 +158,21 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            await _emailSender.EnqueueAccountCreationEmailAsync(
+                user.Email,
+                user.FullName,
+                user.Email,
+                UserRole.Student.ToString(),
+                tempPassword,
+                user.UserId,
+                userId,
+                cancellationToken);
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogAdded), studentTermId, userId);
 

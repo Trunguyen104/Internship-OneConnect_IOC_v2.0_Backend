@@ -20,8 +20,13 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         public Guid? StudentId { get; set; }
         public Guid? UniversityId { get; set; }
         public Guid? EnterpriseId { get; set; }
+        public Guid? UnitId { get; set; }
 
+        public string? UnitName { get; set; }
         public string? PortfolioUrl { get; set; }
+        public string? CvUrl { get; set; }
+        public string? Major { get; set; }
+        public string? ClassName { get; set; }
         public string? Bio { get; set; }
         public string? Expertise { get; set; }
         public string? Department { get; set; }
@@ -35,7 +40,18 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
                 .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.Student != null ? src.Student.StudentId : (Guid?)null))
                 .ForMember(dest => dest.UniversityId, opt => opt.MapFrom(src => src.UniversityUser != null ? src.UniversityUser.UniversityId : (Guid?)null))
                 .ForMember(dest => dest.EnterpriseId, opt => opt.MapFrom(src => src.EnterpriseUser != null ? src.EnterpriseUser.EnterpriseId : (Guid?)null))
+                .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => 
+                    (src.Role == UserRole.SchoolAdmin || src.Role == UserRole.Student) ? (src.UniversityUser != null ? src.UniversityUser.UniversityId : (Guid?)null) :
+                    (src.Role == UserRole.EnterpriseAdmin || src.Role == UserRole.HR || src.Role == UserRole.Mentor) ? (src.EnterpriseUser != null ? src.EnterpriseUser.EnterpriseId : (Guid?)null) :
+                    null))
+                .ForMember(dest => dest.UnitName, opt => opt.MapFrom(src => 
+                    (src.Role == UserRole.SchoolAdmin || src.Role == UserRole.Student) ? (src.UniversityUser != null && src.UniversityUser.University != null ? src.UniversityUser.University.Name : null) :
+                    (src.Role == UserRole.EnterpriseAdmin || src.Role == UserRole.HR || src.Role == UserRole.Mentor) ? (src.EnterpriseUser != null && src.EnterpriseUser.Enterprise != null ? src.EnterpriseUser.Enterprise.Name : null) :
+                    null))
                 .ForMember(dest => dest.PortfolioUrl, opt => opt.MapFrom(src => src.Student != null ? src.Student.PortfolioUrl : null))
+                .ForMember(dest => dest.CvUrl, opt => opt.MapFrom(src => src.Student != null ? src.Student.CvUrl : null))
+                .ForMember(dest => dest.Major, opt => opt.MapFrom(src => src.Student != null ? src.Student.Major : null))
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Student != null ? src.Student.ClassName : null))
                 .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => 
                     src.EnterpriseUser != null ? src.EnterpriseUser.Bio : 
                     src.UniversityUser != null ? src.UniversityUser.Bio : null))

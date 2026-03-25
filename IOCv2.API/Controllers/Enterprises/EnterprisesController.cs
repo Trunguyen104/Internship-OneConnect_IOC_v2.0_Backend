@@ -5,6 +5,7 @@ using IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.RejectApplication;
 using IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise;
+using IOCv2.Application.Features.Enterprises.Queries.GetActiveTerms;
 using IOCv2.Application.Features.Enterprises.Queries.GetApplicationDetail;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseApplications;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR;
@@ -48,7 +49,7 @@ public class EnterprisesController : ApiControllerBase
     /// - 500 Internal Server Error for unexpected failures.
     /// </returns>
     [HttpGet]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetEnterprisesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -213,8 +214,31 @@ public class EnterprisesController : ApiControllerBase
         return HandleResult(result);
     }
 
-    // ──────── Issue 77: Enterprise Application Management ────────
+    // ──────── Issue 68: Active Term Timeline for HR/Mentor ────────
 
+    /// <summary>
+    /// Retrieves the list of ongoing (Active) internship terms for the enterprise.
+    /// HR/EnterpriseAdmin can view all terms in which the enterprise has internship groups.
+    /// Mentors can only view terms in which they have an InternshipGroup.
+    /// Returns timeline information and evaluation/grading deadlines.
+    /// </summary>
+    /// <param name="query">UniversityId (optional): filters by a specific university.</param>
+    [HttpGet("me/terms/active")]
+    [Authorize(Roles = "HR,EnterpriseAdmin,Mentor")]
+    [ProducesResponseType(typeof(ApiResponse<GetActiveTermsForEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetActiveTerms(
+        [FromQuery] GetActiveTermsForEnterpriseQuery query,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(query, cancellationToken);
+        return HandleResult(result);
+    }
+
+    // ──────── Issue 77: Enterprise Application Management ────────
+    
     /// <summary>
     /// Lấy danh sách đơn ứng tuyển thực tập của doanh nghiệp theo kỳ (phân trang).
     /// HR/EnterpriseAdmin xem tất cả. Mentor chỉ xem sinh viên trong nhóm của mình.

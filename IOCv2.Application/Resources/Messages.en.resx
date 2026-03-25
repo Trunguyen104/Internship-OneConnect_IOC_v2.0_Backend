@@ -406,4 +406,178 @@
   <data name="InternshipGroup.ArchiveSuccess" xml:space="preserve">
     <value>Archived group successfully.</value>
   </data>
+  <data name="InternshipPhase.EnterpriseIdRequired" xml:space="preserve">
+    <value>Enterprise ID (EnterpriseId) is required.</value>
+  </data>
+  <data name="InternshipPhase.PhaseIdRequired" xml:space="preserve">
+    <value>Phase ID (PhaseId) is required.</value>
+  </data>
+  <data name="InternshipPhase.NameRequired" xml:space="preserve">
+    <value>Internship phase name is required.</value>
+  </data>
+  <data name="InternshipPhase.NameMaxLength" xml:space="preserve">
+    <value>Internship phase name must not exceed 255 characters.</value>
+  </data>
+  <data name="InternshipPhase.StartDateRequired" xml:space="preserve">
+    <value>Start date (StartDate) is required.</value>
+  </data>
+  <data name="InternshipPhase.EndDateRequired" xml:space="preserve">
+    <value>End date (EndDate) is required.</value>
+  </data>
+  <data name="InternshipPhase.EndDateAfterStartDate" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="InternshipPhase.MaxStudentsGreaterThanZero" xml:space="preserve">
+    <value>Maximum students (MaxStudents) must be greater than 0.</value>
+  </data>
+  <data name="InternshipPhase.NotFound" xml:space="preserve">
+    <value>Internship phase not found.</value>
+  </data>
+  <data name="InternshipPhase.DuplicateName" xml:space="preserve">
+    <value>An internship phase named '{0}' already exists in this enterprise. Please choose a different name.</value>
+  </data>
+  <data name="InternshipPhase.DuplicateNameOnUpdate" xml:space="preserve">
+    <value>Cannot rename to '{0}' because another internship phase in this enterprise already uses this name.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateClosed" xml:space="preserve">
+    <value>Cannot update internship phase '{0}' because it is in Closed status. Only phases in Draft or Open status can be edited.</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteHasActiveGroups" xml:space="preserve">
+    <value>Cannot delete internship phase '{0}' because there are {1} active internship group(s). Please close or archive all groups before deleting.</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteInProgress" xml:space="preserve">
+    <value>Cannot delete internship phase '{0}' because it is currently InProgress. Please close the phase before deleting.</value>
+  </data>
+  <data name="InternshipPhase.StartDateNotInPast" xml:space="preserve">
+    <value>Start date must not be in the past.</value>
+  </data>
+  <data name="InternshipPhase.StudentNotFound" xml:space="preserve">
+    <value>Student profile not found for the current account.</value>
+  </data>
+  <data name="InternshipPhase.UpdateNoChanges" xml:space="preserve">
+    <value>No changes were saved for the internship phase.</value>
+  </data>
+  <data name="InternshipPhase.CreateSuccess" xml:space="preserve">
+    <value>Internship phase created successfully.</value>
+  </data>
+  <data name="InternshipPhase.UpdateSuccess" xml:space="preserve">
+    <value>Internship phase updated successfully.</value>
+  </data>
+  <data name="InternshipPhase.DeleteSuccess" xml:space="preserve">
+    <value>Internship phase deleted successfully.</value>
+  </data>
+  <data name="InternshipPhase.Log.Creating" xml:space="preserve">
+    <value>Starting to create internship phase '{0}' for enterprise {1}.</value>
+  </data>
+  <data name="InternshipPhase.Log.EnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise with ID {0} not found. Cannot create internship phase.</value>
+  </data>
+  <data name="InternshipPhase.Log.DuplicateName" xml:space="preserve">
+    <value>Internship phase named '{0}' already exists in enterprise {1}. Rejecting creation.</value>
+  </data>
+  <data name="InternshipPhase.Log.CreateSuccess" xml:space="preserve">
+    <value>Internship phase created successfully — PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.CreateError" xml:space="preserve">
+    <value>Error creating internship phase '{0}' for enterprise {1}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.Updating" xml:space="preserve">
+    <value>Starting to update internship phase {0} — new name: '{1}', new status: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateNotFound" xml:space="preserve">
+    <value>Internship phase with ID {0} not found. Update request rejected.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateClosed" xml:space="preserve">
+    <value>Rejecting update of internship phase '{0}' (ID: {1}) — phase is in Closed status.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateDuplicateName" xml:space="preserve">
+    <value>Rejecting update of internship phase {0} — name '{1}' is already used by another phase in enterprise {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateSuccess" xml:space="preserve">
+    <value>Internship phase updated successfully — PhaseId: {0}, Name: '{1}'.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateNoChanges" xml:space="preserve">
+    <value>No records saved when updating internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateError" xml:space="preserve">
+    <value>Error updating internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.Deleting" xml:space="preserve">
+    <value>Starting to delete internship phase {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteNotFound" xml:space="preserve">
+    <value>Internship phase with ID {0} not found. Delete request rejected.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteHasActiveGroups" xml:space="preserve">
+    <value>Rejecting deletion of internship phase '{0}' (ID: {1}) — {2} active internship group(s) exist.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteSuccess" xml:space="preserve">
+    <value>Internship phase deleted successfully — PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteNoChanges" xml:space="preserve">
+    <value>No records saved when deleting internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteError" xml:space="preserve">
+    <value>Error deleting internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingList" xml:space="preserve">
+    <value>Getting internship phase list for enterprise {0} — status filter: {1}, page: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ListFromCache" xml:space="preserve">
+    <value>Returning internship phase list from cache for enterprise {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ListSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phase list for enterprise {0} — returning {1}/{2} records (page {3}).</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingById" xml:space="preserve">
+    <value>Getting internship phase details for {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdFromCache" xml:space="preserve">
+    <value>Returning internship phase {0} from cache.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdNotFound" xml:space="preserve">
+    <value>Internship phase with ID {0} not found.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phase — PhaseId: {0}, Name: '{1}', Enterprise: '{2}', Status: {3}, Groups: {4}.</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingMyPhases" xml:space="preserve">
+    <value>Getting internship phases for student (UserId: {0}).</value>
+  </data>
+  <data name="InternshipPhase.Log.StudentNotFound" xml:space="preserve">
+    <value>Student profile not found for UserId {0}. Request denied.</value>
+  </data>
+  <data name="InternshipPhase.Log.MyPhasesSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phases for student {0} (UserId: {1}) — found {2} phase(s).</value>
+  </data>
+  <data name="InternshipPhase.StatusInvalid" xml:space="preserve">
+    <value>Internship phase status is invalid.</value>
+  </data>
+  <data name="InternshipPhase.DescriptionMaxLength" xml:space="preserve">
+    <value>Internship phase description must not exceed 2000 characters.</value>
+  </data>
+  <data name="InternshipPhase.PageNumberMinValue" xml:space="preserve">
+    <value>Page number must be greater than or equal to 1.</value>
+  </data>
+  <data name="InternshipPhase.PageSizeRange" xml:space="preserve">
+    <value>Page size must be between 1 and 50.</value>
+  </data>
+  <data name="InternshipPhase.InvalidStatusTransition" xml:space="preserve">
+    <value>Cannot transition from '{0}' to '{1}'. Please check the valid status flow.</value>
+  </data>
+  <data name="InternshipPhase.NotYourEnterprise" xml:space="preserve">
+    <value>You do not have permission to operate on internship phases of this enterprise.</value>
+  </data>
+  <data name="InternshipPhase.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Enterprise user information not found for the current account.</value>
+  </data>
+  <data name="InternshipPhase.Log.OwnershipDenied" xml:space="preserve">
+    <value>Access denied — User {0} attempted to operate on enterprise {1} but belongs to enterprise {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
+    <value>Rejected status transition of internship phase {0} from '{1}' to '{2}' — invalid transition.</value>
+  </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Term name already exists. Please choose a different name.</value>
+  </data>
 </root>
