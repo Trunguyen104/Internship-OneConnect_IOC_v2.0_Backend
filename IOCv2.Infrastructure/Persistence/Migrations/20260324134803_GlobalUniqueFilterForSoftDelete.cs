@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -58,9 +58,6 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_enterprise_users_user_id",
                 table: "enterprise_users");
 
-            migrationBuilder.DropColumn(
-                name: "is_verified",
-                table: "enterprises");
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_email",
@@ -198,12 +195,6 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_enterprise_users_user_id",
                 table: "enterprise_users");
 
-            migrationBuilder.AddColumn<bool>(
-                name: "is_verified",
-                table: "enterprises",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_email",
