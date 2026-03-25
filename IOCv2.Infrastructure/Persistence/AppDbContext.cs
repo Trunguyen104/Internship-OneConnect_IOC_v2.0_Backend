@@ -35,6 +35,8 @@ public partial class AppDbContext : DbContext
     public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
     public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
     public DbSet<InternshipApplication> InternshipApplications { get; set; } = null!;
+    public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; } = null!;
+
     public DbSet<Logbook> Logbooks { get; set; } = null!;
     public DbSet<Project> Projects { get; set; } = null!;
     public DbSet<ProjectResources> ProjectResources { get; set; } = null!;

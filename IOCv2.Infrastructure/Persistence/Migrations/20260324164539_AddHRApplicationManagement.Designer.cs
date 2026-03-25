@@ -3,17 +3,20 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Persistence.Migrations
+namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260324164539_AddHRApplicationManagement")]
+    partial class AddHRApplicationManagement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,6 +35,10 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("ApplicationId")
                         .HasColumnType("uuid")
                         .HasColumnName("application_id");
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("changed_at");
 
                     b.Property<string>("ChangedByName")
                         .HasMaxLength(200)
@@ -85,8 +92,8 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.HasIndex("ApplicationId")
                         .HasDatabaseName("ix_application_status_histories_application_id");
 
-                    b.HasIndex("CreatedAt")
-                        .HasDatabaseName("ix_application_status_histories_created_at");
+                    b.HasIndex("ChangedAt")
+                        .HasDatabaseName("ix_application_status_histories_changed_at");
 
                     b.ToTable("application_status_histories", (string)null);
                 });
