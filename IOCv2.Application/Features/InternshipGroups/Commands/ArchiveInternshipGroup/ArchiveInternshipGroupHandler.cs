@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.InternshipGroups.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -15,17 +16,20 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
         private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly ILogger<ArchiveInternshipGroupHandler> _logger;
+        private readonly ICacheService _cacheService;
 
         public ArchiveInternshipGroupHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUserService,
             IMessageService messageService,
-            ILogger<ArchiveInternshipGroupHandler> logger)
+            ILogger<ArchiveInternshipGroupHandler> logger,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<ArchiveInternshipGroupResponse>> Handle(ArchiveInternshipGroupCommand request, CancellationToken cancellationToken)
@@ -90,6 +94,10 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                // Clear Cache
+                await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.InternshipGroupId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
 
                 return Result<ArchiveInternshipGroupResponse>.Success(new ArchiveInternshipGroupResponse
                 {
