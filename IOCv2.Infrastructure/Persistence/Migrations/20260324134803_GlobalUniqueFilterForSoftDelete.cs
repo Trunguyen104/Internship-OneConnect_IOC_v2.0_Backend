@@ -58,7 +58,6 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_enterprise_users_user_id",
                 table: "enterprise_users");
 
-            // Removed duplicate DropColumn for "is_verified"
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_email",
@@ -196,7 +195,6 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_enterprise_users_user_id",
                 table: "enterprise_users");
 
-            // Removed redundant AddColumn for "is_verified"
 
             migrationBuilder.CreateIndex(
                 name: "ix_users_email",

@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.Admin;
 /// </summary>
 [Tags("Admin - User Management")]
 [Route("api/v{version:apiVersion}/user-management")]
-[Authorize]
+[Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin")]
 public class UserManagementController : ApiControllerBase
 {
     private readonly IMediator _mediator;
