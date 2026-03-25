@@ -104,5 +104,19 @@ namespace IOCv2.Tests.Features.Sprints.Queries.GetSprints
         public TestDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<Sprint> Sprints { get; set; }
+        public DbSet<InternshipPhase> InternshipPhases { get; set; }
+        public DbSet<SprintWorkItem> SprintWorkItems { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<InternshipGroup> InternshipGroups { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<InternshipPhase>().HasKey(p => p.PhaseId);
+            modelBuilder.Entity<Sprint>().HasKey(s => s.SprintId);
+            modelBuilder.Entity<SprintWorkItem>().HasKey(sw => new { sw.SprintId, sw.WorkItemId });
+            modelBuilder.Entity<Project>().HasKey(p => p.ProjectId);
+            modelBuilder.Entity<InternshipGroup>().HasKey(g => g.InternshipId);
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

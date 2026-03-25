@@ -19,14 +19,7 @@ public static class TestDbSeeder
 
         // 1. Seed Universities
         var fptuId = Guid.NewGuid();
-        context.Universities.Add(new University
-        {
-            UniversityId = fptuId,
-            Code = "FPTU",
-            Name = "FPT University Test",
-            Address = "Test Address",
-            Status = 1
-        });
+        context.Universities.Add(University.Create("FPTU", "FPT University Test", "Test Address", null, fptuId));
 
         // 2. Seed Enterprises
         var fptSoftId = Guid.NewGuid();
@@ -37,8 +30,7 @@ public static class TestDbSeeder
             TaxCode = "0101248141",
             Industry = "IT Test",
             Address = "Test Address",
-            IsVerified = true,
-            Status = 1
+            Status = (short)EnterpriseStatus.Active
         });
 
         context.SaveChanges();
@@ -47,8 +39,9 @@ public static class TestDbSeeder
         var passHash = passwordService.HashPassword("Admin@123");
 
         // Super Admin
+        var superAdminId = Guid.NewGuid();
         var superAdmin = new User(
-            Guid.NewGuid(),
+            superAdminId,
             "SA-001",
             "admin@iocv2.com",
             "Super Admin Test",
@@ -59,8 +52,9 @@ public static class TestDbSeeder
         context.Users.Add(superAdmin);
 
         // Enterprise Admin
+        var enterpriseAdminId = Guid.NewGuid();
         var enterpriseAdmin = new User(
-            Guid.NewGuid(),
+            enterpriseAdminId,
             "EA-001",
             "admin@fpt.com",
             "Enterprise Admin Test",
@@ -73,14 +67,15 @@ public static class TestDbSeeder
         context.EnterpriseUsers.Add(new EnterpriseUser
         {
             EnterpriseUserId = Guid.NewGuid(),
-            UserId = enterpriseAdmin.UserId,
+            UserId = enterpriseAdminId,
             EnterpriseId = fptSoftId,
             Position = "Admin"
         });
 
         // Mentor
+        var mentorUserId = Guid.NewGuid();
         var mentor = new User(
-            Guid.NewGuid(),
+            mentorUserId,
             "ME-001",
             "mentor@fpt.com",
             "Mentor Test",
@@ -94,14 +89,15 @@ public static class TestDbSeeder
         context.EnterpriseUsers.Add(new EnterpriseUser
         {
             EnterpriseUserId = mentorEuId,
-            UserId = mentor.UserId,
+            UserId = mentorUserId,
             EnterpriseId = fptSoftId,
             Position = "Senior Dev"
         });
 
         // Student
+        var studentUserId = Guid.NewGuid();
         var studentUser = new User(
-            Guid.NewGuid(),
+            studentUserId,
             "ST-001",
             "student@fptu.edu.vn",
             "Student Test",
@@ -114,7 +110,7 @@ public static class TestDbSeeder
         context.UniversityUsers.Add(new UniversityUser
         {
             UniversityUserId = Guid.NewGuid(),
-            UserId = studentUser.UserId,
+            UserId = studentUserId,
             UniversityId = fptuId
         });
 
@@ -122,7 +118,7 @@ public static class TestDbSeeder
         context.Students.Add(new Student
         {
             StudentId = studentEntityId,
-            UserId = studentUser.UserId,
+            UserId = studentUserId,
             InternshipStatus = StudentStatus.NO_INTERNSHIP,
             Major = "Computer Science",
             ClassName = "SE1600"
@@ -130,7 +126,7 @@ public static class TestDbSeeder
 
         context.SaveChanges();
 
-        // 4. Terms and Groups
+        // 4. Terms, Phases and Groups
         var termId = Guid.NewGuid();
         var term = new Term
         {
@@ -143,26 +139,37 @@ public static class TestDbSeeder
         };
         context.Terms.Add(term);
 
+        var phase = InternshipPhase.Create(
+            fptSoftId, 
+            "Phase 1", 
+            new DateOnly(2026, 1, 1), 
+            new DateOnly(2026, 5, 1), 
+            100, 
+            "Test Phase"
+        );
+        context.InternshipPhases.Add(phase);
+
         context.StudentTerms.Add(new StudentTerm
         {
+            StudentTermId = Guid.NewGuid(),
             StudentId = studentEntityId,
             TermId = termId,
-            Status = 1
+            EnrollmentStatus = EnrollmentStatus.Active,
+            PlacementStatus = PlacementStatus.Unplaced,
+            EnrollmentDate = new DateOnly(2026, 1, 1)
         });
         
         context.SaveChanges();
         
-        var groupId = Guid.NewGuid();
         var group = InternshipGroup.Create(
-            termId,
+            phase.PhaseId,
             "Test Internship Group",
+            "Test Description",
             fptSoftId,
             mentorEuId,
             DateTime.UtcNow,
             DateTime.UtcNow.AddMonths(2)
         );
-        // Workaround to set identity column if any, but since it's guid we can force set Id or let it generate
-        // The Create method returns new Group.
         context.InternshipGroups.Add(group);
         
         context.SaveChanges();

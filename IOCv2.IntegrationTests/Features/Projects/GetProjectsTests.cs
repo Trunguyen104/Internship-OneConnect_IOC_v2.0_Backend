@@ -31,7 +31,7 @@ public class GetProjectsTests : BaseIntegrationTest
     public async Task GetProjects_ShouldReturnOk_WhenUserIsAuthenticated() 
     {
         // Arrange
-        await AuthenticateAsUserAsync("mentor@fpt.com", "Admin@123");
+        await AuthenticateAsUserAsync("mentor@fptsoftware.com", "Admin@123");
 
         // Act
         var response = await Client.GetAsync("/api/v1/projects");
@@ -45,7 +45,7 @@ public class GetProjectsTests : BaseIntegrationTest
     public async Task GetProjects_ShouldReturnFilteredResults_WhenStatusIsProvided()
     {
         // Arrange
-        await AuthenticateAsUserAsync("mentor@fpt.com", "Admin@123");
+        await AuthenticateAsUserAsync("mentor@fptsoftware.com", "Admin@123");
         var status = 1; // e.g., Planning
 
         // Act - Correct way to pass query parameters in integration tests

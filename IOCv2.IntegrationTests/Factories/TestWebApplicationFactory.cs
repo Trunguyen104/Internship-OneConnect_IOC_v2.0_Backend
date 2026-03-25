@@ -23,6 +23,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         Environment.SetEnvironmentVariable("JWT_ACCESS_TOKEN_EXPIRES_IN_MINUTE", "60");
         Environment.SetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRES_IN_DAYS", "7");
         
+        // Dummy connection strings for health checks
+        Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", "Host=localhost;Database=dummy;Username=postgres;Password=password");
+        Environment.SetEnvironmentVariable("ConnectionStrings__Redis", "localhost:6379");
+        
         builder.ConfigureServices(services =>
         {
             // Remove ALL Entity Framework Core and Npgsql related registrations
@@ -80,7 +84,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 db.Database.EnsureCreated();
 
                 // Seed the database with test data here if necessary
-                TestDbSeeder.SeedTestData(db, passwordService);
+                // TestDbSeeder.SeedTestData(db, passwordService);
             }
         });
 

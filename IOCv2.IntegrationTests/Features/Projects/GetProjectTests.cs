@@ -39,7 +39,7 @@ public class GetProjectTests : BaseIntegrationTest
     public async Task GetProject_ShouldReturnOk_WhenUserIsAuthenticated()
     {
         // Arrange: Authenticate and get DB context
-        await AuthenticateAsUserAsync("mentor@fpt.com", "Admin@123");
+        await AuthenticateAsUserAsync("mentor@fptsoftware.com", "Admin@123");
 
         using var scope = CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
