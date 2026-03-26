@@ -33,6 +33,8 @@ namespace IOCv2.Tests.Features.Projects
                 InternshipId = Guid.NewGuid(),
                 ProjectName = "Valid Project",
                 Description = "A valid project description",
+                Field = "IT",
+                Requirements = "Project requirements",
                 StartDate = DateTime.UtcNow,
                 EndDate = DateTime.UtcNow.AddDays(30)
             };

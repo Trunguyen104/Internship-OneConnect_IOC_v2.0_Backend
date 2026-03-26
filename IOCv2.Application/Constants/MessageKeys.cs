@@ -177,7 +177,6 @@ namespace IOCv2.Application.Constants
             public const string GroupAlreadyArchived = "InternshipGroup.GroupAlreadyArchived";
             public const string CannotArchiveNoData = "InternshipGroup.CannotArchiveNoData";
             public const string HasActivityData = "InternshipGroup.HasActivityData";   // Nhóm có data thực tế, không thể xóa
-            public const string GroupNotActive = "InternshipGroup.GroupNotActive";     // Nhóm không ở trạng thái Active
 
 
             // Logger Keys
@@ -204,6 +203,11 @@ namespace IOCv2.Application.Constants
             public const string LogDeletedSuccess = "InternshipGroup.LogDeletedSuccess";
             public const string LogDeleteFailed = "InternshipGroup.LogDeleteFailed";
             public const string LogDeleteError = "InternshipGroup.LogDeleteError";
+
+            public const string LogGroupNotActive                = "InternshipGroup.LogGroupNotActive";
+            public const string LogPhaseNotOpen                  = "InternshipGroup.LogPhaseNotOpen";
+            public const string LogUnauthorizedEnterpriseAccess  = "InternshipGroup.LogUnauthorizedEnterpriseAccess";
+            public const string LogMentorRoleInvalid             = "InternshipGroup.LogMentorRoleInvalid";
 
             public const string LogAddingStudents = "InternshipGroup.LogAddingStudents";
             public const string LogInvalidStudentIds = "InternshipGroup.LogInvalidStudentIds";

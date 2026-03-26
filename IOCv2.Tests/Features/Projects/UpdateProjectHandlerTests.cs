@@ -24,6 +24,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepo;
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipRepo;
         private readonly Mock<IGenericRepository<EnterpriseUser>> _mockEnterpriseUserRepo;
+        private readonly Mock<IGenericRepository<InternshipStudent>> _mockInternshipStudentRepo;
         private readonly UpdateProjectHandler _handler;
 
         public UpdateProjectHandlerTests()
@@ -38,10 +39,14 @@ namespace IOCv2.Tests.Features.Projects
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
             _mockInternshipRepo = new Mock<IGenericRepository<InternshipGroup>>();
             _mockEnterpriseUserRepo = new Mock<IGenericRepository<EnterpriseUser>>();
+            _mockInternshipStudentRepo = new Mock<IGenericRepository<InternshipStudent>>();
 
             _mockUnitOfWork.Setup(x => x.Repository<Project>()).Returns(_mockProjectRepo.Object);
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>()).Returns(_mockInternshipRepo.Object);
             _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>()).Returns(_mockEnterpriseUserRepo.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipStudent>()).Returns(_mockInternshipStudentRepo.Object);
+            _mockInternshipStudentRepo.Setup(x => x.Query())
+                .Returns(new List<InternshipStudent>().AsQueryable().BuildMock());
             _mockUnitOfWork.Setup(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             _mockUnitOfWork.Setup(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             _mockUnitOfWork.Setup(x => x.RollbackTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);

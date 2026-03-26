@@ -139,7 +139,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, MessageKeys.InternshipGroups.LogUpdateError);
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdateError));
                 return Result<MoveStudentsBetweenGroupsResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.InternalError),
                     ResultErrorType.InternalServerError);

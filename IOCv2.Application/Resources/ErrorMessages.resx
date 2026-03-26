@@ -1036,7 +1036,7 @@
     <value>Sinh viên đã tham gia một nhóm khác trong kỳ này.</value>
   </data>
   <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
-    <value>Student {0} does not have an approved application for enterprise {1}</value>
+    <value>Sinh viên {0} chưa có đơn ứng tuyển được duyệt cho doanh nghiệp {1}.</value>
   </data>
   <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ với ID: {TermId}</value>
@@ -1266,9 +1266,6 @@
   <data name="InternshipGroup.HasActivityData" xml:space="preserve">
     <value>Nhóm đã có dữ liệu hoạt động (logbook, đánh giá, vi phạm hoặc project đã có nội dung), không thể xóa. Vui lòng dùng chức năng Archive để giữ lại lịch sử.</value>
   </data>
-  <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
-    <value>Chỉ có thể xóa nhóm đang ở trạng thái Active. Nhóm đã kết thúc hoặc lưu trữ không thể xóa.</value>
-  </data>
 
     <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi lấy danh sách báo cáo vi phạm.</value>
@@ -1352,6 +1349,18 @@
   </data>
   <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
     <value>Nhóm không còn hoạt động (Finished hoặc Archived).</value>
+  </data>
+  <data name="InternshipGroup.LogGroupNotActive" xml:space="preserve">
+    <value>Không thể thực hiện thao tác. Nhóm {0} không ở trạng thái Active.</value>
+  </data>
+  <data name="InternshipGroup.LogPhaseNotOpen" xml:space="preserve">
+    <value>Đợt thực tập {0} không ở trạng thái mở (trạng thái hiện tại: {1}). Không thể tạo nhóm.</value>
+  </data>
+  <data name="InternshipGroup.LogUnauthorizedEnterpriseAccess" xml:space="preserve">
+    <value>HR {0} cố tạo nhóm cho doanh nghiệp {1} không phải doanh nghiệp của họ.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorRoleInvalid" xml:space="preserve">
+    <value>Người dùng {0} không có vai trò Mentor, không thể gán làm người hướng dẫn.</value>
   </data>
   <data name="Projects.NoGroupAssigned" xml:space="preserve">
     <value>Project chưa được gắn với nhóm thực tập, không thể publish.</value>

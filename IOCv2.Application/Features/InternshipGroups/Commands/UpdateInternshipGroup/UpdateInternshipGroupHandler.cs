@@ -51,9 +51,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
 
                 if (entity.Status != GroupStatus.Active)
                 {
-                    _logger.LogWarning("Cannot update info. Group {GroupId} is not Active.", entity.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogGroupNotActive), entity.InternshipId);
                     return Result<UpdateInternshipGroupResponse>.Failure(
-                        "Chỉ có thể cập nhật thông tin nhóm đang hoạt động (Active).",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.GroupNotActive),
                         ResultErrorType.BadRequest);
                 }
 
@@ -98,7 +98,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     // Chỉ chấp nhận tài khoản có role Mentor
                     if (mentor.User == null || mentor.User.Role != IOCv2.Domain.Enums.UserRole.Mentor)
                     {
-                        _logger.LogWarning("User {UserId} is not a Mentor role, cannot be assigned as mentor.", request.MentorId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorRoleInvalid), request.MentorId);
                         return Result<UpdateInternshipGroupResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
                             ResultErrorType.BadRequest);

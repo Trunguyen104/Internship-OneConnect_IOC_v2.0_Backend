@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using IOCv2.Application.Features.Projects.Commands.CreateProject;
+using IOCv2.Domain.Enums;
 using IOCv2.Infrastructure.Persistence;
 using IOCv2.IntegrationTests.Factories;
 using Microsoft.EntityFrameworkCore;
@@ -52,13 +53,18 @@ public class CreateProjectTests : BaseIntegrationTest
 
         using var scope = CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var internshipId = await db.InternshipGroups.Select(g => g.InternshipId).FirstOrDefaultAsync();
+        var internshipId = await db.InternshipGroups
+            .Where(g => g.Status == GroupStatus.Active)
+            .Select(g => g.InternshipId)
+            .FirstOrDefaultAsync();
 
         var request = new CreateProjectCommand
         {
             ProjectName = "New Test Project Authenticated",
             Description = "Test description",
             InternshipId = internshipId, // Use real seeded internship ID
+            Field = "Công nghệ thông tin",
+            Requirements = "Yêu cầu dự án kiểm thử tích hợp.",
             StartDate = DateTime.UtcNow,
             EndDate = DateTime.UtcNow.AddMonths(1)
         };

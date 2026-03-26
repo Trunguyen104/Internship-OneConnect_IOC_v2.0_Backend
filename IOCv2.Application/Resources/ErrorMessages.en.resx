@@ -1210,9 +1210,6 @@
   <data name="InternshipGroup.HasActivityData" xml:space="preserve">
     <value>The group has existing activity data (logbooks, evaluations, violations, or projects with content) and cannot be deleted. Please use the Archive function to preserve history.</value>
   </data>
-  <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
-    <value>Only Active groups can be deleted. Finished or Archived groups cannot be deleted.</value>
-  </data>
 
     <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Error getting violation reports</value>
@@ -1296,6 +1293,18 @@
   </data>
   <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
     <value>Group is no longer active (Finished or Archived).</value>
+  </data>
+  <data name="InternshipGroup.LogGroupNotActive" xml:space="preserve">
+    <value>Cannot perform operation. Group {0} is not in Active status.</value>
+  </data>
+  <data name="InternshipGroup.LogPhaseNotOpen" xml:space="preserve">
+    <value>Internship phase {0} is not open (current status: {1}). Cannot create group.</value>
+  </data>
+  <data name="InternshipGroup.LogUnauthorizedEnterpriseAccess" xml:space="preserve">
+    <value>HR {0} attempted to create a group for enterprise {1} which is not their own.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorRoleInvalid" xml:space="preserve">
+    <value>User {0} does not have the Mentor role and cannot be assigned as a mentor.</value>
   </data>
   <data name="Projects.NoGroupAssigned" xml:space="preserve">
     <value>Project has no internship group assigned and cannot be published.</value>

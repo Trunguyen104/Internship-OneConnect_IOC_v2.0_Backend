@@ -56,6 +56,8 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedInternshipPhases();   // ← must be before SeedInternshipGroups
             await SeedInternshipGroups();
             await SeedProjectsAndWorkItems();
+            await SeedManageIGProjectData();
+            await SeedInternshipStudents();
             await SeedLogbooks();
             await SeedStakeholdersAndIssues();
             await SeedProjectResources();
@@ -704,6 +706,133 @@ namespace IOCv2.Infrastructure.Persistence
                         StoryPoint = 3
                     });
                 }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Seed dữ liệu cho feature Manage-IG-Project:
+        /// - Projects cho các nhóm Active chưa có dự án (Rikkeisoft Spring, FPT CT)
+        /// - Project archived gắn với nhóm Archived
+        /// - Orphan project (InternshipId = null) — nhóm bị xóa/archived
+        /// </summary>
+        private async Task SeedManageIGProjectData()
+        {
+            // Rikkeisoft Spring 2026 Team — Active group, chưa có project
+            var rikkeiGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
+            if (rikkeiGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == rikkeiGroup.InternshipId))
+            {
+                // Project 1: Published
+                var rikkeiProj1 = Project.Create(
+                    rikkeiGroup.InternshipId,
+                    "Rikkeisoft Internal Portal",
+                    "Xây dựng cổng thông tin nội bộ cho nhân viên Rikkeisoft",
+                    "PRJ-RIKKES_RIKK_2",
+                    "Công nghệ thông tin",
+                    "Phát triển portal nội bộ: quản lý nhân sự, leave request, timesheet.");
+                rikkeiProj1.Update(null, null, null, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2), ProjectStatus.Published);
+                _context.Projects.Add(rikkeiProj1);
+
+                // Project 2: Draft — chưa publish
+                var rikkeiProj2 = Project.Create(
+                    rikkeiGroup.InternshipId,
+                    "Rikkeisoft Mobile App",
+                    "Ứng dụng di động cho khách hàng của Rikkeisoft",
+                    "PRJ-RIKKES_RIKK_3",
+                    "Mobile",
+                    "Phát triển ứng dụng mobile cross-platform bằng Flutter.");
+                _context.Projects.Add(rikkeiProj2);
+            }
+
+            // FPT Software CT OJT Team — Active group, chưa có project
+            var fptCtGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software CT OJT Team");
+            if (fptCtGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == fptCtGroup.InternshipId))
+            {
+                var fptCtProj = Project.Create(
+                    fptCtGroup.InternshipId,
+                    "FPT CT Smart Campus",
+                    "Hệ thống quản lý khuôn viên thông minh cho FPTU Cần Thơ",
+                    "PRJ-FPTSOF_FPT_3",
+                    "IoT / CNTT",
+                    "Tích hợp IoT, camera AI và hệ thống điểm danh tự động.");
+                _context.Projects.Add(fptCtProj);
+            }
+
+            // FPT Archived Project group — project cũng nên Archived
+            var archivedGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Archived Project");
+            if (archivedGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == archivedGroup.InternshipId))
+            {
+                var archivedProj = Project.Create(
+                    archivedGroup.InternshipId,
+                    "FPT Legacy HR System",
+                    "Hệ thống HR cũ đã ngừng phát triển",
+                    "PRJ-FPTSOF_FPT_4",
+                    "Hệ thống doanh nghiệp",
+                    "Duy trì và hỗ trợ hệ thống HR cũ.");
+                archivedProj.Update(null, null, null, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10), ProjectStatus.Archived);
+                _context.Projects.Add(archivedProj);
+            }
+
+            // Orphan project — không gắn nhóm nào (InternshipId = null)
+            // Mô phỏng project bị orphan sau khi nhóm bị xóa
+            if (!await _context.Projects.AnyAsync(p => p.ProjectName == "Orphan Research Project"))
+            {
+                var orphanProj = Project.Create(
+                    null,   // orphan — không gắn nhóm
+                    "Orphan Research Project",
+                    "Dự án nghiên cứu bị orphan do nhóm thực tập đã bị xóa",
+                    "PRJ-ORPHAN_001",
+                    "Nghiên cứu",
+                    "Nghiên cứu ứng dụng AI trong kiểm thử phần mềm.");
+                _context.Projects.Add(orphanProj);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Seed sinh viên vào các nhóm Active để test UpdateProject (assignment count),
+        /// AddStudentsToGroup, MoveStudentsBetweenGroups, RemoveStudentsFromGroup.
+        /// </summary>
+        private async Task SeedInternshipStudents()
+        {
+            var fptGroup = await _context.InternshipGroups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
+            var rikkeiGroup = await _context.InternshipGroups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
+
+            if (fptGroup == null || rikkeiGroup == null) return;
+
+            var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
+            var s2 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student2@fptu.edu.vn");
+            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s6 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student6@fptu.edu.vn");
+            var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
+            var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+
+            // FPT Software OJT Team Alpha: s1(Leader), s2(Member), s3(Member), s6(Member)
+            bool fptHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == fptGroup.InternshipId);
+            if (!fptHasStudents)
+            {
+                if (s1 != null) fptGroup.AddMember(s1.StudentId, InternshipRole.Leader);
+                if (s2 != null) fptGroup.AddMember(s2.StudentId, InternshipRole.Member);
+                if (s3 != null) fptGroup.AddMember(s3.StudentId, InternshipRole.Member);
+                if (s6 != null) fptGroup.AddMember(s6.StudentId, InternshipRole.Member);
+                _context.InternshipGroups.Update(fptGroup);
+            }
+
+            // Rikkeisoft Spring 2026 Team: s4(Leader), s5(Member), s7(Member)
+            bool rikkeiHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == rikkeiGroup.InternshipId);
+            if (!rikkeiHasStudents)
+            {
+                if (s4 != null) rikkeiGroup.AddMember(s4.StudentId, InternshipRole.Leader);
+                if (s5 != null) rikkeiGroup.AddMember(s5.StudentId, InternshipRole.Member);
+                if (s7 != null) rikkeiGroup.AddMember(s7.StudentId, InternshipRole.Member);
+                _context.InternshipGroups.Update(rikkeiGroup);
             }
 
             await _context.SaveChangesAsync();
