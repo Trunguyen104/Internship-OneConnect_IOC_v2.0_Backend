@@ -66,7 +66,7 @@ namespace IOCv2.API.Attributes
         {
             var userId = context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            var ipAdress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAdress = context.Connection?.RemoteIpAddress?.ToString() ?? "unknown";
 
             return string.IsNullOrEmpty(userId) ? ipAdress : $"{userId}:{ipAdress}";
         }

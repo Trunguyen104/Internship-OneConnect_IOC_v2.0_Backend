@@ -95,3 +95,5 @@ app.MapControllers();
 app.UseSignalRConfig();
 
 app.Run();
+
+public partial class Program { }

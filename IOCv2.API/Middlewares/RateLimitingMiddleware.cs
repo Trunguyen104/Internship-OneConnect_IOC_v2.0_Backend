@@ -17,7 +17,7 @@ namespace IOCv2.API.Middlewares
         public async Task Invoke(HttpContext context, IRateLimiter rateLimiter)
         {
             // Lấy IP của client (đã xử lý qua Forwarded Headers nếu có Proxy)
-            var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var ipAddress = context.Connection?.RemoteIpAddress?.ToString() ?? "unknown";
 
             // Kiểm tra IP có đang bị block không
             if (await rateLimiter.IsBlockedAsync(ipAddress, context.RequestAborted))
