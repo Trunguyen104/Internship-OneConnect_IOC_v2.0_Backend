@@ -15,7 +15,7 @@ public class HRApplicationEventHandlers :
     INotificationHandler<ApplicationRejectedSelfApplyEvent>,
     INotificationHandler<ApplicationPlacedUniAssignEvent>,
     INotificationHandler<ApplicationRejectedUniAssignEvent>,
-    INotificationHandler<ApplicationAutoWithdrawnNotifyEnterpriseEvent>
+    INotificationHandler<ApplicationApprovedNotifyUniAdminEvent>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly INotificationPushService _pushService;
@@ -187,26 +187,30 @@ public class HRApplicationEventHandlers :
         }
     }
 
-    public async Task Handle(ApplicationAutoWithdrawnNotifyEnterpriseEvent notification, CancellationToken cancellationToken)
+
+    public async Task Handle(ApplicationApprovedNotifyUniAdminEvent notification, CancellationToken cancellationToken)
     {
-        // Notify all HR/Admin of this Enterprise
-        var enterpriseUsers = await _unitOfWork.Repository<EnterpriseUser>().Query()
-            .Where(eu => eu.EnterpriseId == notification.EnterpriseId)
-            .Select(eu => eu.UserId)
-            .ToListAsync(cancellationToken);
-
-        var content = _messageService.GetMessage(MessageKeys.HRApplications.NotifyEnterpriseAutoWithdrawn)
-            .Replace("{StudentName}", notification.StudentName);
-
-        foreach (var userId in enterpriseUsers)
+        if (notification.UniversityId.HasValue)
         {
-            await CreateAndPushNotificationAsync(
-                userId,
-                "Hồ sơ sinh viên tự động rút khỏi hệ thống",
-                content,
-                NotificationType.SystemAlert,
-                null,
-                cancellationToken);
+            var uniAdmins = await _unitOfWork.Repository<UniversityUser>().Query()
+                .Where(u => u.UniversityId == notification.UniversityId.Value)
+                .Select(u => u.UserId)
+                .ToListAsync(cancellationToken);
+
+            var contentUni = _messageService.GetMessage(MessageKeys.HRApplications.NotifyUniAdminPlaced)
+                .Replace("{Enterprise}", notification.EnterpriseName)
+                .Replace("{StudentName}", notification.StudentName);
+
+            foreach (var uniAdminUserId in uniAdmins)
+            {
+                await CreateAndPushNotificationAsync(
+                    uniAdminUserId,
+                    "Sinh viên được tiếp nhận thực tập",
+                    contentUni,
+                    NotificationType.ApplicationStatusChanged,
+                    notification.ApplicationId,
+                    cancellationToken);
+            }
         }
     }
 }

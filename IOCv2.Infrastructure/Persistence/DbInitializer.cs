@@ -38,6 +38,10 @@ namespace IOCv2.Infrastructure.Persistence
                 new Guid("66666666-6666-6666-6666-666666660004"),
                 new Guid("66666666-6666-6666-6666-666666660005")
             };
+
+            public static readonly Guid JobNetId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbb0001");
+            public static readonly Guid JobReactId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbb0002");
+            public static readonly Guid JobJavaId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbb0003");
         }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
@@ -51,6 +55,7 @@ namespace IOCv2.Infrastructure.Persistence
         {
             await SeedUniversities();
             await SeedEnterprises();
+            await SeedJobs();
             await SeedUsers();
             await SeedTerms();
             await SeedInternshipGroups();
@@ -110,6 +115,54 @@ namespace IOCv2.Infrastructure.Persistence
                     }
                 };
                 await _context.Enterprises.AddRangeAsync(enterprises);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task SeedJobs()
+        {
+            if (!await _context.Jobs.AnyAsync())
+            {
+                var jobs = new List<Job>
+                {
+                    new Job
+                    {
+                        JobId = SeedIds.JobNetId,
+                        EnterpriseId = SeedIds.FptSoftwareId,
+                        Title = ".NET Backend Developer Intern",
+                        Description = "Join our team to build scalable .NET 9 APIs.",
+                        Requirements = "Basic Knowledge of C#, EF Core",
+                        Location = "Hanoi",
+                        Status = JobStatus.OPEN,
+                        Quantity = 5,
+                        ExpireDate = DateTime.UtcNow.AddMonths(2)
+                    },
+                    new Job
+                    {
+                        JobId = SeedIds.JobReactId,
+                        EnterpriseId = SeedIds.FptSoftwareId,
+                        Title = "Frontend (React) Intern",
+                        Description = "Develop beautiful UIs with React and Tailwind.",
+                        Requirements = "HTML, CSS, JS basic",
+                        Location = "Hanoi",
+                        Status = JobStatus.OPEN,
+                        Quantity = 3,
+                        ExpireDate = DateTime.UtcNow.AddMonths(1)
+                    },
+                    new Job
+                    {
+                        JobId = SeedIds.JobJavaId,
+                        EnterpriseId = SeedIds.RikkeisoftId,
+                        Title = "Java Spring Boot Intern",
+                        Description = "Backend development with Java ecosystem.",
+                        Requirements = "Java basic, OOP",
+                        Location = "Hanoi (Handico)",
+                        Status = JobStatus.CLOSED,
+                        Quantity = 2,
+                        ExpireDate = DateTime.UtcNow.AddDays(-5)
+                    }
+                };
+                await _context.Jobs.AddRangeAsync(jobs);
                 await _context.SaveChangesAsync();
             }
         }
@@ -465,22 +518,48 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             // Seed some applications
+            var s1 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student1@fptu.edu.vn");
+            var fptu = await _context.Universities.FirstAsync(u => u.Code == "FPTU");
+            
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s3.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-40) });
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, JobId = SeedIds.JobNetId, Status = InternshipApplicationStatus.Placed, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-40) });
             }
 
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.TermId == spring2026.TermId && a.StudentId == s2.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-10) });
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, JobId = SeedIds.JobJavaId, Status = InternshipApplicationStatus.Placed, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-10) });
             }
 
             if (spring2026Ct != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.TermId == spring2026Ct.TermId && a.StudentId == s4.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026Ct.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-8) });
+                // This one as UniAssign for testing the other flow
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026Ct.TermId, StudentId = s4.StudentId, JobId = SeedIds.JobReactId, Status = InternshipApplicationStatus.Placed, Source = ApplicationSource.UniAssign, UniversityId = fptu.UniversityId, AppliedAt = DateTime.UtcNow.AddDays(-8) });
+            }
+
+            // New test applications for filtering (SelfApply)
+            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s1.StudentId && a.JobId == SeedIds.JobNetId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s1.StudentId, JobId = SeedIds.JobNetId, Status = InternshipApplicationStatus.Applied, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-2) });
+            }
+
+            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s4.StudentId && a.JobId == SeedIds.JobReactId && a.Status == InternshipApplicationStatus.Interviewing))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, JobId = SeedIds.JobReactId, Status = InternshipApplicationStatus.Interviewing, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-5) });
             }
 
             await _context.SaveChangesAsync();
+
+            // Temporary Fix: If there are applications with Source = 0, update them to SelfApply
+            var appsWithNoSource = await _context.InternshipApplications.Where(a => (short)a.Source == 0).ToListAsync();
+            if (appsWithNoSource.Any())
+            {
+                foreach (var app in appsWithNoSource)
+                {
+                    app.Source = ApplicationSource.SelfApply;
+                }
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task SeedProjectsAndWorkItems()

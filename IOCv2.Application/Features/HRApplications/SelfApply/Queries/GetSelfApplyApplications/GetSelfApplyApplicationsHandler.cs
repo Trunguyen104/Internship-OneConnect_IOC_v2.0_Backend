@@ -47,6 +47,7 @@ public class GetSelfApplyApplicationsHandler
 
             // Base query: only SelfApply applications for this enterprise
             var query = _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
+                .Include(a => a.Job)
                 .Include(a => a.Student).ThenInclude(s => s.User)
                 .Include(a => a.Student).ThenInclude(s => s.StudentTerms).ThenInclude(st => st.Term).ThenInclude(t => t.University)
                 .Where(a => a.EnterpriseId == enterpriseUser.EnterpriseId
@@ -80,6 +81,17 @@ public class GetSelfApplyApplicationsHandler
             {
                 query = query.Where(a =>
                     a.AppliedAt.Year == monthDate.Year && a.AppliedAt.Month == monthDate.Month);
+            }
+
+            // Job Id / Job Title filter
+            if (request.JobId.HasValue)
+            {
+                query = query.Where(a => a.JobId == request.JobId);
+            }
+            else if (!string.IsNullOrWhiteSpace(request.JobTitle))
+            {
+                var jobTitle = request.JobTitle.Trim().ToLower();
+                query = query.Where(a => a.Job != null && a.Job.Title.ToLower().Contains(jobTitle));
             }
 
             // Search
@@ -123,7 +135,7 @@ public class GetSelfApplyApplicationsHandler
                     StudentEmail = a.Student?.User?.Email ?? string.Empty,
                     StudentPhone = a.Student?.User?.PhoneNumber ?? string.Empty,
                     UniversityName = latestTerm?.Term?.University?.Name ?? string.Empty,
-                    JobPostingTitle = a.JobPostingTitle,
+                    JobPostingTitle = a.Job?.Title ?? string.Empty,
                     AppliedAt = a.AppliedAt,
                     Status = a.Status,
                     StatusLabel = a.Status.ToString()

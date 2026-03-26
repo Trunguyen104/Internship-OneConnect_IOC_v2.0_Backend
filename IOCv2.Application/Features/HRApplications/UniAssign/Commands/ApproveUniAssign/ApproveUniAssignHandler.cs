@@ -71,8 +71,6 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
                 return Result<ApproveUniAssignResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.HRApplications.InvalidTransition), ResultErrorType.BadRequest);
 
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
             // 1. Approve the Uni Assign application
             var approveHistory = new ApplicationStatusHistory
             {
@@ -92,41 +90,7 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
                 app.Student.InternshipStatus = StudentStatus.Placed;
 
             await _unitOfWork.Repository<ApplicationStatusHistory>().AddAsync(approveHistory, cancellationToken);
-
-            // 2. Cascade Withdraw: all other active applications of this student (both self-apply and uni-assign, any enterprise)
-            var otherActiveApps = await _unitOfWork.Repository<InternshipApplication>().Query()
-                .Include(a => a.Enterprise)
-                .Where(a => a.StudentId == app.StudentId
-                         && a.ApplicationId != app.ApplicationId
-                         && (a.Status == InternshipApplicationStatus.Applied ||
-                             a.Status == InternshipApplicationStatus.Interviewing ||
-                             a.Status == InternshipApplicationStatus.Offered ||
-                             a.Status == InternshipApplicationStatus.PendingAssignment))
-                .ToListAsync(cancellationToken);
-
-            _logger.LogInformation(_messageService.GetMessage(MessageKeys.HRApplications.LogCascadeWithdraw),
-                app.StudentId, otherActiveApps.Count);
-
-            var enterprisesToNotify = new HashSet<Guid>();
-            foreach (var otherApp in otherActiveApps)
-            {
-                var withdrawHistory = new ApplicationStatusHistory
-                {
-                    HistoryId = Guid.NewGuid(),
-                    ApplicationId = otherApp.ApplicationId,
-                    FromStatus = otherApp.Status,
-                    ToStatus = InternshipApplicationStatus.Withdrawn,
-                    Note = "System-triggered: Student placed via Uni Assign",
-                    ChangedByName = "System",
-                    TriggerSource = "System"
-                };
-                otherApp.Status = InternshipApplicationStatus.Withdrawn;
-                await _unitOfWork.Repository<ApplicationStatusHistory>().AddAsync(withdrawHistory, cancellationToken);
-                enterprisesToNotify.Add(otherApp.EnterpriseId);
-            }
-
             await _unitOfWork.SaveChangeAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             // 3. Send notifications
             var studentUserId = app.Student?.UserId;
@@ -140,12 +104,14 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
                     enterpriseName), cancellationToken);
             }
 
-            // Notify each affected enterprise's HR about the auto-withdraw
-            foreach (var entId in enterprisesToNotify)
+            // Notify Uni Admin about the approval
+            if (app.UniversityId.HasValue)
             {
-                await _publisher.Publish(new ApplicationAutoWithdrawnNotifyEnterpriseEvent(
-                    entId,
-                    app.Student?.User?.FullName ?? string.Empty), cancellationToken);
+                await _publisher.Publish(new ApplicationApprovedNotifyUniAdminEvent(
+                    app.UniversityId,
+                    app.Student?.User?.FullName ?? string.Empty,
+                    enterpriseName,
+                    app.ApplicationId), cancellationToken);
             }
 
             return Result<ApproveUniAssignResponse>.Success(new ApproveUniAssignResponse
@@ -153,13 +119,12 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
                 ApplicationId = app.ApplicationId,
                 Status = app.Status,
                 StatusLabel = app.Status.ToString(),
-                WithdrawnApplicationsCount = otherActiveApps.Count,
+                WithdrawnApplicationsCount = 0,
                 UpdatedAt = app.UpdatedAt ?? DateTime.UtcNow
             }, _messageService.GetMessage(MessageKeys.HRApplications.LogApproveUniAssign));
         }
         catch (Exception ex)
         {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error approving uni-assign application {ApplicationId}", request.ApplicationId);
             return Result<ApproveUniAssignResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);

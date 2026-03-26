@@ -28,6 +28,7 @@ public partial class AppDbContext : DbContext
     public DbSet<UniversityUser> UniversityUsers { get; set; } = null!;
     public DbSet<Domain.Entities.Enterprise> Enterprises { get; set; } = null!;
     public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
+    public DbSet<Job> Jobs { get; set; } = null!;
 
     // Project Management
     public DbSet<Term> Terms { get; set; } = null!;

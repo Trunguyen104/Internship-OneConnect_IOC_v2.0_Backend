@@ -8,6 +8,7 @@ public class InternshipApplication : BaseEntity
     public Guid EnterpriseId { get; set; }
     public Guid TermId { get; set; }
     public Guid StudentId { get; set; }
+    public Guid? JobId { get; set; }
 
     public InternshipApplicationStatus Status { get; set; }
     public ApplicationSource Source { get; set; }
@@ -15,8 +16,6 @@ public class InternshipApplication : BaseEntity
     /// <summary>Reject reason (required when Status = Rejected).</summary>
     public string? RejectReason { get; set; }
 
-    /// <summary>Snapshot của tên Job Posting tại thời điểm apply (Self-apply only).</summary>
-    public string? JobPostingTitle { get; set; }
 
     /// <summary>URL CV tại thời điểm apply (Self-apply only).</summary>
     public string? CvSnapshotUrl { get; set; }
@@ -32,6 +31,7 @@ public class InternshipApplication : BaseEntity
     public virtual Enterprise Enterprise { get; set; } = null!;
     public virtual Term Term { get; set; } = null!;
     public virtual Student Student { get; set; } = null!;
+    public virtual Job? Job { get; set; }
     public virtual EnterpriseUser? Reviewer { get; set; }
     public virtual University? University { get; set; }
     public virtual ICollection<ApplicationStatusHistory> StatusHistories { get; set; } = new List<ApplicationStatusHistory>();

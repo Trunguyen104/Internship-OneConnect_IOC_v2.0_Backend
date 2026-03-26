@@ -14,7 +14,11 @@ public record GetSelfApplyApplicationsQuery : IRequest<Result<PaginatedResult<Ge
     public Guid? UniversityId { get; init; }
 
     /// <summary>Format: yyyy-MM (e.g. 2025-08). Filters by applied month.</summary>
-    public string? MonthYear { get; init; }
+    public string? MonthYear { get; set; }
+
+    public string? JobTitle { get; set; }
+
+    public Guid? JobId { get; set; }
 
     /// <summary>When true, includes terminal states (Placed, Rejected, Withdrawn). Default: false.</summary>
     public bool IncludeTerminal { get; init; } = false;

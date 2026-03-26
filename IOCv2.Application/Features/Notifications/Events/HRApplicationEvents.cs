@@ -52,3 +52,11 @@ public record ApplicationAutoWithdrawnNotifyEnterpriseEvent(
     Guid EnterpriseId,
     string StudentName
 ) : INotification;
+
+/// <summary>Uni Admin nhận thông báo khi sinh viên được Approve Uni Assign.</summary>
+public record ApplicationApprovedNotifyUniAdminEvent(
+    Guid? UniversityId,
+    string StudentName,
+    string EnterpriseName,
+    Guid ApplicationId
+) : INotification;

@@ -17,6 +17,7 @@ public class GetApplicationDetailResponse
     public string UniversityName { get; set; } = string.Empty;
 
     // Job/Assignment info
+    public Guid? JobId { get; set; }
     public string? JobPostingTitle { get; set; }
     public bool IsJobClosed { get; set; }
     public bool IsJobDeleted { get; set; }
