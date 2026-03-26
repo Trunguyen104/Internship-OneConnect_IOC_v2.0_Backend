@@ -5,6 +5,8 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Application.Features.Projects.Commands.DeleteProject;
 using IOCv2.Domain.Entities;
 using Microsoft.Extensions.Logging;
+using MockQueryable;
+using MockQueryable.Moq;
 using Moq;
 using System.Linq.Expressions;
 using Xunit;
@@ -19,6 +21,9 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<ICurrentUserService> _mockCurrentUser;
         private readonly Mock<ICacheService> _mockCacheService;
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepo;
+        private readonly Mock<IGenericRepository<EnterpriseUser>> _mockEnterpriseUserRepo;
+        private readonly Mock<IGenericRepository<WorkItem>> _mockWorkItemRepo;
+        private readonly Mock<IGenericRepository<Sprint>> _mockSprintRepo;
         private readonly DeleteProjectHandler _handler;
 
         public DeleteProjectHandlerTests()
@@ -30,8 +35,17 @@ namespace IOCv2.Tests.Features.Projects
             _mockCacheService = new Mock<ICacheService>();
             
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
+            _mockEnterpriseUserRepo = new Mock<IGenericRepository<EnterpriseUser>>();
+            _mockWorkItemRepo = new Mock<IGenericRepository<WorkItem>>();
+            _mockSprintRepo = new Mock<IGenericRepository<Sprint>>();
 
             _mockUnitOfWork.Setup(x => x.Repository<Project>()).Returns(_mockProjectRepo.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>()).Returns(_mockEnterpriseUserRepo.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<WorkItem>()).Returns(_mockWorkItemRepo.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<Sprint>()).Returns(_mockSprintRepo.Object);
+            _mockUnitOfWork.Setup(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(x => x.RollbackTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             _handler = new DeleteProjectHandler(
                 _mockUnitOfWork.Object,
@@ -45,14 +59,20 @@ namespace IOCv2.Tests.Features.Projects
         public async Task Handle_ValidRequest_ShouldReturnSuccess()
         {
             // Arrange
-            var projectId = Guid.NewGuid();
-            var command = new DeleteProjectCommand { ProjectId = projectId };
-            
-            var project = Project.Create(Guid.NewGuid(), "Project for Deletion", "Description");
-            
-            _mockCurrentUser.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
-            _mockProjectRepo.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(project);
+            var userId = Guid.NewGuid();
+            var enterpriseUserId = Guid.NewGuid();
+            var project = Project.Create(Guid.NewGuid(), "Project for Deletion", "Description", "PRJ-TEST_TST_1", "IT", "Requirements", mentorId: enterpriseUserId);
+            var command = new DeleteProjectCommand { ProjectId = project.ProjectId };
+
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
+            }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project> { project }.AsQueryable().BuildMock());
+            _mockWorkItemRepo.Setup(x => x.Query()).Returns(new List<WorkItem>().AsQueryable().BuildMock());
+            _mockSprintRepo.Setup(x => x.Query()).Returns(new List<Sprint>().AsQueryable().BuildMock());
+            _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
             
             _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Delete successful");
             _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -65,8 +85,7 @@ namespace IOCv2.Tests.Features.Projects
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            project.DeletedAt.Should().NotBeNull();
-            _mockProjectRepo.Verify(x => x.UpdateAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockProjectRepo.Verify(x => x.HardDeleteAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Once);
             _mockUnitOfWork.Verify(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -76,10 +95,15 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var projectId = Guid.NewGuid();
             var command = new DeleteProjectCommand { ProjectId = projectId };
-            
-            _mockCurrentUser.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
-            _mockProjectRepo.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Project?)null);
+            var userId = Guid.NewGuid();
+            var enterpriseUserId = Guid.NewGuid();
+
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
+            }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project>().AsQueryable().BuildMock());
             
             _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Project not found");
 

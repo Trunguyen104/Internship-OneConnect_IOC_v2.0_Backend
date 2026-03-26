@@ -33,6 +33,18 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 .GreaterThanOrEqualTo(x => x.StartDate)
                 .WithMessage(_messageService.GetMessage(MessageKeys.Projects.EndDateInvalidRange))
                 .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
+
+            RuleFor(x => x.Field)
+                .MaximumLength(100).WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldMaxLength))
+                .When(x => x.Field != null);
+
+            RuleFor(x => x.Requirements)
+                .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsMaxLength))
+                .When(x => x.Requirements != null);
+
+            RuleFor(x => x.Deliverables)
+                .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.DeliverablesMaxLength))
+                .When(x => x.Deliverables != null);
         }
     }
 }

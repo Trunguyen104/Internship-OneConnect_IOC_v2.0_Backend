@@ -621,13 +621,13 @@ namespace IOCv2.Infrastructure.Persistence
             var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
             // Project 3
-            var proj3 = Project.Create(group3.InternshipId, "IOC v2.0 Platform", "Centralized internship management system");
-            proj3.Update(null, null, null, DateTime.UtcNow.AddMonths(-1).AddDays(5), null, ProjectStatus.InProgress);
+            var proj3 = Project.Create(group3.InternshipId, "IOC v2.0 Platform", "Centralized internship management system", "PRJ-FPTSOF_FPT_1", "CNTT", "Develop a centralized internship management platform.");
+            proj3.Update(null, null, null, DateTime.UtcNow.AddMonths(-1).AddDays(5), null, ProjectStatus.Published);
             _context.Projects.Add(proj3);
 
             // Project 5
-            var proj5 = Project.Create(group5.InternshipId, "Legacy CRM Maintenance", "Fixing bugs and optimizing older modules");
-            proj5.Update(null, null, null, DateTime.UtcNow.AddMonths(-6).AddDays(5), DateTime.UtcNow.AddMonths(-2).AddDays(-5), ProjectStatus.Done); // Fixed: Completed -> Done
+            var proj5 = Project.Create(group5.InternshipId, "Legacy CRM Maintenance", "Fixing bugs and optimizing older modules", "PRJ-RIKKE_RIKK_1", "CNTT", "Fix bugs and optimize legacy modules.");
+            proj5.Update(null, null, null, DateTime.UtcNow.AddMonths(-6).AddDays(5), DateTime.UtcNow.AddMonths(-2).AddDays(-5), ProjectStatus.Completed);
             _context.Projects.Add(proj5);
 
             await _context.SaveChangesAsync();
@@ -656,8 +656,8 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             // [NEW] Seed Pending Project, Cancelled Sprint and WorkItems with different statuses
-            var projPending = Project.Create(group3.InternshipId, "FPT Future System", "Next phase architecture");
-            projPending.Update(null, null, null, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(30), ProjectStatus.Planning);
+            var projPending = Project.Create(group3.InternshipId, "FPT Future System", "Next phase architecture", "PRJ-FPTSOF_FPT_2", "CNTT", "Design next phase architecture.");
+            projPending.Update(null, null, null, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(30), ProjectStatus.Draft);
             if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT Future System"))
             {
                 _context.Projects.Add(projPending);
@@ -701,21 +701,24 @@ namespace IOCv2.Infrastructure.Persistence
             var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
-            if (proj3 == null || proj5 == null || s3 == null || s5 == null) return;
+            if (proj3 == null || proj5 == null || s3 == null || s5 == null || !proj3.InternshipId.HasValue || !proj5.InternshipId.HasValue) return;
+
+            var proj3InternshipId = proj3.InternshipId.Value;
+            var proj5InternshipId = proj5.InternshipId.Value;
 
             if (!await _context.Logbooks.AnyAsync())
             {
                 _context.Logbooks.AddRange(
-                    Logbook.Create(proj3.InternshipId, s3.StudentId, "Integrated basic project structure.", null, "Focus on Auth module.", DateTime.UtcNow.AddDays(-7)),
-                    Logbook.Create(proj3.InternshipId, s3.StudentId, "Started JWT implementation.", "Encountered some middleware issues.", "Resolve middleware and test login.", DateTime.UtcNow.AddDays(-1))
+                    Logbook.Create(proj3InternshipId, s3.StudentId, "Integrated basic project structure.", null, "Focus on Auth module.", DateTime.UtcNow.AddDays(-7)),
+                    Logbook.Create(proj3InternshipId, s3.StudentId, "Started JWT implementation.", "Encountered some middleware issues.", "Resolve middleware and test login.", DateTime.UtcNow.AddDays(-1))
                 );
 
-                if (s1 != null) _context.Logbooks.Add(Logbook.Create(proj3.InternshipId, s1.StudentId, "Initial requirement analysis and documentation.", null, "Finalize SRS.", DateTime.UtcNow.AddDays(-6)));
-                if (s2 != null) _context.Logbooks.Add(Logbook.Create(proj3.InternshipId, s2.StudentId, "UI/UX wireframing for main dashboard.", "Feedback from PO required.", "Update Figma design.", DateTime.UtcNow.AddDays(-5)));
+                if (s1 != null) _context.Logbooks.Add(Logbook.Create(proj3InternshipId, s1.StudentId, "Initial requirement analysis and documentation.", null, "Finalize SRS.", DateTime.UtcNow.AddDays(-6)));
+                if (s2 != null) _context.Logbooks.Add(Logbook.Create(proj3InternshipId, s2.StudentId, "UI/UX wireframing for main dashboard.", "Feedback from PO required.", "Update Figma design.", DateTime.UtcNow.AddDays(-5)));
 
                 for (int i = 1; i <= 4; i++)
                 {
-                    _context.Logbooks.Add(Logbook.Create(proj5.InternshipId, s5.StudentId, $"Work report {i}", null, "Continue next task", DateTime.UtcNow.AddMonths(-6 + i)));
+                    _context.Logbooks.Add(Logbook.Create(proj5InternshipId, s5.StudentId, $"Work report {i}", null, "Continue next task", DateTime.UtcNow.AddMonths(-6 + i)));
                 }
                 
                 await _context.SaveChangesAsync();
@@ -726,7 +729,7 @@ namespace IOCv2.Infrastructure.Persistence
             if (!alreadyLinked)
             {
                 var workItemsProj3 = await _context.WorkItems.Where(w => w.ProjectId == proj3.ProjectId).ToListAsync();
-                var logbooksProj3 = await _context.Logbooks.Where(l => l.InternshipId == proj3.InternshipId).ToListAsync();
+                var logbooksProj3 = await _context.Logbooks.Where(l => l.InternshipId == proj3InternshipId).ToListAsync();
                 
                 if (workItemsProj3.Any() && logbooksProj3.Any())
                 {

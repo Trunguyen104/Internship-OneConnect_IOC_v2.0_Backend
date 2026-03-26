@@ -16,7 +16,9 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         public CreateProjectValidator(IMessageService messageService) {
             _messageService = messageService;
             RuleFor(x => x.InternshipId)
-             .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsInternshipIdRequired));
+                .NotEqual(Guid.Empty)
+                .WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsInternshipIdRequired))
+                .When(x => x.InternshipId.HasValue);
 
             RuleFor(x => x.ProjectName)
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsProjectNameRequired))
@@ -34,6 +36,18 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 .GreaterThanOrEqualTo(x => x.StartDate)
                 .WithMessage(_messageService.GetMessage(MessageKeys.Projects.EndDateInvalidRange))
                 .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
+
+            RuleFor(x => x.Field)
+                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldRequired))
+                .MaximumLength(100).WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldMaxLength));
+
+            RuleFor(x => x.Requirements)
+                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsRequired))
+                .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsMaxLength));
+
+            RuleFor(x => x.Deliverables)
+                .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.DeliverablesMaxLength))
+                .When(x => x.Deliverables != null);
         }
     }
 }

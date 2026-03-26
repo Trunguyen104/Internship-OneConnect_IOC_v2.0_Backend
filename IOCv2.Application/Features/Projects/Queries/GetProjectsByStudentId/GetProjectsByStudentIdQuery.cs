@@ -39,5 +39,6 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         /// Ordering direction ('asc' or 'desc').
         /// </summary>
         public string? SortOrder { get; init; }
+
     }
 }

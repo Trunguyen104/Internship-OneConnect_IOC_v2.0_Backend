@@ -1,39 +1,26 @@
-﻿using IOCv2.Application.Common.Models;
-using IOCv2.Application.Extensions.Mappings;
-using IOCv2.Domain.Entities;
+using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
-using System;
 
 namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
-    /// <summary>
-    /// Command to create a new project within an internship group.
-    /// </summary>
-    public record CreateProjectCommand : IRequest<Result<CreateProjectResponse>>, IMapFrom<Project>
+    public class CreateProjectCommand : IRequest<Result<CreateProjectResponse>>
     {
-        /// <summary>
-        /// Identity of the internship group that will host this project.
-        /// </summary>
-        public Guid InternshipId { get; set; }
-
-        /// <summary>
-        /// Human-readable name of the project. Must be unique within the internship.
-        /// </summary>
+        public Guid? InternshipId { get; set; }
         public string ProjectName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Optional description of the project scope and objectives.
-        /// </summary>
         public string? Description { get; set; }
-
-        /// <summary>
-        /// Estimated or confirmed start date of the project.
-        /// </summary>
         public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        // New fields
+        public string Field { get; set; } = string.Empty;
+        public string Requirements { get; set; } = string.Empty;
+        public string? Deliverables { get; set; }
+        public ProjectTemplate Template { get; set; } = ProjectTemplate.None;
 
         /// <summary>
-        /// Target completion date of the project.
+        /// Tùy chọn — nếu null BE sẽ tự generate theo slugify algorithm.
         /// </summary>
-        public DateTime? EndDate { get; set; }
+        public string? ProjectCode { get; set; }
     }
 }

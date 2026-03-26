@@ -31,7 +31,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         }
         public async Task<Result<GetProjectByIdResponse>> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Retrieving project by ID: {ProjectId}", request.ProjectId);
+            _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogGetById), request.ProjectId);
 
             var cacheKey = ProjectCacheKeys.Project(request.ProjectId);
             var cached = await _cacheService.GetAsync<GetProjectByIdResponse>(cacheKey, cancellationToken);
@@ -43,12 +43,17 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
             var project = await _unitOfWork.Repository<Domain.Entities.Project>()
                 .Query()
                 .Include(x => x.ProjectResources)
+                .Include(x => x.InternshipGroup)
+                    .ThenInclude(g => g.Mentor)
+                        .ThenInclude(m => m.User)
+                .Include(x => x.InternshipGroup)
+                    .ThenInclude(g => g.Members)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (project == null)
             {
-                _logger.LogWarning("Project not found: {ProjectId}", request.ProjectId);
+                _logger.LogWarning(_message.GetMessage(MessageKeys.Projects.LogNotFound), request.ProjectId);
                 return Result<GetProjectByIdResponse>.Failure(
                     _message.GetMessage(MessageKeys.Projects.NotFound),
                     ResultErrorType.NotFound);

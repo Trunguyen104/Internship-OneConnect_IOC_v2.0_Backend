@@ -27,6 +27,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockGroupRepository;
         private readonly Mock<IGenericRepository<InternshipStudent>> _mockInternshipStudentRepository;
         private readonly Mock<ICacheService> _mockCacheService;
+        private readonly Mock<INotificationPushService> _mockPushService;
         private readonly RemoveStudentsFromGroupHandler _handler;
 
         public RemoveStudentsFromGroupHandlerTests()
@@ -40,13 +41,15 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>()).Returns(_mockGroupRepository.Object);
             _mockUnitOfWork.Setup(x => x.Repository<InternshipStudent>()).Returns(_mockInternshipStudentRepository.Object);
             _mockCacheService = new Mock<ICacheService>();
+            _mockPushService = new Mock<INotificationPushService>();
 
             _handler = new RemoveStudentsFromGroupHandler(
                 _mockUnitOfWork.Object,
                 _mockMessageService.Object,
                 _mockMapper.Object,
                 _mockLogger.Object,
-                _mockCacheService.Object);
+                _mockCacheService.Object,
+                _mockPushService.Object);
         }
 
         [Fact]

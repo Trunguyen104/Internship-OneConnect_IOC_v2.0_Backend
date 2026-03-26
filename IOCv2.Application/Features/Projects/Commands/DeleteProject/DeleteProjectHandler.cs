@@ -1,18 +1,12 @@
-﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
-using IOCv2.Application.Services;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
 {
@@ -24,58 +18,90 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
         private readonly ICurrentUserService _currentUser;
         private readonly ICacheService _cacheService;
 
-        public DeleteProjectHandler(IUnitOfWork unitOfWork, ILogger<DeleteProjectHandler> logger, IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService)
+        public DeleteProjectHandler(IUnitOfWork unitOfWork, ILogger<DeleteProjectHandler> logger,
+            IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService)
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            _unitOfWork     = unitOfWork;
+            _logger         = logger;
             _messageService = messageService;
-            _currentUser = currentUser;
-            _cacheService = cacheService;
+            _currentUser    = currentUser;
+            _cacheService   = cacheService;
         }
 
         public async Task<Result<string>> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Attempting to delete project: {ProjectId} by User: {UserId}", request.ProjectId, _currentUser.UserId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogDeleting), request.ProjectId, _currentUser.UserId);
 
-            // 1. Existence and Ownership Check (FFA-SEC)
-            var project = await _unitOfWork.Repository<Project>().GetByIdAsync(request.ProjectId, cancellationToken);
+            if (!Guid.TryParse(_currentUser.UserId, out var currentUserId))
+                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
+
+            if (enterpriseUser == null)
+                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Projects.MentorNotFound), ResultErrorType.Forbidden);
+
+            var project = await _unitOfWork.Repository<Project>().Query()
+                .Include(p => p.InternshipGroup)
+                .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (project == null)
             {
-                _logger.LogWarning("Project not found for deletion: {ProjectId}", request.ProjectId);
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.Projects.LogNotFound), request.ProjectId);
+                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
+            }
+
+            // Scope check
+            if (project.MentorId != enterpriseUser.EnterpriseUserId &&
+                project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
+                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+            var hasWorkItems = await _unitOfWork.Repository<WorkItem>().Query()
+                .AnyAsync(w => w.ProjectId == project.ProjectId, cancellationToken);
+            if (hasWorkItems)
                 return Result<string>.Failure(
-                    _messageService.GetMessage(MessageKeys.Projects.NotFound),
-                    ResultErrorType.NotFound);
-            }
+                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
+                    ResultErrorType.BadRequest);
 
-            // Security: Ownership check (Implementation same as update)
-            var currentUserIdStr = _currentUser.UserId;
-            if (string.IsNullOrEmpty(currentUserIdStr) || !Guid.TryParse(currentUserIdStr, out var currentUserId))
-            {
-                return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
-            }
+            var hasSprints = await _unitOfWork.Repository<Sprint>().Query()
+                .AnyAsync(s => s.ProjectId == project.ProjectId, cancellationToken);
+            if (hasSprints)
+                return Result<string>.Failure(
+                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
+                    ResultErrorType.BadRequest);
 
-            // 2. Logic & Persistence (FFA-FLW)
-            // Soft delete
-            project.DeletedAt = DateTime.UtcNow;
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
+                string logKey;
+                if (project.Status == ProjectStatus.Draft)
+                {
+                    // Draft project without runtime data can be hard-deleted.
+                    await _unitOfWork.Repository<Project>().HardDeleteAsync(project, cancellationToken);
+                    logKey = MessageKeys.Projects.LogDeleteHard;
+                }
+                else
+                {
+                    // Non-draft project is soft-deleted for audit history.
+                    project.DeletedAt = DateTime.UtcNow;
+                    await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
+                    logKey = MessageKeys.Projects.LogDeleteSoft;
+                }
+
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
                 await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
-                _logger.LogInformation("Successfully deleted project {ProjectId}", request.ProjectId);
-
+                _logger.LogInformation(_messageService.GetMessage(logKey), request.ProjectId);
                 return Result<string>.Success(_messageService.GetMessage(MessageKeys.Projects.DeleteSuccess));
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Transaction failed while deleting project {ProjectId}", request.ProjectId);
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.LogDeleteError), request.ProjectId);
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }

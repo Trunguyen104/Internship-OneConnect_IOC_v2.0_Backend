@@ -5,6 +5,8 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Application.Features.Projects.Commands.UpdateProject;
 using IOCv2.Domain.Entities;
 using Microsoft.Extensions.Logging;
+using MockQueryable;
+using MockQueryable.Moq;
 using Moq;
 using System.Linq.Expressions;
 using Xunit;
@@ -21,6 +23,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<ICacheService> _mockCacheService;
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepo;
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipRepo;
+        private readonly Mock<IGenericRepository<EnterpriseUser>> _mockEnterpriseUserRepo;
         private readonly UpdateProjectHandler _handler;
 
         public UpdateProjectHandlerTests()
@@ -34,9 +37,15 @@ namespace IOCv2.Tests.Features.Projects
             
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
             _mockInternshipRepo = new Mock<IGenericRepository<InternshipGroup>>();
+            _mockEnterpriseUserRepo = new Mock<IGenericRepository<EnterpriseUser>>();
 
             _mockUnitOfWork.Setup(x => x.Repository<Project>()).Returns(_mockProjectRepo.Object);
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>()).Returns(_mockInternshipRepo.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>()).Returns(_mockEnterpriseUserRepo.Object);
+            _mockUnitOfWork.Setup(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(x => x.RollbackTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
             _handler = new UpdateProjectHandler(
                 _mockUnitOfWork.Object,
@@ -51,18 +60,23 @@ namespace IOCv2.Tests.Features.Projects
         public async Task Handle_ValidRequest_ShouldReturnSuccess()
         {
             // Arrange
-            var projectId = Guid.NewGuid();
             var internshipId = Guid.NewGuid();
-            var command = new UpdateProjectCommand { ProjectId = projectId, ProjectName = "Updated Name" };
+            var userId = Guid.NewGuid();
+            var enterpriseUserId = Guid.NewGuid();
             
-            var project = Project.Create(internshipId, "Old Name", "Old Description");
+            var project = Project.Create(internshipId, "Old Name", "Old Description", "PRJ-TEST_TST_1", "IT", "Requirements", mentorId: enterpriseUserId);
+            var command = new UpdateProjectCommand { ProjectId = project.ProjectId, ProjectName = "Updated Name" };
             
-            _mockCurrentUser.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
-            _mockProjectRepo.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(project);
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
+            }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project> { project }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Project, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
             
             _mockMapper.Setup(x => x.Map<UpdateProjectResponse>(It.IsAny<Project>()))
-                .Returns(new UpdateProjectResponse { ProjectId = projectId, ProjectName = "Updated Name" });
+                .Returns(new UpdateProjectResponse { ProjectId = project.ProjectId, ProjectName = "Updated Name" });
 
             _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
@@ -84,10 +98,15 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var projectId = Guid.NewGuid();
             var command = new UpdateProjectCommand { ProjectId = projectId, ProjectName = "Updated Name" };
+            var userId = Guid.NewGuid();
+            var enterpriseUserId = Guid.NewGuid();
             
-            _mockCurrentUser.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
-            _mockProjectRepo.Setup(x => x.GetByIdAsync(projectId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Project?)null);
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
+            }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project>().AsQueryable().BuildMock());
             
             _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Project not found");
 

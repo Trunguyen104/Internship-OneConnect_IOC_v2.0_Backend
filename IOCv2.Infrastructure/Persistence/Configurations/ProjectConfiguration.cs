@@ -20,7 +20,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             // Properties
             builder.Property(x => x.InternshipId)
                 .HasColumnName("internship_id")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(x => x.ProjectName)
                 .HasColumnName("project_name")
@@ -63,7 +63,8 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasOne(p => p.InternshipGroup)
                 .WithMany(g => g.Projects)
                 .HasForeignKey(p => p.InternshipId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Indexes
             builder.HasIndex(x => x.InternshipId)
@@ -79,6 +80,47 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .WithOne(pr => pr.Project)
                 .HasForeignKey(pr => pr.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+        // New fields
+        builder.Property(x => x.MentorId)
+            .HasColumnName("mentor_id");
+
+        builder.Property(x => x.ProjectCode)
+            .HasColumnName("project_code")
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.Field)
+            .HasColumnName("field")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(x => x.Template)
+            .HasColumnName("template")
+            .HasConversion<short>()
+            .HasDefaultValue(ProjectTemplate.None);
+
+        builder.Property(x => x.Requirements)
+            .HasColumnName("requirements")
+            .HasMaxLength(2000)
+            .IsRequired();
+
+        builder.Property(x => x.Deliverables)
+            .HasColumnName("deliverables")
+            .HasMaxLength(2000);
+
+        // FK: MentorId → enterprise_users ON DELETE SET NULL
+        builder.HasOne<EnterpriseUser>()
+            .WithMany()
+            .HasForeignKey(p => p.MentorId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+
+        // Unique partial index: project_code WHERE deleted_at IS NULL
+        builder.HasIndex(x => x.ProjectCode)
+            .HasDatabaseName("uix_projects_project_code_active")
+            .HasFilter("deleted_at IS NULL")
+            .IsUnique();
         }
     }
 }

@@ -1243,4 +1243,61 @@
   <data name="ActiveTerms.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
+  <data name="Projects.MentorNotFound" xml:space="preserve">
+    <value>Mentor information not found in the system.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForCreate" xml:space="preserve">
+    <value>Cannot create a project for an archived or finished group.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForPublish" xml:space="preserve">
+    <value>Cannot publish a project for an archived or finished group.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForUpdate" xml:space="preserve">
+    <value>Cannot update a project in an archived or finished group.</value>
+  </data>
+  <data name="Projects.InvalidStatusForPublish" xml:space="preserve">
+    <value>Only Draft projects can be published.</value>
+  </data>
+  <data name="Projects.InvalidStatusForComplete" xml:space="preserve">
+    <value>Only Published projects can be marked as completed.</value>
+  </data>
+  <data name="Projects.InvalidStatusForUpdate" xml:space="preserve">
+    <value>Cannot update a project that is Completed or Archived.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithActiveAssignments" xml:space="preserve">
+    <value>Cannot delete a project that has active student assignments.</value>
+  </data>
+  <data name="Projects.ProjectCodeConflict" xml:space="preserve">
+    <value>Unable to generate a unique project code. Please try again.</value>
+  </data>
+  <data name="Projects.FieldRequired" xml:space="preserve">
+    <value>Project field is required.</value>
+  </data>
+  <data name="Projects.RequirementsRequired" xml:space="preserve">
+    <value>Project requirements are required.</value>
+  </data>
+  <data name="Projects.FieldMaxLength" xml:space="preserve">
+    <value>Project field must not exceed 100 characters.</value>
+  </data>
+  <data name="Projects.RequirementsMaxLength" xml:space="preserve">
+    <value>Project requirements must not exceed 2000 characters.</value>
+  </data>
+  <data name="Projects.DeliverablesMaxLength" xml:space="preserve">
+    <value>Project deliverables must not exceed 2000 characters.</value>
+  </data>
+  <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
+    <value>Group is no longer active (Finished or Archived).</value>
+  </data>
+  <data name="Projects.NoGroupAssigned" xml:space="preserve">
+    <value>Project has no internship group assigned and cannot be published.</value>
+  </data>
+  <data name="Projects.GroupIsFinished" xml:space="preserve">
+    <value>The internship group has finished and the project cannot be published.</value>
+  </data>
+  <data name="Projects.CannotDeleteHasData" xml:space="preserve">
+    <value>Cannot delete project that already has data (work items or sprints).</value>
+  </data>
+  <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
+    <value>Only Active internship groups can be deleted.</value>
+  </data>
 </root>

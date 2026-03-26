@@ -190,9 +190,6 @@
     <data name="SearchTerm.MaxLength" xml:space="preserve">
     <value>Search term cannot exceed 200 characters</value>
   </data>
-    <data name="Projects.NotFound" xml:space="preserve">
-    <value>Project Not Found</value>
-  </data>
     <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Project Delete successful</value>
   </data>
@@ -579,5 +576,101 @@
   </data>
   <data name="Terms.NameExists" xml:space="preserve">
     <value>Term name already exists. Please choose a different name.</value>
+  </data>
+  <data name="Projects.PublishSuccess" xml:space="preserve">
+    <value>Project published successfully.</value>
+  </data>
+  <data name="Projects.CompleteSuccess" xml:space="preserve">
+    <value>Project marked as completed.</value>
+  </data>
+  <data name="Projects.LogPublishSuccess" xml:space="preserve">
+    <value>Project {0} published.</value>
+  </data>
+  <data name="Projects.LogPublishError" xml:space="preserve">
+    <value>Error publishing project {0}.</value>
+  </data>
+  <data name="Projects.LogCompleteSuccess" xml:space="preserve">
+    <value>Project {0} completed.</value>
+  </data>
+  <data name="Projects.LogCompleteError" xml:space="preserve">
+    <value>Error completing project {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteHard" xml:space="preserve">
+    <value>Hard deleted project {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteSoft" xml:space="preserve">
+    <value>Soft deleted project {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteError" xml:space="preserve">
+    <value>Error deleting project {0}.</value>
+  </data>
+  <data name="Projects.LogUpdateSuccess" xml:space="preserve">
+    <value>Successfully updated project {0}.</value>
+  </data>
+  <data name="Projects.LogUpdateError" xml:space="preserve">
+    <value>Error updating project {0}.</value>
+  </data>
+  <data name="Projects.LogNotFound" xml:space="preserve">
+    <value>Project not found: {0}.</value>
+  </data>
+  <data name="Projects.LogNameExists" xml:space="preserve">
+    <value>Project name {0} already exists in the group.</value>
+  </data>
+  <data name="Projects.LogCodeConflict" xml:space="preserve">
+    <value>Unique constraint violation for project code {0}.</value>
+  </data>
+  <data name="Projects.LogCreating" xml:space="preserve">
+    <value>Creating project {0} for group {1}.</value>
+  </data>
+  <data name="Projects.LogUpdating" xml:space="preserve">
+    <value>Updating project {0} by user {1}.</value>
+  </data>
+  <data name="Projects.LogDeleting" xml:space="preserve">
+    <value>Deleting project {0} by user {1}.</value>
+  </data>
+  <data name="Projects.LogGetById" xml:space="preserve">
+    <value>Retrieving project by ID: {0}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationProjectCleanupTitle" xml:space="preserve">
+    <value>Project warning</value>
+  </data>
+  <data name="InternshipGroup.NotificationProjectCleanupContent" xml:space="preserve">
+    <value>{0} was removed from the internship group.</value>
+  </data>
+  <data name="InternshipGroup.LogProjectAssignmentsCleanup" xml:space="preserve">
+    <value>Auto-removed {0} assignment(s) for student {1} after leaving group.</value>
+  </data>
+  <data name="InternshipGroup.LogProjectsArchived" xml:space="preserve">
+    <value>Archived {0} Draft/Published project(s) after group {1} was archived.</value>
+  </data>
+  <data name="Projects.LogOrphanized" xml:space="preserve">
+    <value>Project {0} was orphaned because its group was deleted.</value>
+  </data>
+  <data name="Projects.GetStudentsSuccess" xml:space="preserve">
+    <value>Project students retrieved successfully.</value>
+  </data>
+  <data name="Projects.LogGetStudentsSuccess" xml:space="preserve">
+    <value>Retrieved students for project {0}.</value>
+  </data>
+  <data name="InternshipGroups.NotificationOrphanTitle" xml:space="preserve">
+    <value>Internship group deleted</value>
+  </data>
+  <data name="InternshipGroups.NotificationOrphanContent" xml:space="preserve">
+    <value>Group "{0}" has been deleted. {1} of your project(s) have been moved back to Draft and detached from the group.</value>
+  </data>
+  <data name="InternshipGroups.LogOrphanizeProjects" xml:space="preserve">
+    <value>{0} project(s) orphaned due to group {1} deletion.</value>
+  </data>
+  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
+    <value>Successfully retrieved {0} project(s) for internship group {1}.</value>
+  </data>
+  <data name="Projects.LogGetAll" xml:space="preserve">
+    <value>Retrieving all projects. SearchTerm: {0}, Status: {1}.</value>
+  </data>
+  <data name="Projects.LogGetAllSuccess" xml:space="preserve">
+    <value>Successfully retrieved {0} project(s).</value>
+  </data>
+  <data name="Projects.LogGetByInternshipId" xml:space="preserve">
+    <value>Retrieving projects for internship group {0}.</value>
   </data>
 </root>

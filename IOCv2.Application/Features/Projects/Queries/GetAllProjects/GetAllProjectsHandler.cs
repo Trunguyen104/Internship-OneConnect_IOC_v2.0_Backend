@@ -43,7 +43,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             GetAllProjectsQuery request,
             CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Retrieving all projects with SearchTerm: {SearchTerm}, Status: {Status}", request.SearchTerm, request.Status);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetAll), request.SearchTerm, request.Status);
 
             var cacheKey = ProjectCacheKeys.ProjectList(
                 request.SearchTerm,
@@ -107,7 +107,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             var result = PaginatedResult<GetAllProjectsResponse>.Create(
                 items, totalCount, request.PageNumber, request.PageSize);
 
-            _logger.LogInformation("Successfully retrieved {Count} projects", items.Count);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetAllSuccess), items.Count);
 
             await _cacheService.SetAsync(cacheKey, result, ProjectCacheKeys.Expiration.ProjectList, cancellationToken);
 

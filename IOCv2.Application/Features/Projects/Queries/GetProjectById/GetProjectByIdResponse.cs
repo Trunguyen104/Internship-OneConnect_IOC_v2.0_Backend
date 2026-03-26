@@ -7,6 +7,14 @@ using System.Collections.Generic;
 
 namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
 {
+    public class GroupInfoDto
+    {
+        public Guid InternshipId { get; set; }
+        public string GroupName { get; set; } = string.Empty;
+        public string? MentorName { get; set; }
+        public int StudentCount { get; set; }
+    }
+
     /// <summary>
     /// Detailed response model for a specific project.
     /// </summary>
@@ -20,7 +28,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// <summary>
         /// Identity of the internship group associated with this project.
         /// </summary>
-        public Guid InternshipId { get; set; }
+        public Guid? InternshipId { get; set; }
 
         /// <summary>
         /// Name of the project.
@@ -57,6 +65,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// </summary>
         public List<ProjectResourcesDTO> ProjectResources { get; set; } = new();
 
+        public GroupInfoDto? GroupInfo { get; set; }
+
         /// <summary>
         /// Configures the mapping between the Project entity and its resources to this response DTO.
         /// </summary>
@@ -66,7 +76,17 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
             profile.CreateMap<Domain.Entities.ProjectResources, ProjectResourcesDTO>();
             profile.CreateMap<Project, GetProjectByIdResponse>()
                 .ForMember(dest => dest.ProjectResources,
-                           opt => opt.MapFrom(src => src.ProjectResources));
+                           opt => opt.MapFrom(src => src.ProjectResources))
+                .ForMember(dest => dest.GroupInfo,
+                           opt => opt.MapFrom(src => src.InternshipGroup == null
+                               ? null
+                               : new GroupInfoDto
+                               {
+                                   InternshipId = src.InternshipGroup.InternshipId,
+                                   GroupName = src.InternshipGroup.GroupName,
+                                   MentorName = src.InternshipGroup.Mentor != null ? src.InternshipGroup.Mentor.User.FullName : null,
+                                   StudentCount = src.InternshipGroup.Members.Count
+                               }));
         }
     }
 }

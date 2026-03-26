@@ -81,10 +81,10 @@ public class GetMyInternshipPhasesHandler
             ? new Dictionary<Guid, Project>()
             : (await _unitOfWork.Repository<Project>()
                 .Query()
-                .Where(p => p.DeletedAt == null && internshipIds.Contains(p.InternshipId))
+                .Where(p => p.DeletedAt == null && p.InternshipId.HasValue && internshipIds.Contains(p.InternshipId.Value))
                 .AsNoTracking()
                 .ToListAsync(cancellationToken))
-                .GroupBy(p => p.InternshipId)
+                .GroupBy(p => p.InternshipId!.Value)
                 .ToDictionary(grp => grp.Key, grp => grp.First());
 
         // BUG-J FIX: Deduplicate by PhaseId before projecting.

@@ -22,7 +22,7 @@ public class UploadProjectResourceHandlerTests
         var userId = Guid.NewGuid();
         var studentId = Guid.NewGuid();
 
-        var project = Project.Create(internshipId, "Demo", string.Empty);
+        var project = Project.Create(internshipId, "Demo", string.Empty, "PRJ-DEMO_DMO_1", "IT", "Requirements");
         var projectRepo = new Mock<IGenericRepository<Project>>();
         projectRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Project, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);

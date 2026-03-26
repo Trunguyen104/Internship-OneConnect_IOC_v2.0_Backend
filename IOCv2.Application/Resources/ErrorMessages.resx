@@ -1299,4 +1299,61 @@
   <data name="ActiveTerms.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
+  <data name="Projects.MentorNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin Mentor trong hệ thống.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForCreate" xml:space="preserve">
+    <value>Không thể tạo dự án cho nhóm đã lưu trữ hoặc kết thúc.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForPublish" xml:space="preserve">
+    <value>Không thể phát hành dự án cho nhóm đã lưu trữ hoặc kết thúc.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForUpdate" xml:space="preserve">
+    <value>Không thể cập nhật dự án trong nhóm đã lưu trữ hoặc kết thúc.</value>
+  </data>
+  <data name="Projects.InvalidStatusForPublish" xml:space="preserve">
+    <value>Chỉ có thể phát hành dự án đang ở trạng thái Bản nháp.</value>
+  </data>
+  <data name="Projects.InvalidStatusForComplete" xml:space="preserve">
+    <value>Chỉ có thể hoàn thành dự án đang ở trạng thái Đã phát hành.</value>
+  </data>
+  <data name="Projects.InvalidStatusForUpdate" xml:space="preserve">
+    <value>Không thể cập nhật dự án đã hoàn thành hoặc đã lưu trữ.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithActiveAssignments" xml:space="preserve">
+    <value>Không thể xóa dự án đang có sinh viên được gán.</value>
+  </data>
+  <data name="Projects.ProjectCodeConflict" xml:space="preserve">
+    <value>Không thể tạo mã dự án duy nhất. Vui lòng thử lại.</value>
+  </data>
+  <data name="Projects.FieldRequired" xml:space="preserve">
+    <value>Lĩnh vực dự án là bắt buộc.</value>
+  </data>
+  <data name="Projects.RequirementsRequired" xml:space="preserve">
+    <value>Yêu cầu dự án là bắt buộc.</value>
+  </data>
+  <data name="Projects.FieldMaxLength" xml:space="preserve">
+    <value>Lĩnh vực dự án không được vượt quá 100 ký tự.</value>
+  </data>
+  <data name="Projects.RequirementsMaxLength" xml:space="preserve">
+    <value>Yêu cầu dự án không được vượt quá 2000 ký tự.</value>
+  </data>
+  <data name="Projects.DeliverablesMaxLength" xml:space="preserve">
+    <value>Kết quả bàn giao không được vượt quá 2000 ký tự.</value>
+  </data>
+  <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
+    <value>Nhóm không còn hoạt động (Finished hoặc Archived).</value>
+  </data>
+  <data name="Projects.NoGroupAssigned" xml:space="preserve">
+    <value>Project chưa được gắn với nhóm thực tập, không thể publish.</value>
+  </data>
+  <data name="Projects.GroupIsFinished" xml:space="preserve">
+    <value>Nhóm thực tập đã kết thúc (Finished), không thể publish project.</value>
+  </data>
+  <data name="Projects.CannotDeleteHasData" xml:space="preserve">
+    <value>Không thể xóa project đã có dữ liệu (work items hoặc sprints).</value>
+  </data>
+  <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
+    <value>Chỉ có thể xóa nhóm thực tập đang ở trạng thái Active.</value>
+  </data>
 </root>

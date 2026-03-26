@@ -72,11 +72,11 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
             ? new Dictionary<Guid, Project>()
             : (await _unitOfWork.Repository<Project>()
                 .Query()
-                .Where(project => project.DeletedAt == null && internshipIds.Contains(project.InternshipId))
+                .Where(project => project.DeletedAt == null && project.InternshipId.HasValue && internshipIds.Contains(project.InternshipId.Value))
                 .OrderByDescending(project => project.CreatedAt)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken))
-                .GroupBy(project => project.InternshipId)
+                .GroupBy(project => project.InternshipId!.Value)
                 .ToDictionary(group => group.Key, group => group.First());
 
 

@@ -1,0 +1,109 @@
+using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Projects.Common;
+using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+namespace IOCv2.Application.Features.Projects.Commands.PublishProject
+{
+    public class PublishProjectHandler : IRequestHandler<PublishProjectCommand, Result<PublishProjectResponse>>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUser;
+        private readonly IMessageService _message;
+        private readonly ICacheService _cacheService;
+        private readonly ILogger<PublishProjectHandler> _logger;
+
+        public PublishProjectHandler(
+            IUnitOfWork unitOfWork,
+            ICurrentUserService currentUser,
+            IMessageService message,
+            ICacheService cacheService,
+            ILogger<PublishProjectHandler> logger)
+        {
+            _unitOfWork   = unitOfWork;
+            _currentUser  = currentUser;
+            _message      = message;
+            _cacheService = cacheService;
+            _logger       = logger;
+        }
+
+        public async Task<Result<PublishProjectResponse>> Handle(PublishProjectCommand request, CancellationToken cancellationToken)
+        {
+            if (!Guid.TryParse(_currentUser.UserId, out var currentUserId))
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
+
+            if (enterpriseUser == null)
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.MentorNotFound), ResultErrorType.Forbidden);
+
+            var project = await _unitOfWork.Repository<Project>().Query()
+                .Include(p => p.InternshipGroup)
+                .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
+
+            if (project == null)
+                return Result<PublishProjectResponse>.NotFound(_message.GetMessage(MessageKeys.Projects.NotFound));
+
+            // Scope check: phải là mentor của project hoặc mentor của group
+            if (project.MentorId != enterpriseUser.EnterpriseUserId &&
+                project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+            // Project phải còn gắn group trước khi publish
+            if (project.InternshipId == null)
+                return Result<PublishProjectResponse>.Failure(
+                    _message.GetMessage(MessageKeys.Projects.NoGroupAssigned), ResultErrorType.BadRequest);
+
+            // Status check
+            if (project.Status != ProjectStatus.Draft)
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.InvalidStatusForPublish), ResultErrorType.BadRequest);
+
+            // Group status check
+            var groupStatus = project.InternshipGroup?.Status;
+            if (groupStatus == GroupStatus.Archived)
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupNotActiveForPublish), ResultErrorType.BadRequest);
+
+            if (groupStatus == GroupStatus.Finished)
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupIsFinished), ResultErrorType.BadRequest);
+
+            // Re-validate required fields
+            if (string.IsNullOrWhiteSpace(project.Field) || string.IsNullOrWhiteSpace(project.Requirements))
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.RequirementsRequired), ResultErrorType.BadRequest);
+
+            project.SetStatus(ProjectStatus.Published);
+
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
+                await _unitOfWork.SaveChangeAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
+                await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
+
+                _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogPublishSuccess), project.ProjectId);
+
+                return Result<PublishProjectResponse>.Success(new PublishProjectResponse
+                {
+                    ProjectId = project.ProjectId,
+                    Status    = ProjectStatus.Published,
+                    UpdatedAt = project.UpdatedAt ?? DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogPublishError), project.ProjectId);
+                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
+            }
+        }
+    }
+}
