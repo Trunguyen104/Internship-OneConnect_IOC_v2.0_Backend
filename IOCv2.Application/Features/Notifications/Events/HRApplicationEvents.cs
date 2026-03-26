@@ -60,3 +60,11 @@ public record ApplicationApprovedNotifyUniAdminEvent(
     string EnterpriseName,
     Guid ApplicationId
 ) : INotification;
+
+/// <summary>SV tự rút đơn — notify Enterprise HR (AC-07).</summary>
+public record ApplicationWithdrawnByStudentEvent(
+    Guid EnterpriseId,
+    string StudentName,
+    string JobTitle,
+    Guid ApplicationId
+) : INotification;

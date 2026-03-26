@@ -767,5 +767,22 @@ namespace IOCv2.Application.Constants
             public const string LogCascadeWithdraw = "HRApplications.Log.CascadeWithdraw";
             public const string LogInvalidUserId = "HRApplications.Log.InvalidUserId";
         }
+
+        public static class StudentApplications
+        {
+            // Business errors
+            public const string NotFound = "StudentApplications.NotFound";
+            public const string NotOwner = "StudentApplications.NotOwner";
+            public const string CannotWithdrawNotApplied = "StudentApplications.CannotWithdrawNotApplied";
+            public const string CannotHidePlaced = "StudentApplications.CannotHidePlaced";
+            public const string CannotHideActiveApplication = "StudentApplications.CannotHideActiveApplication";
+
+            // Success
+            public const string WithdrawSuccess = "StudentApplications.WithdrawSuccess";
+            public const string HideSuccess = "StudentApplications.HideSuccess";
+
+            // Notify HR (AC-07)
+            public const string NotifyHRWithdrawn = "StudentApplications.Notify.HR.Withdrawn";
+        }
     }
 }

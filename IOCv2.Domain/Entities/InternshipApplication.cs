@@ -16,6 +16,9 @@ public class InternshipApplication : BaseEntity
     /// <summary>Reject reason (required when Status = Rejected).</summary>
     public string? RejectReason { get; set; }
 
+    /// <summary>Sinh viên ẩn đơn khỏi My Applications (Soft-hide — AC-04). Chỉ áp dụng cho Rejected / Withdrawn.</summary>
+    public bool IsHiddenByStudent { get; set; } = false;
+
 
     /// <summary>URL CV tại thời điểm apply (Self-apply only).</summary>
     public string? CvSnapshotUrl { get; set; }

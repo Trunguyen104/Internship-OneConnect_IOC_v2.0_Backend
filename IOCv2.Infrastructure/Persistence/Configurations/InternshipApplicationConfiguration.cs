@@ -29,6 +29,7 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
             .HasColumnType("smallint");
 
         builder.Property(x => x.RejectReason).HasColumnName("reject_reason").HasMaxLength(1000);
+        builder.Property(x => x.IsHiddenByStudent).HasColumnName("is_hidden_by_student").HasDefaultValue(false);
         builder.Property(x => x.CvSnapshotUrl).HasColumnName("cv_snapshot_url").HasMaxLength(2048);
         builder.Property(x => x.UniversityId).HasColumnName("university_id");
 

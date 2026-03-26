@@ -15,7 +15,8 @@ public class HRApplicationEventHandlers :
     INotificationHandler<ApplicationRejectedSelfApplyEvent>,
     INotificationHandler<ApplicationPlacedUniAssignEvent>,
     INotificationHandler<ApplicationRejectedUniAssignEvent>,
-    INotificationHandler<ApplicationApprovedNotifyUniAdminEvent>
+    INotificationHandler<ApplicationApprovedNotifyUniAdminEvent>,
+    INotificationHandler<ApplicationWithdrawnByStudentEvent>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly INotificationPushService _pushService;
@@ -211,6 +212,30 @@ public class HRApplicationEventHandlers :
                     notification.ApplicationId,
                     cancellationToken);
             }
+        }
+    }
+
+    /// <summary>Notify all HR/EnterpriseAdmin of the enterprise when student withdraws their application (AC-07).</summary>
+    public async Task Handle(ApplicationWithdrawnByStudentEvent notification, CancellationToken cancellationToken)
+    {
+        var hrUsers = await _unitOfWork.Repository<EnterpriseUser>().Query()
+            .Where(eu => eu.EnterpriseId == notification.EnterpriseId)
+            .Select(eu => eu.UserId)
+            .ToListAsync(cancellationToken);
+
+        var content = _messageService.GetMessage(MessageKeys.StudentApplications.NotifyHRWithdrawn)
+            .Replace("{StudentName}", notification.StudentName)
+            .Replace("{JobTitle}", notification.JobTitle);
+
+        foreach (var hrUserId in hrUsers)
+        {
+            await CreateAndPushNotificationAsync(
+                hrUserId,
+                "Sinh viên rút đơn ứng tuyển",
+                content,
+                NotificationType.ApplicationStatusChanged,
+                notification.ApplicationId,
+                cancellationToken);
         }
     }
 }

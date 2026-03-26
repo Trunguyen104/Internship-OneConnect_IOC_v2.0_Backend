@@ -584,4 +584,34 @@
   <data name="HRApplications.Log.InvalidUserId" xml:space="preserve">
     <value>UserId không hợp lệ khi xử lý HR Application.</value>
   </data>
+
+  <!-- ── StudentApplications: Error Messages ── -->
+  <data name="StudentApplications.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đơn ứng tuyển.</value>
+  </data>
+  <data name="StudentApplications.NotOwner" xml:space="preserve">
+    <value>Bạn không có quyền thực hiện thao tác này trên đơn ứng tuyển của người khác.</value>
+  </data>
+  <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
+    <value>Chỉ có thể rút đơn khi đơn đang ở trạng thái "Đã nộp" (Applied).</value>
+  </data>
+  <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
+    <value>Không thể ẩn đơn ứng tuyển đã được chấp nhận (Placed).</value>
+  </data>
+  <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
+    <value>Chỉ có thể ẩn đơn đã kết thúc (Rejected hoặc Withdrawn).</value>
+  </data>
+
+  <!-- ── StudentApplications: Success Messages ── -->
+  <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
+    <value>Đã rút đơn thành công.</value>
+  </data>
+  <data name="StudentApplications.HideSuccess" xml:space="preserve">
+    <value>Đã ẩn khỏi danh sách.</value>
+  </data>
+
+  <!-- ── StudentApplications: Notifications to HR (AC-07) ── -->
+  <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
+    <value>{StudentName} đã rút đơn ứng tuyển vị trí {JobTitle}.</value>
+  </data>
 </root>
