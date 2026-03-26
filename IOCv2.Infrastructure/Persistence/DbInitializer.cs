@@ -548,18 +548,18 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, JobId = SeedIds.JobReactId, Status = InternshipApplicationStatus.Interviewing, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-5) });
             }
 
-            // --- UniAssign Sample Data ---
+            // --- UniAssign Sample Data (Grouped for FPT Software for easier HR Dashboard testing) ---
 
-            // UniAssign: Student 5 -> Rikkeisoft (Pending Assignment)
-            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s5.StudentId && a.Source == ApplicationSource.UniAssign))
+            // UniAssign: Student 5 -> FPT Software (Pending Assignment)
+            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s5.StudentId && a.EnterpriseId == fsoft.EnterpriseId && a.Source == ApplicationSource.UniAssign))
             {
                 var app5 = new InternshipApplication
                 {
                     ApplicationId = Guid.NewGuid(),
-                    EnterpriseId = rikkeisoft.EnterpriseId,
+                    EnterpriseId = fsoft.EnterpriseId,
                     TermId = spring2026.TermId,
                     StudentId = s5.StudentId,
-                    JobId = SeedIds.JobJavaId,
+                    JobId = SeedIds.JobNetId,
                     Status = InternshipApplicationStatus.PendingAssignment,
                     Source = ApplicationSource.UniAssign,
                     UniversityId = fptu.UniversityId,
@@ -575,21 +575,21 @@ namespace IOCv2.Infrastructure.Persistence
                     ToStatus = InternshipApplicationStatus.PendingAssignment,
                     TriggerSource = "System",
                     ChangedByName = "Uni Admin (FPTU)",
-                    Note = "Assigned by University coordinator based on major matching.",
+                    Note = "Assigned by University coordinator to FPT Software .NET team.",
                     CreatedAt = DateTime.UtcNow.AddDays(-3)
                 });
             }
 
-            // UniAssign: Student 1 -> Rikkeisoft (Rejected)
-            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s1.StudentId && a.EnterpriseId == rikkeisoft.EnterpriseId && a.Source == ApplicationSource.UniAssign))
+            // UniAssign: Student 1 -> FPT Software (Rejected previous UniAssign)
+            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s1.StudentId && a.EnterpriseId == fsoft.EnterpriseId && a.Source == ApplicationSource.UniAssign && a.Status == InternshipApplicationStatus.Rejected))
             {
                 var app1Reject = new InternshipApplication
                 {
                     ApplicationId = Guid.NewGuid(),
-                    EnterpriseId = rikkeisoft.EnterpriseId,
+                    EnterpriseId = fsoft.EnterpriseId,
                     TermId = spring2026.TermId,
                     StudentId = s1.StudentId,
-                    JobId = SeedIds.JobJavaId,
+                    JobId = SeedIds.JobReactId, // Let's say they failed the React role first
                     Status = InternshipApplicationStatus.Rejected,
                     Source = ApplicationSource.UniAssign,
                     UniversityId = fptu.UniversityId,
@@ -604,8 +604,8 @@ namespace IOCv2.Infrastructure.Persistence
                     FromStatus = InternshipApplicationStatus.PendingAssignment,
                     ToStatus = InternshipApplicationStatus.Rejected,
                     TriggerSource = "HR",
-                    ChangedByName = "HR Rikkeisoft",
-                    Note = "Candidate does not meet the minimum GPA requirement for the Java Backend position.",
+                    ChangedByName = "HR FPT Software",
+                    Note = "Candidate's portfolio doesn't match the frontend requirements.",
                     CreatedAt = DateTime.UtcNow.AddDays(-14)
                 });
             }
