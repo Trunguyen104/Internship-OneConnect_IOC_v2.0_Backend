@@ -472,4 +472,116 @@
   <data name="InternshipGroup.ArchiveSuccess" xml:space="preserve">
     <value>Lưu trữ nhóm thành công.</value>
   </data>
+
+  <!-- ── HRApplications: Validation ── -->
+  <data name="HRApplications.ApplicationIdRequired" xml:space="preserve">
+    <value>Mã đơn ứng tuyển là bắt buộc.</value>
+  </data>
+  <data name="HRApplications.RejectReasonRequired" xml:space="preserve">
+    <value>Vui lòng nhập lý do từ chối.</value>
+  </data>
+  <data name="HRApplications.RejectReasonMinLength" xml:space="preserve">
+    <value>Lý do từ chối phải có ít nhất 10 ký tự.</value>
+  </data>
+  <data name="HRApplications.RejectReasonMaxLength" xml:space="preserve">
+    <value>Lý do từ chối không được vượt quá 500 ký tự.</value>
+  </data>
+
+  <!-- ── HRApplications: Error Messages ── -->
+  <data name="HRApplications.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đơn ứng tuyển.</value>
+  </data>
+  <data name="HRApplications.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Bạn không có quyền thực hiện thao tác này với tư cách HR của doanh nghiệp.</value>
+  </data>
+  <data name="HRApplications.InvalidTransition" xml:space="preserve">
+    <value>Không thể thay đổi trạng thái. Đơn ứng tuyển không ở trạng thái phù hợp.</value>
+  </data>
+  <data name="HRApplications.CannotRejectPlaced" xml:space="preserve">
+    <value>Không thể từ chối đơn ứng tuyển đã được chấp nhận (Placed).</value>
+  </data>
+  <data name="HRApplications.NotSelfApplyApplication" xml:space="preserve">
+    <value>Thao tác này chỉ áp dụng cho đơn tự ứng tuyển (Self-apply).</value>
+  </data>
+  <data name="HRApplications.NotUniAssignApplication" xml:space="preserve">
+    <value>Thao tác này chỉ áp dụng cho đơn được trường phân công (Uni Assign).</value>
+  </data>
+  <data name="HRApplications.ApplicationNotActive" xml:space="preserve">
+    <value>Đơn ứng tuyển không còn ở trạng thái hoạt động.</value>
+  </data>
+
+  <!-- ── HRApplications: Notifications to Student (Self-apply) ── -->
+  <!-- AC-04: Interviewing -->
+  <data name="HRApplications.Notify.Interviewing" xml:space="preserve">
+    <value>{Enterprise} đã chuyển hồ sơ của bạn sang vòng phỏng vấn. Vui lòng kiểm tra email để biết thêm chi tiết.</value>
+  </data>
+  <!-- AC-04: Offered -->
+  <data name="HRApplications.Notify.Offered" xml:space="preserve">
+    <value>{Enterprise} đã gửi offer cho bạn. Vui lòng kiểm tra email để xem chi tiết offer.</value>
+  </data>
+  <!-- AC-04: Placed (Self-apply) -->
+  <data name="HRApplications.Notify.Placed.SelfApply" xml:space="preserve">
+    <value>Chúc mừng! Bạn đã chính thức được nhận thực tập tại {Enterprise}.</value>
+  </data>
+  <!-- AC-05: Rejected (Self-apply) -->
+  <data name="HRApplications.Notify.Rejected.SelfApply" xml:space="preserve">
+    <value>{Enterprise} đã không chọn bạn. Bạn có thể tiếp tục ứng tuyển nơi khác.</value>
+  </data>
+
+  <!-- ── HRApplications: Notifications to Student (Uni Assign) ── -->
+  <!-- AC-09: Placed (Uni Assign) -->
+  <data name="HRApplications.Notify.Placed.UniAssign" xml:space="preserve">
+    <value>Chúc mừng! Bạn đã chính thức được nhận thực tập tại {Enterprise}.</value>
+  </data>
+  <!-- AC-10: Rejected (Uni Assign) -->
+  <data name="HRApplications.Notify.Rejected.UniAssign" xml:space="preserve">
+    <value>Doanh nghiệp {Enterprise} đã từ chối chỉ định của trường. Vui lòng liên hệ nhà trường để được hỗ trợ.</value>
+  </data>
+
+  <!-- ── HRApplications: Notifications to Uni Admin ── -->
+  <!-- AC-09: Uni Admin notify when Placed -->
+  <data name="HRApplications.Notify.UniAdmin.Placed" xml:space="preserve">
+    <value>{StudentName} đã được {Enterprise} chấp nhận.</value>
+  </data>
+  <!-- AC-10: Uni Admin notify when Rejected -->
+  <data name="HRApplications.Notify.UniAdmin.Rejected" xml:space="preserve">
+    <value>{Enterprise} đã từ chối nhận {StudentName}. Lý do: {Reason}.</value>
+  </data>
+
+  <!-- ── HRApplications: Notifications to Enterprise (Auto-withdraw) ── -->
+  <!-- AC-09: Enterprise notified when student is placed elsewhere -->
+  <data name="HRApplications.Notify.Enterprise.AutoWithdrawn" xml:space="preserve">
+    <value>{StudentName} đã được chỉ định vào doanh nghiệp khác. Đơn ứng tuyển đã tự động rút.</value>
+  </data>
+
+  <!-- ── HRApplications: Notifications to Student (System Auto-withdraw) ── -->
+  <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
+    <value>Đơn ứng tuyển của bạn tại {Enterprise} đã tự động bị rút do bạn đã được nhận thực tập tại nơi khác.</value>
+  </data>
+
+  <!-- ── HRApplications: Log Messages ── -->
+  <data name="HRApplications.Log.MoveToInterviewing" xml:space="preserve">
+    <value>Chuyển application {ApplicationId} sang Interviewing.</value>
+  </data>
+  <data name="HRApplications.Log.SendOffer" xml:space="preserve">
+    <value>Gửi Offer cho application {ApplicationId}.</value>
+  </data>
+  <data name="HRApplications.Log.MarkAsPlaced" xml:space="preserve">
+    <value>Chốt Placed cho application {ApplicationId}.</value>
+  </data>
+  <data name="HRApplications.Log.Reject" xml:space="preserve">
+    <value>Từ chối application {ApplicationId}.</value>
+  </data>
+  <data name="HRApplications.Log.ApproveUniAssign" xml:space="preserve">
+    <value>Phê duyệt Uni Assign cho application {ApplicationId}.</value>
+  </data>
+  <data name="HRApplications.Log.RejectUniAssign" xml:space="preserve">
+    <value>Từ chối Uni Assign cho application {ApplicationId}.</value>
+  </data>
+  <data name="HRApplications.Log.CascadeWithdraw" xml:space="preserve">
+    <value>Cascade Withdraw: Rút {Count} đơn ứng tuyển còn lại của sinh viên {StudentId}.</value>
+  </data>
+  <data name="HRApplications.Log.InvalidUserId" xml:space="preserve">
+    <value>UserId không hợp lệ khi xử lý HR Application.</value>
+  </data>
 </root>
