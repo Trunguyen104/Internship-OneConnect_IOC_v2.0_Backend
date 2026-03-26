@@ -201,8 +201,28 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "HR" });
                 }
             }
+           
+            // 3. School Admin accounts
+            foreach (var uni in universityList)
+            {
+                Guid uniAdminId;
+                if (uni.Code == "FPTU") uniAdminId = SeedIds.SchoolAdminFptId;
+                else if (uni.Code == "FPTU-CT") uniAdminId = SeedIds.SchoolAdminFptCtId;
+                else uniAdminId = Guid.NewGuid();
 
-            // 3. 5 Specific Students
+                var uniAdminEmail = $"schooladmin@{uni.Code.ToLower()}.com";
+                if (!existingEmails.Contains(uniAdminEmail))
+                {
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.SchoolAdmin, cancellationToken);
+                    var user = new User(uniAdminId, userCode, uniAdminEmail, $"School Admin {uni.Code}", UserRole.SchoolAdmin, passHash);
+                    user.SetStatus(UserStatus.Active);
+                    _context.Users.Add(user);
+                    existingEmails.Add(uniAdminEmail);
+                    _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId, Position = "School Administrator" });
+                }
+            }
+
+            // 4. 5 Specific Students
             string[] studentEmails = {
                 "student1@fptu.edu.vn",
                 "student2@fptu.edu.vn",
@@ -735,17 +755,31 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     foreach (var lb in logbooksProj3)
                     {
-                        var wi1 = workItemsProj3[0].WorkItemId;
-                        await _context.Database.ExecuteSqlRawAsync(
-                            "INSERT INTO logbook_work_items (logbook_id, work_items_work_item_id) VALUES ({0}, {1}) ON CONFLICT DO NOTHING", 
-                            lb.LogbookId, wi1);
+                        var wi1 = workItemsProj3[0];
+                        if (_context.Database.IsRelational())
+                        {
+                            await _context.Database.ExecuteSqlRawAsync(
+                                "INSERT INTO logbook_work_items (logbook_id, work_items_work_item_id) VALUES ({0}, {1}) ON CONFLICT DO NOTHING", 
+                                lb.LogbookId, wi1.WorkItemId);
+                        }
+                        else
+                        {
+                            if (!lb.WorkItems.Contains(wi1)) lb.WorkItems.Add(wi1);
+                        }
                             
                         if (workItemsProj3.Count > 1)
                         {
-                            var wi2 = workItemsProj3[1].WorkItemId;
-                            await _context.Database.ExecuteSqlRawAsync(
-                                "INSERT INTO logbook_work_items (logbook_id, work_items_work_item_id) VALUES ({0}, {1}) ON CONFLICT DO NOTHING", 
-                                lb.LogbookId, wi2);
+                            var wi2 = workItemsProj3[1];
+                            if (_context.Database.IsRelational())
+                            {
+                                await _context.Database.ExecuteSqlRawAsync(
+                                    "INSERT INTO logbook_work_items (logbook_id, work_items_work_item_id) VALUES ({0}, {1}) ON CONFLICT DO NOTHING", 
+                                    lb.LogbookId, wi2.WorkItemId);
+                            }
+                            else
+                            {
+                                if (!lb.WorkItems.Contains(wi2)) lb.WorkItems.Add(wi2);
+                            }
                         }
                     }
                     await _context.SaveChangesAsync();

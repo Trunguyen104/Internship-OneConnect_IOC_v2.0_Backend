@@ -1,6 +1,7 @@
 ﻿using IOCv2.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace IOCv2.Domain.Entities
 {
     public class ProjectResources : BaseEntity
     {
+        [Key]
         public Guid ProjectResourceId { get; set; }
         public Guid ProjectId { get; set; }
         public string? ResourceName { get; set; }
