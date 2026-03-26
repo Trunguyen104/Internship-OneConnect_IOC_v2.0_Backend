@@ -3,6 +3,8 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
+using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,13 +23,21 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         private readonly ILogger<GetProjectByIdHandler> _logger;
         private readonly IMessageService _message;
         private readonly ICacheService _cacheService;
-        public GetProjectByIdHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<GetProjectByIdHandler> logger, IMessageService message, ICacheService cacheService)
+        private readonly ICurrentUserService? _currentUserService;
+        public GetProjectByIdHandler(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ILogger<GetProjectByIdHandler> logger,
+            IMessageService message,
+            ICacheService cacheService,
+            ICurrentUserService? currentUserService = null)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _message = message;
             _cacheService = cacheService;
+            _currentUserService = currentUserService;
         }
         public async Task<Result<GetProjectByIdResponse>> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
         {
@@ -57,6 +67,38 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
                 return Result<GetProjectByIdResponse>.Failure(
                     _message.GetMessage(MessageKeys.Projects.NotFound),
                     ResultErrorType.NotFound);
+            }
+
+            var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
+            if (isStudent)
+            {
+                if (project.Status != ProjectStatus.Published && project.Status != ProjectStatus.Completed)
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                if (!project.InternshipId.HasValue)
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                if (!Guid.TryParse(_currentUserService?.UserId, out var currentUserId))
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+                var studentId = await _unitOfWork.Repository<InternshipStudent>().Query()
+                    .Where(s => s.Student.UserId == currentUserId)
+                    .Select(s => s.StudentId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (studentId == Guid.Empty)
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                var isMember = await _unitOfWork.Repository<InternshipStudent>().Query()
+                    .AnyAsync(s => s.InternshipId == project.InternshipId.Value && s.StudentId == studentId, cancellationToken);
+
+                if (!isMember)
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
             }
 
             var response = _mapper.Map<GetProjectByIdResponse>(project);

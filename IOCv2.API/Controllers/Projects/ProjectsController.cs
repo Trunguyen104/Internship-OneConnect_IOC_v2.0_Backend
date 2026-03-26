@@ -118,9 +118,12 @@ public class ProjectsController : ApiControllerBase
 
     /// <summary>
     /// Create a new internship project. Only Mentor role can create projects.
+    /// Hỗ trợ đính kèm tài liệu (file: pdf/docx/xlsx/pptx/zip/rar/jpg/png tối đa theo giới hạn từng loại)
+    /// và link tài liệu qua multipart/form-data.
     /// </summary>
     [HttpPost]
     [Authorize(Roles = "Mentor")]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(ApiResponse<CreateProjectResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -128,7 +131,7 @@ public class ProjectsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateProject(
-        [FromBody] CreateProjectCommand command,
+        [FromForm] CreateProjectCommand command,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);

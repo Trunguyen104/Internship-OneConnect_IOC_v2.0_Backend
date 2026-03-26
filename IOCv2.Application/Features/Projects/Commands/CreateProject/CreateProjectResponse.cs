@@ -1,6 +1,8 @@
 using IOCv2.Application.Extensions.Mappings;
+using IOCv2.Application.Features.Projects.Queries.GetProjectById;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
+using System.Collections.Generic;
 
 namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
@@ -21,9 +23,14 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         public Guid? MentorId { get; set; }
         public DateTime CreatedAt { get; set; }
 
+        /// <summary>Danh sách tài liệu đính kèm đã upload/link trong cùng request tạo project</summary>
+        public List<ProjectResourcesDTO> ProjectResources { get; set; } = new();
+
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Project, CreateProjectResponse>();
+            profile.CreateMap<Project, CreateProjectResponse>()
+                .ForMember(dest => dest.ProjectResources,
+                           opt => opt.MapFrom(src => src.ProjectResources));
         }
     }
 }

@@ -48,6 +48,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         public ProjectStatus? Status { get; set; }
 
         /// <summary>
+        /// Workflow template used by the project.
+        /// </summary>
+        public ProjectTemplate Template { get; set; }
+
+        /// <summary>
         /// Date and time when the project record was created.
         /// </summary>
         public DateTime CreatedAt { get; set; }

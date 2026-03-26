@@ -30,6 +30,12 @@ namespace IOCv2.Infrastructure.Persistence
             public static readonly Guid HrFptId = new Guid("77777777-7777-7777-7777-777777770001");
             public static readonly Guid HrRikkeisoftId = new Guid("77777777-7777-7777-7777-777777770002");
 
+            // Deterministic EnterpriseUser IDs for mentors — phải cố định để group.MentorId khớp sau mỗi lần seed
+            // mentor@fptsoftware.com  → dùng EnterpriseUserId này khi tạo project cho FPT groups
+            // mentor@rikkeisoft.com   → dùng EnterpriseUserId này khi tạo project cho Rikkeisoft groups
+            public static readonly Guid MentorFptEuId = new Guid("88888888-8888-8888-8888-888888880001");
+            public static readonly Guid MentorRikkeisoftEuId = new Guid("88888888-8888-8888-8888-888888880002");
+
             public static readonly List<Guid> StudentIds = new()
             {
                 new Guid("66666666-6666-6666-6666-666666660001"),
@@ -183,12 +189,19 @@ namespace IOCv2.Infrastructure.Persistence
                 var mentorEmail = $"mentor@{baseName}.com";
                 if (!existingEmails.Contains(mentorEmail))
                 {
+                    // Dùng deterministic EnterpriseUserId để group.MentorId khớp sau mọi lần seed lại DB
+                    var mentorEuId = ent.EnterpriseId == SeedIds.FptSoftwareId
+                        ? SeedIds.MentorFptEuId
+                        : ent.EnterpriseId == SeedIds.RikkeisoftId
+                            ? SeedIds.MentorRikkeisoftEuId
+                            : Guid.NewGuid();
+
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
                     var user = new User(mentorId, userCode, mentorEmail, $"Mentor {ent.Name}", UserRole.Mentor, passHash);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(mentorEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
+                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = mentorEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
                 }
 
                 // HR account (new)
@@ -472,8 +485,9 @@ namespace IOCv2.Infrastructure.Persistence
         {
             var fsoft = await _context.Enterprises.FirstAsync(e => e.Name == "FPT Software");
             var rikkeisoft = await _context.Enterprises.FirstAsync(e => e.Name == "Rikkeisoft");
-            var mentorFpt = await _context.EnterpriseUsers.Include(eu => eu.User).FirstAsync(eu => eu.User.Email == "mentor@fptsoftware.com");
-            var mentorRikkeis = await _context.EnterpriseUsers.Include(eu => eu.User).FirstAsync(eu => eu.User.Email == "mentor@rikkeisoft.com");
+            // Dùng EnterpriseUserId cố định từ SeedIds thay vì query DB — tránh race condition khi seed chưa commit
+            var mentorFptEuId    = SeedIds.MentorFptEuId;
+            var mentorRikkeisEuId = SeedIds.MentorRikkeisoftEuId;
 
             // Resolve phases by name (idempotent, no hardcoded Guid constraint)
             var phaseInProgressFpt = await _context.InternshipPhases.FirstAsync(
@@ -502,7 +516,7 @@ namespace IOCv2.Infrastructure.Persistence
             var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
             if (group3 == null)
             {
-                group3 = InternshipGroup.Create(phaseInProgressFpt.PhaseId, "FPT Software OJT Team Alpha", "Next-gen platform development", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow.AddMonths(3));
+                group3 = InternshipGroup.Create(phaseInProgressFpt.PhaseId, "FPT Software OJT Team Alpha", "Next-gen platform development", fsoft.EnterpriseId, mentorFptEuId, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow.AddMonths(3));
                 group3.UpdateStatus(GroupStatus.Active);
                 _context.InternshipGroups.Add(group3);
             }
@@ -510,7 +524,7 @@ namespace IOCv2.Infrastructure.Persistence
             var group5 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
             if (group5 == null)
             {
-                group5 = InternshipGroup.Create(phaseClosedRikkei.PhaseId, "Rikkeisoft CRM Legacy", "Maintenance of legacy CRM", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(-2));
+                group5 = InternshipGroup.Create(phaseClosedRikkei.PhaseId, "Rikkeisoft CRM Legacy", "Maintenance of legacy CRM", rikkeisoft.EnterpriseId, mentorRikkeisEuId, DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(-2));
                 group5.UpdateStatus(GroupStatus.Finished);
                 _context.InternshipGroups.Add(group5);
             }
@@ -518,7 +532,7 @@ namespace IOCv2.Infrastructure.Persistence
             var rikkeiActiveGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
             if (rikkeiActiveGroup == null)
             {
-                rikkeiActiveGroup = InternshipGroup.Create(phaseInProgressRikkei.PhaseId, "Rikkeisoft Spring 2026 Team", "Backend modernization and internal platform work", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
+                rikkeiActiveGroup = InternshipGroup.Create(phaseInProgressRikkei.PhaseId, "Rikkeisoft Spring 2026 Team", "Backend modernization and internal platform work", rikkeisoft.EnterpriseId, mentorRikkeisEuId, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
                 rikkeiActiveGroup.UpdateStatus(GroupStatus.Active);
                 _context.InternshipGroups.Add(rikkeiActiveGroup);
             }
@@ -529,7 +543,7 @@ namespace IOCv2.Infrastructure.Persistence
                 fptCtGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software CT OJT Team");
                 if (fptCtGroup == null)
                 {
-                    fptCtGroup = InternshipGroup.Create(phaseInProgressFpt.PhaseId, "FPT Software CT OJT Team", "Cross-campus internship squad for FPTU Can Tho", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddDays(-15), DateTime.UtcNow.AddMonths(2));
+                    fptCtGroup = InternshipGroup.Create(phaseInProgressFpt.PhaseId, "FPT Software CT OJT Team", "Cross-campus internship squad for FPTU Can Tho", fsoft.EnterpriseId, mentorFptEuId, DateTime.UtcNow.AddDays(-15), DateTime.UtcNow.AddMonths(2));
                     fptCtGroup.UpdateStatus(GroupStatus.Active);
                     _context.InternshipGroups.Add(fptCtGroup);
                 }
@@ -538,7 +552,7 @@ namespace IOCv2.Infrastructure.Persistence
             var archivedGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Archived Project");
             if (archivedGroup == null)
             {
-                archivedGroup = InternshipGroup.Create(phaseClosedFpt.PhaseId, "FPT Archived Project", "Old project idea", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10));
+                archivedGroup = InternshipGroup.Create(phaseClosedFpt.PhaseId, "FPT Archived Project", "Old project idea", fsoft.EnterpriseId, mentorFptEuId, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10));
                 archivedGroup.UpdateStatus(GroupStatus.Archived);
                 _context.InternshipGroups.Add(archivedGroup);
             }

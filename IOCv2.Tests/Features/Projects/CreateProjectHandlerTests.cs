@@ -24,6 +24,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipRepo;
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepo;
         private readonly Mock<IGenericRepository<EnterpriseUser>> _mockEnterpriseUserRepo;
+        private readonly Mock<IFileStorageService> _mockFileStorage;
         private readonly CreateProjectHandler _handler;
 
         public CreateProjectHandlerTests()
@@ -34,6 +35,7 @@ namespace IOCv2.Tests.Features.Projects
             _mockMessage = new Mock<IMessageService>();
             _mockCacheService = new Mock<ICacheService>();
             _mockCurrentUser = new Mock<ICurrentUserService>();
+            _mockFileStorage = new Mock<IFileStorageService>();
 
             _mockInternshipRepo = new Mock<IGenericRepository<InternshipGroup>>();
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
@@ -53,7 +55,8 @@ namespace IOCv2.Tests.Features.Projects
                 _mockLogger.Object,
                 _mockMessage.Object,
                 _mockCacheService.Object,
-                _mockCurrentUser.Object);
+                _mockCurrentUser.Object,
+                _mockFileStorage.Object);
         }
 
         [Fact]

@@ -123,39 +123,49 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                         ResultErrorType.InternalServerError);
                 }
 
-                // Post-commit: gửi thông báo cho mentor nếu có project bị orphan
+                // Post-commit: gửi thông báo cho mentor nếu có project bị orphan.
+                // Lỗi thông báo không được làm rollback kết quả xóa group đã commit.
                 if (projectsToOrphan.Any() && entity.MentorId.HasValue && entity.Mentor != null)
                 {
-                    var mentorUserId = entity.Mentor.UserId;
-
-                    var notification = new Notification
+                    try
                     {
-                        NotificationId = Guid.NewGuid(),
-                        UserId = mentorUserId,
-                        Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationOrphanTitle),
-                        Content = string.Format(
-                            _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationOrphanContent),
-                            entity.GroupName,
-                            projectsToOrphan.Count),
-                        Type = NotificationType.General,
-                        ReferenceType = nameof(InternshipGroup),
-                        ReferenceId = entity.InternshipId,
-                        IsRead = false
-                    };
+                        var mentorUserId = entity.Mentor.UserId;
 
-                    await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
-                    await _unitOfWork.SaveChangeAsync(cancellationToken);
+                        var notification = new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId = mentorUserId,
+                            Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationOrphanTitle),
+                            Content = string.Format(
+                                _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationOrphanContent),
+                                entity.GroupName,
+                                projectsToOrphan.Count),
+                            Type = NotificationType.General,
+                            ReferenceType = nameof(InternshipGroup),
+                            ReferenceId = entity.InternshipId,
+                            IsRead = false
+                        };
 
-                    var unreadCount = await _unitOfWork.Repository<Notification>()
-                        .CountAsync(n => n.UserId == mentorUserId && !n.IsRead, cancellationToken);
+                        await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                    await _pushService.PushNewNotificationAsync(mentorUserId, new
+                        var unreadCount = await _unitOfWork.Repository<Notification>()
+                            .CountAsync(n => n.UserId == mentorUserId && !n.IsRead, cancellationToken);
+
+                        await _pushService.PushNewNotificationAsync(mentorUserId, new
+                        {
+                            type = NotificationType.General,
+                            referenceType = nameof(InternshipGroup),
+                            referenceId = entity.InternshipId,
+                            currentUnreadCount = unreadCount
+                        }, cancellationToken);
+                    }
+                    catch (Exception notifyEx)
                     {
-                        type = NotificationType.General,
-                        referenceType = nameof(InternshipGroup),
-                        referenceId = entity.InternshipId,
-                        currentUnreadCount = unreadCount
-                    }, cancellationToken);
+                        _logger.LogWarning(notifyEx,
+                            "InternshipGroup deletion succeeded but mentor notification failed for group {InternshipId}",
+                            request.InternshipId);
+                    }
                 }
 
                 await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.InternshipId), cancellationToken);

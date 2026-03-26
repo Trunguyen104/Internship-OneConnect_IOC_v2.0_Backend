@@ -24,19 +24,22 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         private readonly ILogger<GetAllProjectsHandler> _logger;
         private readonly IMessageService _messageService;
         private readonly ICacheService _cacheService;
+        private readonly ICurrentUserService? _currentUserService;
 
         public GetAllProjectsHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<GetAllProjectsHandler> logger,
             IMessageService messageService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ICurrentUserService? currentUserService = null)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _messageService = messageService;
             _cacheService = cacheService;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Result<PaginatedResult<GetAllProjectsResponse>>> Handle(
@@ -45,13 +48,37 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         {
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetAll), request.SearchTerm, request.Status);
 
+            var effectiveStudentId = request.StudentId;
+            var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
+            if (isStudent)
+            {
+                if (!Guid.TryParse(_currentUserService?.UserId, out var currentUserId))
+                    return Result<PaginatedResult<GetAllProjectsResponse>>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+                var currentStudentId = await _unitOfWork.Repository<InternshipStudent>().Query()
+                    .Where(s => s.Student.UserId == currentUserId)
+                    .Select(s => s.StudentId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (currentStudentId == Guid.Empty)
+                    return Result<PaginatedResult<GetAllProjectsResponse>>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                if (request.StudentId.HasValue && request.StudentId.Value != currentStudentId)
+                    return Result<PaginatedResult<GetAllProjectsResponse>>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                effectiveStudentId = currentStudentId;
+            }
+
             var cacheKey = ProjectCacheKeys.ProjectList(
                 request.SearchTerm,
                 request.Status.HasValue ? (int)request.Status.Value : null,
                 request.FromDate,
                 request.ToDate,
                 request.InternshipId,
-                request.StudentId,
+                effectiveStudentId,
                 request.PageNumber,
                 request.PageSize,
                 request.SortColumn,
@@ -89,6 +116,25 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             if (request.ToDate.HasValue)
             {
                 query = query.Where(p => p.EndDate <= request.ToDate.Value);
+            }
+
+            if (request.InternshipId.HasValue)
+            {
+                query = query.Where(p => p.InternshipId == request.InternshipId.Value);
+            }
+
+            if (effectiveStudentId.HasValue)
+            {
+                var sid = effectiveStudentId.Value;
+                var studentGroupIds = _unitOfWork.Repository<InternshipStudent>().Query()
+                    .Where(s => s.StudentId == sid)
+                    .Select(s => (Guid?)s.InternshipId);
+                query = query.Where(p => studentGroupIds.Contains(p.InternshipId));
+            }
+
+            if (isStudent)
+            {
+                query = query.Where(p => p.Status == ProjectStatus.Published || p.Status == ProjectStatus.Completed);
             }
 
             // 3. Get Total Count

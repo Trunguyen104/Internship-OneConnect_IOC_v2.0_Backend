@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,13 +22,20 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
         private readonly IMapper _mapper;
         private readonly IMessageService _messageService;
         private readonly ILogger<GetProjectsByInternshipIdHandler> _logger;
+        private readonly ICurrentUserService? _currentUserService;
 
-        public GetProjectsByInternshipIdHandler(IUnitOfWork unitOfWork, IMapper mapper, IMessageService messageService, ILogger<GetProjectsByInternshipIdHandler> logger)
+        public GetProjectsByInternshipIdHandler(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IMessageService messageService,
+            ILogger<GetProjectsByInternshipIdHandler> logger,
+            ICurrentUserService? currentUserService = null)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Result<PaginatedResult<GetProjectsByInternshipIdResponse>>> Handle(GetProjectsByInternshipIdQuery request, CancellationToken cancellationToken)
@@ -49,6 +57,34 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
                 var query = _unitOfWork.Repository<Project>().Query()
                 .Where(p => p.InternshipId == request.InternshipId)
                 .AsNoTracking();
+
+                var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
+                if (isStudent)
+                {
+                    if (!Guid.TryParse(_currentUserService?.UserId, out var currentUserId))
+                        return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+                    var studentId = await _unitOfWork.Repository<Student>().Query()
+                        .AsNoTracking()
+                        .Where(s => s.UserId == currentUserId)
+                        .Select(s => s.StudentId)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (studentId == Guid.Empty)
+                        return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                    var isMemberOfGroup = await _unitOfWork.Repository<InternshipStudent>().Query()
+                        .AsNoTracking()
+                        .AnyAsync(s => s.InternshipId == request.InternshipId && s.StudentId == studentId, cancellationToken);
+
+                    if (!isMemberOfGroup)
+                        return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                    query = query.Where(p => p.Status == ProjectStatus.Published || p.Status == ProjectStatus.Completed);
+                }
 
                 // Apply search term
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm)) { var term = request.SearchTerm.Trim().ToLower(); 

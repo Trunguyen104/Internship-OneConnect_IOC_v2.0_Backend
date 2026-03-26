@@ -1,5 +1,4 @@
 ﻿using IOCv2.Application.Extensions.Mappings;
-using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using System;
@@ -34,6 +33,24 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// Name of the project.
         /// </summary>
         public string ProjectName { get; set; } = string.Empty;
+
+        /// <summary>Mã dự án (auto-generated hoặc do mentor cung cấp)</summary>
+        public string ProjectCode { get; set; } = string.Empty;
+
+        /// <summary>Lĩnh vực dự án (VD: CNTT, Mobile, IoT)</summary>
+        public string Field { get; set; } = string.Empty;
+
+        /// <summary>Yêu cầu dự án</summary>
+        public string Requirements { get; set; } = string.Empty;
+
+        /// <summary>Kết quả bàn giao (tùy chọn)</summary>
+        public string? Deliverables { get; set; }
+
+        /// <summary>Template dự án (None, Scrum, Kanban)</summary>
+        public ProjectTemplate Template { get; set; }
+
+        /// <summary>ID EnterpriseUser của mentor phụ trách project</summary>
+        public Guid? MentorId { get; set; }
 
         /// <summary>
         /// Detailed description of the project goal and scope.
@@ -73,7 +90,6 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// <param name="profile">The Automapper profile.</param>
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Domain.Entities.ProjectResources, ProjectResourcesDTO>();
             profile.CreateMap<Project, GetProjectByIdResponse>()
                 .ForMember(dest => dest.ProjectResources,
                            opt => opt.MapFrom(src => src.ProjectResources))

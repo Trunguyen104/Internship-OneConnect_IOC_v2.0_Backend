@@ -17,12 +17,18 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// <summary>
         /// Identity of the internship group associated with this project.
         /// </summary>
-        public Guid InternshipId { get; set; }
+        public Guid? InternshipId { get; set; }
 
         /// <summary>
         /// Name of the project.
         /// </summary>
         public string ProjectName { get; set; } = string.Empty;
+
+        /// <summary>Mã dự án</summary>
+        public string ProjectCode { get; set; } = string.Empty;
+
+        /// <summary>Lĩnh vực dự án</summary>
+        public string Field { get; set; } = string.Empty;
 
         /// <summary>
         /// Detailed description of the project goal and scope.
@@ -43,6 +49,9 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// Current lifecycle status of the project.
         /// </summary>
         public ProjectStatus? Status { get; set; }
+
+        /// <summary>Template dự án (None, Scrum, Kanban)</summary>
+        public ProjectTemplate Template { get; set; }
 
         /// <summary>
         /// Date and time when the project record was created.

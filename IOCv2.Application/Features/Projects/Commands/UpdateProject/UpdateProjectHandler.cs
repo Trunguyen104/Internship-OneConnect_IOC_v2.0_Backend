@@ -71,21 +71,41 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 return Result<UpdateProjectResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Projects.GroupNotActiveForUpdate), ResultErrorType.BadRequest);
 
+            if (request.InternshipId.HasValue && request.InternshipId.Value == Guid.Empty)
+                return Result<UpdateProjectResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.InvalidRequest), ResultErrorType.BadRequest);
+
             var assignedCount = 0;
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Check internship exists nếu thay đổi
+                // Check target internship nếu thay đổi
                 if (request.InternshipId.HasValue && request.InternshipId != Guid.Empty && request.InternshipId != project.InternshipId)
                 {
-                    var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
-                        .ExistsAsync(i => i.InternshipId == request.InternshipId.Value, cancellationToken);
-                    if (!internshipExists)
+                    var targetGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(i => i.InternshipId == request.InternshipId.Value, cancellationToken);
+
+                    if (targetGroup == null)
                     {
                         await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                         return Result<UpdateProjectResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound);
+                    }
+
+                    if (targetGroup.Status == GroupStatus.Archived || targetGroup.Status == GroupStatus.Finished)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<UpdateProjectResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.Projects.GroupNotActiveForUpdate), ResultErrorType.BadRequest);
+                    }
+
+                    if (targetGroup.MentorId != enterpriseUser.EnterpriseUserId)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<UpdateProjectResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
                     }
                 }
 
@@ -119,23 +139,6 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-                await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
-                await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
-
-                _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogUpdateSuccess), request.ProjectId);
-
-                // Đếm sinh viên trong group (thay thế ProjectAssignment cũ)
-                if (project.InternshipId.HasValue)
-                {
-                    assignedCount = await _unitOfWork.Repository<InternshipStudent>().Query()
-                        .CountAsync(s => s.InternshipId == project.InternshipId.Value, cancellationToken);
-                }
-
-                var response = _mapper.Map<UpdateProjectResponse>(project);
-                response.AssignedStudentCount = assignedCount;
-
-                return Result<UpdateProjectResponse>.Success(response);
             }
             catch (Exception ex)
             {
@@ -143,6 +146,23 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.LogUpdateError), request.ProjectId);
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
+
+            await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
+
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogUpdateSuccess), request.ProjectId);
+
+            // Đếm sinh viên trong group (thay thế ProjectAssignment cũ)
+            if (project.InternshipId.HasValue)
+            {
+                assignedCount = await _unitOfWork.Repository<InternshipStudent>().Query()
+                    .CountAsync(s => s.InternshipId == project.InternshipId.Value, cancellationToken);
+            }
+
+            var response = _mapper.Map<UpdateProjectResponse>(project);
+            response.AssignedStudentCount = assignedCount;
+
+            return Result<UpdateProjectResponse>.Success(response);
         }
     }
 }
