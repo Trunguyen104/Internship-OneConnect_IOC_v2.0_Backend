@@ -38,6 +38,9 @@ namespace IOCv2.Infrastructure.Persistence
                 new Guid("66666666-6666-6666-6666-666666660004"),
                 new Guid("66666666-6666-6666-6666-666666660005")
             };
+
+            // Deterministic id for the sixth seeded student (used for job-apply tests)
+            public static readonly Guid Student6UserId = new Guid("66666666-6666-6666-6666-666666660006");
         }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
@@ -113,45 +116,40 @@ namespace IOCv2.Infrastructure.Persistence
             }
         }
 
-        // New: seed a couple of test jobs tied to seeded enterprises
+        // New: seed a couple of test jobs tied to seeded enterprises (use EF entities)
         private async Task SeedJobs()
         {
             if (await _context.Jobs.AnyAsync()) return;
 
-            var job1Id = Guid.NewGuid();
-            var job2Id = Guid.NewGuid();
-
-            var sql = @"
-INSERT INTO jobs (job_id, enterprise_id, title, description, requirements, location, internship_duration, benefit, quantity, expire_date, status, created_at)
-VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
-       ({11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, now())";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                // job 1 - FPT Software
-                job1Id,
+            // Ensure expire dates are comfortably in the future and Position is set (DB requires it)
+            var job1 = Job.Create(
                 SeedIds.FptSoftwareId,
                 "Junior .NET Intern",
                 "Assist backend team building APIs for the IOC v2 platform.",
-                "C#, .NET, EF Core, REST",
+                "C#, .NET, EF Core, REST, basic SQL",
+                "Monthly stipend, mentorship, certificate",
                 "Hà Nội (Hybrid)",
-                12,
-                "Monthly stipend, mentorship",
                 2,
-                DateTime.UtcNow.AddMonths(1),
-                (short)JobStatus.PUBLISHED,
-                // job 2 - Rikkeisoft
-                job2Id,
+                DateTime.UtcNow.AddMonths(2)
+            );
+            job1.Position = "Backend Intern";
+            job1.Status = JobStatus.PUBLISHED;
+
+            var job2 = Job.Create(
                 SeedIds.RikkeisoftId,
                 "Frontend Intern (Angular)",
                 "Work on feature improvements and UI polishing for legacy CRM.",
-                "Angular, TypeScript, HTML/CSS",
+                "Angular, TypeScript, HTML/CSS, basic RxJS",
+                "Stipend, mentorship, certificate",
                 "Hà Nội (On-site)",
-                12,
-                "Stipend, certificate",
                 1,
-                DateTime.UtcNow.AddMonths(1),
-                (short)JobStatus.PUBLISHED
+                DateTime.UtcNow.AddMonths(2)
             );
+            job2.Position = "Frontend Intern";
+            job2.Status = JobStatus.PUBLISHED;
+
+            await _context.Jobs.AddRangeAsync(job1, job2);
+            await _context.SaveChangesAsync();
         }
 
         private async Task SeedUsers()
@@ -288,7 +286,7 @@ VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
             var student6Email = "student6@fptu.edu.vn";
             if (!existingEmails.Contains(student6Email))
             {
-                var userId6 = Guid.NewGuid();
+                var userId6 = SeedIds.Student6UserId;
                 var userCode6 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                 var user6 = new User(userId6, userCode6, student6Email, "Student Six", UserRole.Student, passHash);
                 user6.SetStatus(UserStatus.Active);
@@ -302,13 +300,13 @@ VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
                 {
                     StudentId = Guid.NewGuid(),
                     UserId = user6.UserId,
-                    InternshipStatus = StudentStatus.APPLIED,
+                    InternshipStatus = StudentStatus.APPLIED, // eligible to apply (not in-progress / completed)
                     Major = "Software Engineering",
                     ClassName = "SE1616"
                 };
 
-                // Attach CV so student6 can apply to jobs
-                student6.UpdateCv("https://example.com/resumes/student6_cv.pdf");
+                // Attach CV so student6 can apply to jobs (use a deterministic reachable test URL)
+                student6.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student6_cv.pdf");
 
                 _context.Students.Add(student6);
             }
@@ -391,8 +389,12 @@ VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, now()),
             _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group5.InternshipId, StudentId = s5.StudentId, Role = InternshipRole.Leader, Status = InternshipStatus.Completed, JoinedAt = DateTime.UtcNow.AddMonths(-6) });
 
             // Seed some applications
-            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, Status = InternshipApplicationStatus.Approved, AppliedAt = DateTime.UtcNow.AddDays(-40) });
-            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-10) });
+            // Ensure JobId is set for each seeded application to satisfy FK constraint (job_id is required)
+            var fptJob = await _context.Jobs.FirstAsync(j => j.EnterpriseId == SeedIds.FptSoftwareId);
+            var rikkeiJob = await _context.Jobs.FirstAsync(j => j.EnterpriseId == SeedIds.RikkeisoftId);
+
+            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, JobId = fptJob.JobId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-40) });
+            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, JobId = rikkeiJob.JobId, Status = InternshipApplicationStatus.PendingAssignment, AppliedAt = DateTime.UtcNow.AddDays(-10) });
 
             await _context.SaveChangesAsync();
         }

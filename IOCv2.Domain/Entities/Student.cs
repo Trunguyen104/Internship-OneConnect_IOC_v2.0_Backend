@@ -34,6 +34,5 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<Logbook> Logbooks { get; set; } = new List<Logbook>();
         public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
         public virtual ICollection<ViolationReport> ViolationReports { get; set; } = new List<ViolationReport>();
-        public virtual ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
     }
 }

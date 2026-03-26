@@ -1,5 +1,6 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.Jobs;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -37,81 +38,129 @@ namespace IOCv2.Application.Features.Jobs.Commands.CloseJob
 
         public async Task<Result<CloseJobResponse>> Handle(CloseJobCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(_currentUserService.UnitId) || !Guid.TryParse(_currentUserService.UnitId, out var enterpriseId))
-            {
-                return Result<CloseJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
-            }
+            _logger.LogInformation("Close job requested: {JobId} by {UserId}", request.JobId, _currentUserService.UserId);
 
-            var repo = _unitOfWork.Repository<Job>();
-
-            // Load job + enterprise + job applications -> include student -> include user for emails
-            var job = await repo.Query()
-                .Include(j => j.Enterprise).ThenInclude(e => e.EnterpriseUsers).ThenInclude(eu => eu.User)
-                .Include(j => j.JobApplications).ThenInclude(ja => ja.Student).ThenInclude(s => s.User)
+            // Load job + related applications + students + user + enterprise
+            var job = await _unitOfWork.Repository<Job>()
+                .Query()
+                .AsNoTracking()
+                .Include(j => j.Enterprise)
+                .Include(j => j.InternshipApplications)
+                    .ThenInclude(a => a.Student)
+                        .ThenInclude(s => s.User)
                 .FirstOrDefaultAsync(j => j.JobId == request.JobId, cancellationToken);
 
             if (job == null)
-                return Result<CloseJobResponse>.NotFound("Job not found");
-
-            if (job.EnterpriseId != enterpriseId)
-                return Result<CloseJobResponse>.Failure("You are not allowed to close this job.", ResultErrorType.Forbidden);
-
-            if (job.Status != JobStatus.PUBLISHED)
             {
-                return Result<CloseJobResponse>.Failure("Only Published job postings can be closed.", ResultErrorType.BadRequest);
+                _logger.LogWarning("Job not found: {JobId}", request.JobId);
+                return Result<CloseJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.RecordNotFound), ResultErrorType.NotFound);
             }
 
-            // Active application statuses per AC: Applied / Interview / Offered
-            var activeStatuses = new[] { JobApplicationStatus.Applied, JobApplicationStatus.Interview, JobApplicationStatus.Offered };
-            var activeApps = job.JobApplications?.Where(a => activeStatuses.Contains(a.Status)).ToList() ?? new();
-
-            if (activeApps.Any() && !request.ConfirmWhenHasActiveApplications)
+            // Only HR of owning enterprise may close (enterprise roles)
+            if (JobsPostingParam.GetJobPostings.EnterpriseRoles.Contains(_currentUserService.Role))
             {
-                var warning = $"Bài đăng đang có [{activeApps.Count}] ứng viên đang trong quá trình xét duyệt. Sau khi đóng, sinh viên mới sẽ không thể ứng tuyển thêm, nhưng các ứng viên hiện tại vẫn được tiếp tục xử lý. Bạn có chắc muốn đóng?";
-                // return success-with-warning so UI can ask for confirmation; no DB change.
-                var preview = new CloseJobResponse { JobId = job.JobId, Status = (short)job.Status, UpdatedAt = job.UpdatedAt };
-                return Result<CloseJobResponse>.SuccessWithWarning(preview, warning);
+                if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+                {
+                    return Result<CloseJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+                }
+
+                var entUser = await _unitOfWork.Repository<EnterpriseUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+
+                if (entUser == null || entUser.EnterpriseId != job.EnterpriseId)
+                {
+                    return Result<CloseJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+                }
+            }
+            else
+            {
+                // Non-enterprise users cannot close jobs
+                return Result<CloseJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+            }
+
+            // Only Published jobs should be closed in AC-06
+            if (job.Status != JobStatus.PUBLISHED)
+            {
+                var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.OnlyPublishedAllowed);
+                return Result<CloseJobResponse>.Failure(msg, ResultErrorType.BadRequest);
+            }
+
+            // Active application statuses per AC-06: PendingHRApproval (Applied), Interviewing, Offered
+            var activeStatuses = new[] {
+                InternshipApplicationStatus.Applied,
+                InternshipApplicationStatus.Interviewing,
+                InternshipApplicationStatus.Offered
+            };
+
+            var activeApplications = job.InternshipApplications?
+                .Where(a => activeStatuses.Contains(a.Status))
+                .ToList() ?? new();
+
+            var activeCount = activeApplications.Count;
+
+            if (activeCount > 0 && !request.ConfirmWhenHasActiveApplications)
+            {
+                // Ask frontend to confirm closing despite active applications
+                var confirmMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ConfirmHasActiveApplications, activeCount);
+                return Result<CloseJobResponse>.Failure(confirmMsg, ResultErrorType.Conflict);
             }
 
             // Proceed to close
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
+                // change status
                 job.Status = JobStatus.CLOSED;
                 job.UpdatedAt = DateTime.UtcNow;
+                if (Guid.TryParse(_currentUserService.UserId, out var updBy))
+                {
+                    job.UpdatedBy = updBy;
+                }
 
-                await repo.UpdateAsync(job, cancellationToken);
+                await _unitOfWork.Repository<Job>().UpdateAsync(job, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                // Notify affected students (only those in active statuses)
-                foreach (var app in activeApps)
+                _logger.LogInformation("Job {JobId} closed by {UserId}. ActiveApplications: {Count}", job.JobId, _currentUserService.UserId, activeCount);
+
+                // Notify students with active applications
+                if (activeCount > 0)
                 {
-                    var studentUser = app.Student?.User;
-                    if (studentUser != null && !string.IsNullOrWhiteSpace(studentUser.Email))
+                    var subject = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotifyStudentClosedSubject, job.Title);
+                    var bodyTemplate = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotifyStudentClosedBody, job.Title, job.Enterprise?.Name ?? string.Empty);
+
+                    // Send email to each distinct student (by email)
+                    var distinctUsers = activeApplications
+                        .Select(a => a.Student?.User)
+                        .Where(u => u != null)
+                        .GroupBy(u => u!.Email.ToLowerInvariant())
+                        .Select(g => g.First()!)
+                        .ToList();
+
+                    foreach (var user in distinctUsers)
                     {
-                        var subj = $"Job Posting \"{job.Title}\" đã được đóng";
-                        var body = $"Job Posting \"{job.Title}\" đã được đóng. Hồ sơ của bạn vẫn sẽ được {job.Enterprise?.Name} tiếp tục xem xét nếu bạn đang trong quá trình phỏng vấn/offer.";
-                        // best-effort enqueue background email; don't await extensively
-                        _ = _emailSender.EnqueueEmailAsync(studentUser.Email, subj, body, job.JobId, null, cancellationToken);
+                        try
+                        {
+                            // Enqueue background email (do not fail the operation if email enqueue fails)
+                            await _emailSender.EnqueueEmailAsync(user.Email, subject, bodyTemplate, job.JobId, job.UpdatedBy, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Failed enqueueing email notification for user {Email} about closed job {JobId}", user.Email, job.JobId);
+                        }
                     }
                 }
 
-                // Return success
-                var response = new CloseJobResponse
-                {
-                    JobId = job.JobId,
-                    Status = (short)job.Status,
-                    UpdatedAt = job.UpdatedAt
-                };
-
-                return Result<CloseJobResponse>.Success(response, "Đã đóng Job Posting.");
+                var successMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.CloseSuccess, job.Title);
+                var response = new CloseJobResponse { Message = successMsg };
+                return Result<CloseJobResponse>.Success(response, successMsg);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error closing job {JobId}", job.JobId);
-                try { await _unitOfWork.RollbackTransactionAsync(cancellationToken); } catch { }
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error while closing job {JobId}", request.JobId);
                 return Result<CloseJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }

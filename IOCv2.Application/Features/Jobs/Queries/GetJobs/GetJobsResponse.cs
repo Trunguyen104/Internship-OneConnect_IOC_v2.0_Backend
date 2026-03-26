@@ -11,6 +11,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
     {
         public Guid JobId { get; set; }
         public string Title { get; set; } = null!;
+        public string Position { get; set; } = null!;
         public string CompanyName { get; set; } = null!;
         public string? CompanyLogoUrl { get; set; }
         public DateTime? ExpireDate { get; set; }
@@ -26,6 +27,9 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
 
         public short Status { get; set; }
 
+        // Helper for UI: whether this job is Deleted (Status == DELETED)
+        public bool IsDeleted { get; set; }
+
         public void Mapping(Profile profile)
         {
             profile.CreateMap<Job, GetJobsResponse>()
@@ -33,13 +37,14 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
                 .ForMember(d => d.CompanyLogoUrl, opt => opt.MapFrom(s => s.Enterprise.LogoUrl))
                 .ForMember(d => d.Status, opt => opt.MapFrom(s => (short)s.Status))
                 .ForMember(d => d.Quantity, opt => opt.MapFrom(s => s.Quantity))
-                .ForMember(d => d.ApplicationCount, opt => opt.MapFrom(s => s.JobApplications.Count))
+                .ForMember(d => d.ApplicationCount, opt => opt.MapFrom(s => s.InternshipApplications.Count))
                 // Map an enterprise active term name (first open term) if present
                 .ForMember(d => d.TermName, opt => opt.MapFrom(s =>
                     s.Enterprise.InternshipApplications
                         .Where(ia => ia.Term != null && ia.Term.Status == TermStatus.Open)
                         .Select(ia => ia.Term.Name)
-                        .FirstOrDefault()));
+                        .FirstOrDefault()))
+                .ForMember(d => d.IsDeleted, opt => opt.MapFrom(s => s.Status == JobStatus.DELETED));
         }
     }
 }

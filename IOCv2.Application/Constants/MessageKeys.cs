@@ -703,6 +703,19 @@ namespace IOCv2.Application.Constants
             //create
             public const string StudentNotFound = "Student.NotFound";
         }
+
+        public static class JobPostingMessageKey
+        {
+            //Apply job
+            public const string CvRequired = "JobPosting.CvRequired";
+            public const string AlreadyPlaced = "JobPosting.AlreadyPlaced";
+            //Close job
+            public const string OnlyPublishedAllowed = "JobPosting.OnlyPublishedAllowed";
+            public const string ConfirmHasActiveApplications = "JobPosting.ConfirmHasActiveApplications";
+            public const string NotifyStudentClosedSubject = "JobPosting.NotifyStudentClosedSubject";
+            public const string NotifyStudentClosedBody = "JobPosting.NotifyStudentClosedBody";
+            public const string CloseSuccess = "JobPosting.CloseSuccess";
+        }
     }
 }
 

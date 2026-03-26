@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+﻿using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -8,6 +8,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using IOCv2.Application.Common.Models;
+using IOCv2.Application.Extensions.Jobs;
 
 namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
 {
@@ -18,79 +21,124 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
         private readonly IMapper _mapper;
         private readonly ILogger<CreateJobPostingHandler> _logger;
         private readonly ICacheService _cacheService;
+        private readonly IMessageService _messageService;
 
-        public CreateJobPostingHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUserService, IMapper mapper, ILogger<CreateJobPostingHandler> logger, ICacheService cacheService)
+        public CreateJobPostingHandler(
+            IUnitOfWork unitOfWork,
+            ICurrentUserService currentUserService,
+            IMapper mapper,
+            ILogger<CreateJobPostingHandler> logger,
+            ICacheService cacheService,
+            IMessageService messageService)
         {
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
             _mapper = mapper;
             _logger = logger;
             _cacheService = cacheService;
+            _messageService = messageService;
         }
 
         public async Task<Result<CreateJobPostingResponse>> Handle(CreateJobPostingCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("CreateJobPosting started for user unit {UnitId}", _currentUserService.UnitId);
+
+            // Ensure current user is associated with an enterprise (HR)
+            if (string.IsNullOrWhiteSpace(_currentUserService.UnitId) || !Guid.TryParse(_currentUserService.UnitId, out var enterpriseId))
+            {
+                _logger.LogWarning("Current HR user is not associated with an enterprise.");
+                return Result<CreateJobPostingResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise),
+                    ResultErrorType.Forbidden);
+            }
+
+            // Create base job via factory (sets Draft status)
+            var job = Job.Create(
+                enterpriseId: enterpriseId,
+                title: request.Title,
+                description: request.Description,
+                requirements: request.Requirements,
+                benefit: request.Benefit,
+                location: request.Location,
+                quantity: request.Quantity,
+                expireDate: request.ExpireDate);
+
+            // Additional properties
+            job.Position = request.Position ?? string.Empty;
+            job.StartDate = request.StartDate;
+            job.EndDate = request.EndDate;
+            job.Audience = request.Audience;
+            // Status already DRAFT from factory
+
+            // If targeted, attach the university
+            if (request.Audience == JobAudience.Targeted)
+            {
+                if (request.UniversityId == null)
+                {
+                    _logger.LogWarning("Targeted audience but no UniversityId provided.");
+                    return Result<CreateJobPostingResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
+                        ResultErrorType.BadRequest);
+                }
+
+                var university = await _unitOfWork.Repository<University>().GetByIdAsync(request.UniversityId.Value, cancellationToken);
+                if (university == null || university.DeletedAt != null)
+                {
+                    _logger.LogWarning("University {UniversityId} not found or deleted.", request.UniversityId);
+                    return Result<CreateJobPostingResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.University.NotFound),
+                        ResultErrorType.NotFound);
+                }
+
+                job.Universities.Add(university);
+            }
+
+            // ----- Duplicate check: prevent creating similar job postings for same enterprise -----
+            // Normalize values for comparison
+            var normalizedTitle = (request.Title ?? string.Empty).Trim();
+            var normalizedPosition = (request.Position ?? string.Empty).Trim();
+            var normalizedLocation = (request.Location ?? string.Empty).Trim();
+
+            var duplicateExists = await _unitOfWork.Repository<Job>().ExistsAsync(j =>
+                j.EnterpriseId == enterpriseId &&
+                j.Title.ToLower() == normalizedTitle.ToLower() &&
+                j.Position.ToLower() == normalizedPosition.ToLower() &&
+                j.StartDate == request.StartDate &&
+                j.EndDate == request.EndDate &&
+                j.Audience == request.Audience &&
+                (j.Location ?? string.Empty).ToLower() == normalizedLocation.ToLower(),
+                cancellationToken);
+
+            if (duplicateExists)
+            {
+                _logger.LogWarning("Duplicate job posting detected for enterprise {EnterpriseId}, title {Title}", enterpriseId, request.Title);
+                return Result<CreateJobPostingResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.DatabaseConflict),
+                    ResultErrorType.Conflict);
+            }
+            // -------------------------------------------------------------------------------
+
+            // Persist
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            await _unitOfWork.Repository<Job>().AddAsync(job, cancellationToken);
             try
             {
-                // Basic validation
-                if (string.IsNullOrWhiteSpace(request.Title))
-                {
-                    return Result<CreateJobPostingResponse>.Failure("Job title is required.", ResultErrorType.BadRequest);
-                }
-
-                if (request.ExpireDate.HasValue && request.ExpireDate.Value.Date < DateTime.UtcNow.Date)
-                {
-                    return Result<CreateJobPostingResponse>.Failure("Expire date must be today or later.", ResultErrorType.BadRequest);
-                }
-
-                // Resolve enterprise id from current user's UnitId (HR context)
-                if (string.IsNullOrWhiteSpace(_currentUserService.UnitId) || !Guid.TryParse(_currentUserService.UnitId, out var enterpriseId))
-                {
-                    return Result<CreateJobPostingResponse>.Failure("Unable to determine enterprise for current user.", ResultErrorType.Unauthorized);
-                }
-
-                // Create domain job (status = DRAFT)
-                var job = Job.Create(
-                    enterpriseId: enterpriseId,
-                    title: request.Title,
-                    description: request.Description,
-                    requirements: request.Requirements,
-                    benefit: request.Benefit,
-                    location: request.Location,
-                    quantity: request.Quantity,
-                    expireDate: request.ExpireDate
-                );
-
-                // Set audit fields
-                if (!string.IsNullOrWhiteSpace(_currentUserService.UserId) && Guid.TryParse(_currentUserService.UserId, out var userId))
-                {
-                    job.CreatedBy = userId;
-                }
-
-                // Persist
-                await _unitOfWork.BeginTransactionAsync(cancellationToken);
-                var repo = _unitOfWork.Repository<Job>();
-                await repo.AddAsync(job, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-                // Map to response DTO
-                var dto = _mapper.Map<CreateJobPostingResponse>(job);
-
-                // Return success with toast message expected by UI
-                return Result<CreateJobPostingResponse>.Success(dto, "Đã lưu bản nháp.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating job posting draft");
-                try
-                {
-                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                }
-                catch { /* swallow rollback exceptions */ }
-
-                return Result<CreateJobPostingResponse>.Failure("Internal server error while creating job.", ResultErrorType.InternalServerError);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error while saving job posting to database.");
+                return Result<CreateJobPostingResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.DatabaseUpdateError),
+                    ResultErrorType.InternalServerError);
             }
+
+            var response = _mapper.Map<CreateJobPostingResponse>(job);
+
+            // Return success with draft-saved message (UI toast)
+            return Result<CreateJobPostingResponse>.Success(response, "Đã lưu bản nháp.");
         }
     }
 }

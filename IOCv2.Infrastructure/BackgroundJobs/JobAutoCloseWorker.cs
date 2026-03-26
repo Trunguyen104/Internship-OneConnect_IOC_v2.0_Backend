@@ -62,7 +62,7 @@ namespace IOCv2.Infrastructure.BackgroundJobs
             var today = DateTime.UtcNow.Date;
             var expiredJobs = await repo.Query()
                 .Include(j => j.Enterprise).ThenInclude(e => e.EnterpriseUsers).ThenInclude(eu => eu.User)
-                .Include(j => j.JobApplications).ThenInclude(ja => ja.Student).ThenInclude(s => s.User)
+                .Include(j => j.InternshipApplications).ThenInclude(ia => ia.Student).ThenInclude(s => s.User)
                 .Where(j => j.Status == JobStatus.PUBLISHED && j.ExpireDate.HasValue && j.ExpireDate.Value.Date < today)
                 .ToListAsync(cancellationToken);
 
@@ -92,8 +92,8 @@ namespace IOCv2.Infrastructure.BackgroundJobs
                     }
 
                     // Notify students in active application statuses
-                    var activeStatuses = new[] { JobApplicationStatus.Applied, JobApplicationStatus.Interview, JobApplicationStatus.Offered };
-                    var recipients = job.JobApplications?
+                    var activeStatuses = new[] { InternshipApplicationStatus.Applied, InternshipApplicationStatus.Interviewing, InternshipApplicationStatus.Offered };
+                    var recipients = job.InternshipApplications?
                         .Where(a => activeStatuses.Contains(a.Status))
                         .Select(a => a.Student?.User?.Email)
                         .Where(e => !string.IsNullOrWhiteSpace(e))

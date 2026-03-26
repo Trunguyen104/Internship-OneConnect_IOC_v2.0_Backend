@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.Jobs;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -34,70 +35,106 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
 
         public async Task<Result<DeleteJobResponse>> Handle(DeleteJobCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(_currentUserService.UnitId) || !Guid.TryParse(_currentUserService.UnitId, out var enterpriseId))
-            {
-                return Result<DeleteJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
-            }
+            _logger.LogInformation("Delete job requested: {JobId} by {UserId}", request.JobId, _currentUserService.UserId);
 
-            var repo = _unitOfWork.Repository<Job>();
-
-            var job = await repo.Query()
-                .Include(j => j.JobApplications)
+            var job = await _unitOfWork.Repository<Job>()
+                .Query()
+                .Include(j => j.InternshipApplications)
                 .FirstOrDefaultAsync(j => j.JobId == request.JobId, cancellationToken);
 
             if (job == null)
             {
-                return Result<DeleteJobResponse>.NotFound("Job not found");
+                _logger.LogWarning("Job not found: {JobId}", request.JobId);
+                return Result<DeleteJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.RecordNotFound), ResultErrorType.NotFound);
             }
 
-            // Check ownership: HR can only delete their enterprise jobs
-            if (job.EnterpriseId != enterpriseId)
+            // Security: only HR of owning enterprise can delete
+            if (JobsPostingParam.GetJobPostings.EnterpriseRoles.Contains(_currentUserService.Role))
             {
-                return Result<DeleteJobResponse>.Failure("You are not allowed to delete this job.", ResultErrorType.Forbidden);
-            }
+                if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+                {
+                    return Result<DeleteJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+                }
 
-            // Already deleted?
-            if (job.DeletedAt.HasValue)
+                var entUser = await _unitOfWork.Repository<EnterpriseUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+
+                if (entUser == null || entUser.EnterpriseId != job.EnterpriseId)
+                {
+                    return Result<DeleteJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+                }
+            }
+            else
             {
-                return Result<DeleteJobResponse>.Failure("Job already deleted.", ResultErrorType.Conflict);
+                return Result<DeleteJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
             }
 
-            // Determine active application statuses (Applied / Interview / Offered)
-            var activeStatuses = new[] { JobApplicationStatus.Applied, JobApplicationStatus.Interview, JobApplicationStatus.Offered };
-            var activeApps = job.JobApplications?.Where(a => activeStatuses.Contains(a.Status)).ToList() ?? new();
-
-            // Case 3: Published or Closed with active applications -> warning unless confirmed
-            if ((job.Status == JobStatus.PUBLISHED || job.Status == JobStatus.CLOSED) && activeApps.Any() && !request.ConfirmWhenHasActiveApplications)
+            // Only proceed for non-deleted jobs
+            if (job.Status == JobStatus.DELETED)
             {
-                var warning = $"Bài ðãng ðang có [{activeApps.Count}] ?ng viên ðang trong quá tr?nh xét duy?t. Các ?ng viên ? giai ðo?n Interviewing/Offered v?n s? ðý?c ti?p t?c x? l? sau khi xóa. B?n có ch?c mu?n xóa?";
-                var preview = new DeleteJobResponse { JobId = job.JobId, DeletedAt = null };
-                return Result<DeleteJobResponse>.SuccessWithWarning(preview, warning);
+                var already = _messageService.GetMessage("Job.Delete.AlreadyDeleted");
+                return Result<DeleteJobResponse>.Failure(already, ResultErrorType.BadRequest);
             }
 
-            // Proceed to soft-delete (all cases: Draft, Published/Closed with no active apps, or confirmed)
+            // Active statuses per AC-08: PendingHRApproval (Applied), Interviewing, Offered
+            var activeStatuses = new[]
+            {
+                InternshipApplicationStatus.Applied,
+                InternshipApplicationStatus.Interviewing,
+                InternshipApplicationStatus.Offered
+            };
+
+            var activeApplications = job.InternshipApplications?
+                .Where(a => activeStatuses.Contains(a.Status))
+                .ToList() ?? new();
+
+            var activeCount = activeApplications.Count;
+
+            // If there are active applications and caller didn't confirm, return confirmation warning
+            if (activeCount > 0 && !request.ConfirmWhenHasActiveApplications)
+            {
+                var confirmMsg = _messageService.GetMessage("Job.Delete.ConfirmHasActiveApplications", activeCount);
+                // Use Conflict so frontend can prompt user and call again with ConfirmWhenHasActiveApplications = true
+                return Result<DeleteJobResponse>.Failure(confirmMsg, ResultErrorType.Conflict);
+            }
+
+            // Proceed to soft-delete (mark as Deleted)
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                await repo.DeleteAsync(job, cancellationToken); // GenericRepository sets DeletedAt for BaseEntity
+                job.Status = JobStatus.DELETED;
+                job.DeletedAt = DateTime.UtcNow;
+                job.UpdatedAt = DateTime.UtcNow;
+                if (Guid.TryParse(_currentUserService.UserId, out var updBy))
+                {
+                    job.UpdatedBy = updBy;
+                }
+
+                await _unitOfWork.Repository<Job>().UpdateAsync(job, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                var response = new DeleteJobResponse
-                {
-                    JobId = job.JobId,
-                    DeletedAt = job.DeletedAt
-                };
+                _logger.LogInformation("Job {JobId} soft-deleted by {UserId}. ActiveApplications: {Count}", job.JobId, _currentUserService.UserId, activeCount);
 
-                var msg = activeApps.Any()
-                    ? "Ð? xóa Job Posting. Các ?ng viên ðang x? l? v?n ðý?c ti?p t?c."
-                    : "Ð? xóa Job Posting.";
-
-                return Result<DeleteJobResponse>.Success(response, msg);
+                // Per AC-08: do NOT modify applications (they remain as-is); no university notify.
+                var successKey = activeCount > 0 ? "Job.Delete.SuccessWithActive" : "Job.Delete.Success";
+                var message = _messageService.GetMessage(successKey, job.Title);
+                var response = new DeleteJobResponse { Message = message };
+                return Result<DeleteJobResponse>.Success(response, message);
             }
-            catch
+            catch (DbUpdateConcurrencyException ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                throw;
+                _logger.LogWarning(ex, "Concurrency conflict when deleting job {JobId}", request.JobId);
+                return Result<DeleteJobResponse>.Failure(_messageService.GetMessage("Job.Delete.VersionConflict"), ResultErrorType.Conflict);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                _logger.LogError(ex, "Error while deleting job {JobId}", request.JobId);
+                return Result<DeleteJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }
     }

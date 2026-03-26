@@ -34,6 +34,11 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
                .HasMaxLength(255)
                .IsRequired();
 
+        builder.Property(j => j.Position)
+               .HasColumnName("position")
+               .HasMaxLength(255)
+               .IsRequired();
+
         builder.Property(j => j.Description)
                .HasColumnName("description")
                .HasColumnType("text")
@@ -49,10 +54,6 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
                .HasMaxLength(255)
                .IsRequired(false);
 
-        builder.Property(j => j.InternshipDuration)
-               .HasColumnName("internship_duration")
-               .IsRequired(false);
-
         builder.Property(j => j.Benefit)
                .HasColumnName("benefit")
                .HasColumnType("text")
@@ -66,6 +67,23 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
                .HasColumnName("expire_date")
                .HasColumnType("timestamp with time zone")
                .IsRequired(false);
+
+        // New: internship date range
+        builder.Property(j => j.StartDate)
+               .HasColumnName("start_date")
+               .HasColumnType("timestamp with time zone")
+               .IsRequired();
+
+        builder.Property(j => j.EndDate)
+               .HasColumnName("end_date")
+               .HasColumnType("timestamp with time zone")
+               .IsRequired();
+
+        // New: audience (public / targeted)
+        builder.Property(j => j.Audience)
+               .HasColumnName("audience")
+               .HasConversion<short>()
+               .IsRequired();
 
         // Enum stored as short (repository convention)
         builder.Property(j => j.Status)
@@ -98,7 +116,22 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.HasIndex(j => j.Status)
                .HasDatabaseName("ix_jobs_status");
 
-        // Soft delete filter
-        builder.HasQueryFilter(j => j.DeletedAt == null);
+        // Many-to-many: jobs <-> universities via join table job_universities
+        builder.HasMany(j => j.Universities)
+               .WithMany(u => u.Jobs)
+               .UsingEntity<Dictionary<string, object>>(
+                   "job_universities",
+                   ju => ju.HasOne<University>().WithMany().HasForeignKey("uni_id").HasConstraintName("fk_job_universities_university_id").OnDelete(DeleteBehavior.Cascade),
+                   ju => ju.HasOne<Job>().WithMany().HasForeignKey("job_id").HasConstraintName("fk_job_universities_job_id").OnDelete(DeleteBehavior.Cascade),
+                   je =>
+                   {
+                       je.HasKey("job_id", "uni_id");
+                       je.ToTable("job_universities");
+                       je.Property<Guid>("job_id").HasColumnName("job_id");
+                       je.Property<Guid>("uni_id").HasColumnName("uni_id");
+                       je.HasIndex(new[] { "uni_id" }).HasDatabaseName("ix_job_universities_uni_id");
+                       je.HasIndex(new[] { "job_id" }).HasDatabaseName("ix_job_universities_job_id");
+                   });
+
     }
 }

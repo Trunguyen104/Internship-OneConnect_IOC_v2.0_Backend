@@ -63,12 +63,13 @@ public class AcceptApplicationCommandHandler : IRequestHandler<AcceptApplication
                     _messageService.GetMessage(MessageKeys.InternshipApplication.NotFound),
                     ResultErrorType.NotFound);
 
-            if (app.Status != InternshipApplicationStatus.Pending)
+            if (app.Status != InternshipApplicationStatus.Applied)
                 return Result<AcceptApplicationResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.InternshipApplication.StatusMustBePendingToAccept),
                     ResultErrorType.BadRequest);
 
-            app.Status = InternshipApplicationStatus.Approved;
+            // Set to the correct enum value that represents "accepted" in the domain
+            app.Status = InternshipApplicationStatus.Placed;
             app.ReviewedAt = DateTime.UtcNow;
             app.ReviewedBy = enterpriseUser.EnterpriseUserId;
 

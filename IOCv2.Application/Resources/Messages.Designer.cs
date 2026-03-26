@@ -250,6 +250,69 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đơn ứng tuyển đã được chấp nhận thành công..
+        /// </summary>
+        internal static string InternshipApplication_AcceptSuccess {
+            get {
+                return ResourceManager.GetString("InternshipApplication.AcceptSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã gán Mentor và thêm sinh viên vào nhóm hiện có thành công..
+        /// </summary>
+        internal static string InternshipApplication_AssignMentorExistingGroupSuccess {
+            get {
+                return ResourceManager.GetString("InternshipApplication.AssignMentorExistingGroupSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã gán Mentor và tạo nhóm thực tập mới thành công..
+        /// </summary>
+        internal static string InternshipApplication_AssignMentorNewGroupSuccess {
+            get {
+                return ResourceManager.GetString("InternshipApplication.AssignMentorNewGroupSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã gán Mentor thành công..
+        /// </summary>
+        internal static string InternshipApplication_AssignMentorSuccess {
+            get {
+                return ResourceManager.GetString("InternshipApplication.AssignMentorSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã gán dự án vào nhóm thực tập thành công..
+        /// </summary>
+        internal static string InternshipApplication_AssignProjectSuccess {
+            get {
+                return ResourceManager.GetString("InternshipApplication.AssignProjectSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đơn ứng tuyển đã bị từ chối..
+        /// </summary>
+        internal static string InternshipApplication_RejectSuccess {
+            get {
+                return ResourceManager.GetString("InternshipApplication.RejectSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lưu trữ nhóm thành công..
+        /// </summary>
+        internal static string InternshipGroup_ArchiveSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.ArchiveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đã thêm thành công {Count} sinh viên vào nhóm: {InternshipId}.
         /// </summary>
         internal static string InternshipGroup_LogAddedStudentsSuccess {
@@ -340,6 +403,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chuyển sinh viên thành công..
+        /// </summary>
+        internal static string InternshipGroup_MoveSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.MoveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tạo issue thành công..
         /// </summary>
         internal static string Issue_CreateSuccess {
@@ -363,6 +435,69 @@ namespace IOCv2.Application.Resources {
         internal static string Issue_UpdateStatusSuccess {
             get {
                 return ResourceManager.GetString("Issue.UpdateStatusSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn đã có nơi thực tập.
+        /// </summary>
+        internal static string JobPosting_AlreadyPlaced {
+            get {
+                return ResourceManager.GetString("JobPosting.AlreadyPlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã đóng tin tuyển dụng &quot;{{0}}&quot; thành công.
+        /// </summary>
+        internal static string JobPosting_CloseSuccess {
+            get {
+                return ResourceManager.GetString("JobPosting.CloseSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Có ứng viên đang ứng tuyển vào vị trí này. Bạn có chắc chắn muốn tiếp tục?.
+        /// </summary>
+        internal static string JobPosting_ConfirmHasActiveApplications {
+            get {
+                return ResourceManager.GetString("JobPosting.ConfirmHasActiveApplications", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn chưa có CV. Vui lòng upload CV trước khi ứng tuyển..
+        /// </summary>
+        internal static string JobPosting_CvRequired {
+            get {
+                return ResourceManager.GetString("JobPosting.CvRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tin tuyển dụng &quot;{{0}}&quot; của {{1}} đã được đóng và không nhận thêm hồ sơ ứng tuyển mới..
+        /// </summary>
+        internal static string JobPosting_NotifyStudentClosedBody {
+            get {
+                return ResourceManager.GetString("JobPosting.NotifyStudentClosedBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thông báo: Việc làm &quot;{{0}}&quot; đã đóng.
+        /// </summary>
+        internal static string JobPosting_NotifyStudentClosedSubject {
+            get {
+                return ResourceManager.GetString("JobPosting.NotifyStudentClosedSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chỉ được phép đóng công việc đã đăng.
+        /// </summary>
+        internal static string JobPosting_OnlyPublishedAllowed {
+            get {
+                return ResourceManager.GetString("JobPosting.OnlyPublishedAllowed", resourceCulture);
             }
         }
         
@@ -660,6 +795,123 @@ namespace IOCv2.Application.Resources {
         internal static string Student_StudentIdRequired {
             get {
                 return ResourceManager.GetString("Student.StudentIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn đã được khôi phục vào đợt thực tập &apos;{0}&apos;..
+        /// </summary>
+        internal static string StudentTerms_Email_BodyRestore {
+            get {
+                return ResourceManager.GetString("StudentTerms.Email.BodyRestore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn đã bị rút khỏi đợt thực tập &apos;{0}&apos;. Vui lòng liên hệ nhà trường nếu có thắc mắc..
+        /// </summary>
+        internal static string StudentTerms_Email_BodyWithdraw {
+            get {
+                return ResourceManager.GetString("StudentTerms.Email.BodyWithdraw", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thông báo khôi phục ghi danh đợt thực tập.
+        /// </summary>
+        internal static string StudentTerms_Email_SubjectRestore {
+            get {
+                return ResourceManager.GetString("StudentTerms.Email.SubjectRestore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thông báo rút khỏi đợt thực tập.
+        /// </summary>
+        internal static string StudentTerms_Email_SubjectWithdraw {
+            get {
+                return ResourceManager.GetString("StudentTerms.Email.SubjectWithdraw", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày sinh.
+        /// </summary>
+        internal static string StudentTerms_Excel_HeaderDateOfBirth {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.HeaderDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email.
+        /// </summary>
+        internal static string StudentTerms_Excel_HeaderEmail {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.HeaderEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Họ và tên.
+        /// </summary>
+        internal static string StudentTerms_Excel_HeaderFullName {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.HeaderFullName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chuyên ngành.
+        /// </summary>
+        internal static string StudentTerms_Excel_HeaderMajor {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.HeaderMajor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Số điện thoại.
+        /// </summary>
+        internal static string StudentTerms_Excel_HeaderPhone {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.HeaderPhone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mã sinh viên.
+        /// </summary>
+        internal static string StudentTerms_Excel_HeaderStudentCode {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.HeaderStudentCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mật khẩu tạm.
+        /// </summary>
+        internal static string StudentTerms_Excel_HeaderTempPassword {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.HeaderTempPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Danh sách sinh viên.
+        /// </summary>
+        internal static string StudentTerms_Excel_WorksheetStudentList {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.WorksheetStudentList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mật khẩu tạm.
+        /// </summary>
+        internal static string StudentTerms_Excel_WorksheetTempPassword {
+            get {
+                return ResourceManager.GetString("StudentTerms.Excel.WorksheetTempPassword", resourceCulture);
             }
         }
         

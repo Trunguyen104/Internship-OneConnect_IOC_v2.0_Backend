@@ -22,6 +22,11 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
         /// </summary>
         public JobStatus? Status { get; init; }
 
+        /// <summary>
+        /// Include jobs with status == Deleted when true. Default is false (keep UI clean).
+        /// </summary>
+        public bool IncludeDeleted { get; init; } = false;
+
         public int PageNumber { get; init; } = 1;
         public int PageSize { get; init; } = 10;
 

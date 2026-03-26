@@ -9,20 +9,31 @@ namespace IOCv2.Domain.Entities
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
         public string Title { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string? Requirements { get; set; }
         public string? Location { get; set; }
-        public int? InternshipDuration { get; set; }
         public string? Benefit { get; set; }
         public int? Quantity { get; set; }
         public DateTime? ExpireDate { get; set; }
+
+        // New: internship date range
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+
+        // New: audience (public / targeted)
+        public JobAudience Audience { get; set; }
+
         public JobStatus Status { get; set; }
 
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;
 
         // Added: applications for this job
-        public virtual ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
+        public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
+
+        // Many-to-many: Jobs <-> Universities
+        public virtual ICollection<University> Universities { get; set; } = new List<University>();
 
         // Factory method for creating a Job (used by application layer)
         public static Job Create(

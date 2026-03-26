@@ -51,7 +51,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents
             var query = from app in _unitOfWork.Repository<IOCv2.Domain.Entities.InternshipApplication>().Query().AsNoTracking()
                         where app.EnterpriseId == enterpriseUser.EnterpriseId
                            && app.TermId == request.TermId
-                           && app.Status == InternshipApplicationStatus.Approved
+                           && app.Status == InternshipApplicationStatus.Placed
                         
                         let assignedGroupMember = _unitOfWork.Repository<InternshipStudent>().Query()
                             .FirstOrDefault(m => m.StudentId == app.StudentId 

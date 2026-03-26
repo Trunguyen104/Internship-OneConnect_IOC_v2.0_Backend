@@ -1,12 +1,10 @@
 using AutoMapper;
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
-using IOCv2.Domain.Enums;
-using System;
 
 namespace IOCv2.Application.Features.Jobs.Queries.GetAllJobApplications
 {
-    public class GetJobApplicationResponse : IMapFrom<JobApplication>
+    public class GetAllInternshipApplicationResponse : IMapFrom<InternshipApplication>
     {
         public Guid ApplicationId { get; set; }
         public Guid JobId { get; set; }
@@ -20,7 +18,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetAllJobApplications
 
         public void Mapping(Profile profile)
         {
-            profile.CreateMap<JobApplication, GetJobApplicationResponse>()
+            profile.CreateMap<InternshipApplication, GetAllInternshipApplicationResponse>()
                 .ForMember(d => d.JobTitle, opt => opt.MapFrom(s => s.Job.Title))
                 .ForMember(d => d.JobStatus, opt => opt.MapFrom(s => (short)s.Job.Status))
                 .ForMember(d => d.StudentName, opt => opt.MapFrom(s => s.Student.User.FullName))

@@ -40,8 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Jobs\Commands\PublishJobPosting\" />
-    <Folder Include="Features\Jobs\Queries\GetAllJobApplications\" />
     <Folder Include="Features\Users\Commands\" />
   </ItemGroup>
 

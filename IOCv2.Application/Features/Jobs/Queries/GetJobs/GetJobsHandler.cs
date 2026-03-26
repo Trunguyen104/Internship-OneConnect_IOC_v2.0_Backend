@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.Jobs;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -38,147 +39,101 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
 
         public async Task<Result<PaginatedResult<GetJobsResponse>>> Handle(GetJobsQuery request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(_currentUserService.UserId) || !Guid.TryParse(_currentUserService.UserId, out var userId))
-            {
-                return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
-            }
+            var userId = Guid.Parse(_currentUserService.UserId!);
 
-            // If the current user is an Enterprise/HR account, return jobs for that enterprise
-            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>()
-                .Query()
-                .FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
-
-            if (enterpriseUser != null)
-            {
-                var query = _unitOfWork.Repository<Job>()
-                    .Query()
-                    .Include(j => j.Enterprise)
-                    .AsNoTracking()
-                    // only jobs belonging to this enterprise and not marked deleted
-                    .Where(j => j.Enterprise != null && j.Enterprise.EnterpriseId == enterpriseUser.EnterpriseId && j.Status != JobStatus.DELETED)
-                    .AsQueryable();
-
-                // Optional status filter for HR view (Draft / Published / Closed)
-                if (request.Status.HasValue)
-                {
-                    query = query.Where(j => j.Status == request.Status.Value);
-                }
-
-                if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-                {
-                    var keyword = request.SearchTerm.Trim().ToLower();
-                    query = query.Where(j =>
-                        j.Title.ToLower().Contains(keyword) ||
-                        (j.Enterprise.Name != null && j.Enterprise.Name.ToLower().Contains(keyword)));
-                }
-
-                if (string.IsNullOrWhiteSpace(request.SortColumn))
-                {
-                    query = query.OrderByDescending(j => j.CreatedAt);
-                }
-                else
-                {
-                    var isDesc = request.SortOrder?.ToLower() == "desc";
-                    query = request.SortColumn?.ToLower() switch
-                    {
-                        "title" => isDesc ? query.OrderByDescending(j => j.Title) : query.OrderBy(j => j.Title),
-                        "expiredate" => isDesc ? query.OrderByDescending(j => j.ExpireDate) : query.OrderBy(j => j.ExpireDate),
-                        _ => query.OrderByDescending(j => j.CreatedAt)
-                    };
-                }
-
-                var totalCount = await query.CountAsync(cancellationToken);
-                var items = await query
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ProjectTo<GetJobsResponse>(_mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken);
-
-                var result = PaginatedResult<GetJobsResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
-                return Result<PaginatedResult<GetJobsResponse>>.Success(result);
-            }
-
-            // Load student (and their terms) for current user
-            var student = await _unitOfWork.Repository<Student>()
-                .Query()
-                .Include(s => s.StudentTerms)
-                    .ThenInclude(st => st.Term)
+            var jobsQuery = _unitOfWork.Repository<Job>()
+                .Query().IgnoreQueryFilters()
                 .AsNoTracking()
-                .FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
-
-            if (student == null)
-            {
-                return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage(MessageKeys.Users.NotFound), ResultErrorType.NotFound);
-            }
-
-            // If student already placed (considered "Placed" when internship in progress or completed) -> hide list
-            if (student.InternshipStatus == StudentStatus.INTERNSHIP_IN_PROGRESS ||
-                student.InternshipStatus == StudentStatus.COMPLETED)
-            {
-                // Return Forbidden with user-friendly message so client can show "Bạn đã có nơi thực tập"
-                return Result<PaginatedResult<GetJobsResponse>>.Failure("Bạn đã có nơi thực tập", ResultErrorType.Forbidden);
-            }
-
-            // Determine the student's active term and its university
-            var activeTerm = student.StudentTerms
-                .Select(st => st.Term)
-                .FirstOrDefault(t => t.Status == TermStatus.Open);
-
-            if (activeTerm == null)
-            {
-                // No active term -> return empty list
-                var empty = PaginatedResult<GetJobsResponse>.Create(Enumerable.Empty<GetJobsResponse>().ToList(), 0, request.PageNumber, request.PageSize);
-                return Result<PaginatedResult<GetJobsResponse>>.Success(empty);
-            }
-
-            var universityId = activeTerm.UniversityId;
-
-            var stuQuery = _unitOfWork.Repository<Job>()
-                .Query()
-                .Include(j => j.Enterprise).ThenInclude(e => e.InternshipApplications).ThenInclude(e => e.Term)
-                .AsNoTracking()
+                .Include(j => j.Enterprise)
+                .Include(j => j.Universities)
+                .Include(j => j.InternshipApplications)
                 .AsQueryable();
 
-            // Only OPEN jobs for students (Published)
-            stuQuery = stuQuery.Where(j => j.Status == JobStatus.PUBLISHED);
+            // Enterprise view (HR / EnterpriseAdmin)
+            if (JobsPostingParam.GetJobPostings.EnterpriseRoles.Contains(_currentUserService.Role))
+            {
+                var entUser = await _unitOfWork.Repository<EnterpriseUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
 
-            // Filter by university via internship applications' term -> university
-            stuQuery = stuQuery.Where(j => j.Enterprise != null && j.Enterprise.InternshipApplications.Any(ia => ia.Term != null && ia.Term.UniversityId == universityId));
+                if (entUser == null) return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage("NotAllowed"), ResultErrorType.Forbidden);
 
-            // Apply search
+                jobsQuery = jobsQuery.Where(j => j.EnterpriseId == entUser.EnterpriseId);
+
+                if (request.Status.HasValue) jobsQuery = jobsQuery.Where(j => j.Status == request.Status.Value);
+                if (!request.IncludeDeleted) jobsQuery = jobsQuery.Where(j => j.Status != JobStatus.DELETED);
+            }
+            else // School / Student / other (school-side behavior)
+            {
+                // Student / school users only see jobs assigned to their university and only published jobs
+                var uniUser = await _unitOfWork.Repository<UniversityUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+
+                if (uniUser == null) return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage("NotAllowed"), ResultErrorType.Forbidden);
+
+                // If caller is a student and already placed (internship in progress), return empty page (UI shows message)
+                var student = await _unitOfWork.Repository<Student>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
+
+                if (student != null && student.InternshipStatus == StudentStatus.INTERNSHIP_IN_PROGRESS)
+                {
+                    var empty = PaginatedResult<GetJobsResponse>.Create(new List<GetJobsResponse>(), 0, request.PageNumber, request.PageSize);
+                    return Result<PaginatedResult<GetJobsResponse>>.Success(empty);
+                }
+
+                // Visibility rules for job audience:
+                // - Public: visible to all partner universities (show to all university users)
+                // - Targeted: visible only to students of the specific university (job must be linked to that university)
+                jobsQuery = jobsQuery.Where(j =>
+                    j.Status == JobStatus.PUBLISHED &&
+                    (j.Audience == JobAudience.Public || j.Universities.Any(u => u.UniversityId == uniUser.UniversityId))
+                );
+            }
+
+            // Search
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                var keyword = request.SearchTerm.Trim().ToLower();
-                stuQuery = stuQuery.Where(j =>
-                    j.Title.ToLower().Contains(keyword) ||
-                    (j.Enterprise.Name != null && j.Enterprise.Name.ToLower().Contains(keyword)));
+                var term = request.SearchTerm.Trim();
+                jobsQuery = jobsQuery.Where(j => j.Title.Contains(term));
             }
 
             // Sorting
-            if (string.IsNullOrWhiteSpace(request.SortColumn))
+            var sortOrderDesc = string.Equals(request.SortOrder, "desc", StringComparison.OrdinalIgnoreCase);
+            if (!string.IsNullOrWhiteSpace(request.SortColumn))
             {
-                stuQuery = stuQuery.OrderByDescending(j => j.CreatedAt);
+                switch (request.SortColumn.ToLowerInvariant())
+                {
+                    case "title":
+                        jobsQuery = sortOrderDesc ? jobsQuery.OrderByDescending(j => j.Title) : jobsQuery.OrderBy(j => j.Title);
+                        break;
+                    case "expiredate":
+                        jobsQuery = sortOrderDesc ? jobsQuery.OrderByDescending(j => j.ExpireDate) : jobsQuery.OrderBy(j => j.ExpireDate);
+                        break;
+                    default:
+                        jobsQuery = jobsQuery.OrderByDescending(j => j.ExpireDate);
+                        break;
+                }
             }
             else
             {
-                var isDesc = request.SortOrder?.ToLower() == "desc";
-                stuQuery = request.SortColumn?.ToLower() switch
-                {
-                    "title" => isDesc ? stuQuery.OrderByDescending(j => j.Title) : stuQuery.OrderBy(j => j.Title),
-                    "expiredate" => isDesc ? stuQuery.OrderByDescending(j => j.ExpireDate) : stuQuery.OrderBy(j => j.ExpireDate),
-                    _ => stuQuery.OrderByDescending(j => j.CreatedAt)
-                };
+                jobsQuery = jobsQuery.OrderByDescending(j => j.ExpireDate);
             }
 
-            var stuTotal = await stuQuery.CountAsync(cancellationToken);
-            var stuItems = await stuQuery
+            // Pagination + projection
+            var total = await jobsQuery.CountAsync(cancellationToken);
+            var items = await jobsQuery
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ProjectTo<GetJobsResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 
-            var stuResult = PaginatedResult<GetJobsResponse>.Create(stuItems, stuTotal, request.PageNumber, request.PageSize);
-            return Result<PaginatedResult<GetJobsResponse>>.Success(stuResult);
+            var result = PaginatedResult<GetJobsResponse>.Create(items, total, request.PageNumber, request.PageSize);
+            return Result<PaginatedResult<GetJobsResponse>>.Success(result);
         }
     }
 }

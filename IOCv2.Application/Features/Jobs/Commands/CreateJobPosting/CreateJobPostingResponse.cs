@@ -1,20 +1,19 @@
 ﻿using IOCv2.Application.Extensions.Mappings;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
 {
-    public class CreateJobPostingResponse : IMapFrom<Domain.Entities.Job>
+    public class CreateJobPostingResponse : IMapFrom<Job>
     {
         public Guid JobId { get; set; }
+        public Guid EnterpriseId { get; set; }
         public string Title { get; set; } = string.Empty;
-        public string? Requirements { get; set; }
-        public string? Benefit { get; set; }
-        public string? Location { get; set; }
-        public int? Quantity { get; set; }
-        public DateTime? ExpireDate { get; private set; }
+        public string Position { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public JobAudience Audience { get; set; }
+        public JobStatus Status { get; set; }
     }
 }

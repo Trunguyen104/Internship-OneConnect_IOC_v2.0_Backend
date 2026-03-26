@@ -63,7 +63,8 @@ public class RejectApplicationCommandHandler : IRequestHandler<RejectApplication
                     _messageService.GetMessage(MessageKeys.InternshipApplication.NotFound),
                     ResultErrorType.NotFound);
 
-            if (app.Status != InternshipApplicationStatus.Pending)
+            // use the enum member that represents a newly submitted / pending application
+            if (app.Status != InternshipApplicationStatus.Applied)
                 return Result<RejectApplicationResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.InternshipApplication.StatusMustBePendingToReject),
                     ResultErrorType.BadRequest);
