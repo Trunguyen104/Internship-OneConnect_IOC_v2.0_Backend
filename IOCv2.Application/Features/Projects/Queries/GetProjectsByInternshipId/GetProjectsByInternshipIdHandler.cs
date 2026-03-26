@@ -32,7 +32,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
 
         public async Task<Result<PaginatedResult<GetProjectsByInternshipIdResponse>>> Handle(GetProjectsByInternshipIdQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Retrieving projects for Internship: {InternshipId}", request.InternshipId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetByInternshipId), request.InternshipId);
 
             // Check if the internship exists
             var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
@@ -40,7 +40,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
             
             if (!internshipExists) 
             { 
-                _logger.LogWarning("Internship not found: {InternshipId}", request.InternshipId);
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNotFound), request.InternshipId);
                 return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
                     _messageService.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound); 
             }
@@ -72,7 +72,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
                 .ProjectTo<GetProjectsByInternshipIdResponse>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
                 var result = PaginatedResult<GetProjectsByInternshipIdResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
                 
-                _logger.LogInformation("Successfully retrieved {Count} projects for Internship {InternshipId}", items.Count, request.InternshipId);
+                _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetByInternshipIdSuccess), items.Count, request.InternshipId);
 
                 return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Success(result);
         }

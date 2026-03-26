@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MockQueryable;
 using MockQueryable.Moq;
 using Moq;
+using System.Linq.Expressions;
 using Xunit;
 
 namespace IOCv2.Tests.Features.Projects
