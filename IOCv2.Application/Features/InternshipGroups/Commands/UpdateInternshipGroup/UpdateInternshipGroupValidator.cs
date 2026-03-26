@@ -15,9 +15,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
             RuleFor(v => v.PhaseId)
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.PhaseIdRequired));
 
-            RuleFor(v => v.StartDate)
-                .LessThan(v => v.EndDate).When(v => v.StartDate.HasValue && v.EndDate.HasValue)
-                .WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.StartDateBeforeEndDate));
+
         }
     }
 }

@@ -11,8 +11,6 @@ public class GetMyInternshipGroupsResponse
     public Guid SchoolId { get; set; }
     public Guid PhaseId { get; set; }
     public GroupStatus GroupStatus { get; set; }
-    public DateTime? StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
     public string Description { get; set; } = string.Empty;
     public bool AllowLecturerView { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -39,8 +37,6 @@ public class GetMyInternshipGroupsResponse
             SchoolId = university?.UniversityId ?? Guid.Empty,
             PhaseId = group.PhaseId,
             GroupStatus = group.Status,
-            StartDate = group.StartDate,
-            EndDate = group.EndDate,
             Description = group.Description ?? string.Empty,
             AllowLecturerView = false,
             CreatedAt = group.CreatedAt,

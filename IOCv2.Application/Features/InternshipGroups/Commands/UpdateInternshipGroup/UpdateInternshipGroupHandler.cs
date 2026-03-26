@@ -115,8 +115,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     request.PhaseId,
                     request.EnterpriseId,
                     resolvedMentorId, // EnterpriseUserId
-                    request.StartDate,
-                    request.EndDate
+                    null,
+                    null
                 );
 
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(entity);

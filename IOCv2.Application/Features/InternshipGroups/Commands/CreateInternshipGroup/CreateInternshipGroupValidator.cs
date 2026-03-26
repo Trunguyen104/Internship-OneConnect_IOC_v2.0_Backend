@@ -16,10 +16,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
             RuleFor(v => v.PhaseId)
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.PhaseIdRequired));
 
-            RuleFor(v => v.StartDate)
-                .LessThan(v => v.EndDate).When(v => v.StartDate.HasValue && v.EndDate.HasValue)
-                .WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.StartDateBeforeEndDate));
-
             // ACV-3: Validate Enum string input for each student's Role.
             RuleForEach(v => v.Students)
                 .ChildRules(student =>

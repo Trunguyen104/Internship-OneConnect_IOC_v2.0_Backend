@@ -139,8 +139,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     request.Description,
                     request.EnterpriseId,
                     resolvedMentorId, // EnterpriseUserId
-                    request.StartDate,
-                    request.EndDate
+                    null,
+                    null
                 );
 
                 // ── 6. Bắt buộc ít nhất 1 sinh viên ───────────────────────────────

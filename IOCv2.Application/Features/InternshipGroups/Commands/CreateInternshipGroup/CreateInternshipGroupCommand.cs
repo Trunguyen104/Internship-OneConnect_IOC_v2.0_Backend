@@ -35,16 +35,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
         public Guid? MentorId { get; init; }
 
         /// <summary>
-        /// Planned start date of the internship.
-        /// </summary>
-        public DateTime? StartDate { get; init; }
-
-        /// <summary>
-        /// Planned end date of the internship.
-        /// </summary>
-        public DateTime? EndDate { get; init; }
-
-        /// <summary>
         /// List of initial students to be added to the group.
         /// </summary>
         public List<CreateInternshipStudentDto> Students { get; init; } = new List<CreateInternshipStudentDto>();

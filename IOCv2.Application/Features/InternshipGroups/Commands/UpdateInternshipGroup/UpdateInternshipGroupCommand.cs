@@ -40,14 +40,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         /// </summary>
         public Guid? MentorId { get; init; }
 
-        /// <summary>
-        /// Updated start date.
-        /// </summary>
-        public DateTime? StartDate { get; init; }
 
-        /// <summary>
-        /// Updated end date.
-        /// </summary>
-        public DateTime? EndDate { get; init; }
     }
 }

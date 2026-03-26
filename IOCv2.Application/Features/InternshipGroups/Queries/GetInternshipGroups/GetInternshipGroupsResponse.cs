@@ -15,8 +15,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public string GroupName { get; set; } = string.Empty;
         public string? EnterpriseName { get; set; }
         public string? MentorName { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
         public GroupStatus Status { get; set; }
 
         /// <summary>
