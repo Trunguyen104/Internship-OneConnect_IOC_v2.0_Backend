@@ -52,6 +52,27 @@ public class InternshipGroupsController : ApiControllerBase
     }
 
     /// <summary>
+    /// Get paginated list of archived internship groups with optional search and filter.
+    /// </summary>
+    [HttpGet("archived")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor,Student")]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetInternshipGroupsResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetArchivedInternshipGroups(
+        [FromQuery] GetInternshipGroupsQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        var archivedQuery = query with 
+        { 
+            Status = IOCv2.Domain.Enums.GroupStatus.Archived, 
+            IncludeArchived = true 
+        };
+        _logger.LogInformation("Request to get archived internship groups with query: {@Query}", archivedQuery);
+        return HandleResult(await _mediator.Send(archivedQuery, cancellationToken));
+    }
+
+    /// <summary>
     /// Get details of a single internship group by ID.
     /// </summary>
     /// <param name="id">Internship group ID.</param>

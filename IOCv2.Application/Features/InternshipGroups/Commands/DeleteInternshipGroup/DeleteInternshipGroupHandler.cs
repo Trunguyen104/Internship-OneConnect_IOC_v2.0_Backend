@@ -39,9 +39,13 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
 
             try
             {
+                // ── 1. Load nhóm kèm tất cả navigation cần thiết để phán xét ──────
                 var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
                     .Include(g => g.Members)
-                    .AsNoTracking()
+                    .Include(g => g.Logbooks)
+                    .Include(g => g.ViolationReports)
+                    .Include(g => g.Projects)
+                        .ThenInclude(p => p.WorkItems)
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (entity == null)
@@ -50,26 +54,59 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                     return Result<DeleteInternshipGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
-                // Chặn xóa nếu nhóm còn sinh viên
-                if (entity.Members.Any())
-                {
-                    _logger.LogWarning("Attempted to delete group {InternshipId} which still has {Count} student(s).",
-                        request.InternshipId, entity.Members.Count);
-                    return Result<DeleteInternshipGroupResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipGroups.HasStudents),
-                        ResultErrorType.BadRequest);
-                }
-
+                // ── 2. Chỉ nhóm Active mới được phép xóa (AC-G09) ────────────────
                 if (entity.Status != GroupStatus.Active)
                 {
-                    _logger.LogWarning("Attempted to delete group {InternshipId} which is not Active.", request.InternshipId);
+                    _logger.LogWarning("Attempted to delete group {InternshipId} with status {Status}.", request.InternshipId, entity.Status);
                     return Result<DeleteInternshipGroupResponse>.Failure(
-                        "Nhóm đã kết thúc hoặc lưu trữ, không thể xóa.",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.GroupNotActive),
                         ResultErrorType.BadRequest);
                 }
 
+                // ── 3. Kiểm tra "data thực tế" (AC-G09) ──────────────────────────
+                // Data thực tế = logbook entries + vi phạm + project có WorkItem
+                // KHÔNG tính: SV trong nhóm, project chưa có nội dung
+                var hasActivityData = HasRealActivityData(entity);
+
+                if (hasActivityData)
+                {
+                    _logger.LogWarning(
+                        "Cannot delete group {InternshipId}: group has actual activity data (logbooks={L}, violations={V}, projectsWithItems={P}).",
+                        request.InternshipId,
+                        entity.Logbooks.Count,
+                        entity.ViolationReports.Count,
+                        entity.Projects.Count(p => p.WorkItems.Any()));
+
+                    return Result<DeleteInternshipGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.HasActivityData),
+                        ResultErrorType.BadRequest);
+                }
+
+                // ── 4. Không có data thực tế → tiến hành xóa ─────────────────────
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
+                // a) Auto-unlink tất cả SV (InternshipStudent records)
+                //    EF cascade sẽ tự xóa các bản ghi InternshipStudent khi nhóm bị xóa,
+                //    nhưng log rõ để trace.
+                if (entity.Members.Any())
+                {
+                    _logger.LogInformation(
+                        "Auto-unlinking {Count} student(s) from group {InternshipId} before deletion.",
+                        entity.Members.Count, request.InternshipId);
+                    // EF cascade delete sẽ xử lý, trạng thái Placed của StudentTerm KHÔNG thay đổi theo AC
+                }
+
+                // b) Unlink projects không có nội dung: project sẽ bị cascade-deleted cùng nhóm.
+                //    (Project.InternshipId là required FK nên không thể null ra; chúng sẽ bị xóa.)
+                if (entity.Projects.Any(p => !p.WorkItems.Any()))
+                {
+                    _logger.LogInformation(
+                        "Group {InternshipId} has {Count} project(s) without content — will be removed with the group.",
+                        request.InternshipId,
+                        entity.Projects.Count(p => !p.WorkItems.Any()));
+                }
+
+                // c) Hard delete nhóm — cascade xóa Members, Projects (không có content), Stakeholders, etc.
                 await _unitOfWork.Repository<InternshipGroup>().DeleteAsync(entity);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
@@ -94,6 +131,28 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteError), request.InternshipId);
                 return Result<DeleteInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
+        }
+
+        /// <summary>
+        /// Kiểm tra xem nhóm có "data thực tế" hay không.
+        /// Data thực tế = logbook entries, vi phạm, hoặc ít nhất 1 project đã có WorkItems.
+        /// KHÔNG tính: SV trong nhóm, project chỉ được link nhưng chưa có nội dung.
+        /// </summary>
+        private static bool HasRealActivityData(InternshipGroup group)
+        {
+            // 1. Có bất kỳ logbook entry nào
+            if (group.Logbooks.Any())
+                return true;
+
+            // 2. Có bất kỳ báo cáo vi phạm nào
+            if (group.ViolationReports.Any())
+                return true;
+
+            // 3. Có bất kỳ project nào đã có WorkItems (task/submission/logbook)
+            if (group.Projects.Any(p => p.WorkItems.Any()))
+                return true;
+
+            return false;
         }
     }
 }

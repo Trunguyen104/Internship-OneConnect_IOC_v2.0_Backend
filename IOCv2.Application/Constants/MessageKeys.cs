@@ -175,6 +175,9 @@ namespace IOCv2.Application.Constants
             public const string MoveSuccess = "InternshipGroup.MoveSuccess";
             public const string ArchiveSuccess = "InternshipGroup.ArchiveSuccess";
             public const string GroupAlreadyArchived = "InternshipGroup.GroupAlreadyArchived";
+            public const string CannotArchiveNoData = "InternshipGroup.CannotArchiveNoData";
+            public const string HasActivityData = "InternshipGroup.HasActivityData";   // Nhóm có data thực tế, không thể xóa
+            public const string GroupNotActive = "InternshipGroup.GroupNotActive";     // Nhóm không ở trạng thái Active
 
 
             // Logger Keys
