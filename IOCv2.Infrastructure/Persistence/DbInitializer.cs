@@ -548,6 +548,68 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, JobId = SeedIds.JobReactId, Status = InternshipApplicationStatus.Interviewing, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-5) });
             }
 
+            // --- UniAssign Sample Data ---
+
+            // UniAssign: Student 5 -> Rikkeisoft (Pending Assignment)
+            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s5.StudentId && a.Source == ApplicationSource.UniAssign))
+            {
+                var app5 = new InternshipApplication
+                {
+                    ApplicationId = Guid.NewGuid(),
+                    EnterpriseId = rikkeisoft.EnterpriseId,
+                    TermId = spring2026.TermId,
+                    StudentId = s5.StudentId,
+                    JobId = SeedIds.JobJavaId,
+                    Status = InternshipApplicationStatus.PendingAssignment,
+                    Source = ApplicationSource.UniAssign,
+                    UniversityId = fptu.UniversityId,
+                    AppliedAt = DateTime.UtcNow.AddDays(-3)
+                };
+                _context.InternshipApplications.Add(app5);
+
+                _context.ApplicationStatusHistories.Add(new ApplicationStatusHistory
+                {
+                    HistoryId = Guid.NewGuid(),
+                    ApplicationId = app5.ApplicationId,
+                    FromStatus = InternshipApplicationStatus.Applied,
+                    ToStatus = InternshipApplicationStatus.PendingAssignment,
+                    TriggerSource = "System",
+                    ChangedByName = "Uni Admin (FPTU)",
+                    Note = "Assigned by University coordinator based on major matching.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-3)
+                });
+            }
+
+            // UniAssign: Student 1 -> Rikkeisoft (Rejected)
+            if (!await _context.InternshipApplications.AnyAsync(a => a.StudentId == s1.StudentId && a.EnterpriseId == rikkeisoft.EnterpriseId && a.Source == ApplicationSource.UniAssign))
+            {
+                var app1Reject = new InternshipApplication
+                {
+                    ApplicationId = Guid.NewGuid(),
+                    EnterpriseId = rikkeisoft.EnterpriseId,
+                    TermId = spring2026.TermId,
+                    StudentId = s1.StudentId,
+                    JobId = SeedIds.JobJavaId,
+                    Status = InternshipApplicationStatus.Rejected,
+                    Source = ApplicationSource.UniAssign,
+                    UniversityId = fptu.UniversityId,
+                    AppliedAt = DateTime.UtcNow.AddDays(-15)
+                };
+                _context.InternshipApplications.Add(app1Reject);
+
+                _context.ApplicationStatusHistories.Add(new ApplicationStatusHistory
+                {
+                    HistoryId = Guid.NewGuid(),
+                    ApplicationId = app1Reject.ApplicationId,
+                    FromStatus = InternshipApplicationStatus.PendingAssignment,
+                    ToStatus = InternshipApplicationStatus.Rejected,
+                    TriggerSource = "HR",
+                    ChangedByName = "HR Rikkeisoft",
+                    Note = "Candidate does not meet the minimum GPA requirement for the Java Backend position.",
+                    CreatedAt = DateTime.UtcNow.AddDays(-14)
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             // Temporary Fix: If there are applications with Source = 0, update them to SelfApply
