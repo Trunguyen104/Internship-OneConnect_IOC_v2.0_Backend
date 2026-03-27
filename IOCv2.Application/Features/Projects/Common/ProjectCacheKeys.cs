@@ -9,7 +9,9 @@ public static class ProjectCacheKeys
 
     public static string ProjectList(
         string? searchTerm,
-        int? status,
+        int? visibilityStatus,
+        int? operationalStatus,
+        bool showArchived,
         DateTime? fromDate,
         DateTime? toDate,
         Guid? internshipId,
@@ -20,7 +22,9 @@ public static class ProjectCacheKeys
         string? sortOrder)
     {
         var searchPart = string.IsNullOrWhiteSpace(searchTerm) ? "none" : searchTerm.Trim().ToLowerInvariant();
-        var statusPart = status?.ToString() ?? "all";
+        var visibilityPart = visibilityStatus?.ToString() ?? "all";
+        var operationalPart = operationalStatus?.ToString() ?? "all";
+        var archivedPart = showArchived ? "1" : "0";
         var fromPart = fromDate?.ToString("yyyyMMdd") ?? "none";
         var toPart = toDate?.ToString("yyyyMMdd") ?? "none";
         var internshipPart = internshipId?.ToString() ?? "all";
@@ -28,7 +32,7 @@ public static class ProjectCacheKeys
         var sortColumnPart = string.IsNullOrWhiteSpace(sortColumn) ? "default" : sortColumn.Trim().ToLowerInvariant();
         var sortOrderPart = string.IsNullOrWhiteSpace(sortOrder) ? "default" : sortOrder.Trim().ToLowerInvariant();
 
-        return $"{ProjectListPrefix}:status:{statusPart}:search:{searchPart}:from:{fromPart}:to:{toPart}:internship:{internshipPart}:student:{studentPart}:page:{pageNumber}:size:{pageSize}:sort:{sortColumnPart}:order:{sortOrderPart}";
+        return $"{ProjectListPrefix}:vis:{visibilityPart}:ops:{operationalPart}:archived:{archivedPart}:search:{searchPart}:from:{fromPart}:to:{toPart}:internship:{internshipPart}:student:{studentPart}:page:{pageNumber}:size:{pageSize}:sort:{sortColumnPart}:order:{sortOrderPart}";
     }
 
     public static string ProjectListPattern() => $"{ProjectListPrefix}:*";

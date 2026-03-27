@@ -46,9 +46,14 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Current lifecycle status of the project.
+        /// Visibility status of the project (Draft or Published).
         /// </summary>
-        public ProjectStatus? Status { get; set; }
+        public VisibilityStatus VisibilityStatus { get; set; }
+
+        /// <summary>
+        /// Operational status of the project (Unstarted, Active, Completed, Archived).
+        /// </summary>
+        public OperationalStatus OperationalStatus { get; set; }
 
         /// <summary>Template dự án (None, Scrum, Kanban)</summary>
         public ProjectTemplate Template { get; set; }

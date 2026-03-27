@@ -46,10 +46,12 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             GetAllProjectsQuery request,
             CancellationToken cancellationToken)
         {
-            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetAll), request.SearchTerm, request.Status);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogGetAll), request.SearchTerm, request.VisibilityStatus);
+
+            var isMentor = string.Equals(_currentUserService?.Role, "Mentor", StringComparison.OrdinalIgnoreCase);
+            var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
 
             var effectiveStudentId = request.StudentId;
-            var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
             if (isStudent)
             {
                 if (!Guid.TryParse(_currentUserService?.UserId, out var currentUserId))
@@ -74,7 +76,9 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 
             var cacheKey = ProjectCacheKeys.ProjectList(
                 request.SearchTerm,
-                request.Status.HasValue ? (int)request.Status.Value : null,
+                request.VisibilityStatus.HasValue ? (int)request.VisibilityStatus.Value : null,
+                request.OperationalStatus.HasValue ? (int)request.OperationalStatus.Value : null,
+                request.ShowArchived,
                 request.FromDate,
                 request.ToDate,
                 request.InternshipId,
@@ -102,11 +106,15 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                     (p.Description != null && p.Description.ToLower().Contains(term)));
             }
 
-            if (request.Status.HasValue)
-            {
-                query = query.Where(p => p.Status == request.Status.Value);
-            }
+            if (request.VisibilityStatus.HasValue)
+                query = query.Where(p => p.VisibilityStatus == request.VisibilityStatus.Value);
 
+            if (request.OperationalStatus.HasValue)
+                query = query.Where(p => p.OperationalStatus == request.OperationalStatus.Value);
+
+            // Hide Archived by default
+            if (!request.ShowArchived)
+                query = query.Where(p => p.OperationalStatus != OperationalStatus.Archived);
 
             if (request.FromDate.HasValue)
             {
@@ -132,18 +140,55 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                 query = query.Where(p => studentGroupIds.Contains(p.InternshipId));
             }
 
-            if (isStudent)
+            // 3. Apply role-based visibility filters
+            if (isMentor)
             {
-                query = query.Where(p => p.Status == ProjectStatus.Published || p.Status == ProjectStatus.Completed);
+                // Mentor sees: their own Drafts + all Published
+                if (!Guid.TryParse(_currentUserService?.UserId, out var mentorUserId))
+                    return Result<PaginatedResult<GetAllProjectsResponse>>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+                var mentorEnterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(eu => eu.UserId == mentorUserId, cancellationToken);
+
+                if (mentorEnterpriseUser != null)
+                {
+                    query = query.Where(p =>
+                        p.VisibilityStatus == VisibilityStatus.Published ||
+                        (p.VisibilityStatus == VisibilityStatus.Draft && p.MentorId == mentorEnterpriseUser.EnterpriseUserId));
+                }
+                else
+                {
+                    // Mentor has no enterprise user record — only show Published
+                    query = query.Where(p => p.VisibilityStatus == VisibilityStatus.Published);
+                }
+            }
+            else if (isStudent)
+            {
+                // Student: only Published + Active or Completed
+                query = query.Where(p =>
+                    p.VisibilityStatus == VisibilityStatus.Published &&
+                    (p.OperationalStatus == OperationalStatus.Active || p.OperationalStatus == OperationalStatus.Completed));
+            }
+            else
+            {
+                // HR, UniAdmin, Admin, EnterpriseAdmin, SchoolAdmin: only Published
+                // SuperAdmin has no role filter — sees everything
+                var isSuperAdmin = string.Equals(_currentUserService?.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
+                if (!isSuperAdmin)
+                {
+                    query = query.Where(p => p.VisibilityStatus == VisibilityStatus.Published);
+                }
             }
 
-            // 3. Get Total Count
+            // 4. Get Total Count
             var totalCount = await query.CountAsync(cancellationToken);
 
-            // 4. Sorting
+            // 5. Sorting
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
 
-            // 5. Pagination & Mapping
+            // 6. Pagination & Mapping
             var items = await query
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
@@ -172,8 +217,10 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                 ("startdate", false) => query.OrderBy(p => p.StartDate),
                 ("enddate", true) => query.OrderByDescending(p => p.EndDate),
                 ("enddate", false) => query.OrderBy(p => p.EndDate),
-                ("status", true) => query.OrderByDescending(p => p.Status),
-                ("status", false) => query.OrderBy(p => p.Status),
+                ("visibilitystatus", true) => query.OrderByDescending(p => p.VisibilityStatus),
+                ("visibilitystatus", false) => query.OrderBy(p => p.VisibilityStatus),
+                ("operationalstatus", true) => query.OrderByDescending(p => p.OperationalStatus),
+                ("operationalstatus", false) => query.OrderBy(p => p.OperationalStatus),
                 ("createdat", true) => query.OrderByDescending(p => p.CreatedAt),
                 ("createdat", false) => query.OrderBy(p => p.CreatedAt),
                 _ => query.OrderByDescending(p => p.CreatedAt)
