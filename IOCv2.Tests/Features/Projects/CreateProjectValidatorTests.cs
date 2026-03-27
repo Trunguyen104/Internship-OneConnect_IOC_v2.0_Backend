@@ -16,7 +16,7 @@ namespace IOCv2.Tests.Features.Projects
         public CreateProjectValidatorTests()
         {
             _mockMessageService = new Mock<IMessageService>();
-            
+
             // Setup message service to return the key itself so we can verify the exact error constant
             _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>()))
                 .Returns((string key) => key);
@@ -30,7 +30,6 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var command = new CreateProjectCommand
             {
-                InternshipId = Guid.NewGuid(),
                 ProjectName = "Valid Project",
                 Description = "A valid project description",
                 Field = "IT",
@@ -47,26 +46,6 @@ namespace IOCv2.Tests.Features.Projects
             result.Errors.Should().BeEmpty();
         }
 
-        [Fact]
-        public void Validate_EmptyInternshipId_ShouldHaveError()
-        {
-            // Arrange
-            var command = new CreateProjectCommand
-            {
-                InternshipId = Guid.Empty, // Invalid
-                ProjectName = "Valid Project"
-            };
-
-            // Act
-            var result = _validator.Validate(command);
-
-            // Assert
-            result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => 
-                e.PropertyName == nameof(CreateProjectCommand.InternshipId) && 
-                e.ErrorMessage == MessageKeys.Projects.ProjectsInternshipIdRequired);
-        }
-
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
@@ -76,7 +55,6 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var command = new CreateProjectCommand
             {
-                InternshipId = Guid.NewGuid(),
                 ProjectName = projectName // Invalid
             };
 
@@ -85,8 +63,8 @@ namespace IOCv2.Tests.Features.Projects
 
             // Assert
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => 
-                e.PropertyName == nameof(CreateProjectCommand.ProjectName) && 
+            result.Errors.Should().Contain(e =>
+                e.PropertyName == nameof(CreateProjectCommand.ProjectName) &&
                 e.ErrorMessage == MessageKeys.Projects.ProjectsProjectNameRequired);
         }
 
@@ -96,7 +74,6 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var command = new CreateProjectCommand
             {
-                InternshipId = Guid.NewGuid(),
                 ProjectName = new string('A', 256) // Exceeds max 255
             };
 
@@ -105,8 +82,8 @@ namespace IOCv2.Tests.Features.Projects
 
             // Assert
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => 
-                e.PropertyName == nameof(CreateProjectCommand.ProjectName) && 
+            result.Errors.Should().Contain(e =>
+                e.PropertyName == nameof(CreateProjectCommand.ProjectName) &&
                 e.ErrorMessage == MessageKeys.Projects.ProjectNameMaxLength);
         }
 
@@ -116,7 +93,6 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var command = new CreateProjectCommand
             {
-                InternshipId = Guid.NewGuid(),
                 ProjectName = "Valid Project",
                 Description = new string('B', 2001) // Exceeds max 2000
             };
@@ -126,8 +102,8 @@ namespace IOCv2.Tests.Features.Projects
 
             // Assert
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => 
-                e.PropertyName == nameof(CreateProjectCommand.Description) && 
+            result.Errors.Should().Contain(e =>
+                e.PropertyName == nameof(CreateProjectCommand.Description) &&
                 e.ErrorMessage == MessageKeys.Projects.DescriptionMaxLength);
         }
 
@@ -137,7 +113,6 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var command = new CreateProjectCommand
             {
-                InternshipId = Guid.NewGuid(),
                 ProjectName = "Valid Project",
                 StartDate = DateTime.UtcNow.AddDays(10), // Start after End
                 EndDate = DateTime.UtcNow.AddDays(5)
@@ -148,14 +123,14 @@ namespace IOCv2.Tests.Features.Projects
 
             // Assert
             result.IsValid.Should().BeFalse();
-            
+
             // Both StartDate and EndDate have rules checking against each other
-            result.Errors.Should().Contain(e => 
-                e.PropertyName == nameof(CreateProjectCommand.StartDate) && 
+            result.Errors.Should().Contain(e =>
+                e.PropertyName == nameof(CreateProjectCommand.StartDate) &&
                 e.ErrorMessage == MessageKeys.Projects.StartDateInvalidRange);
-                
-            result.Errors.Should().Contain(e => 
-                e.PropertyName == nameof(CreateProjectCommand.EndDate) && 
+
+            result.Errors.Should().Contain(e =>
+                e.PropertyName == nameof(CreateProjectCommand.EndDate) &&
                 e.ErrorMessage == MessageKeys.Projects.EndDateInvalidRange);
         }
     }

@@ -68,7 +68,6 @@ namespace IOCv2.Tests.Features.Projects
             var command = new CreateProjectCommand
             {
                 ProjectName = "New Project",
-                InternshipId = null,
                 Field = "IT",
                 Requirements = "Requirements"
             };
@@ -96,51 +95,40 @@ namespace IOCv2.Tests.Features.Projects
         }
 
         [Fact]
-        public async Task Handle_InternshipNotFound_ShouldReturnFailure()
+        public async Task Handle_EnterpriseUserNotFound_ShouldReturnFailure()
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var enterpriseUserId = Guid.NewGuid();
-            var command = new CreateProjectCommand { ProjectName = "New Project", InternshipId = Guid.NewGuid(), Field = "IT", Requirements = "Requirements" };
+            var command = new CreateProjectCommand { ProjectName = "New Project", Field = "IT", Requirements = "Requirements" };
 
             _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
-            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
-            {
-                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
-            }.AsQueryable().BuildMock());
-            _mockInternshipRepo.Setup(x => x.Query()).Returns(new List<InternshipGroup>().AsQueryable().BuildMock());
-            
-            _mockMessage.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Internship not found");
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>().AsQueryable().BuildMock());
+
+            _mockMessage.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Mentor not found");
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
             result.IsSuccess.Should().BeFalse();
-            result.Error.Should().Be("Internship not found");
+            result.Error.Should().Be("Mentor not found");
         }
 
         [Fact]
-        public async Task Handle_ProjectAlreadyExists_ShouldReturnFailure()
+        public async Task Handle_InvalidUserId_ShouldReturnUnauthorized()
         {
             // Arrange
-            var internshipId = Guid.NewGuid();
-            var command = new CreateProjectCommand { ProjectName = "New Project", InternshipId = internshipId };
+            var command = new CreateProjectCommand { ProjectName = "New Project" };
 
-            _mockInternshipRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<InternshipGroup, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
-            
-            _mockProjectRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Project, bool>>>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
-            
-            _mockMessage.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Project already exists");
+            _mockCurrentUser.Setup(x => x.UserId).Returns("not-a-guid");
+            _mockMessage.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Unauthorized");
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
             result.IsSuccess.Should().BeFalse();
-            result.Error.Should().Be("Project already exists");
+            result.Error.Should().Be("Unauthorized");
         }
     }
 }

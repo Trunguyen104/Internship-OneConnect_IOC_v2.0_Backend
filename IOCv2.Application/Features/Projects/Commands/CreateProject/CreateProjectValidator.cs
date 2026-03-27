@@ -1,12 +1,6 @@
 using FluentValidation;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser;
 using IOCv2.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
@@ -15,10 +9,6 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         private readonly IMessageService _messageService;
         public CreateProjectValidator(IMessageService messageService) {
             _messageService = messageService;
-            RuleFor(x => x.InternshipId)
-                .NotEqual(Guid.Empty)
-                .WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsInternshipIdRequired))
-                .When(x => x.InternshipId.HasValue);
 
             RuleFor(x => x.ProjectName)
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsProjectNameRequired))
