@@ -16,6 +16,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
         private readonly ICurrentUserService _currentUser;
         private readonly IMessageService _message;
         private readonly ICacheService _cacheService;
+        private readonly INotificationPushService _notificationService;
         private readonly ILogger<CompleteProjectHandler> _logger;
 
         public CompleteProjectHandler(
@@ -23,13 +24,15 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
             ICurrentUserService currentUser,
             IMessageService message,
             ICacheService cacheService,
+            INotificationPushService notificationService,
             ILogger<CompleteProjectHandler> logger)
         {
-            _unitOfWork   = unitOfWork;
-            _currentUser  = currentUser;
-            _message      = message;
-            _cacheService = cacheService;
-            _logger       = logger;
+            _unitOfWork           = unitOfWork;
+            _currentUser          = currentUser;
+            _message              = message;
+            _cacheService         = cacheService;
+            _notificationService  = notificationService;
+            _logger               = logger;
         }
 
         public async Task<Result<CompleteProjectResponse>> Handle(CompleteProjectCommand request, CancellationToken cancellationToken)
@@ -56,10 +59,10 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
                 project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<CompleteProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
-            if (project.Status != ProjectStatus.Published)
+            if (project.OperationalStatus != OperationalStatus.Active)
                 return Result<CompleteProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.InvalidStatusForComplete), ResultErrorType.BadRequest);
 
-            // Warning-only count: số sinh viên đang thuộc group của project.
+            // Warning: số sinh viên đang thuộc group của project
             var pendingCount = 0;
             if (project.InternshipId.HasValue)
             {
@@ -67,7 +70,10 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
                     .CountAsync(s => s.InternshipId == project.InternshipId.Value, cancellationToken);
             }
 
-            project.SetStatus(ProjectStatus.Completed);
+            // Warning: intern phase chưa kết thúc
+            var internPhaseEndWarning = project.InternshipGroup?.EndDate > DateTime.UtcNow.Date;
+
+            project.SetOperationalStatus(OperationalStatus.Completed);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -80,14 +86,6 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
                 await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
                 _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogCompleteSuccess), project.ProjectId);
-
-                return Result<CompleteProjectResponse>.Success(new CompleteProjectResponse
-                {
-                    ProjectId            = project.ProjectId,
-                    Status               = ProjectStatus.Completed,
-                    PendingStudentsCount = pendingCount,
-                    UpdatedAt            = project.UpdatedAt ?? DateTime.UtcNow
-                });
             }
             catch (Exception ex)
             {
@@ -95,6 +93,63 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
                 _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogCompleteError), project.ProjectId);
                 return Result<CompleteProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
+
+            // Post-commit: gửi notification đến Mentor nếu có
+            if (project.MentorId.HasValue)
+            {
+                try
+                {
+                    var mentorEnterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(eu => eu.EnterpriseUserId == project.MentorId, cancellationToken);
+
+                    var mentorUserId = mentorEnterpriseUser?.UserId;
+
+                    if (mentorUserId.HasValue)
+                    {
+                        var notification = new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId         = mentorUserId.Value,
+                            Title          = "Dự án đã hoàn thành",
+                            Content        = $"Dự án [{project.ProjectId}] đã được đánh dấu hoàn thành.",
+                            Type           = NotificationType.General,
+                            ReferenceType  = "Project",
+                            ReferenceId    = project.ProjectId,
+                            IsRead         = false
+                        };
+
+                        await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                        var unreadCount = await _unitOfWork.Repository<Notification>()
+                            .CountAsync(n => n.UserId == mentorUserId.Value && !n.IsRead, cancellationToken);
+
+                        await _notificationService.PushNewNotificationAsync(mentorUserId.Value, new
+                        {
+                            type             = NotificationType.General,
+                            referenceType    = "Project",
+                            referenceId      = project.ProjectId,
+                            currentUnreadCount = unreadCount
+                        }, cancellationToken);
+                    }
+                }
+                catch (Exception notifyEx)
+                {
+                    _logger.LogWarning(notifyEx,
+                        "CompleteProject succeeded but mentor notification failed for project {ProjectId}",
+                        project.ProjectId);
+                }
+            }
+
+            return Result<CompleteProjectResponse>.Success(new CompleteProjectResponse
+            {
+                ProjectId              = project.ProjectId,
+                OperationalStatus      = OperationalStatus.Completed,
+                PendingStudentsCount   = pendingCount,
+                InternPhaseEndWarning  = internPhaseEndWarning,
+                UpdatedAt              = project.UpdatedAt ?? DateTime.UtcNow
+            });
         }
     }
 }
