@@ -19,7 +19,9 @@ public static class ProjectCacheKeys
         int pageNumber,
         int pageSize,
         string? sortColumn,
-        string? sortOrder)
+        string? sortOrder,
+        string? field = null,
+        string? scopedUserId = null)
     {
         var searchPart = string.IsNullOrWhiteSpace(searchTerm) ? "none" : searchTerm.Trim().ToLowerInvariant();
         var visibilityPart = visibilityStatus?.ToString() ?? "all";
@@ -31,8 +33,11 @@ public static class ProjectCacheKeys
         var studentPart = studentId?.ToString() ?? "all";
         var sortColumnPart = string.IsNullOrWhiteSpace(sortColumn) ? "default" : sortColumn.Trim().ToLowerInvariant();
         var sortOrderPart = string.IsNullOrWhiteSpace(sortOrder) ? "default" : sortOrder.Trim().ToLowerInvariant();
+        var fieldPart = string.IsNullOrWhiteSpace(field) ? "all" : field.Trim().ToLowerInvariant();
+        // B2: user-scoped cache để tránh data leak giữa Mentor/Student
+        var userPart = string.IsNullOrWhiteSpace(scopedUserId) ? "public" : scopedUserId.Trim().ToLowerInvariant();
 
-        return $"{ProjectListPrefix}:vis:{visibilityPart}:ops:{operationalPart}:archived:{archivedPart}:search:{searchPart}:from:{fromPart}:to:{toPart}:internship:{internshipPart}:student:{studentPart}:page:{pageNumber}:size:{pageSize}:sort:{sortColumnPart}:order:{sortOrderPart}";
+        return $"{ProjectListPrefix}:user:{userPart}:vis:{visibilityPart}:ops:{operationalPart}:archived:{archivedPart}:search:{searchPart}:from:{fromPart}:to:{toPart}:internship:{internshipPart}:student:{studentPart}:field:{fieldPart}:page:{pageNumber}:size:{pageSize}:sort:{sortColumnPart}:order:{sortOrderPart}";
     }
 
     public static string ProjectListPattern() => $"{ProjectListPrefix}:*";

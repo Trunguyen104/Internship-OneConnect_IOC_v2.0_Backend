@@ -17,15 +17,18 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
         private readonly IMessageService _messageService;
         private readonly ICurrentUserService _currentUser;
         private readonly ICacheService _cacheService;
+        private readonly INotificationPushService _pushService;
 
         public DeleteProjectHandler(IUnitOfWork unitOfWork, ILogger<DeleteProjectHandler> logger,
-            IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService)
+            IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService,
+            INotificationPushService pushService)
         {
             _unitOfWork     = unitOfWork;
             _logger         = logger;
             _messageService = messageService;
             _currentUser    = currentUser;
             _cacheService   = cacheService;
+            _pushService    = pushService;
         }
 
         public async Task<Result<string>> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
@@ -53,16 +56,8 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            // Scope check: allow Mentor who created the project OR any Mentor from the same enterprise
-            var projectMentor = project.MentorId.HasValue
-                ? await _unitOfWork.Repository<EnterpriseUser>().Query()
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(eu => eu.EnterpriseUserId == project.MentorId.Value, cancellationToken)
-                : null;
-
-            bool isSameEnterprise = projectMentor != null && projectMentor.EnterpriseId == enterpriseUser.EnterpriseId;
-
-            if (project.MentorId != enterpriseUser.EnterpriseUserId && !isSameEnterprise)
+            // B8: Scope check — chỉ Mentor tạo project mới được xóa (AC-11)
+            if (project.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Block delete if project is already Completed or Archived
@@ -112,6 +107,29 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
                 _logger.LogInformation(_messageService.GetMessage(logKey), request.ProjectId);
+
+                // AC-13: Push ProjectListChanged signal tới Mentor
+                if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+                {
+                    try
+                    {
+                        await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                        {
+                            type      = ProjectSignalConstants.ProjectListChanged,
+                            action    = ProjectSignalConstants.Actions.Deleted,
+                            projectId = project.ProjectId
+                        }, cancellationToken);
+                        _logger.LogInformation(
+                            _messageService.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Deleted, mentorUserIdForSignal, project.ProjectId);
+                    }
+                    catch (Exception signalEx)
+                    {
+                        _logger.LogWarning(signalEx, _messageService.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Deleted, mentorUserIdForSignal, project.ProjectId);
+                    }
+                }
+
                 return Result<string>.Success(_messageService.GetMessage(MessageKeys.Projects.DeleteSuccess));
             }
             catch (Exception ex)

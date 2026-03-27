@@ -17,19 +17,22 @@ namespace IOCv2.Application.Features.Projects.Commands.ArchiveProject
         private readonly IMessageService _message;
         private readonly ICacheService _cacheService;
         private readonly ILogger<ArchiveProjectHandler> _logger;
+        private readonly INotificationPushService _pushService;
 
         public ArchiveProjectHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUser,
             IMessageService message,
             ICacheService cacheService,
-            ILogger<ArchiveProjectHandler> logger)
+            ILogger<ArchiveProjectHandler> logger,
+            INotificationPushService pushService)
         {
             _unitOfWork   = unitOfWork;
             _currentUser  = currentUser;
             _message      = message;
             _cacheService = cacheService;
             _logger       = logger;
+            _pushService  = pushService;
         }
 
         public async Task<Result<ArchiveProjectResponse>> Handle(ArchiveProjectCommand request, CancellationToken cancellationToken)
@@ -57,7 +60,7 @@ namespace IOCv2.Application.Features.Projects.Commands.ArchiveProject
             // Điều kiện: project phải ở trạng thái Completed
             if (project.OperationalStatus != OperationalStatus.Completed)
                 return Result<ArchiveProjectResponse>.Failure(
-                    "Project must be Completed before archiving.",
+                    _message.GetMessage(MessageKeys.Projects.MustBeCompletedToArchive),
                     ResultErrorType.BadRequest);
 
             project.SetOperationalStatus(OperationalStatus.Archived);
@@ -72,7 +75,29 @@ namespace IOCv2.Application.Features.Projects.Commands.ArchiveProject
                 await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
                 await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
-                _logger.LogInformation("Project {ProjectId} archived successfully.", project.ProjectId);
+                _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogArchiveSuccess), project.ProjectId);
+
+                // AC-13: Push ProjectListChanged signal tới Mentor
+                if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+                {
+                    try
+                    {
+                        await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                        {
+                            type      = ProjectSignalConstants.ProjectListChanged,
+                            action    = ProjectSignalConstants.Actions.Archived,
+                            projectId = project.ProjectId
+                        }, cancellationToken);
+                        _logger.LogInformation(
+                            _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Archived, mentorUserIdForSignal, project.ProjectId);
+                    }
+                    catch (Exception signalEx)
+                    {
+                        _logger.LogWarning(signalEx, _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Archived, mentorUserIdForSignal, project.ProjectId);
+                    }
+                }
 
                 return Result<ArchiveProjectResponse>.Success(new ArchiveProjectResponse
                 {
@@ -85,7 +110,7 @@ namespace IOCv2.Application.Features.Projects.Commands.ArchiveProject
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error archiving project {ProjectId}", project.ProjectId);
+                _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogArchiveError), project.ProjectId);
                 return Result<ArchiveProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
         }

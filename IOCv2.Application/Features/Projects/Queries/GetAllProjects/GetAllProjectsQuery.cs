@@ -67,5 +67,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// Sorting direction ('asc' or 'desc').
         /// </summary>
         public string? SortOrder { get; set; }
+
+        /// <summary>F3 (AC-01): Filter theo lĩnh vực dự án (VD: CNTT, Mobile, IoT)</summary>
+        public string? Field { get; set; }
     }
 }

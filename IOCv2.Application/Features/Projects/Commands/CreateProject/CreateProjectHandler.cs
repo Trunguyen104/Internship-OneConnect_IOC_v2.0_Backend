@@ -21,6 +21,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         private readonly ICacheService _cacheService;
         private readonly ICurrentUserService _currentUser;
         private readonly IFileStorageService _fileStorage;
+        private readonly INotificationPushService _pushService;
 
         public CreateProjectHandler(
             IUnitOfWork unitOfWork,
@@ -29,7 +30,8 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             IMessageService message,
             ICacheService cacheService,
             ICurrentUserService currentUser,
-            IFileStorageService fileStorage)
+            IFileStorageService fileStorage,
+            INotificationPushService pushService)
         {
             _unitOfWork   = unitOfWork;
             _mapper       = mapper;
@@ -38,6 +40,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             _cacheService = cacheService;
             _currentUser  = currentUser;
             _fileStorage  = fileStorage;
+            _pushService  = pushService;
         }
 
         public async Task<Result<CreateProjectResponse>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
@@ -104,12 +107,45 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 }
             }
 
-            // 5. Create + Persist
+            // 5. F1/F2: Validate optional group assignment trước khi tạo project
+            InternshipGroup? assignedGroup = null;
+            if (request.InternshipGroupId.HasValue)
+            {
+                assignedGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(g => g.InternshipId == request.InternshipGroupId.Value, cancellationToken);
+
+                if (assignedGroup == null)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound);
+
+                if (assignedGroup.Status == GroupStatus.Archived || assignedGroup.Status == GroupStatus.Finished)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
+
+                if (assignedGroup.EndDate.HasValue && assignedGroup.EndDate.Value.Date < DateTime.UtcNow.Date)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
+
+                if (assignedGroup.MentorId != enterpriseUser.EnterpriseUserId)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+            }
+
+            // 6. Create + Persist
             var newProject = Project.Create(
                 request.ProjectName, request.Description,
                 projectCode, request.Field, request.Requirements,
                 request.Deliverables, mentorId: enterpriseUser.EnterpriseUserId,
                 startDate: request.StartDate, endDate: request.EndDate);
+
+            // F2: PublishOnSave — Mentor nhấn Save → Published ngay khi tạo
+            if (request.PublishOnSave)
+                newProject.Publish();
+
+            // F2: AssignToGroup nếu có InternshipGroupId
+            if (assignedGroup != null)
+                newProject.AssignToGroup(assignedGroup.InternshipId, assignedGroup.StartDate, assignedGroup.EndDate);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -149,10 +185,59 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 if (request.Files?.Count > 0 || request.Links?.Count > 0)
                     await _unitOfWork.SaveChangeAsync(cancellationToken);
 
+                // F2: Notify students nếu project Published + có group assigned
+                if (assignedGroup != null && newProject.VisibilityStatus == VisibilityStatus.Published)
+                {
+                    var studentUserIds = await _unitOfWork.Repository<InternshipStudent>().Query()
+                        .Where(s => s.InternshipId == assignedGroup.InternshipId)
+                        .Select(s => s.Student.UserId)
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var userId in studentUserIds)
+                    {
+                        var notif = new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId         = userId,
+                            Title          = _message.GetMessage(MessageKeys.Projects.NotifNewProjectTitle),
+                            Content        = _message.GetMessage(MessageKeys.Projects.NotifNewProjectContent, newProject.ProjectName),
+                            Type           = NotificationType.General,
+                            ReferenceType  = "Project",
+                            ReferenceId    = newProject.ProjectId
+                        };
+                        await _unitOfWork.Repository<Notification>().AddAsync(notif, cancellationToken);
+                    }
+
+                    if (studentUserIds.Any())
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
+                }
+
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
                 _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogCreateSuccess), newProject.ProjectId);
+
+                // AC-13: Push ProjectListChanged signal tới Mentor
+                if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+                {
+                    try
+                    {
+                        await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                        {
+                            type      = ProjectSignalConstants.ProjectListChanged,
+                            action    = ProjectSignalConstants.Actions.Created,
+                            projectId = newProject.ProjectId
+                        }, cancellationToken);
+                        _logger.LogInformation(
+                            _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Created, mentorUserIdForSignal, newProject.ProjectId);
+                    }
+                    catch (Exception signalEx)
+                    {
+                        _logger.LogWarning(signalEx, _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Created, mentorUserIdForSignal, newProject.ProjectId);
+                    }
+                }
 
                 // Reload kèm resources nếu có đính kèm, ngược lại map trực tiếp từ entity
                 if (uploadedFiles.Count > 0 || request.Links?.Count > 0)

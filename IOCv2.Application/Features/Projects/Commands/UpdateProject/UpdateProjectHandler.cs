@@ -19,16 +19,19 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
         private readonly IMessageService _messageService;
         private readonly ICurrentUserService _currentUser;
         private readonly ICacheService _cacheService;
+        private readonly INotificationPushService _pushService;
 
         public UpdateProjectHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateProjectHandler> logger,
-            IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService)
+            IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService,
+            INotificationPushService pushService)
         {
-            _unitOfWork    = unitOfWork;
-            _mapper        = mapper;
-            _logger        = logger;
+            _unitOfWork     = unitOfWork;
+            _mapper         = mapper;
+            _logger         = logger;
             _messageService = messageService;
-            _currentUser   = currentUser;
-            _cacheService  = cacheService;
+            _currentUser    = currentUser;
+            _cacheService   = cacheService;
+            _pushService    = pushService;
         }
 
         public async Task<Result<UpdateProjectResponse>> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
@@ -55,9 +58,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            // Scope check: project creator hoặc Mentor của group được assign
-            if (project.MentorId != enterpriseUser.EnterpriseUserId &&
-                project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
+            // B9: Scope check — chỉ Mentor tạo project mới được edit (AC-08, AC-14)
+            if (project.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Block nếu project không còn editable (OperationalStatus không phải Unstarted/Active)
@@ -122,8 +124,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                         {
                             NotificationId = Guid.NewGuid(),
                             UserId         = userId,
-                            Title          = "Dự án được cập nhật",
-                            Content        = $"Dự án {project.ProjectName} vừa được cập nhật bởi Mentor.",
+                            Title          = _messageService.GetMessage(MessageKeys.Projects.NotifUpdatedTitle),
+                            Content        = _messageService.GetMessage(MessageKeys.Projects.NotifUpdatedContent, project.ProjectName),
                             Type           = NotificationType.General,
                             ReferenceType  = "Project",
                             ReferenceId    = project.ProjectId
@@ -146,6 +148,28 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
             await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogUpdateSuccess), request.ProjectId);
+
+            // AC-13: Push ProjectListChanged signal tới Mentor
+            if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+            {
+                try
+                {
+                    await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                    {
+                        type      = ProjectSignalConstants.ProjectListChanged,
+                        action    = ProjectSignalConstants.Actions.Updated,
+                        projectId = project.ProjectId
+                    }, cancellationToken);
+                    _logger.LogInformation(
+                        _messageService.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.Updated, mentorUserIdForSignal, project.ProjectId);
+                }
+                catch (Exception signalEx)
+                {
+                    _logger.LogWarning(signalEx, _messageService.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.Updated, mentorUserIdForSignal, project.ProjectId);
+                }
+            }
 
             // Đếm sinh viên trong group
             if (project.InternshipId.HasValue)

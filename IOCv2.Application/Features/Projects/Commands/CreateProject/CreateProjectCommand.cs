@@ -15,8 +15,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         public string Url { get; set; } = string.Empty;
     }
 
-    public class 
-        CreateProjectCommand : IRequest<Result<CreateProjectResponse>>
+    public class CreateProjectCommand : IRequest<Result<CreateProjectResponse>>
     {
         public string ProjectName { get; set; } = string.Empty;
         public string? Description { get; set; }
@@ -27,6 +26,12 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
         public string Field { get; set; } = string.Empty;
         public string Requirements { get; set; } = string.Empty;
         public string? Deliverables { get; set; }
+
+        /// <summary>F1 (AC-02): Gán ngay Intern Group khi tạo (optional)</summary>
+        public Guid? InternshipGroupId { get; set; }
+
+        /// <summary>F1 (AC-02): true = Mentor nhấn Save → Published; false = auto-save → Draft</summary>
+        public bool PublishOnSave { get; set; } = false;
 
         /// <summary>
         /// Upload file tài liệu đính kèm (pdf, docx, xlsx, pptx, zip, rar, jpg, png — tối đa theo giới hạn từng loại).

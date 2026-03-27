@@ -111,8 +111,8 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
                         {
                             NotificationId = Guid.NewGuid(),
                             UserId         = mentorUserId.Value,
-                            Title          = "Dự án đã hoàn thành",
-                            Content        = $"Dự án [{project.ProjectId}] đã được đánh dấu hoàn thành.",
+                            Title          = _message.GetMessage(MessageKeys.Projects.NotifCompletedTitle),
+                            Content        = _message.GetMessage(MessageKeys.Projects.NotifCompletedContent, project.ProjectId),
                             Type           = NotificationType.General,
                             ReferenceType  = "Project",
                             ReferenceId    = project.ProjectId,
@@ -137,8 +137,30 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
                 catch (Exception notifyEx)
                 {
                     _logger.LogWarning(notifyEx,
-                        "CompleteProject succeeded but mentor notification failed for project {ProjectId}",
+                        _message.GetMessage(MessageKeys.Projects.LogCompleteNotificationFailed),
                         project.ProjectId);
+                }
+            }
+
+            // AC-13: Push ProjectListChanged signal tới Mentor
+            if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+            {
+                try
+                {
+                    await _notificationService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                    {
+                        type      = ProjectSignalConstants.ProjectListChanged,
+                        action    = ProjectSignalConstants.Actions.Completed,
+                        projectId = project.ProjectId
+                    }, cancellationToken);
+                    _logger.LogInformation(
+                        _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.Completed, mentorUserIdForSignal, project.ProjectId);
+                }
+                catch (Exception signalEx)
+                {
+                    _logger.LogWarning(signalEx, _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.Completed, mentorUserIdForSignal, project.ProjectId);
                 }
             }
 

@@ -58,6 +58,15 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// <summary>Template dự án (None, Scrum, Kanban)</summary>
         public ProjectTemplate Template { get; set; }
 
+        /// <summary>B7: Tên nhóm được gán (hoặc null nếu chưa gán)</summary>
+        public string? GroupName { get; set; }
+
+        /// <summary>B11: Trạng thái nhóm để hiển thị badge "Nhóm đã lưu trữ" (AC-15)</summary>
+        public GroupStatus? GroupStatus { get; set; }
+
+        /// <summary>F4: true khi group bị xóa và project trở thành orphan (AC-16)</summary>
+        public bool IsOrphaned { get; set; }
+
         /// <summary>
         /// Date and time when the project record was created.
         /// </summary>
@@ -69,7 +78,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// <param name="profile">The Automapper profile.</param>
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Project, GetAllProjectsResponse>();
+            profile.CreateMap<Project, GetAllProjectsResponse>()
+                .ForMember(dest => dest.GroupName,
+                           opt => opt.MapFrom(src => src.InternshipGroup != null ? src.InternshipGroup.GroupName : null))
+                .ForMember(dest => dest.GroupStatus,
+                           opt => opt.MapFrom(src => src.InternshipGroup != null ? (GroupStatus?)src.InternshipGroup.Status : null));
         }
     }
 }

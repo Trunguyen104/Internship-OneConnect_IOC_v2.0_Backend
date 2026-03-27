@@ -17,19 +17,22 @@ namespace IOCv2.Application.Features.Projects.Commands.PublishProject
         private readonly IMessageService _message;
         private readonly ICacheService _cacheService;
         private readonly ILogger<PublishProjectHandler> _logger;
+        private readonly INotificationPushService _pushService;
 
         public PublishProjectHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUser,
             IMessageService message,
             ICacheService cacheService,
-            ILogger<PublishProjectHandler> logger)
+            ILogger<PublishProjectHandler> logger,
+            INotificationPushService pushService)
         {
             _unitOfWork   = unitOfWork;
             _currentUser  = currentUser;
             _message      = message;
             _cacheService = cacheService;
             _logger       = logger;
+            _pushService  = pushService;
         }
 
         public async Task<Result<PublishProjectResponse>> Handle(PublishProjectCommand request, CancellationToken cancellationToken)
@@ -75,6 +78,28 @@ namespace IOCv2.Application.Features.Projects.Commands.PublishProject
                 await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
                 _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogPublishSuccess), project.ProjectId);
+
+                // AC-13: Push ProjectListChanged signal tới Mentor
+                if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+                {
+                    try
+                    {
+                        await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                        {
+                            type      = ProjectSignalConstants.ProjectListChanged,
+                            action    = ProjectSignalConstants.Actions.Published,
+                            projectId = project.ProjectId
+                        }, cancellationToken);
+                        _logger.LogInformation(
+                            _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Published, mentorUserIdForSignal, project.ProjectId);
+                    }
+                    catch (Exception signalEx)
+                    {
+                        _logger.LogWarning(signalEx, _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                            ProjectSignalConstants.Actions.Published, mentorUserIdForSignal, project.ProjectId);
+                    }
+                }
 
                 return Result<PublishProjectResponse>.Success(new PublishProjectResponse
                 {

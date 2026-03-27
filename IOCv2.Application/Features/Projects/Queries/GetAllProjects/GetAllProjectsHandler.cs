@@ -74,6 +74,9 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                 effectiveStudentId = currentStudentId;
             }
 
+            // B2: Thêm userId vào cache key để tránh data leak giữa các Mentor/Student
+            string? scopedUserId = (isMentor || isStudent) ? _currentUserService?.UserId : null;
+
             var cacheKey = ProjectCacheKeys.ProjectList(
                 request.SearchTerm,
                 request.VisibilityStatus.HasValue ? (int)request.VisibilityStatus.Value : null,
@@ -86,7 +89,9 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                 request.PageNumber,
                 request.PageSize,
                 request.SortColumn,
-                request.SortOrder);
+                request.SortOrder,
+                request.Field,
+                scopedUserId);
 
             var cached = await _cacheService.GetAsync<PaginatedResult<GetAllProjectsResponse>>(cacheKey, cancellationToken);
             if (cached != null)
@@ -131,6 +136,12 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
                 query = query.Where(p => p.InternshipId == request.InternshipId.Value);
             }
 
+            // F3: Filter theo Field (AC-01)
+            if (!string.IsNullOrWhiteSpace(request.Field))
+            {
+                query = query.Where(p => p.Field == request.Field);
+            }
+
             if (effectiveStudentId.HasValue)
             {
                 var sid = effectiveStudentId.Value;
@@ -143,7 +154,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
             // 3. Apply role-based visibility filters
             if (isMentor)
             {
-                // Mentor sees: their own Drafts + all Published
+                // B1: Mentor chỉ thấy project do chính mình tạo (Draft + Published)
                 if (!Guid.TryParse(_currentUserService?.UserId, out var mentorUserId))
                     return Result<PaginatedResult<GetAllProjectsResponse>>.Failure(
                         _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
@@ -154,14 +165,12 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 
                 if (mentorEnterpriseUser != null)
                 {
-                    query = query.Where(p =>
-                        p.VisibilityStatus == VisibilityStatus.Published ||
-                        (p.VisibilityStatus == VisibilityStatus.Draft && p.MentorId == mentorEnterpriseUser.EnterpriseUserId));
+                    query = query.Where(p => p.MentorId == mentorEnterpriseUser.EnterpriseUserId);
                 }
                 else
                 {
-                    // Mentor has no enterprise user record — only show Published
-                    query = query.Where(p => p.VisibilityStatus == VisibilityStatus.Published);
+                    // Mentor không có enterprise user record — không có project nào
+                    query = query.Where(p => false);
                 }
             }
             else if (isStudent)

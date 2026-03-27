@@ -24,6 +24,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<IGenericRepository<EnterpriseUser>> _mockEnterpriseUserRepo;
         private readonly Mock<IGenericRepository<WorkItem>> _mockWorkItemRepo;
         private readonly Mock<IGenericRepository<Sprint>> _mockSprintRepo;
+        private readonly Mock<INotificationPushService> _mockPushService;
         private readonly DeleteProjectHandler _handler;
 
         public DeleteProjectHandlerTests()
@@ -33,6 +34,7 @@ namespace IOCv2.Tests.Features.Projects
             _mockMessageService = new Mock<IMessageService>();
             _mockCurrentUser = new Mock<ICurrentUserService>();
             _mockCacheService = new Mock<ICacheService>();
+            _mockPushService = new Mock<INotificationPushService>();
             
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
             _mockEnterpriseUserRepo = new Mock<IGenericRepository<EnterpriseUser>>();
@@ -52,7 +54,8 @@ namespace IOCv2.Tests.Features.Projects
                 _mockLogger.Object,
                 _mockMessageService.Object,
                 _mockCurrentUser.Object,
-                _mockCacheService.Object);
+                _mockCacheService.Object,
+                _mockPushService.Object);
         }
 
         [Fact]

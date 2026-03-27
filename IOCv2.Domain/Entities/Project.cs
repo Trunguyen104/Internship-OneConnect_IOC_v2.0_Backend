@@ -25,6 +25,9 @@ namespace IOCv2.Domain.Entities
         public string Requirements { get; private set; } = string.Empty;
         public string? Deliverables { get; private set; }
 
+        // AC-16: true khi InternshipGroup bị xóa và project bị tách ra (orphan)
+        public bool IsOrphaned { get; private set; }
+
         // Computed property
         public bool IsEditable => OperationalStatus == OperationalStatus.Unstarted || OperationalStatus == OperationalStatus.Active;
 
@@ -115,6 +118,7 @@ namespace IOCv2.Domain.Entities
             StartDate         = startDate;
             EndDate           = endDate;
             OperationalStatus = OperationalStatus.Active;
+            IsOrphaned        = false;  // Reset orphan flag khi gán nhóm mới
             UpdatedAt         = DateTime.UtcNow;
         }
 
@@ -127,13 +131,15 @@ namespace IOCv2.Domain.Entities
         }
 
         /// <summary>
-        /// AC-13: Khi InternshipGroup bị xóa, project bị "orphan" — tách khỏi group.
+        /// AC-16: Khi InternshipGroup bị xóa, project bị "orphan" — tách khỏi group.
         /// InternshipId → null. OperationalStatus → Unstarted. VisibilityStatus không đổi.
+        /// IsOrphaned → true (để phân biệt với project chưa bao giờ được gán nhóm).
         /// </summary>
         public void SetOrphan()
         {
             InternshipId      = null;
             OperationalStatus = OperationalStatus.Unstarted;
+            IsOrphaned        = true;
             UpdatedAt         = DateTime.UtcNow;
         }
 

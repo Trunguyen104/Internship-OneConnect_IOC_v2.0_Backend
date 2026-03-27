@@ -55,7 +55,7 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
 
             // Project phải đang Active (có group)
             if (project.OperationalStatus != OperationalStatus.Active)
-                return Result<SwapGroupResponse>.Failure("Project is not currently assigned to any group.", ResultErrorType.BadRequest);
+                return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.ProjectNotAssigned), ResultErrorType.BadRequest);
 
             // Student data check: block swap nếu có WorkItem hoặc Sprint
             if (project.InternshipId.HasValue)
@@ -64,13 +64,13 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                     .AnyAsync(w => w.ProjectId == project.ProjectId, cancellationToken);
 
                 if (hasWorkItems)
-                    return Result<SwapGroupResponse>.Failure("Cannot swap group: project has student data (work items).", ResultErrorType.BadRequest);
+                    return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.HasStudentDataWorkItems), ResultErrorType.BadRequest);
 
                 var hasSprints = await _unitOfWork.Repository<Sprint>().Query()
                     .AnyAsync(s => s.ProjectId == project.ProjectId, cancellationToken);
 
                 if (hasSprints)
-                    return Result<SwapGroupResponse>.Failure("Cannot swap group: project has student data (sprints).", ResultErrorType.BadRequest);
+                    return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.HasStudentDataSprints), ResultErrorType.BadRequest);
             }
 
             // Load new group
@@ -81,10 +81,10 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                 return Result<SwapGroupResponse>.NotFound(_message.GetMessage(MessageKeys.Internships.NotFound));
 
             if (newGroup.Status == GroupStatus.Archived || newGroup.Status == GroupStatus.Finished)
-                return Result<SwapGroupResponse>.Failure("Group is not active.", ResultErrorType.BadRequest);
+                return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
 
             if (newGroup.EndDate.HasValue && newGroup.EndDate.Value.Date < DateTime.UtcNow.Date)
-                return Result<SwapGroupResponse>.Failure("Group's internship phase has ended.", ResultErrorType.BadRequest);
+                return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
 
             // Mentor phải phụ trách group mới
             if (newGroup.MentorId != enterpriseUser.EnterpriseUserId)
@@ -104,7 +104,7 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error swapping group for project {ProjectId}", project.ProjectId);
+                _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogSwapGroupError), project.ProjectId);
                 return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
 
@@ -127,8 +127,8 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                             {
                                 NotificationId = Guid.NewGuid(),
                                 UserId         = userId,
-                                Title          = "Dự án đã rời nhóm",
-                                Content        = $"Dự án {project.ProjectName} không còn thuộc nhóm của bạn.",
+                                Title          = _message.GetMessage(MessageKeys.Projects.NotifProjectLeftTitle),
+                                Content        = _message.GetMessage(MessageKeys.Projects.NotifProjectLeftContent, project.ProjectName),
                                 Type           = NotificationType.General,
                                 ReferenceType  = "Project",
                                 ReferenceId    = project.ProjectId
@@ -166,8 +166,8 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                         {
                             NotificationId = Guid.NewGuid(),
                             UserId         = userId,
-                            Title          = "Dự án mới trong nhóm",
-                            Content        = $"Dự án {project.ProjectName} vừa được thêm vào nhóm của bạn.",
+                            Title          = _message.GetMessage(MessageKeys.Projects.NotifNewProjectTitle),
+                            Content        = _message.GetMessage(MessageKeys.Projects.NotifNewProjectContent, project.ProjectName),
                             Type           = NotificationType.General,
                             ReferenceType  = "Project",
                             ReferenceId    = project.ProjectId
@@ -194,15 +194,37 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to send notifications for project {ProjectId} swap group", project.ProjectId);
+                    _logger.LogWarning(ex, _message.GetMessage(MessageKeys.Projects.LogSwapNotificationFailed), project.ProjectId);
                 }
             }
 
             await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
             await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
-            _logger.LogInformation("Project {ProjectId} swapped from group {OldInternshipId} to group {NewInternshipId}",
+            _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogSwapGroupSuccess),
                 project.ProjectId, oldInternshipId, newGroup.InternshipId);
+
+            // AC-13: Push ProjectListChanged signal tới Mentor
+            if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+            {
+                try
+                {
+                    await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                    {
+                        type      = ProjectSignalConstants.ProjectListChanged,
+                        action    = ProjectSignalConstants.Actions.GroupSwapped,
+                        projectId = project.ProjectId
+                    }, cancellationToken);
+                    _logger.LogInformation(
+                        _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.GroupSwapped, mentorUserIdForSignal, project.ProjectId);
+                }
+                catch (Exception signalEx)
+                {
+                    _logger.LogWarning(signalEx, _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.GroupSwapped, mentorUserIdForSignal, project.ProjectId);
+                }
+            }
 
             return Result<SwapGroupResponse>.Success(new SwapGroupResponse
             {

@@ -123,6 +123,12 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             .HasColumnName("deliverables")
             .HasMaxLength(2000);
 
+        // F4: IsOrphaned flag (AC-16) — phân biệt "chưa gán nhóm" vs "nhóm bị xóa"
+        builder.Property(x => x.IsOrphaned)
+            .HasColumnName("is_orphaned")
+            .HasDefaultValue(false)
+            .IsRequired();
+
         // FK: MentorId → enterprise_users ON DELETE SET NULL
         builder.HasOne<EnterpriseUser>()
             .WithMany()

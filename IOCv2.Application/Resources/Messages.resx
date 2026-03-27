@@ -726,6 +726,81 @@
   <data name="Projects.LogGetStudentsSuccess" xml:space="preserve">
     <value>Lấy danh sách sinh viên cho project {0} thành công.</value>
   </data>
+  <data name="Projects.UnpublishSuccess" xml:space="preserve">
+    <value>Dự án đã được chuyển về trạng thái Bản nháp thành công.</value>
+  </data>
+  <data name="Projects.LogUnpublishSuccess" xml:space="preserve">
+    <value>Project {0} đã được unpublish thành công.</value>
+  </data>
+  <data name="Projects.LogUnpublishError" xml:space="preserve">
+    <value>Lỗi khi unpublish project {0}.</value>
+  </data>
+  <data name="Projects.ArchiveSuccess" xml:space="preserve">
+    <value>Dự án đã được lưu trữ thành công.</value>
+  </data>
+  <data name="Projects.LogArchiveSuccess" xml:space="preserve">
+    <value>Project {0} đã được archive thành công.</value>
+  </data>
+  <data name="Projects.LogArchiveError" xml:space="preserve">
+    <value>Lỗi khi archive project {0}.</value>
+  </data>
+  <data name="Projects.AssignGroupSuccess" xml:space="preserve">
+    <value>Dự án đã được gán vào nhóm thực tập thành công.</value>
+  </data>
+  <data name="Projects.LogAssignGroupSuccess" xml:space="preserve">
+    <value>Project {0} đã được gán vào nhóm {1}.</value>
+  </data>
+  <data name="Projects.LogAssignGroupError" xml:space="preserve">
+    <value>Lỗi khi gán nhóm cho project {0}.</value>
+  </data>
+  <data name="Projects.SwapGroupSuccess" xml:space="preserve">
+    <value>Dự án đã được chuyển sang nhóm thực tập mới thành công.</value>
+  </data>
+  <data name="Projects.LogSwapGroupSuccess" xml:space="preserve">
+    <value>Project {0} đã được chuyển từ nhóm {1} sang nhóm {2}.</value>
+  </data>
+  <data name="Projects.LogSwapGroupError" xml:space="preserve">
+    <value>Lỗi khi hoán đổi nhóm cho project {0}.</value>
+  </data>
+  <data name="Projects.NotifNewProjectTitle" xml:space="preserve">
+    <value>Dự án mới trong nhóm</value>
+  </data>
+  <data name="Projects.NotifNewProjectContent" xml:space="preserve">
+    <value>Dự án {0} vừa được thêm vào nhóm của bạn.</value>
+  </data>
+  <data name="Projects.NotifProjectLeftTitle" xml:space="preserve">
+    <value>Dự án đã rời nhóm</value>
+  </data>
+  <data name="Projects.NotifProjectLeftContent" xml:space="preserve">
+    <value>Dự án {0} không còn thuộc nhóm của bạn.</value>
+  </data>
+  <data name="Projects.NotifUpdatedTitle" xml:space="preserve">
+    <value>Dự án được cập nhật</value>
+  </data>
+  <data name="Projects.NotifUpdatedContent" xml:space="preserve">
+    <value>Dự án {0} vừa được cập nhật bởi Mentor.</value>
+  </data>
+  <data name="Projects.NotifCompletedTitle" xml:space="preserve">
+    <value>Dự án đã hoàn thành</value>
+  </data>
+  <data name="Projects.NotifCompletedContent" xml:space="preserve">
+    <value>Dự án [{0}] đã được đánh dấu hoàn thành.</value>
+  </data>
+  <data name="Projects.LogCompleteNotificationFailed" xml:space="preserve">
+    <value>Hoàn thành project thành công nhưng gửi thông báo cho Mentor thất bại. ProjectId: {0}.</value>
+  </data>
+  <data name="Projects.LogAssignNotificationFailed" xml:space="preserve">
+    <value>Gán nhóm cho project thành công nhưng gửi thông báo thất bại. ProjectId: {0}.</value>
+  </data>
+  <data name="Projects.LogSwapNotificationFailed" xml:space="preserve">
+    <value>Hoán đổi nhóm cho project thành công nhưng gửi thông báo thất bại. ProjectId: {0}.</value>
+  </data>
+  <data name="Projects.LogUpdateNotificationFailed" xml:space="preserve">
+    <value>Cập nhật project thành công nhưng gửi thông báo thất bại. ProjectId: {0}.</value>
+  </data>
+  <data name="Projects.LogProjectListChanged" xml:space="preserve">
+    <value>Đã gửi tín hiệu ProjectListChanged (action={0}) tới Mentor {1} cho project {2}.</value>
+  </data>
   <data name="InternshipGroups.NotificationOrphanTitle" xml:space="preserve">
     <value>Nhóm thực tập bị xóa</value>
   </data>
@@ -782,5 +857,32 @@
   </data>
   <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
     <value>Nộp nhật ký thực tập trễ</value>
+  </data>
+  <data name="Profile.LogUpdateStart" xml:space="preserve">
+    <value>[START] UpdateMyProfile cho User: {UserId}</value>
+  </data>
+  <data name="Profile.LogAuthFailed" xml:space="preserve">
+    <value>[AUTH_FAILED] User ID không tìm thấy trong context.</value>
+  </data>
+  <data name="Profile.LogUserNotFound" xml:space="preserve">
+    <value>[NOT_FOUND] Không tìm thấy user: {UserId}</value>
+  </data>
+  <data name="Profile.LogUpdateSuccess" xml:space="preserve">
+    <value>[SUCCESS] Đã cập nhật profile cho user: {UserId}</value>
+  </data>
+  <data name="Profile.LogUpdateError" xml:space="preserve">
+    <value>[ERROR] Lỗi khi cập nhật profile cho user: {UserId}</value>
+  </data>
+  <data name="Profile.LogCvFileNotFound" xml:space="preserve">
+    <value>Không tìm thấy file CV trong storage cho User: {UserId}</value>
+  </data>
+  <data name="Profile.LogGetProfile" xml:space="preserve">
+    <value>Đang lấy profile cho User {UserId}</value>
+  </data>
+  <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy User {UserId} khi lấy profile</value>
+  </data>
+  <data name="Profile.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật thông tin cá nhân thành công.</value>
   </data>
 </root>

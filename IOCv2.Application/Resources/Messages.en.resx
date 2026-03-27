@@ -652,6 +652,81 @@
   <data name="Projects.LogGetStudentsSuccess" xml:space="preserve">
     <value>Retrieved students for project {0}.</value>
   </data>
+  <data name="Projects.UnpublishSuccess" xml:space="preserve">
+    <value>Project successfully moved back to Draft.</value>
+  </data>
+  <data name="Projects.LogUnpublishSuccess" xml:space="preserve">
+    <value>Project {0} unpublished successfully.</value>
+  </data>
+  <data name="Projects.LogUnpublishError" xml:space="preserve">
+    <value>Error unpublishing project {0}.</value>
+  </data>
+  <data name="Projects.ArchiveSuccess" xml:space="preserve">
+    <value>Project archived successfully.</value>
+  </data>
+  <data name="Projects.LogArchiveSuccess" xml:space="preserve">
+    <value>Project {0} archived successfully.</value>
+  </data>
+  <data name="Projects.LogArchiveError" xml:space="preserve">
+    <value>Error archiving project {0}.</value>
+  </data>
+  <data name="Projects.AssignGroupSuccess" xml:space="preserve">
+    <value>Project assigned to internship group successfully.</value>
+  </data>
+  <data name="Projects.LogAssignGroupSuccess" xml:space="preserve">
+    <value>Project {0} assigned to group {1}.</value>
+  </data>
+  <data name="Projects.LogAssignGroupError" xml:space="preserve">
+    <value>Error assigning group to project {0}.</value>
+  </data>
+  <data name="Projects.SwapGroupSuccess" xml:space="preserve">
+    <value>Project group swapped successfully.</value>
+  </data>
+  <data name="Projects.LogSwapGroupSuccess" xml:space="preserve">
+    <value>Project {0} swapped from group {1} to group {2}.</value>
+  </data>
+  <data name="Projects.LogSwapGroupError" xml:space="preserve">
+    <value>Error swapping group for project {0}.</value>
+  </data>
+  <data name="Projects.NotifNewProjectTitle" xml:space="preserve">
+    <value>New project in your group</value>
+  </data>
+  <data name="Projects.NotifNewProjectContent" xml:space="preserve">
+    <value>Project {0} has been added to your group.</value>
+  </data>
+  <data name="Projects.NotifProjectLeftTitle" xml:space="preserve">
+    <value>Project removed from your group</value>
+  </data>
+  <data name="Projects.NotifProjectLeftContent" xml:space="preserve">
+    <value>Project {0} is no longer part of your group.</value>
+  </data>
+  <data name="Projects.NotifUpdatedTitle" xml:space="preserve">
+    <value>Project updated</value>
+  </data>
+  <data name="Projects.NotifUpdatedContent" xml:space="preserve">
+    <value>Project {0} has been updated by Mentor.</value>
+  </data>
+  <data name="Projects.NotifCompletedTitle" xml:space="preserve">
+    <value>Project completed</value>
+  </data>
+  <data name="Projects.NotifCompletedContent" xml:space="preserve">
+    <value>Project [{0}] has been marked as completed.</value>
+  </data>
+  <data name="Projects.LogCompleteNotificationFailed" xml:space="preserve">
+    <value>CompleteProject succeeded but mentor notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogAssignNotificationFailed" xml:space="preserve">
+    <value>Group assignment succeeded but student notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogSwapNotificationFailed" xml:space="preserve">
+    <value>Group swap succeeded but student notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogUpdateNotificationFailed" xml:space="preserve">
+    <value>Project update succeeded but student notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogProjectListChanged" xml:space="preserve">
+    <value>Sent ProjectListChanged signal (action={0}) to Mentor {1} for project {2}.</value>
+  </data>
   <data name="InternshipGroups.NotificationOrphanTitle" xml:space="preserve">
     <value>Internship group deleted</value>
   </data>
@@ -711,5 +786,32 @@
   </data>
   <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
     <value>Late logbook submission</value>
+  </data>
+  <data name="Profile.LogUpdateStart" xml:space="preserve">
+    <value>[START] UpdateMyProfile for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogAuthFailed" xml:space="preserve">
+    <value>[AUTH_FAILED] User ID not found in context.</value>
+  </data>
+  <data name="Profile.LogUserNotFound" xml:space="preserve">
+    <value>[NOT_FOUND] User not found: {UserId}</value>
+  </data>
+  <data name="Profile.LogUpdateSuccess" xml:space="preserve">
+    <value>[SUCCESS] Profile updated for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogUpdateError" xml:space="preserve">
+    <value>[ERROR] Failed to update profile for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogCvFileNotFound" xml:space="preserve">
+    <value>CV file not found in storage for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogGetProfile" xml:space="preserve">
+    <value>Getting profile for User {UserId}</value>
+  </data>
+  <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
+    <value>User {UserId} not found when fetching profile</value>
+  </data>
+  <data name="Profile.UpdateSuccess" xml:space="preserve">
+    <value>Profile updated successfully.</value>
   </data>
 </root>

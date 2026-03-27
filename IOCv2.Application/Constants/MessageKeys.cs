@@ -143,6 +143,34 @@ namespace IOCv2.Application.Constants
             public const string EmailInvalid = "Profile.EmailInvalid";
             public const string PhoneRequired = "Profile.PhoneRequired";
             public const string PhoneInvalid = "Profile.PhoneInvalid";
+            
+            // New Validation Rules
+            public const string PhoneMaxLength = "Profile.PhoneMaxLength";
+            public const string PortfolioUrlMaxLength = "Profile.PortfolioUrlMaxLength";
+            public const string PortfolioUrlInvalid = "Profile.PortfolioUrlInvalid";
+            public const string BioMaxLength = "Profile.BioMaxLength";
+            public const string ExpertiseMaxLength = "Profile.ExpertiseMaxLength";
+            public const string DepartmentMaxLength = "Profile.DepartmentMaxLength";
+            public const string CvFileMaxSize = "Profile.CvFileMaxSize";
+            public const string CvFileInvalidFormat = "Profile.CvFileInvalidFormat";
+
+            // Errors
+            public const string StudentNotFound = "Profile.StudentNotFound";
+            public const string CvNotFound = "Profile.CvNotFound";
+            public const string FileNotFoundInStorage = "Profile.FileNotFoundInStorage";
+
+            // Success
+            public const string UpdateSuccess = "Profile.UpdateSuccess";
+
+            // Logger
+            public const string LogUpdateStart = "Profile.LogUpdateStart";
+            public const string LogAuthFailed = "Profile.LogAuthFailed";
+            public const string LogUserNotFound = "Profile.LogUserNotFound";
+            public const string LogUpdateSuccess = "Profile.LogUpdateSuccess";
+            public const string LogUpdateError = "Profile.LogUpdateError";
+            public const string LogCvFileNotFound = "Profile.LogCvFileNotFound";
+            public const string LogGetProfile = "Profile.LogGetProfile";
+            public const string LogGetProfileUserNotFound = "Profile.LogGetProfileUserNotFound";
         }
 
         public static class InternshipGroups
@@ -406,6 +434,53 @@ namespace IOCv2.Application.Constants
             public const string LogOrphanized          = "Projects.LogOrphanized";
             public const string GetStudentsSuccess     = "Projects.GetStudentsSuccess";
             public const string LogGetStudentsSuccess  = "Projects.LogGetStudentsSuccess";
+
+            // Unpublish
+            public const string UnpublishSuccess           = "Projects.UnpublishSuccess";
+            public const string CannotUnpublishStarted     = "Projects.CannotUnpublishStarted";
+            public const string LogUnpublishSuccess        = "Projects.LogUnpublishSuccess";
+            public const string LogUnpublishError          = "Projects.LogUnpublishError";
+
+            // Archive
+            public const string ArchiveSuccess             = "Projects.ArchiveSuccess";
+            public const string MustBeCompletedToArchive   = "Projects.MustBeCompletedToArchive";
+            public const string LogArchiveSuccess          = "Projects.LogArchiveSuccess";
+            public const string LogArchiveError            = "Projects.LogArchiveError";
+
+            // AssignGroup
+            public const string AssignGroupSuccess         = "Projects.AssignGroupSuccess";
+            public const string AlreadyAssignedToGroup     = "Projects.AlreadyAssignedToGroup";
+            public const string GroupNotActive             = "Projects.GroupNotActive";
+            public const string GroupPhaseEnded            = "Projects.GroupPhaseEnded";
+            public const string LogAssignGroupSuccess      = "Projects.LogAssignGroupSuccess";
+            public const string LogAssignGroupError        = "Projects.LogAssignGroupError";
+
+            // SwapGroup
+            public const string SwapGroupSuccess           = "Projects.SwapGroupSuccess";
+            public const string ProjectNotAssigned         = "Projects.ProjectNotAssigned";
+            public const string HasStudentDataWorkItems    = "Projects.HasStudentDataWorkItems";
+            public const string HasStudentDataSprints      = "Projects.HasStudentDataSprints";
+            public const string LogSwapGroupSuccess        = "Projects.LogSwapGroupSuccess";
+            public const string LogSwapGroupError          = "Projects.LogSwapGroupError";
+
+            // Notification messages (stored in DB)
+            public const string NotifNewProjectTitle       = "Projects.NotifNewProjectTitle";
+            public const string NotifNewProjectContent     = "Projects.NotifNewProjectContent";
+            public const string NotifProjectLeftTitle      = "Projects.NotifProjectLeftTitle";
+            public const string NotifProjectLeftContent    = "Projects.NotifProjectLeftContent";
+            public const string NotifUpdatedTitle          = "Projects.NotifUpdatedTitle";
+            public const string NotifUpdatedContent        = "Projects.NotifUpdatedContent";
+            public const string NotifCompletedTitle        = "Projects.NotifCompletedTitle";
+            public const string NotifCompletedContent      = "Projects.NotifCompletedContent";
+
+            // Log messages for notification failures
+            public const string LogCompleteNotificationFailed  = "Projects.LogCompleteNotificationFailed";
+            public const string LogAssignNotificationFailed    = "Projects.LogAssignNotificationFailed";
+            public const string LogSwapNotificationFailed      = "Projects.LogSwapNotificationFailed";
+            public const string LogUpdateNotificationFailed    = "Projects.LogUpdateNotificationFailed";
+
+            // AC-13: SignalR ProjectListChanged log
+            public const string LogProjectListChanged      = "Projects.LogProjectListChanged";
         }
 
 

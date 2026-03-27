@@ -12,6 +12,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         public string GroupName { get; set; } = string.Empty;
         public string? MentorName { get; set; }
         public int StudentCount { get; set; }
+        /// <summary>B12: Trạng thái của nhóm để hiển thị badge "Nhóm đã lưu trữ" (AC-06, AC-15)</summary>
+        public GroupStatus? Status { get; set; }
     }
 
     /// <summary>
@@ -67,10 +69,14 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// </summary>
         public DateTime? EndDate { get; set; }
 
-        /// <summary>
-        /// Current lifecycle status of the project.
-        /// </summary>
-        public ProjectStatus? Status { get; set; }
+        /// <summary>B6: Visibility layer status (Draft / Published)</summary>
+        public VisibilityStatus VisibilityStatus { get; set; }
+
+        /// <summary>B6: Operational layer status (Unstarted / Active / Completed / Archived)</summary>
+        public OperationalStatus OperationalStatus { get; set; }
+
+        /// <summary>F4/B13: true khi group bị xóa và project trở thành orphan</summary>
+        public bool IsOrphaned { get; set; }
 
         /// <summary>
         /// Date and time when the project record was created.
@@ -98,10 +104,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
                                ? null
                                : new GroupInfoDto
                                {
-                                   InternshipId = src.InternshipGroup.InternshipId,
-                                   GroupName = src.InternshipGroup.GroupName,
-                                   MentorName = src.InternshipGroup.Mentor != null ? src.InternshipGroup.Mentor.User.FullName : null,
-                                   StudentCount = src.InternshipGroup.Members.Count
+                                   InternshipId  = src.InternshipGroup.InternshipId,
+                                   GroupName     = src.InternshipGroup.GroupName,
+                                   MentorName    = src.InternshipGroup.Mentor != null ? src.InternshipGroup.Mentor.User.FullName : null,
+                                   StudentCount  = src.InternshipGroup.Members.Count,
+                                   Status        = src.InternshipGroup.Status  // B12
                                }));
         }
     }

@@ -55,7 +55,7 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
 
             // Project phải là Unstarted
             if (project.OperationalStatus != OperationalStatus.Unstarted)
-                return Result<AssignGroupResponse>.Failure("Project is already assigned to a group.", ResultErrorType.BadRequest);
+                return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.AlreadyAssignedToGroup), ResultErrorType.BadRequest);
 
             // Load group
             var group = await _unitOfWork.Repository<InternshipGroup>().Query()
@@ -66,10 +66,10 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
                 return Result<AssignGroupResponse>.NotFound(_message.GetMessage(MessageKeys.Internships.NotFound));
 
             if (group.Status == GroupStatus.Archived || group.Status == GroupStatus.Finished)
-                return Result<AssignGroupResponse>.Failure("Group is not active.", ResultErrorType.BadRequest);
+                return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
 
             if (group.EndDate.HasValue && group.EndDate.Value.Date < DateTime.UtcNow.Date)
-                return Result<AssignGroupResponse>.Failure("Group's internship phase has ended.", ResultErrorType.BadRequest);
+                return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
 
             // Mentor phải phụ trách group
             if (group.MentorId != enterpriseUser.EnterpriseUserId)
@@ -87,7 +87,7 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error assigning group to project {ProjectId}", project.ProjectId);
+                _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogAssignGroupError), project.ProjectId);
                 return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
 
@@ -107,8 +107,8 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
                         {
                             NotificationId = Guid.NewGuid(),
                             UserId         = userId,
-                            Title          = "Dự án mới trong nhóm",
-                            Content        = $"Dự án {project.ProjectName} vừa được thêm vào nhóm của bạn.",
+                            Title          = _message.GetMessage(MessageKeys.Projects.NotifNewProjectTitle),
+                            Content        = _message.GetMessage(MessageKeys.Projects.NotifNewProjectContent, project.ProjectName),
                             Type           = NotificationType.General,
                             ReferenceType  = "Project",
                             ReferenceId    = project.ProjectId
@@ -135,14 +135,36 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to send notifications for project {ProjectId} assignment", project.ProjectId);
+                    _logger.LogWarning(ex, _message.GetMessage(MessageKeys.Projects.LogAssignNotificationFailed), project.ProjectId);
                 }
             }
 
             await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
             await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
-            _logger.LogInformation("Project {ProjectId} assigned to group {InternshipId}", project.ProjectId, group.InternshipId);
+            _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogAssignGroupSuccess), project.ProjectId, group.InternshipId);
+
+            // AC-13: Push ProjectListChanged signal tới Mentor
+            if (Guid.TryParse(_currentUser.UserId, out var mentorUserIdForSignal))
+            {
+                try
+                {
+                    await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
+                    {
+                        type      = ProjectSignalConstants.ProjectListChanged,
+                        action    = ProjectSignalConstants.Actions.GroupAssigned,
+                        projectId = project.ProjectId
+                    }, cancellationToken);
+                    _logger.LogInformation(
+                        _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.GroupAssigned, mentorUserIdForSignal, project.ProjectId);
+                }
+                catch (Exception signalEx)
+                {
+                    _logger.LogWarning(signalEx, _message.GetMessage(MessageKeys.Projects.LogProjectListChanged),
+                        ProjectSignalConstants.Actions.GroupAssigned, mentorUserIdForSignal, project.ProjectId);
+                }
+            }
 
             return Result<AssignGroupResponse>.Success(new AssignGroupResponse
             {

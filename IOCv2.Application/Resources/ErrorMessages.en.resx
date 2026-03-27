@@ -1315,6 +1315,30 @@
   <data name="Projects.CannotDeleteHasData" xml:space="preserve">
     <value>Cannot delete project that already has data (work items or sprints).</value>
   </data>
+  <data name="Projects.CannotUnpublishStarted" xml:space="preserve">
+    <value>Project cannot be unpublished after group assignment has started.</value>
+  </data>
+  <data name="Projects.MustBeCompletedToArchive" xml:space="preserve">
+    <value>Project must be Completed before archiving.</value>
+  </data>
+  <data name="Projects.AlreadyAssignedToGroup" xml:space="preserve">
+    <value>Project is already assigned to a group.</value>
+  </data>
+  <data name="Projects.GroupNotActive" xml:space="preserve">
+    <value>Group is not active (Finished or Archived).</value>
+  </data>
+  <data name="Projects.GroupPhaseEnded" xml:space="preserve">
+    <value>Group's internship phase has ended.</value>
+  </data>
+  <data name="Projects.ProjectNotAssigned" xml:space="preserve">
+    <value>Project is not currently assigned to any group.</value>
+  </data>
+  <data name="Projects.HasStudentDataWorkItems" xml:space="preserve">
+    <value>Cannot swap group: project has student data (work items).</value>
+  </data>
+  <data name="Projects.HasStudentDataSprints" xml:space="preserve">
+    <value>Cannot swap group: project has student data (sprints).</value>
+  </data>
   <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
     <value>Only Active internship groups can be deleted.</value>
   </data>
@@ -1356,5 +1380,38 @@
   </data>
   <data name="InternshipGroup.LogMoveError" xml:space="preserve">
     <value>An error occurred while moving students between groups</value>
+  </data>
+  <data name="Profile.PhoneMaxLength" xml:space="preserve">
+    <value>Phone Number must not exceed 15 characters.</value>
+  </data>
+  <data name="Profile.PortfolioUrlMaxLength" xml:space="preserve">
+    <value>Portfolio URL must not exceed 255 characters.</value>
+  </data>
+  <data name="Profile.PortfolioUrlInvalid" xml:space="preserve">
+    <value>Portfolio URL is invalid.</value>
+  </data>
+  <data name="Profile.BioMaxLength" xml:space="preserve">
+    <value>Bio must not exceed 1000 characters.</value>
+  </data>
+  <data name="Profile.ExpertiseMaxLength" xml:space="preserve">
+    <value>Expertise must not exceed 500 characters.</value>
+  </data>
+  <data name="Profile.DepartmentMaxLength" xml:space="preserve">
+    <value>Department must not exceed 150 characters.</value>
+  </data>
+  <data name="Profile.CvFileMaxSize" xml:space="preserve">
+    <value>CV file must not exceed 10MB.</value>
+  </data>
+  <data name="Profile.CvFileInvalidFormat" xml:space="preserve">
+    <value>Only .pdf, .doc, and .docx files are allowed.</value>
+  </data>
+  <data name="Profile.StudentNotFound" xml:space="preserve">
+    <value>Student profile not found.</value>
+  </data>
+  <data name="Profile.CvNotFound" xml:space="preserve">
+    <value>CV not found for this profile.</value>
+  </data>
+  <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
+    <value>File not found in storage.</value>
   </data>
 </root>

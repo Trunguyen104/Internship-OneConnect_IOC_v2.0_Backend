@@ -138,6 +138,7 @@ namespace IOCv2.Infrastructure.Persistence
                 .Select(u => u.Email)
                 .ToHashSetAsync();
             CancellationToken cancellationToken = default;
+            int phoneCounter = 1000;
 
             // 1. Super Admin
             if (!await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Role == UserRole.SuperAdmin))
@@ -145,7 +146,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var userId = SeedIds.SuperAdminId;
                 var userCode = await _userService.GenerateUserCodeAsync(UserRole.SuperAdmin, cancellationToken);
                 var superAdmin = new User(userId, userCode, "admin@iocv2.com", "Super Administrator", UserRole.SuperAdmin, passHash);
-                superAdmin.UpdateProfile(superAdmin.FullName, "0987654321", null, UserGender.Male, new DateOnly(1980, 1, 1), "Hà Nội");
+                superAdmin.UpdateProfile(superAdmin.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(1980, 1, 1), "Hà Nội");
                 superAdmin.SetStatus(UserStatus.Active);
                 _context.Users.Add(superAdmin);
                 existingEmails.Add(superAdmin.Email);
@@ -181,7 +182,7 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.EnterpriseAdmin, cancellationToken);
                     var user = new User(adminId, userCode, adminEmail, $"Admin of {ent.Name}", UserRole.EnterpriseAdmin, passHash);
-                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(1985, 1, 1), ent.Address);
+                    user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(1985, 1, 1), ent.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(adminEmail);
@@ -200,7 +201,7 @@ namespace IOCv2.Infrastructure.Persistence
 
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
                     var user = new User(mentorId, userCode, mentorEmail, $"Mentor {ent.Name}", UserRole.Mentor, passHash);
-                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(1990, 1, 1), ent.Address);
+                    user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(1990, 1, 1), ent.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(mentorEmail);
@@ -213,7 +214,7 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.HR, cancellationToken);
                     var user = new User(hrId, userCode, hrEmail, $"HR {ent.Name}", UserRole.HR, passHash);
-                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Female, new DateOnly(1992, 1, 1), ent.Address);
+                    user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, UserGender.Female, new DateOnly(1992, 1, 1), ent.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(hrEmail);
@@ -234,7 +235,7 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.SchoolAdmin, cancellationToken);
                     var user = new User(uniAdminId, userCode, uniAdminEmail, $"School Admin {uni.Code}", UserRole.SchoolAdmin, passHash);
-                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(1985, 1, 1), uni.Address);
+                    user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(1985, 1, 1), uni.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(uniAdminEmail);
@@ -289,7 +290,7 @@ namespace IOCv2.Infrastructure.Persistence
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                     var user = new User(userId, userCode, studentEmails[i], studentNames[i], UserRole.Student, passHash);
                     var gender = i % 2 == 0 ? UserGender.Male : UserGender.Female;
-                    user.UpdateProfile(user.FullName, "0987654321", null, gender, new DateOnly(2004, 1, 1), "Hà Nội");
+                    user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, gender, new DateOnly(2004, 1, 1), "Hà Nội");
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(studentEmails[i]);
@@ -314,7 +315,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var userId = Guid.NewGuid();
                 var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                 var user = new User(userId, userCode, devEmail, "Nguyễn Trung Nguyên", UserRole.Student, passHash);
-                user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(2002, 1, 1), "Hà Nội");
+                user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(2002, 1, 1), "Hà Nội");
                 user.SetStatus(UserStatus.Active);
                 _context.Users.Add(user);
                 _context.Students.Add(new Student { StudentId = Guid.NewGuid(), UserId = user.UserId, InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS, Major = "Software Engineering", ClassName = "SE1616" });

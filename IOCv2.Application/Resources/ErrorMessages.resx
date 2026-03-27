@@ -1371,6 +1371,30 @@
   <data name="Projects.CannotDeleteHasData" xml:space="preserve">
     <value>Không thể xóa project đã có dữ liệu (work items hoặc sprints).</value>
   </data>
+  <data name="Projects.CannotUnpublishStarted" xml:space="preserve">
+    <value>Không thể chuyển về Bản nháp sau khi dự án đã được gán cho nhóm.</value>
+  </data>
+  <data name="Projects.MustBeCompletedToArchive" xml:space="preserve">
+    <value>Dự án phải ở trạng thái Hoàn thành trước khi lưu trữ.</value>
+  </data>
+  <data name="Projects.AlreadyAssignedToGroup" xml:space="preserve">
+    <value>Dự án đã được gán cho một nhóm thực tập rồi.</value>
+  </data>
+  <data name="Projects.GroupNotActive" xml:space="preserve">
+    <value>Nhóm thực tập không còn hoạt động (đã kết thúc hoặc đã lưu trữ).</value>
+  </data>
+  <data name="Projects.GroupPhaseEnded" xml:space="preserve">
+    <value>Kỳ thực tập của nhóm đã kết thúc, không thể gán dự án.</value>
+  </data>
+  <data name="Projects.ProjectNotAssigned" xml:space="preserve">
+    <value>Dự án hiện không được gán cho nhóm nào.</value>
+  </data>
+  <data name="Projects.HasStudentDataWorkItems" xml:space="preserve">
+    <value>Không thể chuyển nhóm: dự án đã có dữ liệu sinh viên (work items).</value>
+  </data>
+  <data name="Projects.HasStudentDataSprints" xml:space="preserve">
+    <value>Không thể chuyển nhóm: dự án đã có dữ liệu sinh viên (sprints).</value>
+  </data>
   <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
     <value>Chỉ có thể xóa nhóm thực tập đang ở trạng thái Active.</value>
   </data>
@@ -1412,5 +1436,38 @@
   </data>
   <data name="InternshipGroup.LogMoveError" xml:space="preserve">
     <value>Đã xảy ra lỗi trong quá trình chuyển sinh viên giữa các nhóm</value>
+  </data>
+  <data name="Profile.PhoneMaxLength" xml:space="preserve">
+    <value>Số điện thoại không được vượt quá 15 ký tự.</value>
+  </data>
+  <data name="Profile.PortfolioUrlMaxLength" xml:space="preserve">
+    <value>Link portfolio không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="Profile.PortfolioUrlInvalid" xml:space="preserve">
+    <value>Link portfolio không hợp lệ.</value>
+  </data>
+  <data name="Profile.BioMaxLength" xml:space="preserve">
+    <value>Giới thiệu bản thân không được vượt quá 1000 ký tự.</value>
+  </data>
+  <data name="Profile.ExpertiseMaxLength" xml:space="preserve">
+    <value>Chuyên môn không được vượt quá 500 ký tự.</value>
+  </data>
+  <data name="Profile.DepartmentMaxLength" xml:space="preserve">
+    <value>Khoa/Phòng ban không được vượt quá 150 ký tự.</value>
+  </data>
+  <data name="Profile.CvFileMaxSize" xml:space="preserve">
+    <value>File CV không được vượt quá 10MB.</value>
+  </data>
+  <data name="Profile.CvFileInvalidFormat" xml:space="preserve">
+    <value>Chỉ chấp nhận các file định dạng .pdf, .doc, và .docx.</value>
+  </data>
+  <data name="Profile.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ hệ thống.</value>
+  </data>
+  <data name="Profile.CvNotFound" xml:space="preserve">
+    <value>Không tìm thấy CV cho hồ sơ này.</value>
+  </data>
+  <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
+    <value>Không tìm thấy file tải lên.</value>
   </data>
 </root>

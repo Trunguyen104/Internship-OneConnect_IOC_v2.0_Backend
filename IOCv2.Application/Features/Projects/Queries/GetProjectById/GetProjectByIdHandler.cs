@@ -43,13 +43,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         {
             _logger.LogInformation(_message.GetMessage(MessageKeys.Projects.LogGetById), request.ProjectId);
 
-            var cacheKey = ProjectCacheKeys.Project(request.ProjectId);
-            var cached = await _cacheService.GetAsync<GetProjectByIdResponse>(cacheKey, cancellationToken);
-            if (cached != null)
-            {
-                return Result<GetProjectByIdResponse>.Success(cached);
-            }
-
+            // B5: Load project TRƯỚC khi kiểm tra cache để role check chạy trên dữ liệu thực
             var project = await _unitOfWork.Repository<Domain.Entities.Project>()
                 .Query()
                 .Include(x => x.ProjectResources)
@@ -69,10 +63,32 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
                     ResultErrorType.NotFound);
             }
 
-            var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
-            if (isStudent)
+            var role = _currentUserService?.Role ?? string.Empty;
+            var isSuperAdmin = string.Equals(role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
+            var isMentor = string.Equals(role, "Mentor", StringComparison.OrdinalIgnoreCase);
+            var isStudent = string.Equals(role, "Student", StringComparison.OrdinalIgnoreCase);
+
+            // B4: Mentor isolation — Mentor chỉ được xem project của chính mình
+            if (isMentor)
             {
-                if (project.Status != ProjectStatus.Published && project.Status != ProjectStatus.Completed)
+                if (!Guid.TryParse(_currentUserService?.UserId, out var mentorUserId))
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+                var mentorEnterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(eu => eu.UserId == mentorUserId, cancellationToken);
+
+                if (mentorEnterpriseUser == null || project.MentorId != mentorEnterpriseUser.EnterpriseUserId)
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+            }
+            // B3: Student check dùng two-layer model (không dùng legacy Status)
+            else if (isStudent)
+            {
+                if (project.VisibilityStatus != VisibilityStatus.Published ||
+                    (project.OperationalStatus != OperationalStatus.Active &&
+                     project.OperationalStatus != OperationalStatus.Completed))
                     return Result<GetProjectByIdResponse>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
@@ -99,6 +115,21 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
                 if (!isMember)
                     return Result<GetProjectByIdResponse>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+            }
+            // B10: HR, UniAdmin, SchoolAdmin, EnterpriseAdmin — chỉ xem Published
+            else if (!isSuperAdmin)
+            {
+                if (project.VisibilityStatus != VisibilityStatus.Published)
+                    return Result<GetProjectByIdResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+            }
+
+            // B5: Cache sau khi role check thành công
+            var cacheKey = ProjectCacheKeys.Project(request.ProjectId);
+            var cached = await _cacheService.GetAsync<GetProjectByIdResponse>(cacheKey, cancellationToken);
+            if (cached != null)
+            {
+                return Result<GetProjectByIdResponse>.Success(cached);
             }
 
             var response = _mapper.Map<GetProjectByIdResponse>(project);

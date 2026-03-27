@@ -91,9 +91,10 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
                 try
                 {
+                    // B13: Dùng OperationalStatus thay vì legacy Status (luôn null với project mới)
                     projectsToOrphan = await _unitOfWork.Repository<Project>().Query()
                         .Where(p => p.InternshipId == request.InternshipId
-                                 && (p.Status == ProjectStatus.Draft || p.Status == ProjectStatus.Published))
+                                 && p.OperationalStatus == OperationalStatus.Active)
                         .ToListAsync(cancellationToken);
 
                     foreach (var project in projectsToOrphan)
