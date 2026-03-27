@@ -25,6 +25,7 @@ namespace IOCv2.Tests.Features.Projects
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipRepo;
         private readonly Mock<IGenericRepository<EnterpriseUser>> _mockEnterpriseUserRepo;
         private readonly Mock<IGenericRepository<InternshipStudent>> _mockInternshipStudentRepo;
+        private readonly Mock<INotificationPushService> _mockPushService;
         private readonly UpdateProjectHandler _handler;
 
         public UpdateProjectHandlerTests()
@@ -35,6 +36,7 @@ namespace IOCv2.Tests.Features.Projects
             _mockMessageService = new Mock<IMessageService>();
             _mockCurrentUser = new Mock<ICurrentUserService>();
             _mockCacheService = new Mock<ICacheService>();
+            _mockPushService = new Mock<INotificationPushService>();
             
             _mockProjectRepo = new Mock<IGenericRepository<Project>>();
             _mockInternshipRepo = new Mock<IGenericRepository<InternshipGroup>>();
@@ -58,7 +60,8 @@ namespace IOCv2.Tests.Features.Projects
                 _mockLogger.Object,
                 _mockMessageService.Object,
                 _mockCurrentUser.Object,
-                _mockCacheService.Object);
+                _mockCacheService.Object,
+                _mockPushService.Object);
         }
 
         [Fact]
