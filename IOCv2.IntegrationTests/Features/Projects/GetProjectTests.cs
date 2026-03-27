@@ -56,13 +56,13 @@ public class GetProjectTests : BaseIntegrationTest
 
         // Create and save a new Project
         var project = IOCv2.Domain.Entities.Project.Create(
-            internshipId,
             "Integration Test Project",
             "Test Description",
             "PRJ-INT-GETPROJ-1",
             "IT",
             "Integration test requirements"
         );
+        project.AssignToGroup(internshipId, null, null);
         db.Projects.Add(project);
         await db.SaveChangesAsync();
 

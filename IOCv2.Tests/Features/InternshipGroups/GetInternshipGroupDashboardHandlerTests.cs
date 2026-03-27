@@ -43,7 +43,8 @@ public class GetInternshipGroupDashboardHandlerTests
         var internshipId = group.InternshipId;
         var query = new GetInternshipGroupDashboardQuery(internshipId);
 
-        var project = Project.Create(internshipId, "Test Project", "Desc", "PRJ-TEST_TST_1", "IT", "Requirements");
+        var project = Project.Create("Test Project", "Desc", "PRJ-TEST_TST_1", "IT", "Requirements");
+        project.AssignToGroup(internshipId, null, null);
         var workItem1 = new WorkItem { 
             Title = "Task 1", 
             Status = WorkItemStatus.Done, 

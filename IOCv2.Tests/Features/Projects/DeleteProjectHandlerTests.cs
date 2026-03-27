@@ -61,7 +61,7 @@ namespace IOCv2.Tests.Features.Projects
             // Arrange
             var userId = Guid.NewGuid();
             var enterpriseUserId = Guid.NewGuid();
-            var project = Project.Create(Guid.NewGuid(), "Project for Deletion", "Description", "PRJ-TEST_TST_1", "IT", "Requirements", mentorId: enterpriseUserId);
+            var project = Project.Create("Project for Deletion", "Description", "PRJ-TEST_TST_1", "IT", "Requirements", mentorId: enterpriseUserId);
             var command = new DeleteProjectCommand { ProjectId = project.ProjectId };
 
             _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());

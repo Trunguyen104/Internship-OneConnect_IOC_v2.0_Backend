@@ -17,7 +17,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
         public string? Description { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public ProjectStatus? Status { get; set; }
+        public VisibilityStatus VisibilityStatus { get; set; }
+        public OperationalStatus OperationalStatus { get; set; }
         public Guid? MentorId { get; set; }
 
         /// <summary>

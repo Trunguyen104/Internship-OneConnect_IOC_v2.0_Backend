@@ -9,7 +9,6 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
     {
         [JsonIgnore]
         public Guid ProjectId { get; set; }
-        public Guid? InternshipId { get; set; }
         public string? ProjectName { get; set; }
         public string? Description { get; set; }
         public DateTime? StartDate { get; set; }
@@ -17,6 +16,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
         // Status không được phép thay đổi qua UpdateProject.
         // Dùng PublishProject / CompleteProject / ArchiveProject để chuyển trạng thái.
+        // Group assignment giờ qua AssignGroup/SwapGroup riêng.
 
         // New fields
         public string? Field { get; set; }

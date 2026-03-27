@@ -55,65 +55,26 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            // Scope check
+            // Scope check: project creator hoặc Mentor của group được assign
             if (project.MentorId != enterpriseUser.EnterpriseUserId &&
                 project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
-            // Block nếu status = Completed hoặc Archived
-            if (project.Status == ProjectStatus.Completed || project.Status == ProjectStatus.Archived)
+            // Block nếu project không còn editable (OperationalStatus không phải Unstarted/Active)
+            if (!project.IsEditable)
                 return Result<UpdateProjectResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Projects.InvalidStatusForUpdate), ResultErrorType.BadRequest);
-
-            // Block nếu group Archived/Finished
-            var groupStatus = project.InternshipGroup?.Status;
-            if (groupStatus == GroupStatus.Archived || groupStatus == GroupStatus.Finished)
-                return Result<UpdateProjectResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Projects.GroupNotActiveForUpdate), ResultErrorType.BadRequest);
-
-            if (request.InternshipId.HasValue && request.InternshipId.Value == Guid.Empty)
-                return Result<UpdateProjectResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Common.InvalidRequest), ResultErrorType.BadRequest);
 
             var assignedCount = 0;
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // Check target internship nếu thay đổi
-                if (request.InternshipId.HasValue && request.InternshipId != Guid.Empty && request.InternshipId != project.InternshipId)
-                {
-                    var targetGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(i => i.InternshipId == request.InternshipId.Value, cancellationToken);
-
-                    if (targetGroup == null)
-                    {
-                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                        return Result<UpdateProjectResponse>.Failure(
-                            _messageService.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound);
-                    }
-
-                    if (targetGroup.Status == GroupStatus.Archived || targetGroup.Status == GroupStatus.Finished)
-                    {
-                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                        return Result<UpdateProjectResponse>.Failure(
-                            _messageService.GetMessage(MessageKeys.Projects.GroupNotActiveForUpdate), ResultErrorType.BadRequest);
-                    }
-
-                    if (targetGroup.MentorId != enterpriseUser.EnterpriseUserId)
-                    {
-                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                        return Result<UpdateProjectResponse>.Failure(
-                            _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
-                    }
-                }
-
                 // Uniqueness check: ProjectName nếu thay đổi
                 if (request.ProjectName is not null && project.ProjectName != request.ProjectName)
                 {
                     var nameExists = await _unitOfWork.Repository<Project>()
-                        .ExistsAsync(p => p.InternshipId == (request.InternshipId ?? project.InternshipId)
+                        .ExistsAsync(p => p.InternshipId == project.InternshipId
                                        && p.ProjectName == request.ProjectName
                                        && p.ProjectId != request.ProjectId, cancellationToken);
                     if (nameExists)
@@ -125,12 +86,10 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 }
 
                 project.Update(
-                    request.InternshipId,
                     request.ProjectName,
                     request.Description,
                     request.StartDate,
                     request.EndDate,
-                    null, // Status không được phép thay đổi qua UpdateProject
                     request.Field,
                     request.Requirements,
                     request.Deliverables,
@@ -138,7 +97,43 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                // Auto-publish: nếu project còn Draft thì publish sau khi update
+                if (project.VisibilityStatus == VisibilityStatus.Draft)
+                {
+                    project.Publish();
+                    await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
+                    await _unitOfWork.SaveChangeAsync(cancellationToken);
+                }
+
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                // Notify students nếu project đang assigned cho group
+                if (project.InternshipId.HasValue)
+                {
+                    var studentUserIds = await _unitOfWork.Repository<InternshipStudent>().Query()
+                        .Where(s => s.InternshipId == project.InternshipId.Value)
+                        .Select(s => s.Student.UserId)
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var userId in studentUserIds)
+                    {
+                        var notif = new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId         = userId,
+                            Title          = "Dự án được cập nhật",
+                            Content        = $"Dự án {project.ProjectName} vừa được cập nhật bởi Mentor.",
+                            Type           = NotificationType.General,
+                            ReferenceType  = "Project",
+                            ReferenceId    = project.ProjectId
+                        };
+                        await _unitOfWork.Repository<Notification>().AddAsync(notif, cancellationToken);
+                    }
+
+                    if (studentUserIds.Any())
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
+                }
             }
             catch (Exception ex)
             {
@@ -152,7 +147,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogUpdateSuccess), request.ProjectId);
 
-            // Đếm sinh viên trong group (thay thế ProjectAssignment cũ)
+            // Đếm sinh viên trong group
             if (project.InternshipId.HasValue)
             {
                 assignedCount = await _unitOfWork.Repository<InternshipStudent>().Query()

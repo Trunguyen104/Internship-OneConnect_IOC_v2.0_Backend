@@ -145,6 +145,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var userId = SeedIds.SuperAdminId;
                 var userCode = await _userService.GenerateUserCodeAsync(UserRole.SuperAdmin, cancellationToken);
                 var superAdmin = new User(userId, userCode, "admin@iocv2.com", "Super Administrator", UserRole.SuperAdmin, passHash);
+                superAdmin.UpdateProfile(superAdmin.FullName, "0987654321", null, UserGender.Male, new DateOnly(1980, 1, 1), "Hà Nội");
                 superAdmin.SetStatus(UserStatus.Active);
                 _context.Users.Add(superAdmin);
                 existingEmails.Add(superAdmin.Email);
@@ -180,6 +181,7 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.EnterpriseAdmin, cancellationToken);
                     var user = new User(adminId, userCode, adminEmail, $"Admin of {ent.Name}", UserRole.EnterpriseAdmin, passHash);
+                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(1985, 1, 1), ent.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(adminEmail);
@@ -198,6 +200,7 @@ namespace IOCv2.Infrastructure.Persistence
 
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
                     var user = new User(mentorId, userCode, mentorEmail, $"Mentor {ent.Name}", UserRole.Mentor, passHash);
+                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(1990, 1, 1), ent.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(mentorEmail);
@@ -210,6 +213,7 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.HR, cancellationToken);
                     var user = new User(hrId, userCode, hrEmail, $"HR {ent.Name}", UserRole.HR, passHash);
+                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Female, new DateOnly(1992, 1, 1), ent.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(hrEmail);
@@ -230,6 +234,7 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.SchoolAdmin, cancellationToken);
                     var user = new User(uniAdminId, userCode, uniAdminEmail, $"School Admin {uni.Code}", UserRole.SchoolAdmin, passHash);
+                    user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(1985, 1, 1), uni.Address);
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(uniAdminEmail);
@@ -283,6 +288,8 @@ namespace IOCv2.Infrastructure.Persistence
                     var userId = i < SeedIds.StudentIds.Count ? SeedIds.StudentIds[i] : Guid.NewGuid();
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                     var user = new User(userId, userCode, studentEmails[i], studentNames[i], UserRole.Student, passHash);
+                    var gender = i % 2 == 0 ? UserGender.Male : UserGender.Female;
+                    user.UpdateProfile(user.FullName, "0987654321", null, gender, new DateOnly(2004, 1, 1), "Hà Nội");
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(studentEmails[i]);
@@ -307,6 +314,7 @@ namespace IOCv2.Infrastructure.Persistence
                 var userId = Guid.NewGuid();
                 var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                 var user = new User(userId, userCode, devEmail, "Nguyễn Trung Nguyên", UserRole.Student, passHash);
+                user.UpdateProfile(user.FullName, "0987654321", null, UserGender.Male, new DateOnly(2002, 1, 1), "Hà Nội");
                 user.SetStatus(UserStatus.Active);
                 _context.Users.Add(user);
                 _context.Students.Add(new Student { StudentId = Guid.NewGuid(), UserId = user.UserId, InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS, Major = "Software Engineering", ClassName = "SE1616" });
@@ -654,13 +662,16 @@ namespace IOCv2.Infrastructure.Persistence
             var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
             // Project 3
-            var proj3 = Project.Create(group3.InternshipId, "IOC v2.0 Platform", "Centralized internship management system", "PRJ-FPTSOF_FPT_1", "CNTT", "Develop a centralized internship management platform.");
-            proj3.Update(null, null, null, DateTime.UtcNow.AddMonths(-1).AddDays(5), null, ProjectStatus.Published);
+            var proj3 = Project.Create("IOC v2.0 Platform", "Centralized internship management system", "PRJ-FPTSOF_FPT_1", "CNTT", "Develop a centralized internship management platform.");
+            proj3.AssignToGroup(group3.InternshipId, DateTime.UtcNow.AddMonths(-1).AddDays(5), null);
+            proj3.Publish();
             _context.Projects.Add(proj3);
 
             // Project 5
-            var proj5 = Project.Create(group5.InternshipId, "Legacy CRM Maintenance", "Fixing bugs and optimizing older modules", "PRJ-RIKKE_RIKK_1", "CNTT", "Fix bugs and optimize legacy modules.");
-            proj5.Update(null, null, null, DateTime.UtcNow.AddMonths(-6).AddDays(5), DateTime.UtcNow.AddMonths(-2).AddDays(-5), ProjectStatus.Completed);
+            var proj5 = Project.Create("Legacy CRM Maintenance", "Fixing bugs and optimizing older modules", "PRJ-RIKKE_RIKK_1", "CNTT", "Fix bugs and optimize legacy modules.");
+            proj5.AssignToGroup(group5.InternshipId, DateTime.UtcNow.AddMonths(-6).AddDays(5), DateTime.UtcNow.AddMonths(-2).AddDays(-5));
+            proj5.Publish();
+            proj5.SetOperationalStatus(OperationalStatus.Completed);
             _context.Projects.Add(proj5);
 
             await _context.SaveChangesAsync();
@@ -689,8 +700,9 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             // [NEW] Seed Pending Project, Cancelled Sprint and WorkItems with different statuses
-            var projPending = Project.Create(group3.InternshipId, "FPT Future System", "Next phase architecture", "PRJ-FPTSOF_FPT_2", "CNTT", "Design next phase architecture.");
-            projPending.Update(null, null, null, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(30), ProjectStatus.Draft);
+            var projPending = Project.Create("FPT Future System", "Next phase architecture", "PRJ-FPTSOF_FPT_2", "CNTT", "Design next phase architecture.");
+            projPending.AssignToGroup(group3.InternshipId, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(30));
+            // Draft by default — no Publish() call
             if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT Future System"))
             {
                 _context.Projects.Add(projPending);
@@ -739,23 +751,23 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 // Project 1: Published
                 var rikkeiProj1 = Project.Create(
-                    rikkeiGroup.InternshipId,
                     "Rikkeisoft Internal Portal",
                     "Xây dựng cổng thông tin nội bộ cho nhân viên Rikkeisoft",
                     "PRJ-RIKKES_RIKK_2",
                     "Công nghệ thông tin",
                     "Phát triển portal nội bộ: quản lý nhân sự, leave request, timesheet.");
-                rikkeiProj1.Update(null, null, null, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2), ProjectStatus.Published);
+                rikkeiProj1.AssignToGroup(rikkeiGroup.InternshipId, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
+                rikkeiProj1.Publish();
                 _context.Projects.Add(rikkeiProj1);
 
                 // Project 2: Draft — chưa publish
                 var rikkeiProj2 = Project.Create(
-                    rikkeiGroup.InternshipId,
                     "Rikkeisoft Mobile App",
                     "Ứng dụng di động cho khách hàng của Rikkeisoft",
                     "PRJ-RIKKES_RIKK_3",
                     "Mobile",
                     "Phát triển ứng dụng mobile cross-platform bằng Flutter.");
+                rikkeiProj2.AssignToGroup(rikkeiGroup.InternshipId, null, null);
                 _context.Projects.Add(rikkeiProj2);
             }
 
@@ -764,12 +776,12 @@ namespace IOCv2.Infrastructure.Persistence
             if (fptCtGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == fptCtGroup.InternshipId))
             {
                 var fptCtProj = Project.Create(
-                    fptCtGroup.InternshipId,
                     "FPT CT Smart Campus",
                     "Hệ thống quản lý khuôn viên thông minh cho FPTU Cần Thơ",
                     "PRJ-FPTSOF_FPT_3",
                     "IoT / CNTT",
                     "Tích hợp IoT, camera AI và hệ thống điểm danh tự động.");
+                fptCtProj.AssignToGroup(fptCtGroup.InternshipId, null, null);
                 _context.Projects.Add(fptCtProj);
             }
 
@@ -778,13 +790,14 @@ namespace IOCv2.Infrastructure.Persistence
             if (archivedGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == archivedGroup.InternshipId))
             {
                 var archivedProj = Project.Create(
-                    archivedGroup.InternshipId,
                     "FPT Legacy HR System",
                     "Hệ thống HR cũ đã ngừng phát triển",
                     "PRJ-FPTSOF_FPT_4",
                     "Hệ thống doanh nghiệp",
                     "Duy trì và hỗ trợ hệ thống HR cũ.");
-                archivedProj.Update(null, null, null, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10), ProjectStatus.Archived);
+                archivedProj.AssignToGroup(archivedGroup.InternshipId, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10));
+                archivedProj.Publish();
+                archivedProj.SetOperationalStatus(OperationalStatus.Archived);
                 _context.Projects.Add(archivedProj);
             }
 
@@ -793,12 +806,12 @@ namespace IOCv2.Infrastructure.Persistence
             if (!await _context.Projects.AnyAsync(p => p.ProjectName == "Orphan Research Project"))
             {
                 var orphanProj = Project.Create(
-                    null,   // orphan — không gắn nhóm
                     "Orphan Research Project",
                     "Dự án nghiên cứu bị orphan do nhóm thực tập đã bị xóa",
                     "PRJ-ORPHAN_001",
                     "Nghiên cứu",
                     "Nghiên cứu ứng dụng AI trong kiểm thử phần mềm.");
+                // orphan — không gắn nhóm, InternshipId = null by default
                 _context.Projects.Add(orphanProj);
             }
 
