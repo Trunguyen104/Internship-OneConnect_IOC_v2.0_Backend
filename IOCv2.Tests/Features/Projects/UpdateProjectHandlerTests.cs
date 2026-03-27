@@ -73,6 +73,7 @@ namespace IOCv2.Tests.Features.Projects
             var enterpriseUserId = Guid.NewGuid();
             
             var project = Project.Create("Old Name", "Old Description", "PRJ-TEST_TST_1", "IT", "Requirements", mentorId: enterpriseUserId);
+            project.Publish();
             project.AssignToGroup(internshipId, null, null);
             var command = new UpdateProjectCommand { ProjectId = project.ProjectId, ProjectName = "Updated Name" };
             

@@ -54,14 +54,20 @@ public class GetProjectTests : BaseIntegrationTest
             throw new Exception("No InternshipGroups found. Ensure TestDbSeeder is working.");
         }
 
+        // Get the mentor details
+        var mentorUser = await db.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
+        var mentorEnterpriseUser = await db.EnterpriseUsers.FirstOrDefaultAsync(eu => eu.UserId == mentorUser.UserId);
+
         // Create and save a new Project
         var project = IOCv2.Domain.Entities.Project.Create(
             "Integration Test Project",
             "Test Description",
             "PRJ-INT-GETPROJ-1",
             "IT",
-            "Integration test requirements"
+            "Integration test requirements",
+            mentorId: mentorEnterpriseUser?.EnterpriseUserId
         );
+        project.Publish();
         project.AssignToGroup(internshipId, null, null);
         db.Projects.Add(project);
         await db.SaveChangesAsync();
