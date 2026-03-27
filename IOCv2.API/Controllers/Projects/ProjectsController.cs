@@ -1,8 +1,12 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Projects.Commands.ArchiveProject;
+using IOCv2.Application.Features.Projects.Commands.AssignGroup;
 using IOCv2.Application.Features.Projects.Commands.CompleteProject;
 using IOCv2.Application.Features.Projects.Commands.CreateProject;
 using IOCv2.Application.Features.Projects.Commands.DeleteProject;
 using IOCv2.Application.Features.Projects.Commands.PublishProject;
+using IOCv2.Application.Features.Projects.Commands.SwapGroup;
+using IOCv2.Application.Features.Projects.Commands.UnpublishProject;
 using IOCv2.Application.Features.Projects.Commands.UpdateProject;
 using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
 using IOCv2.Application.Features.Projects.Queries.GetProjectById;
@@ -193,6 +197,84 @@ public class ProjectsController : ApiControllerBase
         CancellationToken cancellationToken)
     {
         var command = new CompleteProjectCommand { ProjectId = projectId };
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Unpublish a Published project (Published → Draft). Only available when OperationalStatus is Unstarted.
+    /// </summary>
+    [HttpPatch("{projectId:guid}/unpublish")]
+    [Authorize(Roles = "Mentor")]
+    [ProducesResponseType(typeof(ApiResponse<UnpublishProjectResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UnpublishProject(
+        [FromRoute] Guid projectId,
+        CancellationToken cancellationToken)
+    {
+        var command = new UnpublishProjectCommand { ProjectId = projectId };
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Assign a project to an internship group. Sets OperationalStatus to Active.
+    /// </summary>
+    [HttpPost("{projectId:guid}/assign-group")]
+    [Authorize(Roles = "Mentor")]
+    [ProducesResponseType(typeof(ApiResponse<AssignGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AssignGroup(
+        [FromRoute] Guid projectId,
+        [FromBody] AssignGroupCommand command,
+        CancellationToken cancellationToken)
+    {
+        command.ProjectId = projectId;
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Swap a project's assigned group. Only available when project has no student data.
+    /// </summary>
+    [HttpPatch("{projectId:guid}/change-group")]
+    [Authorize(Roles = "Mentor")]
+    [ProducesResponseType(typeof(ApiResponse<SwapGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SwapGroup(
+        [FromRoute] Guid projectId,
+        [FromBody] SwapGroupCommand command,
+        CancellationToken cancellationToken)
+    {
+        command.ProjectId = projectId;
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Archive a Completed project (Completed → Archived).
+    /// </summary>
+    [HttpPost("{projectId:guid}/archive")]
+    [Authorize(Roles = "Mentor")]
+    [ProducesResponseType(typeof(ApiResponse<ArchiveProjectResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ArchiveProject(
+        [FromRoute] Guid projectId,
+        CancellationToken cancellationToken)
+    {
+        var command = new ArchiveProjectCommand { ProjectId = projectId };
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
