@@ -45,39 +45,24 @@ namespace IOCv2.Application.Features.Projects.Commands.PublishProject
                 return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.MentorNotFound), ResultErrorType.Forbidden);
 
             var project = await _unitOfWork.Repository<Project>().Query()
-                .Include(p => p.InternshipGroup)
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (project == null)
                 return Result<PublishProjectResponse>.NotFound(_message.GetMessage(MessageKeys.Projects.NotFound));
 
-            // Scope check: phải là mentor của project hoặc mentor của group
-            if (project.MentorId != enterpriseUser.EnterpriseUserId &&
-                project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
+            // Scope check: phải là mentor của project
+            if (project.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
-            // Project phải còn gắn group trước khi publish
-            if (project.InternshipId == null)
-                return Result<PublishProjectResponse>.Failure(
-                    _message.GetMessage(MessageKeys.Projects.NoGroupAssigned), ResultErrorType.BadRequest);
-
             // Status check
-            if (project.Status != ProjectStatus.Draft)
+            if (project.VisibilityStatus != VisibilityStatus.Draft)
                 return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.InvalidStatusForPublish), ResultErrorType.BadRequest);
-
-            // Group status check
-            var groupStatus = project.InternshipGroup?.Status;
-            if (groupStatus == GroupStatus.Archived)
-                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupNotActiveForPublish), ResultErrorType.BadRequest);
-
-            if (groupStatus == GroupStatus.Finished)
-                return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupIsFinished), ResultErrorType.BadRequest);
 
             // Re-validate required fields
             if (string.IsNullOrWhiteSpace(project.Field) || string.IsNullOrWhiteSpace(project.Requirements))
                 return Result<PublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.RequirementsRequired), ResultErrorType.BadRequest);
 
-            project.SetStatus(ProjectStatus.Published);
+            project.Publish();
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -93,9 +78,10 @@ namespace IOCv2.Application.Features.Projects.Commands.PublishProject
 
                 return Result<PublishProjectResponse>.Success(new PublishProjectResponse
                 {
-                    ProjectId = project.ProjectId,
-                    Status    = ProjectStatus.Published,
-                    UpdatedAt = project.UpdatedAt ?? DateTime.UtcNow
+                    ProjectId         = project.ProjectId,
+                    VisibilityStatus  = project.VisibilityStatus,
+                    OperationalStatus = project.OperationalStatus,
+                    UpdatedAt         = project.UpdatedAt ?? DateTime.UtcNow
                 });
             }
             catch (Exception ex)
