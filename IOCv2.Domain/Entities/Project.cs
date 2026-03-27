@@ -10,6 +10,12 @@ namespace IOCv2.Domain.Entities
         public string? Description { get; private set; }
         public DateTime? StartDate { get; private set; }
         public DateTime? EndDate { get; private set; }
+
+        // Two-Layer Status Model
+        public VisibilityStatus VisibilityStatus { get; private set; }
+        public OperationalStatus OperationalStatus { get; private set; }
+
+        // TEMPORARY: kept for backward compat with handlers not yet updated
         public ProjectStatus? Status { get; private set; }
 
         public Guid? MentorId { get; private set; }
@@ -19,7 +25,10 @@ namespace IOCv2.Domain.Entities
         public string Requirements { get; private set; } = string.Empty;
         public string? Deliverables { get; private set; }
 
-        // Navigation Properties — Assignments đã bị xóa
+        // Computed property
+        public bool IsEditable => OperationalStatus == OperationalStatus.Unstarted || OperationalStatus == OperationalStatus.Active;
+
+        // Navigation Properties
         public virtual InternshipGroup? InternshipGroup { get; set; }
         public virtual ICollection<ProjectResources> ProjectResources { get; set; } = new List<ProjectResources>();
         public virtual ICollection<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
@@ -28,7 +37,6 @@ namespace IOCv2.Domain.Entities
         private Project() { }
 
         public static Project Create(
-            Guid? internshipId,          // NULLABLE
             string projectName,
             string? description,
             string projectCode,
@@ -42,41 +50,38 @@ namespace IOCv2.Domain.Entities
         {
             return new Project
             {
-                ProjectId    = Guid.NewGuid(),
-                InternshipId = internshipId,
-                ProjectName  = projectName,
-                Description  = description,
-                ProjectCode  = projectCode,
-                Field        = field,
-                Requirements = requirements,
-                Deliverables = deliverables,
-                Template     = template,
-                MentorId     = mentorId,
-                StartDate    = startDate,
-                EndDate      = endDate,
-                Status       = ProjectStatus.Draft,
-                CreatedAt    = DateTime.UtcNow
+                ProjectId         = Guid.NewGuid(),
+                ProjectName       = projectName,
+                Description       = description,
+                ProjectCode       = projectCode,
+                Field             = field,
+                Requirements      = requirements,
+                Deliverables      = deliverables,
+                Template          = template,
+                MentorId          = mentorId,
+                StartDate         = startDate,
+                EndDate           = endDate,
+                VisibilityStatus  = VisibilityStatus.Draft,
+                OperationalStatus = OperationalStatus.Unstarted,
+                Status            = null,
+                CreatedAt         = DateTime.UtcNow
             };
         }
 
         public void Update(
-            Guid? internshipId,
             string? projectName,
             string? description,
             DateTime? startDate,
             DateTime? endDate,
-            ProjectStatus? status,
             string? field = null,
             string? requirements = null,
             string? deliverables = null,
             ProjectTemplate? template = null)
         {
-            if (internshipId.HasValue && internshipId != Guid.Empty) InternshipId = internshipId.Value;
             if (projectName != null)   ProjectName  = projectName;
             Description = description;
             StartDate   = startDate;
             EndDate     = endDate;
-            if (status.HasValue)       Status       = status.Value;
             if (field != null)         Field        = field;
             if (requirements != null)  Requirements = requirements;
             Deliverables = deliverables;
@@ -84,21 +89,58 @@ namespace IOCv2.Domain.Entities
             UpdatedAt = DateTime.UtcNow;
         }
 
-        public void SetStatus(ProjectStatus newStatus)
+        // Visibility lifecycle methods
+        public void Publish()
         {
-            Status    = newStatus;
+            VisibilityStatus = VisibilityStatus.Published;
             UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void Unpublish()
+        {
+            VisibilityStatus = VisibilityStatus.Draft;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        // Operational lifecycle methods
+        public void SetOperationalStatus(OperationalStatus status)
+        {
+            OperationalStatus = status;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void AssignToGroup(Guid internshipId, DateTime? startDate, DateTime? endDate)
+        {
+            InternshipId      = internshipId;
+            StartDate         = startDate;
+            EndDate           = endDate;
+            OperationalStatus = OperationalStatus.Active;
+            UpdatedAt         = DateTime.UtcNow;
+        }
+
+        public void SwapGroup(Guid newInternshipId, DateTime? startDate, DateTime? endDate)
+        {
+            InternshipId = newInternshipId;
+            StartDate    = startDate;
+            EndDate      = endDate;
+            UpdatedAt    = DateTime.UtcNow;
         }
 
         /// <summary>
         /// AC-13: Khi InternshipGroup bị xóa, project bị "orphan" — tách khỏi group.
-        /// Published → Draft. InternshipId → null.
+        /// InternshipId → null. OperationalStatus → Unstarted. VisibilityStatus không đổi.
         /// </summary>
         public void SetOrphan()
         {
-            InternshipId = null;
-            if (Status == ProjectStatus.Published)
-                Status = ProjectStatus.Draft;
+            InternshipId      = null;
+            OperationalStatus = OperationalStatus.Unstarted;
+            UpdatedAt         = DateTime.UtcNow;
+        }
+
+        // BACKWARD COMPAT: kept for handlers not yet migrated to two-layer status
+        public void SetStatus(ProjectStatus newStatus)
+        {
+            Status    = newStatus;
             UpdatedAt = DateTime.UtcNow;
         }
     }
