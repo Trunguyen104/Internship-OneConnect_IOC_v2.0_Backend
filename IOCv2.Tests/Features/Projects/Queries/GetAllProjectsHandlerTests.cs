@@ -50,6 +50,7 @@ public class GetAllProjectsHandlerTests
     public async Task Handle_ReturnsPagedResult_WhenCacheMiss()
     {
         var project = Project.Create("P1", "Desc", "PRJ-TEST_TST_1", "IT", "Requirements", null, ProjectTemplate.None, null, DateTime.UtcNow, DateTime.UtcNow.AddDays(1));
+        project.Publish();
         var data = new List<Project> { project };
         var mockQuery = data.AsQueryable().BuildMock();
 

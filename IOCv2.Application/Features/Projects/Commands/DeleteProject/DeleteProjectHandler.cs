@@ -36,6 +36,7 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
 
             var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .Include(eu => eu.Enterprise)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
 
@@ -52,11 +53,26 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            // Scope check
-            if (project.MentorId != enterpriseUser.EnterpriseUserId &&
-                project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
+            // Scope check: allow Mentor who created the project OR any Mentor from the same enterprise
+            var projectMentor = project.MentorId.HasValue
+                ? await _unitOfWork.Repository<EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(eu => eu.EnterpriseUserId == project.MentorId.Value, cancellationToken)
+                : null;
+
+            bool isSameEnterprise = projectMentor != null && projectMentor.EnterpriseId == enterpriseUser.EnterpriseId;
+
+            if (project.MentorId != enterpriseUser.EnterpriseUserId && !isSameEnterprise)
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
+            // Block delete if project is already Completed or Archived
+            if (project.OperationalStatus == OperationalStatus.Completed ||
+                project.OperationalStatus == OperationalStatus.Archived)
+                return Result<string>.Failure(
+                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
+                    ResultErrorType.BadRequest);
+
+            // Data checks: block delete if project has associated WorkItems or Sprints
             var hasWorkItems = await _unitOfWork.Repository<WorkItem>().Query()
                 .AnyAsync(w => w.ProjectId == project.ProjectId, cancellationToken);
             if (hasWorkItems)
@@ -75,15 +91,15 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
             try
             {
                 string logKey;
-                if (project.Status == ProjectStatus.Draft)
+                if (project.OperationalStatus == OperationalStatus.Unstarted)
                 {
-                    // Draft project without runtime data can be hard-deleted.
+                    // Unstarted project without runtime data can be hard-deleted.
                     await _unitOfWork.Repository<Project>().HardDeleteAsync(project, cancellationToken);
                     logKey = MessageKeys.Projects.LogDeleteHard;
                 }
                 else
                 {
-                    // Non-draft project is soft-deleted for audit history.
+                    // Active project is soft-deleted for audit history.
                     project.DeletedAt = DateTime.UtcNow;
                     await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
                     logKey = MessageKeys.Projects.LogDeleteSoft;

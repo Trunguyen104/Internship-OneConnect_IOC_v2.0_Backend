@@ -30,11 +30,11 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
 
     public async Task<Result<List<GetMyInternshipGroupsResponse>>> Handle(GetMyInternshipGroupsQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting mine internship groups query.");
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStartQueryMine));
 
         if (string.IsNullOrWhiteSpace(_currentUserService.UserId) || !Guid.TryParse(_currentUserService.UserId, out var userId))
         {
-            _logger.LogWarning("Mine internship groups query denied because current user is unavailable.");
+            _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogQueryMineDenied));
             throw new UnauthorizedAccessException(_messageService.GetMessage(MessageKeys.Common.Unauthorized));
         }
 
@@ -47,7 +47,7 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
 
         if (student == null)
         {
-            _logger.LogWarning("Mine internship groups query failed because student profile was not found for current user.");
+            _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogQueryMineStudentNotFound));
             throw new NotFoundException(_messageService.GetMessage(MessageKeys.Users.NotFound));
         }
 
@@ -101,7 +101,7 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
             })
             .ToList();
 
-        _logger.LogInformation("Completed mine internship groups query with {Count} groups.", response.Count);
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogQueryMineCompleted), response.Count);
 
         return Result<List<GetMyInternshipGroupsResponse>>.Success(response);
     }

@@ -108,7 +108,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdateError));
+                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.InternshipGroups.LogArchiveError));
                 return Result<ArchiveInternshipGroupResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.InternalError),
                     ResultErrorType.InternalServerError);

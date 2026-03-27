@@ -673,4 +673,43 @@
   <data name="Projects.LogGetByInternshipId" xml:space="preserve">
     <value>Retrieving projects for internship group {0}.</value>
   </data>
+  <data name="InternshipGroup.LogQueryById" xml:space="preserve">
+    <value>Querying internship group with ID: {InternshipId} by user {UserId} (role: {Role})</value>
+  </data>
+  <data name="InternshipGroup.LogScopedHrEnterprise" xml:space="preserve">
+    <value>HR/EnterpriseAdmin {UserId} → scoped to enterprise {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogScopedMentor" xml:space="preserve">
+    <value>Mentor {UserId} → scoped to MentorId {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogScopedStudent" xml:space="preserve">
+    <value>Student {UserId} → scoped to StudentId {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogRetrievedGroups" xml:space="preserve">
+    <value>Retrieved {Count} internship groups for user {UserId} (role: {Role})</value>
+  </data>
+  <data name="InternshipGroup.LogStartQueryMine" xml:space="preserve">
+    <value>Starting mine internship groups query.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineCompleted" xml:space="preserve">
+    <value>Completed mine internship groups query with {Count} groups.</value>
+  </data>
+  <data name="InternshipGroup.LogStartQueryTerms" xml:space="preserve">
+    <value>Starting get my internship terms query.</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardQuery" xml:space="preserve">
+    <value>Starting to get dashboard data for InternshipId: {Id}</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardGenerated" xml:space="preserve">
+    <value>Successfully generated dashboard data for InternshipId: {Id}. TotalTasks: {TaskCount}</value>
+  </data>
+  <data name="InternshipGroup.LogResolvedPhases" xml:space="preserve">
+    <value>Resolved {Count} phase(s) for enterprise {EnterpriseId}: [{PhaseIds}]</value>
+  </data>
+  <data name="InternshipGroup.Unassigned" xml:space="preserve">
+    <value>Unassigned</value>
+  </data>
+  <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
+    <value>Late logbook submission</value>
+  </data>
 </root>

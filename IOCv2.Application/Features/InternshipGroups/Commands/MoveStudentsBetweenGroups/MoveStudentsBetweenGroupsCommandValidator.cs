@@ -1,20 +1,21 @@
 using FluentValidation;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetweenGroups
 {
     internal class MoveStudentsBetweenGroupsCommandValidator : AbstractValidator<MoveStudentsBetweenGroupsCommand>
     {
-        public MoveStudentsBetweenGroupsCommandValidator()
+        public MoveStudentsBetweenGroupsCommandValidator(IMessageService messageService)
         {
             RuleFor(x => x.FromGroupId)
-                .NotEmpty().WithMessage(MessageKeys.Internships.InternshipIdRequired);
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.Internships.InternshipIdRequired));
 
             RuleFor(x => x.ToGroupId)
-                .NotEmpty().WithMessage(MessageKeys.Internships.InternshipIdRequired);
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.Internships.InternshipIdRequired));
 
             RuleFor(x => x.StudentIds)
-                .NotEmpty().WithMessage(MessageKeys.InternshipGroups.StudentListRequired);
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.StudentListRequired));
         }
     }
 }

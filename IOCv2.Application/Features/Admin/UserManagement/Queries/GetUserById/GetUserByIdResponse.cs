@@ -13,6 +13,9 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public string? AvatarUrl { get; set; }
+        public UserGender? Gender { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        public string? Address { get; set; }
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
         public Guid? UnitId { get; set; }
@@ -26,6 +29,9 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById
         public void Mapping(Profile profile)
         {
             profile.CreateMap<User, GetUserByIdResponse>()
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => 

@@ -744,4 +744,43 @@
   <data name="Projects.LogGetByInternshipId" xml:space="preserve">
     <value>Đang lấy danh sách dự án cho nhóm thực tập {0}.</value>
   </data>
+  <data name="InternshipGroup.LogQueryById" xml:space="preserve">
+    <value>Truy vấn nhóm thực tập ID: {InternshipId} bởi người dùng {UserId} (vai trò: {Role})</value>
+  </data>
+  <data name="InternshipGroup.LogScopedHrEnterprise" xml:space="preserve">
+    <value>HR/EnterpriseAdmin {UserId} → giới hạn theo doanh nghiệp {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogScopedMentor" xml:space="preserve">
+    <value>Mentor {UserId} → giới hạn theo MentorId {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogScopedStudent" xml:space="preserve">
+    <value>Sinh viên {UserId} → giới hạn theo StudentId {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogRetrievedGroups" xml:space="preserve">
+    <value>Đã lấy {Count} nhóm thực tập cho người dùng {UserId} (vai trò: {Role})</value>
+  </data>
+  <data name="InternshipGroup.LogStartQueryMine" xml:space="preserve">
+    <value>Bắt đầu truy vấn nhóm thực tập của tôi.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineCompleted" xml:space="preserve">
+    <value>Hoàn thành truy vấn nhóm thực tập của tôi với {Count} nhóm.</value>
+  </data>
+  <data name="InternshipGroup.LogStartQueryTerms" xml:space="preserve">
+    <value>Bắt đầu truy vấn kỳ thực tập của tôi.</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardQuery" xml:space="preserve">
+    <value>Bắt đầu lấy dữ liệu dashboard cho nhóm thực tập ID: {Id}</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardGenerated" xml:space="preserve">
+    <value>Đã tạo dữ liệu dashboard thành công cho nhóm thực tập ID: {Id}. Tổng công việc: {TaskCount}</value>
+  </data>
+  <data name="InternshipGroup.LogResolvedPhases" xml:space="preserve">
+    <value>Đã xác định {Count} đợt thực tập cho doanh nghiệp {EnterpriseId}: [{PhaseIds}]</value>
+  </data>
+  <data name="InternshipGroup.Unassigned" xml:space="preserve">
+    <value>Chưa phân công</value>
+  </data>
+  <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
+    <value>Nộp nhật ký thực tập trễ</value>
+  </data>
 </root>

@@ -1318,4 +1318,43 @@
   <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
     <value>Only Active internship groups can be deleted.</value>
   </data>
+  <data name="InternshipGroup.LogNoStudentsProvided" xml:space="preserve">
+    <value>No students were provided when creating group '{GroupName}'</value>
+  </data>
+  <data name="InternshipGroup.LogStudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Student {StudentId} is already in an active group in internship phase {PhaseId}</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedHrEnterprise" xml:space="preserve">
+    <value>User {UserId} (HR/EnterpriseAdmin) tried to access group {GroupId} of a different enterprise.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedMentor" xml:space="preserve">
+    <value>User {UserId} (Mentor) tried to access group {GroupId} they are not assigned to.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedStudent" xml:space="preserve">
+    <value>User {UserId} (Student) tried to access group {GroupId} they are not a member of.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteNotificationFailed" xml:space="preserve">
+    <value>Internship group deletion succeeded but mentor notification failed for group {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFoundForUser" xml:space="preserve">
+    <value>Student record not found for user {UserId}</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineDenied" xml:space="preserve">
+    <value>Mine internship groups query denied because current user is unavailable.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineStudentNotFound" xml:space="preserve">
+    <value>Mine internship groups query failed because student profile was not found for current user.</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardNotFound" xml:space="preserve">
+    <value>Dashboard data not found for InternshipId: {Id}</value>
+  </data>
+  <data name="InternshipGroup.LogNoPhasesForEnterprise" xml:space="preserve">
+    <value>No Active or Upcoming phases found for enterprise {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveError" xml:space="preserve">
+    <value>An error occurred while archiving the internship group</value>
+  </data>
+  <data name="InternshipGroup.LogMoveError" xml:space="preserve">
+    <value>An error occurred while moving students between groups</value>
+  </data>
 </root>

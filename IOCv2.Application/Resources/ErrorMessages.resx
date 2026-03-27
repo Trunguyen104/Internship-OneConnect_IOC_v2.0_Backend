@@ -1374,4 +1374,43 @@
   <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
     <value>Chỉ có thể xóa nhóm thực tập đang ở trạng thái Active.</value>
   </data>
+  <data name="InternshipGroup.LogNoStudentsProvided" xml:space="preserve">
+    <value>Không có sinh viên nào được cung cấp khi tạo nhóm '{GroupName}'</value>
+  </data>
+  <data name="InternshipGroup.LogStudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Sinh viên {StudentId} đã thuộc nhóm Active trong kỳ thực tập {PhaseId}</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedHrEnterprise" xml:space="preserve">
+    <value>Người dùng {UserId} (HR/EnterpriseAdmin) cố truy cập nhóm {GroupId} của doanh nghiệp khác.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedMentor" xml:space="preserve">
+    <value>Người dùng {UserId} (Mentor) cố truy cập nhóm {GroupId} mà họ không được phân công.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedStudent" xml:space="preserve">
+    <value>Người dùng {UserId} (Sinh viên) cố truy cập nhóm {GroupId} mà họ không phải thành viên.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteNotificationFailed" xml:space="preserve">
+    <value>Xóa nhóm thực tập thành công nhưng gửi thông báo cho mentor thất bại. Nhóm: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFoundForUser" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên cho người dùng {UserId}</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineDenied" xml:space="preserve">
+    <value>Truy vấn nhóm thực tập của tôi bị từ chối vì người dùng hiện tại không hợp lệ.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineStudentNotFound" xml:space="preserve">
+    <value>Truy vấn nhóm thực tập của tôi thất bại vì không tìm thấy hồ sơ sinh viên cho người dùng hiện tại.</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardNotFound" xml:space="preserve">
+    <value>Không tìm thấy dữ liệu dashboard cho nhóm thực tập ID: {Id}</value>
+  </data>
+  <data name="InternshipGroup.LogNoPhasesForEnterprise" xml:space="preserve">
+    <value>Không tìm thấy đợt Active hoặc Upcoming cho doanh nghiệp {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình lưu trữ nhóm thực tập</value>
+  </data>
+  <data name="InternshipGroup.LogMoveError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình chuyển sinh viên giữa các nhóm</value>
+  </data>
 </root>

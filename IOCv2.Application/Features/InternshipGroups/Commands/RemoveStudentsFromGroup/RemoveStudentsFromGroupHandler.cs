@@ -14,6 +14,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
     public class RemoveStudentsFromGroupHandler : IRequestHandler<RemoveStudentsFromGroupCommand, Result<RemoveStudentsFromGroupResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
         private readonly ILogger<RemoveStudentsFromGroupHandler> _logger;
@@ -22,6 +23,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
         public RemoveStudentsFromGroupHandler(
             IUnitOfWork unitOfWork,
+            ICurrentUserService currentUserService,
             IMessageService messageService,
             IMapper mapper,
             ILogger<RemoveStudentsFromGroupHandler> logger,
@@ -29,6 +31,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
             INotificationPushService pushService)
         {
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
             _messageService = messageService;
             _mapper = mapper;
             _logger = logger;
@@ -39,6 +42,21 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
         public async Task<Result<RemoveStudentsFromGroupResponse>> Handle(RemoveStudentsFromGroupCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemovingStudents), request.InternshipId);
+
+            // Enterprise ownership check
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+                return Result<RemoveStudentsFromGroupResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Unauthorized),
+                    ResultErrorType.Unauthorized);
+
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
+
+            if (enterpriseUser == null)
+                return Result<RemoveStudentsFromGroupResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseUserNotFound),
+                    ResultErrorType.Forbidden);
 
             try
             {
@@ -62,11 +80,25 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                         ResultErrorType.BadRequest);
                 }
 
+                if (group.EnterpriseId != enterpriseUser.EnterpriseId)
+                    return Result<RemoveStudentsFromGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise),
+                        ResultErrorType.Forbidden);
+
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 var membersToRemove = group.Members
                     .Where(m => request.StudentIds.Contains(m.StudentId))
                     .ToList();
+
+                if (!membersToRemove.Any())
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemoveStudentsFailed));
+                    return Result<RemoveStudentsFromGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.StudentListToRemoveRequired),
+                        ResultErrorType.BadRequest);
+                }
 
                 var memberRepo = _unitOfWork.Repository<InternshipStudent>();
                 foreach (var member in membersToRemove)
@@ -78,7 +110,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (saved >= 0)
+                if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

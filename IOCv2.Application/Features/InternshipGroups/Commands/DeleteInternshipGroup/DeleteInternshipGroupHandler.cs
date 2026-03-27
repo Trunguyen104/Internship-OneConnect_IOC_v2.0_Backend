@@ -163,7 +163,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                     catch (Exception notifyEx)
                     {
                         _logger.LogWarning(notifyEx,
-                            "InternshipGroup deletion succeeded but mentor notification failed for group {InternshipId}",
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteNotificationFailed),
                             request.InternshipId);
                     }
                 }

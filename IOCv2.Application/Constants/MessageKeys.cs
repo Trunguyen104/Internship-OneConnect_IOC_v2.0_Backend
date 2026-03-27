@@ -232,6 +232,48 @@ namespace IOCv2.Application.Constants
             public const string NotificationOrphanTitle    = "InternshipGroups.NotificationOrphanTitle";
             public const string NotificationOrphanContent  = "InternshipGroups.NotificationOrphanContent";
             public const string LogOrphanizeProjects       = "InternshipGroups.LogOrphanizeProjects";
+
+            // Log messages — GetInternshipGroupByIdHandler
+            public const string LogQueryById                   = "InternshipGroup.LogQueryById";
+            public const string LogAccessDeniedHrEnterprise    = "InternshipGroup.LogAccessDeniedHrEnterprise";
+            public const string LogAccessDeniedMentor          = "InternshipGroup.LogAccessDeniedMentor";
+            public const string LogAccessDeniedStudent         = "InternshipGroup.LogAccessDeniedStudent";
+
+            // Log messages — DeleteInternshipGroupHandler
+            public const string LogDeleteNotificationFailed    = "InternshipGroup.LogDeleteNotificationFailed";
+
+            // Log messages — GetInternshipGroupsHandler
+            public const string LogScopedHrEnterprise          = "InternshipGroup.LogScopedHrEnterprise";
+            public const string LogScopedMentor                = "InternshipGroup.LogScopedMentor";
+            public const string LogStudentNotFoundForUser      = "InternshipGroup.LogStudentNotFoundForUser";
+            public const string LogScopedStudent               = "InternshipGroup.LogScopedStudent";
+            public const string LogRetrievedGroups             = "InternshipGroup.LogRetrievedGroups";
+
+            // Log messages — GetMyInternshipGroupsHandler
+            public const string LogStartQueryMine              = "InternshipGroup.LogStartQueryMine";
+            public const string LogQueryMineDenied             = "InternshipGroup.LogQueryMineDenied";
+            public const string LogQueryMineStudentNotFound    = "InternshipGroup.LogQueryMineStudentNotFound";
+            public const string LogQueryMineCompleted          = "InternshipGroup.LogQueryMineCompleted";
+
+            // Log messages — GetMyInternshipTermsHandler
+            public const string LogStartQueryTerms             = "InternshipGroup.LogStartQueryTerms";
+
+            // Log messages — GetInternshipGroupDashboardHandler
+            public const string LogDashboardQuery              = "InternshipGroup.LogDashboardQuery";
+            public const string LogDashboardNotFound           = "InternshipGroup.LogDashboardNotFound";
+            public const string LogDashboardGenerated          = "InternshipGroup.LogDashboardGenerated";
+
+            // Log messages — GetPlacedStudentsHandler
+            public const string LogNoPhasesForEnterprise       = "InternshipGroup.LogNoPhasesForEnterprise";
+            public const string LogResolvedPhases              = "InternshipGroup.LogResolvedPhases";
+
+            // Archive/Move error keys
+            public const string LogArchiveError                = "InternshipGroup.LogArchiveError";
+            public const string LogMoveError                   = "InternshipGroup.LogMoveError";
+
+            // UI labels
+            public const string Unassigned                    = "InternshipGroup.Unassigned";
+            public const string LateLogbookSubmission         = "InternshipGroup.LateLogbookSubmission";
         }
 
         public static class Terms

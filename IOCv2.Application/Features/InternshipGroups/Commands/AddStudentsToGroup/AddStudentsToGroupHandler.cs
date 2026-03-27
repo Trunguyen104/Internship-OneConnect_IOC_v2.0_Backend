@@ -149,7 +149,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (saved >= 0)
+                if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
                     await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(group.InternshipId), cancellationToken);

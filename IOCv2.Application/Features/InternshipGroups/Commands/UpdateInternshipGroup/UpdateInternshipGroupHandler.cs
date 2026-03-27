@@ -122,7 +122,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(entity);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (saved > 0 || !_unitOfWork.Repository<InternshipGroup>().Query().Any(x => x.InternshipId == request.InternshipId))
+                if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
                     await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(entity.InternshipId), cancellationToken);

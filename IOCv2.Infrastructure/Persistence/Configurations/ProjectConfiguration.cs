@@ -37,9 +37,20 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(x => x.EndDate)
                 .HasColumnName("end_date");
 
-            builder.Property(x => x.Status)
-                .HasColumnName("status")
-                .HasConversion<short>();
+            // Explicitly ignore the legacy Status property (replaced by two-layer model)
+            builder.Ignore(x => x.Status);
+
+            builder.Property(x => x.VisibilityStatus)
+                .HasColumnName("visibility_status")
+                .HasConversion<short>()
+                .HasDefaultValue(VisibilityStatus.Draft)
+                .IsRequired();
+
+            builder.Property(x => x.OperationalStatus)
+                .HasColumnName("operational_status")
+                .HasConversion<short>()
+                .HasDefaultValue(OperationalStatus.Unstarted)
+                .IsRequired();
 
             // Audit fields from BaseEntity
             builder.Property(x => x.CreatedAt)
@@ -70,8 +81,11 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasIndex(x => x.InternshipId)
                 .HasDatabaseName("ix_projects_internship_id");
 
-            builder.HasIndex(x => x.Status)
-                .HasDatabaseName("ix_projects_status");
+            builder.HasIndex(x => x.VisibilityStatus)
+                .HasDatabaseName("ix_projects_visibility_status");
+
+            builder.HasIndex(x => x.OperationalStatus)
+                .HasDatabaseName("ix_projects_operational_status");
 
             builder.HasIndex(x => x.CreatedAt)
                 .HasDatabaseName("ix_projects_created_at");
