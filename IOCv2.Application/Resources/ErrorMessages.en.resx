@@ -1197,7 +1197,7 @@
   </data>
   <data name="JobPosting.CreateSuccess" xml:space="preserve">
     <value>Successfully created a job posting.</value>
-  </date>
+  </data>
   <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
     <value>Failed to restore enterprise. EnterpriseId: {EnterpriseId}</value>
   </data>
