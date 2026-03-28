@@ -547,6 +547,15 @@
   <data name="InternshipPhase.Log.MyPhasesSuccess" xml:space="preserve">
     <value>Successfully retrieved internship phases for student {0} (UserId: {1}) — found {2} phase(s).</value>
   </data>
+  <data name="InternshipPhase.Log.MentorUserNotFound" xml:space="preserve">
+    <value>EnterpriseUser not found for Mentor userId={0} while retrieving internship phases.</value>
+  </data>
+  <data name="InternshipPhase.Log.MyMentorPhasesSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phases for Mentor enterpriseUserId={0} (userId={1}) — found {2} phase(s).</value>
+  </data>
+  <data name="InternshipPhase.MentorEnterpriseUserNotFound" xml:space="preserve">
+    <value>Mentor profile not found in the system. Please contact your administrator.</value>
+  </data>
   <data name="InternshipPhase.StatusInvalid" xml:space="preserve">
     <value>Internship phase status is invalid.</value>
   </data>

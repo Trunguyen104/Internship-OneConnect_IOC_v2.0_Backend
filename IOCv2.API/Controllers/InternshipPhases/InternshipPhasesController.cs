@@ -59,10 +59,12 @@ public class InternshipPhasesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get internship phases that the current student belongs to via their internship groups.
+    /// Get internship phases that the current user belongs to.
+    /// Student: phases via their internship groups.
+    /// Mentor: phases via the groups they mentor.
     /// </summary>
     [HttpGet("me")]
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = "Student,Mentor")]
     [RateLimit(maxRequests: 60, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<List<GetMyInternshipPhasesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]

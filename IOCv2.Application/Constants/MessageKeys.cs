@@ -983,10 +983,13 @@ namespace IOCv2.Application.Constants
             public const string LogByIdNotFound = "InternshipPhase.Log.ByIdNotFound";
             public const string LogByIdSuccess = "InternshipPhase.Log.ByIdSuccess";
 
-            // Log - Get My Phases
-            public const string LogGettingMyPhases = "InternshipPhase.Log.GettingMyPhases";
-            public const string LogStudentNotFound = "InternshipPhase.Log.StudentNotFound";
-            public const string LogMyPhasesSuccess = "InternshipPhase.Log.MyPhasesSuccess";
+            // Log - Get My Phases (Student + Mentor)
+            public const string LogGettingMyPhases           = "InternshipPhase.Log.GettingMyPhases";
+            public const string LogStudentNotFound           = "InternshipPhase.Log.StudentNotFound";
+            public const string LogMyPhasesSuccess           = "InternshipPhase.Log.MyPhasesSuccess";
+            public const string LogMentorUserNotFound        = "InternshipPhase.Log.MentorUserNotFound";
+            public const string LogMyMentorPhasesSuccess     = "InternshipPhase.Log.MyMentorPhasesSuccess";
+            public const string MentorEnterpriseUserNotFound = "InternshipPhase.MentorEnterpriseUserNotFound";
         }
 
         public static class Notifications

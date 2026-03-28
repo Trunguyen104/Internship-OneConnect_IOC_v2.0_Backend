@@ -613,6 +613,15 @@
   <data name="InternshipPhase.Log.MyPhasesSuccess" xml:space="preserve">
     <value>Lấy danh sách đợt thực tập thành công cho sinh viên {0} (UserId: {1}) — tìm thấy {2} đợt thực tập.</value>
   </data>
+  <data name="InternshipPhase.Log.MentorUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy EnterpriseUser cho Mentor userId={0} khi lấy danh sách pha thực tập.</value>
+  </data>
+  <data name="InternshipPhase.Log.MyMentorPhasesSuccess" xml:space="preserve">
+    <value>Lấy danh sách pha thực tập của Mentor enterpriseUserId={0} (userId={1}) thành công — tìm thấy {2} pha.</value>
+  </data>
+  <data name="InternshipPhase.MentorEnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin Mentor trong hệ thống. Vui lòng liên hệ quản trị viên.</value>
+  </data>
   <data name="InternshipPhase.StatusInvalid" xml:space="preserve">
     <value>Trạng thái đợt thực tập không hợp lệ.</value>
   </data>
