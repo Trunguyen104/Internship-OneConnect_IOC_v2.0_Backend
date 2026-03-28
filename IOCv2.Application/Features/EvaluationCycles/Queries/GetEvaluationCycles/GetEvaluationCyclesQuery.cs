@@ -5,5 +5,5 @@ namespace IOCv2.Application.Features.EvaluationCycles.Queries.GetEvaluationCycle
 
 public record GetEvaluationCyclesQuery : IRequest<Result<List<GetEvaluationCyclesResponse>>>
 {
-    public Guid TermId { get; init; }
+    public Guid PhaseId { get; init; }
 }

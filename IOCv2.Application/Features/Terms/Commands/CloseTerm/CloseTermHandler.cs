@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Enterprises.Common;
 using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -103,6 +104,8 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
 
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
+            // Invalidate enterprise active-terms cache (AC-07: closed term must disappear from HR/Mentor view)
+            await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.AllActiveTermsPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermClosed), term.TermId, userId);
 

@@ -16,7 +16,7 @@ namespace IOCv2.API.Controllers.Terms;
 /// Terms Management — Manage internship terms (create, view, update, close, delete)
 /// </summary>
 [Tags("Terms Management")]
-[Authorize(Roles = "SchoolAdmin,SuperAdmin,HR,Mentor,EnterpriseAdmin")]
+[Authorize(Roles = "SchoolAdmin,SuperAdmin,EnterpriseAdmin,HR,Mentor")]
 public class TermsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -69,6 +69,7 @@ public class TermsController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created term</returns>
     [HttpPost]
+    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<CreateTermResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -92,6 +93,7 @@ public class TermsController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated term</returns>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<UpdateTermResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -116,6 +118,7 @@ public class TermsController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success message</returns>
     [HttpPatch("{id:guid}/close")]
+    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<CloseTermResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -139,6 +142,7 @@ public class TermsController : ApiControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success message with related data information</returns>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
     [RateLimit(maxRequests: 20, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<DeleteTermResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]

@@ -1,3 +1,4 @@
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Terms.Common;
@@ -58,6 +59,12 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
                 return Result<BulkWithdrawStudentsResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
         }
+
+        // Do not allow bulk withdraw when the term is Ended or Closed
+        if (TermStatusHelper.IsEnded(term.StartDate, term.EndDate, term.Status) ||
+            TermStatusHelper.IsClosed(term.Status))
+            return Result<BulkWithdrawStudentsResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.TermEndedOrClosed));
 
         // Load all studentTerms matching the IDs and TermId
         var studentTerms = await _unitOfWork.Repository<StudentTerm>()

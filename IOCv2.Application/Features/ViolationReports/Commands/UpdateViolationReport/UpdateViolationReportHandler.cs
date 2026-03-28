@@ -19,7 +19,7 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.UpdateViolationRe
     /// Responsibilities:
     /// - Load report with necessary navigation properties for validation and mapping
     /// - Enforce authorization rules (Mentor restrictions)
-    /// - Validate OccurredDate against internship term
+    /// - Validate OccurredDate against internship phase
     /// - Detect concurrent edits using LastUpdate/ForceUpdate
     /// - Apply changes inside a transaction and persist
     /// - Map and return the updated DTO or appropriate error
@@ -51,9 +51,9 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.UpdateViolationRe
 
         /// <summary>
         /// Handle update:
-        /// 1. Load report including Student.User and InternshipGroup.Term for validations and mapping.
+        /// 1. Load report including Student.User and InternshipGroup.InternshipPhase for validations and mapping.
         /// 2. Ensure current user (if Mentor) is allowed to modify the report.
-        /// 3. Validate OccurredDate falls within internship term when available.
+        /// 3. Validate OccurredDate falls within internship phase when available.
         /// 4. Check for optimistic concurrency (LastUpdate) unless ForceUpdate specified.
         /// 5. Perform update inside a transaction and commit/rollback on error.
         /// </summary>
@@ -64,7 +64,7 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.UpdateViolationRe
             // 1) Load report with navigation properties required for validation.
             var report = await _unitOfWork.Repository<ViolationReport>().Query()
                 .Include(v => v.Student).ThenInclude(s => s.User)
-                .Include(v => v.InternshipGroup).ThenInclude(g => g.Term)
+                .Include(v => v.InternshipGroup).ThenInclude(g => g.InternshipPhase)
                 .FirstOrDefaultAsync(v => v.ViolationReportId == request.ViolationReportId, cancellationToken);
 
             if (report == null)
@@ -81,16 +81,15 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.UpdateViolationRe
                 return Result<UpdateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.NotAllowedToUpdateThisReport), ResultErrorType.Forbidden);
             }
 
-            // 3) Validate OccurredDate against internship term (if available).
-            var group = report.InternshipGroup;
-            if (group != null && group.Term != null)
+            // 3) Validate OccurredDate against internship phase dates (if available).
+            InternshipGroup? nullableGroup = report.InternshipGroup;
+            var phase = nullableGroup?.InternshipPhase;
+            if (phase != null)
             {
-                var term = group.Term;
-                if (term != null)
-                {
-                    if (request.OccurredDate < term.StartDate) return Result<UpdateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.OccurredDateBeforeInternshipStart), ResultErrorType.BadRequest);
-                    if (request.OccurredDate > term.EndDate) return Result<UpdateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.InternshipHasEnded), ResultErrorType.BadRequest);
-                }
+                if (request.OccurredDate < phase.StartDate)
+                    return Result<UpdateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.OccurredDateBeforeInternshipStart));
+                if (request.OccurredDate > phase.EndDate)
+                    return Result<UpdateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.InternshipHasEnded));
             }
 
             // 4) Concurrency detection: if server record was updated after client's LastUpdate and ForceUpdate not set, return conflict with info.
@@ -98,18 +97,7 @@ namespace IOCv2.Application.Features.ViolationReports.Commands.UpdateViolationRe
             {
                 if (report.UpdatedAt.Value > request.LastUpdate.Value)
                 {
-                    // Attempt to get the human-readable name of the last updater for logging/feedback.
-                    string lastUpdater = "Someone";
-                    if (report.UpdatedBy.HasValue)
-                    {
-                        var updaterName = await _unitOfWork.Repository<User>().Query()
-                            .Where(u => u.UserId == report.UpdatedBy.Value)
-                            .Select(u => u.FullName).FirstOrDefaultAsync(cancellationToken);
-                        if (!string.IsNullOrWhiteSpace(updaterName))
-                            lastUpdater = updaterName;
-                    }
-
-                    var updatedAtLocal = report.UpdatedAt?.ToLocalTime().ToString("g") ?? string.Empty;
+                    var updatedAtLocal = report.UpdatedAt.Value.ToLocalTime().ToString("g");
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.ViolationReportKey.ViolationReportUpdatedByAnotherUser), updatedAtLocal);
                     return Result<UpdateViolationReportResponse>.Failure(_messageService.GetMessage(MessageKeys.ViolationReportKey.ViolationReportUpdatedByAnotherUser, updatedAtLocal), ResultErrorType.Conflict);
                 }

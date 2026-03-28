@@ -13,13 +13,23 @@ public class ActiveTermTimelineResponse
     public string TermName { get; set; } = null!;
     public Guid UniversityId { get; set; }
     public string UniversityName { get; set; } = null!;
+
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public TermDisplayStatus Status { get; set; }
+
+    /// <summary>Always Active because only ongoing terms are returned.</summary>
+    public TermDisplayStatus Status { get; set; } = TermDisplayStatus.Active;
+
+    // Timeline
     public int TotalDays { get; set; }
     public int DaysElapsed { get; set; }
     public int DaysRemaining { get; set; }
     public double ProgressPercent { get; set; }
+
+    /// <summary>
+    /// List of evaluation/grading deadlines (EvaluationCycles) for the term.
+    /// Empty if not yet configured by Uni Admin.
+    /// </summary>
     public List<DeadlineInfo> Deadlines { get; set; } = new();
 }
 
@@ -27,10 +37,18 @@ public class DeadlineInfo
 {
     public Guid CycleId { get; set; }
     public string CycleName { get; set; } = null!;
-    public string DeadlineType { get; set; } = "EvaluationSubmission";
+
+    /// <summary>Deadline = EndDate of the EvaluationCycle.</summary>
     public DateTime DeadlineDate { get; set; }
+
+    /// <summary>Number of days remaining until the deadline. Negative means overdue.</summary>
     public int DaysUntilDeadline { get; set; }
+
+    /// <summary>True if there are 7 days or fewer remaining (and not overdue).</summary>
     public bool IsWarning { get; set; }
+
+    /// <summary>True if the deadline has passed.</summary>
     public bool IsOverdue { get; set; }
+
     public EvaluationCycleStatus CycleStatus { get; set; }
 }

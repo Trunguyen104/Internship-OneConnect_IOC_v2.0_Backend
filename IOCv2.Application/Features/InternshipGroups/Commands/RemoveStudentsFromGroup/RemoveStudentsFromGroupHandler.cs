@@ -68,7 +68,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                 var memberRepo = _unitOfWork.Repository<InternshipStudent>();
                 foreach (var member in membersToRemove)
                 {
-                    await memberRepo.DeleteAsync(member);
+                    // Hard-delete: xóa hẳn record để sinh viên có thể được thêm vào nhóm khác
+                    // Soft-delete sẽ gây conflict composite PK (InternshipId, StudentId) khi thêm lại
+                    await memberRepo.HardDeleteAsync(member);
                 }
 
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);

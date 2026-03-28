@@ -103,8 +103,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                     .AsNoTracking()
                     .Where(a => studentIds.Contains(a.StudentId)
                              && a.EnterpriseId == enterpriseUser.EnterpriseId
-                             && a.Status == InternshipApplicationStatus.Placed
-                             && a.TermId == group.TermId)
+                             && a.Status == InternshipApplicationStatus.Approved)
                     .Select(a => a.StudentId)
                     .ToListAsync(cancellationToken);
 
@@ -124,7 +123,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 var alreadyInGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                     .AsNoTracking()
                     .Include(g => g.Members)
-                    .Where(g => g.TermId == group.TermId && g.Status == GroupStatus.Active && g.InternshipId != group.InternshipId)
+                    .Where(g => g.PhaseId == group.PhaseId && g.Status == GroupStatus.Active && g.InternshipId != group.InternshipId)
                     .SelectMany(g => g.Members)
                     .Where(m => studentIds.Contains(m.StudentId))
                     .Select(m => m.StudentId)
@@ -133,7 +132,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 if (alreadyInGroup.Any())
                 {
                     var firstInGroup = alreadyInGroup.First();
-                    _logger.LogWarning("Student {StudentId} is already in another active group in term {TermId}", firstInGroup, group.TermId);
+                    _logger.LogWarning("Student {StudentId} is already in another active group in phase {PhaseId}", firstInGroup, group.PhaseId);
                     return Result<AddStudentsToGroupResponse>.Failure(
                         "Sinh viên đã tham gia một nhóm khác trong kỳ này.",
                         ResultErrorType.BadRequest);

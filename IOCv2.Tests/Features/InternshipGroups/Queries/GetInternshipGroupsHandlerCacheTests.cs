@@ -12,6 +12,17 @@ namespace IOCv2.Tests.Features.InternshipGroups.Queries;
 
 public class GetInternshipGroupsHandlerCacheTests
 {
+    private static readonly Guid _superAdminId = Guid.NewGuid();
+
+    // Helper: tạo mock ICurrentUserService mặc định là SuperAdmin
+    private static Mock<ICurrentUserService> SuperAdminUser()
+    {
+        var mock = new Mock<ICurrentUserService>();
+        mock.Setup(x => x.UserId).Returns(_superAdminId.ToString());
+        mock.Setup(x => x.Role).Returns("SuperAdmin");
+        return mock;
+    }
+
     [Fact]
     public async Task Handle_UsesCache_WhenAvailable()
     {
@@ -27,7 +38,9 @@ public class GetInternshipGroupsHandlerCacheTests
             Mock.Of<IUnitOfWork>(),
             Mock.Of<IMapper>(),
             cache.Object,
-            Mock.Of<ILogger<GetInternshipGroupsHandler>>());
+            Mock.Of<ILogger<GetInternshipGroupsHandler>>(),
+            SuperAdminUser().Object,
+            Mock.Of<IMessageService>());
 
         var result = await handler.Handle(new GetInternshipGroupsQuery(), CancellationToken.None);
 
@@ -57,7 +70,9 @@ public class GetInternshipGroupsHandlerCacheTests
             uow.Object,
             mapper,
             cache.Object,
-            Mock.Of<ILogger<GetInternshipGroupsHandler>>());
+            Mock.Of<ILogger<GetInternshipGroupsHandler>>(),
+            SuperAdminUser().Object,
+            Mock.Of<IMessageService>());
 
         var result = await handler.Handle(new GetInternshipGroupsQuery { PageNumber = 1, PageSize = 10 }, CancellationToken.None);
 

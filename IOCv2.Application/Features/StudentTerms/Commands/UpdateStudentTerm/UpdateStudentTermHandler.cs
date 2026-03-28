@@ -121,6 +121,23 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
             return Result<UpdateStudentTermResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.CannotWithdrawPlacedViaUpdate));
 
+        // 7b. Cross-term check: prevent re-activating a student who is already Active in another term
+        if (studentTerm.EnrollmentStatus == EnrollmentStatus.Withdrawn &&
+            resultingEnrollmentStatus == EnrollmentStatus.Active)
+        {
+            var activeElsewhere = await _unitOfWork.Repository<StudentTerm>()
+                .Query()
+                .AnyAsync(st =>
+                    st.StudentId == studentTerm.StudentId &&
+                    st.StudentTermId != studentTerm.StudentTermId &&
+                    st.EnrollmentStatus == EnrollmentStatus.Active,
+                    cancellationToken);
+
+            if (activeElsewhere)
+                return Result<UpdateStudentTermResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.StudentTerms.AlreadyEnrolled), ResultErrorType.Conflict);
+        }
+
         // 8. Snapshot old state for counter delta
         var wasActive = studentTerm.EnrollmentStatus == EnrollmentStatus.Active;
         var wasUnplaced = studentTerm.PlacementStatus == PlacementStatus.Unplaced;

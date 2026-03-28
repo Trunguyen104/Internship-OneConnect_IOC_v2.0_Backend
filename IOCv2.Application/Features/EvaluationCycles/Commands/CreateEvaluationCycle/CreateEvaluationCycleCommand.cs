@@ -7,7 +7,7 @@ namespace IOCv2.Application.Features.EvaluationCycles.Commands.CreateEvaluationC
 
 public record CreateEvaluationCycleCommand : IRequest<Result<CreateEvaluationCycleResponse>>
 {
-    public Guid TermId { get; init; }
+    public Guid PhaseId { get; init; }
     public string Name { get; init; } = null!;
     public DateTime StartDate { get; init; }
     public DateTime EndDate { get; init; }

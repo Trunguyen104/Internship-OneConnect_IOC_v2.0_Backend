@@ -1,4 +1,3 @@
-using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Enterprises.Common;
@@ -16,175 +15,155 @@ public class GetActiveTermsForEnterpriseHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
-    private readonly IMessageService _messageService;
     private readonly ICacheService _cacheService;
+    private readonly IMessageService _messageService;
     private readonly ILogger<GetActiveTermsForEnterpriseHandler> _logger;
 
     public GetActiveTermsForEnterpriseHandler(
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
-        IMessageService messageService,
         ICacheService cacheService,
+        IMessageService messageService,
         ILogger<GetActiveTermsForEnterpriseHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
-        _messageService = messageService;
         _cacheService = cacheService;
+        _messageService = messageService;
         _logger = logger;
     }
 
     public async Task<Result<GetActiveTermsForEnterpriseResponse>> Handle(
         GetActiveTermsForEnterpriseQuery request, CancellationToken cancellationToken)
     {
-        var userId = Guid.Parse(_currentUserService.UserId!);
-        var role = _currentUserService.Role;
-        var isMentor = string.Equals(role, "Mentor", StringComparison.OrdinalIgnoreCase);
-
-        // Lookup EnterpriseUser
-        var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>()
-            .Query()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(eu => eu.UserId == userId, cancellationToken);
-
-        if (enterpriseUser == null)
-            return Result<GetActiveTermsForEnterpriseResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Enterprise.HRNotAssociatedWithEnterprise),
-                ResultErrorType.Forbidden);
-
-        var enterpriseId = enterpriseUser.EnterpriseId;
-
-        // Try cache
-        var cacheKey = EnterpriseCacheKeys.ActiveTerms(enterpriseId, enterpriseUser.EnterpriseUserId, isMentor, request.UniversityId);
-        var cached = await _cacheService.GetAsync<GetActiveTermsForEnterpriseResponse>(cacheKey, cancellationToken);
-        if (cached != null)
-            return Result<GetActiveTermsForEnterpriseResponse>.Success(cached);
-
-        // Resolve term IDs in scope for this user — only Active groups count
-        IQueryable<InternshipGroup> groupQuery;
-        if (isMentor)
+        try
         {
-            // Mentor: only active groups where MentorId = this user's EnterpriseUserId
-            groupQuery = _unitOfWork.Repository<InternshipGroup>()
-                .Query()
-                .AsNoTracking()
-                .Where(ig => ig.MentorId == enterpriseUser.EnterpriseUserId
-                             && ig.Status == GroupStatus.Active);
-        }
-        else
-        {
-            // HR / EnterpriseAdmin: all active groups belonging to the enterprise
-            groupQuery = _unitOfWork.Repository<InternshipGroup>()
-                .Query()
-                .AsNoTracking()
-                .Where(ig => ig.EnterpriseId == enterpriseId
-                             && ig.Status == GroupStatus.Active);
-        }
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+                return Result<GetActiveTermsForEnterpriseResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.ActiveTerms.InvalidUserId), ResultErrorType.Unauthorized);
 
-        var termIdsInScope = await groupQuery
-            .Select(ig => ig.TermId)
-            .Distinct()
-            .ToListAsync(cancellationToken);
+            var isMentor = string.Equals(_currentUserService.Role, UserRole.Mentor.ToString(),
+                StringComparison.OrdinalIgnoreCase);
 
-        if (termIdsInScope.Count == 0)
-        {
-            var empty = new GetActiveTermsForEnterpriseResponse { Terms = new List<ActiveTermTimelineResponse>() };
-            await _cacheService.SetAsync(cacheKey, empty, EnterpriseCacheKeys.Expiration.ActiveTerms, cancellationToken);
-            return Result<GetActiveTermsForEnterpriseResponse>.Success(empty);
-        }
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query().AsNoTracking()
+                .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
 
-        // Load matching Terms (Active only) — include University
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            if (enterpriseUser == null)
+                return Result<GetActiveTermsForEnterpriseResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.ActiveTerms.EnterpriseUserNotFound), ResultErrorType.Forbidden);
 
-        var termsQuery = _unitOfWork.Repository<Term>()
-            .Query()
-            .AsNoTracking()
-            .Include(t => t.University)
-            .Where(t =>
-                termIdsInScope.Contains(t.TermId) &&
-                t.Status == TermStatus.Open &&
-                t.StartDate <= today &&
-                t.EndDate >= today);
+            var enterpriseId = enterpriseUser.EnterpriseId;
 
-        if (request.UniversityId.HasValue)
-            termsQuery = termsQuery.Where(t => t.UniversityId == request.UniversityId.Value);
+            // Try cache
+            var cacheKey = EnterpriseCacheKeys.ActiveTerms(
+                enterpriseId, enterpriseUser.EnterpriseUserId, isMentor, request.UniversityId);
 
-        var terms = await termsQuery.ToListAsync(cancellationToken);
+            var cached = await _cacheService.GetAsync<GetActiveTermsForEnterpriseResponse>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<GetActiveTermsForEnterpriseResponse>.Success(cached);
 
-        if (terms.Count == 0)
-        {
-            var empty = new GetActiveTermsForEnterpriseResponse { Terms = new List<ActiveTermTimelineResponse>() };
-            await _cacheService.SetAsync(cacheKey, empty, EnterpriseCacheKeys.Expiration.ActiveTerms, cancellationToken);
-            return Result<GetActiveTermsForEnterpriseResponse>.Success(empty);
-        }
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        // Load EvaluationCycles for all active terms in one batch
-        // Exclude Cancelled cycles — they have no meaningful deadline to display
-        var activeTermIds = terms.Select(t => t.TermId).ToList();
-        var cycles = await _unitOfWork.Repository<EvaluationCycle>()
-            .Query()
-            .AsNoTracking()
-            .Where(ec => activeTermIds.Contains(ec.TermId)
-                         && ec.Status != EvaluationCycleStatus.Cancelled)
-            .ToListAsync(cancellationToken);
+            // Query active terms linked to this enterprise via InternshipGroups
+            var termsQuery = _unitOfWork.Repository<Term>().Query().AsNoTracking()
+                .Include(t => t.University)
+                .Where(t =>
+                    t.Status == TermStatus.Open &&
+                    t.StartDate <= today &&
+                    t.EndDate >= today);
 
-        var cyclesByTermId = cycles.GroupBy(ec => ec.TermId)
-            .ToDictionary(g => g.Key, g => g.ToList());
+            // Filter: terms where enterprise has approved applications
+            termsQuery = termsQuery.Where(t =>
+                _unitOfWork.Repository<InternshipApplication>().Query()
+                    .Any(a => a.TermId == t.TermId && a.EnterpriseId == enterpriseId));
 
-        var termResponses = terms.Select(term =>
-        {
-            var totalDays = term.EndDate.DayNumber - term.StartDate.DayNumber;
-            var daysElapsed = today.DayNumber - term.StartDate.DayNumber;
-            var daysRemaining = term.EndDate.DayNumber - today.DayNumber;
-            var progressPercent = totalDays > 0
-                ? Math.Round((double)daysElapsed / totalDays * 100, 1)
-                : 0;
+            if (request.UniversityId.HasValue)
+                termsQuery = termsQuery.Where(t => t.UniversityId == request.UniversityId.Value);
 
-            var deadlines = new List<DeadlineInfo>();
-            if (cyclesByTermId.TryGetValue(term.TermId, out var termCycles))
+            var terms = await termsQuery
+                .OrderBy(t => t.EndDate)
+                .ToListAsync(cancellationToken);
+
+            if (terms.Count == 0)
             {
-                deadlines = termCycles
-                    .OrderBy(ec => ec.EndDate)
-                    .Select(ec =>
+                var noTermsKey = isMentor
+                    ? MessageKeys.ActiveTerms.NoActiveTermsFoundForMentor
+                    : MessageKeys.ActiveTerms.NoActiveTermsFoundForEnterprise;
+                return Result<GetActiveTermsForEnterpriseResponse>.Failure(
+                    _messageService.GetMessage(noTermsKey), ResultErrorType.NotFound);
+            }
+
+            // Lấy EvaluationCycles cho enterprise (bỏ qua Cancelled)
+            var cycles = await _unitOfWork.Repository<EvaluationCycle>().Query().AsNoTracking()
+                .Where(ec => ec.InternshipPhase.EnterpriseId == enterpriseId &&
+                             ec.Status != EvaluationCycleStatus.Cancelled)
+                .OrderBy(ec => ec.EndDate)
+                .ToListAsync(cancellationToken);
+
+            // Cycles are now phase-based, not term-based; provide empty lookup for term mapping
+            var cyclesByTerm = new Dictionary<Guid, List<EvaluationCycle>>();
+
+            var nowUtc = DateTime.UtcNow;
+
+            var termResponses = terms.Select(term =>
+            {
+                // Timeline
+                var totalDays = (term.EndDate.DayNumber - term.StartDate.DayNumber);
+                var daysElapsed = Math.Max(0, today.DayNumber - term.StartDate.DayNumber);
+                var daysRemaining = Math.Max(0, term.EndDate.DayNumber - today.DayNumber);
+                var progressPercent = totalDays > 0
+                    ? Math.Round((double)daysElapsed / totalDays * 100, 1)
+                    : 0;
+
+                // Deadlines
+                var deadlines = cyclesByTerm.TryGetValue(term.TermId, out var termCycles)
+                    ? termCycles.Select(ec =>
                     {
-                        // Compare by calendar day (UTC) to avoid partial-day Ceiling bugs
-                        var deadlineDay = DateOnly.FromDateTime(ec.EndDate.ToUniversalTime());
-                        var daysUntil = deadlineDay.DayNumber - today.DayNumber;
+                        var daysUntil = (int)Math.Ceiling((ec.EndDate - nowUtc).TotalDays);
                         return new DeadlineInfo
                         {
                             CycleId = ec.CycleId,
                             CycleName = ec.Name,
-                            DeadlineType = "EvaluationSubmission",
                             DeadlineDate = ec.EndDate,
                             DaysUntilDeadline = daysUntil,
-                            IsWarning = daysUntil >= 0 && daysUntil <= 7,
                             IsOverdue = daysUntil < 0,
+                            IsWarning = daysUntil >= 0 && daysUntil <= 7,
                             CycleStatus = ec.Status
                         };
-                    })
-                    .ToList();
-            }
+                    }).ToList()
+                    : new List<DeadlineInfo>();
 
-            return new ActiveTermTimelineResponse
-            {
-                TermId = term.TermId,
-                TermName = term.Name,
-                UniversityId = term.UniversityId,
-                UniversityName = term.University.Name,
-                StartDate = term.StartDate,
-                EndDate = term.EndDate,
-                Status = TermStatusHelper.GetComputedStatus(term.StartDate, term.EndDate, term.Status),
-                TotalDays = totalDays,
-                DaysElapsed = daysElapsed,
-                DaysRemaining = daysRemaining,
-                ProgressPercent = progressPercent,
-                Deadlines = deadlines
-            };
-        }).ToList();
+                return new ActiveTermTimelineResponse
+                {
+                    TermId = term.TermId,
+                    TermName = term.Name,
+                    UniversityId = term.UniversityId,
+                    UniversityName = term.University.Name,
+                    StartDate = term.StartDate,
+                    EndDate = term.EndDate,
+                    Status = TermDisplayStatus.Active,
+                    TotalDays = totalDays,
+                    DaysElapsed = daysElapsed,
+                    DaysRemaining = daysRemaining,
+                    ProgressPercent = progressPercent,
+                    Deadlines = deadlines
+                };
+            }).ToList();
 
-        var response = new GetActiveTermsForEnterpriseResponse { Terms = termResponses };
-        await _cacheService.SetAsync(cacheKey, response, EnterpriseCacheKeys.Expiration.ActiveTerms, cancellationToken);
+            var response = new GetActiveTermsForEnterpriseResponse { Terms = termResponses };
 
-        return Result<GetActiveTermsForEnterpriseResponse>.Success(response);
+            await _cacheService.SetAsync(cacheKey, response, EnterpriseCacheKeys.Expiration.ActiveTerms, cancellationToken);
+
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.ActiveTerms.LogRetrieved),
+                termResponses.Count, enterpriseId, isMentor);
+
+            return Result<GetActiveTermsForEnterpriseResponse>.Success(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ActiveTerms.LogError), _currentUserService.UserId);
+            return Result<GetActiveTermsForEnterpriseResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.ActiveTerms.SystemError), ResultErrorType.InternalServerError);
+        }
     }
 }

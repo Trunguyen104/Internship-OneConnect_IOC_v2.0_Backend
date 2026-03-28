@@ -594,4 +594,186 @@
   <data name="JobPosting.NotAllowed" xml:space="preserve">
     <value>Bạn không có quyền truy cập vào tài nguyên này.</value>
   </data>
+  <data name="InternshipPhase.EnterpriseIdRequired" xml:space="preserve">
+    <value>ID doanh nghiệp (EnterpriseId) không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.PhaseIdRequired" xml:space="preserve">
+    <value>ID đợt thực tập (PhaseId) không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.NameRequired" xml:space="preserve">
+    <value>Tên đợt thực tập không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.NameMaxLength" xml:space="preserve">
+    <value>Tên đợt thực tập không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="InternshipPhase.StartDateRequired" xml:space="preserve">
+    <value>Ngày bắt đầu (StartDate) không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.EndDateRequired" xml:space="preserve">
+    <value>Ngày kết thúc (EndDate) không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.EndDateAfterStartDate" xml:space="preserve">
+    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="InternshipPhase.MaxStudentsGreaterThanZero" xml:space="preserve">
+    <value>Số lượng sinh viên tối đa (MaxStudents) phải lớn hơn 0.</value>
+  </data>
+  <data name="InternshipPhase.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đợt thực tập.</value>
+  </data>
+  <data name="InternshipPhase.DuplicateName" xml:space="preserve">
+    <value>Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp này. Vui lòng chọn một tên khác.</value>
+  </data>
+  <data name="InternshipPhase.DuplicateNameOnUpdate" xml:space="preserve">
+    <value>Không thể đổi tên thành '{0}' vì đã có đợt thực tập khác trong doanh nghiệp này sử dụng tên này.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateClosed" xml:space="preserve">
+    <value>Không thể cập nhật đợt thực tập '{0}' vì đợt này đã ở trạng thái Đã đóng (Closed). Chỉ có thể chỉnh sửa đợt thực tập đang ở trạng thái Nháp (Draft) hoặc Đang mở (Open).</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteHasActiveGroups" xml:space="preserve">
+    <value>Không thể xóa đợt thực tập '{0}' vì hiện có {1} nhóm thực tập đang hoạt động (Active). Vui lòng kết thúc hoặc lưu trữ tất cả nhóm trước khi thực hiện xóa.</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteInProgress" xml:space="preserve">
+    <value>Không thể xóa đợt thực tập '{0}' vì đợt đang ở trạng thái Đang thực tập (InProgress). Vui lòng đóng đợt thực tập trước khi xóa.</value>
+  </data>
+  <data name="InternshipPhase.StartDateNotInPast" xml:space="preserve">
+    <value>Ngày bắt đầu không được là ngày trong quá khứ.</value>
+  </data>
+  <data name="InternshipPhase.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên cho tài khoản hiện tại.</value>
+  </data>
+  <data name="InternshipPhase.UpdateNoChanges" xml:space="preserve">
+    <value>Không có thay đổi nào được lưu cho đợt thực tập.</value>
+  </data>
+  <data name="InternshipPhase.CreateSuccess" xml:space="preserve">
+    <value>Tạo đợt thực tập thành công.</value>
+  </data>
+  <data name="InternshipPhase.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật đợt thực tập thành công.</value>
+  </data>
+  <data name="InternshipPhase.DeleteSuccess" xml:space="preserve">
+    <value>Xóa đợt thực tập thành công.</value>
+  </data>
+  <data name="InternshipPhase.Log.Creating" xml:space="preserve">
+    <value>Bắt đầu tạo đợt thực tập '{0}' cho doanh nghiệp {1}.</value>
+  </data>
+  <data name="InternshipPhase.Log.EnterpriseNotFound" xml:space="preserve">
+    <value>Không tìm thấy doanh nghiệp có ID {0}. Không thể tạo đợt thực tập.</value>
+  </data>
+  <data name="InternshipPhase.Log.DuplicateName" xml:space="preserve">
+    <value>Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp {1}. Từ chối tạo mới.</value>
+  </data>
+  <data name="InternshipPhase.Log.CreateSuccess" xml:space="preserve">
+    <value>Tạo đợt thực tập thành công — PhaseId: {0}, Tên: '{1}', Doanh nghiệp: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.CreateError" xml:space="preserve">
+    <value>Lỗi khi tạo đợt thực tập '{0}' cho doanh nghiệp {1}. Đã rollback transaction.</value>
+  </data>
+  <data name="InternshipPhase.Log.Updating" xml:space="preserve">
+    <value>Bắt đầu cập nhật đợt thực tập {0} — tên mới: '{1}', trạng thái mới: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateNotFound" xml:space="preserve">
+    <value>Không tìm thấy đợt thực tập với ID {0}. Yêu cầu cập nhật bị từ chối.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateClosed" xml:space="preserve">
+    <value>Từ chối cập nhật đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái Đã đóng (Closed).</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateDuplicateName" xml:space="preserve">
+    <value>Từ chối cập nhật đợt thực tập {0} — tên '{1}' đã được sử dụng bởi đợt thực tập khác trong doanh nghiệp {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật đợt thực tập thành công — PhaseId: {0}, Tên: '{1}'.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateNoChanges" xml:space="preserve">
+    <value>Không có bản ghi nào được lưu khi cập nhật đợt thực tập {0}. Đã rollback transaction.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateError" xml:space="preserve">
+    <value>Lỗi khi cập nhật đợt thực tập {0}. Đã rollback transaction.</value>
+  </data>
+  <data name="InternshipPhase.Log.Deleting" xml:space="preserve">
+    <value>Bắt đầu xóa đợt thực tập {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteNotFound" xml:space="preserve">
+    <value>Không tìm thấy đợt thực tập với ID {0}. Yêu cầu xóa bị từ chối.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteHasActiveGroups" xml:space="preserve">
+    <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — hiện có {2} nhóm thực tập đang hoạt động.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteSuccess" xml:space="preserve">
+    <value>Xóa đợt thực tập thành công — PhaseId: {0}, Tên: '{1}', Doanh nghiệp: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteNoChanges" xml:space="preserve">
+    <value>Không có bản ghi nào được lưu khi xóa đợt thực tập {0}. Đã rollback transaction.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteError" xml:space="preserve">
+    <value>Lỗi khi xóa đợt thực tập {0}. Đã rollback transaction.</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingList" xml:space="preserve">
+    <value>Lấy danh sách đợt thực tập cho doanh nghiệp {0} — lọc trạng thái: {1}, trang: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ListFromCache" xml:space="preserve">
+    <value>Trả về danh sách đợt thực tập từ cache cho doanh nghiệp {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ListSuccess" xml:space="preserve">
+    <value>Lấy danh sách đợt thực tập thành công cho doanh nghiệp {0} — trả về {1}/{2} bản ghi (trang {3}).</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingById" xml:space="preserve">
+    <value>Lấy thông tin chi tiết đợt thực tập {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdFromCache" xml:space="preserve">
+    <value>Trả về thông tin đợt thực tập {0} từ cache.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdNotFound" xml:space="preserve">
+    <value>Không tìm thấy đợt thực tập với ID {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdSuccess" xml:space="preserve">
+    <value>Lấy thông tin đợt thực tập thành công — PhaseId: {0}, Tên: '{1}', Doanh nghiệp: '{2}', Trạng thái: {3}, Số nhóm: {4}.</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingMyPhases" xml:space="preserve">
+    <value>Lấy danh sách đợt thực tập của sinh viên (UserId: {0}).</value>
+  </data>
+  <data name="InternshipPhase.Log.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên cho UserId {0}. Yêu cầu bị từ chối.</value>
+  </data>
+  <data name="InternshipPhase.Log.MyPhasesSuccess" xml:space="preserve">
+    <value>Lấy danh sách đợt thực tập thành công cho sinh viên {0} (UserId: {1}) — tìm thấy {2} đợt thực tập.</value>
+  </data>
+  <data name="InternshipPhase.StatusInvalid" xml:space="preserve">
+    <value>Trạng thái đợt thực tập không hợp lệ.</value>
+  </data>
+  <data name="InternshipPhase.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả đợt thực tập không được vượt quá 2000 ký tự.</value>
+  </data>
+  <data name="InternshipPhase.PageNumberMinValue" xml:space="preserve">
+    <value>Số trang phải lớn hơn hoặc bằng 1.</value>
+  </data>
+  <data name="InternshipPhase.PageSizeRange" xml:space="preserve">
+    <value>Kích thước trang phải từ 1 đến 50.</value>
+  </data>
+  <data name="InternshipPhase.InvalidStatusTransition" xml:space="preserve">
+    <value>Không thể chuyển trạng thái từ '{0}' sang '{1}'. Vui lòng kiểm tra lại quy trình trạng thái.</value>
+  </data>
+  <data name="InternshipPhase.NotYourEnterprise" xml:space="preserve">
+    <value>Bạn không có quyền thao tác trên đợt thực tập của doanh nghiệp này.</value>
+  </data>
+  <data name="InternshipPhase.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin nhân viên doanh nghiệp cho tài khoản hiện tại.</value>
+  </data>
+  <data name="InternshipPhase.Log.OwnershipDenied" xml:space="preserve">
+    <value>Từ chối truy cập — User {0} cố thao tác trên doanh nghiệp {1} nhưng thuộc doanh nghiệp {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
+    <value>Từ chối chuyển trạng thái đợt thực tập {0} từ '{1}' sang '{2}' — không hợp lệ.</value>
+  </data>
+  <!-- B-02 FIX: EndDate in past for active phase -->
+  <data name="InternshipPhase.EndDateInPastForActivePhase" xml:space="preserve">
+    <value>Không thể đặt ngày kết thúc trong quá khứ cho đợt thực tập '{0}' đang ở trạng thái Open hoặc InProgress.</value>
+  </data>
+  <!-- B-05 FIX: Dedicated log key for InProgress phase deletion block -->
+  <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
+    <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái InProgress và không thể xóa.</value>
+  </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Tên kỳ thực tập đã tồn tại, vui lòng chọn tên khác.</value>
+  </data>
 </root>

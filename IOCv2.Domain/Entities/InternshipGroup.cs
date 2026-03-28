@@ -1,14 +1,16 @@
 using IOCv2.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace IOCv2.Domain.Entities
 {
     public class InternshipGroup : BaseEntity
     {
+        [Key]
         public Guid InternshipId { get; private set; }
-        public Guid TermId { get; private set; }
         public string GroupName { get; private set; } = string.Empty;
         public string? Description { get; private set; }
 
+        public Guid PhaseId { get; private set; }
         public Guid? EnterpriseId { get; private set; }
         public virtual Enterprise? Enterprise { get; set; }
 
@@ -20,7 +22,7 @@ namespace IOCv2.Domain.Entities
         public GroupStatus Status { get; private set; }
 
         // Navigation properties
-        public virtual Term Term { get; set; } = null!;
+        public virtual InternshipPhase InternshipPhase { get; set; } = null!;
         private readonly List<InternshipStudent> _members = new();
         public virtual ICollection<InternshipStudent> Members => _members.AsReadOnly();
         
@@ -33,7 +35,7 @@ namespace IOCv2.Domain.Entities
         protected InternshipGroup() { }
 
         public static InternshipGroup Create(
-            Guid termId,
+            Guid phaseId,
             string groupName,
             string? description = null,
             Guid? enterpriseId = null,
@@ -44,7 +46,7 @@ namespace IOCv2.Domain.Entities
             return new InternshipGroup
             {
                 InternshipId = Guid.NewGuid(),
-                TermId = termId,
+                PhaseId = phaseId,
                 GroupName = groupName,
                 Description = description,
                 EnterpriseId = enterpriseId,
@@ -58,7 +60,7 @@ namespace IOCv2.Domain.Entities
         public void UpdateInfo(
             string groupName,
             string? description,
-            Guid termId,
+            Guid phaseId,
             Guid? enterpriseId,
             Guid? mentorId,
             DateTime? startDate,
@@ -66,7 +68,7 @@ namespace IOCv2.Domain.Entities
         {
             GroupName = groupName;
             Description = description;
-            TermId = termId;
+            PhaseId = phaseId;
             EnterpriseId = enterpriseId;
             MentorId = mentorId;
             StartDate = startDate;

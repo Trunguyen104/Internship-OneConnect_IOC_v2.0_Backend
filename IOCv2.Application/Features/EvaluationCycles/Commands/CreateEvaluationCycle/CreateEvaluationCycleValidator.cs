@@ -8,7 +8,7 @@ public class CreateEvaluationCycleValidator : AbstractValidator<CreateEvaluation
 {
     public CreateEvaluationCycleValidator(IMessageService messageService)
     {
-        RuleFor(x => x.TermId)
+        RuleFor(x => x.PhaseId)
             .NotEmpty();
 
         RuleFor(x => x.Name)

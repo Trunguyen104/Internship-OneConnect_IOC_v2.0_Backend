@@ -10,7 +10,7 @@ namespace IOCv2.Infrastructure.Persistence
         private readonly AppDbContext _context;
         private readonly IPasswordService _passwordService;
         private readonly IUserServices _userService;
-        
+
         private static class SeedIds
         {
             public static readonly Guid SuperAdminId = new Guid("00000000-0000-0000-0000-000000000001");
@@ -29,7 +29,7 @@ namespace IOCv2.Infrastructure.Persistence
             // Added HR seed ids for deterministic seeding
             public static readonly Guid HrFptId = new Guid("77777777-7777-7777-7777-777777770001");
             public static readonly Guid HrRikkeisoftId = new Guid("77777777-7777-7777-7777-777777770002");
-            
+
             public static readonly List<Guid> StudentIds = new()
             {
                 new Guid("66666666-6666-6666-6666-666666660001"),
@@ -57,10 +57,18 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedJobs(); // added: seed test jobs for enterprises
             await SeedUsers();
             await SeedTerms();
+            await SeedInternshipPhases();   // ← must be before SeedInternshipGroups
             await SeedInternshipGroups();
             await SeedProjectsAndWorkItems();
             await SeedLogbooks();
+            await SeedStakeholdersAndIssues();
+            await SeedProjectResources();
+            await SeedViolationReports();
             await SeedEvaluations();
+            await SeedNotifications();
+            await SeedSprintWorkItems();
+            await SeedAuditLogs();
+            await SeedSecurityTokens();
 
             if (_context.ChangeTracker.HasChanges())
             {
@@ -233,24 +241,71 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "HR" });
                 }
             }
+           
+            // 3. School Admin accounts
+            foreach (var uni in universityList)
+            {
+                Guid uniAdminId;
+                if (uni.Code == "FPTU") uniAdminId = SeedIds.SchoolAdminFptId;
+                else if (uni.Code == "FPTU-CT") uniAdminId = SeedIds.SchoolAdminFptCtId;
+                else uniAdminId = Guid.NewGuid();
 
-            // 3. 5 Specific Students
+                var uniAdminEmail = $"schooladmin@{uni.Code.ToLower()}.com";
+                if (!existingEmails.Contains(uniAdminEmail))
+                {
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.SchoolAdmin, cancellationToken);
+                    var user = new User(uniAdminId, userCode, uniAdminEmail, $"School Admin {uni.Code}", UserRole.SchoolAdmin, passHash);
+                    user.SetStatus(UserStatus.Active);
+                    _context.Users.Add(user);
+                    existingEmails.Add(uniAdminEmail);
+                    _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId, Position = "School Administrator" });
+                }
+            }
+
+            // 4. 5 Specific Students
             string[] studentEmails = {
                 "student1@fptu.edu.vn",
                 "student2@fptu.edu.vn",
                 "student3@fptu.edu.vn",
                 "student4@fptu.edu.vn",
-                "student5@fptu.edu.vn"
+                "student5@fptu.edu.vn",
+                "student6@fptu.edu.vn",
+                "student7@fptu.edu.vn",
+                "student8@fptu.edu.vn",
+                "student9@fptu.edu.vn",
+                "student10@fptu.edu.vn"
             };
 
-            string[] studentNames = { "Nguyễn Văn Một", "Trần Thị Hai", "Lê Văn Ba", "Phạm Thị Bốn", "Hoàng Văn Năm" };
-            StudentStatus[] studentStatuses = { StudentStatus.NO_INTERNSHIP, StudentStatus.APPLIED, StudentStatus.INTERNSHIP_IN_PROGRESS, StudentStatus.APPLIED, StudentStatus.COMPLETED };
+            string[] studentNames = {
+                "Nguyễn Văn An",
+                "Trần Thị Bình",
+                "Lê Văn Cường",
+                "Phạm Thị Dung",
+                "Hoàng Văn Em",
+                "Đỗ Thị Phương",
+                "Vũ Văn Giang",
+                "Bùi Thị Hoa",
+                "Đinh Văn Nghĩa",
+                "Ngô Thị Kiều"
+            };
+
+            string[] studentClasses = {
+                "SE1616", "SE1617", "SE1616", "SE1618", "SE1617",
+                "SE1619", "SE1616", "SE1618", "SE1619", "SE1617"
+            };
+
+            string[] studentMajors = {
+                "Software Engineering", "Software Engineering", "Information Technology",
+                "Software Engineering", "Information Technology", "Software Engineering",
+                "Computer Science", "Information Technology", "Software Engineering", "Computer Science"
+            };
 
             for (int i = 0; i < studentEmails.Length; i++)
             {
                 if (!existingEmails.Contains(studentEmails[i]))
                 {
-                    var userId = SeedIds.StudentIds[i];
+                    // StudentIds cũ có 5 phần tử, sinh viên 6-10 dùng Guid mới
+                    var userId = i < SeedIds.StudentIds.Count ? SeedIds.StudentIds[i] : Guid.NewGuid();
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                     var user = new User(userId, userCode, studentEmails[i], studentNames[i], UserRole.Student, passHash);
                     user.SetStatus(UserStatus.Active);
@@ -263,9 +318,9 @@ namespace IOCv2.Infrastructure.Persistence
                     {
                         StudentId = Guid.NewGuid(),
                         UserId = user.UserId,
-                        InternshipStatus = studentStatuses[i],
-                        Major = "Software Engineering",
-                        ClassName = "SE1616"
+                        InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                        Major = studentMajors[i],
+                        ClassName = studentClasses[i]
                     });
                 }
             }
@@ -316,77 +371,248 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedTerms()
         {
-            if (!await _context.Terms.AnyAsync())
+            var fptu = await _context.Universities.FirstAsync(u => u.Code == "FPTU");
+            var fptuCt = await _context.Universities.FirstAsync(u => u.Code == "FPTU-CT");
+
+            var fall2025 = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptu.UniversityId && t.Name == "Fall 2025");
+            if (fall2025 == null)
             {
-                var fptu = await _context.Universities.FirstAsync(u => u.Code == "FPTU");
-                
-                var fall2025 = new Term { TermId = Guid.NewGuid(), UniversityId = fptu.UniversityId, Name = "Fall 2025", StartDate = new DateOnly(2025, 9, 1), EndDate = new DateOnly(2025, 12, 31), Status = TermStatus.Closed };
-                var spring2026 = new Term { TermId = Guid.NewGuid(), UniversityId = fptu.UniversityId, Name = "Spring 2026", StartDate = new DateOnly(2026, 1, 1), EndDate = new DateOnly(2026, 4, 30), Status = TermStatus.Open };
-                var summer2026 = new Term { TermId = Guid.NewGuid(), UniversityId = fptu.UniversityId, Name = "Summer 2026", StartDate = new DateOnly(2026, 5, 1), EndDate = new DateOnly(2026, 8, 31), Status = TermStatus.Open };
+                fall2025 = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptu.UniversityId,
+                    Name = "Fall 2025",
+                    StartDate = new DateOnly(2025, 9, 1),
+                    EndDate = new DateOnly(2025, 12, 31),
+                    Status = TermStatus.Closed
+                };
+                _context.Terms.Add(fall2025);
+            }
 
-                _context.Terms.AddRange(fall2025, spring2026, summer2026);
-                await _context.SaveChangesAsync();
+            var spring2026 = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptu.UniversityId && t.Name == "Spring 2026");
+            if (spring2026 == null)
+            {
+                spring2026 = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptu.UniversityId,
+                    Name = "Spring 2026",
+                    StartDate = new DateOnly(2026, 1, 1),
+                    EndDate = new DateOnly(2026, 4, 30),
+                    Status = TermStatus.Open
+                };
+                _context.Terms.Add(spring2026);
+            }
 
-                // Enrollment for students
-                var s2 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student2@fptu.edu.vn");
-                var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
-                var s4 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student4@fptu.edu.vn");
-                var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            var summer2026 = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptu.UniversityId && t.Name == "Summer 2026");
+            if (summer2026 == null)
+            {
+                summer2026 = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptu.UniversityId,
+                    Name = "Summer 2026",
+                    StartDate = new DateOnly(2026, 5, 1),
+                    EndDate = new DateOnly(2026, 8, 31),
+                    Status = TermStatus.Open
+                };
+                _context.Terms.Add(summer2026);
+            }
 
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s2.StudentId, TermId = spring2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Unplaced, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60)) });
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s3.StudentId, TermId = spring2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Placed, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60)) });
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s4.StudentId, TermId = summer2026.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Unplaced, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)) });
-                _context.StudentTerms.Add(new StudentTerm { StudentTermId = Guid.NewGuid(), StudentId = s5.StudentId, TermId = fall2025.TermId, EnrollmentStatus = EnrollmentStatus.Active, PlacementStatus = PlacementStatus.Placed, EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-200)) });
+            var spring2026Ct = await _context.Terms.FirstOrDefaultAsync(t => t.UniversityId == fptuCt.UniversityId && t.Name == "Spring 2026");
+            if (spring2026Ct == null)
+            {
+                spring2026Ct = new Term
+                {
+                    TermId = Guid.NewGuid(),
+                    UniversityId = fptuCt.UniversityId,
+                    Name = "Spring 2026",
+                    StartDate = new DateOnly(2026, 2, 1),
+                    EndDate = new DateOnly(2026, 5, 31),
+                    Status = TermStatus.Open
+                };
+                _context.Terms.Add(spring2026Ct);
+            }
 
-                // Ensure seeded student6 is enrolled so they can apply for jobs
-                var maybeS6 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student6@fptu.edu.vn");
-                if (maybeS6 != null)
+            await _context.SaveChangesAsync();
+
+            // Enroll tất cả 10 sinh viên vào Spring 2026 (FPTU) với PlacementStatus.Placed
+            // → đã được accept vào doanh nghiệp nhưng chưa có nhóm
+            var allStudents = await _context.Students
+                .Include(s => s.User)
+                .Where(s => s.User.Email.StartsWith("student") && s.User.Email.EndsWith("@fptu.edu.vn"))
+                .ToListAsync();
+
+            foreach (var student in allStudents)
+            {
+                if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == student.StudentId && st.TermId == spring2026.TermId))
                 {
                     _context.StudentTerms.Add(new StudentTerm
                     {
                         StudentTermId = Guid.NewGuid(),
-                        StudentId = maybeS6.StudentId,
+                        StudentId = student.StudentId,
                         TermId = spring2026.TermId,
                         EnrollmentStatus = EnrollmentStatus.Active,
-                        PlacementStatus = PlacementStatus.Unplaced,
-                        EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10))
+                        PlacementStatus = PlacementStatus.Placed,
+                        EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60))
                     });
                 }
-
-                await _context.SaveChangesAsync();
             }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedInternshipPhases()
+        {
+            var fsoft = await _context.Enterprises.FirstAsync(e => e.Name == "FPT Software");
+            var rikkeisoft = await _context.Enterprises.FirstAsync(e => e.Name == "Rikkeisoft");
+
+            // Helper: create a phase via factory, then advance status via UpdateInfo
+            async Task EnsurePhase(
+                Guid enterpriseId, string name,
+                DateOnly start, DateOnly end,
+                int? maxStudents, string? description,
+                InternshipPhaseStatus targetStatus)
+            {
+                if (await _context.InternshipPhases
+                        .AnyAsync(p => p.EnterpriseId == enterpriseId && p.Name == name))
+                    return;
+
+                // Create always starts at Draft
+                var phase = InternshipPhase.Create(enterpriseId, name, start, end, maxStudents, description);
+
+                // Advance to target status via UpdateInfo
+                if (targetStatus != InternshipPhaseStatus.Draft)
+                    phase.UpdateInfo(name, start, end, maxStudents, description, targetStatus);
+
+                _context.InternshipPhases.Add(phase);
+            }
+
+            // ── FPT Software phases ──────────────────────────────────────────────
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Software Fall 2025",
+                new DateOnly(2025, 9, 1), new DateOnly(2025, 12, 31),
+                30, "Đợt thực tập Fall 2025 của FPT Software — đã kết thúc",
+                InternshipPhaseStatus.Closed);
+
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Software Spring 2026",
+                new DateOnly(2026, 1, 15), new DateOnly(2026, 4, 30),
+                50, "Đợt thực tập Spring 2026 của FPT Software — đang diễn ra",
+                InternshipPhaseStatus.InProgress);
+
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Software Summer 2026",
+                new DateOnly(2026, 5, 1), new DateOnly(2026, 8, 31),
+                40, "Đợt thực tập Summer 2026 của FPT Software — đang tuyển",
+                InternshipPhaseStatus.Open);
+
+            // ── Rikkeisoft phases ────────────────────────────────────────────────
+            await EnsurePhase(
+                rikkeisoft.EnterpriseId,
+                "Rikkeisoft Fall 2025",
+                new DateOnly(2025, 9, 1), new DateOnly(2025, 12, 31),
+                20, "Đợt thực tập Fall 2025 của Rikkeisoft — đã kết thúc",
+                InternshipPhaseStatus.Closed);
+
+            await EnsurePhase(
+                rikkeisoft.EnterpriseId,
+                "Rikkeisoft Spring 2026",
+                new DateOnly(2026, 2, 1), new DateOnly(2026, 5, 31),
+                20, "Đợt thực tập Spring 2026 của Rikkeisoft — đang diễn ra",
+                InternshipPhaseStatus.InProgress);
+
+            await EnsurePhase(
+                rikkeisoft.EnterpriseId,
+                "Rikkeisoft Summer 2026",
+                new DateOnly(2026, 6, 1), new DateOnly(2026, 9, 30),
+                15, "Đợt thực tập Summer 2026 của Rikkeisoft — bản nháp",
+                InternshipPhaseStatus.Draft);
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task SeedInternshipGroups()
         {
-            if (await _context.InternshipGroups.AnyAsync()) return;
-
-            var spring2026 = await _context.Terms.FirstAsync(t => t.Name == "Spring 2026");
-            var fall2025 = await _context.Terms.FirstAsync(t => t.Name == "Fall 2025");
             var fsoft = await _context.Enterprises.FirstAsync(e => e.Name == "FPT Software");
             var rikkeisoft = await _context.Enterprises.FirstAsync(e => e.Name == "Rikkeisoft");
             var mentorFpt = await _context.EnterpriseUsers.Include(eu => eu.User).FirstAsync(eu => eu.User.Email == "mentor@fptsoftware.com");
             var mentorRikkeis = await _context.EnterpriseUsers.Include(eu => eu.User).FirstAsync(eu => eu.User.Email == "mentor@rikkeisoft.com");
 
+            // Resolve phases by name (idempotent, no hardcoded Guid constraint)
+            var phaseInProgressFpt = await _context.InternshipPhases.FirstAsync(
+                p => p.EnterpriseId == fsoft.EnterpriseId && p.Name == "FPT Software Spring 2026");
+            var phaseClosedFpt = await _context.InternshipPhases.FirstAsync(
+                p => p.EnterpriseId == fsoft.EnterpriseId && p.Name == "FPT Software Fall 2025");
+            var phaseOpenFpt = await _context.InternshipPhases.FirstAsync(
+                p => p.EnterpriseId == fsoft.EnterpriseId && p.Name == "FPT Software Summer 2026");
+            var phaseInProgressRikkei = await _context.InternshipPhases.FirstAsync(
+                p => p.EnterpriseId == rikkeisoft.EnterpriseId && p.Name == "Rikkeisoft Spring 2026");
+            // BUG-10 FIX: Use Rikkeisoft's own closed phase, not FPT's
+            var phaseClosedRikkei = await _context.InternshipPhases.FirstAsync(
+                p => p.EnterpriseId == rikkeisoft.EnterpriseId && p.Name == "Rikkeisoft Fall 2025");
+
+            var s1 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student1@fptu.edu.vn");
             var s2 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student2@fptu.edu.vn");
             var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student4@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
-            // Group for Student 3 (Active)
-            var group3 = InternshipGroup.Create(spring2026.TermId, "FPT Software OJT Team", "Next-gen platform development", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow.AddMonths(3));
-            group3.UpdateStatus(GroupStatus.Active);
-            _context.InternshipGroups.Add(group3);
+            var spring2026 = await _context.Terms.FirstAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU");
+            var fall2025 = await _context.Terms.FirstAsync(t => t.Name == "Fall 2025" && t.University.Code == "FPTU");
+            var spring2026Ct = await _context.Terms.Include(t => t.University).FirstOrDefaultAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU-CT");
 
-            // Group for Student 5 (Completed)
-            var group5 = InternshipGroup.Create(fall2025.TermId, "Rikkeisoft CRM Legacy", "Maintenance of legacy CRM", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(-2));
-            group5.UpdateStatus(GroupStatus.Finished); // Fixed: Closed -> Finished
-            _context.InternshipGroups.Add(group5);
+            // FPT Software OJT Team -> FPT Software OJT Team Alpha
+            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
+            if (group3 == null)
+            {
+                group3 = InternshipGroup.Create(phaseInProgressFpt.PhaseId, "FPT Software OJT Team Alpha", "Next-gen platform development", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddMonths(-1), DateTime.UtcNow.AddMonths(3));
+                group3.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(group3);
+            }
+
+            var group5 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
+            if (group5 == null)
+            {
+                group5 = InternshipGroup.Create(phaseClosedRikkei.PhaseId, "Rikkeisoft CRM Legacy", "Maintenance of legacy CRM", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddMonths(-6), DateTime.UtcNow.AddMonths(-2));
+                group5.UpdateStatus(GroupStatus.Finished);
+                _context.InternshipGroups.Add(group5);
+            }
+
+            var rikkeiActiveGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
+            if (rikkeiActiveGroup == null)
+            {
+                rikkeiActiveGroup = InternshipGroup.Create(phaseInProgressRikkei.PhaseId, "Rikkeisoft Spring 2026 Team", "Backend modernization and internal platform work", rikkeisoft.EnterpriseId, mentorRikkeis.EnterpriseUserId, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
+                rikkeiActiveGroup.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(rikkeiActiveGroup);
+            }
+
+            InternshipGroup? fptCtGroup = null;
+            if (spring2026Ct != null)
+            {
+                fptCtGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software CT OJT Team");
+                if (fptCtGroup == null)
+                {
+                    fptCtGroup = InternshipGroup.Create(phaseInProgressFpt.PhaseId, "FPT Software CT OJT Team", "Cross-campus internship squad for FPTU Can Tho", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddDays(-15), DateTime.UtcNow.AddMonths(2));
+                    fptCtGroup.UpdateStatus(GroupStatus.Active);
+                    _context.InternshipGroups.Add(fptCtGroup);
+                }
+            }
+            
+            var archivedGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Archived Project");
+            if (archivedGroup == null)
+            {
+                archivedGroup = InternshipGroup.Create(phaseClosedFpt.PhaseId, "FPT Archived Project", "Old project idea", fsoft.EnterpriseId, mentorFpt.EnterpriseUserId, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10));
+                archivedGroup.UpdateStatus(GroupStatus.Archived);
+                _context.InternshipGroups.Add(archivedGroup);
+            }
 
             await _context.SaveChangesAsync();
 
-            // Link Students to Groups
-            _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group3.InternshipId, StudentId = s3.StudentId, Role = InternshipRole.Member, Status = InternshipStatus.InProgress, JoinedAt = DateTime.UtcNow.AddMonths(-1) });
-            _context.InternshipStudents.Add(new InternshipStudent { InternshipId = group5.InternshipId, StudentId = s5.StudentId, Role = InternshipRole.Leader, Status = InternshipStatus.Completed, JoinedAt = DateTime.UtcNow.AddMonths(-6) });
+            // DO NOT ADD TO InternshipStudents (As per commit instructions)
 
             // Seed some applications
             // Ensure JobId is set for each seeded application to satisfy FK constraint (job_id is required)
@@ -395,15 +621,94 @@ namespace IOCv2.Infrastructure.Persistence
 
             _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, JobId = fptJob.JobId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-40) });
             _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, JobId = rikkeiJob.JobId, Status = InternshipApplicationStatus.PendingAssignment, AppliedAt = DateTime.UtcNow.AddDays(-10) });
+            // [NEW] Seed Pending and Rejected Applications
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s4.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-2) });
+            }
+
+            if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s2.StudentId))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = fall2025.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Rejected, RejectReason = "Not a good fit for this semester", AppliedAt = DateTime.UtcNow.AddDays(-100) });
+            }
 
             await _context.SaveChangesAsync();
+
+            // ── Thêm InternshipApplication Approved cho từng sinh viên ─────────────
+            // API GetPlacedStudents query từ InternshipApplication (Status=Approved),
+            // vì vậy mỗi sinh viên PHẢI có 1 application Approved để xuất hiện trong danh sách.
+            //
+            // Phân công: 6 SV → FPT Software, 4 SV → Rikkeisoft
+            var allStudents = await _context.Students
+                .Include(s => s.User)
+                .Where(s => s.User.Email.StartsWith("student") && s.User.Email.EndsWith("@fptu.edu.vn"))
+                .OrderBy(s => s.User.Email)   // student1, student10, student2, ... student9
+                .ToListAsync();
+
+            // Sắp xếp theo số thứ tự: student1..10
+            var orderedStudents = allStudents
+                .OrderBy(s => int.Parse(System.Text.RegularExpressions.Regex
+                    .Match(s.User.Email, @"\d+").Value))
+                .ToList();
+
+            // FPT Software: student1, student2, student3, student6, student7, student8
+            var fstudents = new[] { 0, 1, 2, 5, 6, 7 };
+            // Rikkeisoft:   student4, student5, student9, student10
+            var rstudents = new[] { 3, 4, 8, 9 };
+
+            foreach (var idx in fstudents)
+            {
+                if (idx >= orderedStudents.Count) continue;
+                var stu = orderedStudents[idx];
+                if (!await _context.InternshipApplications.AnyAsync(
+                    a => a.EnterpriseId == fsoft.EnterpriseId
+                      && a.TermId == spring2026.TermId
+                      && a.StudentId == stu.StudentId))
+                {
+                    _context.InternshipApplications.Add(new InternshipApplication
+                    {
+                        ApplicationId = Guid.NewGuid(),
+                        EnterpriseId = fsoft.EnterpriseId,
+                        TermId = spring2026.TermId,
+                        StudentId = stu.StudentId,
+                        Status = InternshipApplicationStatus.Approved,
+                        AppliedAt = DateTime.UtcNow.AddDays(-30)
+                    });
+                }
+            }
+
+            foreach (var idx in rstudents)
+            {
+                if (idx >= orderedStudents.Count) continue;
+                var stu = orderedStudents[idx];
+                if (!await _context.InternshipApplications.AnyAsync(
+                    a => a.EnterpriseId == rikkeisoft.EnterpriseId
+                      && a.TermId == spring2026.TermId
+                      && a.StudentId == stu.StudentId))
+                {
+                    _context.InternshipApplications.Add(new InternshipApplication
+                    {
+                        ApplicationId = Guid.NewGuid(),
+                        EnterpriseId = rikkeisoft.EnterpriseId,
+                        TermId = spring2026.TermId,
+                        StudentId = stu.StudentId,
+                        Status = InternshipApplicationStatus.Approved,
+                        AppliedAt = DateTime.UtcNow.AddDays(-25)
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            // Không thêm sinh viên vào bất kỳ nhóm nào.
+            // Tất cả 10 SV đã có Approved application → xuất hiện trong GetPlacedStudents.
+            // HR có thể thêm từng SV vào nhóm qua API AddStudentsToGroup.
         }
 
         private async Task SeedProjectsAndWorkItems()
         {
             if (await _context.Projects.AnyAsync()) return;
 
-            var group3 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "FPT Software OJT Team");
+            var group3 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
             var group5 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
             var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
@@ -427,7 +732,7 @@ namespace IOCv2.Infrastructure.Persistence
 
             var sprint5 = new Sprint(proj5.ProjectId, "Final Polish", "Release documentation");
             sprint5.Start(DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-3)), DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-2).AddDays(-10)));
-            sprint5.Complete(); 
+            sprint5.Complete();
             _context.Sprints.Add(sprint5);
 
             // Work Items for S3
@@ -443,52 +748,373 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.WorkItems.Add(new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj5.ProjectId, Title = $"Legacy fix #{i}", Type = WorkItemType.Task, Status = WorkItemStatus.Done, AssigneeId = s5.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-3).AddDays(i * 10)) });
             }
 
+            // [NEW] Seed Pending Project, Cancelled Sprint and WorkItems with different statuses
+            var projPending = Project.Create(group3.InternshipId, "FPT Future System", "Next phase architecture");
+            projPending.Update(null, null, null, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(30), ProjectStatus.Planning);
+            if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT Future System"))
+            {
+                _context.Projects.Add(projPending);
+                
+                var cancelledSprint = new Sprint(projPending.ProjectId, "Cancelled Sprint", "A sprint that was planned but cancelled");
+                cancelledSprint.Start(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20)));
+                _context.Sprints.Add(cancelledSprint);
+
+                _context.WorkItems.AddRange(
+                    new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = projPending.ProjectId, Title = "Gather Requirements", Type = WorkItemType.Task, Status = WorkItemStatus.Cancelled, AssigneeId = null, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15)) },
+                    new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = projPending.ProjectId, Title = "Initial Design", Type = WorkItemType.Task, Status = WorkItemStatus.Todo, AssigneeId = null, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20)) }
+                );
+
+                // [NEW] Add a sub-task for demonstration
+                var requirementsTask = await _context.WorkItems.FirstOrDefaultAsync(w => w.Title == "Gather Requirements" && w.ProjectId == projPending.ProjectId);
+                if (requirementsTask != null)
+                {
+                    _context.WorkItems.Add(new WorkItem 
+                    { 
+                        WorkItemId = Guid.NewGuid(), 
+                        ProjectId = projPending.ProjectId, 
+                        ParentId = requirementsTask.WorkItemId, 
+                        Title = "Interview Stakeholders", 
+                        Type = WorkItemType.Task, 
+                        Status = WorkItemStatus.Todo,
+                        Priority = Priority.High,
+                        StoryPoint = 3
+                    });
+                }
+            }
+
             await _context.SaveChangesAsync();
         }
 
         private async Task SeedLogbooks()
         {
-            if (await _context.Logbooks.AnyAsync()) return;
+            var proj3 = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectName == "IOC v2.0 Platform");
+            var proj5 = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectName == "Legacy CRM Maintenance");
+            var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
+            var s2 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student2@fptu.edu.vn");
+            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
-            var proj3 = await _context.Projects.FirstAsync(p => p.ProjectName == "IOC v2.0 Platform");
-            var proj5 = await _context.Projects.FirstAsync(p => p.ProjectName == "Legacy CRM Maintenance");
-            var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
-            var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            if (proj3 == null || proj5 == null || s3 == null || s5 == null) return;
 
-            _context.Logbooks.AddRange(
-                Logbook.Create(proj3.InternshipId, s3.StudentId, "Integrated basic project structure.", null, "Focus on Auth module.", DateTime.UtcNow.AddDays(-7)),
-                Logbook.Create(proj3.InternshipId, s3.StudentId, "Started JWT implementation.", "Encountered some middleware issues.", "Resolve middleware and test login.", DateTime.UtcNow.AddDays(-1))
-            );
-
-            for (int i = 1; i <= 4; i++)
+            if (!await _context.Logbooks.AnyAsync())
             {
-                _context.Logbooks.Add(Logbook.Create(proj5.InternshipId, s5.StudentId, $"Work report {i}", null, "Continue next task", DateTime.UtcNow.AddMonths(-6 + i)));
+                _context.Logbooks.AddRange(
+                    Logbook.Create(proj3.InternshipId, s3.StudentId, "Integrated basic project structure.", null, "Focus on Auth module.", DateTime.UtcNow.AddDays(-7)),
+                    Logbook.Create(proj3.InternshipId, s3.StudentId, "Started JWT implementation.", "Encountered some middleware issues.", "Resolve middleware and test login.", DateTime.UtcNow.AddDays(-1))
+                );
+
+                if (s1 != null) _context.Logbooks.Add(Logbook.Create(proj3.InternshipId, s1.StudentId, "Initial requirement analysis and documentation.", null, "Finalize SRS.", DateTime.UtcNow.AddDays(-6)));
+                if (s2 != null) _context.Logbooks.Add(Logbook.Create(proj3.InternshipId, s2.StudentId, "UI/UX wireframing for main dashboard.", "Feedback from PO required.", "Update Figma design.", DateTime.UtcNow.AddDays(-5)));
+
+                for (int i = 1; i <= 4; i++)
+                {
+                    _context.Logbooks.Add(Logbook.Create(proj5.InternshipId, s5.StudentId, $"Work report {i}", null, "Continue next task", DateTime.UtcNow.AddMonths(-6 + i)));
+                }
+                
+                await _context.SaveChangesAsync();
             }
-            
+
+            // [NEW] Link WorkItems to Logbooks if not already linked (Using direct SQL for shadow junction table)
+            bool alreadyLinked = await _context.Logbooks.AnyAsync(l => l.WorkItems.Any());
+            if (!alreadyLinked)
+            {
+                var workItemsProj3 = await _context.WorkItems.Where(w => w.ProjectId == proj3.ProjectId).ToListAsync();
+                var logbooksProj3 = await _context.Logbooks.Where(l => l.InternshipId == proj3.InternshipId).ToListAsync();
+                
+                if (workItemsProj3.Any() && logbooksProj3.Any())
+                {
+                    foreach (var lb in logbooksProj3)
+                    {
+                        var wi1 = workItemsProj3[0];
+                        if (_context.Database.IsRelational())
+                        {
+                            await _context.Database.ExecuteSqlRawAsync(
+                                "INSERT INTO logbook_work_items (logbook_id, work_items_work_item_id) VALUES ({0}, {1}) ON CONFLICT DO NOTHING", 
+                                lb.LogbookId, wi1.WorkItemId);
+                        }
+                        else
+                        {
+                            if (!lb.WorkItems.Contains(wi1)) lb.WorkItems.Add(wi1);
+                        }
+                            
+                        if (workItemsProj3.Count > 1)
+                        {
+                            var wi2 = workItemsProj3[1];
+                            if (_context.Database.IsRelational())
+                            {
+                                await _context.Database.ExecuteSqlRawAsync(
+                                    "INSERT INTO logbook_work_items (logbook_id, work_items_work_item_id) VALUES ({0}, {1}) ON CONFLICT DO NOTHING", 
+                                    lb.LogbookId, wi2.WorkItemId);
+                            }
+                            else
+                            {
+                                if (!lb.WorkItems.Contains(wi2)) lb.WorkItems.Add(wi2);
+                            }
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
+        private async Task SeedStakeholdersAndIssues()
+        {
+            if (await _context.Stakeholders.AnyAsync()) return;
+
+            var group3 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
+            var s3 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student3@fptu.edu.vn");
+
+            var customer = new Stakeholder(
+                group3.InternshipId,
+                "John Doe",
+                StakeholderType.Real,
+                "john.doe@globaltech.com",
+                "Product Owner",
+                "Product Owner from Global Tech Corp");
+            _context.Stakeholders.Add(customer);
+
+            _context.StakeholderIssues.Add(new StakeholderIssue(
+                Guid.NewGuid(),
+                customer.Id,
+                "Missing Auth Requirements",
+                "The current requirement for JWT doesn't specify the token expiration policy."));
+
             await _context.SaveChangesAsync();
         }
 
         private async Task SeedEvaluations()
         {
-            if (await _context.Evaluations.AnyAsync()) return;
+            var phaseFptSpring = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.Name == "FPT Software Spring 2026");
+            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team");
+            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var mentorFpt = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
 
-            var fall2025 = await _context.Terms.FirstAsync(t => t.Name == "Fall 2025");
-            var group5 = await _context.InternshipGroups.FirstAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
-            var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
-            var mentorUser = await _context.Users.FirstAsync(u => u.Email == "mentor@rikkeisoft.com");
+            if (phaseFptSpring == null || group3 == null || s3 == null || mentorFpt == null) return;
 
-            var cycle = new EvaluationCycle { CycleId = Guid.NewGuid(), TermId = fall2025.TermId, Name = "Final Evaluation", StartDate = DateTime.UtcNow.AddMonths(-3), EndDate = DateTime.UtcNow.AddMonths(-2), Status = EvaluationCycleStatus.Completed };
-            _context.EvaluationCycles.Add(cycle);
+            // Seed Evaluation Cycle
+            var cycle = await _context.Set<EvaluationCycle>().FirstOrDefaultAsync(c => c.Name == "Mid-term Spring 2026");
+            if (cycle == null)
+            {
+                cycle = new EvaluationCycle
+                {
+                    CycleId = Guid.NewGuid(),
+                    PhaseId = phaseFptSpring.PhaseId,
+                    Name = "Mid-term Spring 2026",
+                    StartDate = DateTime.UtcNow.AddDays(-10),
+                    EndDate = DateTime.UtcNow.AddDays(10),
+                    Status = EvaluationCycleStatus.Grading
+                };
+                
+                cycle.Criteria.Add(new EvaluationCriteria { CriteriaId = Guid.NewGuid(), CycleId = cycle.CycleId, Name = "Technical Skills", Description = "Code quality and architecture", Weight = 0.60m });
+                cycle.Criteria.Add(new EvaluationCriteria { CriteriaId = Guid.NewGuid(), CycleId = cycle.CycleId, Name = "Soft Skills", Description = "Communication and teamwork", Weight = 0.40m });
+                
+                _context.Set<EvaluationCycle>().Add(cycle);
+                await _context.SaveChangesAsync();
+            }
+
+            // Seed Evaluation for student3
+            if (!await _context.Set<Evaluation>().AnyAsync(e => e.StudentId == s3.StudentId && e.CycleId == cycle.CycleId))
+            {
+                var criteriaList = cycle.Criteria.ToList();
+                if (criteriaList.Count >= 2)
+                {
+                    var evalDraft = new Evaluation
+                    {
+                        EvaluationId = Guid.NewGuid(),
+                        CycleId = cycle.CycleId,
+                        InternshipId = group3.InternshipId,
+                        StudentId = s3.StudentId,
+                        EvaluatorId = mentorFpt.UserId,
+                        Status = EvaluationStatus.Draft,
+                        Note = "Good progress, but needs better test coverage."
+                    };
+                    
+                    evalDraft.Details.Add(new EvaluationDetail { DetailId = Guid.NewGuid(), EvaluationId = evalDraft.EvaluationId, CriteriaId = criteriaList[0].CriteriaId, Score = 8.0m, Comment = "Solid coding" });
+                    evalDraft.Details.Add(new EvaluationDetail { DetailId = Guid.NewGuid(), EvaluationId = evalDraft.EvaluationId, CriteriaId = criteriaList[1].CriteriaId, Score = 7.5m, Comment = "Good speaker" });
+                    evalDraft.TotalScore = (8.0m * 0.60m) + (7.5m * 0.40m);
+                    
+                    _context.Set<Evaluation>().Add(evalDraft);
+
+                    var evalPublishedGroup = new Evaluation
+                    {
+                        EvaluationId = Guid.NewGuid(),
+                        CycleId = cycle.CycleId,
+                        InternshipId = group3.InternshipId,
+                        StudentId = null, // Group feedback
+                        EvaluatorId = mentorFpt.UserId,
+                        Status = EvaluationStatus.Published,
+                        Note = "Excellent team coordination overall.",
+                        TotalScore = 9.0m
+                    };
+                    _context.Set<Evaluation>().Add(evalPublishedGroup);
+                    
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
+        private async Task SeedProjectResources()
+        {
+            var proj3 = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectName == "IOC v2.0 Platform");
+            if (proj3 != null && !await _context.ProjectResources.AnyAsync(pr => pr.ProjectId == proj3.ProjectId))
+            {
+                _context.ProjectResources.AddRange(
+                    new ProjectResources(proj3.ProjectId, "System Architecture", FileType.PDF, "https://example.com/arch.pdf"),
+                    new ProjectResources(proj3.ProjectId, "Figma Design", FileType.LINK, "https://figma.com/design"),
+                    new ProjectResources(proj3.ProjectId, "Demo Video", FileType.LINK, "https://youtube.com/demo")
+                );
+            }
             await _context.SaveChangesAsync();
+        }
 
-            var criteria = new EvaluationCriteria { CriteriaId = Guid.NewGuid(), CycleId = cycle.CycleId, Name = "Technical Skills", Description = "Programming and problem solving", MaxScore = 100m, Weight = 50m };
-            _context.EvaluationCriteria.Add(criteria);
+        private async Task SeedViolationReports()
+        {
+            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team");
+            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+
+            if (group3 != null && s3 != null && !await _context.Set<ViolationReport>().AnyAsync(v => v.StudentId == s3.StudentId))
+            {
+                _context.Set<ViolationReport>().Add(new ViolationReport
+                {
+                    ViolationReportId = Guid.NewGuid(),
+                    StudentId = s3.StudentId,
+                    InternshipGroupId = group3.InternshipId,
+                    OccurredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)),
+                    Description = "Student missed the team meeting twice without notice."
+                });
+            }
             await _context.SaveChangesAsync();
+        }
 
-            var evaluation = new Evaluation { EvaluationId = Guid.NewGuid(), CycleId = cycle.CycleId, InternshipId = group5.InternshipId, StudentId = s5.StudentId, EvaluatorId = mentorUser.UserId, Status = EvaluationStatus.Published, TotalScore = 95m, Note = "Excellent performance throughout the term." }; // Fixed: Completed -> Published
-            _context.Evaluations.Add(evaluation);
-            
-            _context.EvaluationDetails.Add(new EvaluationDetail { DetailId = Guid.NewGuid(), EvaluationId = evaluation.EvaluationId, CriteriaId = criteria.CriteriaId, Score = 95m, Comment = "Strong understanding of legacy code." });
+         private async Task SeedNotifications()
+        {
+            var users = await _context.Users.ToListAsync();
+            var notifications = new List<Notification>();
+
+            foreach (var user in users)
+            {
+                if (!await _context.Set<Notification>().AnyAsync(n => n.UserId == user.UserId))
+                {
+                    if (user.Email == "student3@fptu.edu.vn")
+                    {
+                        notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = "Hồ sơ thực tập được duyệt", Content = "Hồ sơ thực tập của bạn tại FPT Software đã được duyệt.", Type = NotificationType.ApplicationAccepted, ReferenceType = "InternshipApplication", IsRead = false });
+                        notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = "Nhắc nhở nộp báo cáo", Content = "Sắp đến hạn nộp báo cáo định kỳ. Vui lòng cập nhật Logbook.", Type = NotificationType.LogbookFeedback, IsRead = true, ReadAt = DateTime.UtcNow.AddDays(-1) });
+                    }
+                    else if (user.Email == "student5@fptu.edu.vn")
+                    {
+                        notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = "Đã nhận được báo cáo Logbook", Content = "Mentor đã nhận xét báo cáo số 1 của bạn.", Type = NotificationType.LogbookFeedback, ReferenceType = "Logbook", IsRead = false });
+                        notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = "Kết quả đánh giá", Content = "Đánh giá thực tập của bạn đã được công bố.", Type = NotificationType.EvaluationPublished, IsRead = true, ReadAt = DateTime.UtcNow.AddDays(-2) });
+                        notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = "Hoàn thành thực tập", Content = "Chúc mừng bạn đã hoàn thành kỳ thực tập.", Type = NotificationType.General, IsRead = false });
+                    }
+                    else if (user.Email == "trunguyen.104@gmail.com")
+                    {
+                        for (int i = 1; i <= 10; i++)
+                        {
+                            notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = $"Thông báo Demo số {i}", Content = $"Đây là nội dung chi tiết cho thông báo demo số {i}. Vui lòng kiểm tra chức năng hệ thống.", Type = NotificationType.General, IsRead = (i % 3 == 0), ReadAt = (i % 3 == 0) ? DateTime.UtcNow.AddHours(-i) : null });
+                        }
+                    }
+                    else
+                    {
+                        notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = "Chào mừng đến với hệ thống IOC", Content = $"Kính chào {user.FullName}, đây là thông báo tự động từ hệ thống. Chúc bạn có một ngày làm việc hiệu quả!", Type = NotificationType.General, IsRead = false });
+                        notifications.Add(new Notification { NotificationId = Guid.NewGuid(), UserId = user.UserId, Title = "Cập nhật hệ thống", Content = "Hệ thống vừa trải qua một đợt cập nhật các tính năng quan trọng.", Type = NotificationType.General, IsRead = true, ReadAt = DateTime.UtcNow.AddDays(-1) });
+                    }
+                }
+            }
+
+            if (notifications.Any())
+            {
+                _context.Set<Notification>().AddRange(notifications);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task SeedSprintWorkItems()
+        {
+            if (await _context.SprintWorkItems.AnyAsync()) return;
+
+            var sprints = await _context.Sprints.ToListAsync();
+            foreach (var sprint in sprints)
+            {
+                var workItems = await _context.WorkItems
+                    .Where(w => w.ProjectId == sprint.ProjectId)
+                    .Take(3)
+                    .ToListAsync();
+
+                float order = 1.0f;
+                foreach (var wi in workItems)
+                {
+                    _context.SprintWorkItems.Add(new SprintWorkItem 
+                    { 
+                        SprintId = sprint.SprintId, 
+                        WorkItemId = wi.WorkItemId, 
+                        BoardOrder = order++ 
+                    });
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedAuditLogs()
+        {
+            if (await _context.AuditLogs.AnyAsync()) return;
+
+            var admin = await _context.Users.FirstOrDefaultAsync(u => u.Email == "admin@iocv2.com");
+            var mentorFpt = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
+
+            if (admin != null)
+            {
+                _context.AuditLogs.AddRange(
+                    new AuditLog { AuditLogId = Guid.NewGuid(), Action = AuditAction.Approve, EntityType = "User", EntityId = admin.UserId, PerformedById = admin.UserId, Reason = "Initial admin approval", CreatedAt = DateTime.UtcNow.AddDays(-5) },
+                    new AuditLog { AuditLogId = Guid.NewGuid(), Action = AuditAction.Create, EntityType = "University", EntityId = SeedIds.FptuId, PerformedById = admin.UserId, Reason = "Initial setup", CreatedAt = DateTime.UtcNow.AddDays(-10) }
+                );
+            }
+
+            if (mentorFpt != null)
+            {
+                var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team");
+                if (group3 != null)
+                {
+                    _context.AuditLogs.Add(new AuditLog 
+                    { 
+                        AuditLogId = Guid.NewGuid(), 
+                        Action = AuditAction.Update, 
+                        EntityType = "InternshipGroup", 
+                        EntityId = group3.InternshipId, 
+                        PerformedById = mentorFpt.UserId, 
+                        Reason = "Update group description", 
+                        CreatedAt = DateTime.UtcNow.AddDays(-2) 
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedSecurityTokens()
+        {
+            if (await _context.RefreshTokens.AnyAsync() || await _context.PasswordResetTokens.AnyAsync()) return;
+
+            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            if (s3 != null)
+            {
+                _context.RefreshTokens.Add(new RefreshToken 
+                { 
+                    RefreshTokenId = Guid.NewGuid(), 
+                    UserId = s3.UserId, 
+                    Token = "mock-refresh-token-student3-2026", 
+                    Expires = DateTime.UtcNow.AddDays(7), 
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                _context.PasswordResetTokens.Add(new PasswordResetToken 
+                { 
+                    TokenId = Guid.NewGuid(), 
+                    UserId = s3.UserId, 
+                    TokenHash = "mock-reset-token-s3", 
+                    ExpiresAt = DateTimeOffset.UtcNow.AddHours(2), 
+                    CreatedAt = DateTime.UtcNow 
+                });
+            }
 
             await _context.SaveChangesAsync();
         }

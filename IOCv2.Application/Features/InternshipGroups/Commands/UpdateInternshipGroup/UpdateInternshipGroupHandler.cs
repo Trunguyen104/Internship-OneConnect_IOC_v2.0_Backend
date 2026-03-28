@@ -57,12 +57,12 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                         ResultErrorType.BadRequest);
                 }
 
-                // Validate TermId
-                var termExists = await _unitOfWork.Repository<Term>()
-                    .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
-                if (!termExists)
+                // Validate PhaseId
+                var phaseExists = await _unitOfWork.Repository<InternshipPhase>()
+                    .ExistsAsync(p => p.PhaseId == request.PhaseId, cancellationToken);
+                if (!phaseExists)
                 {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.PhaseId);
                     return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
 
@@ -78,16 +78,33 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     }
                 }
 
-                // Validate MentorId if provided
+                // Validate MentorId if provided — request truyền UserId
+                Guid? resolvedMentorId = null;
                 if (request.MentorId.HasValue)
                 {
-                    var mentorExists = await _unitOfWork.Repository<EnterpriseUser>()
-                        .ExistsAsync(u => u.EnterpriseUserId == request.MentorId.Value, cancellationToken);
-                    if (!mentorExists)
+                    // Frontend truyền UserId của mentor → tìm ra EnterpriseUserId để lưu DB
+                    var mentor = await _unitOfWork.Repository<EnterpriseUser>()
+                        .Query()
+                        .Include(eu => eu.User)
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(eu => eu.UserId == request.MentorId.Value, cancellationToken);
+
+                    if (mentor == null)
                     {
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
                     }
+
+                    // Chỉ chấp nhận tài khoản có role Mentor
+                    if (mentor.User == null || mentor.User.Role != IOCv2.Domain.Enums.UserRole.Mentor)
+                    {
+                        _logger.LogWarning("User {UserId} is not a Mentor role, cannot be assigned as mentor.", request.MentorId);
+                        return Result<UpdateInternshipGroupResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
+                            ResultErrorType.BadRequest);
+                    }
+
+                    resolvedMentorId = mentor.EnterpriseUserId;
                 }
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -95,9 +112,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 entity.UpdateInfo(
                     request.GroupName,
                     request.Description,
-                    request.TermId,
+                    request.PhaseId,
                     request.EnterpriseId,
-                    request.MentorId,
+                    resolvedMentorId, // EnterpriseUserId
                     request.StartDate,
                     request.EndDate
                 );
