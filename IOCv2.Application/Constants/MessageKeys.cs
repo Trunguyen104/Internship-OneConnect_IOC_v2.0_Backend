@@ -773,6 +773,7 @@ namespace IOCv2.Application.Constants
             public const string ReopenNotifyStudentSubject = "JobPosting.ReopenNotifyStudentSubject";
             public const string ReopenNotifyStudentBody = "JobPosting.ReopenNotifyStudentBody";
             public const string ReopenSuccess = "JobPosting.ReopenSuccess";
+        }
         public static class InternshipPhase
         {
             // Validator
