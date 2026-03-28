@@ -164,7 +164,9 @@ public class CloudinaryFileStorageService : IFileStorageService
             : publicIdWithoutExtension;
         var resourceTypeValue = resourceType == ResourceType.Raw ? "raw" : "image";
 
-        var signedUrl = _cloudinary.DownloadPrivate(publicId!, true, null, deliveryType, null, resourceTypeValue);
+        // Use inline signed URL so browsers can preview PDFs/images in a new tab,
+        // while still allowing users to click the browser's built-in download action.
+        var signedUrl = _cloudinary.DownloadPrivate(publicId!, false, null, deliveryType, null, resourceTypeValue);
         return string.IsNullOrWhiteSpace(signedUrl) ? filePath : signedUrl;
     }
 
