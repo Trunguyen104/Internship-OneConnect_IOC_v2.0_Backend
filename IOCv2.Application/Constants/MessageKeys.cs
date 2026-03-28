@@ -436,10 +436,11 @@ namespace IOCv2.Application.Constants
             public const string LogGetStudentsSuccess  = "Projects.LogGetStudentsSuccess";
 
             // Unpublish
-            public const string UnpublishSuccess           = "Projects.UnpublishSuccess";
-            public const string CannotUnpublishStarted     = "Projects.CannotUnpublishStarted";
-            public const string LogUnpublishSuccess        = "Projects.LogUnpublishSuccess";
-            public const string LogUnpublishError          = "Projects.LogUnpublishError";
+            public const string UnpublishSuccess              = "Projects.UnpublishSuccess";
+            public const string CannotUnpublishStarted        = "Projects.CannotUnpublishStarted";
+            public const string InvalidStatusForUnpublish     = "Projects.InvalidStatusForUnpublish";
+            public const string LogUnpublishSuccess           = "Projects.LogUnpublishSuccess";
+            public const string LogUnpublishError             = "Projects.LogUnpublishError";
 
             // Archive
             public const string ArchiveSuccess             = "Projects.ArchiveSuccess";
@@ -478,6 +479,10 @@ namespace IOCv2.Application.Constants
             public const string LogAssignNotificationFailed    = "Projects.LogAssignNotificationFailed";
             public const string LogSwapNotificationFailed      = "Projects.LogSwapNotificationFailed";
             public const string LogUpdateNotificationFailed    = "Projects.LogUpdateNotificationFailed";
+
+            // Log messages for resource cleanup failures
+            public const string LogCleanupResourceFailed       = "Projects.LogCleanupResourceFailed";
+            public const string LogDeleteResourceAfterUpdate   = "Projects.LogDeleteResourceAfterUpdate";
 
             // AC-13: SignalR ProjectListChanged log
             public const string LogProjectListChanged      = "Projects.LogProjectListChanged";

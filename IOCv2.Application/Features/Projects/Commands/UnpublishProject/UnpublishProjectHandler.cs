@@ -55,7 +55,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UnpublishProject
 
             // Phải đang Published
             if (project.VisibilityStatus != VisibilityStatus.Published)
-                return Result<UnpublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.InvalidStatusForPublish), ResultErrorType.BadRequest);
+                return Result<UnpublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.InvalidStatusForUnpublish), ResultErrorType.BadRequest);
 
             // Chỉ unpublish được khi OperationalStatus == Unstarted
             if (project.OperationalStatus != OperationalStatus.Unstarted)

@@ -1265,7 +1265,7 @@
     <value>Only Draft projects can be published.</value>
   </data>
   <data name="Projects.InvalidStatusForComplete" xml:space="preserve">
-    <value>Only Published projects can be marked as completed.</value>
+    <value>Only Active projects can be marked as completed.</value>
   </data>
   <data name="Projects.InvalidStatusForUpdate" xml:space="preserve">
     <value>Cannot update a project that is Completed or Archived.</value>
@@ -1314,6 +1314,9 @@
   </data>
   <data name="Projects.CannotDeleteHasData" xml:space="preserve">
     <value>Cannot delete project that already has data (work items or sprints).</value>
+  </data>
+  <data name="Projects.InvalidStatusForUnpublish" xml:space="preserve">
+    <value>Only Published projects can be unpublished.</value>
   </data>
   <data name="Projects.CannotUnpublishStarted" xml:space="preserve">
     <value>Project cannot be unpublished after group assignment has started.</value>

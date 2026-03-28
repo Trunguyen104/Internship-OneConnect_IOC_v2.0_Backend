@@ -24,13 +24,15 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         private readonly IMessageService _message;
         private readonly ICacheService _cacheService;
         private readonly ICurrentUserService? _currentUserService;
+        private readonly IFileStorageService? _fileStorageService;
         public GetProjectByIdHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<GetProjectByIdHandler> logger,
             IMessageService message,
             ICacheService cacheService,
-            ICurrentUserService? currentUserService = null)
+            ICurrentUserService? currentUserService = null,
+            IFileStorageService? fileStorageService = null)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -38,6 +40,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
             _message = message;
             _cacheService = cacheService;
             _currentUserService = currentUserService;
+            _fileStorageService = fileStorageService;
         }
         public async Task<Result<GetProjectByIdResponse>> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
         {
@@ -133,8 +136,31 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
             }
 
             var response = _mapper.Map<GetProjectByIdResponse>(project);
+            ResolveResourceUrls(response.ProjectResources);
             await _cacheService.SetAsync(cacheKey, response, ProjectCacheKeys.Expiration.Project, cancellationToken);
             return Result<GetProjectByIdResponse>.Success(response);
+        }
+
+        private void ResolveResourceUrls(List<ProjectResourcesDTO> resources)
+        {
+            if (_fileStorageService == null || resources.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var resource in resources)
+            {
+                if (resource.ResourceType == FileType.LINK || string.IsNullOrWhiteSpace(resource.ResourceUrl))
+                {
+                    continue;
+                }
+
+                resource.ResourceUrl = _fileStorageService.GetFileUrl(resource.ResourceUrl);
+                if (!Uri.IsWellFormedUriString(resource.ResourceUrl, UriKind.Absolute))
+                {
+                    resource.ResourceUrl = _fileStorageService.GetDomainUrl() + resource.ResourceUrl;
+                }
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 using AutoMapper;
+using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.ProjectResources.Common;
 using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -20,10 +22,11 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
         private readonly ICurrentUserService _currentUser;
         private readonly ICacheService _cacheService;
         private readonly INotificationPushService _pushService;
+        private readonly IFileStorageService? _fileStorageService;
 
         public UpdateProjectHandler(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UpdateProjectHandler> logger,
             IMessageService messageService, ICurrentUserService currentUser, ICacheService cacheService,
-            INotificationPushService pushService)
+            INotificationPushService pushService, IFileStorageService? fileStorageService = null)
         {
             _unitOfWork     = unitOfWork;
             _mapper         = mapper;
@@ -32,6 +35,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
             _currentUser    = currentUser;
             _cacheService   = cacheService;
             _pushService    = pushService;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<Result<UpdateProjectResponse>> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
@@ -50,6 +54,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
             var project = await _unitOfWork.Repository<Project>().Query()
                 .Include(p => p.InternshipGroup)
+                .Include(p => p.ProjectResources)
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (project == null)
@@ -68,6 +73,9 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                     _messageService.GetMessage(MessageKeys.Projects.InvalidStatusForUpdate), ResultErrorType.BadRequest);
 
             var assignedCount = 0;
+            var resourceReadCacheKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var filesToDelete = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var uploadedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -100,11 +108,139 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                // Auto-publish: nếu project còn Draft thì publish sau khi update
-                if (project.VisibilityStatus == VisibilityStatus.Draft)
+                if (request.Files?.Count > 0)
                 {
-                    project.Publish();
-                    await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
+                    if (_fileStorageService == null)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<UpdateProjectResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.InternalError),
+                            ResultErrorType.InternalServerError);
+                    }
+
+                    foreach (var file in request.Files)
+                    {
+                        var validation = FileValidationHelper.ValidateFile(file.FileName, file.Length);
+                        if (!validation.IsValid)
+                        {
+                            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                            return Result<UpdateProjectResponse>.Failure(
+                                $"{file.FileName}: {validation.ErrorMessage}",
+                                ResultErrorType.BadRequest);
+                        }
+
+                        var fileName = FileParams.GetFileName(file.FileName);
+                        var fileUrl = await _fileStorageService.UploadFileAsync(
+                            file,
+                            FileParams.GetFolder(project.ProjectId),
+                            fileName,
+                            cancellationToken);
+                        uploadedFiles.Add(fileUrl);
+
+                        var fileType = FileValidationHelper.GetFileType(file.FileName);
+                        if (!fileType.HasValue)
+                        {
+                            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                            return Result<UpdateProjectResponse>.Failure(
+                                _messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType),
+                                ResultErrorType.BadRequest);
+                        }
+
+                        var resource = new IOCv2.Domain.Entities.ProjectResources(
+                            project.ProjectId,
+                            file.FileName,
+                            fileType.Value,
+                            fileUrl);
+
+                        await _unitOfWork.Repository<IOCv2.Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
+                        resourceReadCacheKeys.Add(ProjectResourceCacheKeys.Read(resource.ProjectResourceId));
+                    }
+                }
+
+                if (request.Links?.Count > 0)
+                {
+                    foreach (var link in request.Links.Where(l => !string.IsNullOrWhiteSpace(l.Url)))
+                    {
+                        var resource = new IOCv2.Domain.Entities.ProjectResources(
+                            project.ProjectId,
+                            string.IsNullOrWhiteSpace(link.ResourceName) ? link.Url : link.ResourceName,
+                            FileType.LINK,
+                            link.Url.Trim());
+
+                        await _unitOfWork.Repository<IOCv2.Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
+                        resourceReadCacheKeys.Add(ProjectResourceCacheKeys.Read(resource.ProjectResourceId));
+                    }
+                }
+
+                var resourceById = project.ProjectResources
+                    .ToDictionary(r => r.ProjectResourceId, r => r);
+
+                if (request.ResourceDeleteIds?.Count > 0)
+                {
+                    foreach (var resourceId in request.ResourceDeleteIds)
+                    {
+                        if (!resourceById.TryGetValue(resourceId, out var resource))
+                        {
+                            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                            return Result<UpdateProjectResponse>.Failure(
+                                _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
+                                ResultErrorType.NotFound);
+                        }
+
+                        await _unitOfWork.Repository<IOCv2.Domain.Entities.ProjectResources>().DeleteAsync(resource, cancellationToken);
+                        resourceReadCacheKeys.Add(ProjectResourceCacheKeys.Read(resource.ProjectResourceId));
+
+                        if (resource.ResourceType != FileType.LINK && !string.IsNullOrWhiteSpace(resource.ResourceUrl))
+                        {
+                            filesToDelete.Add(resource.ResourceUrl);
+                        }
+
+                        resourceById.Remove(resourceId);
+                    }
+                }
+
+                if (request.ResourceUpdates?.Count > 0)
+                {
+                    foreach (var resourceInput in request.ResourceUpdates)
+                    {
+                        if (!resourceById.TryGetValue(resourceInput.ProjectResourceId, out var resource))
+                        {
+                            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                            return Result<UpdateProjectResponse>.Failure(
+                                _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
+                                ResultErrorType.NotFound);
+                        }
+
+                        if (resourceInput.ResourceName != null)
+                        {
+                            resource.ResourceName = resourceInput.ResourceName.Trim();
+                        }
+
+                        if (resourceInput.ExternalUrl != null)
+                        {
+                            if (resource.ResourceType != FileType.LINK)
+                            {
+                                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                                return Result<UpdateProjectResponse>.Failure(
+                                    _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
+                                    ResultErrorType.BadRequest);
+                            }
+
+                            resource.ResourceUrl = resourceInput.ExternalUrl.Trim();
+                        }
+
+                        await _unitOfWork.Repository<IOCv2.Domain.Entities.ProjectResources>().UpdateAsync(resource, cancellationToken);
+                        resourceReadCacheKeys.Add(ProjectResourceCacheKeys.Read(resource.ProjectResourceId));
+                    }
+                }
+
+                if ((request.ResourceDeleteIds?.Count > 0) || (request.ResourceUpdates?.Count > 0))
+                {
+                    await _unitOfWork.SaveChangeAsync(cancellationToken);
+                }
+
+                if ((request.Files?.Count > 0) || (request.Links?.Count > 0))
+                {
                     await _unitOfWork.SaveChangeAsync(cancellationToken);
                 }
 
@@ -140,12 +276,48 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                if (_fileStorageService != null && uploadedFiles.Count > 0)
+                {
+                    foreach (var uploadedFile in uploadedFiles)
+                    {
+                        try
+                        {
+                            await _fileStorageService.DeleteFileAsync(uploadedFile, cancellationToken);
+                        }
+                        catch (Exception cleanupEx)
+                        {
+                            _logger.LogWarning(cleanupEx, _messageService.GetMessage(MessageKeys.Projects.LogCleanupResourceFailed), uploadedFile);
+                        }
+                    }
+                }
                 _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.LogUpdateError), request.ProjectId);
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
             }
 
+            if (_fileStorageService != null && filesToDelete.Count > 0)
+            {
+                foreach (var fileUrl in filesToDelete)
+                {
+                    try
+                    {
+                        await _fileStorageService.DeleteFileAsync(fileUrl, cancellationToken);
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        _logger.LogWarning(deleteEx, _messageService.GetMessage(MessageKeys.Projects.LogDeleteResourceAfterUpdate), fileUrl);
+                    }
+                }
+            }
+
             await _cacheService.RemoveAsync(ProjectCacheKeys.Project(project.ProjectId), cancellationToken);
             await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(project.ProjectId), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(null), cancellationToken);
+
+            foreach (var readCacheKey in resourceReadCacheKeys)
+            {
+                await _cacheService.RemoveAsync(readCacheKey, cancellationToken);
+            }
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Projects.LogUpdateSuccess), request.ProjectId);
 

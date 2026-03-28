@@ -144,9 +144,13 @@ public class ProjectsController : ApiControllerBase
 
     /// <summary>
     /// Update an existing project. Only the project's Mentor can update.
+    /// Also supports resource operations in the same request body:
+    /// - resourceUpdates: rename resource, and update externalUrl for LINK resources
+    /// - resourceDeleteIds: remove resources from project
     /// </summary>
     [HttpPut("{projectId:guid}")]
     [Authorize(Roles = "Mentor")]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(ApiResponse<UpdateProjectResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -155,7 +159,7 @@ public class ProjectsController : ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateProject(
         [FromRoute] Guid projectId,
-        [FromBody] UpdateProjectCommand command,
+        [FromForm] UpdateProjectCommand command,
         CancellationToken cancellationToken)
     {
         command.ProjectId = projectId;

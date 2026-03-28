@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Projects.Common;
+using IOCv2.Application.Features.Projects.Queries.GetProjectById;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -246,10 +247,14 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                         .Include(p => p.ProjectResources)
                         .AsNoTracking()
                         .FirstAsync(p => p.ProjectId == newProject.ProjectId, cancellationToken);
-                    return Result<CreateProjectResponse>.Success(_mapper.Map<CreateProjectResponse>(createdProject));
+                    var createdResponse = _mapper.Map<CreateProjectResponse>(createdProject);
+                    ResolveResourceUrls(createdResponse.ProjectResources);
+                    return Result<CreateProjectResponse>.Success(createdResponse);
                 }
 
-                return Result<CreateProjectResponse>.Success(_mapper.Map<CreateProjectResponse>(newProject));
+                var response = _mapper.Map<CreateProjectResponse>(newProject);
+                ResolveResourceUrls(response.ProjectResources);
+                return Result<CreateProjectResponse>.Success(response);
             }
             catch (DbUpdateException dbEx) when (
                 dbEx.InnerException?.Message.Contains("uix_projects_project_code_active") == true ||
@@ -272,6 +277,24 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                     await _fileStorage.DeleteFileAsync(url, cancellationToken);
                 _logger.LogError(ex, _message.GetMessage(MessageKeys.Projects.LogCreateError));
                 return Result<CreateProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
+            }
+        }
+
+        private void ResolveResourceUrls(List<ProjectResourcesDTO> resources)
+        {
+            if (resources.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var resource in resources)
+            {
+                if (resource.ResourceType == FileType.LINK || string.IsNullOrWhiteSpace(resource.ResourceUrl))
+                {
+                    continue;
+                }
+
+                resource.ResourceUrl = _fileStorage.GetFileUrl(resource.ResourceUrl);
             }
         }
     }

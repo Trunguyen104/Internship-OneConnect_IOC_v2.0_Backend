@@ -1321,7 +1321,7 @@
     <value>Chỉ có thể phát hành dự án đang ở trạng thái Bản nháp.</value>
   </data>
   <data name="Projects.InvalidStatusForComplete" xml:space="preserve">
-    <value>Chỉ có thể hoàn thành dự án đang ở trạng thái Đã phát hành.</value>
+    <value>Chỉ có thể hoàn thành dự án đang ở trạng thái Đang hoạt động (Active).</value>
   </data>
   <data name="Projects.InvalidStatusForUpdate" xml:space="preserve">
     <value>Không thể cập nhật dự án đã hoàn thành hoặc đã lưu trữ.</value>
@@ -1370,6 +1370,9 @@
   </data>
   <data name="Projects.CannotDeleteHasData" xml:space="preserve">
     <value>Không thể xóa project đã có dữ liệu (work items hoặc sprints).</value>
+  </data>
+  <data name="Projects.InvalidStatusForUnpublish" xml:space="preserve">
+    <value>Chỉ có thể chuyển về Bản nháp dự án đang ở trạng thái Đã phát hành.</value>
   </data>
   <data name="Projects.CannotUnpublishStarted" xml:space="preserve">
     <value>Không thể chuyển về Bản nháp sau khi dự án đã được gán cho nhóm.</value>

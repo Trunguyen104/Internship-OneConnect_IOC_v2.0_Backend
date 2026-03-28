@@ -724,6 +724,12 @@
   <data name="Projects.LogUpdateNotificationFailed" xml:space="preserve">
     <value>Project update succeeded but student notification failed for project {0}.</value>
   </data>
+  <data name="Projects.LogCleanupResourceFailed" xml:space="preserve">
+    <value>Failed to cleanup uploaded resource after update rollback for project. FileUrl: {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteResourceAfterUpdate" xml:space="preserve">
+    <value>Failed to delete resource file after project update. FileUrl: {0}.</value>
+  </data>
   <data name="Projects.LogProjectListChanged" xml:space="preserve">
     <value>Sent ProjectListChanged signal (action={0}) to Mentor {1} for project {2}.</value>
   </data>

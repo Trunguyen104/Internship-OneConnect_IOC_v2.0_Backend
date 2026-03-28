@@ -112,7 +112,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
                             NotificationId = Guid.NewGuid(),
                             UserId         = mentorUserId.Value,
                             Title          = _message.GetMessage(MessageKeys.Projects.NotifCompletedTitle),
-                            Content        = _message.GetMessage(MessageKeys.Projects.NotifCompletedContent, project.ProjectId),
+                            Content        = _message.GetMessage(MessageKeys.Projects.NotifCompletedContent, project.ProjectName),
                             Type           = NotificationType.General,
                             ReferenceType  = "Project",
                             ReferenceId    = project.ProjectId,

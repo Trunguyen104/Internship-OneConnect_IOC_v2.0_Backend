@@ -663,13 +663,13 @@ namespace IOCv2.Infrastructure.Persistence
             var s5 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
             // Project 3
-            var proj3 = Project.Create("IOC v2.0 Platform", "Centralized internship management system", "PRJ-FPTSOF_FPT_1", "CNTT", "Develop a centralized internship management platform.");
+            var proj3 = Project.Create("IOC v2.0 Platform", "Centralized internship management system", "PRJ-FPTSOF_FPT_1", "CNTT", "Develop a centralized internship management platform.", mentorId: SeedIds.MentorFptEuId);
             proj3.AssignToGroup(group3.InternshipId, DateTime.UtcNow.AddMonths(-1).AddDays(5), null);
             proj3.Publish();
             _context.Projects.Add(proj3);
 
             // Project 5
-            var proj5 = Project.Create("Legacy CRM Maintenance", "Fixing bugs and optimizing older modules", "PRJ-RIKKE_RIKK_1", "CNTT", "Fix bugs and optimize legacy modules.");
+            var proj5 = Project.Create("Legacy CRM Maintenance", "Fixing bugs and optimizing older modules", "PRJ-RIKKE_RIKK_1", "CNTT", "Fix bugs and optimize legacy modules.", mentorId: SeedIds.MentorRikkeisoftEuId);
             proj5.AssignToGroup(group5.InternshipId, DateTime.UtcNow.AddMonths(-6).AddDays(5), DateTime.UtcNow.AddMonths(-2).AddDays(-5));
             proj5.Publish();
             proj5.SetOperationalStatus(OperationalStatus.Completed);
@@ -701,7 +701,7 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             // [NEW] Seed Pending Project, Cancelled Sprint and WorkItems with different statuses
-            var projPending = Project.Create("FPT Future System", "Next phase architecture", "PRJ-FPTSOF_FPT_2", "CNTT", "Design next phase architecture.");
+            var projPending = Project.Create("FPT Future System", "Next phase architecture", "PRJ-FPTSOF_FPT_2", "CNTT", "Design next phase architecture.", mentorId: SeedIds.MentorFptEuId);
             projPending.AssignToGroup(group3.InternshipId, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(30));
             // Draft by default — no Publish() call
             if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT Future System"))
@@ -750,24 +750,26 @@ namespace IOCv2.Infrastructure.Persistence
             var rikkeiGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
             if (rikkeiGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == rikkeiGroup.InternshipId))
             {
-                // Project 1: Published
+                // Project 1: Published + Active
                 var rikkeiProj1 = Project.Create(
                     "Rikkeisoft Internal Portal",
                     "Xây dựng cổng thông tin nội bộ cho nhân viên Rikkeisoft",
                     "PRJ-RIKKES_RIKK_2",
                     "Công nghệ thông tin",
-                    "Phát triển portal nội bộ: quản lý nhân sự, leave request, timesheet.");
+                    "Phát triển portal nội bộ: quản lý nhân sự, leave request, timesheet.",
+                    mentorId: SeedIds.MentorRikkeisoftEuId);
                 rikkeiProj1.AssignToGroup(rikkeiGroup.InternshipId, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
                 rikkeiProj1.Publish();
                 _context.Projects.Add(rikkeiProj1);
 
-                // Project 2: Draft — chưa publish
+                // Project 2: Draft + Active — chưa publish
                 var rikkeiProj2 = Project.Create(
                     "Rikkeisoft Mobile App",
                     "Ứng dụng di động cho khách hàng của Rikkeisoft",
                     "PRJ-RIKKES_RIKK_3",
                     "Mobile",
-                    "Phát triển ứng dụng mobile cross-platform bằng Flutter.");
+                    "Phát triển ứng dụng mobile cross-platform bằng Flutter.",
+                    mentorId: SeedIds.MentorRikkeisoftEuId);
                 rikkeiProj2.AssignToGroup(rikkeiGroup.InternshipId, null, null);
                 _context.Projects.Add(rikkeiProj2);
             }
@@ -781,7 +783,8 @@ namespace IOCv2.Infrastructure.Persistence
                     "Hệ thống quản lý khuôn viên thông minh cho FPTU Cần Thơ",
                     "PRJ-FPTSOF_FPT_3",
                     "IoT / CNTT",
-                    "Tích hợp IoT, camera AI và hệ thống điểm danh tự động.");
+                    "Tích hợp IoT, camera AI và hệ thống điểm danh tự động.",
+                    mentorId: SeedIds.MentorFptEuId);
                 fptCtProj.AssignToGroup(fptCtGroup.InternshipId, null, null);
                 _context.Projects.Add(fptCtProj);
             }
@@ -795,15 +798,15 @@ namespace IOCv2.Infrastructure.Persistence
                     "Hệ thống HR cũ đã ngừng phát triển",
                     "PRJ-FPTSOF_FPT_4",
                     "Hệ thống doanh nghiệp",
-                    "Duy trì và hỗ trợ hệ thống HR cũ.");
+                    "Duy trì và hỗ trợ hệ thống HR cũ.",
+                    mentorId: SeedIds.MentorFptEuId);
                 archivedProj.AssignToGroup(archivedGroup.InternshipId, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10));
                 archivedProj.Publish();
                 archivedProj.SetOperationalStatus(OperationalStatus.Archived);
                 _context.Projects.Add(archivedProj);
             }
 
-            // Orphan project — không gắn nhóm nào (InternshipId = null)
-            // Mô phỏng project bị orphan sau khi nhóm bị xóa
+            // Orphan project — bị orphan sau khi nhóm bị xóa (IsOrphaned = true, InternshipId = null)
             if (!await _context.Projects.AnyAsync(p => p.ProjectName == "Orphan Research Project"))
             {
                 var orphanProj = Project.Create(
@@ -811,9 +814,25 @@ namespace IOCv2.Infrastructure.Persistence
                     "Dự án nghiên cứu bị orphan do nhóm thực tập đã bị xóa",
                     "PRJ-ORPHAN_001",
                     "Nghiên cứu",
-                    "Nghiên cứu ứng dụng AI trong kiểm thử phần mềm.");
-                // orphan — không gắn nhóm, InternshipId = null by default
+                    "Nghiên cứu ứng dụng AI trong kiểm thử phần mềm.",
+                    mentorId: SeedIds.MentorFptEuId);
+                orphanProj.SetOrphan(); // simulate: group bị xóa sau khi assign
+                orphanProj.Publish();  // Published nhưng orphan — test badge AC-16
                 _context.Projects.Add(orphanProj);
+            }
+
+            // Project Draft/Unstarted chưa gán nhóm — test case "Chưa gán nhóm"
+            if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT AI Code Review Tool"))
+            {
+                var draftUnassigned = Project.Create(
+                    "FPT AI Code Review Tool",
+                    "Công cụ review code tự động sử dụng AI cho intern FPT Software",
+                    "PRJ-FPTSOF_FPT_5",
+                    "CNTT",
+                    "Xây dựng tool phân tích code, phát hiện bug và gợi ý cải thiện bằng LLM.",
+                    mentorId: SeedIds.MentorFptEuId);
+                // Draft + Unstarted + không gắn nhóm — đại diện cho project mới tạo, chưa assign group
+                _context.Projects.Add(draftUnassigned);
             }
 
             await _context.SaveChangesAsync();

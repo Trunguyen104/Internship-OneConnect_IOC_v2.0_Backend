@@ -798,6 +798,12 @@
   <data name="Projects.LogUpdateNotificationFailed" xml:space="preserve">
     <value>Cập nhật project thành công nhưng gửi thông báo thất bại. ProjectId: {0}.</value>
   </data>
+  <data name="Projects.LogCleanupResourceFailed" xml:space="preserve">
+    <value>Không thể dọn dẹp file resource đã upload sau khi rollback cập nhật project. FileUrl: {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteResourceAfterUpdate" xml:space="preserve">
+    <value>Không thể xóa file resource sau khi cập nhật project thành công. FileUrl: {0}.</value>
+  </data>
   <data name="Projects.LogProjectListChanged" xml:space="preserve">
     <value>Đã gửi tín hiệu ProjectListChanged (action={0}) tới Mentor {1} cho project {2}.</value>
   </data>
