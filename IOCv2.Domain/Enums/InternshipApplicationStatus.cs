@@ -5,7 +5,7 @@ public enum InternshipApplicationStatus : short
     // ── Self-apply flow ──────────────────────────────────
     /// <summary>SV vừa nộp đơn, chờ HR xem xét.</summary>
     Applied = 1,
-    Approved = 0,
+    
     /// <summary>Đang trong quá trình phỏng vấn.</summary>
     Interviewing = 2,
 
