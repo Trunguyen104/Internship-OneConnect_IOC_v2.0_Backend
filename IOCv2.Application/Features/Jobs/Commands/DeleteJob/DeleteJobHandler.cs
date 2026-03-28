@@ -74,7 +74,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
             // Only proceed for non-deleted jobs
             if (job.Status == JobStatus.DELETED)
             {
-                var already = _messageService.GetMessage("Job.Delete.AlreadyDeleted");
+                var already = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.AlreadyDeleted);
                 return Result<DeleteJobResponse>.Failure(already, ResultErrorType.BadRequest);
             }
 
@@ -95,7 +95,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
             // If there are active applications and caller didn't confirm, return confirmation warning
             if (activeCount > 0 && !request.ConfirmWhenHasActiveApplications)
             {
-                var confirmMsg = _messageService.GetMessage("Job.Delete.ConfirmHasActiveApplications", activeCount);
+                var confirmMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.DeleteConfirmHasActiveApplications, activeCount);
                 // Use Conflict so frontend can prompt user and call again with ConfirmWhenHasActiveApplications = true
                 return Result<DeleteJobResponse>.Failure(confirmMsg, ResultErrorType.Conflict);
             }
@@ -119,8 +119,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
                 _logger.LogInformation("Job {JobId} soft-deleted by {UserId}. ActiveApplications: {Count}", job.JobId, _currentUserService.UserId, activeCount);
 
                 // Per AC-08: do NOT modify applications (they remain as-is); no university notify.
-                var successKey = activeCount > 0 ? "Job.Delete.SuccessWithActive" : "Job.Delete.Success";
-                var message = _messageService.GetMessage(successKey, job.Title);
+                var successKey = activeCount > 0 ? MessageKeys.JobPostingMessageKey.DeleteWithActiveApplications : MessageKeys.JobPostingMessageKey.DeleteSuccess;
+                var message = _messageService.GetMessage(successKey, job.Title ?? string.Empty);
                 var response = new DeleteJobResponse { Message = message };
                 return Result<DeleteJobResponse>.Success(response, message);
             }
@@ -128,7 +128,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogWarning(ex, "Concurrency conflict when deleting job {JobId}", request.JobId);
-                return Result<DeleteJobResponse>.Failure(_messageService.GetMessage("Job.Delete.VersionConflict"), ResultErrorType.Conflict);
+                return Result<DeleteJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.DleteVersionConflict), ResultErrorType.Conflict);
             }
             catch (Exception ex)
             {

@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
+namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByMine
 {
-    public class GetEnterpriseByMineResponse : IMapFrom<Domain.Entities.Enterprise>
+    public class GetEnterpriseByMineResponse : IMapFrom<Enterprise>
     {
         public Guid EnterpriseId { get; set; }
         public string? TaxCode { get; set; }

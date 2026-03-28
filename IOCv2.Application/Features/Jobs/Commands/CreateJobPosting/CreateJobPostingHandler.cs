@@ -68,7 +68,9 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
             job.StartDate = request.StartDate;
             job.EndDate = request.EndDate;
             job.Audience = request.Audience;
-            // Status already DRAFT from factory
+
+            // Because this command represents publishing, set status to PUBLISHED immediately
+            job.Status = JobStatus.PUBLISHED;
 
             // If targeted, attach the university
             if (request.Audience == JobAudience.Targeted)
@@ -101,8 +103,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
 
             var duplicateExists = await _unitOfWork.Repository<Job>().ExistsAsync(j =>
                 j.EnterpriseId == enterpriseId &&
-                j.Title.ToLower() == normalizedTitle.ToLower() &&
-                j.Position.ToLower() == normalizedPosition.ToLower() &&
+                (j.Title ?? string.Empty).ToLower() == normalizedTitle.ToLower() &&
+                (j.Position ?? string.Empty).ToLower() == normalizedPosition.ToLower() &&
                 j.StartDate == request.StartDate &&
                 j.EndDate == request.EndDate &&
                 j.Audience == request.Audience &&
@@ -138,7 +140,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
             var response = _mapper.Map<CreateJobPostingResponse>(job);
 
             // Return success with draft-saved message (UI toast)
-            return Result<CreateJobPostingResponse>.Success(response, "Đã lưu bản nháp.");
+            return Result<CreateJobPostingResponse>.Success(response, _messageService.GetMessage(MessageKeys.JobPostingMessageKey.CreateSuccess));
         }
     }
 }

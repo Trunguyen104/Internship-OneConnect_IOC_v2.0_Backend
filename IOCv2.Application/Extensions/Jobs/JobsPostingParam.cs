@@ -8,6 +8,12 @@ namespace IOCv2.Application.Extensions.Jobs
 {
     public class JobsPostingParam
     {
+        public class Common
+        {
+            public const int MinimumDurationDays = 28;      // 4 weeks
+            public const int WarningThresholdDays = 42;     // 6 weeks  
+            public const int MaximumDurationDays = 365;     // 12 months
+        }
         public class Filter
         {
             public const string Desc = "desc";

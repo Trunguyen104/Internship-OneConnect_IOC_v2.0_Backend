@@ -439,11 +439,56 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Công việc này đã bị xóa trước đó..
+        /// </summary>
+        internal static string JobPosting_AlreadyDeleted {
+            get {
+                return ResourceManager.GetString("JobPosting.AlreadyDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bạn đã có nơi thực tập.
         /// </summary>
         internal static string JobPosting_AlreadyPlaced {
             get {
                 return ResourceManager.GetString("JobPosting.AlreadyPlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Công việc này đã được đăng tải..
+        /// </summary>
+        internal static string JobPosting_AlreadyPublished {
+            get {
+                return ResourceManager.GetString("JobPosting.AlreadyPublished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Audience không hợp lệ..
+        /// </summary>
+        internal static string JobPosting_AudienceInvalid {
+            get {
+                return ResourceManager.GetString("JobPosting.AudienceInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đối tượng tuyển dụng là bắt buộc..
+        /// </summary>
+        internal static string JobPosting_AudienceRequired {
+            get {
+                return ResourceManager.GetString("JobPosting.AudienceRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lợi ích quá dài..
+        /// </summary>
+        internal static string JobPosting_BenefitTooLong {
+            get {
+                return ResourceManager.GetString("JobPosting.BenefitTooLong", resourceCulture);
             }
         }
         
@@ -475,6 +520,141 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Công việc này đang có {0} đơn ứng tuyển đang hoạt động. Bạn có chắc chắn muốn xóa?.
+        /// </summary>
+        internal static string JobPosting_DeleteConfirmHasActiveApplications {
+            get {
+                return ResourceManager.GetString("JobPosting.DeleteConfirmHasActiveApplications", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Công việc &apos;{0}&apos; đã được xóa thành công.
+        /// </summary>
+        internal static string JobPosting_DeleteSuccess {
+            get {
+                return ResourceManager.GetString("JobPosting.DeleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Công việc đã được thay đổi bởi người dùng khác. Vui lòng tải lại trang và thử lại..
+        /// </summary>
+        internal static string JobPosting_DeleteVersionConflict {
+            get {
+                return ResourceManager.GetString("JobPosting.DeleteVersionConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Công việc &apos;{0}&apos; đã được xóa thành công. Các ứng dụng hiện có vẫn còn..
+        /// </summary>
+        internal static string JobPosting_DeleteWithActiveApplications {
+            get {
+                return ResourceManager.GetString("JobPosting.DeleteWithActiveApplications", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phần mô tả quá dài..
+        /// </summary>
+        internal static string JobPosting_DescriptionTooLong {
+            get {
+                return ResourceManager.GetString("JobPosting.DescriptionTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã lưu bản nháp..
+        /// </summary>
+        internal static string JobPosting_DraftSavedSuccess {
+            get {
+                return ResourceManager.GetString("JobPosting.DraftSavedSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày kết thúc phải cách ngày bắt đầu tối đa {0} ngày..
+        /// </summary>
+        internal static string JobPosting_EndDateMaxDuration {
+            get {
+                return ResourceManager.GetString("JobPosting.EndDateMaxDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày kết thúc phải cách ngày bắt đầu ít nhất {0} ngày..
+        /// </summary>
+        internal static string JobPosting_EndDateMinDuration {
+            get {
+                return ResourceManager.GetString("JobPosting.EndDateMinDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày kết thúc là bắt buộc..
+        /// </summary>
+        internal static string JobPosting_EndDateRequired {
+            get {
+                return ResourceManager.GetString("JobPosting.EndDateRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hạn sử dụng phải là hôm nay hoặc muộn hơn..
+        /// </summary>
+        internal static string JobPosting_ExpireDateMustBeTodayOrLater {
+            get {
+                return ResourceManager.GetString("JobPosting.ExpireDateMustBeTodayOrLater", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày hết hạn là bắt buộc..
+        /// </summary>
+        internal static string JobPosting_ExpireDateRequired {
+            get {
+                return ResourceManager.GetString("JobPosting.ExpireDateRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vị trí là bắt buộc.
+        /// </summary>
+        internal static string JobPosting_LocationRequired {
+            get {
+                return ResourceManager.GetString("JobPosting.LocationRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Địa điểm quá xa..
+        /// </summary>
+        internal static string JobPosting_LocationTooLong {
+            get {
+                return ResourceManager.GetString("JobPosting.LocationTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền truy cập vào tài nguyên này..
+        /// </summary>
+        internal static string JobPosting_NotAllowed {
+            get {
+                return ResourceManager.GetString("JobPosting.NotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy việc làm được đăng này..
+        /// </summary>
+        internal static string JobPosting_NotFound {
+            get {
+                return ResourceManager.GetString("JobPosting.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tin tuyển dụng &quot;{{0}}&quot; của {{1}} đã được đóng và không nhận thêm hồ sơ ứng tuyển mới..
         /// </summary>
         internal static string JobPosting_NotifyStudentClosedBody {
@@ -498,6 +678,150 @@ namespace IOCv2.Application.Resources {
         internal static string JobPosting_OnlyPublishedAllowed {
             get {
                 return ResourceManager.GetString("JobPosting.OnlyPublishedAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Job Posting đã được đăng tuyển..
+        /// </summary>
+        internal static string JobPosting_PublishSuccess {
+            get {
+                return ResourceManager.GetString("JobPosting.PublishSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Số lượng phải bằng 0 hoặc lớn hơn..
+        /// </summary>
+        internal static string JobPosting_QuantityMustBePositive {
+            get {
+                return ResourceManager.GetString("JobPosting.QuantityMustBePositive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày hết hạn không hợp lệ khi mở lại công việc..
+        /// </summary>
+        internal static string JobPosting_ReopenExpireDateInvalid {
+            get {
+                return ResourceManager.GetString("JobPosting.ReopenExpireDateInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kính gửi bạn,&lt;br/&gt;&lt;br/&gt;Công việc &lt;b&gt;{0}&lt;/b&gt; từ &lt;b&gt;{1}&lt;/b&gt; vừa được mở lại. Nếu bạn quan tâm, vui lòng truy cập hệ thống để xem chi tiết và nộp hồ sơ.&lt;br/&gt;&lt;br/&gt;Trân trọng..
+        /// </summary>
+        internal static string JobPosting_ReopenNotifyStudentBody {
+            get {
+                return ResourceManager.GetString("JobPosting.ReopenNotifyStudentBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cơ hội việc làm: {0}.
+        /// </summary>
+        internal static string JobPosting_ReopenNotifyStudentSubject {
+            get {
+                return ResourceManager.GetString("JobPosting.ReopenNotifyStudentSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã mở lại công việc &quot;{0}&quot; thành công..
+        /// </summary>
+        internal static string JobPosting_ReopenSuccess {
+            get {
+                return ResourceManager.GetString("JobPosting.ReopenSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yêu cầu quá dài..
+        /// </summary>
+        internal static string JobPosting_RequirementsTooLong {
+            get {
+                return ResourceManager.GetString("JobPosting.RequirementsTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày bắt đầu phải là hôm nay hoặc muộn hơn..
+        /// </summary>
+        internal static string JobPosting_StartDateMustBeTodayOrLater {
+            get {
+                return ResourceManager.GetString("JobPosting.StartDateMustBeTodayOrLater", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngày bắt đầu là bắt buộc..
+        /// </summary>
+        internal static string JobPosting_StartDateRequired {
+            get {
+                return ResourceManager.GetString("JobPosting.StartDateRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đối tượng mục tiêu cụ thể yêu cầu chọn một trường đại học..
+        /// </summary>
+        internal static string JobPosting_TargetedRequiresSingleUniversity {
+            get {
+                return ResourceManager.GetString("JobPosting.TargetedRequiresSingleUniversity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tiêu đề là bắt buộc để lưu bản nháp..
+        /// </summary>
+        internal static string JobPosting_TitleRequired {
+            get {
+                return ResourceManager.GetString("JobPosting.TitleRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tiêu đề tin tuyển dụng không được vượt quá {0} ký tự.
+        /// </summary>
+        internal static string JobPosting_TitleTooLong {
+            get {
+                return ResourceManager.GetString("JobPosting.TitleTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trường đại học cần được cung cấp cho đối tượng mục tiêu cụ thể..
+        /// </summary>
+        internal static string JobPosting_UniversityRequiredForTargetAudience {
+            get {
+                return ResourceManager.GetString("JobPosting.UniversityRequiredForTargetAudience", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Công việc này đã có {0} đơn ứng tuyển. Bạn có chắc chắn muốn cập nhật?.
+        /// </summary>
+        internal static string JobPosting_UpdateConfirmHasApplications {
+            get {
+                return ResourceManager.GetString("JobPosting.UpdateConfirmHasApplications", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Danh sách trường đại học không hợp lệ..
+        /// </summary>
+        internal static string JobPosting_UpdateInvalidUniversities {
+            get {
+                return ResourceManager.GetString("JobPosting.UpdateInvalidUniversities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Số lượng cập nhật không được nhỏ hơn số lượng đã được giao ({0})..
+        /// </summary>
+        internal static string JobPosting_UpdateQuantityLessThanPlaced {
+            get {
+                return ResourceManager.GetString("JobPosting.UpdateQuantityLessThanPlaced", resourceCulture);
             }
         }
         

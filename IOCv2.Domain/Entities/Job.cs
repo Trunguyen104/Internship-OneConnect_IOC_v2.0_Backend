@@ -8,8 +8,8 @@ namespace IOCv2.Domain.Entities
     {
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Position { get; set; } = string.Empty;
+        public string? Title { get; set; }
+        public string? Position { get; set; }
         public string? Description { get; set; }
         public string? Requirements { get; set; }
         public string? Location { get; set; }
@@ -18,13 +18,12 @@ namespace IOCv2.Domain.Entities
         public DateTime? ExpireDate { get; set; }
 
         // New: internship date range
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         // New: audience (public / targeted)
-        public JobAudience Audience { get; set; }
-
-        public JobStatus Status { get; set; }
+        public JobAudience? Audience { get; set; }
+        public JobStatus? Status { get; set; }
 
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;

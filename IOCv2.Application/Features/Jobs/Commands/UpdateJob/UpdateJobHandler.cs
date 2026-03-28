@@ -89,7 +89,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
             // AC-05: Published + has applications => require confirmation flag
             if (job.Status == JobStatus.PUBLISHED && applicationsCount > 0 && !request.ForceUpdateWithApplications)
             {
-                var msg = _messageService.GetMessage("Job.Update.ConfirmHasApplications", applicationsCount);
+                var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.UpdateConfirmHasApplications, applicationsCount);
                 // Use Conflict to indicate user action/confirmation required
                 return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.Conflict);
             }
@@ -100,7 +100,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
             {
                 if (!request.ExpireDate.HasValue || request.ExpireDate.Value.Date < DateTime.UtcNow.Date)
                 {
-                    var msg = _messageService.GetMessage("Job.Reopen.ExpireDateInvalid"); // "Deadline không hợp lệ..."
+                    var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenExpireDateInvalid); // "Deadline không hợp lệ..."
                     return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.BadRequest);
                 }
             }
@@ -109,7 +109,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
             var placedCount = job.InternshipApplications?.Count(a => a.Status == InternshipApplicationStatus.Placed) ?? 0;
             if (request.Quantity.HasValue && request.Quantity.Value < placedCount)
             {
-                var msg = _messageService.GetMessage("Job.Update.QuantityLessThanPlaced", placedCount);
+                var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.UpdateQuantityLessThanPlaced, placedCount);
                 return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.BadRequest);
             }
 
@@ -135,25 +135,47 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
                     job.UpdatedBy = updBy;
                 }
 
-                // Update many-to-many: Universities
-                if (request.UniversityIds != null)
+                if (request.Audience == JobAudience.Targeted)
                 {
-                    var universities = (await _unitOfWork.Repository<Domain.Entities.University>()
-                        .FindAsync(u => request.UniversityIds.Contains(u.UniversityId), cancellationToken))
-                        .ToList();
-
-                    // Replace the collection
-                    job.Universities.Clear();
-                    foreach (var u in universities)
+                    // Update many-to-many: Universities
+                    if (request.UniversityIds != null)
                     {
-                        job.Universities.Add(u);
+                        // Ensure distinct requested IDs
+                        var requestedIds = request.UniversityIds.Distinct().ToList();
+
+                        var universities = (await _unitOfWork.Repository<Domain.Entities.University>()
+                            .FindAsync(u => requestedIds.Contains(u.UniversityId), cancellationToken))
+                            .ToList();
+
+                        // Determine missing IDs (requested but not found in DB)
+                        var foundIds = universities.Select(u => u.UniversityId).ToList();
+                        var missingIds = requestedIds.Except(foundIds).ToList();
+
+                        if (missingIds.Any())
+                        {
+                            // Rollback and return a BadRequest indicating invalid/missing university IDs
+                            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+
+                            // Provide a helpful message. Assumes message key exists; falls back to a generic message if not.
+                            var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.UpdateInvalidUniversities, missingIds.Count, string.Join(',', missingIds))
+                                      ?? _messageService.GetMessage(MessageKeys.Common.InvalidRequest);
+
+                            return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.BadRequest);
+                        }
+
+                        // Replace the collection
+                        job.Universities.Clear();
+                        foreach (var u in universities)
+                        {
+                            job.Universities.Add(u);
+                        }
                     }
-                }
-                else if (job.Audience == JobAudience.Targeted && (job.Universities == null || !job.Universities.Any()))
-                {
-                    // If targeted and no universities provided & none exist on entity -> invalid
-                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                    return Result<UpdateJobResponse>.Failure(_messageService.GetMessage("Job.TargetedRequiresSingleUniversity"), ResultErrorType.BadRequest);
+                    else if (job.Universities == null || !job.Universities.Any())
+                    {
+                        // If targeted and no universities provided & none exist on entity -> invalid
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<UpdateJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.TargetedRequiresSingleUniversity), ResultErrorType.BadRequest);
+                    }
                 }
 
                 // If closed -> reopen to published after successful update (AC-05 / AC-07)
@@ -187,8 +209,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
 
                     if (activeApplications.Any())
                     {
-                        var subject = _messageService.GetMessage("Job.Reopen.NotifyStudent.Subject", job.Title);
-                        var bodyTemplate = _messageService.GetMessage("Job.Reopen.NotifyStudent.Body", job.Title, job.Enterprise?.Name ?? string.Empty);
+                        var subject = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenNotifyStudentSubject, job.Title);
+                        var bodyTemplate = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenNotifyStudentBody, job.Title, job.Enterprise?.Name ?? string.Empty);
 
                         var distinctUsers = activeApplications
                             .Select(a => a.Student?.User)
@@ -209,11 +231,9 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
                             }
                         }
                     }
-
-                    var successMsg = _messageService.GetMessage("Job.Reopen.Success", job.Title);
+                    var successMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenSuccess, job.Title);
                     return Result<UpdateJobResponse>.Success(response, successMsg);
                 }
-
                 return Result<UpdateJobResponse>.Success(response);
             }
             catch (Exception ex)

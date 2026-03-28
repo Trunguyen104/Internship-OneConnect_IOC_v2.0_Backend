@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Migrations
+namespace IOCv2.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260326102244_RefactorMigrationsJobDb")]
-    partial class RefactorMigrationsJobDb
+    [Migration("20260327033524_AddInitialJobDb")]
+    partial class AddInitialJobDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

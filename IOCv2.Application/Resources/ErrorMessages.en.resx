@@ -1,439 +1,438 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <!--
-      Microsoft ResX Schema
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
 
-      Version 2.0
-
-      The primary goals of this format is to allow a simple XML format
-      that is mostly human readable. The generation and parsing of the
-      various data types are done through the TypeConverter classes
-      associated with the data types.
-
-      Example:
-
-      ... ado.net/XML headers & schema ...
-      <resheader name="resmimetype">text/microsoft-resx</resheader>
-      <resheader name="version">2.0</resheader>
-      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-          <value>[base64 mime encoded serialized .NET Framework object]</value>
-      </data>
-      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-          <comment>This is a comment</comment>
-      </data>
-
-      There are any number of "resheader" rows that contain simple
-      name/value pairs.
-
-      Each data row contains a name, and value. The row also contains a
-      type or mimetype. Type corresponds to a .NET class that support
-      text/value conversion through the TypeConverter architecture.
-      Classes that don't support this are serialized and stored with the
-      mimetype set.
-
-      The mimetype is used for serialized objects, and tells the
-      ResXResourceReader how to depersist the object. This is currently not
-      extensible. For a given mimetype the value must be set accordingly:
-
-      Note - application/x-microsoft.net.object.binary.base64 is the format
-      that the ResXResourceWriter will generate, however the reader can
-      read any of the formats listed below.
-
-      mimetype: application/x-microsoft.net.object.binary.base64
-      value   : The object must be serialized with
-              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-              : and then encoded with base64 encoding.
-
-      mimetype: application/x-microsoft.net.object.soap.base64
-      value   : The object must be serialized with
-              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-              : and then encoded with base64 encoding.
-
-      mimetype: application/x-microsoft.net.object.bytearray.base64
-      value   : The object must be serialized into a byte array
-              : using a System.ComponentModel.TypeConverter
-              : and then encoded with base64 encoding.
-      -->
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-        <xsd:element name="root" msdata:IsDataSet="true">
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
             <xsd:complexType>
-                <xsd:choice maxOccurs="unbounded">
-                    <xsd:element name="metadata">
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-                            </xsd:sequence>
-                            <xsd:attribute name="name" use="required" type="xsd:string" />
-                            <xsd:attribute name="type" type="xsd:string" />
-                            <xsd:attribute name="mimetype" type="xsd:string" />
-                            <xsd:attribute ref="xml:space" />
-                        </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="assembly">
-                        <xsd:complexType>
-                            <xsd:attribute name="alias" type="xsd:string" />
-                            <xsd:attribute name="name" type="xsd:string" />
-                        </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="data">
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-                            </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-                            <xsd:attribute ref="xml:space" />
-                        </xsd:complexType>
-                    </xsd:element>
-                    <xsd:element name="resheader">
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                            </xsd:sequence>
-                            <xsd:attribute name="name" type="xsd:string" use="required" />
-                        </xsd:complexType>
-                    </xsd:element>
-                </xsd:choice>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
-        </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>2.0</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="Common.DatabaseConflict" xml:space="preserve">
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common.DatabaseConflict" xml:space="preserve">
     <value>The record already exists in the system.</value>
   </data>
-    <data name="Common.OperationCancelled" xml:space="preserve">
+  <data name="Common.OperationCancelled" xml:space="preserve">
     <value>The operation was cancelled.</value>
   </data>
-    <data name="Common.PageNumberInvalid" xml:space="preserve">
+  <data name="Common.PageNumberInvalid" xml:space="preserve">
     <value>Page number must be greater than 0.</value>
   </data>
-    <data name="Common.PageSizeInvalid" xml:space="preserve">
+  <data name="Common.PageSizeInvalid" xml:space="preserve">
     <value>Page size must be greater than 0.</value>
   </data>
-    <data name="Common.PageSizeTooLarge" xml:space="preserve">
+  <data name="Common.PageSizeTooLarge" xml:space="preserve">
     <value>Page size cannot exceed 100.</value>
   </data>
-    <data name="Common.IdMismatch" xml:space="preserve">
+  <data name="Common.IdMismatch" xml:space="preserve">
     <value>ID in URL does not match ID in body.</value>
   </data>
-    <data name="Common.Unauthorized" xml:space="preserve">
+  <data name="Common.Unauthorized" xml:space="preserve">
     <value>You are not authorized to perform this action.</value>
   </data>
-    <data name="Common.NoPermission" xml:space="preserve">
+  <data name="Common.NoPermission" xml:space="preserve">
     <value>You do not have permission to perform this action</value>
   </data>
-    <data name="Password.MinLength" xml:space="preserve">
+  <data name="Password.MinLength" xml:space="preserve">
     <value>Password must be at least 8 characters long.</value>
   </data>
-    <data name="Password.RequireUppercase" xml:space="preserve">
+  <data name="Password.RequireUppercase" xml:space="preserve">
     <value>Password must contain at least one uppercase letter.</value>
   </data>
-    <data name="Password.RequireLowercase" xml:space="preserve">
+  <data name="Password.RequireLowercase" xml:space="preserve">
     <value>Password must contain at least one lowercase letter.</value>
   </data>
-    <data name="Password.RequireDigit" xml:space="preserve">
+  <data name="Password.RequireDigit" xml:space="preserve">
     <value>Password must contain at least one digit.</value>
   </data>
-    <data name="Password.RequireSpecial" xml:space="preserve">
+  <data name="Password.RequireSpecial" xml:space="preserve">
     <value>Password must contain at least one special character.</value>
   </data>
-    <data name="ResetPassword.ReasonRequired" xml:space="preserve">
+  <data name="ResetPassword.ReasonRequired" xml:space="preserve">
     <value>Password reset reason is required.</value>
   </data>
-    <data name="ResetPassword.ReasonMinLength" xml:space="preserve">
+  <data name="ResetPassword.ReasonMinLength" xml:space="preserve">
     <value>Reason must be at least 10 characters long.</value>
   </data>
-    <data name="ResetPassword.ReasonMaxLength" xml:space="preserve">
+  <data name="ResetPassword.ReasonMaxLength" xml:space="preserve">
     <value>Reason cannot exceed 500 characters.</value>
   </data>
-    <data name="Auth.InvalidCredentials" xml:space="preserve">
+  <data name="Auth.InvalidCredentials" xml:space="preserve">
     <value>Invalid email or password.</value>
   </data>
-    <data name="Auth.AccountInactive" xml:space="preserve">
+  <data name="Auth.AccountInactive" xml:space="preserve">
     <value>Account is currently locked or inactive.</value>
   </data>
-    <data name="Auth.AccountBlocked" xml:space="preserve">
+  <data name="Auth.AccountBlocked" xml:space="preserve">
     <value>Account temporarily blocked due to too many failed attempts. Please try again later.</value>
   </data>
-    <data name="Auth.InvalidToken" xml:space="preserve">
+  <data name="Auth.InvalidToken" xml:space="preserve">
     <value>Invalid or expired token.</value>
   </data>
-    <data name="Auth.RefreshTokenNotFound" xml:space="preserve">
+  <data name="Auth.RefreshTokenNotFound" xml:space="preserve">
     <value>Refresh token not found.</value>
   </data>
-    <data name="Auth.RefreshTokenExpired" xml:space="preserve">
+  <data name="Auth.RefreshTokenExpired" xml:space="preserve">
     <value>Refresh token has expired.</value>
   </data>
-    <data name="Auth.RefreshTokenRevoked" xml:space="preserve">
+  <data name="Auth.RefreshTokenRevoked" xml:space="preserve">
     <value>Refresh token has been revoked.</value>
   </data>
-    <data name="Auth.AccountCreationEmailFailed" xml:space="preserve">
+  <data name="Auth.AccountCreationEmailFailed" xml:space="preserve">
     <value>Account creation failed: Unable to send notification email. Please check the email address.</value>
   </data>
-    <data name="Auth.ResetRequestLimit" xml:space="preserve">
+  <data name="Auth.ResetRequestLimit" xml:space="preserve">
     <value>Too many password reset requests. Please try again later.</value>
   </data>
-    <data name="Auth.InvalidResetLink" xml:space="preserve">
+  <data name="Auth.InvalidResetLink" xml:space="preserve">
     <value>The reset link is invalid or has expired.</value>
   </data>
-    <data name="Auth.UserNotLoggedIn" xml:space="preserve">
+  <data name="Auth.UserNotLoggedIn" xml:space="preserve">
     <value>User is not logged in.</value>
   </data>
-    <data name="Auth.InvalidAction" xml:space="preserve">
+  <data name="Auth.InvalidAction" xml:space="preserve">
     <value>Invalid action.</value>
   </data>
-    <data name="Auth.TooManyAttempts" xml:space="preserve">
+  <data name="Auth.TooManyAttempts" xml:space="preserve">
     <value>Too many attempts. Please try again later.</value>
   </data>
-    <data name="Password.ConfirmationMismatch" xml:space="preserve">
+  <data name="Password.ConfirmationMismatch" xml:space="preserve">
     <value>Password confirmation does not match.</value>
   </data>
-    <data name="Password.MustBeDifferent" xml:space="preserve">
+  <data name="Password.MustBeDifferent" xml:space="preserve">
     <value>New password must be different from current password.</value>
   </data>
-    <data name="Password.IncorrectCurrent" xml:space="preserve">
+  <data name="Password.IncorrectCurrent" xml:space="preserve">
     <value>Current password is incorrect.</value>
   </data>
-    <data name="Profile.PhoneExists" xml:space="preserve">
+  <data name="Profile.PhoneExists" xml:space="preserve">
     <value>Phone number is already in use by another user.</value>
   </data>
-    <data name="Profile.EmailExists" xml:space="preserve">
+  <data name="Profile.EmailExists" xml:space="preserve">
     <value>Email is already in use by another user.</value>
   </data>
-    <data name="Enterprise.NotFound" xml:space="preserve">
+  <data name="Enterprise.NotFound" xml:space="preserve">
     <value>No enterprise information found.</value>
   </data>
-    <data name="InternshipGroup.NameRequired" xml:space="preserve">
+  <data name="InternshipGroup.NameRequired" xml:space="preserve">
     <value>Internship group name is required.</value>
   </data>
-    <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
+  <data name="InternshipGroup.NameMaxLength" xml:space="preserve">
     <value>Internship group name cannot exceed 255 characters.</value>
   </data>
-    <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
+  <data name="InternshipGroup.TermIdRequired" xml:space="preserve">
     <value>Term ID is required.</value>
   </data>
-    <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
+  <data name="InternshipGroup.StartDateBeforeEndDate" xml:space="preserve">
     <value>Start date must be before end date.</value>
   </data>
-    <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
+  <data name="InternshipGroup.StudentListRequired" xml:space="preserve">
     <value>Student list is required.</value>
   </data>
-    <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
+  <data name="InternshipGroup.StudentListToRemoveRequired" xml:space="preserve">
     <value>List of students to remove is required.</value>
   </data>
-    <data name="Projects.LogDeleteError" xml:space="preserve">
+  <data name="Projects.LogDeleteError" xml:space="preserve">
     <value>Error deleting project {0}</value>
   </data>
-    <data name="ProjectResources.ProjectIdRequired" xml:space="preserve">
+  <data name="ProjectResources.ProjectIdRequired" xml:space="preserve">
     <value>Project Resource ID is required</value>
   </data>
-    <data name="ProjectResources.ResourceNameMaxLength" xml:space="preserve">
+  <data name="ProjectResources.ResourceNameMaxLength" xml:space="preserve">
     <value>Resource name cannot exceed 500 characters</value>
   </data>
-    <data name="Projects.ProjectIdRequired" xml:space="preserve">
+  <data name="Projects.ProjectIdRequired" xml:space="preserve">
     <value>Project ID is required</value>
   </data>
-    <data name="ProjectResources.LogNotFound" xml:space="preserve">
+  <data name="ProjectResources.LogNotFound" xml:space="preserve">
     <value>Project resource with ID {0} not found</value>
   </data>
-    <data name="ProjectResources.NotFound" xml:space="preserve">
+  <data name="ProjectResources.NotFound" xml:space="preserve">
     <value>Project Resource Not Found</value>
   </data>
-    <data name="Projects.LogNotFound" xml:space="preserve">
+  <data name="Projects.LogNotFound" xml:space="preserve">
     <value>Project with ID {0} not found</value>
   </data>
-    <data name="Projects.NotFound" xml:space="preserve">
+  <data name="Projects.NotFound" xml:space="preserve">
     <value>Project Not Found</value>
   </data>
-    <data name="ProjectResources.LogUpdateError" xml:space="preserve">
+  <data name="ProjectResources.LogUpdateError" xml:space="preserve">
     <value>Error occurred while updating project resource with ID {0}</value>
   </data>
-    <data name="ProjectResources.UpdateError" xml:space="preserve">
+  <data name="ProjectResources.UpdateError" xml:space="preserve">
     <value>An error occurred while updating the project resource.</value>
   </data>
-    <data name="ProjectResources.LogUploadError" xml:space="preserve">
+  <data name="ProjectResources.LogUploadError" xml:space="preserve">
     <value>Error uploading file to project {0}</value>
   </data>
-    <data name="ProjectResources.FileRequired" xml:space="preserve">
+  <data name="ProjectResources.FileRequired" xml:space="preserve">
     <value>File is required</value>
   </data>
-    <data name="ProjectResources.InvalidFileType" xml:space="preserve">
+  <data name="ProjectResources.InvalidFileType" xml:space="preserve">
     <value>Invalid file type. Allowed types: {0}</value>
   </data>
-    <data name="ProjectResources.FileSizeExceeded" xml:space="preserve">
+  <data name="ProjectResources.FileSizeExceeded" xml:space="preserve">
     <value>File size exceeds maximum allowed</value>
   </data>
-    <data name="ProjectResources.GetAllError" xml:space="preserve">
+  <data name="ProjectResources.GetAllError" xml:space="preserve">
     <value>Error getting all project resources</value>
   </data>
-    <data name="ProjectResources.GetByIdError" xml:space="preserve">
+  <data name="ProjectResources.GetByIdError" xml:space="preserve">
     <value>Error getting project resource by ID: {0}</value>
   </data>
-    <data name="Projects.ProjectNameExistsInternship" xml:space="preserve">
+  <data name="Projects.ProjectNameExistsInternship" xml:space="preserve">
     <value>Project name already exists for this internship</value>
   </data>
-    <data name="Projects.LogCreateError" xml:space="preserve">
+  <data name="Projects.LogCreateError" xml:space="preserve">
     <value>Error creating project for internship {0}</value>
   </data>
-    <data name="Projects.InternshipIdRequired" xml:space="preserve">
+  <data name="Projects.InternshipIdRequired" xml:space="preserve">
     <value>Internship ID is required.</value>
   </data>
-    <data name="Projects.ProjectNameRequired" xml:space="preserve">
+  <data name="Projects.ProjectNameRequired" xml:space="preserve">
     <value>Project name is required.</value>
   </data>
-    <data name="Projects.ProjectNameMaxLength" xml:space="preserve">
+  <data name="Projects.ProjectNameMaxLength" xml:space="preserve">
     <value>Project name cannot exceed 255 characters</value>
   </data>
-    <data name="Projects.DescriptionMaxLength" xml:space="preserve">
+  <data name="Projects.DescriptionMaxLength" xml:space="preserve">
     <value>Description cannot exceed 2000 characters</value>
   </data>
-    <data name="Projects.StartDateInvalidRange" xml:space="preserve">
+  <data name="Projects.StartDateInvalidRange" xml:space="preserve">
     <value>Start date must be less than or equal to end date</value>
   </data>
-    <data name="Projects.EndDateInvalidRange" xml:space="preserve">
+  <data name="Projects.EndDateInvalidRange" xml:space="preserve">
     <value>End date must be greater than or equal to start date</value>
   </data>
-    <data name="Projects.UpdateError" xml:space="preserve">
+  <data name="Projects.UpdateError" xml:space="preserve">
     <value>Error updating project {0}</value>
   </data>
-    <data name="Projects.GetAllError" xml:space="preserve">
+  <data name="Projects.GetAllError" xml:space="preserve">
     <value>Error getting all projects</value>
   </data>
-    <data name="Projects.GetByStudentIdError" xml:space="preserve">
+  <data name="Projects.GetByStudentIdError" xml:space="preserve">
     <value>Error getting projects for student {0}</value>
   </data>
-    <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    <data name="Internships.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
-        <value />
-    </data>
-    <data name="Epic.ProjectIdRequired" xml:space="preserve">
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Internships.InternshipIdRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Epic.ProjectIdRequired" xml:space="preserve">
     <value>Project ID is required.</value>
   </data>
-    <data name="Epic.NameRequired" xml:space="preserve">
+  <data name="Epic.NameRequired" xml:space="preserve">
     <value>Epic name is required.</value>
   </data>
-    <data name="Epic.NameMaxLength" xml:space="preserve">
+  <data name="Epic.NameMaxLength" xml:space="preserve">
     <value>Epic name must not exceed 255 characters.</value>
   </data>
-    <data name="Epic.DescriptionMaxLength" xml:space="preserve">
+  <data name="Epic.DescriptionMaxLength" xml:space="preserve">
     <value>Description must not exceed 2000 characters.</value>
   </data>
-    <data name="Epic.NotFound" xml:space="preserve">
+  <data name="Epic.NotFound" xml:space="preserve">
     <value>Epic not found.</value>
   </data>
-    <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
+  <data name="Epic.CannotDeleteWithChildren" xml:space="preserve">
     <value>Cannot delete Epic with existing children. Please remove or reassign all children first.</value>
   </data>
-    <data name="Epic.ProjectNotFound" xml:space="preserve">
+  <data name="Epic.ProjectNotFound" xml:space="preserve">
     <value>Project not found.</value>
   </data>
-    <data name="Stakeholder.NotFound" xml:space="preserve">
+  <data name="Stakeholder.NotFound" xml:space="preserve">
     <value>Stakeholder not found.</value>
   </data>
-    <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
+  <data name="Stakeholder.ProjectNotFound" xml:space="preserve">
     <value>Project not found.</value>
   </data>
-    <data name="Stakeholder.EmailExists" xml:space="preserve">
+  <data name="Stakeholder.EmailExists" xml:space="preserve">
     <value>Email already exists in this project.</value>
   </data>
-    <data name="Stakeholder.IdRequired" xml:space="preserve">
+  <data name="Stakeholder.IdRequired" xml:space="preserve">
     <value>Stakeholder ID is required.</value>
   </data>
-    <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
+  <data name="Stakeholder.ProjectIdRequired" xml:space="preserve">
     <value>Project ID is required.</value>
   </data>
-    <data name="Stakeholder.NameRequired" xml:space="preserve">
+  <data name="Stakeholder.NameRequired" xml:space="preserve">
     <value>Name is required.</value>
   </data>
-    <data name="Stakeholder.NameMaxLength" xml:space="preserve">
+  <data name="Stakeholder.NameMaxLength" xml:space="preserve">
     <value>Name cannot exceed 200 characters.</value>
   </data>
-    <data name="Stakeholder.EmailRequired" xml:space="preserve">
+  <data name="Stakeholder.EmailRequired" xml:space="preserve">
     <value>Email is required.</value>
   </data>
-    <data name="Stakeholder.EmailInvalid" xml:space="preserve">
+  <data name="Stakeholder.EmailInvalid" xml:space="preserve">
     <value>Email format is invalid.</value>
   </data>
-    <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
+  <data name="Stakeholder.EmailMaxLength" xml:space="preserve">
     <value>Email cannot exceed 150 characters.</value>
   </data>
-    <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
+  <data name="Stakeholder.RoleMaxLength" xml:space="preserve">
     <value>Role cannot exceed 100 characters.</value>
   </data>
-    <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
+  <data name="Stakeholder.DescriptionMaxLength" xml:space="preserve">
     <value>Description cannot exceed 500 characters.</value>
   </data>
-    <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
+  <data name="Stakeholder.PhoneNumberInvalid" xml:space="preserve">
     <value>Phone number is invalid. Please enter a valid phone number format.</value>
   </data>
-    <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
+  <data name="Stakeholder.PhoneNumberMaxLength" xml:space="preserve">
     <value>Phone number cannot exceed 15 characters.</value>
   </data>
-    <data name="Stakeholder.CreateSuccess" xml:space="preserve">
+  <data name="Stakeholder.CreateSuccess" xml:space="preserve">
     <value>Stakeholder created successfully.</value>
   </data>
-    <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
+  <data name="Stakeholder.UpdateSuccess" xml:space="preserve">
     <value>Stakeholder updated successfully.</value>
   </data>
-    <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
+  <data name="Stakeholder.DeleteSuccess" xml:space="preserve">
     <value>Stakeholder deleted successfully.</value>
   </data>
-    <data name="Issue.NotFound" xml:space="preserve">
+  <data name="Issue.NotFound" xml:space="preserve">
     <value>Issue not found.</value>
   </data>
-    <data name="Issue.StakeholderNotFound" xml:space="preserve">
+  <data name="Issue.StakeholderNotFound" xml:space="preserve">
     <value>Stakeholder not found.</value>
   </data>
-    <data name="Issue.TitleRequired" xml:space="preserve">
+  <data name="Issue.TitleRequired" xml:space="preserve">
     <value>Title is required.</value>
   </data>
-    <data name="Issue.DescriptionRequired" xml:space="preserve">
+  <data name="Issue.DescriptionRequired" xml:space="preserve">
     <value>Description is required.</value>
   </data>
-    <data name="Issue.StakeholderIdRequired" xml:space="preserve">
+  <data name="Issue.StakeholderIdRequired" xml:space="preserve">
     <value>Stakeholder ID is required.</value>
   </data>
-    <data name="Issue.InvalidStatus" xml:space="preserve">
+  <data name="Issue.InvalidStatus" xml:space="preserve">
     <value>Invalid status. Please select: Open, InProgress, Resolved, or Closed.</value>
   </data>
-    <data name="Issue.CreateFailed" xml:space="preserve">
+  <data name="Issue.CreateFailed" xml:space="preserve">
     <value>Failed to create issue.</value>
   </data>
-    <data name="Issue.UpdateFailed" xml:space="preserve">
+  <data name="Issue.UpdateFailed" xml:space="preserve">
     <value>Failed to update issue.</value>
   </data>
-    <data name="Issue.DeleteFailed" xml:space="preserve">
+  <data name="Issue.DeleteFailed" xml:space="preserve">
     <value>Failed to delete issue.</value>
   </data>
-    <data name="Projects.LogGetByIdError" xml:space="preserve">
+  <data name="Projects.LogGetByIdError" xml:space="preserve">
     <value>Error when get project ID : {0}</value>
   </data>
-    <data name="Projects.LogGetByInternshipIdErr" xml:space="preserve">
+  <data name="Projects.LogGetByInternshipIdErr" xml:space="preserve">
     <value>Error when get project by internship ID: {0}</value>
   </data>
-    <data name="Internships.NotFound" xml:space="preserve">
+  <data name="Internships.NotFound" xml:space="preserve">
     <value>No internship found with ID: {0}</value>
   </data>
-  <!-- StudentTerms — Validation: TermId / StudentTermId -->
   <data name="StudentTerms.TermIdRequired" xml:space="preserve">
     <value>TermId is required.</value>
   </data>
@@ -452,24 +451,18 @@
   <data name="StudentTerms.ValidRecordsMinCount" xml:space="preserve">
     <value>At least 1 valid record is required.</value>
   </data>
-
-  <!-- StudentTerms — Validation: File -->
   <data name="StudentTerms.FileRequired" xml:space="preserve">
     <value>File is required.</value>
   </data>
   <data name="StudentTerms.FileEmpty" xml:space="preserve">
     <value>File must not be empty.</value>
   </data>
-
-  <!-- StudentTerms — Validation: FullName -->
   <data name="StudentTerms.FullNameRequired" xml:space="preserve">
     <value>Full name is required.</value>
   </data>
   <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
     <value>Full name must contain only letters and spaces.</value>
   </data>
-
-  <!-- StudentTerms — Validation: StudentCode -->
   <data name="StudentTerms.StudentCodeRequired" xml:space="preserve">
     <value>Student code is required.</value>
   </data>
@@ -488,8 +481,6 @@
   <data name="StudentTerms.StudentCodeInOtherTerm" xml:space="preserve">
     <value>Student is already enrolled in another term.</value>
   </data>
-
-  <!-- StudentTerms — Validation: Email -->
   <data name="StudentTerms.EmailRequired" xml:space="preserve">
     <value>Email is required.</value>
   </data>
@@ -505,21 +496,15 @@
   <data name="StudentTerms.EmailInOtherTerm" xml:space="preserve">
     <value>Email is already enrolled in another term.</value>
   </data>
-
-  <!-- StudentTerms — Validation: Phone -->
   <data name="StudentTerms.PhoneInvalid" xml:space="preserve">
     <value>Phone number is invalid.</value>
   </data>
-
-  <!-- StudentTerms — Validation: DateOfBirth -->
   <data name="StudentTerms.DateOfBirthInvalidFormat" xml:space="preserve">
     <value>Date of birth format is invalid (dd/MM/yyyy).</value>
   </data>
   <data name="StudentTerms.DateOfBirthMinAge" xml:space="preserve">
     <value>Student must be at least 15 years old.</value>
   </data>
-
-  <!-- StudentTerms — Validation: List query -->
   <data name="StudentTerms.SearchTermMaxLength" xml:space="preserve">
     <value>Search term must not exceed 100 characters.</value>
   </data>
@@ -529,8 +514,6 @@
   <data name="StudentTerms.SortOrderAllowedValues" xml:space="preserve">
     <value>SortOrder must be 'asc' or 'desc'.</value>
   </data>
-
-  <!-- StudentTerms Messages -->
   <data name="StudentTerms.NotFound" xml:space="preserve">
     <value>Student term enrollment record not found.</value>
   </data>
@@ -627,260 +610,259 @@
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>{0} students imported into term {1} by {2}.</value>
   </data>
-
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Term not found.</value>
   </data>
-    <data name="Terms.UniversityIdRequired" xml:space="preserve">
+  <data name="Terms.UniversityIdRequired" xml:space="preserve">
     <value>SuperAdmin must specify a UniversityId when creating a term.</value>
   </data>
-    <data name="Terms.NameRequired" xml:space="preserve">
+  <data name="Terms.NameRequired" xml:space="preserve">
     <value>Term name is required.</value>
   </data>
-    <data name="Terms.NameMaxLength" xml:space="preserve">
+  <data name="Terms.NameMaxLength" xml:space="preserve">
     <value>Term name cannot exceed 255 characters.</value>
   </data>
-    <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
+  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
     <value>Term name contains invalid or dangerous characters.</value>
   </data>
-    <data name="Terms.NameExists" xml:space="preserve">
+  <data name="Terms.NameExists" xml:space="preserve">
     <value>Term name already exists. Please choose a different name.</value>
   </data>
-    <data name="Terms.StartDateRequired" xml:space="preserve">
+  <data name="Terms.StartDateRequired" xml:space="preserve">
     <value>Start date is required.</value>
   </data>
-    <data name="Terms.EndDateRequired" xml:space="preserve">
+  <data name="Terms.EndDateRequired" xml:space="preserve">
     <value>End date is required.</value>
   </data>
-    <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
+  <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
     <value>End date must be after start date.</value>
   </data>
-    <data name="Terms.StartDateInPast" xml:space="preserve">
+  <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Start date cannot be in the past.</value>
   </data>
-    <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
+  <data name="Terms.StartDateMustBeOneWeekAhead" xml:space="preserve">
     <value>Start date cannot be today. Please select a date at least 1 week from now or a date before today.</value>
   </data>
-    <data name="Terms.InvalidDateFormat" xml:space="preserve">
+  <data name="Terms.InvalidDateFormat" xml:space="preserve">
     <value>Invalid date format. Please use dd/mm/yyyy format.</value>
   </data>
-    <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
+  <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
     <value>This time period overlaps with term [{0}].</value>
   </data>
-    <data name="Terms.CreateSuccess" xml:space="preserve">
+  <data name="Terms.CreateSuccess" xml:space="preserve">
     <value>Term created successfully.</value>
   </data>
-    <data name="Terms.UpdateSuccess" xml:space="preserve">
+  <data name="Terms.UpdateSuccess" xml:space="preserve">
     <value>Term updated successfully.</value>
   </data>
-    <data name="Terms.CloseSuccess" xml:space="preserve">
+  <data name="Terms.CloseSuccess" xml:space="preserve">
     <value>Term [{0}] has been closed successfully.</value>
   </data>
-    <data name="Terms.DeleteSuccess" xml:space="preserve">
+  <data name="Terms.DeleteSuccess" xml:space="preserve">
     <value>Term deleted successfully.</value>
   </data>
-    <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
+  <data name="Terms.OnlyActiveCanBeClosed" xml:space="preserve">
     <value>Only Active or Ended terms (still open status) can be closed.</value>
   </data>
-    <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
+  <data name="Terms.OnlyUpcomingCanBeDeleted" xml:space="preserve">
     <value>Cannot delete active, ended, or closed terms. Please use Close Term feature if needed.</value>
   </data>
-    <data name="Terms.VersionConflict" xml:space="preserve">
+  <data name="Terms.VersionConflict" xml:space="preserve">
     <value>This term has been updated by someone else. Please reload the page to see the latest information before editing.</value>
   </data>
-    <data name="Terms.StatusChanged" xml:space="preserve">
+  <data name="Terms.StatusChanged" xml:space="preserve">
     <value>Cannot delete this term because its status has changed. Please reload the page to see the latest information.</value>
   </data>
-    <data name="Terms.AlreadyDeleted" xml:space="preserve">
+  <data name="Terms.AlreadyDeleted" xml:space="preserve">
     <value>This term has already been deleted. Please reload the page.</value>
   </data>
-    <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
+  <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
     <value>There are {0} students without company assignments in this term. Are you sure you want to close it?</value>
   </data>
-    <data name="Terms.HasRelatedData" xml:space="preserve">
+  <data name="Terms.HasRelatedData" xml:space="preserve">
     <value>Warning: This term has related data</value>
   </data>
-    <data name="Terms.StartDateLocked" xml:space="preserve">
+  <data name="Terms.StartDateLocked" xml:space="preserve">
     <value>Start date cannot be changed after the term has started.</value>
   </data>
-    <data name="Terms.YearInvalidRange" xml:space="preserve">
+  <data name="Terms.YearInvalidRange" xml:space="preserve">
     <value>Year must be between 2000 and 2100.</value>
   </data>
-    <data name="Terms.CloseReasonRequired" xml:space="preserve">
+  <data name="Terms.CloseReasonRequired" xml:space="preserve">
     <value>Close reason is required.</value>
   </data>
-    <data name="Terms.CloseReasonMinLength" xml:space="preserve">
+  <data name="Terms.CloseReasonMinLength" xml:space="preserve">
     <value>Close reason must be at least 10 characters long.</value>
   </data>
-    <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
+  <data name="Terms.CloseReasonMaxLength" xml:space="preserve">
     <value>Close reason cannot exceed 500 characters.</value>
   </data>
-    <data name="Terms.Log.TermCreated" xml:space="preserve">
+  <data name="Terms.Log.TermCreated" xml:space="preserve">
     <value>Term {0} created successfully by user {1}</value>
   </data>
-    <data name="Terms.Log.TermUpdated" xml:space="preserve">
+  <data name="Terms.Log.TermUpdated" xml:space="preserve">
     <value>Term {0} updated successfully by user {1}</value>
   </data>
-    <data name="Terms.Log.TermClosed" xml:space="preserve">
+  <data name="Terms.Log.TermClosed" xml:space="preserve">
     <value>Term {0} closed by user {1}</value>
   </data>
-    <data name="Terms.Log.TermDeleted" xml:space="preserve">
+  <data name="Terms.Log.TermDeleted" xml:space="preserve">
     <value>Term {0} soft-deleted by user {1}</value>
   </data>
-    <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
+  <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
     <value>Retrieved {0} terms for university {1}</value>
   </data>
-    <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
+  <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
     <value>User {0} is not associated with any university</value>
   </data>
-    <data name="Terms.Log.TermNotFound" xml:space="preserve">
+  <data name="Terms.Log.TermNotFound" xml:space="preserve">
     <value>Term {0} not found</value>
   </data>
-    <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
+  <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
     <value>Term {0} not found or access denied for user {1}</value>
   </data>
-    <data name="Terms.Log.VersionConflict" xml:space="preserve">
+  <data name="Terms.Log.VersionConflict" xml:space="preserve">
     <value>Version conflict for term {0}</value>
   </data>
-    <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
+  <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
     <value>Version conflict for term {0}. Expected: {1}, Got: {2}</value>
   </data>
-    <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
+  <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
     <value>Duplicate term name detected: {0}</value>
   </data>
-    <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
+  <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
     <value>Concurrency conflict updating term {0}</value>
   </data>
-    <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
+  <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
     <value>Concurrency conflict closing term {0}</value>
   </data>
-    <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
+  <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
     <value>Error creating term</value>
   </data>
-    <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
+  <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
     <value>Error updating term {0}</value>
   </data>
-    <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
+  <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
     <value>Error closing term {0}</value>
   </data>
-    <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
+  <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
     <value>Error deleting term {0}</value>
   </data>
-    <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
+  <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
     <value>Error retrieving terms</value>
   </data>
-    <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
+  <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
     <value>Error retrieving term {0}</value>
   </data>
-    <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
+  <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
     <value>Error while retrieving enterprises</value>
   </data>
-    <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
+  <data name="Enterprise.GetEnterpriseByIdError" xml:space="preserve">
     <value>Error occurred while getting enterprise by id</value>
   </data>
-    <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
+  <data name="Enterprise.EnterpriseWithSameTaxCodeExists" xml:space="preserve">
     <value>The tax identification number already exists in the system.</value>
   </data>
-    <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
+  <data name="Enterprise.LogEnterpriseWithSameTaxCodeExists" xml:space="preserve">
     <value>The business with tax code '{TaxCode}' already exists.</value>
   </data>
-    <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
+  <data name="Enterprise.ErrorCreatingEnterprise" xml:space="preserve">
     <value>An error occurred while creating the business.</value>
   </data>
-    <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
+  <data name="Enterprise.InvalidTaxCodeFormat" xml:space="preserve">
     <value>The tax identification number is not in the correct format.</value>
   </data>
-    <data name="Enterprise.NameNotEmpty" xml:space="preserve">
+  <data name="Enterprise.NameNotEmpty" xml:space="preserve">
     <value>Name is required.</value>
   </data>
-    <data name="Enterprise.NameMaxLength" xml:space="preserve">
+  <data name="Enterprise.NameMaxLength" xml:space="preserve">
     <value>Name must not exceed {0} characters.</value>
   </data>
-    <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
+  <data name="Enterprise.WebsiteNotValid" xml:space="preserve">
     <value>Website must start with http or https.</value>
   </data>
-    <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
+  <data name="Enterprise.LogoUrlNotValid" xml:space="preserve">
     <value>LogoUrl must start with http or https.</value>
   </data>
-    <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
+  <data name="Enterprise.BackgroundUrlNotValid" xml:space="preserve">
     <value>BackgroundUrl must start with http or https.</value>
   </data>
-    <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
+  <data name="Enterprise.UpdatePermissionsNotAllowed" xml:space="preserve">
     <value>You are not allowed to modify this enterprise.</value>
   </data>
-    <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
+  <data name="Enterprise.LogUpdatePermissionsNotAllowed" xml:space="preserve">
     <value>Error: No permission to edit enterprise {enterpriseId}.</value>
   </data>
-    <data name="Enterprise.LogNotFound" xml:space="preserve">
+  <data name="Enterprise.LogNotFound" xml:space="preserve">
     <value>Enterprise {enterpriseId} not found</value>
   </data>
-    <data name="Enterprise.LogUpdateEnterpriseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
-        <value />
-    </data>
-    <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
+  <data name="Enterprise.LogUpdateEnterpriseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
     <value>Updating the tax code is not allowed.</value>
   </data>
-    <data name="Enterprise.LogDeleteError" xml:space="preserve">
+  <data name="Enterprise.LogDeleteError" xml:space="preserve">
     <value>Error occurred while deleting enterprise with ID {EnterpriseId}</value>
   </data>
-    <data name="Enterprise.DeleteError" xml:space="preserve">
+  <data name="Enterprise.DeleteError" xml:space="preserve">
     <value>An error occurred while deleting the enterprise. Please try again later.</value>
   </data>
-    <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
+  <data name="Enterprise.HR.NotAssociatedWithEnterprise" xml:space="preserve">
     <value>You are not associated with any enterprise as an HR.</value>
   </data>
-    <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
+  <data name="Enterprise.NotFoundCurrentHR" xml:space="preserve">
     <value>Enterprise not found for the current HR.</value>
   </data>
-    <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
+  <data name="InternshipGroup.LogCreationFailed" xml:space="preserve">
     <value>Failed to save internship group to database</value>
   </data>
-    <data name="InternshipGroup.LogCreationError" xml:space="preserve">
+  <data name="InternshipGroup.LogCreationError" xml:space="preserve">
     <value>Error occurred while creating internship group</value>
   </data>
-    <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
+  <data name="InternshipGroup.LogUpdateFailed" xml:space="preserve">
     <value>Failed to update internship group in database</value>
   </data>
-    <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
+  <data name="InternshipGroup.LogUpdateError" xml:space="preserve">
     <value>Error occurred while updating internship group</value>
   </data>
-    <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
+  <data name="InternshipGroup.LogDeleteFailed" xml:space="preserve">
     <value>Failed to delete internship group from database</value>
   </data>
-    <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
+  <data name="InternshipGroup.LogDeleteError" xml:space="preserve">
     <value>Error occurred while deleting internship group: {InternshipId}</value>
   </data>
-    <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
+  <data name="InternshipGroup.LogInvalidStudentIds" xml:space="preserve">
     <value>Some student IDs are invalid or not found</value>
   </data>
-    <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
+  <data name="InternshipGroup.LogAddStudentsFailed" xml:space="preserve">
     <value>Failed to update group members in database</value>
   </data>
-    <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
+  <data name="InternshipGroup.LogAddStudentsError" xml:space="preserve">
     <value>Error occurred while adding students to group</value>
   </data>
-    <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
+  <data name="InternshipGroup.LogRemoveStudentsFailed" xml:space="preserve">
     <value>Failed to update group in database</value>
   </data>
-    <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
+  <data name="InternshipGroup.LogRemoveStudentsError" xml:space="preserve">
     <value>Error occurred while removing students from group</value>
   </data>
-    <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
+  <data name="InternshipGroup.InvalidStudentId" xml:space="preserve">
     <value>Invalid student ID.</value>
   </data>
-    <data name="InternshipGroup.TermNotFound" xml:space="preserve">
+  <data name="InternshipGroup.TermNotFound" xml:space="preserve">
     <value>Term not found.</value>
   </data>
-    <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
     <value>Enterprise not found.</value>
   </data>
-    <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
+  <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
     <value>Mentor not found.</value>
   </data>
-    <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
+  <data name="InternshipGroup.StudentNotFound" xml:space="preserve">
     <value>Student not found.</value>
   </data>
-    <data name="InternshipGroup.NotFound" xml:space="preserve">
+  <data name="InternshipGroup.NotFound" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
   <data name="InternshipGroup.HasStudents" xml:space="preserve">
@@ -904,113 +886,111 @@
   <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
     <value>Term not found for ID: {TermId}</value>
   </data>
-    <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
+  <data name="InternshipGroup.LogEnterpriseNotFound" xml:space="preserve">
     <value>Enterprise not found for ID: {EnterpriseId}</value>
   </data>
-    <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
+  <data name="InternshipGroup.LogMentorNotFound" xml:space="preserve">
     <value>Mentor not found for ID: {MentorId}</value>
   </data>
-    <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
+  <data name="InternshipGroup.LogStudentNotFound" xml:space="preserve">
     <value>Student not found for ID: {StudentId}</value>
   </data>
-    <data name="InternshipGroup.LogNotFound" xml:space="preserve">
+  <data name="InternshipGroup.LogNotFound" xml:space="preserve">
     <value>Internship group not found for ID: {InternshipId}</value>
   </data>
-    <data name="Logbooks.StudentNotFound" xml:space="preserve">
+  <data name="Logbooks.StudentNotFound" xml:space="preserve">
     <value>Student record not found for logged in user. Ensure you are logged in with a Student account.</value>
   </data>
-    <data name="Logbooks.UpdateForbidden" xml:space="preserve">
+  <data name="Logbooks.UpdateForbidden" xml:space="preserve">
     <value>You do not have permission to update this logbook.</value>
   </data>
-    <data name="Logbooks.DeleteForbidden" xml:space="preserve">
+  <data name="Logbooks.DeleteForbidden" xml:space="preserve">
     <value>You do not have permission to delete this logbook.</value>
   </data>
-    <data name="Logbooks.InvalidInternship" xml:space="preserve">
+  <data name="Logbooks.InvalidInternship" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
-    <data name="EvaluationCycle.NotFound" xml:space="preserve">
+  <data name="EvaluationCycle.NotFound" xml:space="preserve">
     <value>Evaluation cycle not found.</value>
   </data>
-    <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
+  <data name="EvaluationCycle.TermNotFound" xml:space="preserve">
     <value>Corresponding term not found.</value>
   </data>
-    <data name="EvaluationCycle.NameRequired" xml:space="preserve">
+  <data name="EvaluationCycle.NameRequired" xml:space="preserve">
     <value>Evaluation cycle name is required.</value>
   </data>
-    <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
+  <data name="EvaluationCycle.StartDateRequired" xml:space="preserve">
     <value>Start date is required.</value>
   </data>
-    <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
+  <data name="EvaluationCycle.EndDateRequired" xml:space="preserve">
     <value>End date is required.</value>
   </data>
-    <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
+  <data name="EvaluationCycle.EndDateMustBeAfterStart" xml:space="preserve">
     <value>End date must be after start date.</value>
   </data>
-    <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
+  <data name="EvaluationCycle.CannotDeleteWithCriteria" xml:space="preserve">
     <value>Evaluation cycles with criteria cannot be deleted.</value>
   </data>
-    <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
+  <data name="EvaluationCycle.CannotUpdateCompleted" xml:space="preserve">
     <value>Cannot update a completed evaluation cycle.</value>
   </data>
-    <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
+  <data name="EvaluationCycle.AlreadyCompleted" xml:space="preserve">
     <value>This evaluation cycle has already been completed or cancelled.</value>
   </data>
-    <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
+  <data name="EvaluationCycle.CannotCompleteWithoutCriteria" xml:space="preserve">
     <value>Cannot complete an evaluation cycle without any criteria.</value>
   </data>
-    <data name="EvaluationCriteria.NotFound" xml:space="preserve">
+  <data name="EvaluationCriteria.NotFound" xml:space="preserve">
     <value>Evaluation criteria not found.</value>
   </data>
-    <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
+  <data name="EvaluationCriteria.CycleNotFound" xml:space="preserve">
     <value>Corresponding evaluation cycle not found.</value>
   </data>
-    <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
+  <data name="EvaluationCriteria.CannotCreateInCompletedCycle" xml:space="preserve">
     <value>Cannot add new criteria to an already completed evaluation cycle.</value>
   </data>
-    <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
+  <data name="EvaluationCriteria.CannotUpdateInCompletedCycle" xml:space="preserve">
     <value>Cannot update criteria in an already completed evaluation cycle.</value>
   </data>
-    <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
+  <data name="EvaluationCriteria.CannotDeleteInCompletedCycle" xml:space="preserve">
     <value>Cannot delete criteria in an already completed evaluation cycle.</value>
   </data>
-    <data name="Evaluation.NotFound" xml:space="preserve">
+  <data name="Evaluation.NotFound" xml:space="preserve">
     <value>Evaluation results not found.</value>
   </data>
-    <data name="Evaluation.CycleNotFound" xml:space="preserve">
+  <data name="Evaluation.CycleNotFound" xml:space="preserve">
     <value>Corresponding evaluation cycle not found.</value>
   </data>
-    <data name="Evaluation.InternshipNotFound" xml:space="preserve">
+  <data name="Evaluation.InternshipNotFound" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
-    <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
+  <data name="Evaluation.CannotUpdateSubmitted" xml:space="preserve">
     <value>Cannot update an evaluation once the results is submitted or published.</value>
   </data>
-    <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
+  <data name="Evaluation.CriteriaNotFound" xml:space="preserve">
     <value>Some evaluation criteria are missing.</value>
   </data>
-    <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
+  <data name="Evaluation.ScoreExceedsMax" xml:space="preserve">
     <value>Given score cannot exceed the maximum score of its respective criteria.</value>
   </data>
-    <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
+  <data name="Evaluation.AlreadySubmitted" xml:space="preserve">
     <value>All members in this group have been fully submitted.</value>
   </data>
-    <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
+  <data name="Evaluation.CannotPublishIfNotSubmitted" xml:space="preserve">
     <value>Cannot publish the scores unless all students in the internship group are marked as "Submitted".</value>
   </data>
-    <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
+  <data name="Evaluation.CannotSaveInCompletedCycle" xml:space="preserve">
     <value>Cannot draft evaluation scores in an already completed evaluation cycle.</value>
   </data>
-    <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
+  <data name="Evaluation.CannotUpdateInCompletedCycle" xml:space="preserve">
     <value>Cannot update evaluation scores in an already completed evaluation cycle.</value>
   </data>
-    <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
+  <data name="Evaluation.CannotSubmitInCompletedCycle" xml:space="preserve">
     <value>Cannot submit evaluation scores in an already completed evaluation cycle.</value>
   </data>
-    <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
+  <data name="Evaluation.CannotPublishInCompletedCycle" xml:space="preserve">
     <value>Cannot publish evaluation scores in an already completed evaluation cycle.</value>
   </data>
-
-  <!-- ── InternshipApplication: Validation ── -->
   <data name="InternshipApplication.ApplicationIdRequired" xml:space="preserve">
     <value>Application ID is required.</value>
   </data>
@@ -1032,8 +1012,6 @@
   <data name="InternshipApplication.ProjectDescriptionMaxLength" xml:space="preserve">
     <value>Project description cannot exceed 1000 characters.</value>
   </data>
-
-  <!-- ── InternshipApplication: Business Errors ── -->
   <data name="InternshipApplication.NotFound" xml:space="preserve">
     <value>Application not found.</value>
   </data>
@@ -1061,8 +1039,6 @@
   <data name="InternshipApplication.ProjectNameExistsInGroup" xml:space="preserve">
     <value>A project with this name already exists in the group.</value>
   </data>
-
-  <!-- ── InternshipApplication: Log Keys ── -->
   <data name="InternshipApplication.Log.Accepting" xml:space="preserve">
     <value>Accepting application {0}</value>
   </data>
@@ -1102,88 +1078,10 @@
   <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
     <value>Current user identity is missing or invalid</value>
   </data>
-  <data name="Password.NotEmpty" xml:space="preserve">
-    <value>Password cannot be empty.</value>
-  </data>
-    <data name="CannotIdentifyManager" xml:space="preserve">
-    <value>Cannot identify the manager performing the reset.</value>
-  </data>
-    <data name="OnlyManagerCanReset" xml:space="preserve">
-    <value>Only managers are allowed to reset passwords.</value>
-  </data>
-    <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
-    <value>Password can only be reset for active accounts.</value>
-  </data>
-    <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
-    <value>Employee ID is required.</value>
-  </data>
-    <data name="ResetStatusNoEmail" xml:space="preserve">
-    <value>Password reset successful. However, the email could not be sent.</value>
-  </data>
-    <data name="Employee.CannotUpdateInactive" xml:space="preserve">
-    <value>Cannot update information for inactive employees.</value>
-  </data>
-    <data name="Profile.EmployeeIdRequired" xml:space="preserve">
-    <value>EmployeeId cannot be empty.</value>
-  </data>
-    <data name="Profile.FullNameRequired" xml:space="preserve">
-    <value>Full name cannot be empty.</value>
-  </data>
-    <data name="Profile.FullNameMaxLength" xml:space="preserve">
-    <value>Full name cannot exceed 100 characters.</value>
-  </data>
-    <data name="Profile.EmailRequired" xml:space="preserve">
-    <value>Email cannot be empty.</value>
-  </data>
-    <data name="Profile.EmailInvalid" xml:space="preserve">
-    <value>Invalid email format.</value>
-  </data>
-    <data name="Profile.PhoneRequired" xml:space="preserve">
-    <value>Phone number cannot be empty.</value>
-  </data>
-    <data name="Profile.PhoneInvalid" xml:space="preserve">
-    <value>Invalid phone number format.</value>
-  </data>
-    <data name="Employee.CodeInvalidFormat" xml:space="preserve">
-    <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
-  </data>
-    <data name="Auth.TokenRequired" xml:space="preserve">
-    <value>Token is required.</value>
-  </data>
-    <data name="Auth.NewPasswordRequired" xml:space="preserve">
-    <value>New password is required.</value>
-  </data>
-    <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
-    <value>Confirm password is required.</value>
-  </data>
-    <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
-    <value>Confirm password does not match new password.</value>
-  </data>
-    <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
-    <value>Employee code is required.</value>
-  </data>
-    <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
-    <value>If an account exists for that employee code, a reset email has been sent.</value>
-  </data>
-    <data name="EmployeeNotActive" xml:space="preserve">
-    <value>Employee is not active.</value>
-  </data>
-    <data name="CannotPromoteToManager" xml:space="preserve">
-    <value>Cannot promote to Manager directly.</value>
-  </data>
-    <data name="NewRoleMustBeDifferent" xml:space="preserve">
-    <value>New role must be different from current role.</value>
-  </data>
-    <data name="DatabaseUpdateError" xml:space="preserve">
-    <value>An error occurred while updating the database.</value>
-  </data>
-    <data name="RoleChangedButEmailFailed" xml:space="preserve">
-    <value>Role changed successfully for {0}, but notification email failed to send.</value>
-  </data>
-    <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
+  <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
     <value>Failed to restore enterprise. EnterpriseId: {EnterpriseId}</value>
   </data>
-    <data name="Enterprise.RestoreFailed" xml:space="preserve">
+  <data name="Enterprise.RestoreFailed" xml:space="preserve">
     <value>Failed to restore enterprise.</value>
   </data>
   <data name="InternshipGroup.MustBelongToYourEnterprise" xml:space="preserve">
@@ -1201,20 +1099,100 @@
   <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
     <value>The group has already been archived.</value>
   </data>
-
-    <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
+  <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Error getting violation reports</value>
   </data>
-    <data name="ViolationReport.CreateViolationReportError" xml:space="preserve">
+  <data name="ViolationReport.CreateViolationReportError" xml:space="preserve">
     <value>An error occurred while generating the violation report.</value>
   </data>
-    <data name="ViolationReport.ErrorOccurredWhileDeletingViolationReport" xml:space="preserve">
+  <data name="ViolationReport.ErrorOccurredWhileDeletingViolationReport" xml:space="preserve">
     <value>An error occurred while deleting violation report {0}.</value>
   </data>
-    <data name="ViolationReport.ErrorOccurredWhileUpdatingViolationReport" xml:space="preserve">
+  <data name="ViolationReport.ErrorOccurredWhileUpdatingViolationReport" xml:space="preserve">
     <value>An error occurred while updating the report. Please try again.</value>
   </data>
-    <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
+  <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
     <value>An error occurred while retrieving violation report details.</value>
+  </data>
+  <data name="Password.NotEmpty" xml:space="preserve">
+    <value>Password cannot be empty.</value>
+  </data>
+  <data name="CannotIdentifyManager" xml:space="preserve">
+    <value>Cannot identify the manager performing the reset.</value>
+  </data>
+  <data name="OnlyManagerCanReset" xml:space="preserve">
+    <value>Only managers are allowed to reset passwords.</value>
+  </data>
+  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Password can only be reset for active accounts.</value>
+  </data>
+  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
+    <value>Employee ID is required.</value>
+  </data>
+  <data name="ResetStatusNoEmail" xml:space="preserve">
+    <value>Password reset successful. However, the email could not be sent.</value>
+  </data>
+  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
+    <value>Cannot update information for inactive employees.</value>
+  </data>
+  <data name="Profile.EmployeeIdRequired" xml:space="preserve">
+    <value>EmployeeId cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameRequired" xml:space="preserve">
+    <value>Full name cannot be empty.</value>
+  </data>
+  <data name="Profile.FullNameMaxLength" xml:space="preserve">
+    <value>Full name cannot exceed 100 characters.</value>
+  </data>
+  <data name="Profile.EmailRequired" xml:space="preserve">
+    <value>Email cannot be empty.</value>
+  </data>
+  <data name="Profile.EmailInvalid" xml:space="preserve">
+    <value>Invalid email format.</value>
+  </data>
+  <data name="Profile.PhoneRequired" xml:space="preserve">
+    <value>Phone number cannot be empty.</value>
+  </data>
+  <data name="Profile.PhoneInvalid" xml:space="preserve">
+    <value>Invalid phone number format.</value>
+  </data>
+  <data name="Employee.CodeInvalidFormat" xml:space="preserve">
+    <value>Employee Code must start with W, C, B, or M followed by 6 digits (e.g., M000001).</value>
+  </data>
+  <data name="Auth.TokenRequired" xml:space="preserve">
+    <value>Token is required.</value>
+  </data>
+  <data name="Auth.NewPasswordRequired" xml:space="preserve">
+    <value>New password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
+    <value>Confirm password is required.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
+    <value>Confirm password does not match new password.</value>
+  </data>
+  <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
+    <value>Employee code is required.</value>
+  </data>
+  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <value>If an account exists for that employee code, a reset email has been sent.</value>
+  </data>
+  <data name="EmployeeNotActive" xml:space="preserve">
+    <value>Employee is not active.</value>
+  </data>
+  <data name="CannotPromoteToManager" xml:space="preserve">
+    <value>Cannot promote to Manager directly.</value>
+  </data>
+  <data name="NewRoleMustBeDifferent" xml:space="preserve">
+    <value>New role must be different from current role.</value>
+  </data>
+  <data name="DatabaseUpdateError" xml:space="preserve">
+    <value>An error occurred while updating the database.</value>
+  </data>
+  <data name="RoleChangedButEmailFailed" xml:space="preserve">
+    <value>Role changed successfully for {0}, but notification email failed to send.</value>
+  </data>
+  <data name="JobPosting.CreateSuccess" xml:space="preserve">
+    <value>Successfully created a job posting.</value>
   </data>
 </root>

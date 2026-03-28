@@ -128,8 +128,12 @@ namespace IOCv2.Application.Features.Jobs.Commands.CloseJob
                 // Notify students with active applications
                 if (activeCount > 0)
                 {
-                    var subject = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotifyStudentClosedSubject, job.Title);
-                    var bodyTemplate = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotifyStudentClosedBody, job.Title, job.Enterprise?.Name ?? string.Empty);
+                    var jobTitle = job.Title ?? string.Empty;
+                    var subject = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotifyStudentClosedSubject, jobTitle);
+                    var bodyTemplate = _messageService.GetMessage(
+                        MessageKeys.JobPostingMessageKey.NotifyStudentClosedBody,
+                        jobTitle,
+                        job.Enterprise?.Name ?? string.Empty);
 
                     // Send email to each distinct student (by email)
                     var distinctUsers = activeApplications
@@ -153,7 +157,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CloseJob
                     }
                 }
 
-                var successMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.CloseSuccess, job.Title);
+                var successMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.CloseSuccess, job.Title ?? string.Empty);
                 var response = new CloseJobResponse { Message = successMsg };
                 return Result<CloseJobResponse>.Success(response, successMsg);
             }

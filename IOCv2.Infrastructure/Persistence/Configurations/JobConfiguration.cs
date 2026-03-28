@@ -32,12 +32,12 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(j => j.Title)
                .HasColumnName("title")
                .HasMaxLength(255)
-               .IsRequired();
+               .IsRequired(false);
 
         builder.Property(j => j.Position)
                .HasColumnName("position")
                .HasMaxLength(255)
-               .IsRequired();
+               .IsRequired(false);
 
         builder.Property(j => j.Description)
                .HasColumnName("description")
@@ -72,24 +72,24 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(j => j.StartDate)
                .HasColumnName("start_date")
                .HasColumnType("timestamp with time zone")
-               .IsRequired();
+               .IsRequired(false);
 
         builder.Property(j => j.EndDate)
                .HasColumnName("end_date")
                .HasColumnType("timestamp with time zone")
-               .IsRequired();
+               .IsRequired(false);
 
         // New: audience (public / targeted)
         builder.Property(j => j.Audience)
                .HasColumnName("audience")
                .HasConversion<short>()
-               .IsRequired();
+               .IsRequired(false);
 
         // Enum stored as short (repository convention)
         builder.Property(j => j.Status)
                .HasColumnName("status")
                .HasConversion<short>()
-               .IsRequired();
+               .IsRequired(false);
 
         // Audit fields
         builder.Property(j => j.CreatedAt)

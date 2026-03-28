@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.ProjectResources;
 using IOCv2.Application.Features.ProjectResources.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;

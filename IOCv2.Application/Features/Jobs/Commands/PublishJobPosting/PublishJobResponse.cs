@@ -1,6 +1,6 @@
 using System;
 
-namespace IOCv2.Application.Features.Jobs.Commands.PublishJob
+namespace IOCv2.Application.Features.Jobs.Commands.PublishJobPosting
 {
     public class PublishJobResponse
     {

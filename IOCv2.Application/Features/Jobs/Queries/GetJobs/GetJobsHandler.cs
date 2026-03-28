@@ -57,7 +57,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
                     .AsNoTracking()
                     .FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
 
-                if (entUser == null) return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage("NotAllowed"), ResultErrorType.Forbidden);
+                if (entUser == null) return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotAllowed), ResultErrorType.Forbidden);
 
                 jobsQuery = jobsQuery.Where(j => j.EnterpriseId == entUser.EnterpriseId);
 
@@ -72,7 +72,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
                     .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
 
-                if (uniUser == null) return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage("NotAllowed"), ResultErrorType.Forbidden);
+                if (uniUser == null) return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotAllowed), ResultErrorType.Forbidden);
 
                 // If caller is a student and already placed (internship in progress), return empty page (UI shows message)
                 var student = await _unitOfWork.Repository<Student>()
@@ -99,7 +99,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 var term = request.SearchTerm.Trim();
-                jobsQuery = jobsQuery.Where(j => j.Title.Contains(term));
+                jobsQuery = jobsQuery.Where(j => (j.Title ?? string.Empty).Contains(term));
             }
 
             // Sorting

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR
+namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByMine
 {
     public record GetEnterpriseByMineCommand : IRequest<Result<GetEnterpriseByMineResponse>>
     {

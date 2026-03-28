@@ -3,7 +3,7 @@ using MediatR;
 using System;
 using System.Text.Json.Serialization;
 
-namespace IOCv2.Application.Features.Jobs.Commands.PublishJob
+namespace IOCv2.Application.Features.Jobs.Commands.PublishJobPosting
 {
     public record PublishJobCommand : IRequest<Result<PublishJobResponse>>
     {

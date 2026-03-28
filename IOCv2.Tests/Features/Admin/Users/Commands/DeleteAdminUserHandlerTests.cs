@@ -9,7 +9,7 @@ using Moq;
 using MockQueryable;
 using MockQueryable.Moq;
 
-namespace IOCv2.Tests.Features.Admin.UserManagement.Commands;
+namespace IOCv2.Tests.Features.Admin.Users.Commands;
 
 public class DeleteUserHandlerTests
 {

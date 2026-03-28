@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Migrations
+namespace IOCv2.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260326042718_AddJobPostingDb")]
-    partial class AddJobPostingDb
+    [Migration("20260328052319_RefactorJobDB")]
+    partial class RefactorJobDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -511,7 +511,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<DateTime>("AppliedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamptz")
-                        .HasColumnName("created_at")
+                        .HasColumnName("applied_at")
                         .HasDefaultValueSql("now()");
 
                     b.Property<DateTime>("CreatedAt")
@@ -523,7 +523,8 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("created_by");
 
                     b.Property<string>("CvSnapshotUrl")
-                        .HasColumnType("text")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
                         .HasColumnName("cv_snapshot_url");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -543,12 +544,13 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("job_id");
 
                     b.Property<string>("JobPostingTitle")
-                        .HasColumnType("text")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
                         .HasColumnName("job_posting_title");
 
                     b.Property<string>("RejectReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("reject_reason");
 
                     b.Property<DateTime?>("ReviewedAt")
@@ -586,9 +588,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasKey("ApplicationId")
                         .HasName("pk_internship_applications");
 
-                    b.HasIndex("EnterpriseId")
-                        .HasDatabaseName("ix_internship_applications_enterprise_id");
-
                     b.HasIndex("InternshipGroupInternshipId")
                         .HasDatabaseName("ix_internship_applications_internship_group_internship_id");
 
@@ -604,15 +603,16 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("UniversityId")
                         .HasDatabaseName("ix_internship_applications_university_id");
 
+                    b.HasIndex("EnterpriseId", "Status")
+                        .HasDatabaseName("ix_internship_applications_enterprise_id_status");
+
+                    b.HasIndex("StudentId", "Status")
+                        .HasDatabaseName("ix_internship_applications_student_id_status");
+
                     b.HasIndex("StudentId", "TermId", "EnterpriseId")
-                        .IsUnique()
                         .HasDatabaseName("ix_internship_applications_student_id_term_id_enterprise_id");
 
-                    b.ToTable("internship_applications", null, t =>
-                        {
-                            t.Property("CreatedAt")
-                                .HasColumnName("created_at1");
-                        });
+                    b.ToTable("internship_applications", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
@@ -752,6 +752,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("job_id");
 
+                    b.Property<short?>("Audience")
+                        .HasColumnType("smallint")
+                        .HasColumnName("audience");
+
                     b.Property<string>("Benefit")
                         .HasColumnType("text")
                         .HasColumnName("benefit");
@@ -774,6 +778,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_id");
@@ -788,7 +796,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("location");
 
                     b.Property<string>("Position")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("position");
@@ -801,12 +808,15 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("requirements");
 
-                    b.Property<short>("Status")
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<short?>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("title");
@@ -2241,7 +2251,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasOne("IOCv2.Domain.Entities.Job", "Job")
                         .WithMany("InternshipApplications")
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_internship_applications_jobs_job_id");
 
@@ -2266,6 +2276,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasOne("IOCv2.Domain.Entities.University", "University")
                         .WithMany()
                         .HasForeignKey("UniversityId")
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_internship_applications_universities_university_id");
 
                     b.Navigation("Enterprise");

@@ -1,10 +1,10 @@
 ﻿using IOCv2.API.Attributes;
 using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.Jobs.Commands.ApplyJob;
 using IOCv2.Application.Features.Jobs.Commands.CloseJob;
+using IOCv2.Application.Features.Jobs.Commands.CreateJobDraft;
 using IOCv2.Application.Features.Jobs.Commands.CreateJobPosting;
 using IOCv2.Application.Features.Jobs.Commands.DeleteJob;
-using IOCv2.Application.Features.Jobs.Commands.PublishJob;
+using IOCv2.Application.Features.Jobs.Commands.PublishJobPosting;
 using IOCv2.Application.Features.Jobs.Commands.UpdateJob;
 using IOCv2.Application.Features.Jobs.Queries.GetJobById;
 using IOCv2.Application.Features.Jobs.Queries.GetJobs;
@@ -44,7 +44,6 @@ namespace IOCv2.API.Controllers.Jobs
         /// <param name="query">Query parameters (search, pagination, filters)</param>
         [HttpGet]
         [Authorize(Roles = "HR,Student")]
-        [RateLimit(maxRequests: 60, windowMinutes: 1)]
         [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetJobsResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -63,7 +62,6 @@ namespace IOCv2.API.Controllers.Jobs
         /// <param name="id">Job id</param>
         [HttpGet("{id:guid}", Name = "GetJobById")]
         [Authorize(Roles = "HR,Student")]
-        [RateLimit(maxRequests: 60, windowMinutes: 1)]
         [ProducesResponseType(typeof(ApiResponse<GetJobByIdResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -83,7 +81,6 @@ namespace IOCv2.API.Controllers.Jobs
         /// <param name="command">Create job command</param>
         [HttpPost]
         [Authorize(Roles = "HR")]
-        [RateLimit(maxRequests: 20, windowMinutes: 1)]
         [ProducesResponseType(typeof(ApiResponse<CreateJobPostingResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -99,26 +96,23 @@ namespace IOCv2.API.Controllers.Jobs
         }
 
         /// <summary>
-        /// Student applies to a job posting.
-        /// - Students call this endpoint to submit an application.
+        /// Create a new job draft (HR / Enterprise).
+        /// Returns 201 Created with location header to GetJobById.
         /// </summary>
-        /// <param name="id">Job id</param>
-        /// <param name="command">Apply command (body)</param>
-        [HttpPost("{id:guid}/apply")]
-        [Authorize(Roles = "Student")]
-        [RateLimit(maxRequests: 30, windowMinutes: 1)]
-        [ProducesResponseType(typeof(ApiResponse<ApplyJobResponse>), StatusCodes.Status201Created)]
+        /// <param name="command">Create job draft command</param>
+        [HttpPost("draft")]
+        [Authorize(Roles = "HR")]
+        [ProducesResponseType(typeof(ApiResponse<CreateJobDraftResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> ApplyJob(
-            [FromRoute] Guid id,
-            [FromBody] ApplyJobCommand command,
+        public async Task<IActionResult> CreateJobDraft(
+            [FromBody] CreateJobDraftCommand command,
             CancellationToken cancellationToken = default)
         {
-            // ensure JobId is set from route - frontend may omit it
-            var result = await _mediator.Send(command with { JobId = id }, cancellationToken);
-            return HandleCreateResult(result, nameof(GetJobById), new { id = result.Data?.ApplicationId, version = "1" });
+            var result = await _mediator.Send(command, cancellationToken);
+            // CreatedAtAction -> GetJobById
+            return HandleCreateResult(result, nameof(GetJobById), new { id = result.Data?.JobId, version = "1" });
         }
 
         /// <summary>
@@ -127,7 +121,6 @@ namespace IOCv2.API.Controllers.Jobs
         /// <param name="id">Job id</param>
         [HttpPost("{id:guid}/publish")]
         [Authorize(Roles = "HR")]
-        [RateLimit(maxRequests: 20, windowMinutes: 1)]
         [ProducesResponseType(typeof(ApiResponse<PublishJobResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -151,7 +144,6 @@ namespace IOCv2.API.Controllers.Jobs
         /// <param name="command">Updated job data</param>
         [HttpPut("{id:guid}")]
         [Authorize(Roles = "HR")]
-        [RateLimit(maxRequests: 20, windowMinutes: 1)]
         [ProducesResponseType(typeof(ApiResponse<UpdateJobResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -174,7 +166,6 @@ namespace IOCv2.API.Controllers.Jobs
         /// <param name="command">Close job command</param>
         [HttpPatch("{id:guid}/close")]
         [Authorize(Roles = "HR")]
-        [RateLimit(maxRequests: 20, windowMinutes: 1)]
         [ProducesResponseType(typeof(ApiResponse<CloseJobResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -196,7 +187,6 @@ namespace IOCv2.API.Controllers.Jobs
         /// <param name="id">Job id</param>
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "HR")]
-        [RateLimit(maxRequests: 20, windowMinutes: 1)]
         [ProducesResponseType(typeof(ApiResponse<DeleteJobResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
