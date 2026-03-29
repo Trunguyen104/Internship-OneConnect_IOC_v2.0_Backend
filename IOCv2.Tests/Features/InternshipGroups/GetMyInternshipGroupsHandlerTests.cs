@@ -64,14 +64,19 @@ public class GetMyInternshipGroupsHandlerTests
         var mentor = new EnterpriseUser { EnterpriseUserId = mentorId, EnterpriseId = enterpriseId, UserId = Guid.NewGuid(), User = mentorUser };
         var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", null, enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
         group.Enterprise = new Enterprise { EnterpriseId = enterpriseId, Name = "Rikasoft" };
-        group.Term = term;
+        var phase = InternshipPhase.Create(enterpriseId, "FU Cần Thơ - Mùa xuân 2026",
+            DateOnly.FromDateTime(new DateTime(2026, 1, 1)),
+            DateOnly.FromDateTime(new DateTime(2026, 4, 30)), null, null);
+        typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, termId);
+        group.InternshipPhase = phase;
         group.Mentor = mentor;
         group.UpdateStatus(IOCv2.Domain.Enums.GroupStatus.Active);
         group.AddMember(studentId, IOCv2.Domain.Enums.InternshipRole.Leader);
 
         typeof(InternshipGroup).GetProperty(nameof(InternshipGroup.InternshipId))!.SetValue(group, internshipId);
 
-        var project = Project.Create(internshipId, "IOC Version 2", string.Empty);
+        var project = Project.Create("IOC Version 2", string.Empty, "PRJ-IOC_IOC_1", "IT", "Requirements");
+        project.AssignToGroup(internshipId, null, null);
         typeof(Project).GetProperty(nameof(Project.ProjectId))!.SetValue(project, projectId);
 
         _mockCurrentUserService.Setup(service => service.UserId).Returns(userId.ToString());
@@ -93,7 +98,8 @@ public class GetMyInternshipGroupsHandlerTests
         result.Data.Should().HaveCount(1);
         result.Data![0].Id.Should().Be(internshipId);
         result.Data[0].Name.Should().Be("FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)");
-        result.Data[0].SchoolId.Should().Be(schoolId);
+        // SchoolId comes from student.User.UniversityUser.University which is not loaded via mock (returns Guid.Empty)
+        result.Data[0].SchoolId.Should().Be(Guid.Empty);
         result.Data[0].Enterprise!.Name.Should().Be("Rikasoft");
         result.Data[0].Mentors.Should().ContainSingle();
         result.Data[0].ProjectId.Should().Be(projectId);

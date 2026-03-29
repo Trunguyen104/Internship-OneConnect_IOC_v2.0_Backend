@@ -7,8 +7,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents
     {
         public GetPlacedStudentsQueryValidator()
         {
-            RuleFor(x => x.TermId)
-                .NotEmpty().WithMessage(MessageKeys.InternshipGroups.TermIdRequired);
+            // PhaseId là optional — nếu không truyền, backend tự tìm phase Active/Upcoming
 
             RuleFor(v => v.PageNumber)
                 .GreaterThanOrEqualTo(1).WithMessage(MessageKeys.Page.PageNumberMinValue);

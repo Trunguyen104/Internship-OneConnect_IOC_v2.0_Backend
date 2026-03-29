@@ -46,6 +46,7 @@ namespace IOCv2.API.Middlewares
             var message = "An unexpected error occurred.";
             List<string>? errors = null;
 
+            _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
             switch (exception)
             {
                 case DomainViolationException domainEx:

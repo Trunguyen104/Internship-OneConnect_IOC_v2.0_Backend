@@ -11,26 +11,36 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
     public class GetInternshipGroupsResponse : IMapFrom<InternshipGroup>
     {
         public Guid InternshipId { get; set; }
-        public Guid TermId { get; set; }
+        public Guid PhaseId { get; set; }
         public string GroupName { get; set; } = string.Empty;
         public string? EnterpriseName { get; set; }
         public string? MentorName { get; set; }
+
+        /// <summary>Group-specific override dates (may be null if not set).</summary>
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public GroupStatus Status { get; set; }
 
         /// <summary>
-        /// Total number of students assigned to this group.
+        /// Phase-level date boundaries — used by server for ViolationReport OccurredDate validation.
+        /// Frontend must use these dates (not StartDate/EndDate) when validating user input.
         /// </summary>
+        public DateOnly? PhaseStartDate { get; set; }
+        public DateOnly? PhaseEndDate { get; set; }
+
+        public GroupStatus Status { get; set; }
+
+        /// <summary>Total number of students assigned to this group.</summary>
         public int NumberOfMembers { get; set; }
 
         public void Mapping(Profile profile)
         {
             profile.CreateMap<InternshipGroup, GetInternshipGroupsResponse>()
-                .ForMember(d => d.EnterpriseName, opt => opt.MapFrom(s => s.Enterprise != null ? s.Enterprise.Name : null))
-                .ForMember(d => d.MentorName, opt => opt.MapFrom(s => s.Mentor != null && s.Mentor.User != null ? s.Mentor.User.FullName : null))
+                .ForMember(d => d.EnterpriseName,  opt => opt.MapFrom(s => s.Enterprise != null ? s.Enterprise.Name : null))
+                .ForMember(d => d.MentorName,      opt => opt.MapFrom(s => s.Mentor != null && s.Mentor.User != null ? s.Mentor.User.FullName : null))
                 .ForMember(d => d.NumberOfMembers, opt => opt.MapFrom(s => s.Members.Count))
-                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status));
+                .ForMember(d => d.Status,          opt => opt.MapFrom(s => s.Status))
+                .ForMember(d => d.PhaseStartDate,  opt => opt.MapFrom(s => s.InternshipPhase != null ? (DateOnly?)s.InternshipPhase.StartDate : null))
+                .ForMember(d => d.PhaseEndDate,    opt => opt.MapFrom(s => s.InternshipPhase != null ? (DateOnly?)s.InternshipPhase.EndDate   : null));
         }
     }
 }

@@ -31,7 +31,7 @@ public class GetMyInternshipTermsHandler : IRequestHandler<GetMyInternshipTermsQ
 
     public async Task<Result<List<GetMyInternshipTermsResponse>>> Handle(GetMyInternshipTermsQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting get my internship terms query.");
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStartQueryTerms));
 
         if (string.IsNullOrWhiteSpace(_currentUserService.UserId) || !Guid.TryParse(_currentUserService.UserId, out var userId))
         {
@@ -62,18 +62,29 @@ public class GetMyInternshipTermsHandler : IRequestHandler<GetMyInternshipTermsQ
             })
             .ToListAsync(cancellationToken);
 
-        // Get group info for these terms
-        var termIds = terms.Select(t => t.Term.TermId).ToList();
+        // Get group info for this student (InternshipGroup no longer has TermId)
         var groups = await _unitOfWork.Repository<InternshipGroup>()
             .Query()
             .Include(g => g.Enterprise)
             .Include(g => g.Mentor)
                 .ThenInclude(m => m!.User)
             .Include(g => g.Members)
-            .Where(g => termIds.Contains(g.TermId) && g.Members.Any(m => m.StudentId == student.StudentId))
+            .Where(g => g.Members.Any(m => m.StudentId == student.StudentId))
             .ToListAsync(cancellationToken);
 
-        var groupLookup = groups.ToDictionary(g => g.TermId);
+        // Use the first matching group per term lookup by student membership (best-effort)
+        var groupLookup = new Dictionary<Guid, InternshipGroup>();
+        int index = 0;
+        foreach (var g in groups)
+        {
+            // Map group to the first term that matches by position (legacy fallback)
+            // This is a temporary fix — use GetMyInternshipPhases for phase-based logic
+            if (index < terms.Count)
+            {
+                groupLookup[terms[index].Term.TermId] = g;
+                index++;
+            }
+        }
 
         var response = terms.Select(t => {
             var term = t.Term;

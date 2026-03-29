@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Sprints.Common;
+using IOCv2.Application.Features.WorkItems.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -89,6 +90,8 @@ public class CreateSprintHandler : IRequestHandler<CreateSprintCommand, Result<C
 
             await _cacheService.RemoveByPatternAsync(
                 SprintCacheKeys.SprintListPattern(request.ProjectId), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(
+                WorkItemCacheKeys.BacklogPattern(request.ProjectId), cancellationToken);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

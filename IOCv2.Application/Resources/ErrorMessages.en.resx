@@ -1204,6 +1204,12 @@
   <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
     <value>The group has already been archived.</value>
   </data>
+  <data name="InternshipGroups.CannotArchiveNoData" xml:space="preserve">
+    <value>Archiving is not supported for groups without activity data.</value>
+  </data>
+  <data name="InternshipGroup.HasActivityData" xml:space="preserve">
+    <value>The group has existing activity data (logbooks, evaluations, violations, or projects with content) and cannot be deleted. Please use the Archive function to preserve history.</value>
+  </data>
 
     <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Error getting violation reports</value>
@@ -1242,5 +1248,173 @@
   </data>
   <data name="ActiveTerms.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
+  </data>
+  <data name="Projects.MentorNotFound" xml:space="preserve">
+    <value>Mentor information not found in the system.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForCreate" xml:space="preserve">
+    <value>Cannot create a project for an archived or finished group.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForPublish" xml:space="preserve">
+    <value>Cannot publish a project for an archived or finished group.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForUpdate" xml:space="preserve">
+    <value>Cannot update a project in an archived or finished group.</value>
+  </data>
+  <data name="Projects.InvalidStatusForPublish" xml:space="preserve">
+    <value>Only Draft projects can be published.</value>
+  </data>
+  <data name="Projects.InvalidStatusForComplete" xml:space="preserve">
+    <value>Only Active projects can be marked as completed.</value>
+  </data>
+  <data name="Projects.InvalidStatusForUpdate" xml:space="preserve">
+    <value>Cannot update a project that is Completed or Archived.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithActiveAssignments" xml:space="preserve">
+    <value>Cannot delete a project that has active student assignments.</value>
+  </data>
+  <data name="Projects.ProjectCodeConflict" xml:space="preserve">
+    <value>Unable to generate a unique project code. Please try again.</value>
+  </data>
+  <data name="Projects.FieldRequired" xml:space="preserve">
+    <value>Project field is required.</value>
+  </data>
+  <data name="Projects.RequirementsRequired" xml:space="preserve">
+    <value>Project requirements are required.</value>
+  </data>
+  <data name="Projects.FieldMaxLength" xml:space="preserve">
+    <value>Project field must not exceed 100 characters.</value>
+  </data>
+  <data name="Projects.RequirementsMaxLength" xml:space="preserve">
+    <value>Project requirements must not exceed 2000 characters.</value>
+  </data>
+  <data name="Projects.DeliverablesMaxLength" xml:space="preserve">
+    <value>Project deliverables must not exceed 2000 characters.</value>
+  </data>
+  <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
+    <value>Group is no longer active (Finished or Archived).</value>
+  </data>
+  <data name="InternshipGroup.LogGroupNotActive" xml:space="preserve">
+    <value>Cannot perform operation. Group {0} is not in Active status.</value>
+  </data>
+  <data name="InternshipGroup.LogPhaseNotOpen" xml:space="preserve">
+    <value>Internship phase {0} is not open (current status: {1}). Cannot create group.</value>
+  </data>
+  <data name="InternshipGroup.LogUnauthorizedEnterpriseAccess" xml:space="preserve">
+    <value>HR {0} attempted to create a group for enterprise {1} which is not their own.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorRoleInvalid" xml:space="preserve">
+    <value>User {0} does not have the Mentor role and cannot be assigned as a mentor.</value>
+  </data>
+  <data name="Projects.NoGroupAssigned" xml:space="preserve">
+    <value>Project has no internship group assigned and cannot be published.</value>
+  </data>
+  <data name="Projects.GroupIsFinished" xml:space="preserve">
+    <value>The internship group has finished and the project cannot be published.</value>
+  </data>
+  <data name="Projects.CannotDeleteHasData" xml:space="preserve">
+    <value>Cannot delete project that already has data (work items or sprints).</value>
+  </data>
+  <data name="Projects.InvalidStatusForUnpublish" xml:space="preserve">
+    <value>Only Published projects can be unpublished.</value>
+  </data>
+  <data name="Projects.CannotUnpublishStarted" xml:space="preserve">
+    <value>Project cannot be unpublished after group assignment has started.</value>
+  </data>
+  <data name="Projects.MustBeCompletedToArchive" xml:space="preserve">
+    <value>Project must be Completed before archiving.</value>
+  </data>
+  <data name="Projects.AlreadyAssignedToGroup" xml:space="preserve">
+    <value>Project is already assigned to a group.</value>
+  </data>
+  <data name="Projects.GroupNotActive" xml:space="preserve">
+    <value>Group is not active (Finished or Archived).</value>
+  </data>
+  <data name="Projects.GroupPhaseEnded" xml:space="preserve">
+    <value>Group's internship phase has ended.</value>
+  </data>
+  <data name="Projects.ProjectNotAssigned" xml:space="preserve">
+    <value>Project is not currently assigned to any group.</value>
+  </data>
+  <data name="Projects.HasStudentDataWorkItems" xml:space="preserve">
+    <value>Cannot swap group: project has student data (work items).</value>
+  </data>
+  <data name="Projects.HasStudentDataSprints" xml:space="preserve">
+    <value>Cannot swap group: project has student data (sprints).</value>
+  </data>
+  <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
+    <value>Only Active internship groups can be deleted.</value>
+  </data>
+  <data name="InternshipGroup.LogNoStudentsProvided" xml:space="preserve">
+    <value>No students were provided when creating group '{GroupName}'</value>
+  </data>
+  <data name="InternshipGroup.LogStudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Student {StudentId} is already in an active group in internship phase {PhaseId}</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedHrEnterprise" xml:space="preserve">
+    <value>User {UserId} (HR/EnterpriseAdmin) tried to access group {GroupId} of a different enterprise.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedMentor" xml:space="preserve">
+    <value>User {UserId} (Mentor) tried to access group {GroupId} they are not assigned to.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedStudent" xml:space="preserve">
+    <value>User {UserId} (Student) tried to access group {GroupId} they are not a member of.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteNotificationFailed" xml:space="preserve">
+    <value>Internship group deletion succeeded but mentor notification failed for group {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFoundForUser" xml:space="preserve">
+    <value>Student record not found for user {UserId}</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineDenied" xml:space="preserve">
+    <value>Mine internship groups query denied because current user is unavailable.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineStudentNotFound" xml:space="preserve">
+    <value>Mine internship groups query failed because student profile was not found for current user.</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardNotFound" xml:space="preserve">
+    <value>Dashboard data not found for InternshipId: {Id}</value>
+  </data>
+  <data name="InternshipGroup.LogNoPhasesForEnterprise" xml:space="preserve">
+    <value>No Active or Upcoming phases found for enterprise {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveError" xml:space="preserve">
+    <value>An error occurred while archiving the internship group</value>
+  </data>
+  <data name="InternshipGroup.LogMoveError" xml:space="preserve">
+    <value>An error occurred while moving students between groups</value>
+  </data>
+  <data name="Profile.PhoneMaxLength" xml:space="preserve">
+    <value>Phone Number must not exceed 15 characters.</value>
+  </data>
+  <data name="Profile.PortfolioUrlMaxLength" xml:space="preserve">
+    <value>Portfolio URL must not exceed 255 characters.</value>
+  </data>
+  <data name="Profile.PortfolioUrlInvalid" xml:space="preserve">
+    <value>Portfolio URL is invalid.</value>
+  </data>
+  <data name="Profile.BioMaxLength" xml:space="preserve">
+    <value>Bio must not exceed 1000 characters.</value>
+  </data>
+  <data name="Profile.ExpertiseMaxLength" xml:space="preserve">
+    <value>Expertise must not exceed 500 characters.</value>
+  </data>
+  <data name="Profile.DepartmentMaxLength" xml:space="preserve">
+    <value>Department must not exceed 150 characters.</value>
+  </data>
+  <data name="Profile.CvFileMaxSize" xml:space="preserve">
+    <value>CV file must not exceed 10MB.</value>
+  </data>
+  <data name="Profile.CvFileInvalidFormat" xml:space="preserve">
+    <value>Only .pdf, .doc, and .docx files are allowed.</value>
+  </data>
+  <data name="Profile.StudentNotFound" xml:space="preserve">
+    <value>Student profile not found.</value>
+  </data>
+  <data name="Profile.CvNotFound" xml:space="preserve">
+    <value>CV not found for this profile.</value>
+  </data>
+  <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
+    <value>File not found in storage.</value>
   </data>
 </root>

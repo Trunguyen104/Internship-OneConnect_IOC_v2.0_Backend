@@ -32,6 +32,7 @@ public partial class AppDbContext : DbContext
 
     // Project Management
     public DbSet<Term> Terms { get; set; } = null!;
+    public DbSet<InternshipPhase> InternshipPhases { get; set; } = null!;
     public DbSet<StudentTerm> StudentTerms { get; set; } = null!;
     public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
     public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
@@ -92,8 +93,12 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<SprintWorkItem>()
+        .HasKey(x => new { x.SprintId, x.WorkItemId });
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         OnModelCreatingPartial(modelBuilder);
+        base.OnModelCreating(modelBuilder);
 
         ApplyGlobalFilters(modelBuilder);
     }
@@ -112,6 +117,30 @@ public partial class AppDbContext : DbContext
                 var lambda = Expression.Lambda(equalExpression, parameter);
 
                 modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+
+                // Configure Unique Indexes to ignore soft-deleted rows
+                var deletedAtProperty = entityType.FindProperty(nameof(BaseEntity.DeletedAt));
+                if (deletedAtProperty != null)
+                {
+                    var columnName = deletedAtProperty.GetColumnBaseName() ?? "deleted_at";
+                    var filterSql = $"{columnName} IS NULL";
+
+                    foreach (var index in entityType.GetIndexes())
+                    {
+                        if (index.IsUnique)
+                        {
+                            var currentFilter = index.GetFilter();
+                            if (string.IsNullOrEmpty(currentFilter))
+                            {
+                                index.SetFilter(filterSql);
+                            }
+                            else if (!currentFilter.Contains(filterSql) && !currentFilter.Contains(columnName))
+                            {
+                                index.SetFilter($"({currentFilter}) AND {filterSql}");
+                            }
+                        }
+                    }
+                }
             }
         }
     }

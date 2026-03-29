@@ -1,9 +1,11 @@
 using IOCv2.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace IOCv2.Domain.Entities;
 
 public class InternshipApplication : BaseEntity
 {
+    [Key]
     public Guid ApplicationId { get; set; }
     public Guid EnterpriseId { get; set; }
     public Guid TermId { get; set; }

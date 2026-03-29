@@ -51,18 +51,18 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
 
                 if (entity.Status != GroupStatus.Active)
                 {
-                    _logger.LogWarning("Cannot update info. Group {GroupId} is not Active.", entity.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogGroupNotActive), entity.InternshipId);
                     return Result<UpdateInternshipGroupResponse>.Failure(
-                        "Chỉ có thể cập nhật thông tin nhóm đang hoạt động (Active).",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.GroupNotActive),
                         ResultErrorType.BadRequest);
                 }
 
-                // Validate TermId
-                var termExists = await _unitOfWork.Repository<Term>()
-                    .ExistsAsync(t => t.TermId == request.TermId, cancellationToken);
-                if (!termExists)
+                // Validate PhaseId
+                var phaseExists = await _unitOfWork.Repository<InternshipPhase>()
+                    .ExistsAsync(p => p.PhaseId == request.PhaseId, cancellationToken);
+                if (!phaseExists)
                 {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.TermId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.PhaseId);
                     return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound), ResultErrorType.NotFound);
                 }
 
@@ -85,13 +85,25 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     // Frontend truyền UserId của mentor → tìm ra EnterpriseUserId để lưu DB
                     var mentor = await _unitOfWork.Repository<EnterpriseUser>()
                         .Query()
+                        .Include(eu => eu.User)
                         .AsNoTracking()
-                        .FirstOrDefaultAsync(u => u.UserId == request.MentorId.Value, cancellationToken);
+                        .FirstOrDefaultAsync(eu => eu.UserId == request.MentorId.Value, cancellationToken);
+
                     if (mentor == null)
                     {
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorNotFound), request.MentorId);
                         return Result<UpdateInternshipGroupResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound), ResultErrorType.NotFound);
                     }
+
+                    // Chỉ chấp nhận tài khoản có role Mentor
+                    if (mentor.User == null || mentor.User.Role != IOCv2.Domain.Enums.UserRole.Mentor)
+                    {
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorRoleInvalid), request.MentorId);
+                        return Result<UpdateInternshipGroupResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
+                            ResultErrorType.BadRequest);
+                    }
+
                     resolvedMentorId = mentor.EnterpriseUserId;
                 }
 
@@ -100,7 +112,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 entity.UpdateInfo(
                     request.GroupName,
                     request.Description,
-                    request.TermId,
+                    request.PhaseId,
                     request.EnterpriseId,
                     resolvedMentorId, // EnterpriseUserId
                     request.StartDate,
@@ -110,7 +122,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(entity);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (saved > 0 || !_unitOfWork.Repository<InternshipGroup>().Query().Any(x => x.InternshipId == request.InternshipId))
+                if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
                     await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(entity.InternshipId), cancellationToken);

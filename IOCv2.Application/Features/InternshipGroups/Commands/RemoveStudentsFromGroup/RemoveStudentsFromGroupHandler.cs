@@ -14,34 +14,57 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
     public class RemoveStudentsFromGroupHandler : IRequestHandler<RemoveStudentsFromGroupCommand, Result<RemoveStudentsFromGroupResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
         private readonly ILogger<RemoveStudentsFromGroupHandler> _logger;
         private readonly ICacheService _cacheService;
+        private readonly INotificationPushService _pushService;
 
         public RemoveStudentsFromGroupHandler(
             IUnitOfWork unitOfWork,
+            ICurrentUserService currentUserService,
             IMessageService messageService,
             IMapper mapper,
             ILogger<RemoveStudentsFromGroupHandler> logger,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            INotificationPushService pushService)
         {
             _unitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
             _messageService = messageService;
             _mapper = mapper;
             _logger = logger;
             _cacheService = cacheService;
+            _pushService = pushService;
         }
 
         public async Task<Result<RemoveStudentsFromGroupResponse>> Handle(RemoveStudentsFromGroupCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemovingStudents), request.InternshipId);
 
+            // Enterprise ownership check
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+                return Result<RemoveStudentsFromGroupResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Unauthorized),
+                    ResultErrorType.Unauthorized);
+
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
+
+            if (enterpriseUser == null)
+                return Result<RemoveStudentsFromGroupResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseUserNotFound),
+                    ResultErrorType.Forbidden);
+
             try
             {
-                // Không dùng AsNoTracking — cần EF track để xóa InternshipStudent
                 var group = await _unitOfWork.Repository<InternshipGroup>().Query()
                     .Include(g => g.Members)
+                        .ThenInclude(m => m.Student)
+                            .ThenInclude(s => s.User)
+                    .Include(g => g.Mentor)
                     .FirstOrDefaultAsync(x => x.InternshipId == request.InternshipId, cancellationToken);
 
                 if (group == null)
@@ -52,35 +75,88 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
 
                 if (group.Status != GroupStatus.Active)
                 {
-                    _logger.LogWarning("Cannot remove students from group. Group {GroupId} is not Active.", group.InternshipId);
                     return Result<RemoveStudentsFromGroupResponse>.Failure(
-                        "Chỉ có thể xóa sinh viên khỏi nhóm đang hoạt động (Active).",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.GroupNotActive),
                         ResultErrorType.BadRequest);
                 }
 
+                if (group.EnterpriseId != enterpriseUser.EnterpriseId)
+                    return Result<RemoveStudentsFromGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise),
+                        ResultErrorType.Forbidden);
+
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-                // Xóa trực tiếp các InternshipStudent record thay vì UpdateAsync group
                 var membersToRemove = group.Members
                     .Where(m => request.StudentIds.Contains(m.StudentId))
                     .ToList();
 
+                if (!membersToRemove.Any())
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemoveStudentsFailed));
+                    return Result<RemoveStudentsFromGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.StudentListToRemoveRequired),
+                        ResultErrorType.BadRequest);
+                }
+
                 var memberRepo = _unitOfWork.Repository<InternshipStudent>();
                 foreach (var member in membersToRemove)
                 {
-                    await memberRepo.DeleteAsync(member);
+                    // Hard-delete: xóa hẳn record để sinh viên có thể được thêm vào nhóm khác
+                    // Soft-delete sẽ gây conflict composite PK (InternshipId, StudentId) khi thêm lại
+                    await memberRepo.HardDeleteAsync(member);
                 }
 
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (saved >= 0)
+                if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                    if (group.MentorId.HasValue && group.Mentor != null && membersToRemove.Any())
+                    {
+                        var mentorUserId = group.Mentor.UserId;
+
+                        foreach (var member in membersToRemove)
+                        {
+                            var studentName = member.Student?.User?.FullName ?? member.StudentId.ToString();
+
+                            var notification = new Notification
+                            {
+                                NotificationId = Guid.NewGuid(),
+                                UserId = mentorUserId,
+                                Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationProjectCleanupTitle),
+                                Content = string.Format(
+                                    _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationProjectCleanupContent),
+                                    studentName),
+                                Type = NotificationType.General,
+                                ReferenceType = nameof(InternshipGroup),
+                                ReferenceId = group.InternshipId,
+                                IsRead = false
+                            };
+
+                            await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+                        }
+
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                        var unreadCount = await _unitOfWork.Repository<Notification>()
+                            .CountAsync(n => n.UserId == mentorUserId && !n.IsRead, cancellationToken);
+
+                        await _pushService.PushNewNotificationAsync(mentorUserId, new
+                        {
+                            type = NotificationType.General,
+                            referenceType = nameof(InternshipGroup),
+                            referenceId = group.InternshipId,
+                            currentUnreadCount = unreadCount
+                        }, cancellationToken);
+                    }
+
                     await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(group.InternshipId), cancellationToken);
                     await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRemovedStudentsSuccess), request.InternshipId);
 
-                    // Reload group sau khi xóa để response đúng
                     var updatedGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                         .Include(g => g.Members)
                         .AsNoTracking()

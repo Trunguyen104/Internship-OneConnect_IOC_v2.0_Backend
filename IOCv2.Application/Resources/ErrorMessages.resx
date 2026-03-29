@@ -1036,7 +1036,7 @@
     <value>Sinh viên đã tham gia một nhóm khác trong kỳ này.</value>
   </data>
   <data name="InternshipGroup.LogStudentNotApproved" xml:space="preserve">
-    <value>Student {0} does not have an approved application for enterprise {1}</value>
+    <value>Sinh viên {0} chưa có đơn ứng tuyển được duyệt cho doanh nghiệp {1}.</value>
   </data>
   <data name="InternshipGroup.LogTermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ với ID: {TermId}</value>
@@ -1260,6 +1260,12 @@
   <data name="InternshipGroup.GroupAlreadyArchived" xml:space="preserve">
     <value>Nhóm đã được lưu trữ (Archived) từ trước.</value>
   </data>
+  <data name="InternshipGroups.CannotArchiveNoData" xml:space="preserve">
+    <value>Không hỗ trợ Archive cho nhóm chưa có dữ liệu hoạt động.</value>
+  </data>
+  <data name="InternshipGroup.HasActivityData" xml:space="preserve">
+    <value>Nhóm đã có dữ liệu hoạt động (logbook, đánh giá, vi phạm hoặc project đã có nội dung), không thể xóa. Vui lòng dùng chức năng Archive để giữ lại lịch sử.</value>
+  </data>
 
     <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi lấy danh sách báo cáo vi phạm.</value>
@@ -1298,5 +1304,173 @@
   </data>
   <data name="ActiveTerms.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
+  </data>
+  <data name="Projects.MentorNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin Mentor trong hệ thống.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForCreate" xml:space="preserve">
+    <value>Không thể tạo dự án cho nhóm đã lưu trữ hoặc kết thúc.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForPublish" xml:space="preserve">
+    <value>Không thể phát hành dự án cho nhóm đã lưu trữ hoặc kết thúc.</value>
+  </data>
+  <data name="Projects.GroupNotActiveForUpdate" xml:space="preserve">
+    <value>Không thể cập nhật dự án trong nhóm đã lưu trữ hoặc kết thúc.</value>
+  </data>
+  <data name="Projects.InvalidStatusForPublish" xml:space="preserve">
+    <value>Chỉ có thể phát hành dự án đang ở trạng thái Bản nháp.</value>
+  </data>
+  <data name="Projects.InvalidStatusForComplete" xml:space="preserve">
+    <value>Chỉ có thể hoàn thành dự án đang ở trạng thái Đang hoạt động (Active).</value>
+  </data>
+  <data name="Projects.InvalidStatusForUpdate" xml:space="preserve">
+    <value>Không thể cập nhật dự án đã hoàn thành hoặc đã lưu trữ.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithActiveAssignments" xml:space="preserve">
+    <value>Không thể xóa dự án đang có sinh viên được gán.</value>
+  </data>
+  <data name="Projects.ProjectCodeConflict" xml:space="preserve">
+    <value>Không thể tạo mã dự án duy nhất. Vui lòng thử lại.</value>
+  </data>
+  <data name="Projects.FieldRequired" xml:space="preserve">
+    <value>Lĩnh vực dự án là bắt buộc.</value>
+  </data>
+  <data name="Projects.RequirementsRequired" xml:space="preserve">
+    <value>Yêu cầu dự án là bắt buộc.</value>
+  </data>
+  <data name="Projects.FieldMaxLength" xml:space="preserve">
+    <value>Lĩnh vực dự án không được vượt quá 100 ký tự.</value>
+  </data>
+  <data name="Projects.RequirementsMaxLength" xml:space="preserve">
+    <value>Yêu cầu dự án không được vượt quá 2000 ký tự.</value>
+  </data>
+  <data name="Projects.DeliverablesMaxLength" xml:space="preserve">
+    <value>Kết quả bàn giao không được vượt quá 2000 ký tự.</value>
+  </data>
+  <data name="InternshipGroup.GroupNotActive" xml:space="preserve">
+    <value>Nhóm không còn hoạt động (Finished hoặc Archived).</value>
+  </data>
+  <data name="InternshipGroup.LogGroupNotActive" xml:space="preserve">
+    <value>Không thể thực hiện thao tác. Nhóm {0} không ở trạng thái Active.</value>
+  </data>
+  <data name="InternshipGroup.LogPhaseNotOpen" xml:space="preserve">
+    <value>Đợt thực tập {0} không ở trạng thái mở (trạng thái hiện tại: {1}). Không thể tạo nhóm.</value>
+  </data>
+  <data name="InternshipGroup.LogUnauthorizedEnterpriseAccess" xml:space="preserve">
+    <value>HR {0} cố tạo nhóm cho doanh nghiệp {1} không phải doanh nghiệp của họ.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorRoleInvalid" xml:space="preserve">
+    <value>Người dùng {0} không có vai trò Mentor, không thể gán làm người hướng dẫn.</value>
+  </data>
+  <data name="Projects.NoGroupAssigned" xml:space="preserve">
+    <value>Project chưa được gắn với nhóm thực tập, không thể publish.</value>
+  </data>
+  <data name="Projects.GroupIsFinished" xml:space="preserve">
+    <value>Nhóm thực tập đã kết thúc (Finished), không thể publish project.</value>
+  </data>
+  <data name="Projects.CannotDeleteHasData" xml:space="preserve">
+    <value>Không thể xóa project đã có dữ liệu (work items hoặc sprints).</value>
+  </data>
+  <data name="Projects.InvalidStatusForUnpublish" xml:space="preserve">
+    <value>Chỉ có thể chuyển về Bản nháp dự án đang ở trạng thái Đã phát hành.</value>
+  </data>
+  <data name="Projects.CannotUnpublishStarted" xml:space="preserve">
+    <value>Không thể chuyển về Bản nháp sau khi dự án đã được gán cho nhóm.</value>
+  </data>
+  <data name="Projects.MustBeCompletedToArchive" xml:space="preserve">
+    <value>Dự án phải ở trạng thái Hoàn thành trước khi lưu trữ.</value>
+  </data>
+  <data name="Projects.AlreadyAssignedToGroup" xml:space="preserve">
+    <value>Dự án đã được gán cho một nhóm thực tập rồi.</value>
+  </data>
+  <data name="Projects.GroupNotActive" xml:space="preserve">
+    <value>Nhóm thực tập không còn hoạt động (đã kết thúc hoặc đã lưu trữ).</value>
+  </data>
+  <data name="Projects.GroupPhaseEnded" xml:space="preserve">
+    <value>Kỳ thực tập của nhóm đã kết thúc, không thể gán dự án.</value>
+  </data>
+  <data name="Projects.ProjectNotAssigned" xml:space="preserve">
+    <value>Dự án hiện không được gán cho nhóm nào.</value>
+  </data>
+  <data name="Projects.HasStudentDataWorkItems" xml:space="preserve">
+    <value>Không thể chuyển nhóm: dự án đã có dữ liệu sinh viên (work items).</value>
+  </data>
+  <data name="Projects.HasStudentDataSprints" xml:space="preserve">
+    <value>Không thể chuyển nhóm: dự án đã có dữ liệu sinh viên (sprints).</value>
+  </data>
+  <data name="InternshipGroups.CannotDeleteNotActive" xml:space="preserve">
+    <value>Chỉ có thể xóa nhóm thực tập đang ở trạng thái Active.</value>
+  </data>
+  <data name="InternshipGroup.LogNoStudentsProvided" xml:space="preserve">
+    <value>Không có sinh viên nào được cung cấp khi tạo nhóm '{GroupName}'</value>
+  </data>
+  <data name="InternshipGroup.LogStudentAlreadyInActiveGroup" xml:space="preserve">
+    <value>Sinh viên {StudentId} đã thuộc nhóm Active trong kỳ thực tập {PhaseId}</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedHrEnterprise" xml:space="preserve">
+    <value>Người dùng {UserId} (HR/EnterpriseAdmin) cố truy cập nhóm {GroupId} của doanh nghiệp khác.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedMentor" xml:space="preserve">
+    <value>Người dùng {UserId} (Mentor) cố truy cập nhóm {GroupId} mà họ không được phân công.</value>
+  </data>
+  <data name="InternshipGroup.LogAccessDeniedStudent" xml:space="preserve">
+    <value>Người dùng {UserId} (Sinh viên) cố truy cập nhóm {GroupId} mà họ không phải thành viên.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteNotificationFailed" xml:space="preserve">
+    <value>Xóa nhóm thực tập thành công nhưng gửi thông báo cho mentor thất bại. Nhóm: {InternshipId}</value>
+  </data>
+  <data name="InternshipGroup.LogStudentNotFoundForUser" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ sinh viên cho người dùng {UserId}</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineDenied" xml:space="preserve">
+    <value>Truy vấn nhóm thực tập của tôi bị từ chối vì người dùng hiện tại không hợp lệ.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineStudentNotFound" xml:space="preserve">
+    <value>Truy vấn nhóm thực tập của tôi thất bại vì không tìm thấy hồ sơ sinh viên cho người dùng hiện tại.</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardNotFound" xml:space="preserve">
+    <value>Không tìm thấy dữ liệu dashboard cho nhóm thực tập ID: {Id}</value>
+  </data>
+  <data name="InternshipGroup.LogNoPhasesForEnterprise" xml:space="preserve">
+    <value>Không tìm thấy đợt Active hoặc Upcoming cho doanh nghiệp {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình lưu trữ nhóm thực tập</value>
+  </data>
+  <data name="InternshipGroup.LogMoveError" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình chuyển sinh viên giữa các nhóm</value>
+  </data>
+  <data name="Profile.PhoneMaxLength" xml:space="preserve">
+    <value>Số điện thoại không được vượt quá 15 ký tự.</value>
+  </data>
+  <data name="Profile.PortfolioUrlMaxLength" xml:space="preserve">
+    <value>Link portfolio không được vượt quá 255 ký tự.</value>
+  </data>
+  <data name="Profile.PortfolioUrlInvalid" xml:space="preserve">
+    <value>Link portfolio không hợp lệ.</value>
+  </data>
+  <data name="Profile.BioMaxLength" xml:space="preserve">
+    <value>Giới thiệu bản thân không được vượt quá 1000 ký tự.</value>
+  </data>
+  <data name="Profile.ExpertiseMaxLength" xml:space="preserve">
+    <value>Chuyên môn không được vượt quá 500 ký tự.</value>
+  </data>
+  <data name="Profile.DepartmentMaxLength" xml:space="preserve">
+    <value>Khoa/Phòng ban không được vượt quá 150 ký tự.</value>
+  </data>
+  <data name="Profile.CvFileMaxSize" xml:space="preserve">
+    <value>File CV không được vượt quá 10MB.</value>
+  </data>
+  <data name="Profile.CvFileInvalidFormat" xml:space="preserve">
+    <value>Chỉ chấp nhận các file định dạng .pdf, .doc, và .docx.</value>
+  </data>
+  <data name="Profile.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy hồ sơ hệ thống.</value>
+  </data>
+  <data name="Profile.CvNotFound" xml:space="preserve">
+    <value>Không tìm thấy CV cho hồ sơ này.</value>
+  </data>
+  <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
+    <value>Không tìm thấy file tải lên.</value>
   </data>
 </root>

@@ -92,9 +92,7 @@ public class GetTermByIdHandler : IRequestHandler<GetTermByIdQuery, Result<GetTe
                         _unitOfWork.Repository<InternshipApplication>().Query()
                             .Any(a => a.TermId == t.TermId && a.EnterpriseId == eid) ||
                         _unitOfWork.Repository<StudentTerm>().Query()
-                            .Any(st => st.TermId == t.TermId && st.EnterpriseId == eid && st.EnrollmentStatus == EnrollmentStatus.Active) ||
-                        _unitOfWork.Repository<InternshipGroup>().Query()
-                            .Any(ig => ig.TermId == t.TermId && ig.EnterpriseId == eid))
+                            .Any(st => st.TermId == t.TermId && st.EnterpriseId == eid && st.EnrollmentStatus == EnrollmentStatus.Active))
                     .AnyAsync(cancellationToken);
 
                 if (!termInScope)

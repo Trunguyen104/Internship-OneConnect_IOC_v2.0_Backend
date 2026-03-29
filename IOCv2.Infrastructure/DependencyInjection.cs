@@ -1,4 +1,5 @@
 using IOCv2.Application.Interfaces;
+using IOCv2.Infrastructure.BackgroundJobs;
 using IOCv2.Infrastructure.Persistence;
 using IOCv2.Infrastructure.Persistence.Repositories;
 using IOCv2.Infrastructure.Security;
@@ -52,6 +53,9 @@ namespace IOCv2.Infrastructure
 
             // Register Hosted Service to process emails
             services.AddHostedService<EmailHostedService>();
+
+            // Register Background Job to auto-complete expired projects
+            services.AddHostedService<AutoCompleteProjectsJob>();
 
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITokenService, JwtTokenService>();

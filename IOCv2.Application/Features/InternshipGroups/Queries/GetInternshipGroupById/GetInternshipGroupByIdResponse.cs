@@ -11,8 +11,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
     public class GetInternshipGroupByIdResponse : IMapFrom<InternshipGroup>
     {
         public Guid InternshipId { get; set; }
-        public Guid TermId { get; set; }
+        public Guid PhaseId { get; set; }
         public string GroupName { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public Guid? EnterpriseId { get; set; }
         public string? EnterpriseName { get; set; }
         public Guid? MentorId { get; set; }
