@@ -8,12 +8,13 @@ public static class EnvironmentConfig
 {
     public static void LoadEnvironmentVariables(this WebApplicationBuilder builder)
     {
-        // Walk up parent directories to find the shared root .env file
-        var envPath = FindEnvFile(Directory.GetCurrentDirectory());
-
+        var envFileName = builder.Environment.EnvironmentName == "Test" ? ".env.test" : ".env";
+        var envPath = FindEnvFile(Directory.GetCurrentDirectory(), envFileName);
+        
         if (envPath != null)
         {
             Env.Load(envPath);
+            Log.Information("Environment Variable Mapping: Loaded from {EnvFile}", envFileName);
         }
 
         // Map JWT
@@ -101,14 +102,14 @@ public static class EnvironmentConfig
     }
 
     /// <summary>
-    /// Walk up parent directories to find the nearest .env file.
+    /// Walk up parent directories to find the nearest environment file.
     /// </summary>
-    private static string? FindEnvFile(string startDir)
+    private static string? FindEnvFile(string startDir, string fileName = ".env")
     {
         var dir = startDir;
         for (var i = 0; i < 5; i++) // max 5 levels up
         {
-            var candidate = Path.Combine(dir, ".env");
+            var candidate = Path.Combine(dir, fileName);
             if (File.Exists(candidate)) return candidate;
 
             var parent = Directory.GetParent(dir);
