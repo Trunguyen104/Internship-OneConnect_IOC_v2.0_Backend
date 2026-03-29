@@ -962,6 +962,18 @@ namespace IOCv2.Application.Constants
             public const string ReopenNotifyStudentSubject = "JobPosting.ReopenNotifyStudentSubject";
             public const string ReopenNotifyStudentBody = "JobPosting.ReopenNotifyStudentBody";
             public const string ReopenSuccess = "JobPosting.ReopenSuccess";
+            // Apply Job
+            public const string UploadCVRequired = "JobPosting.UploadCVRequired";
+            public const string CannotApplyWhenPlaced = "JobPosting.CannotApplyWhenPlaced";
+            public const string PositionNotOpenForApplication = "JobPosting.PositionNotOpenForApplication";
+            public const string ApplicationDeadlinePassed = "JobPosting.ApplicationDeadlinePassed";
+            public const string NoActiveInternshipPeriod = "JobPosting.NoActiveInternshipPeriod";
+            public const string AlreadyHaveActiveApplication = "JobPosting.AlreadyHaveActiveApplication";
+            public const string ApplicationLimitReached = "JobPosting.ApplicationLimitReached";
+            public const string StudentAppliedToEnterpriseJob = "JobPosting.StudentAppliedToEnterpriseJob";
+            public const string ApplySuccessPendingHR = "JobPosting.ApplySuccessPendingHR";
+            // Get Jobs
+            public const string InternshipInProgress = "JobPosting.InternshipInProgress";
         }
         public static class InternshipPhase
         {

@@ -55,9 +55,9 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
                 RuleFor(x => x.EndDate)
                     .NotEmpty()
                     .WithMessage(messageService.GetMessage("End date is required."))
-                    .Must((cmd, end) => end.HasValue && cmd.StartDate.HasValue && end.Value.Day > cmd.StartDate.Value.Day + JobsPostingParam.Common.MinimumDurationDays)
+                    .Must((cmd, end) => end.HasValue && cmd.StartDate.HasValue && end.Value > cmd.StartDate.Value.AddDays(JobsPostingParam.Common.MinimumDurationDays))
                     .WithMessage(messageService.GetMessage($"End date must be at least {JobsPostingParam.Common.MinimumDurationDays} days after start date."))
-                    .Must((cmd, end) => end.HasValue && cmd.StartDate.HasValue && end.Value.Day <= cmd.StartDate.Value.Day + JobsPostingParam.Common.MaximumDurationDays)
+                    .Must((cmd, end) => end.HasValue && cmd.StartDate.HasValue && end.Value <= cmd.StartDate.Value.AddDays(JobsPostingParam.Common.MaximumDurationDays))
                     .WithMessage(messageService.GetMessage($"End date must be at most {JobsPostingParam.Common.MaximumDurationDays} days after start date."));
 
                 // Audience rules

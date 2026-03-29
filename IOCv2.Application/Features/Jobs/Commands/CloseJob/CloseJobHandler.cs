@@ -2,6 +2,7 @@
 using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.Jobs;
 using IOCv2.Application.Interfaces;
+using IOCv2.Application.Features.Notifications.Events;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
@@ -18,20 +19,20 @@ namespace IOCv2.Application.Features.Jobs.Commands.CloseJob
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMessageService _messageService;
-        private readonly IBackgroundEmailSender _emailSender;
+        private readonly IPublisher _publisher;
         private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<CloseJobHandler> _logger;
 
         public CloseJobHandler(
             IUnitOfWork unitOfWork,
             IMessageService messageService,
-            IBackgroundEmailSender emailSender,
+            IPublisher publisher,
             ICurrentUserService currentUserService,
             ILogger<CloseJobHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
-            _emailSender = emailSender;
+            _publisher = publisher;
             _currentUserService = currentUserService;
             _logger = logger;
         }
@@ -125,17 +126,12 @@ namespace IOCv2.Application.Features.Jobs.Commands.CloseJob
 
                 _logger.LogInformation("Job {JobId} closed by {UserId}. ActiveApplications: {Count}", job.JobId, _currentUserService.UserId, activeCount);
 
-                // Notify students with active applications
+                // Publish notification events for students with active applications (no emails here)
                 if (activeCount > 0)
                 {
                     var jobTitle = job.Title ?? string.Empty;
-                    var subject = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotifyStudentClosedSubject, jobTitle);
-                    var bodyTemplate = _messageService.GetMessage(
-                        MessageKeys.JobPostingMessageKey.NotifyStudentClosedBody,
-                        jobTitle,
-                        job.Enterprise?.Name ?? string.Empty);
+                    var enterpriseName = job.Enterprise?.Name ?? string.Empty;
 
-                    // Send email to each distinct student (by email)
                     var distinctUsers = activeApplications
                         .Select(a => a.Student?.User)
                         .Where(u => u != null)
@@ -147,12 +143,15 @@ namespace IOCv2.Application.Features.Jobs.Commands.CloseJob
                     {
                         try
                         {
-                            // Enqueue background email (do not fail the operation if email enqueue fails)
-                            await _emailSender.EnqueueEmailAsync(user.Email, subject, bodyTemplate, job.JobId, job.UpdatedBy, cancellationToken);
+                            await _publisher.Publish(new JobClosedEvent(
+                                user.UserId,
+                                job.JobId,
+                                jobTitle,
+                                enterpriseName), cancellationToken);
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogWarning(ex, "Failed enqueueing email notification for user {Email} about closed job {JobId}", user.Email, job.JobId);
+                            _logger.LogWarning(ex, "Failed to publish JobClosedEvent for user {UserId} and job {JobId}", user.UserId, job.JobId);
                         }
                     }
                 }
