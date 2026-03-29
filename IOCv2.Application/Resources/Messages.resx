@@ -1019,7 +1019,4 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>Không tìm thấy User {UserId} khi lấy profile</value>
   </data>
-  <data name="Profile.UpdateSuccess" xml:space="preserve">
-    <value>Cập nhật thông tin cá nhân thành công.</value>
-  </data>
 </root>
