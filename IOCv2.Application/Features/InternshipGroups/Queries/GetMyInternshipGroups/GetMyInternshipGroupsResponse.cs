@@ -9,8 +9,8 @@ public class GetMyInternshipGroupsResponse
     public string Name { get; set; } = string.Empty;
     public Guid? EnterpriseId { get; set; }
     public Guid SchoolId { get; set; }
-    public Guid TermId { get; set; }
-    public InternshipStatus GroupStatus { get; set; }
+    public Guid PhaseId { get; set; }
+    public GroupStatus GroupStatus { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Description { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ public class GetMyInternshipGroupsResponse
     public DateTime? UpdatedAt { get; set; }
     public MineEnterpriseDto? Enterprise { get; set; }
     public MineSchoolDto? School { get; set; }
-    public MineTermDto? Term { get; set; }
+    public MinePhaseDto? Phase { get; set; }
     public MineProjectDto? Project { get; set; }
     public List<MineMentorDto> Mentors { get; set; } = new();
     public int StudentCount { get; set; }
@@ -29,19 +29,19 @@ public class GetMyInternshipGroupsResponse
     public Guid? CreatedBy { get; set; }
     public Guid? UpdatedBy { get; set; }
 
-    public static GetMyInternshipGroupsResponse FromEntity(InternshipGroup group, Project? project)
+    public static GetMyInternshipGroupsResponse FromEntity(InternshipGroup group, Project? project, University? university = null)
     {
         return new GetMyInternshipGroupsResponse
         {
             Id = group.InternshipId,
             Name = group.GroupName,
             EnterpriseId = group.EnterpriseId,
-            SchoolId = group.Term.UniversityId,
-            TermId = group.TermId,
+            SchoolId = university?.UniversityId ?? Guid.Empty,
+            PhaseId = group.PhaseId,
             GroupStatus = group.Status,
             StartDate = group.StartDate,
             EndDate = group.EndDate,
-            Description = string.Empty,
+            Description = group.Description ?? string.Empty,
             AllowLecturerView = false,
             CreatedAt = group.CreatedAt,
             UpdatedAt = group.UpdatedAt,
@@ -52,17 +52,17 @@ public class GetMyInternshipGroupsResponse
                     Id = group.Enterprise.EnterpriseId,
                     Name = group.Enterprise.Name
                 },
-            School = group.Term.University == null
+            School = university == null
                 ? null
                 : new MineSchoolDto
                 {
-                    Id = group.Term.University.UniversityId,
-                    Name = group.Term.University.Name
+                    Id = university.UniversityId,
+                    Name = university.Name
                 },
-            Term = new MineTermDto
+            Phase = new MinePhaseDto
             {
-                Id = group.Term.TermId,
-                Name = group.Term.Name
+                Id = group.InternshipPhase?.PhaseId ?? Guid.Empty,
+                Name = group.InternshipPhase?.Name ?? string.Empty
             },
             Project = project == null
                 ? null
@@ -107,6 +107,12 @@ public class MineSchoolDto
 }
 
 public class MineTermDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
+public class MinePhaseDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;

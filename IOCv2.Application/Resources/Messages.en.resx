@@ -147,10 +147,7 @@
   <data name="SearchTerm.MaxLength" xml:space="preserve">
     <value>Search term cannot exceed 200 characters</value>
   </data>
-  <data name="Projects.NotFound" xml:space="preserve">
-    <value>Project Not Found</value>
-  </data>
-  <data name="Projects.DeleteSuccess" xml:space="preserve">
+    <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Project Delete successful</value>
   </data>
   <data name="Projects.LogDelete" xml:space="preserve">
@@ -243,6 +240,63 @@
   <data name="InternshipGroup.LogRemovedStudentsSuccess" xml:space="preserve">
     <value>Successfully removed students from group: {InternshipId}</value>
   </data>
+  <data name="StudentTerms.Email.SubjectWithdraw" xml:space="preserve">
+    <value>Notice: Withdrawn from Internship Term</value>
+  </data>
+  <data name="StudentTerms.Email.BodyWithdraw" xml:space="preserve">
+    <value>You have been withdrawn from internship term '{0}'. Please contact your university if you have any questions.</value>
+  </data>
+  <data name="StudentTerms.Email.SubjectRestore" xml:space="preserve">
+    <value>Notice: Enrollment Restored for Internship Term</value>
+  </data>
+  <data name="StudentTerms.Email.BodyRestore" xml:space="preserve">
+    <value>Your enrollment in internship term '{0}' has been restored.</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderStudentCode" xml:space="preserve">
+    <value>Student Code</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderFullName" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderPhone" xml:space="preserve">
+    <value>Phone Number</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderDateOfBirth" xml:space="preserve">
+    <value>Date of Birth</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderMajor" xml:space="preserve">
+    <value>Major</value>
+  </data>
+  <data name="StudentTerms.Excel.HeaderTempPassword" xml:space="preserve">
+    <value>Temporary Password</value>
+  </data>
+  <data name="StudentTerms.Excel.WorksheetStudentList" xml:space="preserve">
+    <value>Student List</value>
+  </data>
+  <data name="StudentTerms.Excel.WorksheetTempPassword" xml:space="preserve">
+    <value>Temporary Passwords</value>
+  </data>
+  <data name="InternshipApplication.AcceptSuccess" xml:space="preserve">
+    <value>Application accepted successfully.</value>
+  </data>
+  <data name="InternshipApplication.RejectSuccess" xml:space="preserve">
+    <value>Application rejected successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorNewGroupSuccess" xml:space="preserve">
+    <value>Mentor assigned and a new internship group has been created successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignMentorExistingGroupSuccess" xml:space="preserve">
+    <value>Mentor assigned and student added to existing group successfully.</value>
+  </data>
+  <data name="InternshipApplication.AssignProjectSuccess" xml:space="preserve">
+    <value>Project assigned to internship group successfully.</value>
+  </data>
   <data name="Enterprise.DeletePermissionDenied" xml:space="preserve">
     <value>You do not have permission to delete this enterprise.</value>
   </data>
@@ -254,5 +308,647 @@
   </data>
   <data name="Enterprise.GetByIDPermissionsNotAllowed" xml:space="preserve">
     <value>You do not have permission to view this enterprise.</value>
+  </data>
+  <data name="ViolationReport.FilteredNotFound" xml:space="preserve">
+    <value>No matching violation report found</value>
+  </data>
+  <data name="ViolationReport.NotFound" xml:space="preserve">
+    <value>No violation reports available</value>
+  </data>
+  <data name="Student.NotFound" xml:space="preserve">
+    <value>Student not found.</value>
+  </data>
+  <data name="ViolationReport.NotAllowedToReport" xml:space="preserve">
+    <value>You are not allowed to report for this student.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateCannotBeBeforeInternshipStart" xml:space="preserve">
+    <value>Occurred date cannot be before internship start.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateCannotBeAfterInternshipEnd" xml:space="preserve">
+    <value>Internship has ended.</value>
+  </data>
+  <data name="ViolationReport.CreateViolationReportSuccess" xml:space="preserve">
+    <value>Violation report successfully created.</value>
+  </data>
+  <data name="ViolationReport.LogNotFound" xml:space="preserve">
+    <value>Violation report not found: {ViolationReportId}</value>
+  </data>
+  <data name="Student.StudentIdRequired" xml:space="preserve">
+    <value>Student ID is required.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateIsRequired" xml:space="preserve">
+    <value>Occurred date is required.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateInFuture" xml:space="preserve">
+    <value>The occurred date must not be later than the current date and time.</value>
+  </data>
+  <data name="ViolationReport.DescriptionIsRequired" xml:space="preserve">
+    <value>Description is required and cannot be empty.</value>
+  </data>
+  <data name="ViolationReport.DescriptionMinLength" xml:space="preserve">
+    <value>Description must be at least {0} characters long.</value>
+  </data>
+  <data name="ViolationReport.DescriptionMaxLength" xml:space="preserve">
+    <value>Description must not exceed {0} characters.</value>
+  </data>
+  <data name="ViolationReport.LogDeleteNotOwner" xml:space="preserve">
+    <value>Mentor {UserId} attempted to delete a report they don't own: {ViolationReportId}</value>
+  </data>
+  <data name="ViolationReport.DeleteNotOwner" xml:space="preserve">
+    <value>You can only delete violation reports that you created yourself.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportDeletedSuccessfully" xml:space="preserve">
+    <value>Violation report {0} deleted successfully</value>
+  </data>
+  <data name="ViolationReport.UpdatingViolationReportByUser" xml:space="preserve">
+    <value>Updating violation report {0} by user {1}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportNotFound" xml:space="preserve">
+    <value>Violation report {0} was not found.</value>
+  </data>
+  <data name="ViolationReport.UserNotAllowedToUpdateViolationReport" xml:space="preserve">
+    <value>User {0} is not allowed to update violation report {1}.</value>
+  </data>
+  <data name="ViolationReport.NotAllowedToUpdateThisReport" xml:space="preserve">
+    <value>You are not allowed to update this report.</value>
+  </data>
+  <data name="ViolationReport.OccurredDateBeforeInternshipStart" xml:space="preserve">
+    <value>Occurred date cannot be before internship start.</value>
+  </data>
+  <data name="ViolationReport.InternshipHasEnded" xml:space="preserve">
+    <value>Internship has ended.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportUpdatedByAnotherUser" xml:space="preserve">
+    <value>Violation report has been updated by another user at {0}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportUpdatedSuccessfully" xml:space="preserve">
+    <value>Violation report has been updated successfully.</value>
+  </data>
+  <data name="ViolationReport.FailedToUpdateViolationReport" xml:space="preserve">
+    <value>Failed to update violation report {0}.</value>
+  </data>
+  <data name="ViolationReport.ViolationReportIdIsRequired" xml:space="preserve">
+    <value>ViolationReportId is required.</value>
+  </data>
+  <data name="InternshipGroup.MoveSuccess" xml:space="preserve">
+    <value>Moved students successfully.</value>
+  </data>
+  <data name="InternshipGroup.ArchiveSuccess" xml:space="preserve">
+    <value>Archived group successfully.</value>
+  </data>
+  <data name="JobPosting.CvRequired" xml:space="preserve">
+    <value>You don't have a CV yet. Please upload your CV before applying.</value>
+  </data>
+  <data name="JobPosting.AlreadyPlaced" xml:space="preserve">
+    <value>You already have an internship.</value>
+  </data>
+  <data name="JobPosting.OnlyPublishedAllowed" xml:space="preserve">
+    <value>Only published jobs can be closed</value>
+  </data>
+  <data name="JobPosting.ConfirmHasActiveApplications" xml:space="preserve">
+    <value>There are candidates applying for this position. Are you sure you want to proceed?</value>
+  </data>
+  <data name="JobPosting.NotifyStudentClosedSubject" xml:space="preserve">
+    <value>Notification: "{{0}}" has been closed</value>
+  </data>
+  <data name="JobPosting.NotifyStudentClosedBody" xml:space="preserve">
+    <value>The job posting "{{0}}" from {{1}} has been closed and is no longer accepting new applications.</value>
+  </data>
+  <data name="JobPosting.CloseSuccess" xml:space="preserve">
+    <value>Successfully closed job posting "{{0}}"</value>
+  </data>
+  <data name="JobPosting.TitleRequired" xml:space="preserve">
+    <value>Title is required to save a draft.</value>
+  </data>
+  <data name="JobPosting.DraftSavedSuccess" xml:space="preserve">
+    <value>Draft saved.</value>
+  </data>
+  <data name="JobPosting.TitleTooLong" xml:space="preserve">
+    <value>Job posting titles must not exceed {0} characters.</value>
+  </data>
+  <data name="JobPosting.DescriptionTooLong" xml:space="preserve">
+    <value>Description is too long.</value>
+  </data>
+  <data name="JobPosting.RequirementsTooLong" xml:space="preserve">
+    <value>Requirements is too long.</value>
+  </data>
+  <data name="JobPosting.BenefitTooLong" xml:space="preserve">
+    <value>Benefit is too long.</value>
+  </data>
+  <data name="JobPosting.LocationRequired" xml:space="preserve">
+    <value>Location is required</value>
+  </data>
+  <data name="JobPosting.LocationTooLong" xml:space="preserve">
+    <value>Location is too long.</value>
+  </data>
+  <data name="JobPosting.QuantityMustBePositive" xml:space="preserve">
+    <value>Quantity must be 0 or greater.</value>
+  </data>
+  <data name="JobPosting.ExpireDateMustBeTodayOrLater" xml:space="preserve">
+    <value>Expire date must be today or later.</value>
+  </data>
+  <data name="JobPosting.StartDateMustBeTodayOrLater" xml:space="preserve">
+    <value>Start date must be today or later.</value>
+  </data>
+  <data name="JobPosting.EndDateMinDuration" xml:space="preserve">
+    <value>End date must be at least {0} days after start date.</value>
+  </data>
+  <data name="JobPosting.EndDateMaxDuration" xml:space="preserve">
+    <value>End date must be at most {0} days after start date.</value>
+  </data>
+  <data name="JobPosting.StartDateRequired" xml:space="preserve">
+    <value>Start date is required.</value>
+  </data>
+  <data name="JobPosting.EndDateRequired" xml:space="preserve">
+    <value>End date is required.</value>
+  </data>
+  <data name="JobPosting.AudienceInvalid" xml:space="preserve">
+    <value>Audience is invalid.</value>
+  </data>
+  <data name="JobPosting.UniversityRequiredForTargetAudience" xml:space="preserve">
+    <value>University must be provided for targeted audience.</value>
+  </data>
+  <data name="JobPosting.AlreadyDeleted" xml:space="preserve">
+    <value>This job has already been deleted.</value>
+  </data>
+  <data name="JobPosting.DeleteConfirmHasActiveApplications" xml:space="preserve">
+    <value>This job currently has {0} active applications. Are you sure you want to delete it?</value>
+  </data>
+  <data name="JobPosting.DeleteSuccess" xml:space="preserve">
+    <value>Job '{0}' deleted successfully</value>
+  </data>
+  <data name="JobPosting.DeleteWithActiveApplications" xml:space="preserve">
+    <value>Job '{0}' deleted successfully. Existing applications remain.</value>
+  </data>
+  <data name="JobPosting.DeleteVersionConflict" xml:space="preserve">
+    <value>The job has been modified by another user. Please reload the page and try again.</value>
+  </data>
+  <data name="JobPosting.NotFound" xml:space="preserve">
+    <value>This job could not be found.</value>
+  </data>
+  <data name="JobPosting.PublishSuccess" xml:space="preserve">
+    <value>The job posting has been published.</value>
+  </data>
+  <data name="JobPosting.AlreadyPublished" xml:space="preserve">
+    <value>Job is already published.</value>
+  </data>
+  <data name="JobPosting.ExpireDateRequired" xml:space="preserve">
+    <value>Expire date is required.</value>
+  </data>
+  <data name="JobPosting.AudienceRequired" xml:space="preserve">
+    <value>Audience is required.</value>
+  </data>
+  <data name="JobPosting.UpdateConfirmHasApplications" xml:space="preserve">
+    <value>This job has {0} application(s). Updating may affect existing applications. Confirm update?</value>
+  </data>
+  <data name="JobPosting.ReopenExpireDateInvalid" xml:space="preserve">
+    <value>Invalid expiration date when reopening the job.</value>
+  </data>
+  <data name="JobPosting.UpdateQuantityLessThanPlaced" xml:space="preserve">
+    <value>The updated quantity cannot be less than the quantity already placed ({0}).</value>
+  </data>
+  <data name="JobPosting.UpdateInvalidUniversities" xml:space="preserve">
+    <value>The list of universities is invalid.</value>
+  </data>
+  <data name="JobPosting.TargetedRequiresSingleUniversity" xml:space="preserve">
+    <value>Targeted audience requires selecting a single university.</value>
+  </data>
+  <data name="JobPosting.ReopenNotifyStudentSubject" xml:space="preserve">
+    <value>Job Opportunity: {0}</value>
+  </data>
+  <data name="JobPosting.ReopenNotifyStudentBody" xml:space="preserve">
+    <value>&gt;Dear Student,&lt;br/&gt;&lt;br/&gt;The job &lt;b&gt;{0}&lt;/b&gt; from &lt;b&gt;{1}&lt;/b&gt; has been reopened. If you are interested, please visit the system for more details and submit your application.&lt;br/&gt;&lt;br/&gt;Best regards.</value>
+  </data>
+  <data name="JobPosting.ReopenSuccess" xml:space="preserve">
+    <value>Job "{0}" has been successfully reopened.</value>
+  </data>
+  <data name="JobPosting.NotAllowed" xml:space="preserve">
+    <value>You do not have permission to access this resource.</value>
+  </data>
+  <data name="InternshipPhase.EnterpriseIdRequired" xml:space="preserve">
+    <value>Enterprise ID (EnterpriseId) is required.</value>
+  </data>
+  <data name="InternshipPhase.PhaseIdRequired" xml:space="preserve">
+    <value>Phase ID (PhaseId) is required.</value>
+  </data>
+  <data name="InternshipPhase.NameRequired" xml:space="preserve">
+    <value>Internship phase name is required.</value>
+  </data>
+  <data name="InternshipPhase.NameMaxLength" xml:space="preserve">
+    <value>Internship phase name must not exceed 255 characters.</value>
+  </data>
+  <data name="InternshipPhase.StartDateRequired" xml:space="preserve">
+    <value>Start date (StartDate) is required.</value>
+  </data>
+  <data name="InternshipPhase.EndDateRequired" xml:space="preserve">
+    <value>End date (EndDate) is required.</value>
+  </data>
+  <data name="InternshipPhase.EndDateAfterStartDate" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="InternshipPhase.MaxStudentsGreaterThanZero" xml:space="preserve">
+    <value>Maximum students (MaxStudents) must be greater than 0.</value>
+  </data>
+  <data name="InternshipPhase.NotFound" xml:space="preserve">
+    <value>Internship phase not found.</value>
+  </data>
+  <data name="InternshipPhase.DuplicateName" xml:space="preserve">
+    <value>An internship phase named '{0}' already exists in this enterprise. Please choose a different name.</value>
+  </data>
+  <data name="InternshipPhase.DuplicateNameOnUpdate" xml:space="preserve">
+    <value>Cannot rename to '{0}' because another internship phase in this enterprise already uses this name.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateClosed" xml:space="preserve">
+    <value>Cannot update internship phase '{0}' because it is in Closed status. Only phases in Draft or Open status can be edited.</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteHasActiveGroups" xml:space="preserve">
+    <value>Cannot delete internship phase '{0}' because there are {1} active internship group(s). Please close or archive all groups before deleting.</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteInProgress" xml:space="preserve">
+    <value>Cannot delete internship phase '{0}' because it is currently InProgress. Please close the phase before deleting.</value>
+  </data>
+  <data name="InternshipPhase.StartDateNotInPast" xml:space="preserve">
+    <value>Start date must not be in the past.</value>
+  </data>
+  <data name="InternshipPhase.StudentNotFound" xml:space="preserve">
+    <value>Student profile not found for the current account.</value>
+  </data>
+  <data name="InternshipPhase.UpdateNoChanges" xml:space="preserve">
+    <value>No changes were saved for the internship phase.</value>
+  </data>
+  <data name="InternshipPhase.CreateSuccess" xml:space="preserve">
+    <value>Internship phase created successfully.</value>
+  </data>
+  <data name="InternshipPhase.UpdateSuccess" xml:space="preserve">
+    <value>Internship phase updated successfully.</value>
+  </data>
+  <data name="InternshipPhase.DeleteSuccess" xml:space="preserve">
+    <value>Internship phase deleted successfully.</value>
+  </data>
+  <data name="InternshipPhase.Log.Creating" xml:space="preserve">
+    <value>Starting to create internship phase '{0}' for enterprise {1}.</value>
+  </data>
+  <data name="InternshipPhase.Log.EnterpriseNotFound" xml:space="preserve">
+    <value>Enterprise with ID {0} not found. Cannot create internship phase.</value>
+  </data>
+  <data name="InternshipPhase.Log.DuplicateName" xml:space="preserve">
+    <value>Internship phase named '{0}' already exists in enterprise {1}. Rejecting creation.</value>
+  </data>
+  <data name="InternshipPhase.Log.CreateSuccess" xml:space="preserve">
+    <value>Internship phase created successfully — PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.CreateError" xml:space="preserve">
+    <value>Error creating internship phase '{0}' for enterprise {1}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.Updating" xml:space="preserve">
+    <value>Starting to update internship phase {0} — new name: '{1}', new status: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateNotFound" xml:space="preserve">
+    <value>Internship phase with ID {0} not found. Update request rejected.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateClosed" xml:space="preserve">
+    <value>Rejecting update of internship phase '{0}' (ID: {1}) — phase is in Closed status.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateDuplicateName" xml:space="preserve">
+    <value>Rejecting update of internship phase {0} — name '{1}' is already used by another phase in enterprise {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateSuccess" xml:space="preserve">
+    <value>Internship phase updated successfully — PhaseId: {0}, Name: '{1}'.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateNoChanges" xml:space="preserve">
+    <value>No records saved when updating internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.UpdateError" xml:space="preserve">
+    <value>Error updating internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.Deleting" xml:space="preserve">
+    <value>Starting to delete internship phase {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteNotFound" xml:space="preserve">
+    <value>Internship phase with ID {0} not found. Delete request rejected.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteHasActiveGroups" xml:space="preserve">
+    <value>Rejecting deletion of internship phase '{0}' (ID: {1}) — {2} active internship group(s) exist.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteSuccess" xml:space="preserve">
+    <value>Internship phase deleted successfully — PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteNoChanges" xml:space="preserve">
+    <value>No records saved when deleting internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteError" xml:space="preserve">
+    <value>Error deleting internship phase {0}. Transaction rolled back.</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingList" xml:space="preserve">
+    <value>Getting internship phase list for enterprise {0} — status filter: {1}, page: {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ListFromCache" xml:space="preserve">
+    <value>Returning internship phase list from cache for enterprise {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ListSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phase list for enterprise {0} — returning {1}/{2} records (page {3}).</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingById" xml:space="preserve">
+    <value>Getting internship phase details for {0}.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdFromCache" xml:space="preserve">
+    <value>Returning internship phase {0} from cache.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdNotFound" xml:space="preserve">
+    <value>Internship phase with ID {0} not found.</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phase — PhaseId: {0}, Name: '{1}', Enterprise: '{2}', Status: {3}, Groups: {4}.</value>
+  </data>
+  <data name="InternshipPhase.Log.GettingMyPhases" xml:space="preserve">
+    <value>Getting internship phases for student (UserId: {0}).</value>
+  </data>
+  <data name="InternshipPhase.Log.StudentNotFound" xml:space="preserve">
+    <value>Student profile not found for UserId {0}. Request denied.</value>
+  </data>
+  <data name="InternshipPhase.Log.MyPhasesSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phases for student {0} (UserId: {1}) — found {2} phase(s).</value>
+  </data>
+  <data name="InternshipPhase.Log.MentorUserNotFound" xml:space="preserve">
+    <value>EnterpriseUser not found for Mentor userId={0} while retrieving internship phases.</value>
+  </data>
+  <data name="InternshipPhase.Log.MyMentorPhasesSuccess" xml:space="preserve">
+    <value>Successfully retrieved internship phases for Mentor enterpriseUserId={0} (userId={1}) — found {2} phase(s).</value>
+  </data>
+  <data name="InternshipPhase.MentorEnterpriseUserNotFound" xml:space="preserve">
+    <value>Mentor profile not found in the system. Please contact your administrator.</value>
+  </data>
+  <data name="InternshipPhase.StatusInvalid" xml:space="preserve">
+    <value>Internship phase status is invalid.</value>
+  </data>
+  <data name="InternshipPhase.DescriptionMaxLength" xml:space="preserve">
+    <value>Internship phase description must not exceed 2000 characters.</value>
+  </data>
+  <data name="InternshipPhase.PageNumberMinValue" xml:space="preserve">
+    <value>Page number must be greater than or equal to 1.</value>
+  </data>
+  <data name="InternshipPhase.PageSizeRange" xml:space="preserve">
+    <value>Page size must be between 1 and 50.</value>
+  </data>
+  <data name="InternshipPhase.InvalidStatusTransition" xml:space="preserve">
+    <value>Cannot transition from '{0}' to '{1}'. Please check the valid status flow.</value>
+  </data>
+  <data name="InternshipPhase.NotYourEnterprise" xml:space="preserve">
+    <value>You do not have permission to operate on internship phases of this enterprise.</value>
+  </data>
+  <data name="InternshipPhase.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Enterprise user information not found for the current account.</value>
+  </data>
+  <data name="InternshipPhase.Log.OwnershipDenied" xml:space="preserve">
+    <value>Access denied — User {0} attempted to operate on enterprise {1} but belongs to enterprise {2}.</value>
+  </data>
+  <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
+    <value>Rejected status transition of internship phase {0} from '{1}' to '{2}' — invalid transition.</value>
+  </data>
+  <data name="Terms.NameExists" xml:space="preserve">
+    <value>Term name already exists. Please choose a different name.</value>
+  </data>
+  <data name="Projects.PublishSuccess" xml:space="preserve">
+    <value>Project published successfully.</value>
+  </data>
+  <data name="Projects.CompleteSuccess" xml:space="preserve">
+    <value>Project marked as completed.</value>
+  </data>
+  <data name="Projects.LogPublishSuccess" xml:space="preserve">
+    <value>Project {0} published.</value>
+  </data>
+  <data name="Projects.LogPublishError" xml:space="preserve">
+    <value>Error publishing project {0}.</value>
+  </data>
+  <data name="Projects.LogCompleteSuccess" xml:space="preserve">
+    <value>Project {0} completed.</value>
+  </data>
+  <data name="Projects.LogCompleteError" xml:space="preserve">
+    <value>Error completing project {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteHard" xml:space="preserve">
+    <value>Hard deleted project {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteSoft" xml:space="preserve">
+    <value>Soft deleted project {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteError" xml:space="preserve">
+    <value>Error deleting project {0}.</value>
+  </data>
+  <data name="Projects.LogUpdateSuccess" xml:space="preserve">
+    <value>Successfully updated project {0}.</value>
+  </data>
+  <data name="Projects.LogUpdateError" xml:space="preserve">
+    <value>Error updating project {0}.</value>
+  </data>
+  <data name="Projects.LogNotFound" xml:space="preserve">
+    <value>Project not found: {0}.</value>
+  </data>
+  <data name="Projects.LogNameExists" xml:space="preserve">
+    <value>Project name {0} already exists in the group.</value>
+  </data>
+  <data name="Projects.LogCodeConflict" xml:space="preserve">
+    <value>Unique constraint violation for project code {0}.</value>
+  </data>
+  <data name="Projects.LogCreating" xml:space="preserve">
+    <value>Creating project {0} for group {1}.</value>
+  </data>
+  <data name="Projects.LogUpdating" xml:space="preserve">
+    <value>Updating project {0} by user {1}.</value>
+  </data>
+  <data name="Projects.LogDeleting" xml:space="preserve">
+    <value>Deleting project {0} by user {1}.</value>
+  </data>
+  <data name="Projects.LogGetById" xml:space="preserve">
+    <value>Retrieving project by ID: {0}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationProjectCleanupTitle" xml:space="preserve">
+    <value>Project warning</value>
+  </data>
+  <data name="InternshipGroup.NotificationProjectCleanupContent" xml:space="preserve">
+    <value>{0} was removed from the internship group.</value>
+  </data>
+  <data name="InternshipGroup.LogProjectAssignmentsCleanup" xml:space="preserve">
+    <value>Auto-removed {0} assignment(s) for student {1} after leaving group.</value>
+  </data>
+  <data name="InternshipGroup.LogProjectsArchived" xml:space="preserve">
+    <value>Archived {0} Draft/Published project(s) after group {1} was archived.</value>
+  </data>
+  <data name="Projects.LogOrphanized" xml:space="preserve">
+    <value>Project {0} was orphaned because its group was deleted.</value>
+  </data>
+  <data name="Projects.GetStudentsSuccess" xml:space="preserve">
+    <value>Project students retrieved successfully.</value>
+  </data>
+  <data name="Projects.LogGetStudentsSuccess" xml:space="preserve">
+    <value>Retrieved students for project {0}.</value>
+  </data>
+  <data name="Projects.UnpublishSuccess" xml:space="preserve">
+    <value>Project successfully moved back to Draft.</value>
+  </data>
+  <data name="Projects.LogUnpublishSuccess" xml:space="preserve">
+    <value>Project {0} unpublished successfully.</value>
+  </data>
+  <data name="Projects.LogUnpublishError" xml:space="preserve">
+    <value>Error unpublishing project {0}.</value>
+  </data>
+  <data name="Projects.ArchiveSuccess" xml:space="preserve">
+    <value>Project archived successfully.</value>
+  </data>
+  <data name="Projects.LogArchiveSuccess" xml:space="preserve">
+    <value>Project {0} archived successfully.</value>
+  </data>
+  <data name="Projects.LogArchiveError" xml:space="preserve">
+    <value>Error archiving project {0}.</value>
+  </data>
+  <data name="Projects.AssignGroupSuccess" xml:space="preserve">
+    <value>Project assigned to internship group successfully.</value>
+  </data>
+  <data name="Projects.LogAssignGroupSuccess" xml:space="preserve">
+    <value>Project {0} assigned to group {1}.</value>
+  </data>
+  <data name="Projects.LogAssignGroupError" xml:space="preserve">
+    <value>Error assigning group to project {0}.</value>
+  </data>
+  <data name="Projects.SwapGroupSuccess" xml:space="preserve">
+    <value>Project group swapped successfully.</value>
+  </data>
+  <data name="Projects.LogSwapGroupSuccess" xml:space="preserve">
+    <value>Project {0} swapped from group {1} to group {2}.</value>
+  </data>
+  <data name="Projects.LogSwapGroupError" xml:space="preserve">
+    <value>Error swapping group for project {0}.</value>
+  </data>
+  <data name="Projects.NotifNewProjectTitle" xml:space="preserve">
+    <value>New project in your group</value>
+  </data>
+  <data name="Projects.NotifNewProjectContent" xml:space="preserve">
+    <value>Project {0} has been added to your group.</value>
+  </data>
+  <data name="Projects.NotifProjectLeftTitle" xml:space="preserve">
+    <value>Project removed from your group</value>
+  </data>
+  <data name="Projects.NotifProjectLeftContent" xml:space="preserve">
+    <value>Project {0} is no longer part of your group.</value>
+  </data>
+  <data name="Projects.NotifUpdatedTitle" xml:space="preserve">
+    <value>Project updated</value>
+  </data>
+  <data name="Projects.NotifUpdatedContent" xml:space="preserve">
+    <value>Project {0} has been updated by Mentor.</value>
+  </data>
+  <data name="Projects.NotifCompletedTitle" xml:space="preserve">
+    <value>Project completed</value>
+  </data>
+  <data name="Projects.NotifCompletedContent" xml:space="preserve">
+    <value>Project [{0}] has been marked as completed.</value>
+  </data>
+  <data name="Projects.LogCompleteNotificationFailed" xml:space="preserve">
+    <value>CompleteProject succeeded but mentor notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogAssignNotificationFailed" xml:space="preserve">
+    <value>Group assignment succeeded but student notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogSwapNotificationFailed" xml:space="preserve">
+    <value>Group swap succeeded but student notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogUpdateNotificationFailed" xml:space="preserve">
+    <value>Project update succeeded but student notification failed for project {0}.</value>
+  </data>
+  <data name="Projects.LogCleanupResourceFailed" xml:space="preserve">
+    <value>Failed to cleanup uploaded resource after update rollback for project. FileUrl: {0}.</value>
+  </data>
+  <data name="Projects.LogDeleteResourceAfterUpdate" xml:space="preserve">
+    <value>Failed to delete resource file after project update. FileUrl: {0}.</value>
+  </data>
+  <data name="Projects.LogProjectListChanged" xml:space="preserve">
+    <value>Sent ProjectListChanged signal (action={0}) to Mentor {1} for project {2}.</value>
+  </data>
+  <data name="InternshipGroups.NotificationOrphanTitle" xml:space="preserve">
+    <value>Internship group deleted</value>
+  </data>
+  <data name="InternshipGroups.NotificationOrphanContent" xml:space="preserve">
+    <value>Group "{0}" has been deleted. {1} of your project(s) have been moved back to Draft and detached from the group.</value>
+  </data>
+  <data name="InternshipGroups.LogOrphanizeProjects" xml:space="preserve">
+    <value>{0} project(s) orphaned due to group {1} deletion.</value>
+  </data>
+  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
+    <value>Successfully retrieved {0} project(s) for internship group {1}.</value>
+  </data>
+  <data name="Projects.LogGetAll" xml:space="preserve">
+    <value>Retrieving all projects. SearchTerm: {0}, Status: {1}.</value>
+  </data>
+  <data name="Projects.LogGetAllSuccess" xml:space="preserve">
+    <value>Successfully retrieved {0} project(s).</value>
+  </data>
+  <data name="Projects.LogGetByInternshipId" xml:space="preserve">
+    <value>Retrieving projects for internship group {0}.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryById" xml:space="preserve">
+    <value>Querying internship group with ID: {InternshipId} by user {UserId} (role: {Role})</value>
+  </data>
+  <data name="InternshipGroup.LogScopedHrEnterprise" xml:space="preserve">
+    <value>HR/EnterpriseAdmin {UserId} → scoped to enterprise {EnterpriseId}</value>
+  </data>
+  <data name="InternshipGroup.LogScopedMentor" xml:space="preserve">
+    <value>Mentor {UserId} → scoped to MentorId {MentorId}</value>
+  </data>
+  <data name="InternshipGroup.LogScopedStudent" xml:space="preserve">
+    <value>Student {UserId} → scoped to StudentId {StudentId}</value>
+  </data>
+  <data name="InternshipGroup.LogRetrievedGroups" xml:space="preserve">
+    <value>Retrieved {Count} internship groups for user {UserId} (role: {Role})</value>
+  </data>
+  <data name="InternshipGroup.LogStartQueryMine" xml:space="preserve">
+    <value>Starting mine internship groups query.</value>
+  </data>
+  <data name="InternshipGroup.LogQueryMineCompleted" xml:space="preserve">
+    <value>Completed mine internship groups query with {Count} groups.</value>
+  </data>
+  <data name="InternshipGroup.LogStartQueryTerms" xml:space="preserve">
+    <value>Starting get my internship terms query.</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardQuery" xml:space="preserve">
+    <value>Starting to get dashboard data for InternshipId: {Id}</value>
+  </data>
+  <data name="InternshipGroup.LogDashboardGenerated" xml:space="preserve">
+    <value>Successfully generated dashboard data for InternshipId: {Id}. TotalTasks: {TaskCount}</value>
+  </data>
+  <data name="InternshipGroup.LogResolvedPhases" xml:space="preserve">
+    <value>Resolved {Count} phase(s) for enterprise {EnterpriseId}: [{PhaseIds}]</value>
+  </data>
+  <data name="InternshipGroup.Unassigned" xml:space="preserve">
+    <value>Unassigned</value>
+  </data>
+  <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
+    <value>Late logbook submission</value>
+  </data>
+  <data name="Profile.LogUpdateStart" xml:space="preserve">
+    <value>[START] UpdateMyProfile for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogAuthFailed" xml:space="preserve">
+    <value>[AUTH_FAILED] User ID not found in context.</value>
+  </data>
+  <data name="Profile.LogUserNotFound" xml:space="preserve">
+    <value>[NOT_FOUND] User not found: {UserId}</value>
+  </data>
+  <data name="Profile.LogUpdateSuccess" xml:space="preserve">
+    <value>[SUCCESS] Profile updated for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogUpdateError" xml:space="preserve">
+    <value>[ERROR] Failed to update profile for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogCvFileNotFound" xml:space="preserve">
+    <value>CV file not found in storage for User: {UserId}</value>
+  </data>
+  <data name="Profile.LogGetProfile" xml:space="preserve">
+    <value>Getting profile for User {UserId}</value>
+  </data>
+  <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
+    <value>User {UserId} not found when fetching profile</value>
+  </data>
+  <data name="Profile.UpdateSuccess" xml:space="preserve">
+    <value>Profile updated successfully.</value>
   </data>
 </root>

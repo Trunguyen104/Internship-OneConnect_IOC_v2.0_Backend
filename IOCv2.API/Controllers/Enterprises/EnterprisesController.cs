@@ -1,10 +1,11 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise;
-using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByHR;
+using IOCv2.Application.Features.Enterprises.Queries.GetActiveTerms;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById;
+using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByMine;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterprises;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,7 +45,7 @@ public class EnterprisesController : ApiControllerBase
     /// - 500 Internal Server Error for unexpected failures.
     /// </returns>
     [HttpGet]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetEnterprisesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -63,6 +64,7 @@ public class EnterprisesController : ApiControllerBase
     /// </summary>
     [HttpGet("{enterpriseId:guid}", Name = "GetEnterpriseById")]
     [ProducesResponseType(typeof(ApiResponse<GetEnterpriseByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEnterpriseById(
         [FromRoute] Guid enterpriseId,
@@ -152,6 +154,7 @@ public class EnterprisesController : ApiControllerBase
     [HttpDelete("{enterpriseId}")]
     [Authorize(Roles = "SuperAdmin")]
     [ProducesResponseType(typeof(ApiResponse<DeleteEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteEnterprise([FromRoute] Guid enterpriseId, CancellationToken cancellationToken)
@@ -206,4 +209,28 @@ public class EnterprisesController : ApiControllerBase
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
+
+    // ──────── Issue 68: Active Term Timeline for HR/Mentor ────────
+
+    /// <summary>
+    /// Retrieves the list of ongoing (Active) internship terms for the enterprise.
+    /// HR/EnterpriseAdmin can view all terms in which the enterprise has internship groups.
+    /// Mentors can only view terms in which they have an InternshipGroup.
+    /// Returns timeline information and evaluation/grading deadlines.
+    /// </summary>
+    /// <param name="query">UniversityId (optional): filters by a specific university.</param>
+    [HttpGet("me/terms/active")]
+    [Authorize(Roles = "HR,EnterpriseAdmin,Mentor")]
+    [ProducesResponseType(typeof(ApiResponse<GetActiveTermsForEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetActiveTerms(
+        [FromQuery] GetActiveTermsForEnterpriseQuery query,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(query, cancellationToken);
+        return HandleResult(result);
+    }
+
 }

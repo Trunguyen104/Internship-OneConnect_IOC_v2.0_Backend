@@ -17,12 +17,18 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// <summary>
         /// Identity of the internship group associated with this project.
         /// </summary>
-        public Guid InternshipId { get; set; }
+        public Guid? InternshipId { get; set; }
 
         /// <summary>
         /// Name of the project.
         /// </summary>
         public string ProjectName { get; set; } = string.Empty;
+
+        /// <summary>Mã dự án</summary>
+        public string ProjectCode { get; set; } = string.Empty;
+
+        /// <summary>Lĩnh vực dự án</summary>
+        public string Field { get; set; } = string.Empty;
 
         /// <summary>
         /// Detailed description of the project goal and scope.
@@ -40,9 +46,26 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Current lifecycle status of the project.
+        /// Visibility status of the project (Draft or Published).
         /// </summary>
-        public ProjectStatus? Status { get; set; }
+        public VisibilityStatus VisibilityStatus { get; set; }
+
+        /// <summary>
+        /// Operational status of the project (Unstarted, Active, Completed, Archived).
+        /// </summary>
+        public OperationalStatus OperationalStatus { get; set; }
+
+        /// <summary>Template dự án (None, Scrum, Kanban)</summary>
+        public ProjectTemplate Template { get; set; }
+
+        /// <summary>B7: Tên nhóm được gán (hoặc null nếu chưa gán)</summary>
+        public string? GroupName { get; set; }
+
+        /// <summary>B11: Trạng thái nhóm để hiển thị badge "Nhóm đã lưu trữ" (AC-15)</summary>
+        public GroupStatus? GroupStatus { get; set; }
+
+        /// <summary>F4: true khi group bị xóa và project trở thành orphan (AC-16)</summary>
+        public bool IsOrphaned { get; set; }
 
         /// <summary>
         /// Date and time when the project record was created.
@@ -55,7 +78,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// <param name="profile">The Automapper profile.</param>
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Project, GetAllProjectsResponse>();
+            profile.CreateMap<Project, GetAllProjectsResponse>()
+                .ForMember(dest => dest.GroupName,
+                           opt => opt.MapFrom(src => src.InternshipGroup != null ? src.InternshipGroup.GroupName : null))
+                .ForMember(dest => dest.GroupStatus,
+                           opt => opt.MapFrom(src => src.InternshipGroup != null ? (GroupStatus?)src.InternshipGroup.Status : null));
         }
     }
 }

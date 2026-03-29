@@ -1,4 +1,6 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Exceptions;
+using IOCv2.Application.Features.Universities.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -11,15 +13,18 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateUniversityHandler> _logger;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ICacheService _cacheService;
 
     public CreateUniversityHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         ILogger<CreateUniversityHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<Guid>> Handle(CreateUniversityCommand request, CancellationToken cancellationToken)
@@ -30,17 +35,27 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
         await _unitOfWork.BeginTransactionAsync();
         try
         {
+            // TX-6: Pre-check uniqueness before write
+            var exists = await _unitOfWork.Repository<University>()
+                .ExistsAsync(u => u.Code == request.Code, cancellationToken);
+            
+            if (exists)
+            {
+                throw new ConflictException("University code already exists", "Code");
+            }
+
             var university = University.Create(
-                request.Code,
-                request.Name,
-                request.Address,
+                request.Code.Trim(),
+                request.Name.Trim(),
+                request.Address?.Trim(),
                 null);
 
-
-            await _unitOfWork.Repository<University>().AddAsync(university);
+            await _unitOfWork.Repository<University>().AddAsync(university, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
-            
+
             await _unitOfWork.CommitTransactionAsync();
+
+            await _cacheService.RemoveByPatternAsync(UniversityCacheKeys.UniversityListPattern(), cancellationToken);
 
             _logger.LogInformation("Successfully created university: {UniversityId}", university.UniversityId);
 

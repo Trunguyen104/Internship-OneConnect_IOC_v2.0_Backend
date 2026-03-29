@@ -21,9 +21,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
         public string GroupName { get; set; } = string.Empty;
 
         /// <summary>
-        /// The academic term associated with this group.
+        /// The internship phase associated with this group.
         /// </summary>
-        public Guid TermId { get; set; }
+        public Guid PhaseId { get; set; }
 
         /// <summary>
         /// Current lifecycle status of the group.

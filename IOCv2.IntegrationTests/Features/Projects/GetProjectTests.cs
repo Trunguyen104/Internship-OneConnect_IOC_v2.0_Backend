@@ -1,0 +1,83 @@
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using FluentAssertions;
+using IOCv2.Application.Features.Projects.Queries.GetProjectById;
+using IOCv2.Infrastructure.Persistence;
+using IOCv2.IntegrationTests.Factories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+namespace IOCv2.IntegrationTests.Features.Projects;
+
+public class GetProjectTests : BaseIntegrationTest
+{
+    public GetProjectTests(TestWebApplicationFactory factory) : base(factory)
+    {
+    }
+
+    [Fact]
+    public async Task GetProject_ShouldReturnUnauthorized_WhenUserIsNotAuthenticated()
+    {
+        var request = new GetProjectByIdQuery
+        {
+            ProjectId = Guid.NewGuid()
+        };
+        // Act
+        var response = await Client.GetAsync($"/api/v1/projects/{request.ProjectId}");
+
+        // Assert
+        var content = await response.Content.ReadAsStringAsync();
+        Console.WriteLine(content);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task GetProject_ShouldReturnOk_WhenUserIsAuthenticated()
+    {
+        // Arrange: Authenticate and get DB context
+        await AuthenticateAsUserAsync("mentor@fptsoftware.com", "Admin@123");
+
+        using var scope = CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        // Get a seeded InternshipId (required to create a Project)
+        var internshipId = await db.InternshipGroups
+            .Select(g => g.InternshipId)
+            .FirstOrDefaultAsync();
+
+        if (internshipId == Guid.Empty)
+        {
+            throw new Exception("No InternshipGroups found. Ensure TestDbSeeder is working.");
+        }
+
+        // Get the mentor details
+        var mentorUser = await db.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
+        var mentorEnterpriseUser = await db.EnterpriseUsers.FirstOrDefaultAsync(eu => eu.UserId == mentorUser.UserId);
+
+        // Create and save a new Project
+        var project = IOCv2.Domain.Entities.Project.Create(
+            "Integration Test Project",
+            "Test Description",
+            "PRJ-INT-GETPROJ-1",
+            "IT",
+            "Integration test requirements",
+            mentorId: mentorEnterpriseUser?.EnterpriseUserId
+        );
+        project.Publish();
+        project.AssignToGroup(internshipId, null, null);
+        db.Projects.Add(project);
+        await db.SaveChangesAsync();
+
+        // Act
+        var response = await Client.GetAsync($"/api/v1/projects/{project.ProjectId}");
+
+        // Assert
+        var content = await response.Content.ReadAsStringAsync();
+        Console.WriteLine(content);
+        response.IsSuccessStatusCode.Should().BeTrue("Status: {0}, Content: {1}", response.StatusCode, content);
+    }
+}

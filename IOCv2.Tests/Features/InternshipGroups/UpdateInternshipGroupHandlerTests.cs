@@ -48,22 +48,22 @@ namespace IOCv2.Tests.Features.InternshipGroups
         public async Task Handle_ValidRequest_ShouldReturnSuccess()
         {
             // Arrange
-            var termId = Guid.NewGuid();
-            var existingGroup = InternshipGroup.Create(termId, "Old Name");
+            var phaseId = Guid.NewGuid();
+            var existingGroup = InternshipGroup.Create(phaseId, "Old Name");
             var internshipId = existingGroup.InternshipId;
-            
+
             var command = new UpdateInternshipGroupCommand
             {
                 InternshipId = internshipId,
-                TermId = termId,
+                PhaseId = phaseId,
                 GroupName = "Updated Name"
             };
             // Set private InternshipId via reflection if needed, but here we can just ensure the mock returns it
-            
+
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
                 .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
-            
-            _mockUnitOfWork.Setup(x => x.Repository<Term>().ExistsAsync(It.IsAny<Expression<Func<Term, bool>>>(), It.IsAny<CancellationToken>()))
+
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
             
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))

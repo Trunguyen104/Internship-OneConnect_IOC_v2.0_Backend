@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -17,25 +18,29 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public CreateTermHandler(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IMessageService messageService,
         ILogger<CreateTermHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<CreateTermResponse>> Handle(CreateTermCommand request, CancellationToken cancellationToken)
     {
         try
         {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var userId = Guid.Parse(_currentUserService.UserId!);
             var isSuperAdmin =
                 string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
@@ -80,32 +85,38 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
                 universityId = universityUser.UniversityId;
             }
 
-            // Check for overlapping terms
-            var hasOverlap = await _unitOfWork.Repository<Term>()
+            
+            
+            // Check for duplicate term name within the university
+            var duplicateNameExists = await _unitOfWork.Repository<Term>()
+                .Query()
+                .Where(t => t.UniversityId == universityId && t.Name.ToLower() == request.Name.Trim().ToLower())
+                .AnyAsync(cancellationToken);
+
+            if (duplicateNameExists)
+            {
+                return Result<CreateTermResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Terms.NameExists),
+                    ResultErrorType.Conflict);
+            }
+
+            
+            // Check for overlapping terms (a single query returns the name if conflict exists)
+            var overlappingTermName = await _unitOfWork.Repository<Term>()
                 .Query()
                 .Where(t => t.UniversityId == universityId)
                 .Where(t => t.Status == TermStatus.Open || t.Status == TermStatus.Closed)
-                .AnyAsync(t =>
-                        (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
-                        (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
-                        (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate),
-                    cancellationToken);
+                .Where(t =>
+                    (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
+                    (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
+                    (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate))
+                .Select(t => (string?)t.Name)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (hasOverlap)
+            if (overlappingTermName != null)
             {
-                var overlappingTerm = await _unitOfWork.Repository<Term>()
-                    .Query()
-                    .Where(t => t.UniversityId == universityId)
-                    .Where(t => t.Status == TermStatus.Open || t.Status == TermStatus.Closed)
-                    .Where(t =>
-                        (request.StartDate >= t.StartDate && request.StartDate <= t.EndDate) ||
-                        (request.EndDate >= t.StartDate && request.EndDate <= t.EndDate) ||
-                        (request.StartDate <= t.StartDate && request.EndDate >= t.EndDate))
-                    .Select(t => t.Name)
-                    .FirstOrDefaultAsync(cancellationToken);
-
                 return Result<CreateTermResponse>.Failure(
-                    string.Format(_messageService.GetMessage(MessageKeys.Terms.OverlapWithActiveTerm), overlappingTerm),
+                    string.Format(_messageService.GetMessage(MessageKeys.Terms.OverlapWithActiveTerm), overlappingTermName),
                     ResultErrorType.Conflict);
             }
 
@@ -129,6 +140,9 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
 
             await _unitOfWork.Repository<Term>().AddAsync(term, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermCreated), term.TermId, userId);
 
@@ -136,19 +150,14 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
             return Result<CreateTermResponse>.Success(response,
                 _messageService.GetMessage(MessageKeys.Terms.CreateSuccess));
         }
-        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key") == true || 
-                                            ex.InnerException?.Message.Contains("UNIQUE constraint") == true ||
-                                            ex.InnerException?.Message.Contains("IX_Terms_Name") == true)
-        {
-            _logger.LogWarning(_messageService.GetMessage(MessageKeys.Terms.LogDuplicateTermName), ex.Message);
-            return Result<CreateTermResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.Terms.NameExists),
-                ResultErrorType.Conflict);
-        }
+        
         catch (Exception ex)
         {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorCreatingTerm));
-            throw;
+            return Result<CreateTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

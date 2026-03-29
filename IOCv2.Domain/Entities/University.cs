@@ -13,6 +13,9 @@ namespace IOCv2.Domain.Entities
         public virtual ICollection<UniversityUser> UniversityUsers { get; set; } = new List<UniversityUser>();
         public virtual ICollection<Term> Terms { get; set; } = new List<Term>();
 
+        // Many-to-many: Universities <-> Jobs
+        public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
+
         protected University() { }
 
         public static University Create(string code, string name, string? address, string? logoUrl)

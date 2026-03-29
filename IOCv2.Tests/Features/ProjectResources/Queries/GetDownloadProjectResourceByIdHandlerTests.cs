@@ -1,6 +1,6 @@
 using FluentAssertions;
 using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById;
+using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using MockQueryable;
 using MockQueryable.Moq;
+using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetDownloadProjectResourceById;
 
 namespace IOCv2.Tests.Features.ProjectResources.Queries;
 
@@ -21,7 +22,8 @@ public class GetDownloadProjectResourceByIdHandlerTests
         var studentId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        var project = Project.Create(internshipId, "Demo", string.Empty);
+        var project = Project.Create("Demo", string.Empty, "PRJ-DEMO_DMO_1", "IT", "Requirements");
+        project.AssignToGroup(internshipId, null, null);
         var projectId = project.ProjectId;
 
         var resource = new IOCv2.Domain.Entities.ProjectResources(projectId, "Figma", FileType.LINK, "https://figma.com/file/abc")

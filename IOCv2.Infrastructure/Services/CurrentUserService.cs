@@ -17,5 +17,6 @@ namespace IOCv2.Infrastructure.Services
         public string? UserCode => _httpContextAccessor.HttpContext?.User?.FindFirstValue("UserCode");
         public string? Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
         public string? IpAddress => _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
+        public string? UnitId => _httpContextAccessor.HttpContext?.User?.FindFirstValue("UnitId");
     }
 }

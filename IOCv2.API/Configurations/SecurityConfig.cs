@@ -57,16 +57,25 @@ public static class SecurityConfig
             {
                 OnMessageReceived = context =>
                 {
-                    // Preference 1: Bearer token in Header (standard)
-                    // Preference 2: accessToken in Cookies (for better web security)
-                    if (!context.Request.Headers.ContainsKey("Authorization"))
+                    // Priority 1: Bearer token in Authorization Header (REST)
+                    if (context.Request.Headers.ContainsKey("Authorization"))
+                        return Task.CompletedTask;
+
+                    // Priority 2: access_token in query string (SignalR WebSocket)
+                    // SignalR JS client cannot include HTTP headers in WebSocket handshake
+                    var accessTokenFromQuery = context.Request.Query["access_token"].ToString();
+                    if (!string.IsNullOrEmpty(accessTokenFromQuery) &&
+                        context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
                     {
-                        var accessToken = context.Request.Cookies["accessToken"];
-                        if (!string.IsNullOrEmpty(accessToken))
-                        {
-                            context.Token = accessToken;
-                        }
+                        context.Token = accessTokenFromQuery;
+                        return Task.CompletedTask;
                     }
+
+                    // Priority 3: accessToken in Cookie (web)
+                    var accessToken = context.Request.Cookies["accessToken"];
+                    if (!string.IsNullOrEmpty(accessToken))
+                        context.Token = accessToken;
+
                     return Task.CompletedTask;
                 }
             };

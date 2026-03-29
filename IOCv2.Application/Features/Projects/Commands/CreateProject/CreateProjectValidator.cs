@@ -1,22 +1,14 @@
-﻿using FluentValidation;
+using FluentValidation;
 using IOCv2.Application.Constants;
-using IOCv2.Application.Features.Admin.Users.Commands.CreateAdminUser;
 using IOCv2.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
-    internal class CreateProjectValidator : AbstractValidator<CreateProjectCommand>
+    public class CreateProjectValidator : AbstractValidator<CreateProjectCommand>
     {
         private readonly IMessageService _messageService;
         public CreateProjectValidator(IMessageService messageService) {
             _messageService = messageService;
-            RuleFor(x => x.InternshipId)
-             .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsInternshipIdRequired));
 
             RuleFor(x => x.ProjectName)
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.ProjectsProjectNameRequired))
@@ -34,6 +26,18 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 .GreaterThanOrEqualTo(x => x.StartDate)
                 .WithMessage(_messageService.GetMessage(MessageKeys.Projects.EndDateInvalidRange))
                 .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
+
+            RuleFor(x => x.Field)
+                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldRequired))
+                .MaximumLength(100).WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldMaxLength));
+
+            RuleFor(x => x.Requirements)
+                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsRequired))
+                .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsMaxLength));
+
+            RuleFor(x => x.Deliverables)
+                .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.DeliverablesMaxLength))
+                .When(x => x.Deliverables != null);
         }
     }
 }

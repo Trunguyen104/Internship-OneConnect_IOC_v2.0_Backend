@@ -13,8 +13,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.NameRequired))
                 .MaximumLength(255).WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.NameMaxLength));
 
-            RuleFor(v => v.TermId)
-                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipGroups.TermIdRequired));
+            RuleFor(v => v.PhaseId)
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.PhaseIdRequired));
 
             RuleFor(v => v.StartDate)
                 .LessThan(v => v.EndDate).When(v => v.StartDate.HasValue && v.EndDate.HasValue)
@@ -25,7 +25,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 .ChildRules(student =>
                 {
                     student.RuleFor(s => s.Role)
-                        .IsInEnum().WithMessage("Invalid student role.");
+                        .IsInEnum().WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidRole));
 
                 });
         }

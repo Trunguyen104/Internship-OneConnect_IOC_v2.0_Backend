@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -15,17 +16,20 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
     private readonly ILogger<DeleteTermHandler> _logger;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public DeleteTermHandler(
         IUnitOfWork unitOfWork,
         IMessageService messageService,
         ILogger<DeleteTermHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<DeleteTermResponse>> Handle(DeleteTermCommand request, CancellationToken cancellationToken)
@@ -92,11 +96,6 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
                 .IgnoreQueryFilters()
                 .CountAsync(st => st.TermId == request.TermId, cancellationToken);
 
-            var internshipGroupsCount = await _unitOfWork.Repository<InternshipGroup>()
-                .Query()
-                .IgnoreQueryFilters()
-                .CountAsync(ig => ig.TermId == request.TermId, cancellationToken);
-
             // Soft delete term
             await _unitOfWork.Repository<Term>().DeleteAsync(term, cancellationToken);
 
@@ -112,28 +111,20 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
                     await _unitOfWork.Repository<StudentTerm>().DeleteAsync(st, cancellationToken);
             }
 
-            if (internshipGroupsCount > 0)
-            {
-                var internshipGroups = await _unitOfWork.Repository<InternshipGroup>()
-                    .Query()
-                    .Where(ig => ig.TermId == request.TermId)
-                    .ToListAsync(cancellationToken);
-
-                foreach (var ig in internshipGroups)
-                    await _unitOfWork.Repository<InternshipGroup>().DeleteAsync(ig, cancellationToken);
-            }
-
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermDeleted), term.TermId, userId);
 
             var response = new DeleteTermResponse
             {
                 Message = _messageService.GetMessage(MessageKeys.Terms.DeleteSuccess),
-                HasRelatedData = studentTermsCount > 0 || internshipGroupsCount > 0,
+                HasRelatedData = studentTermsCount > 0,
                 RelatedStudentTermsCount = studentTermsCount,
-                RelatedInternshipGroupsCount = internshipGroupsCount
+                RelatedInternshipGroupsCount = 0
             };
 
             return Result<DeleteTermResponse>.Success(response, response.Message);
@@ -142,7 +133,9 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorDeletingTerm), request.TermId);
-            throw;
+            return Result<DeleteTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿namespace IOCv2.Application.Constants
+namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -143,6 +143,34 @@
             public const string EmailInvalid = "Profile.EmailInvalid";
             public const string PhoneRequired = "Profile.PhoneRequired";
             public const string PhoneInvalid = "Profile.PhoneInvalid";
+            
+            // New Validation Rules
+            public const string PhoneMaxLength = "Profile.PhoneMaxLength";
+            public const string PortfolioUrlMaxLength = "Profile.PortfolioUrlMaxLength";
+            public const string PortfolioUrlInvalid = "Profile.PortfolioUrlInvalid";
+            public const string BioMaxLength = "Profile.BioMaxLength";
+            public const string ExpertiseMaxLength = "Profile.ExpertiseMaxLength";
+            public const string DepartmentMaxLength = "Profile.DepartmentMaxLength";
+            public const string CvFileMaxSize = "Profile.CvFileMaxSize";
+            public const string CvFileInvalidFormat = "Profile.CvFileInvalidFormat";
+
+            // Errors
+            public const string StudentNotFound = "Profile.StudentNotFound";
+            public const string CvNotFound = "Profile.CvNotFound";
+            public const string FileNotFoundInStorage = "Profile.FileNotFoundInStorage";
+
+            // Success
+            public const string UpdateSuccess = "Profile.UpdateSuccess";
+
+            // Logger
+            public const string LogUpdateStart = "Profile.LogUpdateStart";
+            public const string LogAuthFailed = "Profile.LogAuthFailed";
+            public const string LogUserNotFound = "Profile.LogUserNotFound";
+            public const string LogUpdateSuccess = "Profile.LogUpdateSuccess";
+            public const string LogUpdateError = "Profile.LogUpdateError";
+            public const string LogCvFileNotFound = "Profile.LogCvFileNotFound";
+            public const string LogGetProfile = "Profile.LogGetProfile";
+            public const string LogGetProfileUserNotFound = "Profile.LogGetProfileUserNotFound";
         }
 
         public static class InternshipGroups
@@ -155,10 +183,29 @@
             public const string StudentListToRemoveRequired = "InternshipGroup.StudentListToRemoveRequired";
             public const string InvalidStudentId = "InternshipGroup.InvalidStudentId";
             public const string TermNotFound = "InternshipGroup.TermNotFound";
+            public const string TermNotActive = "InternshipGroup.TermNotActive";
             public const string EnterpriseNotFound = "InternshipGroup.EnterpriseNotFound";
             public const string MentorNotFound = "InternshipGroup.MentorNotFound";
             public const string StudentNotFound = "InternshipGroup.StudentNotFound";
             public const string NotFound = "InternshipGroup.NotFound";
+            public const string HasStudents = "InternshipGroup.HasStudents";
+            public const string EnterpriseUserNotFound = "InternshipGroup.EnterpriseUserNotFound";
+            public const string StudentNotApproved = "InternshipGroup.StudentNotApproved";
+            public const string LogStudentNotApproved = "InternshipGroup.LogStudentNotApproved";
+            public const string AtLeastOneStudentRequired = "InternshipGroup.AtLeastOneStudentRequired";
+            public const string StudentAlreadyInActiveGroup = "InternshipGroup.StudentAlreadyInActiveGroup";
+
+            // Move & Archive keys
+            public const string MustBelongToYourEnterprise = "InternshipGroup.MustBelongToYourEnterprise";
+            public const string MustBeInSameTerm = "InternshipGroup.MustBeInSameTerm";
+            public const string MustBeActive = "InternshipGroup.MustBeActive";
+            public const string StudentsNotInSourceGroup = "InternshipGroup.StudentsNotInSourceGroup";
+            public const string MoveSuccess = "InternshipGroup.MoveSuccess";
+            public const string ArchiveSuccess = "InternshipGroup.ArchiveSuccess";
+            public const string GroupAlreadyArchived = "InternshipGroup.GroupAlreadyArchived";
+            public const string CannotArchiveNoData = "InternshipGroup.CannotArchiveNoData";
+            public const string HasActivityData = "InternshipGroup.HasActivityData";   // Nhóm có data thực tế, không thể xóa
+
 
             // Logger Keys
             public const string LogTermNotFound = "InternshipGroup.LogTermNotFound";
@@ -166,6 +213,9 @@
             public const string LogMentorNotFound = "InternshipGroup.LogMentorNotFound";
             public const string LogStudentNotFound = "InternshipGroup.LogStudentNotFound";
             public const string LogNotFound = "InternshipGroup.LogNotFound";
+
+            public const string LogNoStudentsProvided = "InternshipGroup.LogNoStudentsProvided";
+            public const string LogStudentAlreadyInActiveGroup = "InternshipGroup.LogStudentAlreadyInActiveGroup";
 
             public const string LogCreating = "InternshipGroup.LogCreating";
             public const string LogCreatedSuccess = "InternshipGroup.LogCreatedSuccess";
@@ -182,6 +232,11 @@
             public const string LogDeleteFailed = "InternshipGroup.LogDeleteFailed";
             public const string LogDeleteError = "InternshipGroup.LogDeleteError";
 
+            public const string LogGroupNotActive                = "InternshipGroup.LogGroupNotActive";
+            public const string LogPhaseNotOpen                  = "InternshipGroup.LogPhaseNotOpen";
+            public const string LogUnauthorizedEnterpriseAccess  = "InternshipGroup.LogUnauthorizedEnterpriseAccess";
+            public const string LogMentorRoleInvalid             = "InternshipGroup.LogMentorRoleInvalid";
+
             public const string LogAddingStudents = "InternshipGroup.LogAddingStudents";
             public const string LogInvalidStudentIds = "InternshipGroup.LogInvalidStudentIds";
             public const string LogAddedStudentsSuccess = "InternshipGroup.LogAddedStudentsSuccess";
@@ -192,6 +247,61 @@
             public const string LogRemovedStudentsSuccess = "InternshipGroup.LogRemovedStudentsSuccess";
             public const string LogRemoveStudentsFailed = "InternshipGroup.LogRemoveStudentsFailed";
             public const string LogRemoveStudentsError = "InternshipGroup.LogRemoveStudentsError";
+
+            // Phase 4 side-effects
+            public const string NotificationProjectCleanupTitle = "InternshipGroup.NotificationProjectCleanupTitle";
+            public const string NotificationProjectCleanupContent = "InternshipGroup.NotificationProjectCleanupContent";
+            public const string LogProjectAssignmentsCleanup = "InternshipGroup.LogProjectAssignmentsCleanup";
+            public const string LogProjectsArchived = "InternshipGroup.LogProjectsArchived";
+            public const string GroupNotActive = "InternshipGroup.GroupNotActive";
+
+            // New US keys
+            public const string CannotDeleteNotActive      = "InternshipGroups.CannotDeleteNotActive";
+            public const string NotificationOrphanTitle    = "InternshipGroups.NotificationOrphanTitle";
+            public const string NotificationOrphanContent  = "InternshipGroups.NotificationOrphanContent";
+            public const string LogOrphanizeProjects       = "InternshipGroups.LogOrphanizeProjects";
+
+            // Log messages — GetInternshipGroupByIdHandler
+            public const string LogQueryById                   = "InternshipGroup.LogQueryById";
+            public const string LogAccessDeniedHrEnterprise    = "InternshipGroup.LogAccessDeniedHrEnterprise";
+            public const string LogAccessDeniedMentor          = "InternshipGroup.LogAccessDeniedMentor";
+            public const string LogAccessDeniedStudent         = "InternshipGroup.LogAccessDeniedStudent";
+
+            // Log messages — DeleteInternshipGroupHandler
+            public const string LogDeleteNotificationFailed    = "InternshipGroup.LogDeleteNotificationFailed";
+
+            // Log messages — GetInternshipGroupsHandler
+            public const string LogScopedHrEnterprise          = "InternshipGroup.LogScopedHrEnterprise";
+            public const string LogScopedMentor                = "InternshipGroup.LogScopedMentor";
+            public const string LogStudentNotFoundForUser      = "InternshipGroup.LogStudentNotFoundForUser";
+            public const string LogScopedStudent               = "InternshipGroup.LogScopedStudent";
+            public const string LogRetrievedGroups             = "InternshipGroup.LogRetrievedGroups";
+
+            // Log messages — GetMyInternshipGroupsHandler
+            public const string LogStartQueryMine              = "InternshipGroup.LogStartQueryMine";
+            public const string LogQueryMineDenied             = "InternshipGroup.LogQueryMineDenied";
+            public const string LogQueryMineStudentNotFound    = "InternshipGroup.LogQueryMineStudentNotFound";
+            public const string LogQueryMineCompleted          = "InternshipGroup.LogQueryMineCompleted";
+
+            // Log messages — GetMyInternshipTermsHandler
+            public const string LogStartQueryTerms             = "InternshipGroup.LogStartQueryTerms";
+
+            // Log messages — GetInternshipGroupDashboardHandler
+            public const string LogDashboardQuery              = "InternshipGroup.LogDashboardQuery";
+            public const string LogDashboardNotFound           = "InternshipGroup.LogDashboardNotFound";
+            public const string LogDashboardGenerated          = "InternshipGroup.LogDashboardGenerated";
+
+            // Log messages — GetPlacedStudentsHandler
+            public const string LogNoPhasesForEnterprise       = "InternshipGroup.LogNoPhasesForEnterprise";
+            public const string LogResolvedPhases              = "InternshipGroup.LogResolvedPhases";
+
+            // Archive/Move error keys
+            public const string LogArchiveError                = "InternshipGroup.LogArchiveError";
+            public const string LogMoveError                   = "InternshipGroup.LogMoveError";
+
+            // UI labels
+            public const string Unassigned                    = "InternshipGroup.Unassigned";
+            public const string LateLogbookSubmission         = "InternshipGroup.LateLogbookSubmission";
         }
 
         public static class Terms
@@ -225,7 +335,7 @@
             public const string CloseReasonRequired = "Terms.CloseReasonRequired";
             public const string CloseReasonMinLength = "Terms.CloseReasonMinLength";
             public const string CloseReasonMaxLength = "Terms.CloseReasonMaxLength";
-            
+
             // Logging messages
             public const string LogTermCreated = "Terms.Log.TermCreated";
             public const string LogTermUpdated = "Terms.Log.TermUpdated";
@@ -275,7 +385,109 @@
             public const string LogGetByInternshipIdSuccess = "Projects.LogGetByInternshipIdSuccess";
             public const string LogGetByInternshipIdErr = "Projects.LogGetByInternshipIdErr";
             public const string LogGetByIdError = "Projects.LogGetByIdError";
+
+            // Lifecycle success
+            public const string PublishSuccess = "Projects.PublishSuccess";
+            public const string CompleteSuccess = "Projects.CompleteSuccess";
+
+            // Scope/Status errors
+            public const string MentorNotFound = "Projects.MentorNotFound";
+            public const string GroupNotActiveForCreate = "Projects.GroupNotActiveForCreate";
+            public const string GroupNotActiveForPublish = "Projects.GroupNotActiveForPublish";
+            public const string GroupNotActiveForUpdate = "Projects.GroupNotActiveForUpdate";
+            public const string InvalidStatusForPublish = "Projects.InvalidStatusForPublish";
+            public const string InvalidStatusForComplete = "Projects.InvalidStatusForComplete";
+            public const string InvalidStatusForUpdate = "Projects.InvalidStatusForUpdate";
+            public const string CannotDeleteWithActiveAssignments = "Projects.CannotDeleteWithActiveAssignments";
+            public const string ProjectCodeConflict = "Projects.ProjectCodeConflict";
+
+            // Validation
+            public const string FieldRequired = "Projects.FieldRequired";
+            public const string RequirementsRequired = "Projects.RequirementsRequired";
+            public const string FieldMaxLength = "Projects.FieldMaxLength";
+            public const string RequirementsMaxLength = "Projects.RequirementsMaxLength";
+            public const string DeliverablesMaxLength = "Projects.DeliverablesMaxLength";
+
+            // Log messages
+            public const string LogPublishSuccess       = "Projects.LogPublishSuccess";
+            public const string LogPublishError         = "Projects.LogPublishError";
+            public const string LogCompleteSuccess      = "Projects.LogCompleteSuccess";
+            public const string LogCompleteError        = "Projects.LogCompleteError";
+            public const string LogUpdateSuccess        = "Projects.LogUpdateSuccess";
+            public const string LogUpdateError          = "Projects.LogUpdateError";
+            public const string LogDeleteHard           = "Projects.LogDeleteHard";
+            public const string LogDeleteSoft           = "Projects.LogDeleteSoft";
+            public const string LogCreating             = "Projects.LogCreating";
+            public const string LogUpdating             = "Projects.LogUpdating";
+            public const string LogDeleting             = "Projects.LogDeleting";
+            public const string LogGetById              = "Projects.LogGetById";
+            public const string LogNameExists           = "Projects.LogNameExists";
+            public const string LogCodeConflict         = "Projects.LogCodeConflict";
+            public const string LogGetAll               = "Projects.LogGetAll";
+            public const string LogGetAllSuccess        = "Projects.LogGetAllSuccess";
+            public const string LogGetByInternshipId    = "Projects.LogGetByInternshipId";
+
+            // New US keys
+            public const string NoGroupAssigned        = "Projects.NoGroupAssigned";
+            public const string GroupIsFinished        = "Projects.GroupIsFinished";
+            public const string CannotDeleteHasData    = "Projects.CannotDeleteHasData";
+            public const string LogOrphanized          = "Projects.LogOrphanized";
+            public const string GetStudentsSuccess     = "Projects.GetStudentsSuccess";
+            public const string LogGetStudentsSuccess  = "Projects.LogGetStudentsSuccess";
+
+            // Unpublish
+            public const string UnpublishSuccess              = "Projects.UnpublishSuccess";
+            public const string CannotUnpublishStarted        = "Projects.CannotUnpublishStarted";
+            public const string InvalidStatusForUnpublish     = "Projects.InvalidStatusForUnpublish";
+            public const string LogUnpublishSuccess           = "Projects.LogUnpublishSuccess";
+            public const string LogUnpublishError             = "Projects.LogUnpublishError";
+
+            // Archive
+            public const string ArchiveSuccess             = "Projects.ArchiveSuccess";
+            public const string MustBeCompletedToArchive   = "Projects.MustBeCompletedToArchive";
+            public const string LogArchiveSuccess          = "Projects.LogArchiveSuccess";
+            public const string LogArchiveError            = "Projects.LogArchiveError";
+
+            // AssignGroup
+            public const string AssignGroupSuccess         = "Projects.AssignGroupSuccess";
+            public const string AlreadyAssignedToGroup     = "Projects.AlreadyAssignedToGroup";
+            public const string GroupNotActive             = "Projects.GroupNotActive";
+            public const string GroupPhaseEnded            = "Projects.GroupPhaseEnded";
+            public const string LogAssignGroupSuccess      = "Projects.LogAssignGroupSuccess";
+            public const string LogAssignGroupError        = "Projects.LogAssignGroupError";
+
+            // SwapGroup
+            public const string SwapGroupSuccess           = "Projects.SwapGroupSuccess";
+            public const string ProjectNotAssigned         = "Projects.ProjectNotAssigned";
+            public const string HasStudentDataWorkItems    = "Projects.HasStudentDataWorkItems";
+            public const string HasStudentDataSprints      = "Projects.HasStudentDataSprints";
+            public const string LogSwapGroupSuccess        = "Projects.LogSwapGroupSuccess";
+            public const string LogSwapGroupError          = "Projects.LogSwapGroupError";
+
+            // Notification messages (stored in DB)
+            public const string NotifNewProjectTitle       = "Projects.NotifNewProjectTitle";
+            public const string NotifNewProjectContent     = "Projects.NotifNewProjectContent";
+            public const string NotifProjectLeftTitle      = "Projects.NotifProjectLeftTitle";
+            public const string NotifProjectLeftContent    = "Projects.NotifProjectLeftContent";
+            public const string NotifUpdatedTitle          = "Projects.NotifUpdatedTitle";
+            public const string NotifUpdatedContent        = "Projects.NotifUpdatedContent";
+            public const string NotifCompletedTitle        = "Projects.NotifCompletedTitle";
+            public const string NotifCompletedContent      = "Projects.NotifCompletedContent";
+
+            // Log messages for notification failures
+            public const string LogCompleteNotificationFailed  = "Projects.LogCompleteNotificationFailed";
+            public const string LogAssignNotificationFailed    = "Projects.LogAssignNotificationFailed";
+            public const string LogSwapNotificationFailed      = "Projects.LogSwapNotificationFailed";
+            public const string LogUpdateNotificationFailed    = "Projects.LogUpdateNotificationFailed";
+
+            // Log messages for resource cleanup failures
+            public const string LogCleanupResourceFailed       = "Projects.LogCleanupResourceFailed";
+            public const string LogDeleteResourceAfterUpdate   = "Projects.LogDeleteResourceAfterUpdate";
+
+            // AC-13: SignalR ProjectListChanged log
+            public const string LogProjectListChanged      = "Projects.LogProjectListChanged";
         }
+
 
         public static class ProjectResourcesKey
         {
@@ -488,9 +700,422 @@
             public const string CannotPublishInCompletedCycle = "Evaluation.CannotPublishInCompletedCycle";
         }
 
+        public static class InternshipApplication
+        {
+            // Validation
+            public const string ApplicationIdRequired = "InternshipApplication.ApplicationIdRequired";
+            public const string MentorIdRequired = "InternshipApplication.MentorIdRequired";
+            public const string RejectReasonRequired = "InternshipApplication.RejectReasonRequired";
+            public const string RejectReasonMaxLength = "InternshipApplication.RejectReasonMaxLength";
+            public const string ProjectNameRequired = "InternshipApplication.ProjectNameRequired";
+            public const string ProjectNameMaxLength = "InternshipApplication.ProjectNameMaxLength";
+            public const string ProjectDescriptionMaxLength = "InternshipApplication.ProjectDescriptionMaxLength";
+
+            // Business errors
+            public const string NotFound = "InternshipApplication.NotFound";
+            public const string EnterpriseUserNotFound = "InternshipApplication.EnterpriseUserNotFound";
+            public const string MentorNotBelongToEnterprise = "InternshipApplication.MentorNotBelongToEnterprise";
+            public const string StatusMustBePendingToAccept = "InternshipApplication.StatusMustBePendingToAccept";
+            public const string StatusMustBePendingToReject = "InternshipApplication.StatusMustBePendingToReject";
+            public const string StatusMustBeApprovedToAssign = "InternshipApplication.StatusMustBeApprovedToAssign";
+            public const string StudentAlreadyInGroup = "InternshipApplication.StudentAlreadyInGroup";
+            public const string StudentNotInMentorGroup = "InternshipApplication.StudentNotInMentorGroup";
+            public const string ProjectNameExistsInGroup = "InternshipApplication.ProjectNameExistsInGroup";
+
+            // Success messages
+            public const string AcceptSuccess = "InternshipApplication.AcceptSuccess";
+            public const string RejectSuccess = "InternshipApplication.RejectSuccess";
+            public const string AssignMentorSuccess = "InternshipApplication.AssignMentorSuccess";
+            public const string AssignMentorNewGroupSuccess = "InternshipApplication.AssignMentorNewGroupSuccess";
+            public const string AssignMentorExistingGroupSuccess = "InternshipApplication.AssignMentorExistingGroupSuccess";
+            public const string AssignProjectSuccess = "InternshipApplication.AssignProjectSuccess";
+
+            // Log keys
+            public const string LogAccepting = "InternshipApplication.Log.Accepting";
+            public const string LogAcceptSuccess = "InternshipApplication.Log.AcceptSuccess";
+            public const string LogAcceptError = "InternshipApplication.Log.AcceptError";
+            public const string LogRejecting = "InternshipApplication.Log.Rejecting";
+            public const string LogRejectSuccess = "InternshipApplication.Log.RejectSuccess";
+            public const string LogRejectError = "InternshipApplication.Log.RejectError";
+            public const string LogAssigningMentor = "InternshipApplication.Log.AssigningMentor";
+            public const string LogAssignMentorSuccess = "InternshipApplication.Log.AssignMentorSuccess";
+            public const string LogAssignMentorError = "InternshipApplication.Log.AssignMentorError";
+            public const string LogAssigningProject = "InternshipApplication.Log.AssigningProject";
+            public const string LogAssignProjectSuccess = "InternshipApplication.Log.AssignProjectSuccess";
+            public const string LogAssignProjectError = "InternshipApplication.Log.AssignProjectError";
+            public const string LogInvalidUserId = "InternshipApplication.Log.InvalidUserId";
+        }
         public static class File
         {
-            
+
+        }
+
+        public static class StudentTerms
+        {
+            // Domain errors
+            public const string NotFound = "StudentTerms.NotFound";
+            public const string TermNotOpen = "StudentTerms.TermNotOpen";
+            public const string TermEndedOrClosed = "StudentTerms.TermEndedOrClosed";
+            public const string CannotWithdrawPlacedViaUpdate = "StudentTerms.CannotWithdrawPlacedViaUpdate";
+            public const string EmailConflict = "StudentTerms.EmailConflict";
+            public const string StudentCodeConflict = "StudentTerms.StudentCodeConflict";
+            public const string AlreadyEnrolled = "StudentTerms.AlreadyEnrolled";
+            public const string AlreadyWithdrawn = "StudentTerms.AlreadyWithdrawn";
+            public const string NotWithdrawn = "StudentTerms.NotWithdrawn";
+            public const string CannotWithdrawPlaced = "StudentTerms.CannotWithdrawPlaced";
+            public const string EnterpriseIdRequiredWhenPlaced = "StudentTerms.EnterpriseIdRequiredWhenPlaced";
+            public const string EnterpriseNotFound = "StudentTerms.EnterpriseNotFound";
+            public const string AllStudentsPlaced = "StudentTerms.AllStudentsPlaced";
+            public const string InvalidFileFormat = "StudentTerms.InvalidFileFormat";
+            public const string FileTooLarge = "StudentTerms.FileTooLarge";
+            public const string InvalidExcelHeaders = "StudentTerms.InvalidExcelHeaders";
+            public const string InvalidExcelHeaderDetail = "StudentTerms.InvalidExcelHeaderDetail";
+            public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
+            public const string TooManyRows = "StudentTerms.TooManyRows";
+
+            // Validation — TermId / StudentTermId
+            public const string TermIdRequired = "StudentTerms.TermIdRequired";
+            public const string StudentTermIdRequired = "StudentTerms.StudentTermIdRequired";
+            public const string StudentTermIdListRequired = "StudentTerms.StudentTermIdListRequired";
+            public const string StudentTermIdListMinCount = "StudentTerms.StudentTermIdListMinCount";
+            public const string ValidRecordsRequired = "StudentTerms.ValidRecordsRequired";
+            public const string ValidRecordsMinCount = "StudentTerms.ValidRecordsMinCount";
+
+            // Validation — File
+            public const string FileRequired = "StudentTerms.FileRequired";
+            public const string FileEmpty = "StudentTerms.FileEmpty";
+
+            // Validation — FullName
+            public const string FullNameRequired = "StudentTerms.FullNameRequired";
+            public const string FullNameInvalid = "StudentTerms.FullNameInvalid";
+
+            // Validation — StudentCode
+            public const string StudentCodeRequired = "StudentTerms.StudentCodeRequired";
+            public const string StudentCodeInvalid = "StudentTerms.StudentCodeInvalid";
+            public const string StudentCodeInvalidDetail = "StudentTerms.StudentCodeInvalidDetail";
+            public const string StudentCodeDuplicateInFile = "StudentTerms.StudentCodeDuplicateInFile";
+            public const string StudentCodeAlreadyInTerm = "StudentTerms.StudentCodeAlreadyInTerm";
+            public const string StudentCodeInOtherTerm = "StudentTerms.StudentCodeInOtherTerm";
+
+            // Validation — Email
+            public const string EmailRequired = "StudentTerms.EmailRequired";
+            public const string EmailInvalid = "StudentTerms.EmailInvalid";
+            public const string EmailDuplicateInFile = "StudentTerms.EmailDuplicateInFile";
+            public const string EmailAlreadyInTerm = "StudentTerms.EmailAlreadyInTerm";
+            public const string EmailInOtherTerm = "StudentTerms.EmailInOtherTerm";
+
+            // Validation — Phone
+            public const string PhoneInvalid = "StudentTerms.PhoneInvalid";
+
+            // Validation — DateOfBirth
+            public const string DateOfBirthInvalidFormat = "StudentTerms.DateOfBirthInvalidFormat";
+            public const string DateOfBirthMinAge = "StudentTerms.DateOfBirthMinAge";
+
+            // Validation — List query
+            public const string SearchTermMaxLength = "StudentTerms.SearchTermMaxLength";
+            public const string SortByAllowedValues = "StudentTerms.SortByAllowedValues";
+            public const string SortOrderAllowedValues = "StudentTerms.SortOrderAllowedValues";
+
+            // Success messages
+            public const string AddSuccess = "StudentTerms.AddSuccess";
+            public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
+            public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
+            public const string RestoreSuccess = "StudentTerms.RestoreSuccess";
+            public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
+            public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
+            public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
+
+            // Email notifications
+            public const string EmailSubjectWithdraw = "StudentTerms.Email.SubjectWithdraw";
+            public const string EmailBodyWithdraw = "StudentTerms.Email.BodyWithdraw";
+            public const string EmailSubjectRestore = "StudentTerms.Email.SubjectRestore";
+            public const string EmailBodyRestore = "StudentTerms.Email.BodyRestore";
+
+            // Excel headers
+            public const string ExcelHeaderStudentCode = "StudentTerms.Excel.HeaderStudentCode";
+            public const string ExcelHeaderFullName = "StudentTerms.Excel.HeaderFullName";
+            public const string ExcelHeaderEmail = "StudentTerms.Excel.HeaderEmail";
+            public const string ExcelHeaderPhone = "StudentTerms.Excel.HeaderPhone";
+            public const string ExcelHeaderDateOfBirth = "StudentTerms.Excel.HeaderDateOfBirth";
+            public const string ExcelHeaderMajor = "StudentTerms.Excel.HeaderMajor";
+            public const string ExcelHeaderTempPassword = "StudentTerms.Excel.HeaderTempPassword";
+            public const string ExcelWorksheetStudentList = "StudentTerms.Excel.WorksheetStudentList";
+            public const string ExcelWorksheetTempPassword = "StudentTerms.Excel.WorksheetTempPassword";
+
+            // Logging
+            public const string LogAdded = "StudentTerms.Log.Added";
+            public const string LogUpdated = "StudentTerms.Log.Updated";
+            public const string LogWithdrawn = "StudentTerms.Log.Withdrawn";
+            public const string LogRestored = "StudentTerms.Log.Restored";
+            public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
+            public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
+        }
+        public static class ActiveTerms
+        {
+            public const string InvalidUserId = "ActiveTerms.InvalidUserId";
+            public const string EnterpriseUserNotFound = "ActiveTerms.EnterpriseUserNotFound";
+            public const string NoActiveTermsFoundForEnterprise = "ActiveTerms.NoActiveTermsFoundForEnterprise";
+            public const string NoActiveTermsFoundForMentor = "ActiveTerms.NoActiveTermsFoundForMentor";
+            public const string SystemError = "ActiveTerms.SystemError";
+            public const string LogRetrieved = "ActiveTerms.Log.Retrieved";
+            public const string LogError = "ActiveTerms.Log.Error";
+        }
+
+        public static class ViolationReportKey
+        {
+            // Validator
+            public const string OccurredDateIsRequired = "ViolationReport.OccurredDateIsRequired";
+            public const string OccurredDateInFuture = "ViolationReport.OccurredDateInFuture";
+            public const string DescriptionIsRequired = "ViolationReport.DescriptionIsRequired";
+            public const string DescriptionMinLength = "ViolationReport.DescriptionMinLength";
+            public const string DescriptionMaxLength = "ViolationReport.DescriptionMaxLength";
+            // Get All
+            public const string GetViolationReportsError = "ViolationReport.GetViolationReportsError";
+            public const string FilteredNotFound = "ViolationReport.FilteredNotFound";
+            public const string NotFound = "ViolationReport.NotFound";
+            // Create
+            public const string NotAllowedToReport = "ViolationReport.NotAllowedToReport";
+            public const string OccurredDateCannotBeBeforeInternshipStart = "ViolationReport.OccurredDateCannotBeBeforeInternshipStart";
+            public const string OccurredDateCannotBeAfterInternshipEnd = "ViolationReport.OccurredDateCannotBeAfterInternshipEnd";
+            public const string CreateViolationReportSuccess = "ViolationReport.CreateViolationReportSuccess";
+            public const string CreateViolationReportError = "ViolationReport.CreateViolationReportError";
+            public const string ViolationReportLogNotFound = "ViolationReport.LogNotFound";
+            // Delete
+            public const string LogDeleteNotOwner = "ViolationReport.LogDeleteNotOwner";
+            public const string DeleteNotOwner = "ViolationReport.DeleteNotOwner";
+            public const string ViolationReportDeletedSuccessfully = "ViolationReport.ViolationReportDeletedSuccessfully";
+            public const string ErrorOccurredWhileDeletingViolationReport = "ViolationReport.ErrorOccurredWhileDeletingViolationReport";
+            // Update
+            public const string UpdatingViolationReportByUser = "ViolationReport.UpdatingViolationReportByUser";
+            public const string ViolationReportNotFound = "ViolationReport.ViolationReportNotFound";
+            public const string UserNotAllowedToUpdateViolationReport = "ViolationReport.UserNotAllowedToUpdateViolationReport";
+            public const string NotAllowedToUpdateThisReport = "ViolationReport.NotAllowedToUpdateThisReport";
+            public const string OccurredDateBeforeInternshipStart = "ViolationReport.OccurredDateBeforeInternshipStart";
+            public const string InternshipHasEnded = "ViolationReport.InternshipHasEnded";
+            public const string ViolationReportUpdatedByAnotherUser = "ViolationReport.ViolationReportUpdatedByAnotherUser";
+            public const string ViolationReportUpdatedSuccessfully = "ViolationReport.ViolationReportUpdatedSuccessfully";
+            public const string FailedToUpdateViolationReport = "ViolationReport.FailedToUpdateViolationReport";
+            public const string ErrorOccurredWhileUpdatingViolationReport = "ViolationReport.ErrorOccurredWhileUpdatingViolationReport";
+            public const string ViolationReportIdIsRequired = "ViolationReport.ViolationReportIdIsRequired";
+            public const string ErrorWhileGettingViolationReportDetail = "ViolationReport.ErrorWhileGettingViolationReportDetail";
+        }
+
+        public static class StudentMessageKey
+        {
+            //validator
+            public const string StudentIdRequired = "Student.StudentIdRequired";
+            //create
+            public const string StudentNotFound = "Student.NotFound";
+        }
+
+        public static class JobPostingMessageKey
+        {
+            // Common
+            public const string TitleRequired = "JobPosting.TitleRequired";
+            public const string TitleTooLong = "JobPosting.TitleTooLong";
+            public const string DescriptionTooLong = "JobPosting.DescriptionTooLong";
+            public const string RequirementsTooLong = "JobPosting.RequirementsTooLong";
+            public const string BenefitTooLong = "JobPosting.BenefitTooLong";
+            public const string LocationRequired = "JobPosting.LocationRequired";
+            public const string LocationTooLong = "JobPosting.LocationTooLong";
+            public const string QuantityMustBePositive = "JobPosting.QuantityMustBePositive";
+            public const string ExpireDateMustBeTodayOrLater = "JobPosting.ExpireDateMustBeTodayOrLater";
+            public const string ExpireDateRequired = "JobPosting.ExpireDateRequired";
+            public const string StartDateMustBeTodayOrLater = "JobPosting.StartDateMustBeTodayOrLater";
+            public const string StartDateRequired = "JobPosting.StartDateRequired";
+            public const string EndDateRequired = "JobPosting.EndDateRequired";
+            public const string EndDateMinDuration = "JobPosting.EndDateMinDuration";
+            public const string EndDateMaxDuration = "JobPosting.EndDateMaxDuration";
+            public const string AudienceInvalid = "JobPosting.AudienceInvalid";
+            public const string AudienceRequired = "JobPosting.AudienceRequired";
+            public const string UniversityRequiredForTargetAudience = "JobPosting.UniversityRequiredForTargetAudience";
+            public const string NotAllowed = "JobPosting.NotAllowed";
+            //Apply job
+            public const string CvRequired = "JobPosting.CvRequired";
+            public const string AlreadyPlaced = "JobPosting.AlreadyPlaced";
+            //Close job
+            public const string OnlyPublishedAllowed = "JobPosting.OnlyPublishedAllowed";
+            public const string ConfirmHasActiveApplications = "JobPosting.ConfirmHasActiveApplications";
+            public const string NotifyStudentClosedSubject = "JobPosting.NotifyStudentClosedSubject";
+            public const string NotifyStudentClosedBody = "JobPosting.NotifyStudentClosedBody";
+            public const string CloseSuccess = "JobPosting.CloseSuccess";
+            // CreateDraft
+            public const string DraftSavedSuccess = "JobPosting.DraftSavedSuccess";
+            // Create Job
+            public const string CreateSuccess = "JobPosting.CreateSuccess";
+            // Delete
+            public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
+            public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";
+            public const string DeleteSuccess = "JobPosting.DeleteSuccess";
+            public const string DeleteWithActiveApplications = "JobPosting.DeleteWithActiveApplications";
+            public const string DleteVersionConflict = "JobPosting.DeleteVersionConflict";
+            // Publish Job
+            public const string JobPostingNotFound = "JobPosting.NotFound";
+            public const string PublishSuccess = "JobPosting.PublishSuccess";
+            public const string AlreadyPublished = "JobPosting.AlreadyPublished";
+            // Update Job
+            public const string UpdateConfirmHasApplications = "JobPosting.UpdateConfirmHasApplications";
+            public const string ReopenExpireDateInvalid = "JobPosting.ReopenExpireDateInvalid";
+            public const string UpdateQuantityLessThanPlaced = "JobPosting.UpdateQuantityLessThanPlaced";
+            public const string UpdateInvalidUniversities = "JobPosting.UpdateInvalidUniversities";
+            public const string TargetedRequiresSingleUniversity = "JobPosting.TargetedRequiresSingleUniversity";
+            public const string ReopenNotifyStudentSubject = "JobPosting.ReopenNotifyStudentSubject";
+            public const string ReopenNotifyStudentBody = "JobPosting.ReopenNotifyStudentBody";
+            public const string ReopenSuccess = "JobPosting.ReopenSuccess";
+        }
+        public static class InternshipPhase
+        {
+            // Validator
+            public const string EnterpriseIdRequired = "InternshipPhase.EnterpriseIdRequired";
+            public const string PhaseIdRequired = "InternshipPhase.PhaseIdRequired";
+            public const string NameRequired = "InternshipPhase.NameRequired";
+            public const string NameMaxLength = "InternshipPhase.NameMaxLength";
+            public const string StartDateRequired = "InternshipPhase.StartDateRequired";
+            public const string StartDateNotInPast = "InternshipPhase.StartDateNotInPast";
+            public const string EndDateRequired = "InternshipPhase.EndDateRequired";
+            public const string EndDateAfterStartDate = "InternshipPhase.EndDateAfterStartDate";
+            public const string MaxStudentsGreaterThanZero = "InternshipPhase.MaxStudentsGreaterThanZero";
+            public const string StatusInvalid = "InternshipPhase.StatusInvalid";
+            public const string DescriptionMaxLength = "InternshipPhase.DescriptionMaxLength";
+            public const string PageNumberMinValue = "InternshipPhase.PageNumberMinValue";
+            public const string PageSizeRange = "InternshipPhase.PageSizeRange";
+
+            // Business errors
+            public const string NotFound = "InternshipPhase.NotFound";
+            public const string DuplicateName = "InternshipPhase.DuplicateName";
+            public const string DuplicateNameOnUpdate = "InternshipPhase.DuplicateNameOnUpdate";
+            public const string CannotUpdateClosed = "InternshipPhase.CannotUpdateClosed";
+            public const string InvalidStatusTransition = "InternshipPhase.InvalidStatusTransition";
+            public const string CannotDeleteHasActiveGroups = "InternshipPhase.CannotDeleteHasActiveGroups";
+            public const string CannotDeleteInProgress = "InternshipPhase.CannotDeleteInProgress";
+            public const string UpdateNoChanges = "InternshipPhase.UpdateNoChanges";
+            public const string StudentNotFound = "InternshipPhase.StudentNotFound";
+            public const string NotYourEnterprise = "InternshipPhase.NotYourEnterprise";
+            public const string EnterpriseUserNotFound = "InternshipPhase.EnterpriseUserNotFound";
+            public const string EndDateInPastForActivePhase = "InternshipPhase.EndDateInPastForActivePhase";
+
+            // Log - Ownership
+            public const string LogOwnershipDenied = "InternshipPhase.Log.OwnershipDenied";
+            public const string LogInvalidStatusTransition = "InternshipPhase.Log.InvalidStatusTransition";
+
+            // Success
+            public const string CreateSuccess = "InternshipPhase.CreateSuccess";
+            public const string UpdateSuccess = "InternshipPhase.UpdateSuccess";
+            public const string DeleteSuccess = "InternshipPhase.DeleteSuccess";
+
+            // Log - Create
+            public const string LogCreating = "InternshipPhase.Log.Creating";
+            public const string LogEnterpriseNotFound = "InternshipPhase.Log.EnterpriseNotFound";
+            public const string LogDuplicateName = "InternshipPhase.Log.DuplicateName";
+            public const string LogCreateSuccess = "InternshipPhase.Log.CreateSuccess";
+            public const string LogCreateError = "InternshipPhase.Log.CreateError";
+
+            // Log - Update
+            public const string LogUpdating = "InternshipPhase.Log.Updating";
+            public const string LogUpdateNotFound = "InternshipPhase.Log.UpdateNotFound";
+            public const string LogUpdateClosed = "InternshipPhase.Log.UpdateClosed";
+            public const string LogUpdateDuplicateName = "InternshipPhase.Log.UpdateDuplicateName";
+            public const string LogUpdateSuccess = "InternshipPhase.Log.UpdateSuccess";
+            public const string LogUpdateNoChanges = "InternshipPhase.Log.UpdateNoChanges";
+            public const string LogUpdateError = "InternshipPhase.Log.UpdateError";
+
+            // Log - Delete
+            public const string LogDeleting = "InternshipPhase.Log.Deleting";
+            public const string LogDeleteNotFound = "InternshipPhase.Log.DeleteNotFound";
+            public const string LogDeleteHasActiveGroups = "InternshipPhase.Log.DeleteHasActiveGroups";
+            public const string LogDeleteInProgress = "InternshipPhase.Log.DeleteInProgress";
+            public const string LogDeleteSuccess = "InternshipPhase.Log.DeleteSuccess";
+            public const string LogDeleteNoChanges = "InternshipPhase.Log.DeleteNoChanges";
+            public const string LogDeleteError = "InternshipPhase.Log.DeleteError";
+
+            // Log - Get List
+            public const string LogGettingList = "InternshipPhase.Log.GettingList";
+            public const string LogListFromCache = "InternshipPhase.Log.ListFromCache";
+            public const string LogListSuccess = "InternshipPhase.Log.ListSuccess";
+
+            // Log - Get By Id
+            public const string LogGettingById = "InternshipPhase.Log.GettingById";
+            public const string LogByIdFromCache = "InternshipPhase.Log.ByIdFromCache";
+            public const string LogByIdNotFound = "InternshipPhase.Log.ByIdNotFound";
+            public const string LogByIdSuccess = "InternshipPhase.Log.ByIdSuccess";
+
+            // Log - Get My Phases (Student + Mentor)
+            public const string LogGettingMyPhases           = "InternshipPhase.Log.GettingMyPhases";
+            public const string LogStudentNotFound           = "InternshipPhase.Log.StudentNotFound";
+            public const string LogMyPhasesSuccess           = "InternshipPhase.Log.MyPhasesSuccess";
+            public const string LogMentorUserNotFound        = "InternshipPhase.Log.MentorUserNotFound";
+            public const string LogMyMentorPhasesSuccess     = "InternshipPhase.Log.MyMentorPhasesSuccess";
+            public const string MentorEnterpriseUserNotFound = "InternshipPhase.MentorEnterpriseUserNotFound";
+        }
+
+        public static class Notifications
+        {
+            public const string NotFound = "Notifications.NotFound";
+            public const string AccessDenied = "Notifications.AccessDenied";
+            public const string MarkReadSuccess = "Notifications.MarkReadSuccess";
+            public const string MarkAllReadSuccess = "Notifications.MarkAllReadSuccess";
+            public const string DeleteSuccess = "Notifications.DeleteSuccess";
+            public const string DeleteError = "Notifications.DeleteError";
+            public const string BulkDeleteSuccess = "Notifications.BulkDeleteSuccess";
+            public const string DeleteNotOwner = "Notifications.DeleteNotOwner";
+            public const string BulkDeleteEmptyIds = "Notifications.BulkDeleteEmptyIds";
+            public const string NotificationIdRequired = "Notifications.NotificationIdRequired";
+        }
+        public static class HRApplications
+        {
+            // Validation
+            public const string ApplicationIdRequired = "HRApplications.ApplicationIdRequired";
+            public const string RejectReasonRequired = "HRApplications.RejectReasonRequired";
+            public const string RejectReasonMaxLength = "HRApplications.RejectReasonMaxLength";
+            public const string RejectReasonMinLength = "HRApplications.RejectReasonMinLength";
+
+            // Business errors
+            public const string NotFound = "HRApplications.NotFound";
+            public const string EnterpriseUserNotFound = "HRApplications.EnterpriseUserNotFound";
+            public const string InvalidTransition = "HRApplications.InvalidTransition";
+            public const string CannotRejectPlaced = "HRApplications.CannotRejectPlaced";
+            public const string NotSelfApplyApplication = "HRApplications.NotSelfApplyApplication";
+            public const string NotUniAssignApplication = "HRApplications.NotUniAssignApplication";
+            public const string ApplicationNotActive = "HRApplications.ApplicationNotActive";
+
+            // Notification message templates
+            public const string NotifyInterviewing = "HRApplications.Notify.Interviewing";
+            public const string NotifyOffered = "HRApplications.Notify.Offered";
+            public const string NotifyPlacedSelfApply = "HRApplications.Notify.Placed.SelfApply";
+            public const string NotifyPlacedUniAssign = "HRApplications.Notify.Placed.UniAssign";
+            public const string NotifyRejectedSelfApply = "HRApplications.Notify.Rejected.SelfApply";
+            public const string NotifyRejectedUniAssign = "HRApplications.Notify.Rejected.UniAssign";
+            public const string NotifyUniAdminRejected = "HRApplications.Notify.UniAdmin.Rejected";
+            public const string NotifyUniAdminPlaced = "HRApplications.Notify.UniAdmin.Placed";
+            public const string NotifyEnterpriseAutoWithdrawn = "HRApplications.Notify.Enterprise.AutoWithdrawn";
+            public const string NotifyStudentAutoWithdrawn = "HRApplications.Notify.Student.AutoWithdrawn";
+
+            // Logging
+            public const string LogMoveToInterviewing = "HRApplications.Log.MoveToInterviewing";
+            public const string LogSendOffer = "HRApplications.Log.SendOffer";
+            public const string LogMarkAsPlaced = "HRApplications.Log.MarkAsPlaced";
+            public const string LogReject = "HRApplications.Log.Reject";
+            public const string LogApproveUniAssign = "HRApplications.Log.ApproveUniAssign";
+            public const string LogRejectUniAssign = "HRApplications.Log.RejectUniAssign";
+            public const string LogCascadeWithdraw = "HRApplications.Log.CascadeWithdraw";
+            public const string LogInvalidUserId = "HRApplications.Log.InvalidUserId";
+        }
+
+        public static class StudentApplications
+        {
+            // Business errors
+            public const string NotFound = "StudentApplications.NotFound";
+            public const string NotOwner = "StudentApplications.NotOwner";
+            public const string CannotWithdrawNotApplied = "StudentApplications.CannotWithdrawNotApplied";
+            public const string CannotHidePlaced = "StudentApplications.CannotHidePlaced";
+            public const string CannotHideActiveApplication = "StudentApplications.CannotHideActiveApplication";
+
+            // Success
+            public const string WithdrawSuccess = "StudentApplications.WithdrawSuccess";
+            public const string HideSuccess = "StudentApplications.HideSuccess";
+
+            // Notify HR (AC-07)
+            public const string NotifyHRWithdrawn = "StudentApplications.Notify.HR.Withdrawn";
         }
     }
 }

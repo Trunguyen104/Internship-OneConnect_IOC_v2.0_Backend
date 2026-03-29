@@ -56,41 +56,41 @@ public class PublishEvaluationHandler : IRequestHandler<PublishEvaluationCommand
                 _messageService.GetMessage(MessageKeys.EvaluationKey.InternshipNotFound),
                 ResultErrorType.NotFound);
 
-        var evaluations = await _unitOfWork.Repository<Evaluation>().Query()
-            .Where(e => e.CycleId == request.CycleId && e.InternshipId == request.InternshipId)
-            .ToListAsync(cancellationToken);
+        var query = _unitOfWork.Repository<Evaluation>().Query()
+            .Where(e => e.CycleId == request.CycleId && e.InternshipId == request.InternshipId);
+
+        if (request.StudentIds != null && request.StudentIds.Count > 0)
+        {
+            query = query.Where(e => request.StudentIds.Contains(e.StudentId!.Value));
+        }
+
+        var evaluations = await query.ToListAsync(cancellationToken);
 
         if (evaluations.Count == 0)
             return Result<PublishEvaluationResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.EvaluationKey.NotFound),
                 ResultErrorType.NotFound);
 
-        var isGroupEvaluation = evaluations.Any(e => e.StudentId == null);
-        
-        if (!isGroupEvaluation && evaluations.Count < internship.Members.Count)
+        // AC-05: Phiếu Pending (chưa chấm) không thể Publish
+        var pendingEvals = evaluations.Where(e => e.Status == EvaluationStatus.Pending).ToList();
+        if (pendingEvals.Count > 0)
         {
             return Result<PublishEvaluationResponse>.Failure(
-                "Chưa tạo đầy đủ bài đánh giá cho toàn bộ sinh viên trong nhóm.",
-                ResultErrorType.BadRequest);
-        }
-try
-        {
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        var unsubmittedEvals = evaluations.Where(e => e.Status != EvaluationStatus.Submitted).ToList();
-        if (unsubmittedEvals.Count > 0)
-        {
-            return Result<PublishEvaluationResponse>.Failure(
-                "Tất cả bài đánh giá của nhóm phải ở trạng thái Submitted trước khi Publish.",
+                "Không thể công bố phiếu điểm chưa được chấm (Pending).",
                 ResultErrorType.BadRequest);
         }
 
-        var now = DateTime.UtcNow;
-        foreach (var eval in evaluations)
+        try
         {
-            eval.Status = EvaluationStatus.Published;
-            eval.UpdatedAt = now;
-            await _unitOfWork.Repository<Evaluation>().UpdateAsync(eval, cancellationToken);
-        }
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            
+            var now = DateTime.UtcNow;
+            foreach (var eval in evaluations)
+            {
+                eval.Status = EvaluationStatus.Published;
+                eval.UpdatedAt = now;
+                await _unitOfWork.Repository<Evaluation>().UpdateAsync(eval, cancellationToken);
+            }
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);

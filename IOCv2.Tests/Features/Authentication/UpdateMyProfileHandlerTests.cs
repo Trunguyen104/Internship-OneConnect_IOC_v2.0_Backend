@@ -13,25 +13,35 @@ using MediatR;
 using Xunit;
 using IOCv2.Application.Common.Models;
 
-namespace IOCv2.Tests.Features.Users.Commands
+namespace IOCv2.Tests.Features.Authentication
 {
     public class UpdateMyProfileHandlerTests
     {
         private readonly Mock<ICurrentUserService> _currentUserService;
         private readonly Mock<IUnitOfWork> _unitOfWork;
+        private readonly Mock<ICacheService> _cacheService;
+        private readonly Mock<IFileStorageService> _fileStorageService;
         private readonly Mock<ILogger<UpdateMyProfileHandler>> _logger;
+        private readonly Mock<IMessageService> _messageService;
         private readonly UpdateMyProfileHandler _handler;
 
         public UpdateMyProfileHandlerTests()
         {
             _currentUserService = new Mock<ICurrentUserService>();
             _unitOfWork = new Mock<IUnitOfWork>();
+            _cacheService = new Mock<ICacheService>();
+            _fileStorageService = new Mock<IFileStorageService>();
             _logger = new Mock<ILogger<UpdateMyProfileHandler>>();
+            _messageService = new Mock<IMessageService>();
+            _messageService.Setup(m => m.GetMessage(It.IsAny<string>())).Returns((string key) => key);
             
             _handler = new UpdateMyProfileHandler(
                 _currentUserService.Object,
                 _unitOfWork.Object,
-                _logger.Object);
+                _cacheService.Object,
+                _fileStorageService.Object,
+                _logger.Object,
+                _messageService.Object);
         }
 
         [Fact]

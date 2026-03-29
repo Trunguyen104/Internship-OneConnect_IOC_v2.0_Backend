@@ -8,6 +8,7 @@ using IOCv2.Application.Features.Authentication.Commands.ResetPassword;
 using IOCv2.Application.Features.Authentication.Commands.RevokeToken;
 using IOCv2.Application.Features.Users.Commands.UpdateMyProfile;
 using IOCv2.Application.Features.Users.Queries.GetMyProfile;
+using IOCv2.Application.Features.Users.Queries.GetDownloadMyCV;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -177,14 +178,35 @@ public class AuthController : ApiControllerBase
     /// <returns>Unit result</returns>
     [HttpPut("me")]
     [Authorize]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(ApiResponse<Unit>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateMyProfileCommand command)
+    public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateMyProfileCommand command)
     {
         _logger.LogInformation("Profile update requested for current user.");
         var result = await _mediator.Send(command);
         return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Download the current user's CV.
+    /// </summary>
+    [HttpGet("me/cv")]
+    [Authorize]
+    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetDownloadCV(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("CV download requested for current user.");
+        var result = await _mediator.Send(new GetDownloadMyCVQuery(), cancellationToken);
+
+        if (!result.IsSuccess || result.Data?.Content == null)
+        {
+            return HandleResult(result);
+        }
+
+        return File(result.Data.Content, result.Data.ContentType, result.Data.FileName);
     }
 
     /// <summary>

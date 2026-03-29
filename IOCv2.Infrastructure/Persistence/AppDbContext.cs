@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -28,13 +28,17 @@ public partial class AppDbContext : DbContext
     public DbSet<UniversityUser> UniversityUsers { get; set; } = null!;
     public DbSet<Domain.Entities.Enterprise> Enterprises { get; set; } = null!;
     public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
+    public DbSet<Job> Jobs { get; set; } = null!;
 
     // Project Management
     public DbSet<Term> Terms { get; set; } = null!;
+    public DbSet<InternshipPhase> InternshipPhases { get; set; } = null!;
     public DbSet<StudentTerm> StudentTerms { get; set; } = null!;
     public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
     public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
     public DbSet<InternshipApplication> InternshipApplications { get; set; } = null!;
+    public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; } = null!;
+
     public DbSet<Logbook> Logbooks { get; set; } = null!;
     public DbSet<Project> Projects { get; set; } = null!;
     public DbSet<ProjectResources> ProjectResources { get; set; } = null!;
@@ -49,7 +53,14 @@ public partial class AppDbContext : DbContext
     public DbSet<EvaluationCriteria> EvaluationCriteria { get; set; } = null!;
     public DbSet<Evaluation> Evaluations { get; set; } = null!;
     public DbSet<EvaluationDetail> EvaluationDetails { get; set; } = null!;
+
+    // Notifications
+    public DbSet<Notification> Notifications { get; set; } = null!;
     
+    //Violation Reports
+    public DbSet<ViolationReport> ViolationReports { get; set; } = null!;
+
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTime.UtcNow;
@@ -82,8 +93,12 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<SprintWorkItem>()
+        .HasKey(x => new { x.SprintId, x.WorkItemId });
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         OnModelCreatingPartial(modelBuilder);
+        base.OnModelCreating(modelBuilder);
 
         ApplyGlobalFilters(modelBuilder);
     }
@@ -102,6 +117,30 @@ public partial class AppDbContext : DbContext
                 var lambda = Expression.Lambda(equalExpression, parameter);
 
                 modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+
+                // Configure Unique Indexes to ignore soft-deleted rows
+                var deletedAtProperty = entityType.FindProperty(nameof(BaseEntity.DeletedAt));
+                if (deletedAtProperty != null)
+                {
+                    var columnName = deletedAtProperty.GetColumnName() ?? "deleted_at";
+                    var filterSql = $"{columnName} IS NULL";
+
+                    foreach (var index in entityType.GetIndexes())
+                    {
+                        if (index.IsUnique)
+                        {
+                            var currentFilter = index.GetFilter();
+                            if (string.IsNullOrEmpty(currentFilter))
+                            {
+                                index.SetFilter(filterSql);
+                            }
+                            else if (!currentFilter.Contains(filterSql) && !currentFilter.Contains(columnName))
+                            {
+                                index.SetFilter($"({currentFilter}) AND {filterSql}");
+                            }
+                        }
+                    }
+                }
             }
         }
     }

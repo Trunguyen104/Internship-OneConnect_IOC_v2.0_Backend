@@ -21,7 +21,7 @@ namespace IOCv2.Infrastructure.Services.Logging
         public async Task Invoke(HttpContext context)
         {
             var userId = context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var ip = context.Connection.RemoteIpAddress?.ToString();
+            var ip = context.Connection?.RemoteIpAddress?.ToString();
 
             using (LogContext.PushProperty("UserId", userId))
             using (LogContext.PushProperty("IP", ip))

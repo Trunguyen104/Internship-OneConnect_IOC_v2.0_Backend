@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById
+namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetDownloadProjectResourceById
 {
     public class GetDownloadProjectResourceByIdHandler : IRequestHandler<GetDownloadProjectResourceByIdQuery, Result<GetDownloadProjectResourceByIdResponse>>
     {
@@ -36,62 +36,56 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         }
         public async Task<Result<GetDownloadProjectResourceByIdResponse>> Handle(GetDownloadProjectResourceByIdQuery request, CancellationToken cancellationToken)
         {
-            try
+
+            // Check if the project resource exists
+            var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query().AsNoTracking().FirstOrDefaultAsync(x => x.ProjectResourceId == request.ProjectResourceId, cancellationToken);
+            if (resource == null)
             {
-                // Check if the project resource exists
-                var resource = await _unitOfWork.Repository<Domain.Entities.ProjectResources>().Query().AsNoTracking().FirstOrDefaultAsync(x => x.ProjectResourceId == request.ProjectResourceId, cancellationToken);
-                if (resource == null)
-                {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ProjectResourceId);
-                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
-                        ResultErrorType.NotFound);
-                }
-
-                var hasAccess = await HasProjectAccessAsync(resource.ProjectId, cancellationToken);
-                if (!hasAccess)
-                {
-                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
-                        ResultErrorType.Forbidden);
-                }
-
-                if (resource.ResourceType == FileType.LINK)
-                {
-                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LinkDownloadNotSupported),
-                        ResultErrorType.BadRequest);
-                }
-
-                // get stream from storage
-                var stream = await _fileStorageService.GetFileAsync(resource.ResourceUrl, cancellationToken);
-                if (stream == null)
-                {
-                    _logger.LogWarning("File not found in storage for resource: {ResourceId}", request.ProjectResourceId);
-                    return Result<GetDownloadProjectResourceByIdResponse>.Failure(
-                        "File not found in storage.",
-                        ResultErrorType.NotFound);
-                }
-
-                var extension = Path.GetExtension(resource.ResourceUrl);
-                var safeResourceName = string.IsNullOrWhiteSpace(resource.ResourceName)
-                    ? request.ProjectResourceId.ToString("N")
-                    : resource.ResourceName;
-                var response = new GetDownloadProjectResourceByIdResponse
-                {
-                    Content = stream,
-                    ContentType = FileValidationHelper.GetMimeType(safeResourceName),
-                    FileName = $"{safeResourceName}{extension}"
-                };
-
-                _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ProjectResourceId);
-                return Result<GetDownloadProjectResourceByIdResponse>.Success(response);
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ProjectResourceId);
+                return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound),
+                    ResultErrorType.NotFound);
             }
-            catch (Exception ex)
+
+            var hasAccess = await HasProjectAccessAsync(resource.ProjectId, cancellationToken);
+            if (!hasAccess)
             {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdError), request.ProjectResourceId);
-                return Result<GetDownloadProjectResourceByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
+                return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                    ResultErrorType.Forbidden);
             }
+
+            if (resource.ResourceType == FileType.LINK)
+            {
+                return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.ProjectResourcesKey.LinkDownloadNotSupported),
+                    ResultErrorType.BadRequest);
+            }
+
+            // get stream from storage
+            var stream = await _fileStorageService.GetFileAsync(resource.ResourceUrl, cancellationToken);
+            if (stream == null)
+            {
+                _logger.LogWarning("File not found in storage for resource: {ResourceId}", request.ProjectResourceId);
+                return Result<GetDownloadProjectResourceByIdResponse>.Failure(
+                    "File not found in storage.",
+                    ResultErrorType.NotFound);
+            }
+
+            var extension = Path.GetExtension(resource.ResourceUrl);
+            var safeResourceName = string.IsNullOrWhiteSpace(resource.ResourceName)
+                ? request.ProjectResourceId.ToString("N")
+                : resource.ResourceName;
+            var response = new GetDownloadProjectResourceByIdResponse
+            {
+                Content = stream,
+                ContentType = FileValidationHelper.GetMimeType(safeResourceName),
+                FileName = $"{safeResourceName}{extension}"
+            };
+
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ProjectResourceId);
+            return Result<GetDownloadProjectResourceByIdResponse>.Success(response);
+
         }
 
         private async Task<bool> HasProjectAccessAsync(Guid projectId, CancellationToken cancellationToken)
@@ -105,6 +99,24 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
             {
                 return false;
+            }
+
+            if (string.Equals(_currentUserService.Role, "Mentor", StringComparison.OrdinalIgnoreCase))
+            {
+                var enterpriseUserId = await _unitOfWork.Repository<Domain.Entities.EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .Where(eu => eu.UserId == currentUserId)
+                    .Select(eu => eu.EnterpriseUserId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (enterpriseUserId == Guid.Empty)
+                {
+                    return false;
+                }
+
+                return await _unitOfWork.Repository<Domain.Entities.Project>().Query()
+                    .AsNoTracking()
+                    .AnyAsync(p => p.ProjectId == projectId && p.MentorId == enterpriseUserId, cancellationToken);
             }
 
             var studentId = await _unitOfWork.Repository<Domain.Entities.Student>().Query()

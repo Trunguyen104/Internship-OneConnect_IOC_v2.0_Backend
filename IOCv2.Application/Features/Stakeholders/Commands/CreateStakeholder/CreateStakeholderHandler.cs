@@ -1,6 +1,7 @@
 ﻿﻿﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Stakeholders.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -16,19 +17,22 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
         private readonly IMessageService _messageService;
         private readonly ILogger<CreateStakeholderHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
         public CreateStakeholderHandler(
-            IUnitOfWork unitOfWork, 
-            IMapper mapper, 
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
             IMessageService messageService,
             ILogger<CreateStakeholderHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<CreateStakeholderResponse>> Handle(CreateStakeholderCommand request, CancellationToken cancellationToken)
@@ -106,7 +110,9 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                _logger.LogInformation("Successfully created stakeholder {StakeholderId} for internship {InternshipId}", 
+                await _cacheService.RemoveByPatternAsync(StakeholderCacheKeys.StakeholderListPattern(request.InternshipId), cancellationToken);
+
+                _logger.LogInformation("Successfully created stakeholder {StakeholderId} for internship {InternshipId}",
                     stakeholder.Id, request.InternshipId);
 
                 var response = _mapper.Map<CreateStakeholderResponse>(stakeholder);
