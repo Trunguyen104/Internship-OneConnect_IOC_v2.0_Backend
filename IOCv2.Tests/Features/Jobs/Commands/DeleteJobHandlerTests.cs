@@ -319,6 +319,16 @@ namespace IOCv2.Tests.Features.Jobs.Commands
 
             public Task<int> CountAsync(Expression<Func<Job, bool>>? predicate = null, CancellationToken cancellationToken = default)
                 => Task.FromResult(predicate is null ? _store.Count : _store.AsQueryable().Count(predicate));
+
+            public Task<int> ExecuteUpdateAsync(
+                Expression<Func<Job, bool>> predicate,
+                Expression<Func<SetPropertyCalls<Job>, SetPropertyCalls<Job>>> setPropertyCalls,
+                CancellationToken cancellationToken = default)
+            {
+                // This is a fake implementation for testing; just return 0 or the count of affected entities.
+                var affected = _store.AsQueryable().Where(predicate).Count();
+                return Task.FromResult(affected);
+            }
         }
 
         private class FakeGenericRepositoryEntUser : IOCv2.Application.Interfaces.IGenericRepository<EnterpriseUser>
@@ -372,6 +382,16 @@ namespace IOCv2.Tests.Features.Jobs.Commands
 
             public Task<int> CountAsync(Expression<Func<EnterpriseUser, bool>>? predicate = null, CancellationToken cancellationToken = default)
                 => Task.FromResult(predicate is null ? _store.Count : _store.AsQueryable().Count(predicate));
+
+            public Task<int> ExecuteUpdateAsync(
+                Expression<Func<EnterpriseUser, bool>> predicate,
+                Expression<Func<SetPropertyCalls<EnterpriseUser>, SetPropertyCalls<EnterpriseUser>>> setPropertyCalls,
+                CancellationToken cancellationToken = default)
+            {
+                // This is a fake implementation for testing; just return 0 or the count of affected entities.
+                var affected = _store.AsQueryable().Where(predicate).Count();
+                return Task.FromResult(affected);
+            }
         }
 
         private class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
