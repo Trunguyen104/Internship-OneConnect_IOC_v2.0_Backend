@@ -116,6 +116,7 @@ namespace IOCv2.Tests.Features.Sprints.Queries.GetSprints
             modelBuilder.Entity<SprintWorkItem>().HasKey(sw => new { sw.SprintId, sw.WorkItemId });
             modelBuilder.Entity<Project>().HasKey(p => p.ProjectId);
             modelBuilder.Entity<InternshipGroup>().HasKey(g => g.InternshipId);
+            modelBuilder.Entity<ApplicationStatusHistory>().HasKey(h => h.HistoryId);
             base.OnModelCreating(modelBuilder);
         }
     }

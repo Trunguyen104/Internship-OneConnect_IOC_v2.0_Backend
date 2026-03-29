@@ -31,7 +31,7 @@ public class GetMyInternshipTermsHandler : IRequestHandler<GetMyInternshipTermsQ
 
     public async Task<Result<List<GetMyInternshipTermsResponse>>> Handle(GetMyInternshipTermsQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting get my internship terms query.");
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStartQueryTerms));
 
         if (string.IsNullOrWhiteSpace(_currentUserService.UserId) || !Guid.TryParse(_currentUserService.UserId, out var userId))
         {
@@ -74,10 +74,16 @@ public class GetMyInternshipTermsHandler : IRequestHandler<GetMyInternshipTermsQ
 
         // Use the first matching group per term lookup by student membership (best-effort)
         var groupLookup = new Dictionary<Guid, InternshipGroup>();
+        int index = 0;
         foreach (var g in groups)
         {
             // Map group to the first term that matches by position (legacy fallback)
             // This is a temporary fix — use GetMyInternshipPhases for phase-based logic
+            if (index < terms.Count)
+            {
+                groupLookup[terms[index].Term.TermId] = g;
+                index++;
+            }
         }
 
         var response = terms.Select(t => {

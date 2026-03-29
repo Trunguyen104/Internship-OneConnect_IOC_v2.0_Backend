@@ -77,9 +77,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
 
                 if (group.Status != GroupStatus.Active)
                 {
-                    _logger.LogWarning("Cannot add students. Group {GroupId} is not Active.", group.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogGroupNotActive), group.InternshipId);
                     return Result<AddStudentsToGroupResponse>.Failure(
-                        "Chỉ có thể thêm sinh viên vào nhóm đang hoạt động (Active).",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.GroupNotActive),
                         ResultErrorType.BadRequest);
                 }
 
@@ -103,7 +103,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                     .AsNoTracking()
                     .Where(a => studentIds.Contains(a.StudentId)
                              && a.EnterpriseId == enterpriseUser.EnterpriseId
-                             && a.Status == InternshipApplicationStatus.Approved)
+                             && a.Status == InternshipApplicationStatus.Placed)
                     .Select(a => a.StudentId)
                     .ToListAsync(cancellationToken);
 
@@ -132,9 +132,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 if (alreadyInGroup.Any())
                 {
                     var firstInGroup = alreadyInGroup.First();
-                    _logger.LogWarning("Student {StudentId} is already in another active group in phase {PhaseId}", firstInGroup, group.PhaseId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentAlreadyInActiveGroup), firstInGroup, group.PhaseId);
                     return Result<AddStudentsToGroupResponse>.Failure(
-                        "Sinh viên đã tham gia một nhóm khác trong kỳ này.",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.StudentAlreadyInActiveGroup),
                         ResultErrorType.BadRequest);
                 }
 
@@ -149,7 +149,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-                if (saved >= 0)
+                if (saved > 0)
                 {
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
                     await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(group.InternshipId), cancellationToken);

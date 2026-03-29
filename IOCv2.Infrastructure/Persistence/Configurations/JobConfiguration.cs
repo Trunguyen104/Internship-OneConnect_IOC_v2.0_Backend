@@ -1,18 +1,19 @@
+using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 
-namespace IOCv2.Infrastructure.Persistence.Configurations;
-
-public class JobConfiguration : IEntityTypeConfiguration<Job>
+namespace IOCv2.Infrastructure.Persistence.Configurations
 {
-    public void Configure(EntityTypeBuilder<Job> builder)
+    public class JobConfiguration : IEntityTypeConfiguration<Job>
     {
-        builder.ToTable("jobs");
+        public void Configure(EntityTypeBuilder<Job> builder)
+        {
+            builder.ToTable("jobs");
 
         // PK
-        builder.HasKey(j => j.JobId);
+            builder.HasKey(j => j.JobId);
         builder.Property(j => j.JobId)
                .HasColumnName("job_id")
                .ValueGeneratedOnAdd();
@@ -86,9 +87,9 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
                .IsRequired(false);
 
         // Enum stored as short (repository convention)
-        builder.Property(j => j.Status)
-               .HasColumnName("status")
-               .HasConversion<short>()
+            builder.Property(j => j.Status)
+                .HasColumnName("status")
+                .HasConversion<short>()
                .IsRequired(false);
 
         // Audit fields
@@ -133,5 +134,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
                        je.HasIndex(new[] { "job_id" }).HasDatabaseName("ix_job_universities_job_id");
                    });
 
+            builder.HasIndex(j => j.EnterpriseId).HasDatabaseName("ix_jobs_enterprise_id");
+            builder.HasIndex(j => j.Status).HasDatabaseName("ix_jobs_status");
+        }
     }
 }

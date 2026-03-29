@@ -69,7 +69,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 }
 
                 forcedEnterpriseId = enterpriseUser.EnterpriseId;
-                _logger.LogInformation("HR/EnterpriseAdmin {UserId} → scoped to enterprise {EnterpriseId}", currentUserId, forcedEnterpriseId);
+                _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogScopedHrEnterprise), currentUserId, forcedEnterpriseId);
             }
             else if (string.Equals(role, "Mentor", StringComparison.OrdinalIgnoreCase))
             {
@@ -87,7 +87,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
                 }
 
                 forcedMentorId = enterpriseUser.EnterpriseUserId;
-                _logger.LogInformation("Mentor {UserId} → scoped to MentorId {MentorId}", currentUserId, forcedMentorId);
+                _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogScopedMentor), currentUserId, forcedMentorId);
             }
             else if (string.Equals(role, "Student", StringComparison.OrdinalIgnoreCase))
             {
@@ -98,14 +98,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
 
                 if (student == null)
                 {
-                    _logger.LogWarning("Student record not found for user {UserId}", currentUserId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStudentNotFoundForUser), currentUserId);
                     return Result<PaginatedResult<GetInternshipGroupsResponse>>.Failure(
                         _messageService.GetMessage(MessageKeys.Users.NotFound),
                         ResultErrorType.NotFound);
                 }
 
                 forcedStudentId = student.StudentId;
-                _logger.LogInformation("Student {UserId} → scoped to StudentId {StudentId}", currentUserId, forcedStudentId);
+                _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogScopedStudent), currentUserId, forcedStudentId);
             }
             // SuperAdmin / SchoolAdmin: không filter bắt buộc — xem tất cả
 
@@ -182,7 +182,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
 
             await _cacheService.SetAsync(cacheKey, paginatedResult, InternshipGroupCacheKeys.Expiration.GroupList, cancellationToken);
 
-            _logger.LogInformation("Retrieved {Count} internship groups for user {UserId} (role: {Role})", resultItems.Count, currentUserId, role);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogRetrievedGroups), resultItems.Count, currentUserId, role);
 
             return Result<PaginatedResult<GetInternshipGroupsResponse>>.Success(paginatedResult);
         }

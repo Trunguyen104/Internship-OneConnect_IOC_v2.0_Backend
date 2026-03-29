@@ -16,6 +16,7 @@ namespace IOCv2.Domain.Entities
         public string? Benefit { get; set; }
         public int? Quantity { get; set; }
         public DateTime? ExpireDate { get; set; }
+        public JobStatus Status { get; set; }
 
         // New: internship date range
         public DateTime? StartDate { get; set; }
@@ -23,7 +24,6 @@ namespace IOCv2.Domain.Entities
 
         // New: audience (public / targeted)
         public JobAudience? Audience { get; set; }
-        public JobStatus? Status { get; set; }
 
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;
@@ -59,5 +59,7 @@ namespace IOCv2.Domain.Entities
                 Status = JobStatus.DRAFT
             };
         }
+        public virtual ICollection<InternshipApplication> Applications { get; set; } = new List<InternshipApplication>();
     }
+
 }

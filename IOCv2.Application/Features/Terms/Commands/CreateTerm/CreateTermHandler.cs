@@ -155,7 +155,9 @@ public class CreateTermHandler : IRequestHandler<CreateTermCommand, Result<Creat
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorCreatingTerm));
-            throw;
+            return Result<CreateTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

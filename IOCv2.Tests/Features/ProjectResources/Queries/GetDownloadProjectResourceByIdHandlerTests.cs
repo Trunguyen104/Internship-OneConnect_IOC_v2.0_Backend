@@ -22,7 +22,8 @@ public class GetDownloadProjectResourceByIdHandlerTests
         var studentId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        var project = Project.Create(internshipId, "Demo", string.Empty);
+        var project = Project.Create("Demo", string.Empty, "PRJ-DEMO_DMO_1", "IT", "Requirements");
+        project.AssignToGroup(internshipId, null, null);
         var projectId = project.ProjectId;
 
         var resource = new IOCv2.Domain.Entities.ProjectResources(projectId, "Figma", FileType.LINK, "https://figma.com/file/abc")

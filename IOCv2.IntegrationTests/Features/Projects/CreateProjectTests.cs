@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Json;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
-using IOCv2.Application.Features.Projects.Commands.CreateProject;
+using IOCv2.Domain.Enums;
 using IOCv2.Infrastructure.Persistence;
 using IOCv2.IntegrationTests.Factories;
 using Microsoft.EntityFrameworkCore;
@@ -26,17 +26,14 @@ public class CreateProjectTests : BaseIntegrationTest
     public async Task CreateProject_ShouldReturnUnauthorized_WhenUserIsNotAuthenticated()
     {
         // Arrange
-        var request = new CreateProjectCommand
-        {
-            ProjectName = "New Test Project Unauthenticated",
-            Description = "Test description",
-            InternshipId = Guid.NewGuid(),
-            StartDate = DateTime.UtcNow,
-            EndDate = DateTime.UtcNow.AddMonths(1)
-        };
+        using var request = CreateCreateProjectMultipartContent(
+            projectName: "New Test Project Unauthenticated",
+            internshipId: Guid.NewGuid(),
+            startDate: DateTime.UtcNow,
+            endDate: DateTime.UtcNow.AddMonths(1));
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/projects", request);
+        var response = await Client.PostAsync("/api/v1/projects", request);
 
         // Assert
         var content = await response.Content.ReadAsStringAsync();
@@ -52,19 +49,21 @@ public class CreateProjectTests : BaseIntegrationTest
 
         using var scope = CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var internshipId = await db.InternshipGroups.Select(g => g.InternshipId).FirstOrDefaultAsync();
+        var internshipId = await db.InternshipGroups
+            .Where(g => g.Status == GroupStatus.Active)
+            .Select(g => g.InternshipId)
+            .FirstOrDefaultAsync();
 
-        var request = new CreateProjectCommand
-        {
-            ProjectName = "New Test Project Authenticated",
-            Description = "Test description",
-            InternshipId = internshipId, // Use real seeded internship ID
-            StartDate = DateTime.UtcNow,
-            EndDate = DateTime.UtcNow.AddMonths(1)
-        };
+        using var request = CreateCreateProjectMultipartContent(
+            projectName: "New Test Project Authenticated",
+            internshipId: internshipId,
+            startDate: DateTime.UtcNow,
+            endDate: DateTime.UtcNow.AddMonths(1),
+            field: "Công nghệ thông tin",
+            requirements: "Yêu cầu dự án kiểm thử tích hợp.");
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/projects", request);
+        var response = await Client.PostAsync("/api/v1/projects", request);
 
         // Assert
         // The exact expected status might be Created (201) or OK (200) depending on your controller implementation.
@@ -72,5 +71,30 @@ public class CreateProjectTests : BaseIntegrationTest
         var content = await response.Content.ReadAsStringAsync();
         Console.WriteLine(content);
         response.IsSuccessStatusCode.Should().BeTrue("Status: {0}, Content: {1}", response.StatusCode, content);
+    }
+
+    private static MultipartFormDataContent CreateCreateProjectMultipartContent(
+        string projectName,
+        Guid? internshipId,
+        DateTime startDate,
+        DateTime endDate,
+        string description = "Test description",
+        string field = "Information Technology",
+        string requirements = "Integration test requirements")
+    {
+        var content = new MultipartFormDataContent();
+        content.Add(new StringContent(projectName), "ProjectName");
+        content.Add(new StringContent(description), "Description");
+        content.Add(new StringContent(field), "Field");
+        content.Add(new StringContent(requirements), "Requirements");
+        content.Add(new StringContent(startDate.ToString("O")), "StartDate");
+        content.Add(new StringContent(endDate.ToString("O")), "EndDate");
+
+        if (internshipId.HasValue)
+        {
+            content.Add(new StringContent(internshipId.Value.ToString()), "InternshipId");
+        }
+
+        return content;
     }
 }

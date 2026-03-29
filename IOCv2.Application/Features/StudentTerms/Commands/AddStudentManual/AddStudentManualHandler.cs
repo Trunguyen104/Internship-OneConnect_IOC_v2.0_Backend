@@ -184,7 +184,9 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, "Error adding student manually to term {TermId}", request.TermId);
-            throw;
+            return Result<AddStudentManualResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

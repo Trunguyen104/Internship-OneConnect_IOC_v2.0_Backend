@@ -73,16 +73,16 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogTermNotFound), request.PhaseId);
                     return Result<CreateInternshipGroupResponse>.Failure(
-                        "Không tìm thấy đợt thực tập.",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotFound),
                         ResultErrorType.NotFound);
                 }
 
                 if (phase.Status != InternshipPhaseStatus.Open)
                 {
-                    _logger.LogWarning("Phase {PhaseId} is not open (status: {Status}). Cannot create internship group.",
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogPhaseNotOpen),
                         request.PhaseId, phase.Status);
                     return Result<CreateInternshipGroupResponse>.Failure(
-                        "Đợt thực tập không ở trạng thái mở.",
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.TermNotActive),
                         ResultErrorType.BadRequest);
                 }
 
@@ -91,7 +91,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 {
                     if (request.EnterpriseId.Value != enterpriseUser.EnterpriseId)
                     {
-                        _logger.LogWarning("HR {UserId} attempted to create group for enterprise {EnterpriseId} which is not their own.",
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUnauthorizedEnterpriseAccess),
                             currentUserId, request.EnterpriseId.Value);
                         return Result<CreateInternshipGroupResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound),
@@ -122,7 +122,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     // Chỉ chấp nhận tài khoản có role Mentor
                     if (mentor.User == null || mentor.User.Role != IOCv2.Domain.Enums.UserRole.Mentor)
                     {
-                        _logger.LogWarning("User {UserId} is not a Mentor role, cannot be assigned as mentor.", request.MentorId);
+                        _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorRoleInvalid), request.MentorId);
                         return Result<CreateInternshipGroupResponse>.Failure(
                             _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
                             ResultErrorType.BadRequest);
@@ -176,7 +176,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         .AsNoTracking()
                         .Where(a => studentIds.Contains(a.StudentId)
                                  && a.EnterpriseId == enterpriseUser.EnterpriseId
-                                 && a.Status == InternshipApplicationStatus.Approved)
+                                 && a.Status == InternshipApplicationStatus.Placed)
                         .Select(a => a.StudentId)
                         .ToListAsync(cancellationToken);
 

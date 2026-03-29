@@ -16,14 +16,20 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
         builder.Property(x => x.EnterpriseId).HasColumnName("enterprise_id").IsRequired();
         builder.Property(x => x.TermId).HasColumnName("term_id").IsRequired();
         builder.Property(x => x.StudentId).HasColumnName("student_id").IsRequired();
+        builder.Property(x => x.JobId).HasColumnName("job_id");
 
         builder.Property(x => x.Status)
             .HasColumnName("status")
             .HasConversion<short>()
             .HasColumnType("smallint");
 
+        builder.Property(x => x.Source)
+            .HasColumnName("source")
+            .HasConversion<short>()
+            .HasColumnType("smallint");
+
         builder.Property(x => x.RejectReason).HasColumnName("reject_reason").HasMaxLength(1000);
-        builder.Property(x => x.JobPostingTitle).HasColumnName("job_posting_title").HasMaxLength(500);
+        builder.Property(x => x.IsHiddenByStudent).HasColumnName("is_hidden_by_student").HasDefaultValue(false);
         builder.Property(x => x.CvSnapshotUrl).HasColumnName("cv_snapshot_url").HasMaxLength(2048);
         builder.Property(x => x.UniversityId).HasColumnName("university_id");
 
@@ -53,6 +59,12 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
         builder.HasOne(x => x.Student)
             .WithMany(s => s.InternshipApplications)
             .HasForeignKey(x => x.StudentId)
+            .IsRequired(false);
+
+        builder.HasOne(x => x.Job)
+            .WithMany(j => j.Applications)
+            .HasForeignKey(x => x.JobId)
+            .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
 
         builder.HasOne(x => x.Reviewer)

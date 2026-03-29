@@ -366,6 +366,24 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đã tự động gỡ {0} assignment của sinh viên {1} sau khi rời nhóm..
+        /// </summary>
+        internal static string InternshipGroup_LogProjectAssignmentsCleanup {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogProjectAssignmentsCleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã lưu trữ {0} dự án Draft/Published sau khi nhóm {1} bị archived..
+        /// </summary>
+        internal static string InternshipGroup_LogProjectsArchived {
+            get {
+                return ResourceManager.GetString("InternshipGroup.LogProjectsArchived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đã xóa thành công sinh viên khỏi nhóm: {InternshipId}.
         /// </summary>
         internal static string InternshipGroup_LogRemovedStudentsSuccess {
@@ -407,6 +425,51 @@ namespace IOCv2.Application.Resources {
         internal static string InternshipGroup_MoveSuccess {
             get {
                 return ResourceManager.GetString("InternshipGroup.MoveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} đã bị xóa khỏi nhóm thực tập..
+        /// </summary>
+        internal static string InternshipGroup_NotificationProjectCleanupContent {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationProjectCleanupContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cảnh báo dự án.
+        /// </summary>
+        internal static string InternshipGroup_NotificationProjectCleanupTitle {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationProjectCleanupTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} project đã được tách khỏi group do group {1} bị xóa..
+        /// </summary>
+        internal static string InternshipGroups_LogOrphanizeProjects {
+            get {
+                return ResourceManager.GetString("InternshipGroups.LogOrphanizeProjects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhóm &quot;{0}&quot; đã bị xóa. {1} project của bạn đã được chuyển về trạng thái Draft và tách khỏi nhóm..
+        /// </summary>
+        internal static string InternshipGroups_NotificationOrphanContent {
+            get {
+                return ResourceManager.GetString("InternshipGroups.NotificationOrphanContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhóm thực tập bị xóa.
+        /// </summary>
+        internal static string InternshipGroups_NotificationOrphanTitle {
+            get {
+                return ResourceManager.GetString("InternshipGroups.NotificationOrphanTitle", resourceCulture);
             }
         }
         
@@ -1437,11 +1500,56 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dự án đã được hoàn thành..
+        /// </summary>
+        internal static string Projects_CompleteSuccess {
+            get {
+                return ResourceManager.GetString("Projects.CompleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Xóa dự án thành công.
         /// </summary>
         internal static string Projects_DeleteSuccess {
             get {
                 return ResourceManager.GetString("Projects.DeleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lấy danh sách sinh viên của project thành công..
+        /// </summary>
+        internal static string Projects_GetStudentsSuccess {
+            get {
+                return ResourceManager.GetString("Projects.GetStudentsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vi phạm unique constraint cho project code {0}..
+        /// </summary>
+        internal static string Projects_LogCodeConflict {
+            get {
+                return ResourceManager.GetString("Projects.LogCodeConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lỗi khi hoàn thành dự án {0}..
+        /// </summary>
+        internal static string Projects_LogCompleteError {
+            get {
+                return ResourceManager.GetString("Projects.LogCompleteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã hoàn thành dự án {0}..
+        /// </summary>
+        internal static string Projects_LogCompleteSuccess {
+            get {
+                return ResourceManager.GetString("Projects.LogCompleteSuccess", resourceCulture);
             }
         }
         
@@ -1455,11 +1563,65 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đang tạo dự án {0} cho nhóm {1}..
+        /// </summary>
+        internal static string Projects_LogCreating {
+            get {
+                return ResourceManager.GetString("Projects.LogCreating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dự án đã bị xóa {ProjectId}.
         /// </summary>
         internal static string Projects_LogDelete {
             get {
                 return ResourceManager.GetString("Projects.LogDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lỗi khi xóa dự án {0}..
+        /// </summary>
+        internal static string Projects_LogDeleteError {
+            get {
+                return ResourceManager.GetString("Projects.LogDeleteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã xóa vĩnh viễn dự án {0}..
+        /// </summary>
+        internal static string Projects_LogDeleteHard {
+            get {
+                return ResourceManager.GetString("Projects.LogDeleteHard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã xóa mềm dự án {0}..
+        /// </summary>
+        internal static string Projects_LogDeleteSoft {
+            get {
+                return ResourceManager.GetString("Projects.LogDeleteSoft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang xóa dự án {0} bởi người dùng {1}..
+        /// </summary>
+        internal static string Projects_LogDeleting {
+            get {
+                return ResourceManager.GetString("Projects.LogDeleting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang lấy thông tin dự án theo ID: {0}..
+        /// </summary>
+        internal static string Projects_LogGetById {
+            get {
+                return ResourceManager.GetString("Projects.LogGetById", resourceCulture);
             }
         }
         
@@ -1473,11 +1635,92 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dự án không tìm thấy.
+        ///   Looks up a localized string similar to Lấy danh sách sinh viên cho project {0} thành công..
         /// </summary>
-        internal static string Projects_NotFound {
+        internal static string Projects_LogGetStudentsSuccess {
             get {
-                return ResourceManager.GetString("Projects.NotFound", resourceCulture);
+                return ResourceManager.GetString("Projects.LogGetStudentsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tên dự án {0} đã tồn tại trong nhóm..
+        /// </summary>
+        internal static string Projects_LogNameExists {
+            get {
+                return ResourceManager.GetString("Projects.LogNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy dự án: {0}..
+        /// </summary>
+        internal static string Projects_LogNotFound {
+            get {
+                return ResourceManager.GetString("Projects.LogNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Project {0} đã bị tách khỏi group (orphan) do group bị xóa..
+        /// </summary>
+        internal static string Projects_LogOrphanized {
+            get {
+                return ResourceManager.GetString("Projects.LogOrphanized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lỗi khi phát hành dự án {0}..
+        /// </summary>
+        internal static string Projects_LogPublishError {
+            get {
+                return ResourceManager.GetString("Projects.LogPublishError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã phát hành dự án {0}..
+        /// </summary>
+        internal static string Projects_LogPublishSuccess {
+            get {
+                return ResourceManager.GetString("Projects.LogPublishSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lỗi khi cập nhật dự án {0}..
+        /// </summary>
+        internal static string Projects_LogUpdateError {
+            get {
+                return ResourceManager.GetString("Projects.LogUpdateError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cập nhật dự án {0} thành công..
+        /// </summary>
+        internal static string Projects_LogUpdateSuccess {
+            get {
+                return ResourceManager.GetString("Projects.LogUpdateSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đang cập nhật dự án {0} bởi người dùng {1}..
+        /// </summary>
+        internal static string Projects_LogUpdating {
+            get {
+                return ResourceManager.GetString("Projects.LogUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dự án đã được phát hành thành công..
+        /// </summary>
+        internal static string Projects_PublishSuccess {
+            get {
+                return ResourceManager.GetString("Projects.PublishSuccess", resourceCulture);
             }
         }
         

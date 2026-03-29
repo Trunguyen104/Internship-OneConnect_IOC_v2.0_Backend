@@ -27,6 +27,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockGroupRepository;
         private readonly Mock<IGenericRepository<InternshipStudent>> _mockInternshipStudentRepository;
         private readonly Mock<ICacheService> _mockCacheService;
+        private readonly Mock<INotificationPushService> _mockPushService;
+        private readonly Mock<ICurrentUserService> _mockCurrentUserService;
         private readonly RemoveStudentsFromGroupHandler _handler;
 
         public RemoveStudentsFromGroupHandlerTests()
@@ -40,13 +42,17 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>()).Returns(_mockGroupRepository.Object);
             _mockUnitOfWork.Setup(x => x.Repository<InternshipStudent>()).Returns(_mockInternshipStudentRepository.Object);
             _mockCacheService = new Mock<ICacheService>();
+            _mockPushService = new Mock<INotificationPushService>();
+            _mockCurrentUserService = new Mock<ICurrentUserService>();
 
             _handler = new RemoveStudentsFromGroupHandler(
                 _mockUnitOfWork.Object,
+                _mockCurrentUserService.Object,
                 _mockMessageService.Object,
                 _mockMapper.Object,
                 _mockLogger.Object,
-                _mockCacheService.Object);
+                _mockCacheService.Object,
+                _mockPushService.Object);
         }
 
         [Fact]
@@ -54,7 +60,18 @@ namespace IOCv2.Tests.Features.InternshipGroups
         {
             // Arrange
             var studentId = Guid.NewGuid();
-            var group = InternshipGroup.Create(Guid.NewGuid(), "Group Name");
+            var currentUserId = Guid.NewGuid();
+            var enterpriseId = Guid.NewGuid();
+
+            _mockCurrentUserService.Setup(x => x.UserId).Returns(currentUserId.ToString());
+
+            var enterpriseUser = new EnterpriseUser { UserId = currentUserId, EnterpriseId = enterpriseId };
+            var mockEnterpriseUserRepository = new Mock<IGenericRepository<EnterpriseUser>>();
+            mockEnterpriseUserRepository.Setup(x => x.Query())
+                .Returns(new List<EnterpriseUser> { enterpriseUser }.AsQueryable().BuildMock());
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>()).Returns(mockEnterpriseUserRepository.Object);
+
+            var group = InternshipGroup.Create(Guid.NewGuid(), "Group Name", null, enterpriseId);
             var internshipId = group.InternshipId;
             
             var command = new RemoveStudentsFromGroupCommand
@@ -100,6 +117,15 @@ namespace IOCv2.Tests.Features.InternshipGroups
         public async Task Handle_NotFound_ShouldReturnNotFound()
         {
             // Arrange
+            var currentUserId = Guid.NewGuid();
+            _mockCurrentUserService.Setup(x => x.UserId).Returns(currentUserId.ToString());
+
+            var enterpriseUser = new EnterpriseUser { UserId = currentUserId };
+            var mockEnterpriseUserRepository = new Mock<IGenericRepository<EnterpriseUser>>();
+            mockEnterpriseUserRepository.Setup(x => x.Query())
+                .Returns(new List<EnterpriseUser> { enterpriseUser }.AsQueryable().BuildMock());
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>()).Returns(mockEnterpriseUserRepository.Object);
+
             var command = new RemoveStudentsFromGroupCommand { InternshipId = Guid.NewGuid() };
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())

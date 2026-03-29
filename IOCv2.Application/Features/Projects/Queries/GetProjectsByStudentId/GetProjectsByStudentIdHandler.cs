@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -41,13 +42,19 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             GetProjectsByStudentIdQuery request,
             CancellationToken cancellationToken)
         {
-            var userId = Guid.Parse(_currentUserService.UserId!);
+            if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
             var studentId = await _unitOfWork.Repository<Student>().Query().Where(s => s.UserId == userId).Select(s => s.StudentId).FirstOrDefaultAsync(cancellationToken);
 
-            // Build base query
-            var query = _unitOfWork.Repository<Project>().Query()
-                .Where(i => i.InternshipGroup.Members.Any(s => s.StudentId == studentId))
-                .Select(p => p).AsNoTracking();
+            // Student visibility uses group membership, and only active-visible statuses.
+            IQueryable<Project> query = _unitOfWork.Repository<Project>().Query()
+                .Where(p => p.InternshipId != null
+                         && p.InternshipGroup != null
+                         && p.InternshipGroup.Members.Any(s => s.StudentId == studentId)
+                         && (p.Status == ProjectStatus.Published || p.Status == ProjectStatus.Completed))
+                .AsNoTracking();
 
 
             // Apply status filter

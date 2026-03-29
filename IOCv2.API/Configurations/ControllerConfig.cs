@@ -14,7 +14,7 @@ public static class ControllerConfig
         {
             // By default, enums are serialized as integers. 
             // If you want them as strings, uncomment the line below:
-            // options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
         services.Configure<RouteOptions>(options =>

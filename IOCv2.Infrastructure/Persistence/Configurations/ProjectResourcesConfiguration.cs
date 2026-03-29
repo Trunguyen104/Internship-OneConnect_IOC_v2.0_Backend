@@ -66,6 +66,20 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasIndex(x => x.CreatedAt)
                 .HasDatabaseName("ix_project_resources_created_at");
 
+            // New fields
+            builder.Property(x => x.UploadedBy)
+                .HasColumnName("uploaded_by");
+
+            builder.Property(x => x.UploadedAt)
+                .HasColumnName("uploaded_at")
+                .HasDefaultValueSql("now()")
+                .IsRequired();
+
+            builder.HasOne(r => r.UploadedByUser)
+                .WithMany()
+                .HasForeignKey(r => r.UploadedBy)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Relationships
             builder.HasOne(x => x.Project)
                 .WithMany(p => p.ProjectResources)

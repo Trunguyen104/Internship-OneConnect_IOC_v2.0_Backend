@@ -25,7 +25,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                 .ChildRules(student =>
                 {
                     student.RuleFor(s => s.Role)
-                        .IsInEnum().WithMessage("Invalid student role.");
+                        .IsInEnum().WithMessage(messageService.GetMessage(MessageKeys.Validation.UserInvalidRole));
 
                 });
         }

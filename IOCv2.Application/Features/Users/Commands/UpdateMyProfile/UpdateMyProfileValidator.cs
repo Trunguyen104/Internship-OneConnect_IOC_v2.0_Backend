@@ -1,44 +1,46 @@
 using FluentValidation;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
 {
     public class UpdateMyProfileValidator : AbstractValidator<UpdateMyProfileCommand>
     {
-        public UpdateMyProfileValidator()
+        public UpdateMyProfileValidator(IMessageService messageService)
         {
             RuleFor(v => v.FullName)
-                .NotEmpty().WithMessage("Full Name is required.")
-                .MaximumLength(150).WithMessage("Full Name must not exceed 150 characters.");
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.Profile.FullNameRequired))
+                .MaximumLength(150).WithMessage(messageService.GetMessage(MessageKeys.Profile.FullNameMaxLength));
 
             RuleFor(v => v.PhoneNumber)
-                .MaximumLength(15).WithMessage("Phone Number must not exceed 15 characters.")
+                .MaximumLength(15).WithMessage(messageService.GetMessage(MessageKeys.Profile.PhoneMaxLength))
                 .Matches(@"^\d+$").When(v => !string.IsNullOrEmpty(v.PhoneNumber))
-                .WithMessage("Phone Number must contain only digits.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Profile.PhoneInvalid));
 
             RuleFor(v => v.PortfolioUrl)
-                .MaximumLength(255).WithMessage("Portfolio URL must not exceed 255 characters.")
+                .MaximumLength(255).WithMessage(messageService.GetMessage(MessageKeys.Profile.PortfolioUrlMaxLength))
                 .Must(LinkMustBeUrl).When(v => !string.IsNullOrEmpty(v.PortfolioUrl))
-                .WithMessage("Portfolio URL is invalid.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Profile.PortfolioUrlInvalid));
 
             RuleFor(v => v.Bio)
-                .MaximumLength(1000).WithMessage("Bio must not exceed 1000 characters.");
+                .MaximumLength(1000).WithMessage(messageService.GetMessage(MessageKeys.Profile.BioMaxLength));
 
             RuleFor(v => v.Expertise)
-                .MaximumLength(500).WithMessage("Expertise must not exceed 500 characters.");
+                .MaximumLength(500).WithMessage(messageService.GetMessage(MessageKeys.Profile.ExpertiseMaxLength));
 
             RuleFor(v => v.Department)
-                .MaximumLength(150).WithMessage("Department must not exceed 150 characters.");
+                .MaximumLength(150).WithMessage(messageService.GetMessage(MessageKeys.Profile.DepartmentMaxLength));
 
             RuleFor(v => v.CvFile)
                 .Must(file => file == null || file.Length <= 10 * 1024 * 1024)
-                .WithMessage("CV file must not exceed 10MB.")
+                .WithMessage(messageService.GetMessage(MessageKeys.Profile.CvFileMaxSize))
                 .Must(file =>
                 {
                     if (file == null) return true;
                     var extension = Path.GetExtension(file.FileName).ToLower();
                     return extension == ".pdf" || extension == ".doc" || extension == ".docx";
                 })
-                .WithMessage("Only .pdf, .doc, and .docx files are allowed.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Profile.CvFileInvalidFormat));
         }
 
         private bool LinkMustBeUrl(string? link)

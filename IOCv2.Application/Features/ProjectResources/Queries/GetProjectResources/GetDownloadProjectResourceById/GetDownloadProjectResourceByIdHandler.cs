@@ -101,6 +101,24 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 return false;
             }
 
+            if (string.Equals(_currentUserService.Role, "Mentor", StringComparison.OrdinalIgnoreCase))
+            {
+                var enterpriseUserId = await _unitOfWork.Repository<Domain.Entities.EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .Where(eu => eu.UserId == currentUserId)
+                    .Select(eu => eu.EnterpriseUserId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (enterpriseUserId == Guid.Empty)
+                {
+                    return false;
+                }
+
+                return await _unitOfWork.Repository<Domain.Entities.Project>().Query()
+                    .AsNoTracking()
+                    .AnyAsync(p => p.ProjectId == projectId && p.MentorId == enterpriseUserId, cancellationToken);
+            }
+
             var studentId = await _unitOfWork.Repository<Domain.Entities.Student>().Query()
                 .AsNoTracking()
                 .Where(s => s.UserId == currentUserId)
