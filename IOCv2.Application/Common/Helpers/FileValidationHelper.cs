@@ -11,13 +11,14 @@ namespace IOCv2.Application.Common.Helpers
     {
         private static readonly HashSet<string> _allowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".pdf", ".docx", ".pptx", ".zip", ".rar", ".jpg", ".jpeg", ".png"
+        ".pdf", ".docx", ".xlsx", ".pptx", ".zip", ".rar", ".jpg", ".jpeg", ".png"
     };
 
         private static readonly Dictionary<string, FileType> _extensionToTypeMap = new(StringComparer.OrdinalIgnoreCase)
         {
             [".pdf"] = FileType.PDF,
             [".docx"] = FileType.DOCX,
+            [".xlsx"] = FileType.XLSX,
             [".pptx"] = FileType.PPTX,
             [".zip"] = FileType.ZIP,
             [".rar"] = FileType.RAR,
@@ -30,6 +31,7 @@ namespace IOCv2.Application.Common.Helpers
         {
             [FileType.PDF] = 50 * 1024 * 1024,      // 50MB
             [FileType.DOCX] = 20 * 1024 * 1024,     // 20MB
+            [FileType.XLSX] = 20 * 1024 * 1024,     // 20MB
             [FileType.PPTX] = 50 * 1024 * 1024,     // 50MB
             [FileType.ZIP] = 200 * 1024 * 1024,     // 200MB
             [FileType.RAR] = 200 * 1024 * 1024,     // 200MB
@@ -147,6 +149,7 @@ namespace IOCv2.Application.Common.Helpers
             {
                 FileType.PDF => "application/pdf",
                 FileType.DOCX => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                FileType.XLSX => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 FileType.PPTX => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                 FileType.ZIP => "application/zip",
                 FileType.RAR => "application/x-rar-compressed",
@@ -163,6 +166,7 @@ namespace IOCv2.Application.Common.Helpers
             {
                 FileType.PDF => ".pdf",
                 FileType.DOCX => ".docx",
+                FileType.XLSX => ".xlsx",
                 FileType.PPTX => ".pptx",
                 FileType.ZIP => ".zip",
                 FileType.RAR => ".rar",

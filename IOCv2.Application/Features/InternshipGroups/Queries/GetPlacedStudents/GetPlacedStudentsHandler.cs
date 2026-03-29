@@ -62,13 +62,13 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents
 
                 if (resolvedPhaseIds.Count == 0)
                 {
-                    _logger.LogInformation("No Active or Upcoming phases found for enterprise {EnterpriseId}", enterpriseId);
+                    _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogNoPhasesForEnterprise), enterpriseId);
                     return Result<PaginatedResult<GetPlacedStudentsResponse>>.Success(
                         new PaginatedResult<GetPlacedStudentsResponse>(new List<GetPlacedStudentsResponse>(), 0, request.PageNumber, request.PageSize));
                 }
             }
 
-            _logger.LogInformation("Resolved {Count} phase(s) for enterprise {EnterpriseId}: [{PhaseIds}]",
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogResolvedPhases),
                 resolvedPhaseIds.Count, enterpriseId, string.Join(", ", resolvedPhaseIds));
 
             // Fetch the display phase so unplaced students have phase context in the UI

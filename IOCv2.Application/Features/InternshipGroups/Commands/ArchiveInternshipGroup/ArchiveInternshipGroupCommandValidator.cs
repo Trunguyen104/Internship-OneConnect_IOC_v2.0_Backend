@@ -1,14 +1,15 @@
 using FluentValidation;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternshipGroup
 {
     internal class ArchiveInternshipGroupCommandValidator : AbstractValidator<ArchiveInternshipGroupCommand>
     {
-        public ArchiveInternshipGroupCommandValidator()
+        public ArchiveInternshipGroupCommandValidator(IMessageService messageService)
         {
             RuleFor(x => x.InternshipGroupId)
-                .NotEmpty().WithMessage(MessageKeys.Internships.InternshipIdRequired);
+                .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.Internships.InternshipIdRequired));
         }
     }
 }

@@ -40,81 +40,81 @@ public class DeleteInternshipPhaseHandler
             _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleting),
             request.PhaseId);
 
+        var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
+            .Include(p => p.InternshipGroups)
+            .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
+
+        if (phase == null)
+        {
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteNotFound),
+                request.PhaseId);
+            return Result<bool>.NotFound(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
+        }
+
+        // ── Ownership check ──
+        var role = _currentUserService.Role;
+        if (role != "SuperAdmin" && role != "SchoolAdmin")
+        {
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+            {
+                return Result<bool>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Unauthorized),
+                    ResultErrorType.Unauthorized);
+            }
+
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
+
+            if (enterpriseUser == null)
+            {
+                return Result<bool>.Failure(
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.EnterpriseUserNotFound),
+                    ResultErrorType.Forbidden);
+            }
+
+            if (enterpriseUser.EnterpriseId != phase.EnterpriseId)
+            {
+                _logger.LogWarning(
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
+                    currentUserId, phase.EnterpriseId, enterpriseUser.EnterpriseId);
+                return Result<bool>.Failure(
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
+                    ResultErrorType.Forbidden);
+            }
+        }
+
+        // BUG-G FIX: Block deletion if ANY non-deleted group exists (Active OR Archived).
+        // Previously only Active groups were checked; Archived (completed) groups were ignored,
+        // making the phase deletable while leaving orphaned historical data that hides student history.
+        var existingGroupCount = phase.InternshipGroups
+            .Count(g => g.DeletedAt == null);
+
+        if (existingGroupCount > 0)
+        {
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteHasActiveGroups),
+                phase.Name, request.PhaseId, existingGroupCount);
+            return Result<bool>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteHasActiveGroups, phase.Name, existingGroupCount),
+                ResultErrorType.BadRequest);
+        }
+
+        // Block deletion of InProgress phases
+        if (phase.Status == InternshipPhaseStatus.InProgress)
+        {
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteInProgress),
+                phase.Name, request.PhaseId);
+            return Result<bool>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteInProgress, phase.Name),
+                ResultErrorType.BadRequest);
+        }
+
         try
         {
-            var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
-                .Include(p => p.InternshipGroups)
-                .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
-
-            if (phase == null)
-            {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteNotFound),
-                    request.PhaseId);
-                return Result<bool>.NotFound(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
-            }
-
-            // ── Ownership check ──
-            var role = _currentUserService.Role;
-            if (role != "SuperAdmin" && role != "SchoolAdmin")
-            {
-                if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
-                {
-                    return Result<bool>.Failure(
-                        _messageService.GetMessage(MessageKeys.Common.Unauthorized),
-                        ResultErrorType.Unauthorized);
-                }
-
-                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
-
-                if (enterpriseUser == null)
-                {
-                    return Result<bool>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.EnterpriseUserNotFound),
-                        ResultErrorType.Forbidden);
-                }
-
-                if (enterpriseUser.EnterpriseId != phase.EnterpriseId)
-                {
-                    _logger.LogWarning(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
-                        currentUserId, phase.EnterpriseId, enterpriseUser.EnterpriseId);
-                    return Result<bool>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
-                        ResultErrorType.Forbidden);
-                }
-            }
-
-            // BUG-G FIX: Block deletion if ANY non-deleted group exists (Active OR Archived).
-            // Previously only Active groups were checked; Archived (completed) groups were ignored,
-            // making the phase deletable while leaving orphaned historical data that hides student history.
-            var existingGroupCount = phase.InternshipGroups
-                .Count(g => g.DeletedAt == null);
-
-            if (existingGroupCount > 0)
-            {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteHasActiveGroups),
-                    phase.Name, request.PhaseId, existingGroupCount);
-                return Result<bool>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteHasActiveGroups, phase.Name, existingGroupCount),
-                    ResultErrorType.BadRequest);
-            }
-
-            // Block deletion of InProgress phases
-            if (phase.Status == InternshipPhaseStatus.InProgress)
-            {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteInProgress),
-                    phase.Name, request.PhaseId);
-                return Result<bool>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteInProgress, phase.Name),
-                    ResultErrorType.BadRequest);
-            }
-
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             await _unitOfWork.Repository<InternshipPhase>().DeleteAsync(phase);

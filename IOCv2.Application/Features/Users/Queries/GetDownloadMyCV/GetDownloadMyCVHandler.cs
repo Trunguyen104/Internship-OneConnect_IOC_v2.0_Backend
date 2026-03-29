@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.IO;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Users.Queries.GetDownloadMyCV
 {
@@ -15,24 +16,27 @@ namespace IOCv2.Application.Features.Users.Queries.GetDownloadMyCV
         private readonly ICurrentUserService _currentUserService;
         private readonly IFileStorageService _fileStorageService;
         private readonly ILogger<GetDownloadMyCVHandler> _logger;
+        private readonly IMessageService _messageService;
 
         public GetDownloadMyCVHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUserService,
             IFileStorageService fileStorageService,
-            ILogger<GetDownloadMyCVHandler> logger)
+            ILogger<GetDownloadMyCVHandler> logger,
+            IMessageService messageService)
         {
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
             _fileStorageService = fileStorageService;
             _logger = logger;
+            _messageService = messageService;
         }
 
         public async Task<Result<GetDownloadMyCVResponse>> Handle(GetDownloadMyCVQuery request, CancellationToken cancellationToken)
         {
             if (!Guid.TryParse(_currentUserService.UserId, out var userId))
             {
-                return Result<GetDownloadMyCVResponse>.Failure("Common.Unauthorized", ResultErrorType.Unauthorized);
+                return Result<GetDownloadMyCVResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
             }
 
             var student = await _unitOfWork.Repository<Student>().Query()
@@ -41,20 +45,20 @@ namespace IOCv2.Application.Features.Users.Queries.GetDownloadMyCV
 
             if (student == null)
             {
-                return Result<GetDownloadMyCVResponse>.Failure("Student profile not found.", ResultErrorType.NotFound);
+                return Result<GetDownloadMyCVResponse>.Failure(_messageService.GetMessage(MessageKeys.Profile.StudentNotFound), ResultErrorType.NotFound);
             }
 
             if (string.IsNullOrEmpty(student.CvUrl))
             {
-                return Result<GetDownloadMyCVResponse>.Failure("CV not found for this profile.", ResultErrorType.NotFound);
+                return Result<GetDownloadMyCVResponse>.Failure(_messageService.GetMessage(MessageKeys.Profile.CvNotFound), ResultErrorType.NotFound);
             }
 
             // Get stream from storage
             var stream = await _fileStorageService.GetFileAsync(student.CvUrl, cancellationToken);
             if (stream == null)
             {
-                _logger.LogWarning("CV file not found in storage for User: {UserId}", userId);
-                return Result<GetDownloadMyCVResponse>.Failure("File not found in storage.", ResultErrorType.NotFound);
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.Profile.LogCvFileNotFound), userId);
+                return Result<GetDownloadMyCVResponse>.Failure(_messageService.GetMessage(MessageKeys.Profile.FileNotFoundInStorage), ResultErrorType.NotFound);
             }
 
             var extension = Path.GetExtension(student.CvUrl);

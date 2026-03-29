@@ -16,6 +16,9 @@ namespace IOCv2.Domain.Entities
         public string? ResourceName { get; set; }
         public FileType ResourceType { get; set; }
         public string ResourceUrl { get; set; } = null!;
+        public Guid? UploadedBy { get; set; }
+        public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+        public virtual EnterpriseUser? UploadedByUser { get; set; }
         public virtual Project Project { get; set; } = null!;
         public ProjectResources()
         { }

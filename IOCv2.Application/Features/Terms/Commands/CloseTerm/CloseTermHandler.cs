@@ -129,7 +129,9 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
         catch (Exception ex)
         {
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorClosingTerm), request.TermId);
-            throw;
+            return Result<CloseTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

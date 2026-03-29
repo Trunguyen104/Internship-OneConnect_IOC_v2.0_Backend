@@ -1,39 +1,47 @@
-﻿using IOCv2.Application.Common.Models;
-using IOCv2.Application.Extensions.Mappings;
-using IOCv2.Domain.Entities;
+using IOCv2.Application.Common.Models;
 using MediatR;
-using System;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
-    /// <summary>
-    /// Command to create a new project within an internship group.
-    /// </summary>
-    public record CreateProjectCommand : IRequest<Result<CreateProjectResponse>>, IMapFrom<Project>
+    /// <summary>DTO cho link tài liệu đính kèm khi tạo project</summary>
+    public class CreateProjectLinkDto
     {
-        /// <summary>
-        /// Identity of the internship group that will host this project.
-        /// </summary>
-        public Guid InternshipId { get; set; }
+        /// <summary>Tên hiển thị cho link</summary>
+        public string ResourceName { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Human-readable name of the project. Must be unique within the internship.
-        /// </summary>
+        /// <summary>URL tài liệu (http/https)</summary>
+        public string Url { get; set; } = string.Empty;
+    }
+
+    public class CreateProjectCommand : IRequest<Result<CreateProjectResponse>>
+    {
         public string ProjectName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Optional description of the project scope and objectives.
-        /// </summary>
         public string? Description { get; set; }
-
-        /// <summary>
-        /// Estimated or confirmed start date of the project.
-        /// </summary>
         public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        // Project details
+        public string Field { get; set; } = string.Empty;
+        public string Requirements { get; set; } = string.Empty;
+        public string? Deliverables { get; set; }
+
+        /// <summary>F1 (AC-02): Gán ngay Intern Group khi tạo (optional)</summary>
+        public Guid? InternshipGroupId { get; set; }
+
+        /// <summary>F1 (AC-02): true = Mentor nhấn Save → Published; false = auto-save → Draft</summary>
+        public bool PublishOnSave { get; set; } = false;
 
         /// <summary>
-        /// Target completion date of the project.
+        /// Upload file tài liệu đính kèm (pdf, docx, xlsx, pptx, zip, rar, jpg, png — tối đa theo giới hạn từng loại).
+        /// Gửi qua multipart/form-data.
         /// </summary>
-        public DateTime? EndDate { get; set; }
+        public List<IFormFile>? Files { get; set; }
+
+        /// <summary>
+        /// Link tài liệu đính kèm (tuỳ chọn, có thể cung cấp cùng lúc với file).
+        /// </summary>
+        public List<CreateProjectLinkDto>? Links { get; set; }
     }
 }

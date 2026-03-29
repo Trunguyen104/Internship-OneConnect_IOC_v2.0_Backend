@@ -40,123 +40,123 @@ public class UpdateInternshipPhaseHandler
             _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdating),
             request.PhaseId, request.Name, request.Status);
 
+        var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
+            .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
+
+        if (phase == null)
+        {
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateNotFound),
+                request.PhaseId);
+            return Result<UpdateInternshipPhaseResponse>.NotFound(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
+        }
+
+        // ── Ownership check ──
+        var role = _currentUserService.Role;
+        if (role != "SuperAdmin" && role != "SchoolAdmin")
+        {
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+            {
+                return Result<UpdateInternshipPhaseResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Unauthorized),
+                    ResultErrorType.Unauthorized);
+            }
+
+            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
+
+            if (enterpriseUser == null)
+            {
+                return Result<UpdateInternshipPhaseResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.EnterpriseUserNotFound),
+                    ResultErrorType.Forbidden);
+            }
+
+            if (enterpriseUser.EnterpriseId != phase.EnterpriseId)
+            {
+                _logger.LogWarning(
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
+                    currentUserId, phase.EnterpriseId, enterpriseUser.EnterpriseId);
+                return Result<UpdateInternshipPhaseResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
+                    ResultErrorType.Forbidden);
+            }
+        }
+
+        // ── BUG-01 FIX: Block ALL updates when phase is Closed ──
+        if (phase.Status == InternshipPhaseStatus.Closed)
+        {
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateClosed),
+                phase.Name, request.PhaseId);
+            return Result<UpdateInternshipPhaseResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotUpdateClosed, phase.Name),
+                ResultErrorType.BadRequest);
+        }
+
+        // ── BUG-02 FIX: Block EndDate regression on active/in-progress phases ──
+        // BUG-C FIX: Use dedicated log key instead of the misleading LogUpdateClosed key
+        if ((phase.Status == InternshipPhaseStatus.InProgress || phase.Status == InternshipPhaseStatus.Open)
+            && request.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
+        {
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateDuplicateName), // intentional reuse — no dedicated EndDateInPast log key
+                request.PhaseId, request.EndDate, phase.Status);
+            return Result<UpdateInternshipPhaseResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.EndDateInPastForActivePhase, phase.Name),
+                ResultErrorType.BadRequest);
+        }
+
+        // ── Status transition validation ──
+        if (!phase.CanTransitionTo(request.Status))
+        {
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogInvalidStatusTransition),
+                request.PhaseId, phase.Status, request.Status);
+            return Result<UpdateInternshipPhaseResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.InvalidStatusTransition, phase.Status, request.Status),
+                ResultErrorType.BadRequest);
+        }
+
+        // ── BUG-H FIX: No-op guard — skip DB write and cache invalidation if nothing changed ──
+        // Previously a request with identical values would still update UpdatedAt, creating a false audit trail.
+        var hasChanges =
+            !string.Equals(phase.Name, request.Name, StringComparison.OrdinalIgnoreCase) ||
+            phase.StartDate != request.StartDate ||
+            phase.EndDate != request.EndDate ||
+            phase.MaxStudents != request.MaxStudents ||
+            phase.Description != request.Description ||
+            phase.Status != request.Status;
+
+        if (!hasChanges)
+        {
+            _logger.LogInformation(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateNoChanges),
+                request.PhaseId);
+            return Result<UpdateInternshipPhaseResponse>.Success(new UpdateInternshipPhaseResponse
+            {
+                PhaseId = phase.PhaseId,
+                EnterpriseId = phase.EnterpriseId,
+                Name = phase.Name,
+                StartDate = phase.StartDate,
+                EndDate = phase.EndDate,
+                MaxStudents = phase.MaxStudents,
+                Description = phase.Description,
+                Status = phase.Status,
+                UpdatedAt = phase.UpdatedAt
+            },
+            _messageService.GetMessage(MessageKeys.InternshipPhase.UpdateNoChanges));
+        }
+
+        // ── BUG-D FIX: Removed redundant outer duplicate-name check (outside transaction) ──
+        // The pre-transaction check provided no race-condition protection. The real guard is
+        // the DB-level UNIQUE INDEX on (enterprise_id, name) filtered by deleted_at IS NULL.
+        // A DbUpdateException from the index violation is now caught and mapped to Conflict.
+
         try
         {
-            var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
-                .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
-
-            if (phase == null)
-            {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateNotFound),
-                    request.PhaseId);
-                return Result<UpdateInternshipPhaseResponse>.NotFound(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
-            }
-
-            // ── Ownership check ──
-            var role = _currentUserService.Role;
-            if (role != "SuperAdmin" && role != "SchoolAdmin")
-            {
-                if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
-                {
-                    return Result<UpdateInternshipPhaseResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Common.Unauthorized),
-                        ResultErrorType.Unauthorized);
-                }
-
-                var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
-
-                if (enterpriseUser == null)
-                {
-                    return Result<UpdateInternshipPhaseResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.EnterpriseUserNotFound),
-                        ResultErrorType.Forbidden);
-                }
-
-                if (enterpriseUser.EnterpriseId != phase.EnterpriseId)
-                {
-                    _logger.LogWarning(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
-                        currentUserId, phase.EnterpriseId, enterpriseUser.EnterpriseId);
-                    return Result<UpdateInternshipPhaseResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
-                        ResultErrorType.Forbidden);
-                }
-            }
-
-            // ── BUG-01 FIX: Block ALL updates when phase is Closed ──
-            if (phase.Status == InternshipPhaseStatus.Closed)
-            {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateClosed),
-                    phase.Name, request.PhaseId);
-                return Result<UpdateInternshipPhaseResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.CannotUpdateClosed, phase.Name),
-                    ResultErrorType.BadRequest);
-            }
-
-            // ── BUG-02 FIX: Block EndDate regression on active/in-progress phases ──
-            // BUG-C FIX: Use dedicated log key instead of the misleading LogUpdateClosed key
-            if ((phase.Status == InternshipPhaseStatus.InProgress || phase.Status == InternshipPhaseStatus.Open)
-                && request.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
-            {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateDuplicateName), // intentional reuse — no dedicated EndDateInPast log key
-                    request.PhaseId, request.EndDate, phase.Status);
-                return Result<UpdateInternshipPhaseResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.EndDateInPastForActivePhase, phase.Name),
-                    ResultErrorType.BadRequest);
-            }
-
-            // ── Status transition validation ──
-            if (!phase.CanTransitionTo(request.Status))
-            {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogInvalidStatusTransition),
-                    request.PhaseId, phase.Status, request.Status);
-                return Result<UpdateInternshipPhaseResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.InvalidStatusTransition, phase.Status, request.Status),
-                    ResultErrorType.BadRequest);
-            }
-
-            // ── BUG-H FIX: No-op guard — skip DB write and cache invalidation if nothing changed ──
-            // Previously a request with identical values would still update UpdatedAt, creating a false audit trail.
-            var hasChanges =
-                !string.Equals(phase.Name, request.Name, StringComparison.OrdinalIgnoreCase) ||
-                phase.StartDate != request.StartDate ||
-                phase.EndDate != request.EndDate ||
-                phase.MaxStudents != request.MaxStudents ||
-                phase.Description != request.Description ||
-                phase.Status != request.Status;
-
-            if (!hasChanges)
-            {
-                _logger.LogInformation(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateNoChanges),
-                    request.PhaseId);
-                return Result<UpdateInternshipPhaseResponse>.Success(new UpdateInternshipPhaseResponse
-                {
-                    PhaseId = phase.PhaseId,
-                    EnterpriseId = phase.EnterpriseId,
-                    Name = phase.Name,
-                    StartDate = phase.StartDate,
-                    EndDate = phase.EndDate,
-                    MaxStudents = phase.MaxStudents,
-                    Description = phase.Description,
-                    Status = phase.Status,
-                    UpdatedAt = phase.UpdatedAt
-                },
-                _messageService.GetMessage(MessageKeys.InternshipPhase.UpdateNoChanges));
-            }
-
-            // ── BUG-D FIX: Removed redundant outer duplicate-name check (outside transaction) ──
-            // The pre-transaction check provided no race-condition protection. The real guard is
-            // the DB-level UNIQUE INDEX on (enterprise_id, name) filtered by deleted_at IS NULL.
-            // A DbUpdateException from the index violation is now caught and mapped to Conflict.
-
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             // Inner duplicate name check — inside transaction for best-effort soft-lock

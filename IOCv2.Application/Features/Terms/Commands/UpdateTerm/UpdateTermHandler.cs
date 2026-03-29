@@ -150,7 +150,9 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorUpdatingTerm), request.TermId);
-            throw;
+            return Result<UpdateTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

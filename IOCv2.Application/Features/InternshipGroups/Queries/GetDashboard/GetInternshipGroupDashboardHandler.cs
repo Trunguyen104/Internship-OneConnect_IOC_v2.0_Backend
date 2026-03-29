@@ -27,7 +27,7 @@ public class GetInternshipGroupDashboardHandler : IRequestHandler<GetInternshipG
 
     public async Task<Result<GetInternshipGroupDashboardResponse>> Handle(GetInternshipGroupDashboardQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting to get dashboard data for InternshipId: {Id}", request.InternshipId);
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDashboardQuery), request.InternshipId);
 
         var dashboardData = await _unitOfWork.Repository<InternshipGroup>()
             .Query()
@@ -42,7 +42,7 @@ public class GetInternshipGroupDashboardHandler : IRequestHandler<GetInternshipG
                     w.Status,
                     w.DueDate,
                     w.UpdatedAt,
-                    AssigneeName = w.Assignee != null && w.Assignee.User != null ? w.Assignee.User.FullName : "Unassigned"
+                    AssigneeName = w.Assignee != null && w.Assignee.User != null ? w.Assignee.User.FullName : null
                 }).ToList(),
                 Logbooks = g.Logbooks.Select(l => new { l.Status }).ToList()
             })
@@ -50,7 +50,7 @@ public class GetInternshipGroupDashboardHandler : IRequestHandler<GetInternshipG
 
         if (dashboardData == null)
         {
-            _logger.LogWarning("Dashboard data not found for InternshipId: {Id}", request.InternshipId);
+            _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDashboardNotFound), request.InternshipId);
             return Result<GetInternshipGroupDashboardResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
         }
 
@@ -107,8 +107,9 @@ public class GetInternshipGroupDashboardHandler : IRequestHandler<GetInternshipG
             }).ToList();
 
         // 5. Workload By Person
+        var unassignedLabel = _messageService.GetMessage(MessageKeys.InternshipGroups.Unassigned);
         response.WorkloadByPerson = workItems
-            .GroupBy(w => w.AssigneeName)
+            .GroupBy(w => w.AssigneeName ?? unassignedLabel)
             .Select(g => new WorkloadDto
             {
                 Name = g.Key,
@@ -116,17 +117,17 @@ public class GetInternshipGroupDashboardHandler : IRequestHandler<GetInternshipG
             }).OrderByDescending(x => x.Count).ToList();
 
         // 6. Student Violations
+        var lateLogbookLabel = _messageService.GetMessage(MessageKeys.InternshipGroups.LateLogbookSubmission);
         response.StudentViolations = logbooks
             .Where(l => l.Status == LogbookStatus.LATE)
-            .GroupBy(l => "Late logbook submission")
+            .GroupBy(l => lateLogbookLabel)
             .Select(g => new ViolationDto
             {
                 Type = g.Key,
                 Count = g.Count()
             }).ToList();
 
-        _logger.LogInformation("Successfully generated dashboard data for InternshipId: {Id}. TotalTasks: {TaskCount}", 
-            request.InternshipId, response.Summary.TotalTasks);
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogDashboardGenerated), request.InternshipId, response.Summary.TotalTasks);
 
         return Result<GetInternshipGroupDashboardResponse>.Success(response);
     }

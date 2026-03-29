@@ -22,6 +22,7 @@ namespace IOCv2.Tests.Features.Users.Commands
         private readonly Mock<ICacheService> _cacheService;
         private readonly Mock<IFileStorageService> _fileStorageService;
         private readonly Mock<ILogger<UpdateMyProfileHandler>> _logger;
+        private readonly Mock<IMessageService> _messageService;
         private readonly UpdateMyProfileHandler _handler;
 
         public UpdateMyProfileHandlerTests()
@@ -31,13 +32,16 @@ namespace IOCv2.Tests.Features.Users.Commands
             _cacheService = new Mock<ICacheService>();
             _fileStorageService = new Mock<IFileStorageService>();
             _logger = new Mock<ILogger<UpdateMyProfileHandler>>();
+            _messageService = new Mock<IMessageService>();
+            _messageService.Setup(m => m.GetMessage(It.IsAny<string>())).Returns((string key) => key);
             
             _handler = new UpdateMyProfileHandler(
                 _currentUserService.Object,
                 _unitOfWork.Object,
                 _cacheService.Object,
                 _fileStorageService.Object,
-                _logger.Object);
+                _logger.Object,
+                _messageService.Object);
         }
 
         [Fact]

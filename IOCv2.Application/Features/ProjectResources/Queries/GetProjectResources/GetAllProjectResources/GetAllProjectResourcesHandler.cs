@@ -18,6 +18,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
         private readonly IMessageService _messageService;
         private readonly ICurrentUserService _currentUserService;
         private readonly ICacheService _cacheService;
+        private readonly IFileStorageService? _fileStorageService;
 
         public GetAllProjectResourcesHandler(
             IUnitOfWork unitOfWork,
@@ -25,7 +26,8 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             ILogger<GetAllProjectResourcesHandler> logger,
             IMessageService messageService,
             ICurrentUserService currentUserService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            IFileStorageService? fileStorageService = null)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -33,6 +35,7 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
             _messageService = messageService;
             _currentUserService = currentUserService;
             _cacheService = cacheService;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<Result<PaginatedResult<GetAllProjectResourcesResponse>>> Handle(
@@ -68,8 +71,30 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
 
             var isAdmin = string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
                           string.Equals(_currentUserService.Role, "Admin", StringComparison.OrdinalIgnoreCase);
+            var isMentor = string.Equals(_currentUserService.Role, "Mentor", StringComparison.OrdinalIgnoreCase);
 
-            if (!isAdmin)
+            if (isMentor)
+            {
+                var enterpriseUserId = await _unitOfWork.Repository<Domain.Entities.EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .Where(eu => eu.UserId == currentUserId)
+                    .Select(eu => eu.EnterpriseUserId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (enterpriseUserId == Guid.Empty)
+                {
+                    return Result<PaginatedResult<GetAllProjectResourcesResponse>>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
+
+                query = from resource in query
+                        join project in _unitOfWork.Repository<Domain.Entities.Project>().Query().AsNoTracking()
+                            on resource.ProjectId equals project.ProjectId
+                        where project.MentorId == enterpriseUserId
+                        select resource;
+            }
+            else if (!isAdmin)
             {
                 var studentId = await _unitOfWork.Repository<Domain.Entities.Student>().Query()
                     .AsNoTracking()
@@ -119,6 +144,8 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                 .ProjectTo<GetAllProjectResourcesResponse>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
 
+            ResolveResourceUrls(items);
+
             var result = PaginatedResult<GetAllProjectResourcesResponse>.Create(
                 items, totalCount, request.PageNumber, request.PageSize);
 
@@ -150,6 +177,28 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
 
                 _ => query.OrderByDescending(x => x.CreatedAt)
             };
+        }
+
+        private void ResolveResourceUrls(List<GetAllProjectResourcesResponse> resources)
+        {
+            if (_fileStorageService == null || resources.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var resource in resources)
+            {
+                if (resource.ResourceType == Domain.Enums.FileType.LINK || string.IsNullOrWhiteSpace(resource.ResourceUrl))
+                {
+                    continue;
+                }
+
+                resource.ResourceUrl = _fileStorageService.GetFileUrl(resource.ResourceUrl);
+                if (!Uri.IsWellFormedUriString(resource.ResourceUrl, UriKind.Absolute))
+                {
+                    resource.ResourceUrl = _fileStorageService.GetDomainUrl() + resource.ResourceUrl;
+                }
+            }
         }
     }
 }
