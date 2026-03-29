@@ -122,7 +122,7 @@ public partial class AppDbContext : DbContext
                 var deletedAtProperty = entityType.FindProperty(nameof(BaseEntity.DeletedAt));
                 if (deletedAtProperty != null)
                 {
-                    var columnName = deletedAtProperty.GetColumnBaseName() ?? "deleted_at";
+                    var columnName = deletedAtProperty.GetColumnName() ?? "deleted_at";
                     var filterSql = $"{columnName} IS NULL";
 
                     foreach (var index in entityType.GetIndexes())
