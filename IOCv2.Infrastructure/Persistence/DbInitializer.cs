@@ -573,7 +573,7 @@ namespace IOCv2.Infrastructure.Persistence
             // [NEW] Seed Pending and Rejected Applications
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s4.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Pending, AppliedAt = DateTime.UtcNow.AddDays(-2) });
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Applied, AppliedAt = DateTime.UtcNow.AddDays(-2) });
             }
 
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s2.StudentId))
@@ -620,7 +620,7 @@ namespace IOCv2.Infrastructure.Persistence
                         EnterpriseId = fsoft.EnterpriseId,
                         TermId = spring2026.TermId,
                         StudentId = stu.StudentId,
-                        Status = InternshipApplicationStatus.Approved,
+                        Status = InternshipApplicationStatus.Placed,
                         AppliedAt = DateTime.UtcNow.AddDays(-30)
                     });
                 }
@@ -641,7 +641,7 @@ namespace IOCv2.Infrastructure.Persistence
                         EnterpriseId = rikkeisoft.EnterpriseId,
                         TermId = spring2026.TermId,
                         StudentId = stu.StudentId,
-                        Status = InternshipApplicationStatus.Approved,
+                        Status = InternshipApplicationStatus.Placed,
                         AppliedAt = DateTime.UtcNow.AddDays(-25)
                     });
                 }

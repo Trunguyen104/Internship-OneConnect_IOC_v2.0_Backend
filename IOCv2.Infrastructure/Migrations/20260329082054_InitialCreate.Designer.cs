@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260321155321_AddViolationReportDB")]
-    partial class AddViolationReportDB
+    [Migration("20260329082054_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,75 @@ namespace IOCv2.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.ApplicationStatusHistory", b =>
+                {
+                    b.Property<Guid>("HistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("history_id");
+
+                    b.Property<Guid>("ApplicationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("application_id");
+
+                    b.Property<string>("ChangedByName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("changed_by_name");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<short>("FromStatus")
+                        .HasColumnType("smallint")
+                        .HasColumnName("from_status");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("note");
+
+                    b.Property<short>("ToStatus")
+                        .HasColumnType("smallint")
+                        .HasColumnName("to_status");
+
+                    b.Property<string>("TriggerSource")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("HR")
+                        .HasColumnName("trigger_source");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("HistoryId")
+                        .HasName("pk_application_status_histories");
+
+                    b.HasIndex("ApplicationId")
+                        .HasDatabaseName("ix_application_status_histories_application_id");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_application_status_histories_created_at");
+
+                    b.ToTable("application_status_histories", (string)null);
+                });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.AuditLog", b =>
                 {
@@ -64,7 +133,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("metadata");
 
-                    b.Property<Guid>("PerformedById")
+                    b.Property<Guid?>("PerformedById")
                         .HasColumnType("uuid")
                         .HasColumnName("performed_by");
 
@@ -131,12 +200,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("industry");
 
-                    b.Property<bool>("IsVerified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_verified");
-
                     b.Property<string>("LogoUrl")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -180,7 +243,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("TaxCode")
                         .IsUnique()
-                        .HasDatabaseName("ix_enterprises_tax_code");
+                        .HasDatabaseName("ix_enterprises_tax_code")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("enterprises", (string)null);
                 });
@@ -243,7 +307,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("UserId")
                         .IsUnique()
-                        .HasDatabaseName("ix_enterprise_users_user_id");
+                        .HasDatabaseName("ix_enterprise_users_user_id")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("enterprise_users", (string)null);
                 });
@@ -320,7 +385,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("CycleId", "InternshipId", "StudentId")
                         .IsUnique()
-                        .HasDatabaseName("ix_evaluations_cycle_internship_student_unique");
+                        .HasDatabaseName("ix_evaluations_cycle_internship_student_unique")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("evaluations", (string)null);
                 });
@@ -416,6 +482,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("name");
 
+                    b.Property<Guid>("PhaseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("phase_id");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamptz")
                         .HasColumnName("start_date");
@@ -423,10 +493,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
-
-                    b.Property<Guid>("TermId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("term_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -439,11 +505,11 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasKey("CycleId")
                         .HasName("pk_evaluation_cycles");
 
+                    b.HasIndex("PhaseId")
+                        .HasDatabaseName("ix_evaluation_cycles_phase_id");
+
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_evaluation_cycles_status");
-
-                    b.HasIndex("TermId")
-                        .HasDatabaseName("ix_evaluation_cycles_term_id");
 
                     b.ToTable("evaluation_cycles", (string)null);
                 });
@@ -502,7 +568,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("EvaluationId", "CriteriaId")
                         .IsUnique()
-                        .HasDatabaseName("ix_evaluation_details_evaluation_criteria_unique");
+                        .HasDatabaseName("ix_evaluation_details_evaluation_criteria_unique")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("evaluation_details", (string)null);
                 });
@@ -528,13 +595,37 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
+                    b.Property<string>("CvSnapshotUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasColumnName("cv_snapshot_url");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
-                    b.Property<Guid>("InternshipId")
+                    b.Property<Guid>("EnterpriseId")
                         .HasColumnType("uuid")
-                        .HasColumnName("internship_id");
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<Guid?>("InternshipGroupInternshipId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_group_internship_id");
+
+                    b.Property<bool>("IsHiddenByStudent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_hidden_by_student");
+
+                    b.Property<Guid?>("JobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.Property<string>("RejectReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("reject_reason");
 
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("timestamptz")
@@ -544,6 +635,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("reviewed_by");
 
+                    b.Property<short>("Source")
+                        .HasColumnType("smallint")
+                        .HasColumnName("source");
+
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
@@ -551,6 +646,14 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid")
                         .HasColumnName("student_id");
+
+                    b.Property<Guid>("TermId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("term_id");
+
+                    b.Property<Guid?>("UniversityId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("university_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -563,15 +666,29 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasKey("ApplicationId")
                         .HasName("pk_internship_applications");
 
+                    b.HasIndex("InternshipGroupInternshipId")
+                        .HasDatabaseName("ix_internship_applications_internship_group_internship_id");
+
+                    b.HasIndex("JobId")
+                        .HasDatabaseName("ix_internship_applications_job_id");
+
                     b.HasIndex("ReviewedBy")
                         .HasDatabaseName("ix_internship_applications_reviewed_by");
 
-                    b.HasIndex("StudentId")
-                        .HasDatabaseName("ix_internship_applications_student_id");
+                    b.HasIndex("TermId")
+                        .HasDatabaseName("ix_internship_applications_term_id");
 
-                    b.HasIndex("InternshipId", "StudentId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_internship_applications_internship_id_student_id");
+                    b.HasIndex("UniversityId")
+                        .HasDatabaseName("ix_internship_applications_university_id");
+
+                    b.HasIndex("EnterpriseId", "Status")
+                        .HasDatabaseName("ix_internship_applications_enterprise_id_status");
+
+                    b.HasIndex("StudentId", "Status")
+                        .HasDatabaseName("ix_internship_applications_student_id_status");
+
+                    b.HasIndex("StudentId", "TermId", "EnterpriseId")
+                        .HasDatabaseName("ix_internship_applications_student_id_term_id_enterprise_id");
 
                     b.ToTable("internship_applications", (string)null);
                 });
@@ -595,6 +712,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("end_date");
@@ -613,6 +734,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("mentor_id");
 
+                    b.Property<Guid>("PhaseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("phase_id");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("start_date");
@@ -620,10 +745,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
-
-                    b.Property<Guid>("TermId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("term_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -645,10 +766,89 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("MentorId")
                         .HasDatabaseName("ix_internship_groups_mentor_id");
 
-                    b.HasIndex("TermId")
-                        .HasDatabaseName("ix_internship_groups_term_id");
+                    b.HasIndex("PhaseId")
+                        .HasDatabaseName("ix_internship_groups_phase_id");
 
                     b.ToTable("internship_groups", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipPhase", b =>
+                {
+                    b.Property<Guid>("PhaseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("phase_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("end_date");
+
+                    b.Property<Guid>("EnterpriseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<int?>("MaxStudents")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_students");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("start_date");
+
+                    b.Property<short>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("PhaseId")
+                        .HasName("pk_internship_phases");
+
+                    b.HasIndex("EnterpriseId")
+                        .HasDatabaseName("ix_internship_phases_enterprise_id");
+
+                    b.HasIndex("EnterpriseId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_internship_phases_enterprise_name_unique")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.HasIndex("EnterpriseId", "Status")
+                        .HasDatabaseName("ix_internship_phases_enterprise_status");
+
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("ix_internship_phases_dates");
+
+                    b.ToTable("internship_phases", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipStudent", b =>
@@ -700,6 +900,84 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasDatabaseName("ix_internship_students_student_id");
 
                     b.ToTable("internship_students", (string)null);
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
+                {
+                    b.Property<Guid>("JobId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.Property<string>("Benefit")
+                        .HasColumnType("text")
+                        .HasColumnName("benefit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<Guid>("EnterpriseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<DateTime?>("ExpireDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expire_date");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("location");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<string>("Requirements")
+                        .HasColumnType("text")
+                        .HasColumnName("requirements");
+
+                    b.Property<short>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("title");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("JobId")
+                        .HasName("pk_jobs");
+
+                    b.HasIndex("EnterpriseId")
+                        .HasDatabaseName("ix_jobs_enterprise_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_jobs_status");
+
+                    b.ToTable("jobs", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
@@ -771,6 +1049,81 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("logbooks", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("notification_id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_read");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("read_at");
+
+                    b.Property<Guid?>("ReferenceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reference_id");
+
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("reference_type");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("title");
+
+                    b.Property<short>("Type")
+                        .HasColumnType("smallint")
+                        .HasColumnName("type");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("NotificationId")
+                        .HasName("pk_notifications");
+
+                    b.HasIndex("UserId", "IsRead")
+                        .HasDatabaseName("ix_notifications_user_id_is_read");
+
+                    b.ToTable("notifications", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.Property<Guid>("TokenId")
@@ -840,6 +1193,11 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
+                    b.Property<string>("Deliverables")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("deliverables");
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)")
@@ -849,13 +1207,37 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("end_date");
 
-                    b.Property<Guid?>("InternshipGroupInternshipId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("internship_group_internship_id");
+                    b.Property<string>("Field")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("field");
 
-                    b.Property<Guid>("InternshipId")
+                    b.Property<Guid?>("InternshipId")
                         .HasColumnType("uuid")
                         .HasColumnName("internship_id");
+
+                    b.Property<bool>("IsOrphaned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_orphaned");
+
+                    b.Property<Guid?>("MentorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("mentor_id");
+
+                    b.Property<short>("OperationalStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)0)
+                        .HasColumnName("operational_status");
+
+                    b.Property<string>("ProjectCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("project_code");
 
                     b.Property<string>("ProjectName")
                         .IsRequired()
@@ -863,13 +1245,21 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("project_name");
 
+                    b.Property<string>("Requirements")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("requirements");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("start_date");
 
-                    b.Property<short?>("Status")
+                    b.Property<short>("Template")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasColumnName("status");
+                        .HasDefaultValue((short)0)
+                        .HasColumnName("template");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -879,20 +1269,34 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
+                    b.Property<short>("VisibilityStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)0)
+                        .HasColumnName("visibility_status");
+
                     b.HasKey("ProjectId")
                         .HasName("pk_projects");
 
                     b.HasIndex("CreatedAt")
                         .HasDatabaseName("ix_projects_created_at");
 
-                    b.HasIndex("InternshipGroupInternshipId")
-                        .HasDatabaseName("ix_projects_internship_group_internship_id");
-
                     b.HasIndex("InternshipId")
                         .HasDatabaseName("ix_projects_internship_id");
 
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_projects_status");
+                    b.HasIndex("MentorId")
+                        .HasDatabaseName("ix_projects_mentor_id");
+
+                    b.HasIndex("OperationalStatus")
+                        .HasDatabaseName("ix_projects_operational_status");
+
+                    b.HasIndex("ProjectCode")
+                        .IsUnique()
+                        .HasDatabaseName("uix_projects_project_code_active")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.HasIndex("VisibilityStatus")
+                        .HasDatabaseName("ix_projects_visibility_status");
 
                     b.ToTable("projects", (string)null);
                 });
@@ -947,6 +1351,16 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
+                    b.Property<DateTime>("UploadedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("uploaded_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid?>("UploadedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("uploaded_by");
+
                     b.HasKey("ProjectResourceId")
                         .HasName("pk_project_resources");
 
@@ -958,6 +1372,9 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("ResourceType")
                         .HasDatabaseName("ix_project_resources_resource_type");
+
+                    b.HasIndex("UploadedBy")
+                        .HasDatabaseName("ix_project_resources_uploaded_by");
 
                     b.ToTable("project_resources", (string)null);
                 });
@@ -1016,7 +1433,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("Token")
                         .IsUnique()
-                        .HasDatabaseName("ix_refresh_tokens_token");
+                        .HasDatabaseName("ix_refresh_tokens_token")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_refresh_tokens_user_id");
@@ -1290,6 +1708,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
+                    b.Property<string>("CvUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("cv_url");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamptz")
                         .HasColumnName("deleted_at");
@@ -1334,20 +1756,19 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("UserId")
                         .IsUnique()
-                        .HasDatabaseName("ix_students_user_id");
+                        .HasDatabaseName("ix_students_user_id")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("students", (string)null);
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.StudentTerm", b =>
                 {
-                    b.Property<Guid>("StudentId")
+                    b.Property<Guid>("StudentTermId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("student_id");
-
-                    b.Property<Guid>("TermId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("term_id");
+                        .HasColumnName("student_term_id")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -1363,9 +1784,51 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamptz")
                         .HasColumnName("deleted_at");
 
-                    b.Property<short?>("Status")
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deleted_by");
+
+                    b.Property<DateOnly>("EnrollmentDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasColumnName("enrollment_date")
+                        .HasDefaultValueSql("CURRENT_DATE");
+
+                    b.Property<string>("EnrollmentNote")
+                        .HasColumnType("text")
+                        .HasColumnName("enrollment_note");
+
+                    b.Property<short>("EnrollmentStatus")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasColumnName("status");
+                        .HasDefaultValue((short)1)
+                        .HasColumnName("enrollment_status");
+
+                    b.Property<Guid?>("EnterpriseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("enterprise_id");
+
+                    b.Property<string>("FinalFeedback")
+                        .HasColumnType("text")
+                        .HasColumnName("final_feedback");
+
+                    b.Property<string>("MidtermFeedback")
+                        .HasColumnType("text")
+                        .HasColumnName("midterm_feedback");
+
+                    b.Property<short>("PlacementStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)0)
+                        .HasColumnName("placement_status");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("student_id");
+
+                    b.Property<Guid>("TermId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("term_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamptz")
@@ -1375,11 +1838,22 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("updated_by");
 
-                    b.HasKey("StudentId", "TermId")
+                    b.HasKey("StudentTermId")
                         .HasName("pk_student_terms");
 
+                    b.HasIndex("EnterpriseId")
+                        .HasDatabaseName("ix_student_terms_enterprise_id");
+
                     b.HasIndex("TermId")
-                        .HasDatabaseName("ix_student_terms_term_id");
+                        .HasDatabaseName("idx_student_terms_term_id");
+
+                    b.HasIndex("StudentId", "TermId")
+                        .IsUnique()
+                        .HasDatabaseName("uq_student_term")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.HasIndex("TermId", "PlacementStatus", "EnrollmentStatus")
+                        .HasDatabaseName("idx_student_terms_statuses");
 
                     b.ToTable("student_terms", (string)null);
                 });
@@ -1535,7 +2009,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique()
-                        .HasDatabaseName("ix_universities_code");
+                        .HasDatabaseName("ix_universities_code")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("universities", (string)null);
                 });
@@ -1597,7 +2072,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("UserId")
                         .IsUnique()
-                        .HasDatabaseName("ix_university_users_user_id");
+                        .HasDatabaseName("ix_university_users_user_id")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.ToTable("university_users", (string)null);
                 });
@@ -1608,6 +2084,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text")
+                        .HasColumnName("address");
 
                     b.Property<string>("AvatarUrl")
                         .HasMaxLength(255)
@@ -1688,11 +2168,13 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_users_email");
+                        .HasDatabaseName("ix_users_email")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.HasIndex("PhoneNumber")
                         .IsUnique()
-                        .HasDatabaseName("ix_users_phone_number");
+                        .HasDatabaseName("ix_users_phone_number")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_users_status")
@@ -1700,7 +2182,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("UserCode")
                         .IsUnique()
-                        .HasDatabaseName("ix_users_user_code");
+                        .HasDatabaseName("ix_users_user_code")
+                        .HasFilter("deleted_at IS NULL");
 
                     b.HasIndex("Role", "Status")
                         .HasDatabaseName("ix_users_role_status");
@@ -1908,6 +2391,18 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("logbook_work_items", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.ApplicationStatusHistory", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.InternshipApplication", "Application")
+                        .WithMany("StatusHistories")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_application_status_histories_internship_applications_applic");
+
+                    b.Navigation("Application");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.AuditLog", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "PerformedBy")
@@ -1990,14 +2485,14 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.EvaluationCycle", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.Term", "Term")
-                        .WithMany()
-                        .HasForeignKey("TermId")
+                    b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternshipPhase")
+                        .WithMany("EvaluationCycles")
+                        .HasForeignKey("PhaseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_evaluation_cycles_terms_term_id");
+                        .HasConstraintName("fk_evaluation_cycles_internship_phases_phase_id");
 
-                    b.Navigation("Term");
+                    b.Navigation("InternshipPhase");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.EvaluationDetail", b =>
@@ -2023,10 +2518,23 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipApplication", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
+                    b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
                         .WithMany("InternshipApplications")
-                        .HasForeignKey("InternshipId")
-                        .HasConstraintName("fk_internship_applications_internship_groups_internship_id");
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_applications_enterprises_enterprise_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", null)
+                        .WithMany("InternshipApplications")
+                        .HasForeignKey("InternshipGroupInternshipId")
+                        .HasConstraintName("fk_internship_applications_internship_groups_internship_group_");
+
+                    b.HasOne("IOCv2.Domain.Entities.Job", "Job")
+                        .WithMany("Applications")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_internship_applications_jobs_job_id");
 
                     b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "Reviewer")
                         .WithMany("ReviewedApplications")
@@ -2039,11 +2547,30 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasForeignKey("StudentId")
                         .HasConstraintName("fk_internship_applications_students_student_id");
 
-                    b.Navigation("InternshipGroup");
+                    b.HasOne("IOCv2.Domain.Entities.Term", "Term")
+                        .WithMany("InternshipApplications")
+                        .HasForeignKey("TermId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_applications_terms_term_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.University", "University")
+                        .WithMany()
+                        .HasForeignKey("UniversityId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_internship_applications_universities_university_id");
+
+                    b.Navigation("Enterprise");
+
+                    b.Navigation("Job");
 
                     b.Navigation("Reviewer");
 
                     b.Navigation("Student");
+
+                    b.Navigation("Term");
+
+                    b.Navigation("University");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
@@ -2060,17 +2587,30 @@ namespace IOCv2.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_internship_groups_enterprise_users_mentor_id");
 
-                    b.HasOne("IOCv2.Domain.Entities.Term", "Term")
+                    b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternshipPhase")
                         .WithMany("InternshipGroups")
-                        .HasForeignKey("TermId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("fk_internship_groups_terms_term_id");
+                        .HasForeignKey("PhaseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_groups_internship_phases_phase_id");
 
                     b.Navigation("Enterprise");
 
-                    b.Navigation("Mentor");
+                    b.Navigation("InternshipPhase");
 
-                    b.Navigation("Term");
+                    b.Navigation("Mentor");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipPhase", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
+                        .WithMany()
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_internship_phases_enterprises_enterprise_id");
+
+                    b.Navigation("Enterprise");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipStudent", b =>
@@ -2094,6 +2634,18 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
+                        .WithMany("Jobs")
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_jobs_enterprises_enterprise_id");
+
+                    b.Navigation("Enterprise");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "Internship")
@@ -2113,6 +2665,18 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notifications_users_user_id");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.User", "User")
@@ -2126,17 +2690,17 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
                 {
-                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", null)
-                        .WithMany("Projects")
-                        .HasForeignKey("InternshipGroupInternshipId")
-                        .HasConstraintName("fk_projects_internship_groups_internship_group_internship_id");
-
                     b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
-                        .WithMany()
+                        .WithMany("Projects")
                         .HasForeignKey("InternshipId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_projects_internship_groups_internship_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", null)
+                        .WithMany()
+                        .HasForeignKey("MentorId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_projects_enterprise_users_mentor_id");
 
                     b.Navigation("InternshipGroup");
                 });
@@ -2150,7 +2714,15 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_project_resources_projects_project_id");
 
+                    b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "UploadedByUser")
+                        .WithMany()
+                        .HasForeignKey("UploadedBy")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_project_resources_enterprise_users_uploaded_by");
+
                     b.Navigation("Project");
+
+                    b.Navigation("UploadedByUser");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.RefreshToken", b =>
@@ -2227,6 +2799,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithOne("Student")
                         .HasForeignKey("IOCv2.Domain.Entities.Student", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_students_users_user_id");
 
                     b.Navigation("User");
@@ -2234,19 +2807,27 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.StudentTerm", b =>
                 {
+                    b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
+                        .WithMany()
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_student_terms_enterprises_enterprise_id");
+
                     b.HasOne("IOCv2.Domain.Entities.Student", "Student")
                         .WithMany("StudentTerms")
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_student_terms_students_student_id");
 
                     b.HasOne("IOCv2.Domain.Entities.Term", "Term")
                         .WithMany("StudentTerms")
                         .HasForeignKey("TermId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_student_terms_terms_term_id");
+
+                    b.Navigation("Enterprise");
 
                     b.Navigation("Student");
 
@@ -2259,6 +2840,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithMany("Terms")
                         .HasForeignKey("UniversityId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_terms_universities_university_id");
 
                     b.Navigation("University");
@@ -2358,7 +2940,11 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     b.Navigation("EnterpriseUsers");
 
+                    b.Navigation("InternshipApplications");
+
                     b.Navigation("InternshipGroups");
+
+                    b.Navigation("Jobs");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.EnterpriseUser", b =>
@@ -2378,6 +2964,11 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Criteria");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipApplication", b =>
+                {
+                    b.Navigation("StatusHistories");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipGroup", b =>
                 {
                     b.Navigation("InternshipApplications");
@@ -2391,6 +2982,18 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Stakeholders");
 
                     b.Navigation("ViolationReports");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.InternshipPhase", b =>
+                {
+                    b.Navigation("EvaluationCycles");
+
+                    b.Navigation("InternshipGroups");
+                });
+
+            modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
+                {
+                    b.Navigation("Applications");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
@@ -2429,7 +3032,7 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Term", b =>
                 {
-                    b.Navigation("InternshipGroups");
+                    b.Navigation("InternshipApplications");
 
                     b.Navigation("StudentTerms");
                 });
