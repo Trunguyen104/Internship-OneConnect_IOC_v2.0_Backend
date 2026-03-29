@@ -176,7 +176,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         .AsNoTracking()
                         .Where(a => studentIds.Contains(a.StudentId)
                                  && a.EnterpriseId == enterpriseUser.EnterpriseId
-                                 && a.Status == InternshipApplicationStatus.Approved)
+                                 && a.Status == InternshipApplicationStatus.Placed)
                         .Select(a => a.StudentId)
                         .ToListAsync(cancellationToken);
 

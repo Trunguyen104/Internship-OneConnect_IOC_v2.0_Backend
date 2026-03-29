@@ -28,6 +28,7 @@ public partial class AppDbContext : DbContext
     public DbSet<UniversityUser> UniversityUsers { get; set; } = null!;
     public DbSet<Domain.Entities.Enterprise> Enterprises { get; set; } = null!;
     public DbSet<EnterpriseUser> EnterpriseUsers { get; set; } = null!;
+    public DbSet<Job> Jobs { get; set; } = null!;
 
     // Project Management
     public DbSet<Term> Terms { get; set; } = null!;
@@ -36,6 +37,8 @@ public partial class AppDbContext : DbContext
     public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
     public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
     public DbSet<InternshipApplication> InternshipApplications { get; set; } = null!;
+    public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; } = null!;
+
     public DbSet<Logbook> Logbooks { get; set; } = null!;
     public DbSet<Project> Projects { get; set; } = null!;
     public DbSet<ProjectResources> ProjectResources { get; set; } = null!;
@@ -119,7 +122,7 @@ public partial class AppDbContext : DbContext
                 var deletedAtProperty = entityType.FindProperty(nameof(BaseEntity.DeletedAt));
                 if (deletedAtProperty != null)
                 {
-                    var columnName = deletedAtProperty.GetColumnBaseName() ?? "deleted_at";
+                    var columnName = deletedAtProperty.GetColumnName() ?? "deleted_at";
                     var filterSql = $"{columnName} IS NULL";
 
                     foreach (var index in entityType.GetIndexes())

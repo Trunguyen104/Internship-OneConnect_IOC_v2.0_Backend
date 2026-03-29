@@ -1005,5 +1005,61 @@ namespace IOCv2.Application.Constants
             public const string BulkDeleteEmptyIds = "Notifications.BulkDeleteEmptyIds";
             public const string NotificationIdRequired = "Notifications.NotificationIdRequired";
         }
+        public static class HRApplications
+        {
+            // Validation
+            public const string ApplicationIdRequired = "HRApplications.ApplicationIdRequired";
+            public const string RejectReasonRequired = "HRApplications.RejectReasonRequired";
+            public const string RejectReasonMaxLength = "HRApplications.RejectReasonMaxLength";
+            public const string RejectReasonMinLength = "HRApplications.RejectReasonMinLength";
+
+            // Business errors
+            public const string NotFound = "HRApplications.NotFound";
+            public const string EnterpriseUserNotFound = "HRApplications.EnterpriseUserNotFound";
+            public const string InvalidTransition = "HRApplications.InvalidTransition";
+            public const string CannotRejectPlaced = "HRApplications.CannotRejectPlaced";
+            public const string NotSelfApplyApplication = "HRApplications.NotSelfApplyApplication";
+            public const string NotUniAssignApplication = "HRApplications.NotUniAssignApplication";
+            public const string ApplicationNotActive = "HRApplications.ApplicationNotActive";
+
+            // Notification message templates
+            public const string NotifyInterviewing = "HRApplications.Notify.Interviewing";
+            public const string NotifyOffered = "HRApplications.Notify.Offered";
+            public const string NotifyPlacedSelfApply = "HRApplications.Notify.Placed.SelfApply";
+            public const string NotifyPlacedUniAssign = "HRApplications.Notify.Placed.UniAssign";
+            public const string NotifyRejectedSelfApply = "HRApplications.Notify.Rejected.SelfApply";
+            public const string NotifyRejectedUniAssign = "HRApplications.Notify.Rejected.UniAssign";
+            public const string NotifyUniAdminRejected = "HRApplications.Notify.UniAdmin.Rejected";
+            public const string NotifyUniAdminPlaced = "HRApplications.Notify.UniAdmin.Placed";
+            public const string NotifyEnterpriseAutoWithdrawn = "HRApplications.Notify.Enterprise.AutoWithdrawn";
+            public const string NotifyStudentAutoWithdrawn = "HRApplications.Notify.Student.AutoWithdrawn";
+
+            // Logging
+            public const string LogMoveToInterviewing = "HRApplications.Log.MoveToInterviewing";
+            public const string LogSendOffer = "HRApplications.Log.SendOffer";
+            public const string LogMarkAsPlaced = "HRApplications.Log.MarkAsPlaced";
+            public const string LogReject = "HRApplications.Log.Reject";
+            public const string LogApproveUniAssign = "HRApplications.Log.ApproveUniAssign";
+            public const string LogRejectUniAssign = "HRApplications.Log.RejectUniAssign";
+            public const string LogCascadeWithdraw = "HRApplications.Log.CascadeWithdraw";
+            public const string LogInvalidUserId = "HRApplications.Log.InvalidUserId";
+        }
+
+        public static class StudentApplications
+        {
+            // Business errors
+            public const string NotFound = "StudentApplications.NotFound";
+            public const string NotOwner = "StudentApplications.NotOwner";
+            public const string CannotWithdrawNotApplied = "StudentApplications.CannotWithdrawNotApplied";
+            public const string CannotHidePlaced = "StudentApplications.CannotHidePlaced";
+            public const string CannotHideActiveApplication = "StudentApplications.CannotHideActiveApplication";
+
+            // Success
+            public const string WithdrawSuccess = "StudentApplications.WithdrawSuccess";
+            public const string HideSuccess = "StudentApplications.HideSuccess";
+
+            // Notify HR (AC-07)
+            public const string NotifyHRWithdrawn = "StudentApplications.Notify.HR.Withdrawn";
+        }
     }
 }

@@ -147,7 +147,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
                     StudentId = studentId,
                     EnterpriseId = _enterpriseId,
                     TermId = Guid.NewGuid(),
-                    Status = InternshipApplicationStatus.Approved
+                    Status = InternshipApplicationStatus.Placed
                 }
             };
             _mockUnitOfWork.Setup(x => x.Repository<IOCv2.Domain.Entities.InternshipApplication>().Query())

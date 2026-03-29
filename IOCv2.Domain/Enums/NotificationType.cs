@@ -8,4 +8,6 @@ public enum NotificationType : short
     InternshipAssigned = 3,
     LogbookFeedback = 4,
     EvaluationPublished = 5,
+    ApplicationStatusChanged = 6,
+    SystemAlert = 7,
 }
