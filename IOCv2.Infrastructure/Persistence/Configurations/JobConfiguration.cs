@@ -24,7 +24,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .IsRequired();
 
         builder.HasOne(j => j.Enterprise)
-               .WithMany(e => e.Job)
+               .WithMany(e => e.Jobs)
                .HasForeignKey(j => j.EnterpriseId)
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("fk_jobs_enterprises_enterprise_id");

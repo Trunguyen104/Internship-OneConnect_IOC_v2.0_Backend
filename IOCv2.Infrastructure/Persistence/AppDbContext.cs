@@ -59,8 +59,6 @@ public partial class AppDbContext : DbContext
     
     //Violation Reports
     public DbSet<ViolationReport> ViolationReports { get; set; } = null!;
-    // Job Postings
-    public DbSet<Job> Jobs { get; set; } = null!;
 
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
