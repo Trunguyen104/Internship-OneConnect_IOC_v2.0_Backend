@@ -131,15 +131,19 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                 {
                     job_id = table.Column<Guid>(type: "uuid", nullable: false),
                     enterprise_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    position = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     description = table.Column<string>(type: "text", nullable: true),
                     requirements = table.Column<string>(type: "text", nullable: true),
                     location = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     benefit = table.Column<string>(type: "text", nullable: true),
-                    quantity = table.Column<int>(type: "integer", nullable: false),
+                    quantity = table.Column<int>(type: "integer", nullable: true),
                     expire_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    status = table.Column<short>(type: "smallint", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    status = table.Column<short>(type: "smallint", nullable: true),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    audience = table.Column<short>(type: "smallint", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -421,6 +425,30 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "job_universities",
+                columns: table => new
+                {
+                    job_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    uni_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_job_universities", x => new { x.job_id, x.uni_id });
+                    table.ForeignKey(
+                        name: "fk_job_universities_job_id",
+                        column: x => x.job_id,
+                        principalTable: "jobs",
+                        principalColumn: "job_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_job_universities_university_id",
+                        column: x => x.uni_id,
+                        principalTable: "universities",
+                        principalColumn: "uni_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "internship_groups",
                 columns: table => new
                 {
@@ -595,10 +623,12 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     is_hidden_by_student = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     cv_snapshot_url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     university_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    job_posting_title = table.Column<string>(type: "text", nullable: true),
                     applied_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()"),
                     reviewed_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
                     reviewed_by = table.Column<Guid>(type: "uuid", nullable: true),
                     internship_group_internship_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    job_id1 = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -631,6 +661,11 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         principalTable: "jobs",
                         principalColumn: "job_id",
                         onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_internship_applications_jobs_job_id1",
+                        column: x => x.job_id1,
+                        principalTable: "jobs",
+                        principalColumn: "job_id");
                     table.ForeignKey(
                         name: "fk_internship_applications_students_student_id",
                         column: x => x.student_id,
@@ -1177,6 +1212,11 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                 column: "job_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_internship_applications_job_id1",
+                table: "internship_applications",
+                column: "job_id1");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_internship_applications_reviewed_by",
                 table: "internship_applications",
                 column: "reviewed_by");
@@ -1247,6 +1287,16 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                 name: "ix_internship_students_student_id",
                 table: "internship_students",
                 column: "student_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_job_universities_job_id",
+                table: "job_universities",
+                column: "job_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_job_universities_uni_id",
+                table: "job_universities",
+                column: "uni_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_jobs_enterprise_id",
@@ -1555,6 +1605,9 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "internship_students");
+
+            migrationBuilder.DropTable(
+                name: "job_universities");
 
             migrationBuilder.DropTable(
                 name: "logbook_work_items");

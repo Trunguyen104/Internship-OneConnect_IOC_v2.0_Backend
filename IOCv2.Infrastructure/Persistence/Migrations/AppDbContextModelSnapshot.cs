@@ -608,18 +608,23 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("InternshipGroupInternshipId")
                         .HasColumnType("uuid")
                         .HasColumnName("internship_group_internship_id");
+
                     b.Property<bool>("IsHiddenByStudent")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasColumnName("is_hidden_by_student");
-                    b.Property<Guid>("JobId")
+
+                    b.Property<Guid?>("JobId")
                         .HasColumnType("uuid")
                         .HasColumnName("job_id");
 
+                    b.Property<Guid?>("JobId1")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id1");
+
                     b.Property<string>("JobPostingTitle")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("job_posting_title");
 
                     b.Property<string>("RejectReason")
@@ -671,6 +676,9 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("JobId")
                         .HasDatabaseName("ix_internship_applications_job_id");
+
+                    b.HasIndex("JobId1")
+                        .HasDatabaseName("ix_internship_applications_job_id1");
 
                     b.HasIndex("ReviewedBy")
                         .HasDatabaseName("ix_internship_applications_reviewed_by");
@@ -2571,11 +2579,15 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_internship_applications_internship_groups_internship_group_");
 
                     b.HasOne("IOCv2.Domain.Entities.Job", "Job")
-                        .WithMany("InternshipApplications")
+                        .WithMany("Applications")
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
+                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_internship_applications_jobs_job_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.Job", null)
+                        .WithMany("InternshipApplications")
+                        .HasForeignKey("JobId1")
+                        .HasConstraintName("fk_internship_applications_jobs_job_id1");
 
                     b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "Reviewer")
                         .WithMany("ReviewedApplications")
@@ -2678,7 +2690,7 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
-                        .WithMany("Job")
+                        .WithMany("Jobs")
                         .HasForeignKey("EnterpriseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -3042,10 +3054,6 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.Navigation("ViolationReports");
                 });
 
-            modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
-                {
-                    b.Navigation("InternshipApplications");
-                    });
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipPhase", b =>
                 {
                     b.Navigation("EvaluationCycles");
@@ -3056,6 +3064,8 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
                 {
                     b.Navigation("Applications");
+
+                    b.Navigation("InternshipApplications");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Project", b =>
