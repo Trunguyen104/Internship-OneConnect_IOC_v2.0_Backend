@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById
+namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetDownloadProjectResourceById
 {
     public class GetDownloadProjectResourceByIdHandler : IRequestHandler<GetDownloadProjectResourceByIdQuery, Result<GetDownloadProjectResourceByIdResponse>>
     {

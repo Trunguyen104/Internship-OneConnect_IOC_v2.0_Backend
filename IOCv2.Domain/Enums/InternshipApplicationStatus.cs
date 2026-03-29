@@ -1,4 +1,4 @@
-namespace IOCv2.Domain.Enums;
+﻿namespace IOCv2.Domain.Enums;
 
 public enum InternshipApplicationStatus : short
 {

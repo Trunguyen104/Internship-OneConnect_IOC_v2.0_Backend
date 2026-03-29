@@ -13,7 +13,7 @@ using MediatR;
 using Xunit;
 using IOCv2.Application.Common.Models;
 
-namespace IOCv2.Tests.Features.Users.Commands
+namespace IOCv2.Tests.Features.Authentication
 {
     public class UpdateMyProfileHandlerTests
     {

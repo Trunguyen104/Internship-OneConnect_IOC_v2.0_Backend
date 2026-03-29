@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using FluentAssertions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Sprints.Queries.GetSprints;
@@ -55,6 +55,7 @@ namespace IOCv2.Tests.Features.Sprints.Queries.GetSprints
 
         private void SetupRepository(List<Sprint> data)
         {
+            // Use an EF Core in-memory DbContext so the returned IQueryable supports EF async operations.
             var context = new TestDbContext(_dbOptions);
             context.Sprints.AddRange(data);
             context.SaveChanges();
@@ -111,12 +112,30 @@ namespace IOCv2.Tests.Features.Sprints.Queries.GetSprints
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Existing configurations
             modelBuilder.Entity<InternshipPhase>().HasKey(p => p.PhaseId);
             modelBuilder.Entity<Sprint>().HasKey(s => s.SprintId);
             modelBuilder.Entity<SprintWorkItem>().HasKey(sw => new { sw.SprintId, sw.WorkItemId });
             modelBuilder.Entity<Project>().HasKey(p => p.ProjectId);
             modelBuilder.Entity<InternshipGroup>().HasKey(g => g.InternshipId);
             modelBuilder.Entity<ApplicationStatusHistory>().HasKey(h => h.HistoryId);
+
+            // Fix cho InternshipApplication - Job relationship
+            modelBuilder.Entity<InternshipApplication>(entity =>
+            {
+                entity.HasKey(e => e.ApplicationId);
+                entity.HasOne(e => e.Job)
+                    .WithMany()
+                    .HasForeignKey(e => e.JobId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Cấu hình thêm cho các entities khác nếu cần
+            modelBuilder.Entity<Job>(entity =>
+            {
+                entity.HasKey(e => e.JobId);
+            });
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.ProjectResources;
 using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Features.Projects.Queries.GetProjectById;
 using IOCv2.Application.Interfaces;
@@ -34,14 +35,14 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             IFileStorageService fileStorage,
             INotificationPushService pushService)
         {
-            _unitOfWork   = unitOfWork;
-            _mapper       = mapper;
-            _logger       = logger;
-            _message      = message;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _logger = logger;
+            _message = message;
             _cacheService = cacheService;
-            _currentUser  = currentUser;
-            _fileStorage  = fileStorage;
-            _pushService  = pushService;
+            _currentUser = currentUser;
+            _fileStorage = fileStorage;
+            _pushService = pushService;
         }
 
         public async Task<Result<CreateProjectResponse>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
@@ -160,7 +161,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                     foreach (var file in request.Files)
                     {
                         var fileName = FileParams.GetFileName(file.FileName);
-                        var fileUrl  = await _fileStorage.UploadFileAsync(
+                        var fileUrl = await _fileStorage.UploadFileAsync(
                             file, FileParams.GetFolder(newProject.ProjectId), fileName, cancellationToken);
                         uploadedFiles.Add((fileUrl, file.FileName, FileValidationHelper.GetFileType(fileUrl)!.Value));
 
@@ -199,12 +200,12 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                         var notif = new Notification
                         {
                             NotificationId = Guid.NewGuid(),
-                            UserId         = userId,
-                            Title          = _message.GetMessage(MessageKeys.Projects.NotifNewProjectTitle),
-                            Content        = _message.GetMessage(MessageKeys.Projects.NotifNewProjectContent, newProject.ProjectName),
-                            Type           = NotificationType.General,
-                            ReferenceType  = "Project",
-                            ReferenceId    = newProject.ProjectId
+                            UserId = userId,
+                            Title = _message.GetMessage(MessageKeys.Projects.NotifNewProjectTitle),
+                            Content = _message.GetMessage(MessageKeys.Projects.NotifNewProjectContent, newProject.ProjectName),
+                            Type = NotificationType.General,
+                            ReferenceType = "Project",
+                            ReferenceId = newProject.ProjectId
                         };
                         await _unitOfWork.Repository<Notification>().AddAsync(notif, cancellationToken);
                     }
@@ -225,8 +226,8 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                     {
                         await _pushService.PushNewNotificationAsync(mentorUserIdForSignal, new
                         {
-                            type      = ProjectSignalConstants.ProjectListChanged,
-                            action    = ProjectSignalConstants.Actions.Created,
+                            type = ProjectSignalConstants.ProjectListChanged,
+                            action = ProjectSignalConstants.Actions.Created,
                             projectId = newProject.ProjectId
                         }, cancellationToken);
                         _logger.LogInformation(

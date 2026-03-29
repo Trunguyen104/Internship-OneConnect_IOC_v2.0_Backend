@@ -28,6 +28,11 @@ public class InternshipApplication : BaseEntity
     /// <summary>University chỉ định (Uni Assign only).</summary>
     public Guid? UniversityId { get; set; }
 
+
+    /// <summary>Snapshot của tên Job Posting tại thời điểm apply (Self-apply only).</summary>
+    public string? JobPostingTitle { get; set; }
+
+
     public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ReviewedAt { get; set; }
     public Guid? ReviewedBy { get; set; }

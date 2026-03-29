@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Constants;
+﻿using IOCv2.Application.Extensions.ProjectResources;
 using IOCv2.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;

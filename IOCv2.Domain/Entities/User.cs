@@ -38,6 +38,20 @@ namespace IOCv2.Domain.Entities
             Status = UserStatus.Active;
         }
 
+        // Static factory used in tests to create a minimal user instance
+        public static User Create(Guid userId, string email)
+        {
+            var u = new User();
+            u.UserId = userId;
+            u.Email = email;
+            u.UserCode = userId.ToString();
+            u.FullName = string.Empty;
+            u.PasswordHash = string.Empty;
+            u.Role = default;
+            u.Status = UserStatus.Active;
+            return u;
+        }
+
         public void UpdateProfile(string fullName, string? phoneNumber, string? avatarUrl, UserGender? gender, DateOnly? dateOfBirth, string? address)
         {
             FullName = fullName;

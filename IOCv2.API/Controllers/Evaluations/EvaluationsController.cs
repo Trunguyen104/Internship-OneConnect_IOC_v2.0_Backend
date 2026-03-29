@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers;
+namespace IOCv2.API.Controllers.Evaluations;
 
 /// <summary>
 /// Evaluation Management — manage evaluation cycles, criteria, and mentor grading.
@@ -156,7 +156,7 @@ public class EvaluationsController : ApiControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command with { CycleId = cycleId }, cancellationToken);
-        return HandleCreateResult(result, nameof(GetEvaluationCriteria), new { cycleId = cycleId, version = "1" });
+        return HandleCreateResult(result, nameof(GetEvaluationCriteria), new { cycleId, version = "1" });
     }
 
     /// <summary>

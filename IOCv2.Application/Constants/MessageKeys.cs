@@ -907,6 +907,62 @@ namespace IOCv2.Application.Constants
             //create
             public const string StudentNotFound = "Student.NotFound";
         }
+
+        public static class JobPostingMessageKey
+        {
+            // Common
+            public const string TitleRequired = "JobPosting.TitleRequired";
+            public const string TitleTooLong = "JobPosting.TitleTooLong";
+            public const string DescriptionTooLong = "JobPosting.DescriptionTooLong";
+            public const string RequirementsTooLong = "JobPosting.RequirementsTooLong";
+            public const string BenefitTooLong = "JobPosting.BenefitTooLong";
+            public const string LocationRequired = "JobPosting.LocationRequired";
+            public const string LocationTooLong = "JobPosting.LocationTooLong";
+            public const string QuantityMustBePositive = "JobPosting.QuantityMustBePositive";
+            public const string ExpireDateMustBeTodayOrLater = "JobPosting.ExpireDateMustBeTodayOrLater";
+            public const string ExpireDateRequired = "JobPosting.ExpireDateRequired";
+            public const string StartDateMustBeTodayOrLater = "JobPosting.StartDateMustBeTodayOrLater";
+            public const string StartDateRequired = "JobPosting.StartDateRequired";
+            public const string EndDateRequired = "JobPosting.EndDateRequired";
+            public const string EndDateMinDuration = "JobPosting.EndDateMinDuration";
+            public const string EndDateMaxDuration = "JobPosting.EndDateMaxDuration";
+            public const string AudienceInvalid = "JobPosting.AudienceInvalid";
+            public const string AudienceRequired = "JobPosting.AudienceRequired";
+            public const string UniversityRequiredForTargetAudience = "JobPosting.UniversityRequiredForTargetAudience";
+            public const string NotAllowed = "JobPosting.NotAllowed";
+            //Apply job
+            public const string CvRequired = "JobPosting.CvRequired";
+            public const string AlreadyPlaced = "JobPosting.AlreadyPlaced";
+            //Close job
+            public const string OnlyPublishedAllowed = "JobPosting.OnlyPublishedAllowed";
+            public const string ConfirmHasActiveApplications = "JobPosting.ConfirmHasActiveApplications";
+            public const string NotifyStudentClosedSubject = "JobPosting.NotifyStudentClosedSubject";
+            public const string NotifyStudentClosedBody = "JobPosting.NotifyStudentClosedBody";
+            public const string CloseSuccess = "JobPosting.CloseSuccess";
+            // CreateDraft
+            public const string DraftSavedSuccess = "JobPosting.DraftSavedSuccess";
+            // Create Job
+            public const string CreateSuccess = "JobPosting.CreateSuccess";
+            // Delete
+            public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
+            public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";
+            public const string DeleteSuccess = "JobPosting.DeleteSuccess";
+            public const string DeleteWithActiveApplications = "JobPosting.DeleteWithActiveApplications";
+            public const string DleteVersionConflict = "JobPosting.DeleteVersionConflict";
+            // Publish Job
+            public const string JobPostingNotFound = "JobPosting.NotFound";
+            public const string PublishSuccess = "JobPosting.PublishSuccess";
+            public const string AlreadyPublished = "JobPosting.AlreadyPublished";
+            // Update Job
+            public const string UpdateConfirmHasApplications = "JobPosting.UpdateConfirmHasApplications";
+            public const string ReopenExpireDateInvalid = "JobPosting.ReopenExpireDateInvalid";
+            public const string UpdateQuantityLessThanPlaced = "JobPosting.UpdateQuantityLessThanPlaced";
+            public const string UpdateInvalidUniversities = "JobPosting.UpdateInvalidUniversities";
+            public const string TargetedRequiresSingleUniversity = "JobPosting.TargetedRequiresSingleUniversity";
+            public const string ReopenNotifyStudentSubject = "JobPosting.ReopenNotifyStudentSubject";
+            public const string ReopenNotifyStudentBody = "JobPosting.ReopenNotifyStudentBody";
+            public const string ReopenSuccess = "JobPosting.ReopenSuccess";
+        }
         public static class InternshipPhase
         {
             // Validator

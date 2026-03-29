@@ -9,7 +9,7 @@ using Moq;
 using MockQueryable;
 using MockQueryable.Moq;
 
-namespace IOCv2.Tests.Features.Admin.UserManagement.Queries;
+namespace IOCv2.Tests.Features.Admin.Users.Queries;
 
 public class GetUsersHandlerTests
 {
@@ -17,10 +17,10 @@ public class GetUsersHandlerTests
     public async Task Handle_ReturnsCachedResult_WhenCacheHit()
     {
         var cache = new Mock<ICacheService>();
-        var cached = new IOCv2.Application.Common.Models.PaginatedResult<GetUsersResponse>(
+        var cached = new Application.Common.Models.PaginatedResult<GetUsersResponse>(
             new List<GetUsersResponse> { new() { FullName = "Cached Admin" } }, 1, 1, 10);
 
-        cache.Setup(x => x.GetAsync<IOCv2.Application.Common.Models.PaginatedResult<GetUsersResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        cache.Setup(x => x.GetAsync<Application.Common.Models.PaginatedResult<GetUsersResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(cached);
 
         var handler = new GetUsersHandler(
@@ -49,8 +49,8 @@ public class GetUsersHandlerTests
         uow.Setup(x => x.Repository<User>()).Returns(repo.Object);
 
         var cache = new Mock<ICacheService>();
-        cache.Setup(x => x.GetAsync<IOCv2.Application.Common.Models.PaginatedResult<GetUsersResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IOCv2.Application.Common.Models.PaginatedResult<GetUsersResponse>?)null);
+        cache.Setup(x => x.GetAsync<Application.Common.Models.PaginatedResult<GetUsersResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Application.Common.Models.PaginatedResult<GetUsersResponse>?)null);
 
         var cfg = new MapperConfiguration(cfg => cfg.CreateMap<User, GetUsersResponse>());
         var mapper = cfg.CreateMapper();
@@ -66,7 +66,7 @@ public class GetUsersHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         result.Data!.Items.Should().HaveCount(1);
-        cache.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<IOCv2.Application.Common.Models.PaginatedResult<GetUsersResponse>>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()), Times.Once);
+        cache.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<Application.Common.Models.PaginatedResult<GetUsersResponse>>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     private Mock<ICurrentUserService> GetMockCurrentUserService()

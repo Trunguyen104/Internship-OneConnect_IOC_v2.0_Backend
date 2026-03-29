@@ -1,6 +1,6 @@
 using FluentAssertions;
 using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetProjectRescourceById;
+using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using MockQueryable;
 using MockQueryable.Moq;
+using IOCv2.Application.Features.ProjectResources.Queries.GetProjectResources.GetDownloadProjectResourceById;
 
 namespace IOCv2.Tests.Features.ProjectResources.Queries;
 
