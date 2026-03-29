@@ -16,7 +16,7 @@ namespace IOCv2.Domain.Entities
         public string? Benefit { get; set; }
         public int? Quantity { get; set; }
         public DateTime? ExpireDate { get; set; }
-        public JobStatus Status { get; set; }
+        public JobStatus? Status { get; set; }
 
         // New: internship date range
         public DateTime? StartDate { get; set; }
