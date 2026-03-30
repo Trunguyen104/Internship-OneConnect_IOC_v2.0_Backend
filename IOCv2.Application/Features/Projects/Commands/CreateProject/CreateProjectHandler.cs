@@ -16,6 +16,8 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
     public class CreateProjectHandler : IRequestHandler<CreateProjectCommand, Result<CreateProjectResponse>>
     {
+        private const string DefaultProjectField = "Software Engineering";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateProjectHandler> _logger;
@@ -137,7 +139,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             // 6. Create + Persist
             var newProject = Project.Create(
                 request.ProjectName, request.Description,
-                projectCode, request.Field, request.Requirements,
+                projectCode, DefaultProjectField, request.Requirements,
                 request.Deliverables, mentorId: enterpriseUser.EnterpriseUserId,
                 startDate: request.StartDate, endDate: request.EndDate);
 

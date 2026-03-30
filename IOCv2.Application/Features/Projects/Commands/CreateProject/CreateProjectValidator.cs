@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 
@@ -27,9 +27,6 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 .WithMessage(_messageService.GetMessage(MessageKeys.Projects.EndDateInvalidRange))
                 .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
 
-            RuleFor(x => x.Field)
-                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldRequired))
-                .MaximumLength(100).WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldMaxLength));
 
             RuleFor(x => x.Requirements)
                 .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsRequired))

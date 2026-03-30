@@ -46,6 +46,25 @@ namespace IOCv2.Tests.Features.Projects
             result.Errors.Should().BeEmpty();
         }
 
+        [Fact]
+        public void Validate_EmptyField_ShouldNotHaveFieldErrors()
+        {
+            // Arrange
+            var command = new CreateProjectCommand
+            {
+                ProjectName = "Valid Project",
+                Field = string.Empty,
+                Requirements = "Project requirements"
+            };
+
+            // Act
+            var result = _validator.Validate(command);
+
+            // Assert
+            result.Errors.Should().NotContain(e =>
+                e.PropertyName == nameof(CreateProjectCommand.Field));
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData("   ")]
