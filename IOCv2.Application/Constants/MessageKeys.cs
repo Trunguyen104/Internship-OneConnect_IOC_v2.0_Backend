@@ -1117,5 +1117,39 @@ namespace IOCv2.Application.Constants
             // Notify HR (AC-07)
             public const string NotifyHRWithdrawn = "StudentApplications.Notify.HR.Withdrawn";
         }
+
+        public static class UniAdminInternship
+        {
+            // Errors
+            public const string UniversityUserNotFound = "UniAdminInternship.UniversityUserNotFound";
+            public const string TermNotFound = "UniAdminInternship.TermNotFound";
+            public const string TermAccessDenied = "UniAdminInternship.TermAccessDenied";
+            public const string StudentNotFound = "UniAdminInternship.StudentNotFound";
+            public const string StudentNotInUniversity = "UniAdminInternship.StudentNotInUniversity";
+            public const string NoOpenTermFound = "UniAdminInternship.NoOpenTermFound";
+
+            // Success
+            public const string StudentsRetrieved = "UniAdminInternship.StudentsRetrieved";
+            public const string StudentDetailRetrieved = "UniAdminInternship.StudentDetailRetrieved";
+            public const string EvaluationsRetrieved = "UniAdminInternship.EvaluationsRetrieved";
+            public const string ViolationsRetrieved = "UniAdminInternship.ViolationsRetrieved";
+
+            // Log
+            public const string LogGetStudentList = "UniAdminInternship.Log.GetStudentList";
+            public const string LogGetStudentDetail = "UniAdminInternship.Log.GetStudentDetail";
+            public const string LogGetEvaluations = "UniAdminInternship.Log.GetEvaluations";
+            public const string LogGetViolations = "UniAdminInternship.Log.GetViolations";
+            public const string LogUniversityUserNotFound = "UniAdminInternship.Log.UniversityUserNotFound";
+            public const string LogTermNotFound = "UniAdminInternship.Log.TermNotFound";
+            public const string LogTermAccessDenied = "UniAdminInternship.Log.TermAccessDenied";
+            public const string LogStudentNotFound = "UniAdminInternship.Log.StudentNotFound";
+            public const string LogNoOpenTerm = "UniAdminInternship.Log.NoOpenTerm";
+
+            // Validation
+            public const string PageNumberInvalid = "UniAdminInternship.PageNumberInvalid";
+            public const string PageSizeInvalid = "UniAdminInternship.PageSizeInvalid";
+            public const string PageSizeTooLarge = "UniAdminInternship.PageSizeTooLarge";
+            public const string StudentIdRequired = "UniAdminInternship.StudentIdRequired";
+        }
     }
 }

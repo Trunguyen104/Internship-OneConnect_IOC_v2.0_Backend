@@ -1451,4 +1451,34 @@
   <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
     <value>Không tìm thấy file tải lên.</value>
   </data>
+  <data name="UniAdminInternship.UniversityUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin quản trị viên trường học. Vui lòng liên hệ quản trị hệ thống.</value>
+  </data>
+  <data name="UniAdminInternship.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập với mã đã cung cấp.</value>
+  </data>
+  <data name="UniAdminInternship.TermAccessDenied" xml:space="preserve">
+    <value>Bạn không có quyền truy cập kỳ thực tập này. Kỳ thực tập không thuộc trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên trong kỳ thực tập này hoặc sinh viên không thuộc trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotInUniversity" xml:space="preserve">
+    <value>Sinh viên này không thuộc trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập đang mở cho trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.PageNumberInvalid" xml:space="preserve">
+    <value>Số trang phải lớn hơn 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeInvalid" xml:space="preserve">
+    <value>Kích thước trang phải lớn hơn 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeTooLarge" xml:space="preserve">
+    <value>Kích thước trang không được vượt quá 100.</value>
+  </data>
+  <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
+    <value>Mã sinh viên không được để trống.</value>
+  </data>
 </root>
