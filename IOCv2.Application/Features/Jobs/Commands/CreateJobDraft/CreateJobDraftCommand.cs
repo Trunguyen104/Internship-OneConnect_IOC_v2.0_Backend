@@ -7,7 +7,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
 {
     public record CreateJobDraftCommand : IRequest<Result<CreateJobDraftResponse>>
     {
-        // Minimal fields supported for draft (Title is required for auto-save)
+        public Guid? InternshipPhaseId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string? Position { get; set; }
         public string? Description { get; set; }

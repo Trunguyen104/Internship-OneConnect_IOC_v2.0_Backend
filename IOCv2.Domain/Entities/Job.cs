@@ -8,6 +8,7 @@ namespace IOCv2.Domain.Entities
     {
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
+        public Guid? InternshipPhaseId { get; set; }
         public string? Title { get; set; }
         public string? Position { get; set; }
         public string? Description { get; set; }
@@ -33,10 +34,12 @@ namespace IOCv2.Domain.Entities
 
         // Many-to-many: Jobs <-> Universities
         public virtual ICollection<University> Universities { get; set; } = new List<University>();
+        public virtual InternshipPhase InternshipPhase { get; set; } = null!;
 
         // Factory method for creating a Job (used by application layer)
         public static Job Create(
             Guid enterpriseId,
+            Guid? internshipPhase,
             string title,
             string? description = null,
             string? requirements = null,
@@ -49,6 +52,7 @@ namespace IOCv2.Domain.Entities
             {
                 JobId = Guid.NewGuid(),
                 EnterpriseId = enterpriseId,
+                InternshipPhaseId = internshipPhase,
                 Title = title,
                 Description = description,
                 Requirements = requirements,

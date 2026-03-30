@@ -87,6 +87,11 @@ namespace IOCv2.Application.Features.Jobs.Commands.PublishJobPosting
 
             if (job == null)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.JobPostingNotFound));
+
+            // Block publish when internship phase not selected
+            if (!job.InternshipPhaseId.HasValue || job.InternshipPhaseId == Guid.Empty)
+                throw new Exception(_messageService.GetMessage(MessageKeys.InternshipPhase.InternshipPhaseIdRequired));
+
             if (job.Status == JobStatus.PUBLISHED)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.AlreadyPublished));
             if (string.IsNullOrWhiteSpace(job.Title))

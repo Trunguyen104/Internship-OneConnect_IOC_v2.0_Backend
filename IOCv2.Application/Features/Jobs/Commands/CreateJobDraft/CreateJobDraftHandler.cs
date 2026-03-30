@@ -62,6 +62,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
             // Create base job via factory (factory sets Draft status)
             var job = Job.Create(
                 enterpriseId: enterpriseId,
+                internshipPhase: request.InternshipPhaseId,
                 title: request.Title,
                 description: request.Description,
                 requirements: request.Requirements,

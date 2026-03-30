@@ -35,7 +35,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
             profile.CreateMap<Job, GetJobsResponse>()
                 .ForMember(d => d.CompanyName, opt => opt.MapFrom(s => s.Enterprise.Name))
                 .ForMember(d => d.CompanyLogoUrl, opt => opt.MapFrom(s => s.Enterprise.LogoUrl))
-                .ForMember(d => d.Status, opt => opt.MapFrom(s => (short)s.Status))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => (short)(s.Status ?? JobStatus.DRAFT)))
                 .ForMember(d => d.Quantity, opt => opt.MapFrom(s => s.Quantity))
                 .ForMember(d => d.ApplicationCount, opt => opt.MapFrom(s => s.InternshipApplications.Count))
                 // Map an enterprise active term name (first open term) if present

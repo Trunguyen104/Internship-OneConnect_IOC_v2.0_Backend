@@ -5,6 +5,7 @@ using IOCv2.Application.Constants;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using IOCv2.Application.Extensions.Jobs;
+using System.Linq;
 
 namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
 {
@@ -47,20 +48,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                 .Must(date => date == null || date.Value.Date >= DateTime.UtcNow.Date)
                 .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ExpireDateMustBeTodayOrLater));
 
-            // Internship period: required and valid
-            RuleFor(x => x.StartDate)
-                .NotEmpty()
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.StartDateRequired))
-                .Must(d => d.Date >= DateTime.UtcNow.Date)
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.StartDateMustBeTodayOrLater));
-
-            RuleFor(x => x.EndDate)
-                .NotEmpty()
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateRequired))
-                .Must((cmd, end) => end > cmd.StartDate.AddDays(JobsPostingParam.Common.MinimumDurationDays))
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMinDuration, JobsPostingParam.Common.MinimumDurationDays))
-                .Must((cmd, end) => end <= cmd.StartDate.AddDays(JobsPostingParam.Common.MaximumDurationDays))
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMaxDuration, JobsPostingParam.Common.MaximumDurationDays));
             // Audience rules
             RuleFor(x => x.Audience)
                 .IsInEnum()
@@ -68,8 +55,9 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
 
             When(x => x.Audience == JobAudience.Targeted, () =>
             {
-                RuleFor(x => x.UniversityId)
-                    .NotEmpty()
+                RuleFor(x => x.UniversityIds)
+                    .NotNull()
+                    .Must(list => list.Any())
                     .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.UniversityRequiredForTargetAudience));
             });
         }
