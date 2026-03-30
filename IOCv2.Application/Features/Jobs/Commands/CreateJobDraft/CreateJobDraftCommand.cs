@@ -14,12 +14,9 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
         public string? Requirements { get; set; }
         public string? Benefit { get; set; }
         public string? Location { get; set; }
-        public int? Quantity { get; set; }
         public DateTime? ExpireDate { get; set; }
 
         // Internship period optional for draft (can be provided)
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
 
         // Audience: optional, defaults to Public
         public JobAudience Audience { get; set; } = JobAudience.Public;

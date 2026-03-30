@@ -15,7 +15,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
         public string? Requirements { get; init; }
         public string? Benefit { get; init; }
         public string? Location { get; init; }
-        public int? Quantity { get; init; }
         public DateTime? ExpireDate { get; init; }
 
         // Audience: Public or Targeted

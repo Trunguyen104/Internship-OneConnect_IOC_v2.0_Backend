@@ -1018,4 +1018,7 @@
     <value>Internship period {0} is full ([{1}]/[{2}] students have been booked). You can close job postings during this period if you do not wish to receive more applications.
 </value>
   </data>
+  <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
+    <value>Only allow selecting phases that are Open (Upcoming) or InProgress (Active)</value>
+  </data>
 </root>

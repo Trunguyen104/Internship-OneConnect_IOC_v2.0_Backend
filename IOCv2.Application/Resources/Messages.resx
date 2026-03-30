@@ -1084,4 +1084,7 @@
     <value>Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ.
 </value>
   </data>
+  <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
+    <value>Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động).</value>
+  </data>
 </root>

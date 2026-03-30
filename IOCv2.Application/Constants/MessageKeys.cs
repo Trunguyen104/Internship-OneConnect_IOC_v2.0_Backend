@@ -944,6 +944,7 @@ namespace IOCv2.Application.Constants
             public const string DraftSavedSuccess = "JobPosting.DraftSavedSuccess";
             // Create Job
             public const string CreateSuccess = "JobPosting.CreateSuccess";
+            public const string InternshipPhaseStatusAllowed = "JobPosting.InternshipPhaseStatusAllowed";
             // Delete
             public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
             public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";

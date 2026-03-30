@@ -15,7 +15,6 @@ namespace IOCv2.Domain.Entities
         public string? Requirements { get; set; }
         public string? Location { get; set; }
         public string? Benefit { get; set; }
-        public int? Quantity { get; set; }
         public DateTime? ExpireDate { get; set; }
         public JobStatus? Status { get; set; }
 
@@ -45,7 +44,6 @@ namespace IOCv2.Domain.Entities
             string? requirements = null,
             string? benefit = null,
             string? location = null,
-            int? quantity = null,
             DateTime? expireDate = null)
         {
             return new Job
@@ -58,7 +56,6 @@ namespace IOCv2.Domain.Entities
                 Requirements = requirements,
                 Benefit = benefit,
                 Location = location,
-                Quantity = quantity,
                 ExpireDate = expireDate,
                 Status = JobStatus.DRAFT
             };

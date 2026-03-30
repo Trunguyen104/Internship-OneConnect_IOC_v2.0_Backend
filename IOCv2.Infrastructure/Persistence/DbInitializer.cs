@@ -154,7 +154,6 @@ namespace IOCv2.Infrastructure.Persistence
                 "C#, .NET, EF Core, REST, basic SQL",
                 "Monthly stipend, mentorship, certificate",
                 "Hà Nội (Hybrid)",
-                2,
                 DateTime.UtcNow.AddMonths(2)
             );
             job1.Position = "Backend Intern";
@@ -168,7 +167,6 @@ namespace IOCv2.Infrastructure.Persistence
                 "Angular, TypeScript, HTML/CSS, basic RxJS",
                 "Stipend, mentorship, certificate",
                 "Hà Nội (On-site)",
-                1,
                 DateTime.UtcNow.AddMonths(2)
             );
             job2.Position = "Frontend Intern";
@@ -342,7 +340,7 @@ namespace IOCv2.Infrastructure.Persistence
                     user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, gender, new DateOnly(2004, 1, 1), "Hà Nội");
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
-                    existingEmails.Add(studentEmails[i]);
+                    existingEmails.Add(user.Email);
 
                     var uni = universityList.First(u => u.Code == "FPTU");
                     _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId });
@@ -473,15 +471,16 @@ namespace IOCv2.Infrastructure.Persistence
                 .Where(s => s.User.Email.StartsWith("student") && s.User.Email.EndsWith("@fptu.edu.vn"))
                 .ToListAsync();
 
+            // spring2026 is created above if missing, use null-forgiving to satisfy analyzer
             foreach (var student in allStudents)
             {
-                if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == student.StudentId && st.TermId == spring2026.TermId))
+                if (!await _context.StudentTerms.AnyAsync(st => st.StudentId == student.StudentId && st.TermId == spring2026!.TermId))
                 {
                     _context.StudentTerms.Add(new StudentTerm
                     {
                         StudentTermId = Guid.NewGuid(),
                         StudentId = student.StudentId,
-                        TermId = spring2026.TermId,
+                        TermId = spring2026!.TermId,
                         EnrollmentStatus = EnrollmentStatus.Active,
                         PlacementStatus = PlacementStatus.Placed,
                         EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60))
@@ -586,6 +585,13 @@ namespace IOCv2.Infrastructure.Persistence
             var fall2025 = await _context.Terms.FirstOrDefaultAsync(t => t.Name == "Fall 2025" && t.University.Code == "FPTU");
             var spring2026Ct = await _context.Terms.Include(t => t.University).FirstOrDefaultAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU-CT");
 
+            // If these essential terms are missing, skip application seeding to avoid null dereference
+            if (spring2026 == null || fall2025 == null)
+            {
+                await _context.SaveChangesAsync();
+                return;
+            }
+
             var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
             if (group3 == null)
             {
@@ -644,14 +650,14 @@ namespace IOCv2.Infrastructure.Persistence
 
             if (fptJob != null && rikkeiJob != null && s2 != null && s3 != null)
             {
-                if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s3.StudentId))
+                if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s3.StudentId && a.TermId == spring2026.TermId))
                     _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, JobId = fptJob.JobId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-40) });
 
-                if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s2.StudentId))
+                if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s2.StudentId && a.TermId == spring2026.TermId))
                     _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, JobId = rikkeiJob.JobId, Status = InternshipApplicationStatus.PendingAssignment, AppliedAt = DateTime.UtcNow.AddDays(-10) });
             }
 
-            if (rikkeiJob != null && s4 != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s4.StudentId))
+            if (rikkeiJob != null && s4 != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s4.StudentId && a.TermId == spring2026.TermId))
             {
                 _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Applied, AppliedAt = DateTime.UtcNow.AddDays(-2) });
             }
@@ -682,14 +688,14 @@ namespace IOCv2.Infrastructure.Persistence
                 var stu = orderedStudents[idx];
                 if (!await _context.InternshipApplications.AnyAsync(
                     a => a.EnterpriseId == fsoft.EnterpriseId
-                      && a.TermId == spring2026.TermId 
+                      && a.TermId == spring2026!.TermId
                       && a.StudentId == stu.StudentId))
                 {
                     _context.InternshipApplications.Add(new InternshipApplication
                     {
                         ApplicationId = Guid.NewGuid(),
                         EnterpriseId = fsoft.EnterpriseId,
-                        TermId = spring2026.TermId,
+                        TermId = spring2026!.TermId,
                         StudentId = stu.StudentId,
                         Status = InternshipApplicationStatus.Placed,
                         AppliedAt = DateTime.UtcNow.AddDays(-30)

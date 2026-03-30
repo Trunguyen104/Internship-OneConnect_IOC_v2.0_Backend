@@ -88,11 +88,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
 
             // Count applications and placed count here for branch decisions
             var applicationsCount = job.InternshipApplications?.Count ?? 0;
-            var placedCount = job.InternshipApplications?.Count(a => a.Status == InternshipApplicationStatus.Placed) ?? 0;
-            if (job.Quantity < placedCount)
-            {
-                return Result<UpdateJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.QuantityCannotBeLessThanPlaced), ResultErrorType.BadRequest);
-            }
+
             // Route handling explicitly by status.
             // Per AC-05 requirements we handle Draft, Published(with/without applications), and Closed separately.
             switch (job.Status)
@@ -165,14 +161,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
         // PUBLISHED without applications: allow full update including InternshipPhase change.
         private async Task<Result<UpdateJobResponse>> HandlePublishedNoAppsAsync(Job job, UpdateJobCommand request, CancellationToken cancellationToken)
         {
-            // Business rule: cannot set Quantity lower than already Placed students
-            var placedCount = job.InternshipApplications?.Count(a => a.Status == InternshipApplicationStatus.Placed) ?? 0;
-            if (request.Quantity.HasValue && request.Quantity.Value < placedCount)
-            {
-                var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.UpdateQuantityLessThanPlaced, placedCount);
-                return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.BadRequest);
-            }
-
             // No confirmation required because there are no active applications
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
@@ -228,14 +216,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
                 // Provide a confirmation conflict result to let frontend ask HR to confirm
                 var confirmMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.UpdateConfirmHasApplications, applicationsCount);
                 return Result<UpdateJobResponse>.Failure(confirmMsg, ResultErrorType.Conflict);
-            }
-
-            // Upon confirmation, validate quantity vs placed
-            var placedCount = job.InternshipApplications?.Count(a => a.Status == InternshipApplicationStatus.Placed) ?? 0;
-            if (request.Quantity.HasValue && request.Quantity.Value < placedCount)
-            {
-                var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.UpdateQuantityLessThanPlaced, placedCount);
-                return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.BadRequest);
             }
 
             // Proceed with update and notify active applicants after successful update
@@ -314,14 +294,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
             if (!request.ExpireDate.HasValue || request.ExpireDate.Value.Date < DateTime.UtcNow.Date)
             {
                 var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenExpireDateInvalid);
-                return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.BadRequest);
-            }
-
-            // Business rule: cannot set Quantity lower than already Placed students
-            var placedCount = job.InternshipApplications?.Count(a => a.Status == InternshipApplicationStatus.Placed) ?? 0;
-            if (request.Quantity.HasValue && request.Quantity.Value < placedCount)
-            {
-                var msg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.UpdateQuantityLessThanPlaced, placedCount);
                 return Result<UpdateJobResponse>.Failure(msg, ResultErrorType.BadRequest);
             }
 
@@ -406,7 +378,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
             job.Requirements = request.Requirements;
             job.Benefit = request.Benefit;
             job.Location = request.Location;
-            job.Quantity = request.Quantity;
             job.ExpireDate = request.ExpireDate;
             job.Audience = request.Audience;
             job.UpdatedAt = DateTime.UtcNow;

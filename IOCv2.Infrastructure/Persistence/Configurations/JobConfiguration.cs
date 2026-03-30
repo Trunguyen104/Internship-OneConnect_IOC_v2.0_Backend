@@ -1,7 +1,6 @@
 using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 
 namespace IOCv2.Infrastructure.Persistence.Configurations
@@ -68,10 +67,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
         builder.Property(j => j.Benefit)
                .HasColumnName("benefit")
                .HasColumnType("text")
-               .IsRequired(false);
-
-        builder.Property(j => j.Quantity)
-               .HasColumnName("quantity")
                .IsRequired(false);
 
         builder.Property(j => j.ExpireDate)

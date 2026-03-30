@@ -38,11 +38,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                 .MaximumLength(255)
                 .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.LocationTooLong));
 
-            RuleFor(x => x.Quantity)
-                .GreaterThan(0)
-                .When(x => x.Quantity.HasValue)
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.QuantityMustBePositive));
-
             // ExpireDate (if provided) must be today or in the future
             RuleFor(x => x.ExpireDate)
                 .Must(date => date == null || date.Value.Date >= DateTime.UtcNow.Date)

@@ -63,11 +63,11 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                 requirements: request.Requirements,
                 benefit: request.Benefit,
                 location: request.Location,
-                quantity: request.Quantity,
                 expireDate: request.ExpireDate);
 
             // Additional properties
             job.Position = request.Position ?? string.Empty;
+            
             job.Audience = request.Audience;
 
             // Because this command represents publishing, set status to PUBLISHED immediately
@@ -81,13 +81,13 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                     _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound),
                     ResultErrorType.NotFound);
             }
-
+            var test = internshipPhase.Status.ToString();
             // Only allow selecting phases that are Open (Upcoming) or InProgress (Active)
             if (internshipPhase.Status != InternshipPhaseStatus.Open && internshipPhase.Status != InternshipPhaseStatus.InProgress)
             {
                 _logger.LogWarning("Internship phase {InternshipPhaseId} is not available for job postings (status {Status}).", request.InternshipPhaseId, internshipPhase.Status);
                 return Result<CreateJobPostingResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
+                    _messageService.GetMessage(MessageKeys.JobPostingMessageKey.InternshipPhaseStatusAllowed),
                     ResultErrorType.BadRequest);
             }
 
@@ -130,7 +130,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
             }
 
             // If targeted, attach the universities (multi-select)
-            if (request.Audience == JobAudience.Targeted)
+            if (job.Audience == JobAudience.Targeted)
             {
                 if (request.UniversityIds == null || !request.UniversityIds.Any())
                 {
