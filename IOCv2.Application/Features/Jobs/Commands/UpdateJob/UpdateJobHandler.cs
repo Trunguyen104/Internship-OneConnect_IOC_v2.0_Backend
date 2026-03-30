@@ -2,6 +2,7 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.Jobs;
+using IOCv2.Application.Features.Notifications.Events;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -23,7 +24,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
         private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<UpdateJobHandler> _logger;
         private readonly IMapper _mapper;
-        private readonly IBackgroundEmailSender _emailSender;
+        private readonly IPublisher _publisher;
 
         public UpdateJobHandler(
             IUnitOfWork unitOfWork,
@@ -31,14 +32,14 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
             ICurrentUserService currentUserService,
             ILogger<UpdateJobHandler> logger,
             IMapper mapper,
-            IBackgroundEmailSender emailSender)
+            IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _currentUserService = currentUserService;
             _logger = logger;
             _mapper = mapper;
-            _emailSender = emailSender;
+            _publisher = publisher;
         }
 
         public async Task<Result<UpdateJobResponse>> Handle(UpdateJobCommand request, CancellationToken cancellationToken)
@@ -209,13 +210,21 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
 
                     if (activeApplications.Any())
                     {
-                        var subject = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenNotifyStudentSubject, job.Title);
-                        var bodyTemplate = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenNotifyStudentBody, job.Title, job.Enterprise?.Name ?? string.Empty);
+                        // Notification message (fallback to Vietnamese string per requirement)
+                        var notificationMessage = _messageService.GetMessage(
+                            MessageKeys.JobPostingMessageKey.ReopenNotifyStudentBody,
+                            job.Title,
+                            job.Enterprise?.Name ?? string.Empty);
+
+                        if (string.IsNullOrWhiteSpace(notificationMessage) || notificationMessage == MessageKeys.JobPostingMessageKey.ReopenNotifyStudentBody)
+                        {
+                            notificationMessage = $"Job Posting [{job.Title}] tại {job.Enterprise?.Name ?? string.Empty} đã được cập nhật và mở lại.";
+                        }
 
                         var distinctUsers = activeApplications
                             .Select(a => a.Student?.User)
-                            .Where(u => u != null && !string.IsNullOrWhiteSpace(u.Email))
-                            .GroupBy(u => u!.Email.ToLowerInvariant())
+                            .Where(u => u != null && u.UserId != Guid.Empty)
+                            .GroupBy(u => u!.UserId)
                             .Select(g => g.First()!)
                             .ToList();
 
@@ -223,14 +232,20 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
                         {
                             try
                             {
-                                await _emailSender.EnqueueEmailAsync(user.Email, subject, bodyTemplate, job.JobId, job.UpdatedBy, cancellationToken);
+                                await _publisher.Publish(new JobReopenedEvent(
+                                    user.UserId,
+                                    job.JobId,
+                                    job.Title ?? string.Empty,
+                                    job.Enterprise?.Name ?? string.Empty,
+                                    notificationMessage), cancellationToken);
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogWarning(ex, "Failed enqueueing reopen-notify email for {Email} about job {JobId}", user.Email, job.JobId);
+                                _logger.LogWarning(ex, "Failed to publish JobReopenedEvent for user {UserId} and job {JobId}", user.UserId, job.JobId);
                             }
                         }
                     }
+
                     var successMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ReopenSuccess, job.Title);
                     return Result<UpdateJobResponse>.Success(response, successMsg);
                 }
