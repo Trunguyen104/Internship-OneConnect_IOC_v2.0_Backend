@@ -25,6 +25,8 @@ namespace IOCv2.Infrastructure.Persistence
             public static readonly Guid SchoolAdminFptCtId = new Guid("33333333-3333-3333-3333-333333330002");
             public static readonly Guid EntAdminRikkeisoftId = new Guid("44444444-4444-4444-4444-444444440002");
             public static readonly Guid MentorRikkeisoftId = new Guid("55555555-5555-5555-5555-555555550002");
+            public static readonly Guid MentorFptAltId = new Guid("55555555-5555-5555-5555-555555550011");
+            public static readonly Guid MentorRikkeisoftAltId = new Guid("55555555-5555-5555-5555-555555550012");
 
             // Added HR seed ids for deterministic seeding
             public static readonly Guid HrFptId = new Guid("77777777-7777-7777-7777-777777770001");
@@ -35,6 +37,8 @@ namespace IOCv2.Infrastructure.Persistence
             // mentor@rikkeisoft.com   → dùng EnterpriseUserId này khi tạo project cho Rikkeisoft groups
             public static readonly Guid MentorFptEuId = new Guid("88888888-8888-8888-8888-888888880001");
             public static readonly Guid MentorRikkeisoftEuId = new Guid("88888888-8888-8888-8888-888888880002");
+            public static readonly Guid MentorFptAltEuId = new Guid("88888888-8888-8888-8888-888888880011");
+            public static readonly Guid MentorRikkeisoftAltEuId = new Guid("88888888-8888-8888-8888-888888880012");
 
             public static readonly List<Guid> StudentIds = new()
             {
@@ -248,6 +252,31 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = mentorEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
                 }
 
+                // Seed a secondary mentor in the same enterprise to support mentor-reassignment scenarios.
+                var mentorAltEmail = $"mentor2@{baseName}.com";
+                if (!existingEmails.Contains(mentorAltEmail))
+                {
+                    var mentorAltUserId = ent.EnterpriseId == SeedIds.FptSoftwareId
+                        ? SeedIds.MentorFptAltId
+                        : ent.EnterpriseId == SeedIds.RikkeisoftId
+                            ? SeedIds.MentorRikkeisoftAltId
+                            : Guid.NewGuid();
+
+                    var mentorAltEuId = ent.EnterpriseId == SeedIds.FptSoftwareId
+                        ? SeedIds.MentorFptAltEuId
+                        : ent.EnterpriseId == SeedIds.RikkeisoftId
+                            ? SeedIds.MentorRikkeisoftAltEuId
+                            : Guid.NewGuid();
+
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
+                    var user = new User(mentorAltUserId, userCode, mentorAltEmail, $"Mentor 2 {ent.Name}", UserRole.Mentor, passHash);
+                    user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(1991, 1, 1), ent.Address);
+                    user.SetStatus(UserStatus.Active);
+                    _context.Users.Add(user);
+                    existingEmails.Add(mentorAltEmail);
+                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = mentorAltEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
+                }
+
                 // HR account (new)
                 var hrEmail = $"hr@{baseName}.com";
                 if (!existingEmails.Contains(hrEmail))
@@ -283,7 +312,7 @@ namespace IOCv2.Infrastructure.Persistence
                 }
             }
 
-            // 4. 5 Specific Students
+            // 4. Seed 10 specific students
             string[] studentEmails = {
                 "student1@fptu.edu.vn",
                 "student2@fptu.edu.vn",
@@ -325,8 +354,13 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 if (!existingEmails.Contains(studentEmails[i]))
                 {
-                    // StudentIds cũ có 5 phần tử, sinh viên 6-10 dùng Guid mới
-                    var userId = i < SeedIds.StudentIds.Count ? SeedIds.StudentIds[i] : Guid.NewGuid();
+                    // Keep student6 deterministic for job-apply tests.
+                    var userId = i switch
+                    {
+                        < 5 => SeedIds.StudentIds[i],
+                        5 => SeedIds.Student6UserId,
+                        _ => Guid.NewGuid()
+                    };
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                     var user = new User(userId, userCode, studentEmails[i], studentNames[i], UserRole.Student, passHash);
                     var gender = i % 2 == 0 ? UserGender.Male : UserGender.Female;
@@ -359,35 +393,6 @@ namespace IOCv2.Infrastructure.Persistence
                 user.SetStatus(UserStatus.Active);
                 _context.Users.Add(user);
                 _context.Students.Add(new Student { StudentId = Guid.NewGuid(), UserId = user.UserId, InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS, Major = "Software Engineering", ClassName = "SE1616" });
-            }
-
-            // New: add a sixth seeded student (student6) with a CV for job-apply testing
-            var student6Email = "student6@fptu.edu.vn";
-            if (!existingEmails.Contains(student6Email))
-            {
-                var userId6 = SeedIds.Student6UserId;
-                var userCode6 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
-                var user6 = new User(userId6, userCode6, student6Email, "Student Six", UserRole.Student, passHash);
-                user6.SetStatus(UserStatus.Active);
-                _context.Users.Add(user6);
-                existingEmails.Add(student6Email);
-
-                var uni6 = universityList.First(u => u.Code == "FPTU");
-                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user6.UserId, UniversityId = uni6.UniversityId });
-
-                var student6 = new Student
-                {
-                    StudentId = Guid.NewGuid(),
-                    UserId = user6.UserId,
-                    InternshipStatus = StudentStatus.APPLIED, // eligible to apply (not in-progress / completed)
-                    Major = "Software Engineering",
-                    ClassName = "SE1616"
-                };
-
-                // Attach CV so student6 can apply to jobs (use a deterministic reachable test URL)
-                student6.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student6_cv.pdf");
-
-                _context.Students.Add(student6);
             }
 
             await _context.SaveChangesAsync();
@@ -649,12 +654,12 @@ namespace IOCv2.Infrastructure.Persistence
             // [NEW] Seed Pending and Rejected Applications
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s4.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Applied, AppliedAt = DateTime.UtcNow.AddDays(-2) });
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, JobId = rikkeiJob.JobId, Status = InternshipApplicationStatus.Applied, AppliedAt = DateTime.UtcNow.AddDays(-2) });
             }
 
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s2.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = fall2025.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Rejected, RejectReason = "Not a good fit for this semester", AppliedAt = DateTime.UtcNow.AddDays(-100) });
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = fall2025.TermId, StudentId = s2.StudentId, JobId = fptJob.JobId, Status = InternshipApplicationStatus.Rejected, RejectReason = "Not a good fit for this semester", AppliedAt = DateTime.UtcNow.AddDays(-100) });
             }
 
             await _context.SaveChangesAsync();
@@ -676,10 +681,10 @@ namespace IOCv2.Infrastructure.Persistence
                     .Match(s.User.Email, @"\d+").Value))
                 .ToList();
 
-            // FPT Software: student1, student2, student3, student6, student7, student8
-            var fstudents = new[] { 0, 1, 2, 5, 6, 7 };
-            // Rikkeisoft:   student4, student5, student9, student10
-            var rstudents = new[] { 3, 4, 8, 9 };
+            // FPT Software: student1, student2, student3, student6, student8
+            var fstudents = new[] { 0, 1, 2, 5, 7 };
+            // Rikkeisoft:   student4, student5, student7, student9, student10
+            var rstudents = new[] { 3, 4, 6, 8, 9 };
 
             foreach (var idx in fstudents)
             {
@@ -696,6 +701,7 @@ namespace IOCv2.Infrastructure.Persistence
                         EnterpriseId = fsoft.EnterpriseId,
                         TermId = spring2026.TermId,
                         StudentId = stu.StudentId,
+                        JobId = fptJob.JobId,
                         Status = InternshipApplicationStatus.Placed,
                         AppliedAt = DateTime.UtcNow.AddDays(-30)
                     });
@@ -717,6 +723,7 @@ namespace IOCv2.Infrastructure.Persistence
                         EnterpriseId = rikkeisoft.EnterpriseId,
                         TermId = spring2026.TermId,
                         StudentId = stu.StudentId,
+                        JobId = rikkeiJob.JobId,
                         Status = InternshipApplicationStatus.Placed,
                         AppliedAt = DateTime.UtcNow.AddDays(-25)
                     });
@@ -789,26 +796,32 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Sprints.Add(cancelledSprint);
 
                 _context.WorkItems.AddRange(
-                    new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = projPending.ProjectId, Title = "Gather Requirements", Type = WorkItemType.Task, Status = WorkItemStatus.Cancelled, AssigneeId = null, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15)) },
                     new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = projPending.ProjectId, Title = "Initial Design", Type = WorkItemType.Task, Status = WorkItemStatus.Todo, AssigneeId = null, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20)) }
                 );
 
-                // [NEW] Add a sub-task for demonstration
-                var requirementsTask = await _context.WorkItems.FirstOrDefaultAsync(w => w.Title == "Gather Requirements" && w.ProjectId == projPending.ProjectId);
-                if (requirementsTask != null)
+                var requirementsTask = new WorkItem
                 {
-                    _context.WorkItems.Add(new WorkItem 
-                    { 
-                        WorkItemId = Guid.NewGuid(), 
-                        ProjectId = projPending.ProjectId, 
-                        ParentId = requirementsTask.WorkItemId, 
-                        Title = "Interview Stakeholders", 
-                        Type = WorkItemType.Task, 
-                        Status = WorkItemStatus.Todo,
-                        Priority = Priority.High,
-                        StoryPoint = 3
-                    });
-                }
+                    WorkItemId = Guid.NewGuid(),
+                    ProjectId = projPending.ProjectId,
+                    Title = "Gather Requirements",
+                    Type = WorkItemType.Task,
+                    Status = WorkItemStatus.Cancelled,
+                    AssigneeId = null,
+                    DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15))
+                };
+                _context.WorkItems.Add(requirementsTask);
+
+                _context.WorkItems.Add(new WorkItem
+                {
+                    WorkItemId = Guid.NewGuid(),
+                    ProjectId = projPending.ProjectId,
+                    ParentId = requirementsTask.WorkItemId,
+                    Title = "Interview Stakeholders",
+                    Type = WorkItemType.Task,
+                    Status = WorkItemStatus.Todo,
+                    Priority = Priority.High,
+                    StoryPoint = 3
+                });
             }
 
             await _context.SaveChangesAsync();
@@ -934,10 +947,52 @@ namespace IOCv2.Infrastructure.Persistence
             var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
             var s6 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student6@fptu.edu.vn");
             var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
+            var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
+            var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
+            var s10 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student10@fptu.edu.vn");
             var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
 
-            // FPT Software OJT Team Alpha: s1(Leader), s2(Member), s3(Member), s6(Member)
+            var spring2026 = await _context.Terms
+                .Include(t => t.University)
+                .FirstOrDefaultAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU");
+
+            if (spring2026 != null)
+            {
+                var assignedEnterpriseByEmail = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["student1@fptu.edu.vn"] = SeedIds.FptSoftwareId,
+                    ["student2@fptu.edu.vn"] = SeedIds.FptSoftwareId,
+                    ["student3@fptu.edu.vn"] = SeedIds.FptSoftwareId,
+                    ["student6@fptu.edu.vn"] = SeedIds.FptSoftwareId,
+                    ["student8@fptu.edu.vn"] = SeedIds.FptSoftwareId,
+                    ["student4@fptu.edu.vn"] = SeedIds.RikkeisoftId,
+                    ["student5@fptu.edu.vn"] = SeedIds.RikkeisoftId,
+                    ["student7@fptu.edu.vn"] = SeedIds.RikkeisoftId,
+                    ["student9@fptu.edu.vn"] = SeedIds.RikkeisoftId,
+                    ["student10@fptu.edu.vn"] = SeedIds.RikkeisoftId
+                };
+
+                var studentTerms = await _context.StudentTerms
+                    .Include(st => st.Student)
+                        .ThenInclude(s => s.User)
+                    .Where(st => st.TermId == spring2026.TermId
+                                 && st.Student.User.Email.StartsWith("student")
+                                 && st.Student.User.Email.EndsWith("@fptu.edu.vn")
+                                 && st.DeletedAt == null)
+                    .ToListAsync();
+
+                foreach (var studentTerm in studentTerms)
+                {
+                    if (assignedEnterpriseByEmail.TryGetValue(studentTerm.Student.User.Email, out var enterpriseId)
+                        && studentTerm.EnterpriseId != enterpriseId)
+                    {
+                        studentTerm.EnterpriseId = enterpriseId;
+                    }
+                }
+            }
+
+            // FPT Software OJT Team Alpha: s1(Leader), s2/s3/s6/s8(Member)
             bool fptHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == fptGroup.InternshipId);
             if (!fptHasStudents)
             {
@@ -945,17 +1000,78 @@ namespace IOCv2.Infrastructure.Persistence
                 if (s2 != null) fptGroup.AddMember(s2.StudentId, InternshipRole.Member);
                 if (s3 != null) fptGroup.AddMember(s3.StudentId, InternshipRole.Member);
                 if (s6 != null) fptGroup.AddMember(s6.StudentId, InternshipRole.Member);
+                if (s8 != null) fptGroup.AddMember(s8.StudentId, InternshipRole.Member);
                 _context.InternshipGroups.Update(fptGroup);
             }
 
-            // Rikkeisoft Spring 2026 Team: s4(Leader), s5(Member), s7(Member)
+            // Rikkeisoft Spring 2026 Team: s4(Leader), s5/s7/s9/s10(Member)
             bool rikkeiHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == rikkeiGroup.InternshipId);
             if (!rikkeiHasStudents)
             {
                 if (s4 != null) rikkeiGroup.AddMember(s4.StudentId, InternshipRole.Leader);
                 if (s5 != null) rikkeiGroup.AddMember(s5.StudentId, InternshipRole.Member);
                 if (s7 != null) rikkeiGroup.AddMember(s7.StudentId, InternshipRole.Member);
+                if (s9 != null) rikkeiGroup.AddMember(s9.StudentId, InternshipRole.Member);
+                if (s10 != null) rikkeiGroup.AddMember(s10.StudentId, InternshipRole.Member);
                 _context.InternshipGroups.Update(rikkeiGroup);
+            }
+
+            // Keep deterministic joined dates for UI test scenarios:
+            // - s3: enough logbooks despite many violations
+            // - s7: few violations but many missing logbooks
+            var s3Membership = await _context.InternshipStudents
+                .FirstOrDefaultAsync(m => m.InternshipId == fptGroup.InternshipId && s3 != null && m.StudentId == s3.StudentId);
+            if (s3Membership != null)
+            {
+                var s3TargetJoinedAt = DateTime.UtcNow.Date.AddDays(-4);
+                if (s3Membership.JoinedAt > s3TargetJoinedAt)
+                {
+                    s3Membership.JoinedAt = s3TargetJoinedAt;
+                }
+            }
+
+            var s7Membership = await _context.InternshipStudents
+                .FirstOrDefaultAsync(m => m.InternshipId == rikkeiGroup.InternshipId && s7 != null && m.StudentId == s7.StudentId);
+            if (s7Membership != null)
+            {
+                var s7TargetJoinedAt = DateTime.UtcNow.Date.AddDays(-12);
+                if (s7Membership.JoinedAt > s7TargetJoinedAt)
+                {
+                    s7Membership.JoinedAt = s7TargetJoinedAt;
+                }
+            }
+
+            var s8Membership = await _context.InternshipStudents
+                .FirstOrDefaultAsync(m => m.InternshipId == fptGroup.InternshipId && s8 != null && m.StudentId == s8.StudentId);
+            if (s8Membership != null)
+            {
+                var s8TargetJoinedAt = DateTime.UtcNow.Date.AddDays(-5);
+                if (s8Membership.JoinedAt > s8TargetJoinedAt)
+                {
+                    s8Membership.JoinedAt = s8TargetJoinedAt;
+                }
+            }
+
+            var s9Membership = await _context.InternshipStudents
+                .FirstOrDefaultAsync(m => m.InternshipId == rikkeiGroup.InternshipId && s9 != null && m.StudentId == s9.StudentId);
+            if (s9Membership != null)
+            {
+                var s9TargetJoinedAt = DateTime.UtcNow.Date.AddDays(-8);
+                if (s9Membership.JoinedAt > s9TargetJoinedAt)
+                {
+                    s9Membership.JoinedAt = s9TargetJoinedAt;
+                }
+            }
+
+            var s10Membership = await _context.InternshipStudents
+                .FirstOrDefaultAsync(m => m.InternshipId == rikkeiGroup.InternshipId && s10 != null && m.StudentId == s10.StudentId);
+            if (s10Membership != null)
+            {
+                var s10TargetJoinedAt = DateTime.UtcNow.Date.AddDays(-9);
+                if (s10Membership.JoinedAt > s10TargetJoinedAt)
+                {
+                    s10Membership.JoinedAt = s10TargetJoinedAt;
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -965,33 +1081,407 @@ namespace IOCv2.Infrastructure.Persistence
         {
             var proj3 = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectName == "IOC v2.0 Platform");
             var proj5 = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectName == "Legacy CRM Maintenance");
+            var rikkeiProj = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectName == "Rikkeisoft Internal Portal");
             var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
             var s2 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student2@fptu.edu.vn");
             var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            var s6 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student6@fptu.edu.vn");
+            var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
+            var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
+            var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
+            var s10 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student10@fptu.edu.vn");
 
             if (proj3 == null || proj5 == null || s3 == null || s5 == null || !proj3.InternshipId.HasValue || !proj5.InternshipId.HasValue) return;
 
             var proj3InternshipId = proj3.InternshipId.Value;
             var proj5InternshipId = proj5.InternshipId.Value;
 
-            if (!await _context.Logbooks.AnyAsync())
+            Guid? rikkeiInternshipId = rikkeiProj?.InternshipId;
+
+            var internshipWindows = await _context.InternshipGroups
+                .Where(g => g.InternshipId == proj3InternshipId
+                         || g.InternshipId == proj5InternshipId
+                         || (rikkeiInternshipId.HasValue && g.InternshipId == rikkeiInternshipId.Value))
+                .ToDictionaryAsync(
+                    g => g.InternshipId,
+                    g => new { StartDate = g.StartDate?.Date, EndDate = g.EndDate?.Date });
+
+            static DateTime GetStartOfWeek(DateTime date)
             {
-                _context.Logbooks.AddRange(
-                    Logbook.Create(proj3InternshipId, s3.StudentId, "Integrated basic project structure.", null, "Focus on Auth module.", DateTime.UtcNow.AddDays(-7)),
-                    Logbook.Create(proj3InternshipId, s3.StudentId, "Started JWT implementation.", "Encountered some middleware issues.", "Resolve middleware and test login.", DateTime.UtcNow.AddDays(-1))
-                );
-
-                if (s1 != null) _context.Logbooks.Add(Logbook.Create(proj3InternshipId, s1.StudentId, "Initial requirement analysis and documentation.", null, "Finalize SRS.", DateTime.UtcNow.AddDays(-6)));
-                if (s2 != null) _context.Logbooks.Add(Logbook.Create(proj3InternshipId, s2.StudentId, "UI/UX wireframing for main dashboard.", "Feedback from PO required.", "Update Figma design.", DateTime.UtcNow.AddDays(-5)));
-
-                for (int i = 1; i <= 4; i++)
-                {
-                    _context.Logbooks.Add(Logbook.Create(proj5InternshipId, s5.StudentId, $"Work report {i}", null, "Continue next task", DateTime.UtcNow.AddMonths(-6 + i)));
-                }
-                
-                await _context.SaveChangesAsync();
+                var diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+                return date.Date.AddDays(-diff);
             }
+
+            DateTime NormalizeReportDate(Guid internshipId, DateTime reportDate)
+            {
+                var normalized = reportDate.Date;
+                var today = DateTime.UtcNow.Date;
+
+                if (normalized > today)
+                {
+                    normalized = today;
+                }
+
+                if (internshipWindows.TryGetValue(internshipId, out var window))
+                {
+                    if (window.StartDate.HasValue && normalized < window.StartDate.Value)
+                    {
+                        normalized = window.StartDate.Value;
+                    }
+
+                    if (window.EndDate.HasValue && normalized > window.EndDate.Value)
+                    {
+                        normalized = window.EndDate.Value;
+                    }
+                }
+
+                return normalized;
+            }
+
+            var currentWeekStart = GetStartOfWeek(DateTime.UtcNow.Date);
+            var lastCompletedWeekStart = currentWeekStart.AddDays(-7);
+
+            var logbookSeeds = new List<(Guid InternshipId, Guid StudentId, string Summary, string? Issue, string Plan, DateTime DateReport, bool IsLate)>();
+
+            void AddLog(
+                Guid internshipId,
+                Guid studentId,
+                string summary,
+                string? issue,
+                string plan,
+                DateTime dateReport,
+                bool isLate)
+            {
+                logbookSeeds.Add((
+                    internshipId,
+                    studentId,
+                    summary,
+                    issue,
+                    plan,
+                    NormalizeReportDate(internshipId, dateReport),
+                    isLate));
+            }
+
+            List<DateTime> BuildWeekStarts(Guid internshipId, int maxWeeks)
+            {
+                var defaultStart = currentWeekStart.AddDays(-28);
+                var start = defaultStart;
+
+                if (internshipWindows.TryGetValue(internshipId, out var window) && window.StartDate.HasValue && window.StartDate.Value > defaultStart)
+                {
+                    start = GetStartOfWeek(window.StartDate.Value);
+                }
+
+                var weekStarts = new List<DateTime>();
+                for (var weekStart = start; weekStart <= lastCompletedWeekStart && weekStarts.Count < maxWeeks; weekStart = weekStart.AddDays(7))
+                {
+                    weekStarts.Add(weekStart);
+                }
+
+                if (weekStarts.Count == 0)
+                {
+                    weekStarts.Add(lastCompletedWeekStart);
+                }
+
+                return weekStarts;
+            }
+
+            void AddWeekLogs(
+                Guid internshipId,
+                Guid studentId,
+                int weekNumber,
+                DateTime weekStart,
+                string weekTheme,
+                string[] dailyWork,
+                bool[] lateFlags)
+            {
+                var dayNames = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
+                var weekTitle = weekNumber switch
+                {
+                    1 => "Kickoff & Research",
+                    2 => "Implementation & Testing",
+                    3 => "Optimization & Stabilization",
+                    4 => "Release & Handover",
+                    _ => "Execution"
+                };
+
+                for (var i = 0; i < 5; i++)
+                {
+                    var isLate = lateFlags.Length > i && lateFlags[i];
+                    var badge = isLate ? "Late" : "Submitted";
+                    var issue = isLate
+                        ? "Late submission due to pending refinement before mentor handoff."
+                        : null;
+
+                    AddLog(
+                        internshipId,
+                        studentId,
+                        $"Week {weekNumber}: {weekTitle} - {dayNames[i]}: {dailyWork[i]} (Status Badge: {badge})",
+                        issue,
+                        $"Next: continue {weekTheme.ToLowerInvariant()} work and keep daily update cadence.",
+                        weekStart.AddDays(i),
+                        isLate);
+                }
+            }
+
+            // FPT active group: 4 weeks x Mon-Fri, with intentional Submitted vs Late badges.
+            var fptWeekStarts = BuildWeekStarts(proj3InternshipId, 4);
+
+            if (s3 != null)
+            {
+                var s3Late = new[]
+                {
+                    new[] { false, false, false, false, false },
+                    new[] { false, true,  true, true, true },
+                    new[] { false, false, false, true,  false },
+                    new[] { false, false, false, false, false }
+                };
+
+                var s3Daily = new[]
+                {
+                    new[]
+                    {
+                        "Set up environment, dependencies, and onboarding checklist",
+                        "Drafted authentication module boundaries",
+                        "Implemented login flow with token issuance",
+                        "Added unit tests for auth service",
+                        "Reviewed PR feedback and refactored middleware"
+                    },
+                    new[]
+                    {
+                        "Built internship dashboard API contract",
+                        "Implemented role guard matrix for Mentor/UniAdmin",
+                        "Added exception mapping for auth endpoints",
+                        "Improved API response consistency",
+                        "Prepared integration test scenarios"
+                    },
+                    new[]
+                    {
+                        "Optimized pagination query for internship listing",
+                        "Added cache key normalization for list endpoints",
+                        "Implemented notification read-state API",
+                        "Hardened validation for update commands",
+                        "Documented backend conventions and error catalog"
+                    },
+                    new[]
+                    {
+                        "Ran smoke tests for release candidate",
+                        "Fixed edge cases from QA report",
+                        "Improved audit logging granularity",
+                        "Aligned API docs with current response shape",
+                        "Prepared demo script and handover notes"
+                    }
+                };
+
+                for (var w = 0; w < fptWeekStarts.Count && w < 4; w++)
+                {
+                    AddWeekLogs(
+                        proj3InternshipId,
+                        s3.StudentId,
+                        w + 1,
+                        fptWeekStarts[w],
+                        "FPT IOC v2 backend delivery",
+                        s3Daily[w],
+                        s3Late[w]);
+                }
+            }
+
+            if (s6 != null)
+            {
+                var s6Week2 = fptWeekStarts.Count >= 2 ? fptWeekStarts[1] : lastCompletedWeekStart;
+                var s6Week3 = fptWeekStarts.Count >= 3 ? fptWeekStarts[2] : lastCompletedWeekStart;
+
+                AddWeekLogs(
+                    proj3InternshipId,
+                    s6.StudentId,
+                    2,
+                    s6Week2,
+                    "API quality assurance",
+                    new[]
+                    {
+                        "Executed API smoke tests for core modules",
+                        "Added negative tests for authentication failures",
+                        "Validated status filters and sort order behavior",
+                        "Checked cache invalidation after create/update",
+                        "Consolidated failing test diagnostics"
+                    },
+                    new[] { false, false, true, false, false });
+
+                AddWeekLogs(
+                    proj3InternshipId,
+                    s6.StudentId,
+                    3,
+                    s6Week3,
+                    "test hardening and CI stability",
+                    new[]
+                    {
+                        "Triaged flaky tests from CI nightly run",
+                        "Improved test fixture isolation",
+                        "Parallelized selected integration suites",
+                        "Added retry policy for transient db timeouts",
+                        "Published test reliability report"
+                    },
+                    new[] { false, false, false, false, true });
+            }
+
+            if (s1 != null)
+            {
+                var s1Week3 = fptWeekStarts.Count >= 3 ? fptWeekStarts[2] : lastCompletedWeekStart;
+                var s1Week4 = fptWeekStarts.Count >= 4 ? fptWeekStarts[3] : lastCompletedWeekStart;
+
+                AddWeekLogs(
+                    proj3InternshipId,
+                    s1.StudentId,
+                    3,
+                    s1Week3,
+                    "project coordination and risk tracking",
+                    new[]
+                    {
+                        "Prepared sprint board and daily ownership mapping",
+                        "Reviewed blockers with mentor and aligned priorities",
+                        "Updated requirement traceability matrix",
+                        "Consolidated status report for stakeholders",
+                        "Closed week with retrospective action items"
+                    },
+                    new[] { false, false, false, false, false });
+
+                AddWeekLogs(
+                    proj3InternshipId,
+                    s1.StudentId,
+                    4,
+                    s1Week4,
+                    "demo readiness and release prep",
+                    new[]
+                    {
+                        "Finalized demo flow and environment checklist",
+                        "Validated end-to-end happy path",
+                        "Collected outstanding bug tickets",
+                        "Performed regression pass with QA",
+                        "Delivered final weekly summary"
+                    },
+                    new[] { false, true, false, false, false });
+            }
+
+            // Add active Rikkeisoft logs to validate cross-enterprise list/detail scenarios.
+            if (rikkeiInternshipId.HasValue)
+            {
+                var rikkeiWeekStarts = BuildWeekStarts(rikkeiInternshipId.Value, 3);
+
+                if (s7 != null)
+                {
+                    for (var w = 0; w < rikkeiWeekStarts.Count; w++)
+                    {
+                        AddWeekLogs(
+                            rikkeiInternshipId.Value,
+                            s7.StudentId,
+                            w + 1,
+                            rikkeiWeekStarts[w],
+                            "Rikkeisoft internal portal delivery",
+                            new[]
+                            {
+                                "Set up UI shell and role-aware navigation",
+                                "Implemented profile module interactions",
+                                "Integrated permission matrix with backend",
+                                "Reviewed feedback from mentor walkthrough",
+                                "Prepared weekly handover notes"
+                            },
+                            w == 0
+                                ? new[] { false, true, true, false, true }
+                                : new[] { false, false, true, false, false });
+                    }
+                }
+
+                if (s4 != null && rikkeiWeekStarts.Count > 0)
+                {
+                    AddWeekLogs(
+                        rikkeiInternshipId.Value,
+                        s4.StudentId,
+                        1,
+                        rikkeiWeekStarts[0],
+                        "API contract and auth endpoint alignment",
+                        new[]
+                        {
+                            "Reviewed internal portal API contract",
+                            "Mapped permission inheritance edge cases",
+                            "Implemented auth endpoint draft",
+                            "Added response validation for profile APIs",
+                            "Refined DTO naming for FE consistency"
+                        },
+                        new[] { false, false, false, true, false });
+                }
+            }
+
+            // Historical group logs: 2 completed workweeks (Mon-Fri) for timeline/history screens.
+            if (internshipWindows.TryGetValue(proj5InternshipId, out var historicalWindow) && historicalWindow.EndDate.HasValue)
+            {
+                var historicalWeek2 = GetStartOfWeek(historicalWindow.EndDate.Value).AddDays(-14);
+                var historicalWeek1 = historicalWeek2.AddDays(-7);
+
+                AddWeekLogs(
+                    proj5InternshipId,
+                    s5.StudentId,
+                    1,
+                    historicalWeek1,
+                    "legacy CRM maintenance",
+                    new[]
+                    {
+                        "Investigated bug clusters in legacy billing module",
+                        "Patched null-handling in old service layer",
+                        "Verified SQL script backward compatibility",
+                        "Validated report generation in staging",
+                        "Summarized mitigation notes for maintenance runbook"
+                    },
+                    new[] { false, false, true, false, false });
+
+                AddWeekLogs(
+                    proj5InternshipId,
+                    s5.StudentId,
+                    2,
+                    historicalWeek2,
+                    "release hardening and documentation",
+                    new[]
+                    {
+                        "Reviewed unresolved production bug tickets",
+                        "Applied fixes for CRM sync scheduler",
+                        "Updated deployment rollback checklist",
+                        "Ran post-deploy verification tests",
+                        "Closed sprint with release report"
+                    },
+                    new[] { false, false, false, false, true });
+            }
+
+            foreach (var seed in logbookSeeds)
+            {
+                var exists = await _context.Logbooks.AnyAsync(l =>
+                    l.InternshipId == seed.InternshipId
+                    && l.StudentId == seed.StudentId
+                    && l.Summary == seed.Summary
+                    && l.DateReport.Date == seed.DateReport.Date
+                    && l.DeletedAt == null);
+
+                if (!exists)
+                {
+                    var logbook = Logbook.Create(
+                        seed.InternshipId,
+                        seed.StudentId,
+                        seed.Summary,
+                        seed.Issue,
+                        seed.Plan,
+                        seed.DateReport);
+
+                    // Control status for UI badge scenarios: Submitted (PUNCTUAL) vs Late (LATE).
+                    logbook.CreatedAt = seed.IsLate
+                        ? seed.DateReport.Date.AddDays(1).AddHours(9)
+                        : seed.DateReport.Date.AddHours(9);
+                    logbook.Update(seed.Summary, seed.Issue, seed.Plan, seed.DateReport);
+
+                    _context.Logbooks.Add(logbook);
+                }
+            }
+
+            await _context.SaveChangesAsync();
 
             // [NEW] Link WorkItems to Logbooks if not already linked (Using direct SQL for shadow junction table)
             bool alreadyLinked = await _context.Logbooks.AnyAsync(l => l.WorkItems.Any());
@@ -1064,7 +1554,7 @@ namespace IOCv2.Infrastructure.Persistence
         private async Task SeedEvaluations()
         {
             var phaseFptSpring = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.Name == "FPT Software Spring 2026");
-            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team");
+            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
             var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
             var mentorFpt = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
 
@@ -1148,20 +1638,77 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedViolationReports()
         {
-            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team");
-            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
+            var rikkeiGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
+            var historicalGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
 
-            if (group3 != null && s3 != null && !await _context.Set<ViolationReport>().AnyAsync(v => v.StudentId == s3.StudentId))
+            var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
+            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
+            var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
+            var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
+            var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
+            var s10 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student10@fptu.edu.vn");
+
+            var violationSeeds = new List<(Guid StudentId, Guid GroupId, DateOnly OccurredDate, string Description)>();
+
+            if (group3 != null)
             {
+                if (s1 != null)
+                    violationSeeds.Add((s1.StudentId, group3.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-6)), "Late check-in without prior notice."));
+
+                if (s3 != null)
+                {
+                    violationSeeds.Add((s3.StudentId, group3.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)), "Student missed the team meeting twice without notice."));
+                    violationSeeds.Add((s3.StudentId, group3.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)), "Submitted daily report after cutoff time."));
+                    violationSeeds.Add((s3.StudentId, group3.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-4)), "Skipped mandatory code review session."));
+                    violationSeeds.Add((s3.StudentId, group3.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-3)), "Did not update task status before stand-up."));
+                }
+
+                if (s8 != null)
+                    violationSeeds.Add((s8.StudentId, group3.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)), "Pushed changes directly to protected branch without PR."));
+            }
+
+            if (rikkeiGroup != null)
+            {
+                if (s4 != null)
+                    violationSeeds.Add((s4.StudentId, rikkeiGroup.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-3)), "Did not follow pull-request review checklist."));
+
+                if (s7 != null)
+                    violationSeeds.Add((s7.StudentId, rikkeiGroup.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)), "Absent in daily stand-up without informing mentor."));
+
+                if (s9 != null)
+                    violationSeeds.Add((s9.StudentId, rikkeiGroup.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)), "Missed bug triage session and did not update Jira ticket."));
+
+                if (s10 != null)
+                    violationSeeds.Add((s10.StudentId, rikkeiGroup.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-4)), "Did not submit weekly report before mentor review window."));
+            }
+
+            if (historicalGroup != null && s5 != null)
+                violationSeeds.Add((s5.StudentId, historicalGroup.InternshipId, DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-4)), "Missed legacy deployment checklist during final sprint."));
+
+            foreach (var seed in violationSeeds)
+            {
+                var exists = await _context.Set<ViolationReport>().AnyAsync(v =>
+                    v.StudentId == seed.StudentId
+                    && v.InternshipGroupId == seed.GroupId
+                    && v.OccurredDate == seed.OccurredDate
+                    && v.Description == seed.Description
+                    && v.DeletedAt == null);
+
+                if (exists) continue;
+
                 _context.Set<ViolationReport>().Add(new ViolationReport
                 {
                     ViolationReportId = Guid.NewGuid(),
-                    StudentId = s3.StudentId,
-                    InternshipGroupId = group3.InternshipId,
-                    OccurredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-2)),
-                    Description = "Student missed the team meeting twice without notice."
+                    StudentId = seed.StudentId,
+                    InternshipGroupId = seed.GroupId,
+                    OccurredDate = seed.OccurredDate,
+                    Description = seed.Description
                 });
             }
+
             await _context.SaveChangesAsync();
         }
 
@@ -1250,7 +1797,7 @@ namespace IOCv2.Infrastructure.Persistence
 
             if (mentorFpt != null)
             {
-                var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team");
+                var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
                 if (group3 != null)
                 {
                     _context.AuditLogs.Add(new AuditLog 

@@ -5,6 +5,8 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -105,6 +107,208 @@ namespace IOCv2.Tests.Features.InternshipGroups
             // Assert
             result.IsSuccess.Should().BeFalse();
             result.ErrorType.Should().Be(ResultErrorType.NotFound);
+        }
+
+        [Fact]
+        public async Task Handle_WhenMentorChanged_ShouldSyncProjectMentorOwnership()
+        {
+            // Arrange
+            var phaseId = Guid.NewGuid();
+            var enterpriseId = Guid.NewGuid();
+            var oldMentorEnterpriseUserId = Guid.NewGuid();
+            var newMentorUserId = Guid.NewGuid();
+            var newMentorEnterpriseUserId = Guid.NewGuid();
+
+            var existingGroup = InternshipGroup.Create(
+                phaseId,
+                "Old Name",
+                mentorId: oldMentorEnterpriseUserId);
+
+            var internshipId = existingGroup.InternshipId;
+            var project = Project.Create(
+                "Project A",
+                "Desc",
+                "PRJ-A",
+                "IT",
+                "Req",
+                mentorId: oldMentorEnterpriseUserId);
+            project.AssignToGroup(internshipId, DateTime.UtcNow.Date.AddDays(-3), DateTime.UtcNow.Date.AddDays(7));
+
+            var command = new UpdateInternshipGroupCommand
+            {
+                InternshipId = internshipId,
+                PhaseId = phaseId,
+                GroupName = "Updated Name",
+                EnterpriseId = enterpriseId,
+                MentorId = newMentorUserId
+            };
+
+            var mentorUser = new User(newMentorUserId, "M001", "mentor@rikkei.com", "Mentor Rikkei", UserRole.Mentor, "hashed");
+            var mentorEnterpriseUser = new EnterpriseUser
+            {
+                EnterpriseUserId = newMentorEnterpriseUserId,
+                UserId = newMentorUserId,
+                EnterpriseId = enterpriseId,
+                User = mentorUser
+            };
+            var mockProjectRepo = new Mock<IGenericRepository<Project>>();
+
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
+                .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
+
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().Query())
+                .Returns(new List<EnterpriseUser> { mentorEnterpriseUser }.BuildMock());
+
+            _mockUnitOfWork.Setup(x => x.Repository<Project>())
+                .Returns(mockProjectRepo.Object);
+            mockProjectRepo.Setup(x => x.Query())
+                .Returns(new List<Project> { project }.BuildMock());
+
+            mockProjectRepo.Setup(x => x.ExecuteUpdateAsync(
+                    It.IsAny<Expression<Func<Project, bool>>>(),
+                    It.IsAny<Expression<Func<SetPropertyCalls<Project>, SetPropertyCalls<Project>>>>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+
+            _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            _mockMapper.Setup(x => x.Map<UpdateInternshipGroupResponse>(It.IsAny<InternshipGroup>()))
+                .Returns(new UpdateInternshipGroupResponse { InternshipId = internshipId, GroupName = "Updated Name" });
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            mockProjectRepo.Verify(x => x.ExecuteUpdateAsync(
+                    It.IsAny<Expression<Func<Project, bool>>>(),
+                    It.IsAny<Expression<Func<SetPropertyCalls<Project>, SetPropertyCalls<Project>>>>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+            _mockCacheService.Verify(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeast(2));
+        }
+
+        [Fact]
+        public async Task Handle_WhenMentorUnchanged_ShouldNotUpdateProjectMentorOwnership()
+        {
+            // Arrange
+            var phaseId = Guid.NewGuid();
+            var enterpriseId = Guid.NewGuid();
+            var mentorUserId = Guid.NewGuid();
+            var mentorEnterpriseUserId = Guid.NewGuid();
+
+            var existingGroup = InternshipGroup.Create(
+                phaseId,
+                "Team A",
+                enterpriseId: enterpriseId,
+                mentorId: mentorEnterpriseUserId);
+
+            var command = new UpdateInternshipGroupCommand
+            {
+                InternshipId = existingGroup.InternshipId,
+                PhaseId = phaseId,
+                GroupName = "Team A Updated",
+                MentorId = mentorUserId
+            };
+
+            var mentorUser = new User(mentorUserId, "M002", "mentor.same@rikkei.com", "Mentor Same", UserRole.Mentor, "hashed");
+            var mentorEnterpriseUser = new EnterpriseUser
+            {
+                EnterpriseUserId = mentorEnterpriseUserId,
+                UserId = mentorUserId,
+                EnterpriseId = enterpriseId,
+                User = mentorUser
+            };
+
+            var mockProjectRepo = new Mock<IGenericRepository<Project>>();
+
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
+                .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().Query())
+                .Returns(new List<EnterpriseUser> { mentorEnterpriseUser }.BuildMock());
+            _mockUnitOfWork.Setup(x => x.Repository<Project>())
+                .Returns(mockProjectRepo.Object);
+            _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+            _mockMapper.Setup(x => x.Map<UpdateInternshipGroupResponse>(It.IsAny<InternshipGroup>()))
+                .Returns(new UpdateInternshipGroupResponse { InternshipId = existingGroup.InternshipId, GroupName = "Team A Updated" });
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            mockProjectRepo.Verify(x => x.ExecuteUpdateAsync(
+                    It.IsAny<Expression<Func<Project, bool>>>(),
+                    It.IsAny<Expression<Func<SetPropertyCalls<Project>, SetPropertyCalls<Project>>>>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
+            _mockCacheService.Verify(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_WhenMentorDifferentEnterprise_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var phaseId = Guid.NewGuid();
+            var groupEnterpriseId = Guid.NewGuid();
+            var mentorEnterpriseId = Guid.NewGuid();
+            var mentorUserId = Guid.NewGuid();
+
+            var existingGroup = InternshipGroup.Create(
+                phaseId,
+                "Team B",
+                enterpriseId: groupEnterpriseId,
+                mentorId: Guid.NewGuid());
+
+            var command = new UpdateInternshipGroupCommand
+            {
+                InternshipId = existingGroup.InternshipId,
+                PhaseId = phaseId,
+                GroupName = "Team B Updated",
+                MentorId = mentorUserId
+            };
+
+            var mentorUser = new User(mentorUserId, "M003", "mentor.other@fpt.com", "Mentor Other", UserRole.Mentor, "hashed");
+            var mentorEnterpriseUser = new EnterpriseUser
+            {
+                EnterpriseUserId = Guid.NewGuid(),
+                UserId = mentorUserId,
+                EnterpriseId = mentorEnterpriseId,
+                User = mentorUser
+            };
+
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
+                .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().Query())
+                .Returns(new List<EnterpriseUser> { mentorEnterpriseUser }.BuildMock());
+            _mockMessageService.Setup(x => x.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise))
+                .Returns("Mentor must belong to the same enterprise as group.");
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorType.Should().Be(ResultErrorType.BadRequest);
+            _mockUnitOfWork.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

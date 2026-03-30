@@ -161,15 +161,20 @@ public class GetUniAdminStudentDetailHandler
 
         // Logbook count
         var logbookCount = 0;
+        var weeklyLogbooks = new List<UniAdminWeeklyLogbookDto>();
         if (internStudent != null && group != null)
         {
-            logbookCount = await _unitOfWork.Repository<Logbook>().Query()
+            var studentLogbooks = await _unitOfWork.Repository<Logbook>().Query()
                 .AsNoTracking()
-                .CountAsync(l =>
+                .Where(l =>
                     l.InternshipId == internStudent.InternshipId
                     && l.StudentId == request.StudentId
-                    && l.DeletedAt == null,
-                    cancellationToken);
+                    && l.DeletedAt == null)
+                .OrderBy(l => l.DateReport)
+                .ToListAsync(cancellationToken);
+
+            logbookCount = studentLogbooks.Count;
+            weeklyLogbooks = BuildWeeklyLogbooks(studentLogbooks, group.StartDate);
         }
 
         var logbookSummary = CalculateLogbookSummary(internStudent, group, logbookCount);
@@ -222,6 +227,7 @@ public class GetUniAdminStudentDetailHandler
             MentorName = group?.Mentor?.User?.FullName,
             MentorEmail = group?.Mentor?.User?.Email,
             Logbook = logbookSummary,
+            LogbookWeeks = weeklyLogbooks,
             ViolationCount = violationCount,
             PublishedEvaluationCount = publishedEvalCount
         };
@@ -287,5 +293,79 @@ public class GetUniAdminStudentDetailHandler
                 count++;
         }
         return count;
+    }
+
+    private static List<UniAdminWeeklyLogbookDto> BuildWeeklyLogbooks(
+        List<Logbook> logbooks,
+        DateTime? groupStartDate)
+    {
+        if (logbooks.Count == 0)
+            return new List<UniAdminWeeklyLogbookDto>();
+
+        var anchor = GetStartOfWeek((groupStartDate ?? logbooks.Min(x => x.DateReport)).Date);
+
+        return logbooks
+            .GroupBy(x => GetWeekNumber(x.DateReport, anchor))
+            .OrderBy(x => x.Key)
+            .Select(g =>
+            {
+                var weekStart = anchor.AddDays((g.Key - 1) * 7);
+                var weekEnd = weekStart.AddDays(4);
+
+                var entries = g
+                    .OrderBy(x => x.DateReport)
+                    .Select(x => new UniAdminWeeklyLogbookEntryDto
+                    {
+                        LogbookId = x.LogbookId,
+                        DateReport = x.DateReport,
+                        Summary = x.Summary,
+                        Issue = x.Issue,
+                        Plan = x.Plan,
+                        Status = x.Status,
+                        StatusBadge = x.Status == LogbookStatus.LATE ? "Late" : "Submitted"
+                    })
+                    .ToList();
+
+                var submittedCount = entries.Count(x => x.Status != LogbookStatus.LATE);
+                var lateCount = entries.Count(x => x.Status == LogbookStatus.LATE);
+                var totalCount = entries.Count;
+
+                return new UniAdminWeeklyLogbookDto
+                {
+                    WeekNumber = g.Key,
+                    WeekTitle = $"Week {g.Key}: {GetWeekTheme(g.Key)}",
+                    WeekStartDate = weekStart,
+                    WeekEndDate = weekEnd,
+                    SubmittedCount = submittedCount,
+                    LateCount = lateCount,
+                    TotalCount = totalCount,
+                    CompletionRatio = $"{submittedCount}/{totalCount}",
+                    Entries = entries
+                };
+            })
+            .ToList();
+    }
+
+    private static DateTime GetStartOfWeek(DateTime date)
+    {
+        var diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+        return date.Date.AddDays(-diff);
+    }
+
+    private static int GetWeekNumber(DateTime date, DateTime anchor)
+    {
+        return ((date.Date - anchor).Days / 7) + 1;
+    }
+
+    private static string GetWeekTheme(int weekNumber)
+    {
+        return weekNumber switch
+        {
+            1 => "Kickoff & Research",
+            2 => "Implementation & Testing",
+            3 => "Optimization & Stabilization",
+            4 => "Release & Handover",
+            _ => "Execution"
+        };
     }
 }

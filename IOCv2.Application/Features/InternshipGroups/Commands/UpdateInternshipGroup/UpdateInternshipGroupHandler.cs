@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Common;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -57,6 +58,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                         ResultErrorType.BadRequest);
                 }
 
+                var oldMentorId = entity.MentorId;
+
                 // Validate PhaseId
                 var phaseExists = await _unitOfWork.Repository<InternshipPhase>()
                     .ExistsAsync(p => p.PhaseId == request.PhaseId, cancellationToken);
@@ -78,8 +81,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     }
                 }
 
+                // Keep current mentor unless request explicitly provides a new mentor.
+                Guid? resolvedMentorId = entity.MentorId;
+                var effectiveEnterpriseId = request.EnterpriseId ?? entity.EnterpriseId;
+
                 // Validate MentorId if provided — request truyền UserId
-                Guid? resolvedMentorId = null;
                 if (request.MentorId.HasValue)
                 {
                     // Frontend truyền UserId của mentor → tìm ra EnterpriseUserId để lưu DB
@@ -96,7 +102,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     }
 
                     // Chỉ chấp nhận tài khoản có role Mentor
-                    if (mentor.User == null || mentor.User.Role != IOCv2.Domain.Enums.UserRole.Mentor)
+                    if (mentor.User.Role != UserRole.Mentor)
                     {
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorRoleInvalid), request.MentorId);
                         return Result<UpdateInternshipGroupResponse>.Failure(
@@ -104,8 +110,27 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                             ResultErrorType.BadRequest);
                     }
 
+                    if (!effectiveEnterpriseId.HasValue || mentor.EnterpriseId != effectiveEnterpriseId.Value)
+                    {
+                        _logger.LogWarning(
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.LogUnauthorizedEnterpriseAccess),
+                            request.InternshipId, request.MentorId, effectiveEnterpriseId);
+                        return Result<UpdateInternshipGroupResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise),
+                            ResultErrorType.BadRequest);
+                    }
+
                     resolvedMentorId = mentor.EnterpriseUserId;
                 }
+
+                var mentorOwnershipChanged = oldMentorId != resolvedMentorId;
+                var projectIdsInGroup = mentorOwnershipChanged
+                    ? await _unitOfWork.Repository<Project>().Query()
+                        .AsNoTracking()
+                        .Where(p => p.InternshipId == entity.InternshipId)
+                        .Select(p => p.ProjectId)
+                        .ToListAsync(cancellationToken)
+                    : new List<Guid>();
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -120,6 +145,16 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 );
 
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(entity);
+
+                if (mentorOwnershipChanged)
+                {
+                    await _unitOfWork.Repository<Project>().ExecuteUpdateAsync(
+                        p => p.InternshipId == entity.InternshipId,
+                        s => s.SetProperty(p => p.MentorId, resolvedMentorId)
+                              .SetProperty(p => p.UpdatedAt, DateTime.UtcNow),
+                        cancellationToken);
+                }
+
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 if (saved > 0)
@@ -127,6 +162,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
                     await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(entity.InternshipId), cancellationToken);
                     await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
+
+                    if (mentorOwnershipChanged)
+                    {
+                        await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
+                        foreach (var projectId in projectIdsInGroup)
+                            await _cacheService.RemoveAsync(ProjectCacheKeys.Project(projectId), cancellationToken);
+                    }
+
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdatedSuccess), entity.InternshipId);
 
                     var response = _mapper.Map<UpdateInternshipGroupResponse>(entity);
