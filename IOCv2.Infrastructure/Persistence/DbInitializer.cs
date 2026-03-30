@@ -1554,71 +1554,230 @@ namespace IOCv2.Infrastructure.Persistence
         private async Task SeedEvaluations()
         {
             var phaseFptSpring = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.Name == "FPT Software Spring 2026");
+            var phaseRikkeiSpring = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.Name == "Rikkeisoft Spring 2026");
             var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
+            var rikkeiGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
+
+            var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
             var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s6 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student6@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
+            var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
+
             var mentorFpt = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
+            var mentorRikkei = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor@rikkeisoft.com");
 
-            if (phaseFptSpring == null || group3 == null || s3 == null || mentorFpt == null) return;
+            if (phaseFptSpring == null || group3 == null || mentorFpt == null) return;
 
-            // Seed Evaluation Cycle
-            var cycle = await _context.Set<EvaluationCycle>().FirstOrDefaultAsync(c => c.Name == "Mid-term Spring 2026");
-            if (cycle == null)
+            async Task<EvaluationCycle> EnsureCycleAsync(string cycleName, InternshipPhase phase, DateTime start, DateTime end)
             {
-                cycle = new EvaluationCycle
+                var cycle = await _context.Set<EvaluationCycle>().FirstOrDefaultAsync(c => c.Name == cycleName);
+                if (cycle == null)
                 {
-                    CycleId = Guid.NewGuid(),
-                    PhaseId = phaseFptSpring.PhaseId,
-                    Name = "Mid-term Spring 2026",
-                    StartDate = DateTime.UtcNow.AddDays(-10),
-                    EndDate = DateTime.UtcNow.AddDays(10),
-                    Status = EvaluationCycleStatus.Grading
-                };
-                
-                cycle.Criteria.Add(new EvaluationCriteria { CriteriaId = Guid.NewGuid(), CycleId = cycle.CycleId, Name = "Technical Skills", Description = "Code quality and architecture", Weight = 0.60m });
-                cycle.Criteria.Add(new EvaluationCriteria { CriteriaId = Guid.NewGuid(), CycleId = cycle.CycleId, Name = "Soft Skills", Description = "Communication and teamwork", Weight = 0.40m });
-                
-                _context.Set<EvaluationCycle>().Add(cycle);
-                await _context.SaveChangesAsync();
-            }
-
-            // Seed Evaluation for student3
-            if (!await _context.Set<Evaluation>().AnyAsync(e => e.StudentId == s3.StudentId && e.CycleId == cycle.CycleId))
-            {
-                var criteriaList = cycle.Criteria.ToList();
-                if (criteriaList.Count >= 2)
-                {
-                    var evalDraft = new Evaluation
+                    cycle = new EvaluationCycle
                     {
-                        EvaluationId = Guid.NewGuid(),
-                        CycleId = cycle.CycleId,
-                        InternshipId = group3.InternshipId,
-                        StudentId = s3.StudentId,
-                        EvaluatorId = mentorFpt.UserId,
-                        Status = EvaluationStatus.Draft,
-                        Note = "Good progress, but needs better test coverage."
+                        CycleId = Guid.NewGuid(),
+                        PhaseId = phase.PhaseId,
+                        Name = cycleName,
+                        StartDate = start,
+                        EndDate = end,
+                        Status = EvaluationCycleStatus.Grading
                     };
-                    
-                    evalDraft.Details.Add(new EvaluationDetail { DetailId = Guid.NewGuid(), EvaluationId = evalDraft.EvaluationId, CriteriaId = criteriaList[0].CriteriaId, Score = 8.0m, Comment = "Solid coding" });
-                    evalDraft.Details.Add(new EvaluationDetail { DetailId = Guid.NewGuid(), EvaluationId = evalDraft.EvaluationId, CriteriaId = criteriaList[1].CriteriaId, Score = 7.5m, Comment = "Good speaker" });
-                    evalDraft.TotalScore = (8.0m * 0.60m) + (7.5m * 0.40m);
-                    
-                    _context.Set<Evaluation>().Add(evalDraft);
 
-                    var evalPublishedGroup = new Evaluation
-                    {
-                        EvaluationId = Guid.NewGuid(),
-                        CycleId = cycle.CycleId,
-                        InternshipId = group3.InternshipId,
-                        StudentId = null, // Group feedback
-                        EvaluatorId = mentorFpt.UserId,
-                        Status = EvaluationStatus.Published,
-                        Note = "Excellent team coordination overall.",
-                        TotalScore = 9.0m
-                    };
-                    _context.Set<Evaluation>().Add(evalPublishedGroup);
-                    
+                    _context.Set<EvaluationCycle>().Add(cycle);
                     await _context.SaveChangesAsync();
                 }
+
+                var hasCriteria = await _context.Set<EvaluationCriteria>()
+                    .AnyAsync(c => c.CycleId == cycle.CycleId);
+
+                if (!hasCriteria)
+                {
+                    _context.Set<EvaluationCriteria>().AddRange(
+                        new EvaluationCriteria
+                        {
+                            CriteriaId = Guid.NewGuid(),
+                            CycleId = cycle.CycleId,
+                            Name = "Technical Skills",
+                            Description = "Code quality and architecture",
+                            MaxScore = 10,
+                            Weight = 0.60m
+                        },
+                        new EvaluationCriteria
+                        {
+                            CriteriaId = Guid.NewGuid(),
+                            CycleId = cycle.CycleId,
+                            Name = "Soft Skills",
+                            Description = "Communication and teamwork",
+                            MaxScore = 10,
+                            Weight = 0.40m
+                        });
+                    await _context.SaveChangesAsync();
+                }
+
+                return cycle;
+            }
+
+            async Task EnsurePublishedEvaluationAsync(
+                Guid internshipId,
+                Guid studentId,
+                Guid evaluatorId,
+                Guid cycleId,
+                decimal technicalScore,
+                decimal softSkillScore,
+                string note)
+            {
+                if (await _context.Set<Evaluation>().AnyAsync(e =>
+                    e.StudentId == studentId
+                    && e.CycleId == cycleId
+                    && e.Status == EvaluationStatus.Published
+                    && e.DeletedAt == null))
+                {
+                    return;
+                }
+
+                var criteriaList = await _context.Set<EvaluationCriteria>()
+                    .Where(c => c.CycleId == cycleId)
+                    .OrderByDescending(c => c.Weight)
+                    .ToListAsync();
+
+                if (criteriaList.Count >= 2)
+                {
+                    var technicalCriteria = criteriaList[0];
+                    var softSkillCriteria = criteriaList[1];
+
+                    var evalPublished = new Evaluation
+                    {
+                        EvaluationId = Guid.NewGuid(),
+                        CycleId = cycleId,
+                        InternshipId = internshipId,
+                        StudentId = studentId,
+                        EvaluatorId = evaluatorId,
+                        Status = EvaluationStatus.Published,
+                        Note = note
+                    };
+
+                    evalPublished.Details.Add(new EvaluationDetail
+                    {
+                        DetailId = Guid.NewGuid(),
+                        EvaluationId = evalPublished.EvaluationId,
+                        CriteriaId = technicalCriteria.CriteriaId,
+                        Score = technicalScore,
+                        Comment = "Strong technical delivery and implementation quality."
+                    });
+
+                    evalPublished.Details.Add(new EvaluationDetail
+                    {
+                        DetailId = Guid.NewGuid(),
+                        EvaluationId = evalPublished.EvaluationId,
+                        CriteriaId = softSkillCriteria.CriteriaId,
+                        Score = softSkillScore,
+                        Comment = "Good teamwork, communication, and collaboration."
+                    });
+
+                    evalPublished.TotalScore =
+                        (technicalScore * technicalCriteria.Weight) +
+                        (softSkillScore * softSkillCriteria.Weight);
+
+                    _context.Set<Evaluation>().Add(evalPublished);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            var fptCycle = await EnsureCycleAsync(
+                "Mid-term Spring 2026",
+                phaseFptSpring,
+                DateTime.UtcNow.AddDays(-10),
+                DateTime.UtcNow.AddDays(10));
+
+            if (s3 != null)
+            {
+                await EnsurePublishedEvaluationAsync(
+                    group3.InternshipId,
+                    s3.StudentId,
+                    mentorFpt.UserId,
+                    fptCycle.CycleId,
+                    8.5m,
+                    8.0m,
+                    "Good progress with stable backend delivery and clear documentation.");
+            }
+
+            if (s1 != null)
+            {
+                await EnsurePublishedEvaluationAsync(
+                    group3.InternshipId,
+                    s1.StudentId,
+                    mentorFpt.UserId,
+                    fptCycle.CycleId,
+                    8.0m,
+                    8.5m,
+                    "Consistent coordination, planning discipline, and team support.");
+            }
+
+            if (s6 != null)
+            {
+                await EnsurePublishedEvaluationAsync(
+                    group3.InternshipId,
+                    s6.StudentId,
+                    mentorFpt.UserId,
+                    fptCycle.CycleId,
+                    7.8m,
+                    7.6m,
+                    "Testing quality improved; continue strengthening automation depth.");
+            }
+
+            if (phaseRikkeiSpring != null && rikkeiGroup != null && mentorRikkei != null)
+            {
+                var rikkeiCycle = await EnsureCycleAsync(
+                    "Mid-term Rikkeisoft Spring 2026",
+                    phaseRikkeiSpring,
+                    DateTime.UtcNow.AddDays(-8),
+                    DateTime.UtcNow.AddDays(12));
+
+                if (s4 != null)
+                {
+                    await EnsurePublishedEvaluationAsync(
+                        rikkeiGroup.InternshipId,
+                        s4.StudentId,
+                        mentorRikkei.UserId,
+                        rikkeiCycle.CycleId,
+                        8.2m,
+                        7.9m,
+                        "Solid API ownership and steady mentoring communication.");
+                }
+
+                if (s7 != null)
+                {
+                    await EnsurePublishedEvaluationAsync(
+                        rikkeiGroup.InternshipId,
+                        s7.StudentId,
+                        mentorRikkei.UserId,
+                        rikkeiCycle.CycleId,
+                        7.5m,
+                        7.8m,
+                        "UI delivery is on track; improve punctual update consistency.");
+                }
+            }
+
+            if (!await _context.Set<Evaluation>().AnyAsync(e =>
+                e.InternshipId == group3.InternshipId
+                && e.StudentId == null
+                && e.CycleId == fptCycle.CycleId
+                && e.Status == EvaluationStatus.Published
+                && e.DeletedAt == null))
+            {
+                _context.Set<Evaluation>().Add(new Evaluation
+                {
+                    EvaluationId = Guid.NewGuid(),
+                    CycleId = fptCycle.CycleId,
+                    InternshipId = group3.InternshipId,
+                    StudentId = null,
+                    EvaluatorId = mentorFpt.UserId,
+                    Status = EvaluationStatus.Published,
+                    Note = "Excellent team coordination overall.",
+                    TotalScore = 9.0m
+                });
+                await _context.SaveChangesAsync();
             }
         }
 
