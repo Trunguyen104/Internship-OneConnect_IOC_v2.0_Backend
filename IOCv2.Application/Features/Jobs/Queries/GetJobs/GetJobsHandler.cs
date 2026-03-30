@@ -74,7 +74,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
 
                 if (uniUser == null) return Result<PaginatedResult<GetJobsResponse>>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotAllowed), ResultErrorType.Forbidden);
 
-                // If caller is a student and already placed (internship in progress), return empty page (UI shows message)
+                // If caller is a student and already placed (internship in progress), return message instead of empty page
                 var student = await _unitOfWork.Repository<Student>()
                     .Query()
                     .AsNoTracking()
@@ -82,8 +82,9 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
 
                 if (student != null && student.InternshipStatus == StudentStatus.INTERNSHIP_IN_PROGRESS)
                 {
-                    var empty = PaginatedResult<GetJobsResponse>.Create(new List<GetJobsResponse>(), 0, request.PageNumber, request.PageSize);
-                    return Result<PaginatedResult<GetJobsResponse>>.Success(empty);
+                    // Try to resolve a localized message first; fall back to hard-coded English string.
+                    var message = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.InternshipInProgress);
+                    return Result<PaginatedResult<GetJobsResponse>>.Failure(message, ResultErrorType.BadRequest);
                 }
 
                 // Visibility rules for job audience:

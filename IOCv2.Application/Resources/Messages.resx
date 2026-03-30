@@ -1019,46 +1019,7 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>Không tìm thấy User {UserId} khi lấy profile</value>
   </data>
-  <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
-    <value>Lấy danh sách sinh viên thực tập thành công.</value>
-  </data>
-  <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
-    <value>Lấy thông tin chi tiết sinh viên thành công.</value>
-  </data>
-  <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
-    <value>Lấy danh sách đánh giá thành công.</value>
-  </data>
-  <data name="UniAdminInternship.ViolationsRetrieved" xml:space="preserve">
-    <value>Lấy danh sách vi phạm thành công.</value>
-  </data>
-  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
-    <value>Không tìm thấy kỳ thực tập đang mở cho trường của bạn. Danh sách trống.</value>
-  </data>
-  <data name="UniAdminInternship.Log.GetStudentList" xml:space="preserve">
-    <value>SchoolAdmin {0} lấy danh sách sinh viên thực tập cho kỳ {1}, tổng {2} bản ghi.</value>
-  </data>
-  <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
-    <value>SchoolAdmin {0} lấy thông tin chi tiết sinh viên {1} trong kỳ {2}.</value>
-  </data>
-  <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
-    <value>SchoolAdmin {0} lấy danh sách đánh giá của sinh viên {1} trong kỳ {2}.</value>
-  </data>
-  <data name="UniAdminInternship.Log.GetViolations" xml:space="preserve">
-    <value>SchoolAdmin {0} lấy danh sách vi phạm của sinh viên {1} trong kỳ {2}.</value>
-  </data>
-  <data name="UniAdminInternship.Log.UniversityUserNotFound" xml:space="preserve">
-    <value>Không tìm thấy UniversityUser cho userId={0}. Từ chối truy cập.</value>
-  </data>
-  <data name="UniAdminInternship.Log.TermNotFound" xml:space="preserve">
-    <value>Không tìm thấy kỳ thực tập với termId={0}.</value>
-  </data>
-  <data name="UniAdminInternship.Log.TermAccessDenied" xml:space="preserve">
-    <value>SchoolAdmin {0} cố truy cập kỳ {1} không thuộc trường {2}.</value>
-  </data>
-  <data name="UniAdminInternship.Log.StudentNotFound" xml:space="preserve">
-    <value>Không tìm thấy sinh viên {0} trong kỳ {1} của trường {2}.</value>
-  </data>
-  <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
-    <value>Không tìm thấy kỳ thực tập đang mở cho trường {0}.</value>
+  <data name="Profile.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật thông tin cá nhân thành công.</value>
   </data>
 </root>
