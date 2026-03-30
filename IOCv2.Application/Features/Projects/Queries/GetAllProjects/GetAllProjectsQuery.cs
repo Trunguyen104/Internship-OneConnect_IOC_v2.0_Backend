@@ -16,10 +16,17 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         public string? SearchTerm { get; set; }
 
         /// <summary>
-        /// Filter by specific project status.
+        /// Filter by visibility status (Draft or Published).
         /// </summary>
-        public ProjectStatus? Status { get; set; }
+        public VisibilityStatus? VisibilityStatus { get; set; }
 
+        /// <summary>
+        /// Filter by operational status (Unstarted, Active, Completed, Archived).
+        /// </summary>
+        public OperationalStatus? OperationalStatus { get; set; }
+
+        /// <summary>Show archived projects (default: false - archived hidden)</summary>
+        public bool ShowArchived { get; set; } = false;
 
         /// <summary>
         /// Filter records starting from this date.
@@ -60,5 +67,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
         /// Sorting direction ('asc' or 'desc').
         /// </summary>
         public string? SortOrder { get; set; }
+
+        /// <summary>F3 (AC-01): Filter theo lĩnh vực dự án (VD: CNTT, Mobile, IoT)</summary>
+        public string? Field { get; set; }
     }
 }

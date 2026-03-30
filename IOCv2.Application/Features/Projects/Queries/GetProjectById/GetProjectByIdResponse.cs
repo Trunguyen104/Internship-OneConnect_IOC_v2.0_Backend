@@ -1,5 +1,4 @@
 ﻿using IOCv2.Application.Extensions.Mappings;
-using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using System;
@@ -7,6 +6,16 @@ using System.Collections.Generic;
 
 namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
 {
+    public class GroupInfoDto
+    {
+        public Guid InternshipId { get; set; }
+        public string GroupName { get; set; } = string.Empty;
+        public string? MentorName { get; set; }
+        public int StudentCount { get; set; }
+        /// <summary>B12: Trạng thái của nhóm để hiển thị badge "Nhóm đã lưu trữ" (AC-06, AC-15)</summary>
+        public GroupStatus? Status { get; set; }
+    }
+
     /// <summary>
     /// Detailed response model for a specific project.
     /// </summary>
@@ -20,12 +29,30 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// <summary>
         /// Identity of the internship group associated with this project.
         /// </summary>
-        public Guid InternshipId { get; set; }
+        public Guid? InternshipId { get; set; }
 
         /// <summary>
         /// Name of the project.
         /// </summary>
         public string ProjectName { get; set; } = string.Empty;
+
+        /// <summary>Mã dự án (auto-generated hoặc do mentor cung cấp)</summary>
+        public string ProjectCode { get; set; } = string.Empty;
+
+        /// <summary>Lĩnh vực dự án (VD: CNTT, Mobile, IoT)</summary>
+        public string Field { get; set; } = string.Empty;
+
+        /// <summary>Yêu cầu dự án</summary>
+        public string Requirements { get; set; } = string.Empty;
+
+        /// <summary>Kết quả bàn giao (tùy chọn)</summary>
+        public string? Deliverables { get; set; }
+
+        /// <summary>Template dự án (None, Scrum, Kanban)</summary>
+        public ProjectTemplate Template { get; set; }
+
+        /// <summary>ID EnterpriseUser của mentor phụ trách project</summary>
+        public Guid? MentorId { get; set; }
 
         /// <summary>
         /// Detailed description of the project goal and scope.
@@ -42,10 +69,14 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// </summary>
         public DateTime? EndDate { get; set; }
 
-        /// <summary>
-        /// Current lifecycle status of the project.
-        /// </summary>
-        public ProjectStatus? Status { get; set; }
+        /// <summary>B6: Visibility layer status (Draft / Published)</summary>
+        public VisibilityStatus VisibilityStatus { get; set; }
+
+        /// <summary>B6: Operational layer status (Unstarted / Active / Completed / Archived)</summary>
+        public OperationalStatus OperationalStatus { get; set; }
+
+        /// <summary>F4/B13: true khi group bị xóa và project trở thành orphan</summary>
+        public bool IsOrphaned { get; set; }
 
         /// <summary>
         /// Date and time when the project record was created.
@@ -57,16 +88,28 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
         /// </summary>
         public List<ProjectResourcesDTO> ProjectResources { get; set; } = new();
 
+        public GroupInfoDto? GroupInfo { get; set; }
+
         /// <summary>
         /// Configures the mapping between the Project entity and its resources to this response DTO.
         /// </summary>
         /// <param name="profile">The Automapper profile.</param>
         public void Mapping(MappingProfile profile)
         {
-            profile.CreateMap<Domain.Entities.ProjectResources, ProjectResourcesDTO>();
             profile.CreateMap<Project, GetProjectByIdResponse>()
                 .ForMember(dest => dest.ProjectResources,
-                           opt => opt.MapFrom(src => src.ProjectResources));
+                           opt => opt.MapFrom(src => src.ProjectResources))
+                .ForMember(dest => dest.GroupInfo,
+                           opt => opt.MapFrom(src => src.InternshipGroup == null
+                               ? null
+                               : new GroupInfoDto
+                               {
+                                   InternshipId  = src.InternshipGroup.InternshipId,
+                                   GroupName     = src.InternshipGroup.GroupName,
+                                   MentorName    = src.InternshipGroup.Mentor != null ? src.InternshipGroup.Mentor.User.FullName : null,
+                                   StudentCount  = src.InternshipGroup.Members.Count,
+                                   Status        = src.InternshipGroup.Status  // B12
+                               }));
         }
     }
 }

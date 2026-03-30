@@ -14,6 +14,7 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
         public DateOnly? DateOfBirth { get; set; }
+        public UserGender? Gender { get; set; }
         public UserRole Role { get; set; }
         public UserStatus Status { get; set; }
         public string? AvatarUrl { get; set; }
@@ -35,6 +36,7 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
         public void Mapping(Profile profile)
         {
             profile.CreateMap<User, GetMyProfileResponse>()
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.Student != null ? src.Student.StudentId : (Guid?)null))

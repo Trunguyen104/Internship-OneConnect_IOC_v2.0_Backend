@@ -9,7 +9,7 @@ using Moq;
 using MockQueryable;
 using MockQueryable.Moq;
 
-namespace IOCv2.Tests.Features.Admin.UserManagement.Queries;
+namespace IOCv2.Tests.Features.Admin.Users.Queries;
 
 public class GetUserByIdHandlerTests
 {
@@ -64,7 +64,7 @@ public class GetUserByIdHandlerTests
         var result = await handler.Handle(new GetUserByIdQuery { UserId = Guid.NewGuid() }, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.ErrorType.Should().Be(IOCv2.Application.Common.Models.ResultErrorType.NotFound);
+        result.ErrorType.Should().Be(Application.Common.Models.ResultErrorType.NotFound);
     }
 
     private Mock<ICurrentUserService> GetMockCurrentUserService()

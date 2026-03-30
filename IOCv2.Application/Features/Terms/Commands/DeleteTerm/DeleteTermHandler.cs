@@ -133,7 +133,9 @@ public class DeleteTermHandler : IRequestHandler<DeleteTermCommand, Result<Delet
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorDeletingTerm), request.TermId);
-            throw;
+            return Result<DeleteTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

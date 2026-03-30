@@ -75,7 +75,8 @@ public class GetMyInternshipGroupsHandlerTests
 
         typeof(InternshipGroup).GetProperty(nameof(InternshipGroup.InternshipId))!.SetValue(group, internshipId);
 
-        var project = Project.Create(internshipId, "IOC Version 2", string.Empty);
+        var project = Project.Create("IOC Version 2", string.Empty, "PRJ-IOC_IOC_1", "IT", "Requirements");
+        project.AssignToGroup(internshipId, null, null);
         typeof(Project).GetProperty(nameof(Project.ProjectId))!.SetValue(project, projectId);
 
         _mockCurrentUserService.Setup(service => service.UserId).Returns(userId.ToString());

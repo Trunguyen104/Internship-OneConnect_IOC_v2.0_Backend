@@ -8,9 +8,13 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
     {
         public GetAllProjectsValidator()
         {
-            RuleFor(x => x.Status)
+            RuleFor(x => x.VisibilityStatus)
                 .IsInEnum()
-                .When(x => x.Status.HasValue);
+                .When(x => x.VisibilityStatus.HasValue);
+
+            RuleFor(x => x.OperationalStatus)
+                .IsInEnum()
+                .When(x => x.OperationalStatus.HasValue);
 
 
             RuleFor(x => x.PageNumber)

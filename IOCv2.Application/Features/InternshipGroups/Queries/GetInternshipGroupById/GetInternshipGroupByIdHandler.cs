@@ -46,7 +46,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
 
             var role = _currentUserService.Role ?? string.Empty;
 
-            _logger.LogInformation("Querying internship group with ID: {Id} by user {UserId} (role: {Role})", request.InternshipId, currentUserId, role);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogQueryById), request.InternshipId, currentUserId, role);
 
             var cacheKey = InternshipGroupCacheKeys.Group(request.InternshipId);
             var cached = await _cacheService.GetAsync<GetInternshipGroupByIdResponse>(cacheKey, cancellationToken);
@@ -104,7 +104,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
 
                 if (enterpriseUser == null || entity.EnterpriseId != enterpriseUser.EnterpriseId)
                 {
-                    _logger.LogWarning("User {UserId} (HR/EnterpriseAdmin) tried to access group {GroupId} of a different enterprise.", currentUserId, entity.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAccessDeniedHrEnterprise), currentUserId, entity.InternshipId);
                     return Result<GetInternshipGroupByIdResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.Common.Forbidden),
                         ResultErrorType.Forbidden);
@@ -119,7 +119,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
 
                 if (enterpriseUser == null || entity.MentorId != enterpriseUser.EnterpriseUserId)
                 {
-                    _logger.LogWarning("User {UserId} (Mentor) tried to access group {GroupId} they are not assigned to.", currentUserId, entity.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAccessDeniedMentor), currentUserId, entity.InternshipId);
                     return Result<GetInternshipGroupByIdResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.Common.Forbidden),
                         ResultErrorType.Forbidden);
@@ -134,7 +134,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
 
                 if (student == null || !entity.Members.Any(m => m.StudentId == student.StudentId))
                 {
-                    _logger.LogWarning("User {UserId} (Student) tried to access group {GroupId} they are not a member of.", currentUserId, entity.InternshipId);
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAccessDeniedStudent), currentUserId, entity.InternshipId);
                     return Result<GetInternshipGroupByIdResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.Common.Forbidden),
                         ResultErrorType.Forbidden);

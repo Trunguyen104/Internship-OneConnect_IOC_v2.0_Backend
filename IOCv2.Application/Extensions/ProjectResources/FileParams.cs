@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Constants
+namespace IOCv2.Application.Extensions.ProjectResources
 {
     public static class FileParams
     {

@@ -32,7 +32,7 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
 
         public async Task<Result<GetMyProfileResponse>> Handle(GetMyProfileQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting profile for User {UserId}", request.UserId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Profile.LogGetProfile), request.UserId);
 
 
             var user = await _unitOfWork.Repository<User>()
@@ -46,7 +46,7 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
 
             if (user == null)
             {
-                _logger.LogWarning("User {UserId} not found when fetching profile", request.UserId);
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.Profile.LogGetProfileUserNotFound), request.UserId);
                 return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
             }
 
