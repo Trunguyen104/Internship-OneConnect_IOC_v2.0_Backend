@@ -951,4 +951,46 @@
   <data name="Profile.UpdateSuccess" xml:space="preserve">
     <value>Profile updated successfully.</value>
   </data>
+  <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
+    <value>Student internship list retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
+    <value>Student detail retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
+    <value>Student evaluations retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.ViolationsRetrieved" xml:space="preserve">
+    <value>Student violations retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>No open internship term found for your university. List is empty.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetStudentList" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved internship student list for term {1}, total {2} records.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved student detail for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved evaluations for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetViolations" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved violations for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.UniversityUserNotFound" xml:space="preserve">
+    <value>UniversityUser not found for userId={0}. Access denied.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermNotFound" xml:space="preserve">
+    <value>Term not found for termId={0}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermAccessDenied" xml:space="preserve">
+    <value>SchoolAdmin {0} attempted to access term {1} not belonging to university {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.StudentNotFound" xml:space="preserve">
+    <value>Student {0} not found in term {1} for university {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
+    <value>No open internship term found for university {0}.</value>
+  </data>
 </root>

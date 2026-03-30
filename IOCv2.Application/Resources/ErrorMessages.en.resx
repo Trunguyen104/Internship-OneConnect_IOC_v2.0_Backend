@@ -1395,4 +1395,34 @@
   <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
     <value>File not found in storage.</value>
   </data>
+  <data name="UniAdminInternship.UniversityUserNotFound" xml:space="preserve">
+    <value>University administrator profile not found. Please contact system administrator.</value>
+  </data>
+  <data name="UniAdminInternship.TermNotFound" xml:space="preserve">
+    <value>Internship term not found with the provided ID.</value>
+  </data>
+  <data name="UniAdminInternship.TermAccessDenied" xml:space="preserve">
+    <value>You do not have permission to access this internship term. The term does not belong to your university.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotFound" xml:space="preserve">
+    <value>Student not found in this internship term or student does not belong to your university.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotInUniversity" xml:space="preserve">
+    <value>This student does not belong to your university.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>No open internship term found for your university.</value>
+  </data>
+  <data name="UniAdminInternship.PageNumberInvalid" xml:space="preserve">
+    <value>Page number must be greater than 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeInvalid" xml:space="preserve">
+    <value>Page size must be greater than 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeTooLarge" xml:space="preserve">
+    <value>Page size cannot exceed 100.</value>
+  </data>
+  <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
+    <value>Student ID is required.</value>
+  </data>
 </root>
