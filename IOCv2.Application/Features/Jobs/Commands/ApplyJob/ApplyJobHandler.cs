@@ -104,16 +104,16 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
                 return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ApplicationDeadlinePassed), ResultErrorType.BadRequest);
             }
 
-            // 7. Determine current active term (Term.Status == Open && contains today)
+            // 7. Determine current active internship phase (Phase.Status == Open && contains today)
             var todayDateOnly = DateOnly.FromDateTime(DateTime.UtcNow);
-            var currentTerm = await _unitOfWork.Repository<Domain.Entities.Term>()
+            var currentPhase = await _unitOfWork.Repository<InternshipPhase>()
                 .Query()
                 .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Status == TermStatus.Open && t.StartDate <= todayDateOnly && t.EndDate >= todayDateOnly, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Status == InternshipPhaseStatus.Open && p.StartDate <= todayDateOnly && p.EndDate >= todayDateOnly, cancellationToken);
 
-            if (currentTerm == null)
+            if (currentPhase == null)
             {
-                _logger.LogWarning("No active term available for self-apply");
+                _logger.LogWarning("No active internship phase available for self-apply");
                 return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.NoActiveInternshipPeriod), ResultErrorType.BadRequest);
             }
 
@@ -137,11 +137,11 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
                 return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.AlreadyHaveActiveApplication), ResultErrorType.BadRequest);
             }
 
-            // 9. Re-apply limit: count previous applications for same job in same term
+            // 9. Re-apply limit: count previous applications for same job in same phase
             var reapplyCount = await _unitOfWork.Repository<InternshipApplication>()
                 .Query()
                 .AsNoTracking()
-                .CountAsync(a => a.StudentId == student.StudentId && a.JobId == job.JobId && a.TermId == currentTerm.TermId, cancellationToken);
+                .CountAsync(a => a.StudentId == student.StudentId && a.JobId == job.JobId && a.TermId == currentPhase.PhaseId, cancellationToken);
 
             if (reapplyCount >= ReapplyLimit)
             {
@@ -157,7 +157,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
                 {
                     ApplicationId = Guid.NewGuid(),
                     EnterpriseId = job.EnterpriseId,
-                    TermId = currentTerm.TermId,
+                    TermId = currentPhase.PhaseId,
                     StudentId = student.StudentId,
                     JobId = job.JobId,
                     Status = InternshipApplicationStatus.Applied,
