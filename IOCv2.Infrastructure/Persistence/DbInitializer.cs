@@ -60,10 +60,10 @@ namespace IOCv2.Infrastructure.Persistence
         {
             await SeedUniversities();
             await SeedEnterprises();
-            await SeedJobs(); // added: seed test jobs for enterprises
+            await SeedInternshipPhases();   // Chạy trước SeedJobs để Jobs có thể link tới InternPhase
+            await SeedJobs(); 
             await SeedUsers();
             await SeedTerms();
-            await SeedInternshipPhases();   // ← must be before SeedInternshipGroups
             await SeedInternshipGroups();
             await SeedProjectsAndWorkItems();
             await SeedManageIGProjectData();
@@ -132,10 +132,12 @@ namespace IOCv2.Infrastructure.Persistence
             }
         }
 
-        // New: seed a couple of test jobs tied to seeded enterprises (use EF entities)
         private async Task SeedJobs()
         {
             if (await _context.Jobs.AnyAsync()) return;
+
+            var fptPhase = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.EnterpriseId == SeedIds.FptSoftwareId && p.Name == "FPT Software Spring 2026");
+            var rikkeiPhase = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.EnterpriseId == SeedIds.RikkeisoftId && p.Name == "Rikkeisoft Spring 2026");
 
             // Ensure expire dates are comfortably in the future and Position is set (DB requires it)
             var job1 = Job.Create(
@@ -150,6 +152,8 @@ namespace IOCv2.Infrastructure.Persistence
             );
             job1.Position = "Backend Intern";
             job1.Status = JobStatus.PUBLISHED;
+            job1.InternPhaseId = fptPhase?.PhaseId;
+            job1.Audience = JobAudience.Public;
 
             var job2 = Job.Create(
                 SeedIds.RikkeisoftId,
@@ -163,8 +167,25 @@ namespace IOCv2.Infrastructure.Persistence
             );
             job2.Position = "Frontend Intern";
             job2.Status = JobStatus.PUBLISHED;
+            job2.InternPhaseId = rikkeiPhase?.PhaseId;
+            job2.Audience = JobAudience.Public;
 
-            await _context.Jobs.AddRangeAsync(job1, job2);
+            var job3 = Job.Create(
+                SeedIds.RikkeisoftId,
+                "Targeted DevOps Intern",
+                "Maintain CI/CD pipelines.",
+                "Docker, Linux, Jenkins",
+                "Mentorship",
+                "Đà Nẵng",
+                1,
+                DateTime.UtcNow.AddMonths(1)
+            );
+            job3.Position = "DevOps Intern";
+            job3.Status = JobStatus.PUBLISHED;
+            job3.InternPhaseId = rikkeiPhase?.PhaseId;
+            job3.Audience = JobAudience.Targeted;
+
+            await _context.Jobs.AddRangeAsync(job1, job2, job3);
             await _context.SaveChangesAsync();
         }
 
@@ -524,7 +545,7 @@ namespace IOCv2.Infrastructure.Persistence
                 fsoft.EnterpriseId,
                 "FPT Software Spring 2026",
                 new DateOnly(2026, 1, 15), new DateOnly(2026, 4, 30),
-                50, "Đợt thực tập Spring 2026 của FPT Software — đang diễn ra",
+                8, "Đợt thực tập Spring 2026 của FPT Software — đang diễn ra",
                 InternshipPhaseStatus.InProgress);
 
             await EnsurePhase(
@@ -640,40 +661,34 @@ namespace IOCv2.Infrastructure.Persistence
             // DO NOT ADD TO InternshipStudents (As per commit instructions)
 
             // Seed some applications
-            // Ensure JobId is set for each seeded application to satisfy FK constraint (job_id is required)
-            var fptJob = await _context.Jobs.FirstAsync(j => j.EnterpriseId == SeedIds.FptSoftwareId);
-            var rikkeiJob = await _context.Jobs.FirstAsync(j => j.EnterpriseId == SeedIds.RikkeisoftId);
+            var fptJob = await _context.Jobs.FirstOrDefaultAsync(j => j.EnterpriseId == SeedIds.FptSoftwareId && j.Audience == JobAudience.Public);
+            var rikkeiJob = await _context.Jobs.FirstOrDefaultAsync(j => j.EnterpriseId == SeedIds.RikkeisoftId && j.Audience == JobAudience.Public);
+            var rikkeiTargetJob = await _context.Jobs.FirstOrDefaultAsync(j => j.EnterpriseId == SeedIds.RikkeisoftId && j.Audience == JobAudience.Targeted);
 
-            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, JobId = fptJob.JobId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-40) });
-            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, JobId = rikkeiJob.JobId, Status = InternshipApplicationStatus.PendingAssignment, AppliedAt = DateTime.UtcNow.AddDays(-10) });
+            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, JobId = fptJob?.JobId, Status = InternshipApplicationStatus.Placed, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-40) });
+            _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, JobId = rikkeiJob?.JobId, Status = InternshipApplicationStatus.PendingAssignment, Source = ApplicationSource.SelfApply, AppliedAt = DateTime.UtcNow.AddDays(-10) });
             // [NEW] Seed Pending and Rejected Applications
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s4.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Applied, AppliedAt = DateTime.UtcNow.AddDays(-2) });
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, JobId = rikkeiTargetJob?.JobId, Source = ApplicationSource.UniAssign, Status = InternshipApplicationStatus.Applied, AppliedAt = DateTime.UtcNow.AddDays(-2) });
             }
 
             if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s2.StudentId))
             {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = fall2025.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Rejected, RejectReason = "Not a good fit for this semester", AppliedAt = DateTime.UtcNow.AddDays(-100) });
+                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = fall2025.TermId, StudentId = s2.StudentId, JobId = fptJob?.JobId, Source = ApplicationSource.SelfApply, Status = InternshipApplicationStatus.Rejected, RejectReason = "Not a good fit for this semester", AppliedAt = DateTime.UtcNow.AddDays(-100) });
             }
 
             await _context.SaveChangesAsync();
 
             // ── Thêm InternshipApplication Approved cho từng sinh viên ─────────────
-            // API GetPlacedStudents query từ InternshipApplication (Status=Approved),
-            // vì vậy mỗi sinh viên PHẢI có 1 application Approved để xuất hiện trong danh sách.
-            //
-            // Phân công: 6 SV → FPT Software, 4 SV → Rikkeisoft
             var allStudents = await _context.Students
                 .Include(s => s.User)
                 .Where(s => s.User.Email.StartsWith("student") && s.User.Email.EndsWith("@fptu.edu.vn"))
-                .OrderBy(s => s.User.Email)   // student1, student10, student2, ... student9
+                .OrderBy(s => s.User.Email)
                 .ToListAsync();
 
-            // Sắp xếp theo số thứ tự: student1..10
             var orderedStudents = allStudents
-                .OrderBy(s => int.Parse(System.Text.RegularExpressions.Regex
-                    .Match(s.User.Email, @"\d+").Value))
+                .OrderBy(s => int.Parse(System.Text.RegularExpressions.Regex.Match(s.User.Email, @"\d+").Value))
                 .ToList();
 
             // FPT Software: student1, student2, student3, student6, student7, student8
@@ -696,6 +711,8 @@ namespace IOCv2.Infrastructure.Persistence
                         EnterpriseId = fsoft.EnterpriseId,
                         TermId = spring2026.TermId,
                         StudentId = stu.StudentId,
+                        JobId = fptJob?.JobId,
+                        Source = idx % 2 == 0 ? ApplicationSource.SelfApply : ApplicationSource.UniAssign, // Mix sources
                         Status = InternshipApplicationStatus.Placed,
                         AppliedAt = DateTime.UtcNow.AddDays(-30)
                     });
@@ -717,6 +734,8 @@ namespace IOCv2.Infrastructure.Persistence
                         EnterpriseId = rikkeisoft.EnterpriseId,
                         TermId = spring2026.TermId,
                         StudentId = stu.StudentId,
+                        JobId = (idx % 2 == 0 ? rikkeiJob?.JobId : rikkeiTargetJob?.JobId),
+                        Source = idx % 2 == 0 ? ApplicationSource.SelfApply : ApplicationSource.UniAssign, // Mix sources
                         Status = InternshipApplicationStatus.Placed,
                         AppliedAt = DateTime.UtcNow.AddDays(-25)
                     });
