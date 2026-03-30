@@ -23,6 +23,16 @@ public class GetApplicationDetailResponse
     public bool IsJobDeleted { get; set; }
     public string? CvSnapshotUrl { get; set; }
 
+    // Intern Phase info (from job.InternPhase)
+    public Guid? InternPhaseId { get; set; }
+    public string? InternPhaseName { get; set; }
+    public DateOnly? InternPhaseStartDate { get; set; }
+    public DateOnly? InternPhaseEndDate { get; set; }
+
+    // Audience
+    public JobAudience? Audience { get; set; }
+    public string? AudienceLabel { get; set; }
+
     // Current status
     public InternshipApplicationStatus Status { get; set; }
     public string StatusLabel { get; set; } = string.Empty;

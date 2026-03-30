@@ -25,10 +25,14 @@ namespace IOCv2.Domain.Entities
         // New: audience (public / targeted)
         public JobAudience? Audience { get; set; }
 
+        // New: intern phase this job belongs to
+        public Guid? InternPhaseId { get; set; }
+        public virtual InternshipPhase? InternPhase { get; set; }
+
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;
 
-        // Added: applications for this job
+        // Applications for this job (EF-mapped navigation)
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
 
         // Many-to-many: Jobs <-> Universities
@@ -59,7 +63,6 @@ namespace IOCv2.Domain.Entities
                 Status = JobStatus.DRAFT
             };
         }
-        public virtual ICollection<InternshipApplication> Applications { get; set; } = new List<InternshipApplication>();
     }
 
 }

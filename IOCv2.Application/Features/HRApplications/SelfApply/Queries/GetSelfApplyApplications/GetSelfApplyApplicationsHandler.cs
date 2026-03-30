@@ -47,7 +47,7 @@ public class GetSelfApplyApplicationsHandler
 
             // Base query: only SelfApply applications for this enterprise
             var query = _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
-                .Include(a => a.Job)
+                .Include(a => a.Job).ThenInclude(j => j!.InternPhase)
                 .Include(a => a.Student).ThenInclude(s => s.User)
                 .Include(a => a.Student).ThenInclude(s => s.StudentTerms).ThenInclude(st => st.Term).ThenInclude(t => t.University)
                 .Where(a => a.EnterpriseId == enterpriseUser.EnterpriseId
@@ -69,10 +69,23 @@ public class GetSelfApplyApplicationsHandler
                 query = query.Where(a => a.Status == statusFilter);
             }
 
+            // University filter
             if (request.UniversityId.HasValue)
             {
                 query = query.Where(a =>
                     a.Student.StudentTerms.Any(st => st.Term.UniversityId == request.UniversityId));
+            }
+
+            // Intern Phase filter
+            if (request.InternPhaseId.HasValue)
+            {
+                query = query.Where(a => a.Job != null && a.Job.InternPhaseId == request.InternPhaseId);
+            }
+
+            // Audience filter (Public / Targeted)
+            if (request.Audience.HasValue)
+            {
+                query = query.Where(a => a.Job != null && a.Job.Audience == request.Audience);
             }
 
             // Month-Year filter
@@ -91,7 +104,7 @@ public class GetSelfApplyApplicationsHandler
             else if (!string.IsNullOrWhiteSpace(request.JobTitle))
             {
                 var jobTitle = request.JobTitle.Trim().ToLower();
-                query = query.Where(a => a.Job != null && a.Job.Title.ToLower().Contains(jobTitle));
+                query = query.Where(a => a.Job != null && a.Job.Title != null && a.Job.Title.ToLower().Contains(jobTitle));
             }
 
             // Search
@@ -103,6 +116,12 @@ public class GetSelfApplyApplicationsHandler
                     (a.Student.User.Email != null && a.Student.User.Email.ToLower().Contains(term)) ||
                     (a.Student.User.UserCode != null && a.Student.User.UserCode.ToLower().Contains(term)));
             }
+
+            // Badge counts (before sorting/paging — on the filtered dataset)
+            var badgeCounts = await query
+                .GroupBy(a => a.Status)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToListAsync(cancellationToken);
 
             // Sorting
             query = (request.SortColumn?.ToLower(), request.SortOrder?.ToLower()) switch
@@ -126,6 +145,7 @@ public class GetSelfApplyApplicationsHandler
             var items = applications.Select(a =>
             {
                 var latestTerm = a.Student?.StudentTerms?.OrderByDescending(st => st.CreatedAt).FirstOrDefault();
+                var audience = a.Job?.Audience;
                 return new GetSelfApplyApplicationsResponse
                 {
                     ApplicationId = a.ApplicationId,
@@ -136,6 +156,14 @@ public class GetSelfApplyApplicationsHandler
                     StudentPhone = a.Student?.User?.PhoneNumber ?? string.Empty,
                     UniversityName = latestTerm?.Term?.University?.Name ?? string.Empty,
                     JobPostingTitle = a.Job?.Title ?? string.Empty,
+                    IsJobClosed = a.Job?.Status == JobStatus.CLOSED,
+                    IsJobDeleted = a.JobId.HasValue && a.Job == null,
+                    InternPhaseId = a.Job?.InternPhaseId,
+                    InternPhaseName = a.Job?.InternPhase?.Name,
+                    InternPhaseStartDate = a.Job?.InternPhase?.StartDate,
+                    InternPhaseEndDate = a.Job?.InternPhase?.EndDate,
+                    Audience = audience,
+                    AudienceLabel = audience?.ToString(),
                     AppliedAt = a.AppliedAt,
                     Status = a.Status,
                     StatusLabel = a.Status.ToString()
@@ -144,6 +172,10 @@ public class GetSelfApplyApplicationsHandler
 
             var result = PaginatedResult<GetSelfApplyApplicationsResponse>.Create(
                 items, totalCount, request.PageNumber, request.PageSize);
+
+            result.BadgeCounts = badgeCounts.ToDictionary(
+                x => x.Status.ToString(),
+                x => x.Count);
 
             return Result<PaginatedResult<GetSelfApplyApplicationsResponse>>.Success(result);
         }

@@ -86,6 +86,20 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .HasConversion<short>()
                .IsRequired(false);
 
+        // New: intern phase FK
+        builder.Property(j => j.InternPhaseId)
+               .HasColumnName("intern_phase_id")
+               .IsRequired(false);
+
+        builder.HasOne(j => j.InternPhase)
+               .WithMany()
+               .HasForeignKey(j => j.InternPhaseId)
+               .OnDelete(DeleteBehavior.SetNull)
+               .HasConstraintName("fk_jobs_internship_phases_phase_id");
+
+        builder.HasIndex(j => j.InternPhaseId)
+               .HasDatabaseName("ix_jobs_intern_phase_id");
+
         // Enum stored as short (repository convention)
             builder.Property(j => j.Status)
                 .HasColumnName("status")

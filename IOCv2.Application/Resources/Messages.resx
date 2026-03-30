@@ -1047,4 +1047,19 @@
   <data name="JobPosting.InternshipInProgress" xml:space="preserve">
     <value>Bạn đang trong kỳ thực tập.</value>
   </data>
+  <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
+    <value>Phase thực tập đã đủ số lượng nhận.</value>
+  </data>
+  <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
+    <value>Đơn ứng tuyển chưa ở trạng thái Đã nhận (Placed).</value>
+  </data>
+  <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
+    <value>HR đã xóa sinh viên khỏi danh sách Placed (ApplicationId: {0}, ByUserId: {1}).</value>
+  </data>
+  <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
+    <value>Kính gửi sinh viên, doanh nghiệp {EnterpriseName} đã xóa bạn khỏi danh sách tiếp nhận thực tập.</value>
+  </data>
+  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
+    <value>Sinh viên {StudentName} đã bị doanh nghiệp {EnterpriseName} xóa khỏi danh sách tiếp nhận thực tập.</value>
+  </data>
 </root>

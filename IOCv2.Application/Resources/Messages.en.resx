@@ -981,4 +981,19 @@
   <data name="JobPosting.InternshipInProgress" xml:space="preserve">
     <value>You are currently doing an internship.</value>
   </data>
+  <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
+    <value>The internship phase has reached its maximum capacity.</value>
+  </data>
+  <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
+    <value>The application is not in the Placed status.</value>
+  </data>
+  <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
+    <value>HR has removed the student from the Placed list (ApplicationId: {0}, ByUserId: {1}).</value>
+  </data>
+  <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
+    <value>Dear student, enterprise {EnterpriseName} has removed you from their internship acceptance list.</value>
+  </data>
+  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
+    <value>Student {StudentName} has been removed from the internship acceptance list by enterprise {EnterpriseName}.</value>
+  </data>
 </root>

@@ -1081,7 +1081,6 @@ namespace IOCv2.Application.Constants
             public const string RejectReasonMaxLength = "HRApplications.RejectReasonMaxLength";
             public const string RejectReasonMinLength = "HRApplications.RejectReasonMinLength";
 
-            // Business errors
             public const string NotFound = "HRApplications.NotFound";
             public const string EnterpriseUserNotFound = "HRApplications.EnterpriseUserNotFound";
             public const string InvalidTransition = "HRApplications.InvalidTransition";
@@ -1089,6 +1088,8 @@ namespace IOCv2.Application.Constants
             public const string NotSelfApplyApplication = "HRApplications.NotSelfApplyApplication";
             public const string NotUniAssignApplication = "HRApplications.NotUniAssignApplication";
             public const string ApplicationNotActive = "HRApplications.ApplicationNotActive";
+            public const string ApplicationNotPlaced = "HRApplications.ApplicationNotPlaced";
+            public const string InternPhaseAtCapacity = "HRApplications.InternPhaseAtCapacity";
 
             // Notification message templates
             public const string NotifyInterviewing = "HRApplications.Notify.Interviewing";
@@ -1109,6 +1110,7 @@ namespace IOCv2.Application.Constants
             public const string LogReject = "HRApplications.Log.Reject";
             public const string LogApproveUniAssign = "HRApplications.Log.ApproveUniAssign";
             public const string LogRejectUniAssign = "HRApplications.Log.RejectUniAssign";
+            public const string LogRemovePlacedUniAssign = "HRApplications.Log.RemovePlacedUniAssign";
             public const string LogCascadeWithdraw = "HRApplications.Log.CascadeWithdraw";
             public const string LogInvalidUserId = "HRApplications.Log.InvalidUserId";
         }
@@ -1128,6 +1130,10 @@ namespace IOCv2.Application.Constants
 
             // Notify HR (AC-07)
             public const string NotifyHRWithdrawn = "StudentApplications.Notify.HR.Withdrawn";
+
+            // Notify SV + Uni Admin when HR removes a Placed student (AC-C05)
+            public const string NotifyStudentRemovedPlaced = "StudentApplications.Notify.Student.RemovedPlaced";
+            public const string NotifyUniAdminRemovedPlaced = "StudentApplications.Notify.UniAdmin.RemovedPlaced";
         }
     }
 }

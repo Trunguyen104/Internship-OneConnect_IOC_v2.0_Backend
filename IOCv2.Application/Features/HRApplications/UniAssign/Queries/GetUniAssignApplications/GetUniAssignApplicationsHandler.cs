@@ -46,6 +46,7 @@ public class GetUniAssignApplicationsHandler
                     _messageService.GetMessage(MessageKeys.HRApplications.EnterpriseUserNotFound), ResultErrorType.Forbidden);
 
             var query = _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
+                .Include(a => a.Job).ThenInclude(j => j!.InternPhase)
                 .Include(a => a.Student).ThenInclude(s => s.User)
                 .Include(a => a.University)
                 .Where(a => a.EnterpriseId == enterpriseUser.EnterpriseId
@@ -61,6 +62,10 @@ public class GetUniAssignApplicationsHandler
             if (request.UniversityId.HasValue)
                 query = query.Where(a => a.UniversityId == request.UniversityId);
 
+            // Intern Phase filter
+            if (request.InternPhaseId.HasValue)
+                query = query.Where(a => a.Job != null && a.Job.InternPhaseId == request.InternPhaseId);
+
             if (!string.IsNullOrWhiteSpace(request.MonthYear) &&
                 DateOnly.TryParseExact(request.MonthYear + "-01", "yyyy-MM-dd", out var monthDate))
                 query = query.Where(a =>
@@ -74,6 +79,12 @@ public class GetUniAssignApplicationsHandler
                     (a.Student.User.Email != null && a.Student.User.Email.ToLower().Contains(term)) ||
                     (a.Student.User.UserCode != null && a.Student.User.UserCode.ToLower().Contains(term)));
             }
+
+            // Badge counts (before sorting/paging)
+            var badgeCounts = await query
+                .GroupBy(a => a.Status)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToListAsync(cancellationToken);
 
             query = (request.SortColumn?.ToLower(), request.SortOrder?.ToLower()) switch
             {
@@ -89,7 +100,7 @@ public class GetUniAssignApplicationsHandler
                 .Take(request.PageSize)
                 .ToListAsync(cancellationToken);
 
-            // Check for AC-10: does each student have an active Self-apply at this enterprise?
+            // Check for AC-C01: does each student have an active Self-apply at this enterprise?
             var studentIds = applications.Select(a => a.StudentId).Distinct().ToList();
             var activeSelfApplyMap = await _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
                 .Where(a => studentIds.Contains(a.StudentId)
@@ -112,6 +123,10 @@ public class GetUniAssignApplicationsHandler
                     StudentCode = a.Student?.User?.UserCode ?? string.Empty,
                     StudentEmail = a.Student?.User?.Email ?? string.Empty,
                     UniversityName = a.University?.Name ?? string.Empty,
+                    InternPhaseId = a.Job?.InternPhaseId,
+                    InternPhaseName = a.Job?.InternPhase?.Name,
+                    InternPhaseStartDate = a.Job?.InternPhase?.StartDate,
+                    InternPhaseEndDate = a.Job?.InternPhase?.EndDate,
                     AppliedAt = a.AppliedAt,
                     Status = a.Status,
                     StatusLabel = a.Status.ToString(),
@@ -122,6 +137,10 @@ public class GetUniAssignApplicationsHandler
 
             var result = PaginatedResult<GetUniAssignApplicationsResponse>.Create(
                 items, totalCount, request.PageNumber, request.PageSize);
+
+            result.BadgeCounts = badgeCounts.ToDictionary(
+                x => x.Status.ToString(),
+                x => x.Count);
 
             return Result<PaginatedResult<GetUniAssignApplicationsResponse>>.Success(result);
         }

@@ -71,6 +71,26 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
                 return Result<ApproveUniAssignResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.HRApplications.InvalidTransition), ResultErrorType.BadRequest);
 
+            // Capacity check: if job belongs to a phase with MaxStudents, ensure there is still room
+            if (app.Job?.InternPhaseId.HasValue == true)
+            {
+                var phase = await _unitOfWork.Repository<InternshipPhase>().Query().AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.PhaseId == app.Job.InternPhaseId!.Value, cancellationToken);
+
+                if (phase?.MaxStudents.HasValue == true)
+                {
+                    var placedCount = await _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
+                        .CountAsync(a => a.Job != null
+                            && a.Job.InternPhaseId == phase.PhaseId
+                            && a.Status == InternshipApplicationStatus.Placed, cancellationToken);
+
+                    if (placedCount >= phase.MaxStudents.Value)
+                        return Result<ApproveUniAssignResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.HRApplications.InternPhaseAtCapacity),
+                            ResultErrorType.BadRequest);
+                }
+            }
+
             // 1. Approve the Uni Assign application
             var approveHistory = new ApplicationStatusHistory
             {
