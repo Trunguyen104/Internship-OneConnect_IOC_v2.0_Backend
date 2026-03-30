@@ -57,10 +57,10 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
             RuleFor(x => x.EndDate)
                 .NotEmpty()
                 .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateRequired))
-                .Must((cmd, end) => end.Day > cmd.StartDate.Day + JobsPostingParam.Common.MinimumDurationDays)
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMinDuration))
-                .Must((cmd, end) => end.Day <= cmd.StartDate.Day + JobsPostingParam.Common.MaximumDurationDays)
-                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMaxDuration));
+                .Must((cmd, end) => end > cmd.StartDate.AddDays(JobsPostingParam.Common.MinimumDurationDays))
+                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMinDuration, JobsPostingParam.Common.MinimumDurationDays))
+                .Must((cmd, end) => end <= cmd.StartDate.AddDays(JobsPostingParam.Common.MaximumDurationDays))
+                .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMaxDuration, JobsPostingParam.Common.MaximumDurationDays));
             // Audience rules
             RuleFor(x => x.Audience)
                 .IsInEnum()

@@ -1,5 +1,6 @@
 ﻿using IOCv2.API.Attributes;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.Jobs.Commands.ApplyJob;
 using IOCv2.Application.Features.Jobs.Commands.CloseJob;
 using IOCv2.Application.Features.Jobs.Commands.CreateJobDraft;
 using IOCv2.Application.Features.Jobs.Commands.CreateJobPosting;
@@ -72,6 +73,27 @@ namespace IOCv2.API.Controllers.Jobs
             CancellationToken cancellationToken = default)
         {
             return HandleResult(await _mediator.Send(new GetJobByIdQuery { JobId = id }, cancellationToken));
+        }
+
+        /// <summary>
+        /// Apply to a job posting (Student).
+        /// - Performs server-side checks (CV present, no active application, not placed, job published and before deadline, re-apply limit).
+        /// - Returns created application id and success message on success.
+        /// </summary>
+        /// <param name="id">Job id</param>
+        [HttpPost("{id:guid}/apply")]
+        [Authorize(Roles = "Student")]
+        [ProducesResponseType(typeof(ApiResponse<ApplyJobResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status429TooManyRequests)]
+        public async Task<IActionResult> ApplyJob(
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken = default)
+        {
+            return HandleResult(await _mediator.Send(new ApplyJobCommand(id), cancellationToken));
         }
 
         /// <summary>

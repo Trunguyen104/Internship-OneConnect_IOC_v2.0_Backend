@@ -172,7 +172,7 @@
     <value>Nếu tài khoản hợp lệ, hệ thống sẽ gửi link reset mật khẩu qua email.</value>
   </data>
   <data name="Profile.UpdateSuccess" xml:space="preserve">
-    <value>Cập nhật thông tin thành công.</value>
+    <value>Cập nhật thông tin cá nhân thành công.</value>
   </data>
   <data name="PageNumber.MinValue" xml:space="preserve">
     <value>Page number must be greater than or equal to 1</value>
@@ -192,7 +192,7 @@
   <data name="SortOrder.AllowedValues" xml:space="preserve">
     <value>Sort order must be either 'asc' or 'desc'</value>
   </data>
-    <data name="Projects.DeleteSuccess" xml:space="preserve">
+  <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Xóa dự án thành công</value>
   </data>
   <data name="Projects.LogDelete" xml:space="preserve">
@@ -213,7 +213,7 @@
   <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Dự án đã được cập nhật {ProjectId}</value>
   </data>
-    <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
+  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
     <value>Lấy thành công {0} dự án cho nhóm thực tập {1}.</value>
   </data>
   <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
@@ -771,11 +771,9 @@
   <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
     <value>Từ chối chuyển trạng thái đợt thực tập {0} từ '{1}' sang '{2}' — không hợp lệ.</value>
   </data>
-  <!-- B-02 FIX: EndDate in past for active phase -->
   <data name="InternshipPhase.EndDateInPastForActivePhase" xml:space="preserve">
     <value>Không thể đặt ngày kết thúc trong quá khứ cho đợt thực tập '{0}' đang ở trạng thái Open hoặc InProgress.</value>
   </data>
-  <!-- B-05 FIX: Dedicated log key for InProgress phase deletion block -->
   <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
     <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái InProgress và không thể xóa.</value>
   </data>
@@ -1019,7 +1017,34 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>Không tìm thấy User {UserId} khi lấy profile</value>
   </data>
-  <data name="Profile.UpdateSuccess" xml:space="preserve">
-    <value>Cập nhật thông tin cá nhân thành công.</value>
+  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
+    <value>Bạn chưa có CV. Vui lòng upload CV trước khi ứng tuyển.</value>
+  </data>
+  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
+    <value>Bạn đã ở trạng thái Placed và không được phép nộp đơn.</value>
+  </data>
+  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
+    <value>Vị trí hiện không mở để ứng tuyển.</value>
+  </data>
+  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
+    <value>Hạn nộp đơn đã kết thúc.</value>
+  </data>
+  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
+    <value>Hiện không có kỳ thực tập active để nộp đơn.</value>
+  </data>
+  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
+    <value>Bạn hiện đã có đơn đang ở trạng thái active và không thể nộp thêm.</value>
+  </data>
+  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
+    <value>Bạn đã đạt giới hạn ứng tuyển cho vị trí này.</value>
+  </data>
+  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
+    <value>{0} đã nộp đơn ứng tuyển tại {1} — {2}. Vui lòng xem xét.</value>
+  </data>
+  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
+    <value>Apply thành công! Đơn của bạn đang chờ HR xem xét.</value>
+  </data>
+  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
+    <value>Bạn đang trong kỳ thực tập.</value>
   </data>
 </root>
