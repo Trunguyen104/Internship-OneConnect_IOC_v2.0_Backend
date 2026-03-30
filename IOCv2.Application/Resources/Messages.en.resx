@@ -144,10 +144,13 @@
   <data name="AccountCreatedButEmailFailed" xml:space="preserve">
     <value>Account created successfully but email notification failed. Please notify the employee directly. Code: {0}, Password: {1}</value>
   </data>
+  <data name="Profile.UpdateSuccess" xml:space="preserve">
+    <value>Profile updated successfully.</value>
+  </data>
   <data name="SearchTerm.MaxLength" xml:space="preserve">
     <value>Search term cannot exceed 200 characters</value>
   </data>
-    <data name="Projects.DeleteSuccess" xml:space="preserve">
+  <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Project Delete successful</value>
   </data>
   <data name="Projects.LogDelete" xml:space="preserve">
@@ -167,6 +170,9 @@
   </data>
   <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Updated project {ProjectId}</value>
+  </data>
+  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
+    <value>Successfully retrieved {0} project(s) for internship group {1}.</value>
   </data>
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Epic created successfully.</value>
@@ -741,15 +747,6 @@
   <data name="Projects.LogUpdateError" xml:space="preserve">
     <value>Error updating project {0}.</value>
   </data>
-  <data name="Projects.LogNotFound" xml:space="preserve">
-    <value>Project not found: {0}.</value>
-  </data>
-  <data name="Projects.LogNameExists" xml:space="preserve">
-    <value>Project name {0} already exists in the group.</value>
-  </data>
-  <data name="Projects.LogCodeConflict" xml:space="preserve">
-    <value>Unique constraint violation for project code {0}.</value>
-  </data>
   <data name="Projects.LogCreating" xml:space="preserve">
     <value>Creating project {0} for group {1}.</value>
   </data>
@@ -761,6 +758,15 @@
   </data>
   <data name="Projects.LogGetById" xml:space="preserve">
     <value>Retrieving project by ID: {0}.</value>
+  </data>
+  <data name="Projects.LogNotFound" xml:space="preserve">
+    <value>Project not found: {0}.</value>
+  </data>
+  <data name="Projects.LogNameExists" xml:space="preserve">
+    <value>Project name {0} already exists in the group.</value>
+  </data>
+  <data name="Projects.LogCodeConflict" xml:space="preserve">
+    <value>Unique constraint violation for project code {0}.</value>
   </data>
   <data name="InternshipGroup.NotificationProjectCleanupTitle" xml:space="preserve">
     <value>Project warning</value>
@@ -873,9 +879,6 @@
   <data name="InternshipGroups.LogOrphanizeProjects" xml:space="preserve">
     <value>{0} project(s) orphaned due to group {1} deletion.</value>
   </data>
-  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
-    <value>Successfully retrieved {0} project(s) for internship group {1}.</value>
-  </data>
   <data name="Projects.LogGetAll" xml:space="preserve">
     <value>Retrieving all projects. SearchTerm: {0}, Status: {1}.</value>
   </data>
@@ -948,7 +951,34 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>User {UserId} not found when fetching profile</value>
   </data>
-  <data name="Profile.UpdateSuccess" xml:space="preserve">
-    <value>Profile updated successfully.</value>
+  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
+    <value>You have not uploaded a CV. Please upload your CV before applying.</value>
+  </data>
+  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
+    <value>You are in Placed status and are not allowed to apply.</value>
+  </data>
+  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
+    <value>This position is currently not open for application.</value>
+  </data>
+  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
+    <value>The application deadline has passed.</value>
+  </data>
+  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
+    <value>There is currently no active internship period to apply for.</value>
+  </data>
+  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
+    <value>You already have an active application and cannot submit another one.</value>
+  </data>
+  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
+    <value>You have reached the application limit for this position.</value>
+  </data>
+  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
+    <value>{0} has applied for the position at {1} — {2}. Please review.</value>
+  </data>
+  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
+    <value>Application successful! Your application is pending HR review.</value>
+  </data>
+  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
+    <value>You are currently doing an internship.</value>
   </data>
 </root>
