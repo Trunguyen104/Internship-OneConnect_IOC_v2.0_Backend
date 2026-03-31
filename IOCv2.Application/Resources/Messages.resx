@@ -806,6 +806,23 @@
   <data name="InternshipPhase.Log.UpdateWithQueueApplications" xml:space="preserve">
     <value>Cảnh báo: Đợt thực tập {0} được cập nhật ngày/số lượng trong khi có đơn ứng tuyển đang chờ xử lý.</value>
   </data>
+  <!-- BUG-B-02 FIX: Cannot delete phase with linked job postings -->
+  <data name="InternshipPhase.CannotDeleteHasJobPostings" xml:space="preserve">
+    <value>Không thể xóa đợt thực tập này vì đang có [{0}] job posting liên kết. Vui lòng xóa hoặc chuyển job posting sang đợt thực tập khác trước khi xóa.</value>
+  </data>
+  <!-- BUG-B-01 FIX: Cannot shorten end date when job postings exceed new end date -->
+  <data name="InternshipPhase.JobPostingsExceedNewEndDate" xml:space="preserve">
+    <value>Có [{0}] job posting đang có deadline vượt qua ngày kết thúc mới. Vui lòng điều chỉnh deadline của job posting trước khi cập nhật ngày kết thúc đợt thực tập.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteHasJobPostings" xml:space="preserve">
+    <value>Từ chối xóa đợt thực tập {0} — hiện có {1} job posting liên kết. Yêu cầu xóa bị từ chối.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteGroupLinksWillBeCleared" xml:space="preserve">
+    <value>Đợt thực tập {0} có {1} nhóm thực tập; các liên kết sẽ được xóa trước khi thực hiện xóa đợt.</value>
+  </data>
+  <data name="InternshipPhase.Log.JobPostingsExceedNewEndDate" xml:space="preserve">
+    <value>Từ chối cập nhật ngày kết thúc đợt thực tập {0} — {1} job posting có deadline vượt quá ngày kết thúc mới.</value>
+  </data>
   <data name="Terms.NameExists" xml:space="preserve">
     <value>Tên kỳ thực tập đã tồn tại, vui lòng chọn tên khác.</value>
   </data>

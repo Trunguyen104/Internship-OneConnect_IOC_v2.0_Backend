@@ -69,6 +69,10 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
                 .Must(date => date == null || date.Value.Date >= DateTime.UtcNow.Date)
                 .WithMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ExpireDateMustBeTodayOrLater));
 
+            RuleFor(x => x.InternshipPhaseId)
+                .Must(id => !id.HasValue || id.Value != Guid.Empty)
+                .WithMessage("Intern phase id is invalid.");
+
             // StartDate: optional; if provided must be today or later
             RuleFor(x => x.StartDate)
                 .Must(d => !d.HasValue || d.Value.Date >= DateTime.UtcNow.Date)

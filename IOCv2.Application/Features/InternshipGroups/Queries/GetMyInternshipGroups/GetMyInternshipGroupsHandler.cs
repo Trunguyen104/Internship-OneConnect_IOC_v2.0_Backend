@@ -80,7 +80,7 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
                 .ToDictionary(group => group.Key, group => group.First());
 
 
-        var phaseIds = groups.Select(group => group.PhaseId).Distinct().ToList();
+        var phaseIds = groups.Where(group => group.PhaseId.HasValue).Select(group => group.PhaseId!.Value).Distinct().ToList();
         var evaluationCycleLookup = phaseIds.Count == 0
             ? new Dictionary<Guid, int>()
             : await _unitOfWork.Repository<EvaluationCycle>()
@@ -96,7 +96,9 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
                     group,
                     projectLookup.GetValueOrDefault(group.InternshipId),
                     university);
-                res.EvaluationCount = evaluationCycleLookup.GetValueOrDefault(group.PhaseId);
+                res.EvaluationCount = group.PhaseId.HasValue
+                    ? evaluationCycleLookup.GetValueOrDefault(group.PhaseId.Value)
+                    : 0;
                 return res;
             })
             .ToList();

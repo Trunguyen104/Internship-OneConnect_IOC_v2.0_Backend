@@ -102,6 +102,7 @@ public class GetInternshipPhasesHandler
         var query = _unitOfWork.Repository<InternshipPhase>().Query()
             .Include(p => p.Enterprise)
             .Include(p => p.InternshipGroups)
+            .Include(p => p.Jobs)
             .Where(p => p.DeletedAt == null)
             .AsNoTracking();
 
@@ -160,7 +161,7 @@ public class GetInternshipPhasesHandler
             RemainingCapacity = Math.Max(p.Capacity - placedLookup.GetValueOrDefault(p.PhaseId), 0),
             Description = p.Description,
             Status = ToLifecycleStatus(p, today),
-            JobPostingCount = 0,
+            JobPostingCount = p.Jobs.Count(j => j.DeletedAt == null),
             GroupCount = p.InternshipGroups.Count(g => g.DeletedAt == null),
             CreatedAt = p.CreatedAt
         }).ToList();

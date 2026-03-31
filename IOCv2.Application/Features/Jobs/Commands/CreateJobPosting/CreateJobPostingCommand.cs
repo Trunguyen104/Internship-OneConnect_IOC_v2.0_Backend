@@ -16,9 +16,12 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
         public int? Quantity { get; init; }
         public DateTime? ExpireDate { get; init; }
 
-        // New required internship period fields
-        public DateTime StartDate { get; init; }
-        public DateTime EndDate { get; init; }
+        // Required: every new job posting must belong to an internship phase.
+        public Guid InternshipPhaseId { get; init; }
+
+        // Deprecated: dates are inherited from InternshipPhase and ignored by backend.
+        public DateTime? StartDate { get; init; }
+        public DateTime? EndDate { get; init; }
 
         // Audience: Public or Targeted
         public JobAudience Audience { get; init; } = JobAudience.Public;

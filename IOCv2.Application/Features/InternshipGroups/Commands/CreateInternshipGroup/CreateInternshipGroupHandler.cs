@@ -8,6 +8,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup
 {
@@ -139,8 +140,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                     request.Description,
                     request.EnterpriseId,
                     resolvedMentorId, // EnterpriseUserId
-                    request.StartDate,
-                    request.EndDate
+                    phase.StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
+                    phase.EndDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)
                 );
 
                 // ── 6. Bắt buộc ít nhất 1 sinh viên ───────────────────────────────

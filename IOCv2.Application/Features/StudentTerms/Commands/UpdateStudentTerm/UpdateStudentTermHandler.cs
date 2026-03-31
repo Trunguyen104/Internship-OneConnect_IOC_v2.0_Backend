@@ -8,6 +8,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace IOCv2.Application.Features.StudentTerms.Commands.UpdateStudentTerm;
 
@@ -75,6 +76,67 @@ public class UpdateStudentTermHandler : IRequestHandler<UpdateStudentTermCommand
         if (targetPlacement == PlacementStatus.Placed && !targetEnterpriseId.HasValue)
             return Result<UpdateStudentTermResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.EnterpriseIdRequiredWhenPlaced));
+
+        if (targetPlacement == PlacementStatus.Placed && targetEnterpriseId.HasValue)
+        {
+            var overlapPhases = await _unitOfWork.Repository<InternshipPhase>()
+                .Query()
+                .AsNoTracking()
+                .Where(p => p.EnterpriseId == targetEnterpriseId.Value
+                         && p.DeletedAt == null
+                         && p.StartDate <= term.EndDate
+                         && p.EndDate >= term.StartDate)
+                .Select(p => new { p.PhaseId, p.Capacity })
+                .ToListAsync(cancellationToken);
+
+            if (overlapPhases.Count == 0)
+            {
+                return Result<UpdateStudentTermResponse>.Failure(
+                    "Enterprise khong co intern phase overlap voi ky thuc tap nay.",
+                    ResultErrorType.BadRequest);
+            }
+
+            var overlapPhaseIds = overlapPhases.Select(p => p.PhaseId).ToList();
+
+            var phasesWithValidJobs = await _unitOfWork.Repository<Job>()
+                .Query()
+                .AsNoTracking()
+                .Where(j => j.DeletedAt == null
+                         && j.PhaseId.HasValue
+                         && overlapPhaseIds.Contains(j.PhaseId.Value)
+                         && (j.Status == JobStatus.PUBLISHED || j.Status == JobStatus.CLOSED))
+                .Select(j => j.PhaseId!.Value)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            if (phasesWithValidJobs.Count == 0)
+            {
+                return Result<UpdateStudentTermResponse>.Failure(
+                    "Enterprise chua co job posting Published/Closed trong intern phase phu hop.",
+                    ResultErrorType.BadRequest);
+            }
+
+            var placedByPhase = await _unitOfWork.Repository<InternshipApplication>()
+                .Query()
+                .AsNoTracking()
+                .Where(a => phasesWithValidJobs.Contains(a.TermId)
+                         && a.Status == InternshipApplicationStatus.Placed
+                         && a.DeletedAt == null)
+                .GroupBy(a => a.TermId)
+                .Select(g => new { PhaseId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.PhaseId, x => x.Count, cancellationToken);
+
+            var hasRemainingCapacity = overlapPhases
+                .Where(p => phasesWithValidJobs.Contains(p.PhaseId))
+                .Any(p => p.Capacity - placedByPhase.GetValueOrDefault(p.PhaseId) > 0);
+
+            if (!hasRemainingCapacity)
+            {
+                return Result<UpdateStudentTermResponse>.Failure(
+                    "Enterprise da het remaining capacity trong cac intern phase hop le.",
+                    ResultErrorType.BadRequest);
+            }
+        }
 
         // 4. Validate EnterpriseId exists
         if (request.EnterpriseId.HasValue)

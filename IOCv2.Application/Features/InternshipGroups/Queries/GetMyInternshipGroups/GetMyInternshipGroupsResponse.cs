@@ -37,7 +37,7 @@ public class GetMyInternshipGroupsResponse
             Name = group.GroupName,
             EnterpriseId = group.EnterpriseId,
             SchoolId = university?.UniversityId ?? Guid.Empty,
-            PhaseId = group.PhaseId,
+            PhaseId = group.PhaseId ?? Guid.Empty,
             GroupStatus = group.Status,
             StartDate = group.StartDate,
             EndDate = group.EndDate,

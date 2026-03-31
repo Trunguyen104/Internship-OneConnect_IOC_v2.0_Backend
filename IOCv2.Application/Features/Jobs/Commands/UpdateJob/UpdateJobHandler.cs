@@ -118,6 +118,32 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                if (request.StartDate.HasValue || request.EndDate.HasValue)
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    return Result<UpdateJobResponse>.Failure(
+                        "Internship dates are read-only and inherited from InternshipPhase.",
+                        ResultErrorType.BadRequest);
+                }
+
+                InternshipPhase? linkedPhase = null;
+                var targetPhaseId = request.InternshipPhaseId ?? job.PhaseId;
+                if (targetPhaseId.HasValue)
+                {
+                    linkedPhase = await _unitOfWork.Repository<InternshipPhase>()
+                        .Query()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(p => p.PhaseId == targetPhaseId.Value
+                                               && p.EnterpriseId == job.EnterpriseId
+                                               && p.DeletedAt == null, cancellationToken);
+
+                    if (linkedPhase == null)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<UpdateJobResponse>.Failure("Intern phase not found for this enterprise.", ResultErrorType.BadRequest);
+                    }
+                }
+
                 // Update scalar properties
                 job.Title = request.Title;
                 job.Position = request.Position ?? job.Position;
@@ -127,8 +153,12 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
                 job.Location = request.Location;
                 job.Quantity = request.Quantity;
                 job.ExpireDate = request.ExpireDate;
-                job.StartDate = request.StartDate;
-                job.EndDate = request.EndDate;
+                job.PhaseId = targetPhaseId;
+                if (linkedPhase != null)
+                {
+                    job.StartDate = linkedPhase.StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                    job.EndDate = linkedPhase.EndDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                }
                 job.Audience = request.Audience;
                 job.UpdatedAt = DateTime.UtcNow;
                 if (Guid.TryParse(_currentUserService.UserId, out var updBy))

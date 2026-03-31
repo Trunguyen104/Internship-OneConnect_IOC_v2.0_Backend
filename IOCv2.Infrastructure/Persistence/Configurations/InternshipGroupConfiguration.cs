@@ -17,7 +17,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             // ===== Properties =====
 
             builder.Property(e => e.PhaseId)
-                .IsRequired()
+                .IsRequired(false)
                 .HasColumnName("phase_id");
 
             builder.Property(e => e.EnterpriseId)

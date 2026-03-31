@@ -17,6 +17,9 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
         public int? Quantity { get; set; }
         public DateTime? ExpireDate { get; set; }
 
+        // Optional for draft; required when publishing/creating final posting.
+        public Guid? InternshipPhaseId { get; set; }
+
         // Internship period optional for draft (can be provided)
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

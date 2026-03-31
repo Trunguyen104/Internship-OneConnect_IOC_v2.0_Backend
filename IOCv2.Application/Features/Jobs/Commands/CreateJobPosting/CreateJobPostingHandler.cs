@@ -63,10 +63,25 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                 quantity: request.Quantity,
                 expireDate: request.ExpireDate);
 
+            var internshipPhase = await _unitOfWork.Repository<InternshipPhase>()
+                .Query()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.PhaseId == request.InternshipPhaseId
+                                       && p.EnterpriseId == enterpriseId
+                                       && p.DeletedAt == null, cancellationToken);
+
+            if (internshipPhase == null)
+            {
+                return Result<CreateJobPostingResponse>.Failure(
+                    "Intern phase not found for this enterprise.",
+                    ResultErrorType.BadRequest);
+            }
+
             // Additional properties
             job.Position = request.Position ?? string.Empty;
-            job.StartDate = request.StartDate;
-            job.EndDate = request.EndDate;
+            job.PhaseId = internshipPhase.PhaseId;
+            job.StartDate = internshipPhase.StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+            job.EndDate = internshipPhase.EndDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
             job.Audience = request.Audience;
 
             // Because this command represents publishing, set status to PUBLISHED immediately
@@ -107,6 +122,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                 (j.Position ?? string.Empty).ToLower() == normalizedPosition.ToLower() &&
                 j.StartDate == request.StartDate &&
                 j.EndDate == request.EndDate &&
+                j.PhaseId == internshipPhase.PhaseId &&
                 j.Audience == request.Audience &&
                 (j.Location ?? string.Empty).ToLower() == normalizedLocation.ToLower(),
                 cancellationToken);

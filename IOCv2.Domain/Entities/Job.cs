@@ -8,6 +8,7 @@ namespace IOCv2.Domain.Entities
     {
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
+        public Guid? PhaseId { get; set; }
         public string? Title { get; set; }
         public string? Position { get; set; }
         public string? Description { get; set; }
@@ -27,6 +28,7 @@ namespace IOCv2.Domain.Entities
 
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;
+        public virtual InternshipPhase? InternshipPhase { get; set; }
 
         // Added: applications for this job
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();

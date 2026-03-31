@@ -1,4 +1,3 @@
-using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using IOCv2.Domain.Entities;
@@ -23,11 +22,21 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .HasColumnName("enterprise_id")
                .IsRequired();
 
+        builder.Property(j => j.PhaseId)
+               .HasColumnName("phase_id")
+               .IsRequired(false);
+
         builder.HasOne(j => j.Enterprise)
                .WithMany(e => e.Jobs)
                .HasForeignKey(j => j.EnterpriseId)
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("fk_jobs_enterprises_enterprise_id");
+
+        builder.HasOne(j => j.InternshipPhase)
+               .WithMany(p => p.Jobs)
+               .HasForeignKey(j => j.PhaseId)
+               .OnDelete(DeleteBehavior.Restrict)
+               .HasConstraintName("fk_jobs_internship_phases_phase_id");
 
         // Fields
         builder.Property(j => j.Title)
@@ -116,6 +125,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
         builder.HasIndex(j => j.Status)
                .HasDatabaseName("ix_jobs_status");
+
+        builder.HasIndex(j => j.PhaseId)
+               .HasDatabaseName("ix_jobs_phase_id");
 
         // Many-to-many: jobs <-> universities via join table job_universities
         builder.HasMany(j => j.Universities)

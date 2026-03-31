@@ -13,6 +13,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
     {
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
+        public Guid? InternshipPhaseId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Position { get; set; } = string.Empty;
         public string? Description { get; set; }

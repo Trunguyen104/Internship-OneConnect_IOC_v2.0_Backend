@@ -104,12 +104,27 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
                 return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ApplicationDeadlinePassed), ResultErrorType.BadRequest);
             }
 
-            // 7. Determine current active internship phase (Phase.Status == Open && contains today)
+            // 7. Resolve internship phase linked to this job (preferred) for capacity/accounting.
             var todayDateOnly = DateOnly.FromDateTime(DateTime.UtcNow);
-            var currentPhase = await _unitOfWork.Repository<InternshipPhase>()
-                .Query()
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Status == InternshipPhaseStatus.Open && p.StartDate <= todayDateOnly && p.EndDate >= todayDateOnly, cancellationToken);
+            InternshipPhase? currentPhase;
+            if (job.PhaseId.HasValue)
+            {
+                currentPhase = await _unitOfWork.Repository<InternshipPhase>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.PhaseId == job.PhaseId.Value
+                                           && p.DeletedAt == null, cancellationToken);
+            }
+            else
+            {
+                currentPhase = await _unitOfWork.Repository<InternshipPhase>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.EnterpriseId == job.EnterpriseId
+                                           && p.Status == InternshipPhaseStatus.Open
+                                           && p.StartDate <= todayDateOnly
+                                           && p.EndDate >= todayDateOnly, cancellationToken);
+            }
 
             if (currentPhase == null)
             {

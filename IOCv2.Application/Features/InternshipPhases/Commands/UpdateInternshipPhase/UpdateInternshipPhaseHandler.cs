@@ -139,6 +139,27 @@ public class UpdateInternshipPhaseHandler
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateWithQueueApplications),
                 request.PhaseId);
 
+        if (request.EndDate < phase.EndDate)
+        {
+            var overDeadlineCount = await _unitOfWork.Repository<Job>().Query()
+                .AsNoTracking()
+                .CountAsync(j => j.PhaseId == phase.PhaseId
+                              && j.DeletedAt == null
+                              && j.ExpireDate.HasValue
+                              && j.ExpireDate.Value.Date > request.EndDate.ToDateTime(TimeOnly.MinValue).Date, cancellationToken);
+
+            if (overDeadlineCount > 0)
+            {
+                _logger.LogWarning(
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogJobPostingsExceedNewEndDate),
+                    phase.PhaseId, overDeadlineCount);
+                return Result<UpdateInternshipPhaseResponse>.Failure(
+                    string.Format(_messageService.GetMessage(MessageKeys.InternshipPhase.JobPostingsExceedNewEndDate),
+                        overDeadlineCount),
+                    ResultErrorType.BadRequest);
+            }
+        }
+
         // ── BUG-H FIX: No-op guard — skip DB write and cache invalidation if nothing changed ──
         // Previously a request with identical values would still update UpdatedAt, creating a false audit trail.
         var hasChanges =
@@ -196,6 +217,9 @@ public class UpdateInternshipPhaseHandler
                 }
             }
 
+            var previousStartDate = phase.StartDate;
+            var previousEndDate = phase.EndDate;
+
             phase.UpdateInfo(
                 request.Name,
                 request.StartDate,
@@ -205,6 +229,19 @@ public class UpdateInternshipPhaseHandler
                 request.Description);
 
             await _unitOfWork.Repository<InternshipPhase>().UpdateAsync(phase);
+
+            if (previousStartDate != request.StartDate || previousEndDate != request.EndDate)
+            {
+                var newStartDateTime = request.StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                var newEndDateTime = request.EndDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                await _unitOfWork.Repository<Job>().ExecuteUpdateAsync(
+                    j => j.PhaseId == phase.PhaseId && j.DeletedAt == null,
+                    s => s
+                        .SetProperty(j => j.StartDate, _ => newStartDateTime)
+                        .SetProperty(j => j.EndDate, _ => newEndDateTime),
+                    cancellationToken);
+            }
+
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

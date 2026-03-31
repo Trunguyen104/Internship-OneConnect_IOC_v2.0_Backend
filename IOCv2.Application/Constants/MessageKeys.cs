@@ -1004,6 +1004,8 @@ namespace IOCv2.Application.Constants
             public const string CannotUpdateEnded = "InternshipPhase.CannotUpdateEnded";
             public const string CannotChangeDateCapacityWhenPlaced = "InternshipPhase.CannotChangeDateCapacityWhenPlaced";
             public const string CannotDeleteHasPlacedStudents = "InternshipPhase.CannotDeleteHasPlacedStudents";
+            public const string CannotDeleteHasJobPostings = "InternshipPhase.CannotDeleteHasJobPostings";
+            public const string JobPostingsExceedNewEndDate = "InternshipPhase.JobPostingsExceedNewEndDate";
             public const string InvalidStatusTransition = "InternshipPhase.InvalidStatusTransition";
             public const string CannotDeleteHasActiveGroups = "InternshipPhase.CannotDeleteHasActiveGroups";
             public const string CannotDeleteInProgress = "InternshipPhase.CannotDeleteInProgress";
@@ -1038,12 +1040,15 @@ namespace IOCv2.Application.Constants
             public const string LogUpdateNoChanges = "InternshipPhase.Log.UpdateNoChanges";
             public const string LogUpdateWithQueueApplications = "InternshipPhase.Log.UpdateWithQueueApplications";
             public const string LogUpdateError = "InternshipPhase.Log.UpdateError";
+            public const string LogJobPostingsExceedNewEndDate = "InternshipPhase.Log.JobPostingsExceedNewEndDate";
 
             // Log - Delete
             public const string LogDeleting = "InternshipPhase.Log.Deleting";
             public const string LogDeleteNotFound = "InternshipPhase.Log.DeleteNotFound";
             public const string LogDeleteHasActiveGroups = "InternshipPhase.Log.DeleteHasActiveGroups";
             public const string LogDeleteInProgress = "InternshipPhase.Log.DeleteInProgress";
+            public const string LogDeleteHasJobPostings = "InternshipPhase.Log.DeleteHasJobPostings";
+            public const string LogDeleteGroupLinksWillBeCleared = "InternshipPhase.Log.DeleteGroupLinksWillBeCleared";
             public const string LogDeleteSuccess = "InternshipPhase.Log.DeleteSuccess";
             public const string LogDeleteNoChanges = "InternshipPhase.Log.DeleteNoChanges";
             public const string LogDeleteError = "InternshipPhase.Log.DeleteError";

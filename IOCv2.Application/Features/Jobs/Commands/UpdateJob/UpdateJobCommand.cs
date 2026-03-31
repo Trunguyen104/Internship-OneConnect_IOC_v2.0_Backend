@@ -22,6 +22,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
         public int? Quantity { get; init; }
         public JobStatus Status { get; init; }
         public DateTime? ExpireDate { get; init; }
+        public Guid? InternshipPhaseId { get; init; }
         public DateTime? StartDate { get; init; }
         public DateTime? EndDate { get; init; }
         public JobAudience Audience { get; init; }

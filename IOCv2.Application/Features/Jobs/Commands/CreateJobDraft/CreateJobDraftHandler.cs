@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using MediatR;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
 {
@@ -72,8 +73,31 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
 
             // Additional optional properties for draft
             job.Position = request.Position ?? string.Empty;
-            if (request.StartDate.HasValue) job.StartDate = request.StartDate.Value;
-            if (request.EndDate.HasValue) job.EndDate = request.EndDate.Value;
+            if (request.InternshipPhaseId.HasValue)
+            {
+                var phase = await _unitOfWork.Repository<InternshipPhase>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.PhaseId == request.InternshipPhaseId.Value
+                                           && p.EnterpriseId == enterpriseId
+                                           && p.DeletedAt == null, cancellationToken);
+
+                if (phase == null)
+                {
+                    return Result<CreateJobDraftResponse>.Failure(
+                        "Intern phase not found for this enterprise.",
+                        ResultErrorType.BadRequest);
+                }
+
+                job.PhaseId = phase.PhaseId;
+                job.StartDate = phase.StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                job.EndDate = phase.EndDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+            }
+            else
+            {
+                if (request.StartDate.HasValue) job.StartDate = request.StartDate.Value;
+                if (request.EndDate.HasValue) job.EndDate = request.EndDate.Value;
+            }
             job.Audience = request.Audience;
 
             // If targeted and university provided, validate and attach; if not provided, still allow draft but log

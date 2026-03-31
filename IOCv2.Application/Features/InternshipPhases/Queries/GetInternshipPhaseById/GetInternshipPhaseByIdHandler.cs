@@ -93,6 +93,7 @@ public class GetInternshipPhaseByIdHandler
             var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
                 .Include(p => p.Enterprise)
                 .Include(p => p.InternshipGroups)
+                .Include(p => p.Jobs)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
 
@@ -136,7 +137,7 @@ public class GetInternshipPhaseByIdHandler
                 RemainingCapacity = Math.Max(phase.Capacity - placedCount, 0),
                 Description = phase.Description,
                 Status = ToLifecycleStatus(phase, today),
-                JobPostingCount = 0,
+                JobPostingCount = phase.Jobs.Count(j => j.DeletedAt == null),
                 GroupCount = phase.InternshipGroups.Count(g => g.DeletedAt == null),
                 CreatedAt = phase.CreatedAt,
                 UpdatedAt = phase.UpdatedAt
@@ -165,6 +166,7 @@ public class GetInternshipPhaseByIdHandler
         var phaseAdmin = await _unitOfWork.Repository<InternshipPhase>().Query()
             .Include(p => p.Enterprise)
             .Include(p => p.InternshipGroups)
+            .Include(p => p.Jobs)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
 
@@ -198,7 +200,7 @@ public class GetInternshipPhaseByIdHandler
             RemainingCapacity = Math.Max(phaseAdmin.Capacity - adminPlacedCount, 0),
             Description = phaseAdmin.Description,
             Status = ToLifecycleStatus(phaseAdmin, adminToday),
-            JobPostingCount = 0,
+            JobPostingCount = phaseAdmin.Jobs.Count(j => j.DeletedAt == null),
             GroupCount = phaseAdmin.InternshipGroups.Count(g => g.DeletedAt == null),
             CreatedAt = phaseAdmin.CreatedAt,
             UpdatedAt = phaseAdmin.UpdatedAt

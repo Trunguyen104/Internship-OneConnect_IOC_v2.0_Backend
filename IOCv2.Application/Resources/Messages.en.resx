@@ -745,6 +745,23 @@
   <data name="InternshipPhase.Log.UpdateWithQueueApplications" xml:space="preserve">
     <value>Warning: Internship phase {0} date/capacity was updated while pending applications exist in queue.</value>
   </data>
+  <!-- BUG-B-02 FIX: Cannot delete phase with linked job postings -->
+  <data name="InternshipPhase.CannotDeleteHasJobPostings" xml:space="preserve">
+    <value>Cannot delete this internship phase because [{0}] job posting(s) are currently linked to it. Please delete or move the job postings to another phase first.</value>
+  </data>
+  <!-- BUG-B-01 FIX: Cannot shorten end date when job postings exceed new end date -->
+  <data name="InternshipPhase.JobPostingsExceedNewEndDate" xml:space="preserve">
+    <value>[{0}] job posting(s) have deadlines that exceed the new end date. Please adjust the job posting deadlines before shortening the internship phase end date.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteHasJobPostings" xml:space="preserve">
+    <value>Rejecting deletion of internship phase {0} — {1} job posting(s) are linked. Delete request denied.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteGroupLinksWillBeCleared" xml:space="preserve">
+    <value>Internship phase {0} has {1} group link(s); links will be cleared before deletion proceeds.</value>
+  </data>
+  <data name="InternshipPhase.Log.JobPostingsExceedNewEndDate" xml:space="preserve">
+    <value>Rejecting end date update for internship phase {0} — {1} job posting(s) have deadlines exceeding the new end date.</value>
+  </data>
   <data name="Terms.NameExists" xml:space="preserve">
     <value>Term name already exists. Please choose a different name.</value>
   </data>

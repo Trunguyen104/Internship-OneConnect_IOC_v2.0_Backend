@@ -10,7 +10,7 @@ namespace IOCv2.Domain.Entities
         public string GroupName { get; private set; } = string.Empty;
         public string? Description { get; private set; }
 
-        public Guid PhaseId { get; private set; }
+        public Guid? PhaseId { get; private set; }
         public Guid? EnterpriseId { get; private set; }
         public virtual Enterprise? Enterprise { get; set; }
 
@@ -22,7 +22,7 @@ namespace IOCv2.Domain.Entities
         public GroupStatus Status { get; private set; }
 
         // Navigation properties
-        public virtual InternshipPhase InternshipPhase { get; set; } = null!;
+        public virtual InternshipPhase? InternshipPhase { get; set; }
         private readonly List<InternshipStudent> _members = new();
         public virtual ICollection<InternshipStudent> Members => _members.AsReadOnly();
         
@@ -60,7 +60,7 @@ namespace IOCv2.Domain.Entities
         public void UpdateInfo(
             string groupName,
             string? description,
-            Guid phaseId,
+            Guid? phaseId,
             Guid? enterpriseId,
             Guid? mentorId,
             DateTime? startDate,
@@ -73,6 +73,13 @@ namespace IOCv2.Domain.Entities
             MentorId = mentorId;
             StartDate = startDate;
             EndDate = endDate;
+        }
+
+        public void ClearPhaseLink()
+        {
+            PhaseId = null;
+            StartDate = null;
+            EndDate = null;
         }
 
         public void AddMember(Guid studentId, InternshipRole role)

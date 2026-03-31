@@ -6,6 +6,7 @@ using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace IOCv2.Application.Features.InternshipPhases.Commands.DeleteInternshipPhase;
 
@@ -85,19 +86,26 @@ public class DeleteInternshipPhaseHandler
             }
         }
 
-        // BUG-G FIX: Block deletion if ANY non-deleted group exists (Active OR Archived).
-        // Previously only Active groups were checked; Archived (completed) groups were ignored,
-        // making the phase deletable while leaving orphaned historical data that hides student history.
         var existingGroupCount = phase.InternshipGroups
             .Count(g => g.DeletedAt == null);
 
         if (existingGroupCount > 0)
+            _logger.LogWarning(
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteGroupLinksWillBeCleared),
+                request.PhaseId, existingGroupCount);
+
+        var linkedJobCount = await _unitOfWork.Repository<Job>().Query()
+            .AsNoTracking()
+            .CountAsync(j => j.PhaseId == phase.PhaseId && j.DeletedAt == null, cancellationToken);
+
+        if (linkedJobCount > 0)
         {
             _logger.LogWarning(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteHasActiveGroups),
-                phase.Name, request.PhaseId, existingGroupCount);
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteHasJobPostings),
+                phase.PhaseId, linkedJobCount);
             return Result<bool>.Failure(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteHasActiveGroups, phase.Name, existingGroupCount),
+                string.Format(_messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteHasJobPostings),
+                    linkedJobCount),
                 ResultErrorType.BadRequest);
         }
 
@@ -110,8 +118,8 @@ public class DeleteInternshipPhaseHandler
         if (placedCount > 0)
         {
             _logger.LogWarning(
-                "Refusing to delete phase {PhaseId} — {PlacedCount} student(s) currently placed.",
-                request.PhaseId, placedCount);
+                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteHasActiveGroups),
+                phase.Name, phase.PhaseId, placedCount);
             return Result<bool>.Failure(
                 string.Format(_messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteHasPlacedStudents), placedCount),
                 ResultErrorType.BadRequest);
@@ -120,6 +128,16 @@ public class DeleteInternshipPhaseHandler
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            if (existingGroupCount > 0)
+            {
+                var groupsToDetach = phase.InternshipGroups.Where(g => g.DeletedAt == null).ToList();
+                foreach (var group in groupsToDetach)
+                {
+                    group.ClearPhaseLink();
+                    await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group, cancellationToken);
+                }
+            }
 
             await _unitOfWork.Repository<InternshipPhase>().HardDeleteAsync(phase, cancellationToken);
             var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
