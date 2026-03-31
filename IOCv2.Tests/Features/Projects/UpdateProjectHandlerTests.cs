@@ -76,13 +76,17 @@ namespace IOCv2.Tests.Features.Projects
         public async Task Handle_ValidRequest_ShouldReturnSuccess()
         {
             // Arrange
-            var internshipId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var enterpriseUserId = Guid.NewGuid();
+            var group = InternshipGroup.Create(
+                phaseId: Guid.NewGuid(),
+                groupName: "IG-A",
+                mentorId: enterpriseUserId);
             
             var project = Project.Create("Old Name", "Old Description", "PRJ-TEST_TST_1", "IT", "Requirements", mentorId: enterpriseUserId);
             project.Publish();
-            project.AssignToGroup(internshipId, null, null);
+            project.AssignToGroup(group.InternshipId, null, null);
+            project.InternshipGroup = group;
             var command = new UpdateProjectCommand { ProjectId = project.ProjectId, ProjectName = "Updated Name" };
             
             _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());

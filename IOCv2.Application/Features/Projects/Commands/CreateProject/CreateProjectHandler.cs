@@ -137,9 +137,13 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             }
 
             // 6. Create + Persist
+            var projectRequirements = string.IsNullOrWhiteSpace(request.Requirements)
+                ? string.Empty
+                : request.Requirements.Trim();
+
             var newProject = Project.Create(
                 request.ProjectName, request.Description,
-                projectCode, DefaultProjectField, request.Requirements,
+                projectCode, DefaultProjectField, projectRequirements,
                 request.Deliverables, mentorId: enterpriseUser.EnterpriseUserId,
                 startDate: request.StartDate, endDate: request.EndDate);
 

@@ -16,6 +16,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 {
     public class UpdateProjectHandler : IRequestHandler<UpdateProjectCommand, Result<UpdateProjectResponse>>
     {
+        private const string FixedProjectField = "Software Engineering";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<UpdateProjectHandler> _logger;
@@ -64,8 +66,11 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            // B9: Scope check — chỉ Mentor tạo project mới được edit (AC-08, AC-14)
-            if (project.MentorId != enterpriseUser.EnterpriseUserId)
+            var canManageProject = project.InternshipId.HasValue
+                ? project.InternshipGroup?.MentorId == enterpriseUser.EnterpriseUserId
+                : project.MentorId == enterpriseUser.EnterpriseUserId;
+
+            if (!canManageProject)
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Block nếu project không còn editable (OperationalStatus không phải Unstarted/Active)
@@ -101,7 +106,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                     request.Description,
                     request.StartDate,
                     request.EndDate,
-                    request.Field,
+                    FixedProjectField,
                     request.Requirements,
                     request.Deliverables,
                     request.Template);

@@ -7,5 +7,6 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
     {
         public Guid ProjectId { get; set; }
         public Guid NewInternshipId { get; set; }
+        public Guid? ReplacementProjectId { get; set; }
     }
 }

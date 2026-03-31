@@ -44,34 +44,35 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                 return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.MentorNotFound), ResultErrorType.Forbidden);
 
             var project = await _unitOfWork.Repository<Project>().Query()
+                .Include(p => p.InternshipGroup)
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (project == null)
                 return Result<SwapGroupResponse>.NotFound(_message.GetMessage(MessageKeys.Projects.NotFound));
 
-            // Scope: chỉ Mentor tạo project
-            if (project.MentorId != enterpriseUser.EnterpriseUserId)
+            var canManageProject = project.InternshipId.HasValue
+                ? project.InternshipGroup?.MentorId == enterpriseUser.EnterpriseUserId
+                : project.MentorId == enterpriseUser.EnterpriseUserId;
+
+            if (!canManageProject)
                 return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Project phải đang Active (có group)
             if (project.OperationalStatus != OperationalStatus.Active)
                 return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.ProjectNotAssigned), ResultErrorType.BadRequest);
 
-            // Student data check: block swap nếu có WorkItem hoặc Sprint
-            if (project.InternshipId.HasValue)
-            {
-                var hasWorkItems = await _unitOfWork.Repository<WorkItem>().Query()
-                    .AnyAsync(w => w.ProjectId == project.ProjectId, cancellationToken);
+            if (!project.InternshipId.HasValue)
+                return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.ProjectNotAssigned), ResultErrorType.BadRequest);
 
-                if (hasWorkItems)
-                    return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.HasStudentDataWorkItems), ResultErrorType.BadRequest);
+            var oldInternshipId = project.InternshipId.Value;
+            var oldGroup = project.InternshipGroup;
+            if (oldGroup == null)
+                return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.InvalidRequest), ResultErrorType.BadRequest);
 
-                var hasSprints = await _unitOfWork.Repository<Sprint>().Query()
-                    .AnyAsync(s => s.ProjectId == project.ProjectId, cancellationToken);
-
-                if (hasSprints)
-                    return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.HasStudentDataSprints), ResultErrorType.BadRequest);
-            }
+            // AC-05 step 1: block swap when source group's current project already has real activity data.
+            var sourceHasActivityData = await HasRealActivityDataAsync(project.ProjectId, oldInternshipId, cancellationToken);
+            if (sourceHasActivityData)
+                return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.CannotDeleteHasData), ResultErrorType.BadRequest);
 
             // Load new group
             var newGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
@@ -90,14 +91,52 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
             if (newGroup.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
-            var oldInternshipId = project.InternshipId;
+            var targetCurrentProject = await _unitOfWork.Repository<Project>().Query()
+                .FirstOrDefaultAsync(p => p.InternshipId == newGroup.InternshipId
+                                       && p.ProjectId != project.ProjectId
+                                       && p.OperationalStatus == OperationalStatus.Active,
+                    cancellationToken);
+
+            if (targetCurrentProject != null)
+            {
+                var targetHasActivityData = await HasRealActivityDataAsync(targetCurrentProject.ProjectId, newGroup.InternshipId, cancellationToken);
+                if (targetHasActivityData)
+                    return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.CannotDeleteHasData), ResultErrorType.BadRequest);
+            }
+
+            var sourceStudentCount = await _unitOfWork.Repository<InternshipStudent>().Query()
+                .CountAsync(s => s.InternshipId == oldInternshipId, cancellationToken);
+
+            Project? replacementProject = null;
+            if (sourceStudentCount > 0)
+            {
+                if (!request.ReplacementProjectId.HasValue)
+                    return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.InvalidRequest), ResultErrorType.BadRequest);
+
+                replacementProject = await _unitOfWork.Repository<Project>().Query()
+                    .FirstOrDefaultAsync(p => p.ProjectId == request.ReplacementProjectId.Value, cancellationToken);
+
+                if (replacementProject == null)
+                    return Result<SwapGroupResponse>.NotFound(_message.GetMessage(MessageKeys.Projects.NotFound));
+
+                if (replacementProject.MentorId != enterpriseUser.EnterpriseUserId ||
+                    replacementProject.OperationalStatus != OperationalStatus.Unstarted ||
+                    replacementProject.InternshipId.HasValue)
+                    return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.InvalidRequest), ResultErrorType.BadRequest);
+            }
 
             project.SwapGroup(newGroup.InternshipId, newGroup.StartDate, newGroup.EndDate);
+            targetCurrentProject?.UnassignFromGroup();
+            replacementProject?.AssignToGroup(oldInternshipId, oldGroup.StartDate, oldGroup.EndDate);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
+                if (targetCurrentProject != null)
+                    await _unitOfWork.Repository<Project>().UpdateAsync(targetCurrentProject, cancellationToken);
+                if (replacementProject != null)
+                    await _unitOfWork.Repository<Project>().UpdateAsync(replacementProject, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
             }
@@ -114,10 +153,9 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                 try
                 {
                     // Notify students của group cũ
-                    if (oldInternshipId.HasValue)
                     {
                         var oldStudentUserIds = await _unitOfWork.Repository<InternshipStudent>().Query()
-                            .Where(s => s.InternshipId == oldInternshipId.Value)
+                            .Where(s => s.InternshipId == oldInternshipId)
                             .Select(s => s.Student.UserId)
                             .ToListAsync(cancellationToken);
 
@@ -236,6 +274,32 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
                 EndDate           = project.EndDate,
                 UpdatedAt         = project.UpdatedAt ?? DateTime.UtcNow
             });
+        }
+
+        private async Task<bool> HasRealActivityDataAsync(Guid projectId, Guid internshipId, CancellationToken cancellationToken)
+        {
+            var hasWorkItems = await _unitOfWork.Repository<WorkItem>().Query()
+                .AnyAsync(w => w.ProjectId == projectId, cancellationToken);
+            if (hasWorkItems) return true;
+
+            var hasSprints = await _unitOfWork.Repository<Sprint>().Query()
+                .AnyAsync(s => s.ProjectId == projectId, cancellationToken);
+            if (hasSprints) return true;
+
+            var hasLogbooks = await _unitOfWork.Repository<Logbook>().Query()
+                .AnyAsync(l => l.InternshipId == internshipId, cancellationToken);
+            if (hasLogbooks) return true;
+
+            var hasStakeholders = await _unitOfWork.Repository<Stakeholder>().Query()
+                .AnyAsync(s => s.InternshipId == internshipId, cancellationToken);
+            if (hasStakeholders) return true;
+
+            var hasEvaluations = await _unitOfWork.Repository<Evaluation>().Query()
+                .AnyAsync(e => e.InternshipId == internshipId, cancellationToken);
+            if (hasEvaluations) return true;
+
+            return await _unitOfWork.Repository<ViolationReport>().Query()
+                .AnyAsync(v => v.InternshipGroupId == internshipId, cancellationToken);
         }
     }
 }

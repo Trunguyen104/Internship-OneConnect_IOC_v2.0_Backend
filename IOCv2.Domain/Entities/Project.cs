@@ -1,4 +1,4 @@
-using IOCv2.Domain.Enums;
+﻿using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
 {
@@ -127,7 +127,19 @@ namespace IOCv2.Domain.Entities
             InternshipId = newInternshipId;
             StartDate    = startDate;
             EndDate      = endDate;
+            OperationalStatus = OperationalStatus.Active;
+            IsOrphaned = false;
             UpdatedAt    = DateTime.UtcNow;
+        }
+
+        public void UnassignFromGroup()
+        {
+            InternshipId = null;
+            StartDate = null;
+            EndDate = null;
+            OperationalStatus = OperationalStatus.Unstarted;
+            IsOrphaned = false;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         /// <summary>

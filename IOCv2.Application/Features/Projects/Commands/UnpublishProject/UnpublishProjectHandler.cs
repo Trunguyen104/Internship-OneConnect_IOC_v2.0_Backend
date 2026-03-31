@@ -44,13 +44,17 @@ namespace IOCv2.Application.Features.Projects.Commands.UnpublishProject
                 return Result<UnpublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.MentorNotFound), ResultErrorType.Forbidden);
 
             var project = await _unitOfWork.Repository<Project>().Query()
+                .Include(p => p.InternshipGroup)
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (project == null)
                 return Result<UnpublishProjectResponse>.NotFound(_message.GetMessage(MessageKeys.Projects.NotFound));
 
-            // Scope: chỉ Mentor tạo project
-            if (project.MentorId != enterpriseUser.EnterpriseUserId)
+            var canManageProject = project.InternshipId.HasValue
+                ? project.InternshipGroup?.MentorId == enterpriseUser.EnterpriseUserId
+                : project.MentorId == enterpriseUser.EnterpriseUserId;
+
+            if (!canManageProject)
                 return Result<UnpublishProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Phải đang Published
