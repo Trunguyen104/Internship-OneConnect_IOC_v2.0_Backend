@@ -1,4 +1,4 @@
-﻿namespace IOCv2.Application.Constants
+namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -1070,6 +1070,9 @@
             public const string LogByIdFromCache = "InternshipPhase.Log.ByIdFromCache";
             public const string LogByIdNotFound = "InternshipPhase.Log.ByIdNotFound";
             public const string LogByIdSuccess = "InternshipPhase.Log.ByIdSuccess";
+            /// <summary>AC-05: log how many job postings and placed students were loaded.</summary>
+            public const string LogByIdTabsLoaded = "InternshipPhase.Log.ByIdTabsLoaded";
+
 
             // Log - Get My Phases (Student + Mentor)
             public const string LogGettingMyPhases           = "InternshipPhase.Log.GettingMyPhases";

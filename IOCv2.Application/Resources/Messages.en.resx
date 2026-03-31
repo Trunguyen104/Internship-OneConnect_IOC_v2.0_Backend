@@ -1103,4 +1103,7 @@
   <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
     <value>Only allow selecting phases that are Open (Upcoming) or InProgress (Active)</value>
   </data>
+  <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
+    <value>Internship phase {0} detail loaded — {1} job posting(s), {2} placed student(s).</value>
+  </data>
 </root>

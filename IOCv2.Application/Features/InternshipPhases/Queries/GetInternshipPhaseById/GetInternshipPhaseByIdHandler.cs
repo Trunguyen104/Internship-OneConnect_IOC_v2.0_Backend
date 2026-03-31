@@ -3,211 +3,248 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.InternshipPhases.Queries.GetInternshipPhaseById;
 
-public class GetInternshipPhaseByIdHandler
+public class GetInternshipPhaseByIdHandler(
+    IUnitOfWork unitOfWork,
+    ICurrentUserService currentUserService,
+    IMessageService messageService,
+    ICacheService cacheService,
+    ILogger<GetInternshipPhaseByIdHandler> logger)
     : IRequestHandler<GetInternshipPhaseByIdQuery, Result<GetInternshipPhaseByIdResponse>>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IMessageService _messageService;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<GetInternshipPhaseByIdHandler> _logger;
-
-    public GetInternshipPhaseByIdHandler(
-        IUnitOfWork unitOfWork,
-        ICurrentUserService currentUserService,
-        IMessageService messageService,
-        ICacheService cacheService,
-        ILogger<GetInternshipPhaseByIdHandler> logger)
-    {
-        _unitOfWork = unitOfWork;
-        _currentUserService = currentUserService;
-        _messageService = messageService;
-        _cacheService = cacheService;
-        _logger = logger;
-    }
-
     public async Task<Result<GetInternshipPhaseByIdResponse>> Handle(
         GetInternshipPhaseByIdQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation(
-            _messageService.GetMessage(MessageKeys.InternshipPhase.LogGettingById),
+        logger.LogInformation(
+            messageService.GetMessage(MessageKeys.InternshipPhase.LogGettingById),
             request.PhaseId);
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         // BUG-07 FIX: Ownership check BEFORE cache lookup to prevent cross-enterprise cache leak
-        var role = _currentUserService.Role;
+        var role = currentUserService.Role;
         if (role != "SuperAdmin" && role != "SchoolAdmin")
         {
-            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+            if (!Guid.TryParse(currentUserService.UserId, out var currentUserId))
             {
                 return Result<GetInternshipPhaseByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.Common.Unauthorized),
+                    messageService.GetMessage(MessageKeys.Common.Unauthorized),
                     ResultErrorType.Unauthorized);
             }
 
-            var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
+            var enterpriseUser = await unitOfWork.Repository<EnterpriseUser>().Query()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
 
             // BUG-06 FIX: null enterpriseUser → Forbidden (previously fell through)
             if (enterpriseUser == null)
             {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
+                logger.LogWarning(
+                    messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
                     currentUserId, request.PhaseId, Guid.Empty);
                 return Result<GetInternshipPhaseByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.EnterpriseUserNotFound),
+                    messageService.GetMessage(MessageKeys.InternshipPhase.EnterpriseUserNotFound),
                     ResultErrorType.Forbidden);
             }
 
-            // BUG-F FIX: Use a role-scoped cache key so admin and non-admin results are never
-            // served from the same cache slot. Prevents future regressions if ownership checks
-            // are moved or refactored inadvertently.
+            // BUG-F FIX: Use a role-scoped cache key, so admin and non-admin results are never
+            // served from the same cache slot.
             var scopedCacheKey = InternshipPhaseCacheKeys.PhaseForEnterprise(request.PhaseId, enterpriseUser.EnterpriseId);
-            var cached = await _cacheService.GetAsync<GetInternshipPhaseByIdResponse>(scopedCacheKey, cancellationToken);
+            var cached = await cacheService.GetAsync<GetInternshipPhaseByIdResponse>(scopedCacheKey, cancellationToken);
             if (cached != null)
             {
-                // Validate cached ownership as defence-in-depth
+                // Validate cached ownership as defense-in-depth
                 if (cached.EnterpriseId != enterpriseUser.EnterpriseId)
                 {
-                    _logger.LogWarning(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
+                    logger.LogWarning(
+                        messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
                         currentUserId, cached.EnterpriseId, enterpriseUser.EnterpriseId);
                     return Result<GetInternshipPhaseByIdResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
+                        messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
                         ResultErrorType.Forbidden);
                 }
-                _logger.LogInformation(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdFromCache),
+                logger.LogInformation(
+                    messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdFromCache),
                     request.PhaseId);
                 return Result<GetInternshipPhaseByIdResponse>.Success(cached);
             }
 
-            var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
-                .Include(p => p.Enterprise)
-                .Include(p => p.InternshipGroups)
-                    .ThenInclude(g => g.Members)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
+            var phase = await LoadPhaseWithTabDataAsync(request.PhaseId, cancellationToken);
 
             if (phase == null)
             {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdNotFound),
+                logger.LogWarning(
+                    messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdNotFound),
                     request.PhaseId);
                 return Result<GetInternshipPhaseByIdResponse>.NotFound(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
+                    messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
             }
 
             if (phase.EnterpriseId != enterpriseUser.EnterpriseId)
             {
-                _logger.LogWarning(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
+                logger.LogWarning(
+                    messageService.GetMessage(MessageKeys.InternshipPhase.LogOwnershipDenied),
                     currentUserId, phase.EnterpriseId, enterpriseUser.EnterpriseId);
                 return Result<GetInternshipPhaseByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
+                    messageService.GetMessage(MessageKeys.InternshipPhase.NotYourEnterprise),
                     ResultErrorType.Forbidden);
             }
 
-            var placedCount = phase.InternshipGroups
-                .Where(g => g.DeletedAt == null)
-                .SelectMany(g => g.Members)
-                .Select(m => m.StudentId)
-                .Distinct()
-                .Count();
+            var response = BuildResponse(phase, today);
 
-            var response = new GetInternshipPhaseByIdResponse
-            {
-                PhaseId = phase.PhaseId,
-                EnterpriseId = phase.EnterpriseId,
-                EnterpriseName = phase.Enterprise?.Name ?? string.Empty,
-                Name = phase.Name,
-                StartDate = phase.StartDate,
-                EndDate = phase.EndDate,
-                MajorFields = phase.MajorFields,
-                Capacity = phase.Capacity,
-                RemainingCapacity = Math.Max(phase.Capacity - placedCount, 0),
-                Description = phase.Description,
-                Status = phase.GetLifecycleStatus(today),
-                GroupCount = phase.InternshipGroups.Count(g => g.DeletedAt == null),
-                CreatedAt = phase.CreatedAt,
-                UpdatedAt = phase.UpdatedAt
-            };
+            await cacheService.SetAsync(scopedCacheKey, response, InternshipPhaseCacheKeys.Expiration.Phase, cancellationToken);
 
-            await _cacheService.SetAsync(scopedCacheKey, response, InternshipPhaseCacheKeys.Expiration.Phase, cancellationToken);
-
-            _logger.LogInformation(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdSuccess),
+            logger.LogInformation(
+                messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdSuccess),
                 phase.PhaseId, phase.Name, response.EnterpriseName, phase.Status, response.GroupCount);
+
+            logger.LogInformation(
+                messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdTabsLoaded),
+                phase.PhaseId, response.JobPostings.Count, response.PlacedStudents.Count);
 
             return Result<GetInternshipPhaseByIdResponse>.Success(response);
         }
 
         // SuperAdmin / SchoolAdmin path — no ownership restriction
         var cacheKey = InternshipPhaseCacheKeys.Phase(request.PhaseId);
-        var cachedAdmin = await _cacheService.GetAsync<GetInternshipPhaseByIdResponse>(cacheKey, cancellationToken);
+        var cachedAdmin = await cacheService.GetAsync<GetInternshipPhaseByIdResponse>(cacheKey, cancellationToken);
         if (cachedAdmin != null)
         {
-            _logger.LogInformation(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdFromCache),
+            logger.LogInformation(
+                messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdFromCache),
                 request.PhaseId);
             return Result<GetInternshipPhaseByIdResponse>.Success(cachedAdmin);
         }
 
-        var phaseAdmin = await _unitOfWork.Repository<InternshipPhase>().Query()
-            .Include(p => p.Enterprise)
-            .Include(p => p.InternshipGroups)
-                .ThenInclude(g => g.Members)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
+        var phaseAdmin = await LoadPhaseWithTabDataAsync(request.PhaseId, cancellationToken);
 
         if (phaseAdmin == null)
         {
-            _logger.LogWarning(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdNotFound),
+            logger.LogWarning(
+                messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdNotFound),
                 request.PhaseId);
             return Result<GetInternshipPhaseByIdResponse>.NotFound(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
+                messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
         }
 
-        var adminPlacedCount = phaseAdmin.InternshipGroups
+        var adminResponse = BuildResponse(phaseAdmin, today);
+
+        await cacheService.SetAsync(cacheKey, adminResponse, InternshipPhaseCacheKeys.Expiration.Phase, cancellationToken);
+
+        logger.LogInformation(
+            messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdSuccess),
+            phaseAdmin.PhaseId, phaseAdmin.Name, adminResponse.EnterpriseName, phaseAdmin.Status, adminResponse.GroupCount);
+
+        logger.LogInformation(
+            messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdTabsLoaded),
+            phaseAdmin.PhaseId, adminResponse.JobPostings.Count, adminResponse.PlacedStudents.Count);
+
+        return Result<GetInternshipPhaseByIdResponse>.Success(adminResponse);
+    }
+
+    // ── Private helpers ──────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Loads the InternshipPhase together with all data needed to populate
+    /// the Job Postings tab and the Placed Students tab (AC-05).
+    /// </summary>
+    private async Task<InternshipPhase?> LoadPhaseWithTabDataAsync(
+        Guid phaseId,
+        CancellationToken cancellationToken)
+    {
+        return await unitOfWork.Repository<InternshipPhase>().Query()
+            // Basic phase info
+            .Include(p => p.Enterprise)
+            // InternshipGroups → Members (for GroupCount + placed-count)
+            .Include(p => p.InternshipGroups)
+                .ThenInclude(g => g.Members)
+            // Job Postings tab: Jobs → Applications count
+            .Include(p => p.Jobs.Where(j => j.DeletedAt == null))
+                .ThenInclude(j => j.InternshipApplications)
+            // Placed Students tab: applications that are Placed and linked to this phase's jobs
+            .Include(p => p.Jobs.Where(j => j.DeletedAt == null))
+                .ThenInclude(j => j.InternshipApplications
+                    .Where(a => a.Status == InternshipApplicationStatus.Placed))
+                    .ThenInclude(a => a.Student)
+                        .ThenInclude(s => s.User)
+            .Include(p => p.Jobs.Where(j => j.DeletedAt == null))
+                .ThenInclude(j => j.InternshipApplications
+                    .Where(a => a.Status == InternshipApplicationStatus.Placed))
+                    .ThenInclude(a => a.University)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.PhaseId == phaseId && p.DeletedAt == null, cancellationToken);
+    }
+
+    /// <summary>
+    /// Maps an <see cref="InternshipPhase"/> (with all includes) into the full
+    /// <see cref="GetInternshipPhaseByIdResponse"/> including tab data.
+    /// </summary>
+    private static GetInternshipPhaseByIdResponse BuildResponse(
+        InternshipPhase phase,
+        DateOnly today)
+    {
+        // ── Placed-count from InternshipGroups (existing logic) ────────────────
+        var placedCount = phase.InternshipGroups
             .Where(g => g.DeletedAt == null)
             .SelectMany(g => g.Members)
             .Select(m => m.StudentId)
             .Distinct()
             .Count();
 
-        var adminResponse = new GetInternshipPhaseByIdResponse
+        // ── Tab: Job Postings ─────────────────────────────────────────────────
+        var jobPostings = phase.Jobs
+            .Select<Job, PhaseJobPostingDto>(j => new PhaseJobPostingDto
+            {
+                JobId = j.JobId,
+                Title = j.Title ?? string.Empty,
+                Status = j.Status,
+                Deadline = j.ExpireDate,
+                ApplicationCount = j.InternshipApplications.Count
+            })
+            .ToList();
+
+        // ── Tab: Placed Students ──────────────────────────────────────────────
+        // Collect all Placed applications from ALL jobs in this phase,
+        // deduplicate by StudentId (a student can only be Placed once).
+        var placedStudents = phase.Jobs
+            .SelectMany(j => j.InternshipApplications
+                .Where(a => a.Status == InternshipApplicationStatus.Placed))
+            .GroupBy(a => a.StudentId)
+            .Select(g => g.OrderByDescending(a => a.ReviewedAt).First()) // latest placement entry
+            .Select<InternshipApplication, PhasePlacedStudentDto>(a => new PhasePlacedStudentDto
+            {
+                StudentId = a.StudentId,
+                FullName = a.Student.User.FullName,
+                UniversityName = a.University.Name,
+                Source = a.Source,
+                PlacedAt = a.ReviewedAt
+            })
+            .ToList();
+
+        return new GetInternshipPhaseByIdResponse
         {
-            PhaseId = phaseAdmin.PhaseId,
-            EnterpriseId = phaseAdmin.EnterpriseId,
-            EnterpriseName = phaseAdmin.Enterprise?.Name ?? string.Empty,
-            Name = phaseAdmin.Name,
-            StartDate = phaseAdmin.StartDate,
-            EndDate = phaseAdmin.EndDate,
-            MajorFields = phaseAdmin.MajorFields,
-            Capacity = phaseAdmin.Capacity,
-            RemainingCapacity = Math.Max(phaseAdmin.Capacity - adminPlacedCount, 0),
-            Description = phaseAdmin.Description,
-            Status = phaseAdmin.GetLifecycleStatus(today),
-            GroupCount = phaseAdmin.InternshipGroups.Count(g => g.DeletedAt == null),
-            CreatedAt = phaseAdmin.CreatedAt,
-            UpdatedAt = phaseAdmin.UpdatedAt
+            PhaseId = phase.PhaseId,
+            EnterpriseId = phase.EnterpriseId,
+            EnterpriseName = phase.Enterprise!.Name,
+            Name = phase.Name,
+            StartDate = phase.StartDate,
+            EndDate = phase.EndDate,
+            MajorFields = phase.MajorFields,
+            Capacity = phase.Capacity,
+            RemainingCapacity = Math.Max(phase.Capacity - placedCount, 0),
+            Description = phase.Description,
+            Status = phase.GetLifecycleStatus(today),
+            GroupCount = phase.InternshipGroups.Count(g => g.DeletedAt == null),
+            CreatedAt = phase.CreatedAt,
+            UpdatedAt = phase.UpdatedAt,
+            JobPostings = jobPostings,
+            PlacedStudents = placedStudents
         };
-
-        await _cacheService.SetAsync(cacheKey, adminResponse, InternshipPhaseCacheKeys.Expiration.Phase, cancellationToken);
-
-        _logger.LogInformation(
-            _messageService.GetMessage(MessageKeys.InternshipPhase.LogByIdSuccess),
-            phaseAdmin.PhaseId, phaseAdmin.Name, adminResponse.EnterpriseName, phaseAdmin.Status, adminResponse.GroupCount);
-
-        return Result<GetInternshipPhaseByIdResponse>.Success(adminResponse);
     }
 }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1157,5 +1157,8 @@
   </data>
   <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
     <value>Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động).</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
+    <value>Đã lấy chi tiết nhóm thực tập {0} — {1} bài đăng tuyển dụng, {2} sinh viên đã được bố trí.</value>
   </data>
 </root>
