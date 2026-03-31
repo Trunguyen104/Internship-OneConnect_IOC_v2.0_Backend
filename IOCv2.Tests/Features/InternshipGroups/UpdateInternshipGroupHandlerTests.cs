@@ -68,6 +68,9 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
             
+            _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
             _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
 
@@ -159,6 +162,9 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
+            _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+
             _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().Query())
                 .Returns(new List<EnterpriseUser> { mentorEnterpriseUser }.BuildMock());
 
@@ -235,6 +241,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
             _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
+            _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
             _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().Query())
                 .Returns(new List<EnterpriseUser> { mentorEnterpriseUser }.BuildMock());
             _mockUnitOfWork.Setup(x => x.Repository<Project>())
@@ -296,6 +304,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
                 .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
             _mockUnitOfWork.Setup(x => x.Repository<InternshipPhase>().ExistsAsync(It.IsAny<Expression<Func<InternshipPhase, bool>>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _mockUnitOfWork.Setup(x => x.Repository<Enterprise>().ExistsAsync(It.IsAny<Expression<Func<Enterprise, bool>>>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
             _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>().Query())
                 .Returns(new List<EnterpriseUser> { mentorEnterpriseUser }.BuildMock());

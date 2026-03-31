@@ -18,19 +18,27 @@ public class CreateInternshipPhaseValidator : AbstractValidator<CreateInternship
         RuleFor(x => x.StartDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateRequired));
 
-        RuleFor(x => x.StartDate)
-            .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow))
-                .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast))
-            .When(x => x.StartDate != default);
-
         RuleFor(x => x.EndDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateRequired))
             .GreaterThan(x => x.StartDate)
                 .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateAfterStartDate));
 
-        RuleFor(x => x.MaxStudents)
-            .GreaterThan(0).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MaxStudentsGreaterThanZero))
-            .When(x => x.MaxStudents.HasValue);
+        RuleFor(x => x)
+            .Must(x => (x.EndDate.DayNumber - x.StartDate.DayNumber) >= 28)
+            .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DurationMinDays))
+            .When(x => x.StartDate != default && x.EndDate != default);
+
+        RuleFor(x => x)
+            .Must(x => (x.EndDate.DayNumber - x.StartDate.DayNumber) <= 365)
+            .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DurationMaxDays))
+            .When(x => x.StartDate != default && x.EndDate != default);
+
+        RuleFor(x => x.MajorFields)
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MajorFieldsRequired))
+            .MaximumLength(1000).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MajorFieldsMaxLength));
+
+        RuleFor(x => x.Capacity)
+            .GreaterThan(0).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MaxStudentsGreaterThanZero));
 
         RuleFor(x => x.Description)
             .MaximumLength(2000).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DescriptionMaxLength))

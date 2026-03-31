@@ -1023,4 +1023,32 @@
   <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
     <value>No open internship term found for university {0}.</value>
   </data>
+
+  <!-- UniAdminInternship — Logbook weekly display badges -->
+  <data name="UniAdminInternship.StatusBadge.Late" xml:space="preserve">
+    <value>Late</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Submitted" xml:space="preserve">
+    <value>Submitted</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Weekend" xml:space="preserve">
+    <value>Weekend</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Holiday" xml:space="preserve">
+    <value>Holiday</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Missing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="UniAdminInternship.WeekTitle" xml:space="preserve">
+    <value>Week {0}: {1} - {2}</value>
+  </data>
+
+  <!-- InternshipPhase — missing EN key -->
+  <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
+    <value>Rejected deletion of internship phase '{0}' (ID: {1}) — phase is in InProgress status and cannot be deleted.</value>
+  </data>
 </root>

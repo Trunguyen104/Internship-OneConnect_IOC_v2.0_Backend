@@ -986,6 +986,10 @@ namespace IOCv2.Application.Constants
             public const string StartDateNotInPast = "InternshipPhase.StartDateNotInPast";
             public const string EndDateRequired = "InternshipPhase.EndDateRequired";
             public const string EndDateAfterStartDate = "InternshipPhase.EndDateAfterStartDate";
+            public const string DurationMinDays = "InternshipPhase.DurationMinDays";
+            public const string DurationMaxDays = "InternshipPhase.DurationMaxDays";
+            public const string MajorFieldsRequired = "InternshipPhase.MajorFieldsRequired";
+            public const string MajorFieldsMaxLength = "InternshipPhase.MajorFieldsMaxLength";
             public const string MaxStudentsGreaterThanZero = "InternshipPhase.MaxStudentsGreaterThanZero";
             public const string StatusInvalid = "InternshipPhase.StatusInvalid";
             public const string DescriptionMaxLength = "InternshipPhase.DescriptionMaxLength";
@@ -997,6 +1001,8 @@ namespace IOCv2.Application.Constants
             public const string DuplicateName = "InternshipPhase.DuplicateName";
             public const string DuplicateNameOnUpdate = "InternshipPhase.DuplicateNameOnUpdate";
             public const string CannotUpdateClosed = "InternshipPhase.CannotUpdateClosed";
+            public const string CannotUpdateEnded = "InternshipPhase.CannotUpdateEnded";
+            public const string CannotUpdateLockedFields = "InternshipPhase.CannotUpdateLockedFields";
             public const string InvalidStatusTransition = "InternshipPhase.InvalidStatusTransition";
             public const string CannotDeleteHasActiveGroups = "InternshipPhase.CannotDeleteHasActiveGroups";
             public const string CannotDeleteInProgress = "InternshipPhase.CannotDeleteInProgress";
@@ -1162,6 +1168,15 @@ namespace IOCv2.Application.Constants
             public const string PageSizeInvalid = "UniAdminInternship.PageSizeInvalid";
             public const string PageSizeTooLarge = "UniAdminInternship.PageSizeTooLarge";
             public const string StudentIdRequired = "UniAdminInternship.StudentIdRequired";
+
+            // Logbook weekly display
+            public const string StatusBadgeLate = "UniAdminInternship.StatusBadge.Late";
+            public const string StatusBadgeSubmitted = "UniAdminInternship.StatusBadge.Submitted";
+            public const string StatusBadgeWeekend = "UniAdminInternship.StatusBadge.Weekend";
+            public const string StatusBadgeHoliday = "UniAdminInternship.StatusBadge.Holiday";
+            public const string StatusBadgePending = "UniAdminInternship.StatusBadge.Pending";
+            public const string StatusBadgeMissing = "UniAdminInternship.StatusBadge.Missing";
+            public const string WeekTitle = "UniAdminInternship.WeekTitle";
         }
     }
 }

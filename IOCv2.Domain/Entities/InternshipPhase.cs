@@ -9,7 +9,8 @@ namespace IOCv2.Domain.Entities
         public string Name { get; private set; } = string.Empty;
         public DateOnly StartDate { get; private set; }
         public DateOnly EndDate { get; private set; }
-        public int? MaxStudents { get; private set; }
+        public string MajorFields { get; private set; } = string.Empty;
+        public int Capacity { get; private set; }
         public string? Description { get; private set; }
         public InternshipPhaseStatus Status { get; private set; } = InternshipPhaseStatus.Draft;
 
@@ -34,7 +35,8 @@ namespace IOCv2.Domain.Entities
             string name,
             DateOnly startDate,
             DateOnly endDate,
-            int? maxStudents,
+            string majorFields,
+            int capacity,
             string? description)
         {
             return new InternshipPhase
@@ -44,10 +46,18 @@ namespace IOCv2.Domain.Entities
                 Name = name,
                 StartDate = startDate,
                 EndDate = endDate,
-                MaxStudents = maxStudents,
+                MajorFields = majorFields,
+                Capacity = capacity,
                 Description = description,
                 Status = InternshipPhaseStatus.Draft
             };
+        }
+
+        public InternshipPhaseLifecycleStatus GetLifecycleStatus(DateOnly today)
+        {
+            if (StartDate > today) return InternshipPhaseLifecycleStatus.Upcoming;
+            if (EndDate < today) return InternshipPhaseLifecycleStatus.Ended;
+            return InternshipPhaseLifecycleStatus.Active;
         }
 
         /// <summary>
@@ -64,14 +74,16 @@ namespace IOCv2.Domain.Entities
             string name,
             DateOnly startDate,
             DateOnly endDate,
-            int? maxStudents,
+            string majorFields,
+            int capacity,
             string? description,
             InternshipPhaseStatus status)
         {
             Name = name;
             StartDate = startDate;
             EndDate = endDate;
-            MaxStudents = maxStudents;
+            MajorFields = majorFields;
+            Capacity = capacity;
             Description = description;
             Status = status;
             UpdatedAt = DateTime.UtcNow;

@@ -61,11 +61,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
 
             var fromGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(g => g.Members)
-                .FirstOrDefaultAsync(g => g.InternshipId == request.FromGroupId, cancellationToken);
+                .FirstOrDefaultAsync(g => g.InternshipId == request.FromGroupId && g.DeletedAt == null, cancellationToken);
 
             var toGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(g => g.Members)
-                .FirstOrDefaultAsync(g => g.InternshipId == request.ToGroupId, cancellationToken);
+                .FirstOrDefaultAsync(g => g.InternshipId == request.ToGroupId && g.DeletedAt == null, cancellationToken);
 
             if (fromGroup == null || toGroup == null)
             {

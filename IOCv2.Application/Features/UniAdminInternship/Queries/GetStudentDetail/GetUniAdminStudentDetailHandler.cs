@@ -174,7 +174,7 @@ public class GetUniAdminStudentDetailHandler
                 .ToListAsync(cancellationToken);
 
             logbookCount = studentLogbooks.Count;
-            weeklyLogbooks = BuildWeeklyLogbooks(studentLogbooks, internStudent.JoinedAt, group.EndDate);
+            weeklyLogbooks = BuildWeeklyLogbooks(studentLogbooks, internStudent.JoinedAt, group.EndDate, _messageService);
         }
 
         var logbookSummary = CalculateLogbookSummary(internStudent, group, logbookCount);
@@ -300,7 +300,8 @@ public class GetUniAdminStudentDetailHandler
     private static List<UniAdminWeeklyLogbookDto> BuildWeeklyLogbooks(
         List<Logbook> logbooks,
         DateTime joinedAt,
-        DateTime? phaseEndDate)
+        DateTime? phaseEndDate,
+        IMessageService messageService)
     {
         var startDate = joinedAt.Date;
         var endDate = (phaseEndDate?.Date ?? DateTime.UtcNow.Date);
@@ -340,7 +341,9 @@ public class GetUniAdminStudentDetailHandler
                         Issue = logbook.Issue,
                         Plan = logbook.Plan,
                         Status = logbook.Status,
-                        StatusBadge = isLate ? "Late" : "Submitted",
+                        StatusBadge = isLate
+                            ? messageService.GetMessage(MessageKeys.UniAdminInternship.StatusBadgeLate)
+                            : messageService.GetMessage(MessageKeys.UniAdminInternship.StatusBadgeSubmitted),
                         SubmittedAt = logbook.CreatedAt,
                         IsSubmitted = true,
                         IsLate = isLate,
@@ -354,7 +357,13 @@ public class GetUniAdminStudentDetailHandler
                 else
                 {
                     var isFuture = d >= today;
-                    var statusBadge = isWeekend ? "Weekend" : isHoliday ? "Holiday" : isFuture ? "Pending" : "Missing";
+                    var statusBadge = isWeekend
+                        ? messageService.GetMessage(MessageKeys.UniAdminInternship.StatusBadgeWeekend)
+                        : isHoliday
+                            ? messageService.GetMessage(MessageKeys.UniAdminInternship.StatusBadgeHoliday)
+                            : isFuture
+                                ? messageService.GetMessage(MessageKeys.UniAdminInternship.StatusBadgePending)
+                                : messageService.GetMessage(MessageKeys.UniAdminInternship.StatusBadgeMissing);
 
                     entries.Add(new UniAdminWeeklyLogbookEntryDto
                     {
@@ -384,7 +393,7 @@ public class GetUniAdminStudentDetailHandler
             weeks.Add(new UniAdminWeeklyLogbookDto
             {
                 WeekNumber = weekNumber,
-                WeekTitle = $"Week {weekNumber}: {rangeStart:dd/MM} - {rangeEnd:dd/MM/yyyy}",
+                WeekTitle = messageService.GetMessage(MessageKeys.UniAdminInternship.WeekTitle, weekNumber, rangeStart.ToString("dd/MM"), rangeEnd.ToString("dd/MM/yyyy")),
                 WeekStartDate = rangeStart,
                 WeekEndDate = rangeEnd,
                 SubmittedCount = submittedCount,

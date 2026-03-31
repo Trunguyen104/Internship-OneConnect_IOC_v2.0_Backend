@@ -39,6 +39,8 @@ public class GetInternshipPhaseByIdHandler
             _messageService.GetMessage(MessageKeys.InternshipPhase.LogGettingById),
             request.PhaseId);
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
         // BUG-07 FIX: Ownership check BEFORE cache lookup to prevent cross-enterprise cache leak
         var role = _currentUserService.Role;
         if (role != "SuperAdmin" && role != "SchoolAdmin")
@@ -91,6 +93,7 @@ public class GetInternshipPhaseByIdHandler
             var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
                 .Include(p => p.Enterprise)
                 .Include(p => p.InternshipGroups)
+                    .ThenInclude(g => g.Members)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
 
@@ -113,6 +116,13 @@ public class GetInternshipPhaseByIdHandler
                     ResultErrorType.Forbidden);
             }
 
+            var placedCount = phase.InternshipGroups
+                .Where(g => g.DeletedAt == null)
+                .SelectMany(g => g.Members)
+                .Select(m => m.StudentId)
+                .Distinct()
+                .Count();
+
             var response = new GetInternshipPhaseByIdResponse
             {
                 PhaseId = phase.PhaseId,
@@ -121,9 +131,11 @@ public class GetInternshipPhaseByIdHandler
                 Name = phase.Name,
                 StartDate = phase.StartDate,
                 EndDate = phase.EndDate,
-                MaxStudents = phase.MaxStudents,
+                MajorFields = phase.MajorFields,
+                Capacity = phase.Capacity,
+                RemainingCapacity = Math.Max(phase.Capacity - placedCount, 0),
                 Description = phase.Description,
-                Status = phase.Status,
+                Status = phase.GetLifecycleStatus(today),
                 GroupCount = phase.InternshipGroups.Count(g => g.DeletedAt == null),
                 CreatedAt = phase.CreatedAt,
                 UpdatedAt = phase.UpdatedAt
@@ -152,6 +164,7 @@ public class GetInternshipPhaseByIdHandler
         var phaseAdmin = await _unitOfWork.Repository<InternshipPhase>().Query()
             .Include(p => p.Enterprise)
             .Include(p => p.InternshipGroups)
+                .ThenInclude(g => g.Members)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
 
@@ -164,6 +177,13 @@ public class GetInternshipPhaseByIdHandler
                 _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
         }
 
+        var adminPlacedCount = phaseAdmin.InternshipGroups
+            .Where(g => g.DeletedAt == null)
+            .SelectMany(g => g.Members)
+            .Select(m => m.StudentId)
+            .Distinct()
+            .Count();
+
         var adminResponse = new GetInternshipPhaseByIdResponse
         {
             PhaseId = phaseAdmin.PhaseId,
@@ -172,9 +192,11 @@ public class GetInternshipPhaseByIdHandler
             Name = phaseAdmin.Name,
             StartDate = phaseAdmin.StartDate,
             EndDate = phaseAdmin.EndDate,
-            MaxStudents = phaseAdmin.MaxStudents,
+            MajorFields = phaseAdmin.MajorFields,
+            Capacity = phaseAdmin.Capacity,
+            RemainingCapacity = Math.Max(phaseAdmin.Capacity - adminPlacedCount, 0),
             Description = phaseAdmin.Description,
-            Status = phaseAdmin.Status,
+            Status = phaseAdmin.GetLifecycleStatus(today),
             GroupCount = phaseAdmin.InternshipGroups.Count(g => g.DeletedAt == null),
             CreatedAt = phaseAdmin.CreatedAt,
             UpdatedAt = phaseAdmin.UpdatedAt

@@ -54,7 +54,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
             }
 
             var group = await _unitOfWork.Repository<InternshipGroup>().Query()
-                .FirstOrDefaultAsync(g => g.InternshipId == request.InternshipGroupId, cancellationToken);
+                .FirstOrDefaultAsync(g => g.InternshipId == request.InternshipGroupId && g.DeletedAt == null, cancellationToken);
 
             if (group == null)
             {
@@ -121,11 +121,9 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
             foreach (var projectId in projectIdsToArchive)
                 await _cacheService.RemoveAsync(ProjectCacheKeys.Project(projectId), cancellationToken);
 
-            return Result<ArchiveInternshipGroupResponse>.Success(new ArchiveInternshipGroupResponse
-            {
-                InternshipGroupId = request.InternshipGroupId,
-                Message = _messageService.GetMessage(MessageKeys.InternshipGroups.ArchiveSuccess)
-            });
+            return Result<ArchiveInternshipGroupResponse>.Success(
+                new ArchiveInternshipGroupResponse { InternshipGroupId = request.InternshipGroupId },
+                _messageService.GetMessage(MessageKeys.InternshipGroups.ArchiveSuccess));
         }
     }
 }

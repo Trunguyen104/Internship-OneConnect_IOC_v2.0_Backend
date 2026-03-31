@@ -591,7 +591,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Không thể xóa đợt thực tập &apos;{0}&apos; vì hiện có {1} nhóm thực tập đang hoạt động (Active). Vui lòng kết thúc hoặc lưu trữ tất cả nhóm trước khi thực hiện xóa..
+        ///   Looks up a localized string similar to Intern Phase &apos;{0}&apos; đang có {1} nhóm thực tập. Không thể xóa khi còn dữ liệu liên quan..
         /// </summary>
         internal static string InternshipPhase_CannotDeleteHasActiveGroups {
             get {
@@ -609,11 +609,29 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Không thể cập nhật đợt thực tập &apos;{0}&apos; vì đợt này đã ở trạng thái Đã đóng (Closed). Chỉ có thể chỉnh sửa đợt thực tập đang ở trạng thái Nháp (Draft) hoặc Đang mở (Open)..
+        ///   Looks up a localized string similar to Không thể cập nhật đợt thực tập &apos;{0}&apos; vì đợt này đã kết thúc..
         /// </summary>
         internal static string InternshipPhase_CannotUpdateClosed {
             get {
                 return ResourceManager.GetString("InternshipPhase.CannotUpdateClosed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể cập nhật đợt thực tập &apos;{0}&apos; vì đợt này đã kết thúc..
+        /// </summary>
+        internal static string InternshipPhase_CannotUpdateEnded {
+            get {
+                return ResourceManager.GetString("InternshipPhase.CannotUpdateEnded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Intern Phase này đã có sinh viên được nhận / nhóm thực tập. Không thể thay đổi thời gian hoặc số lượng. Nếu cần thay đổi, hãy xử lý dứt điểm các sinh viên liên quan trước..
+        /// </summary>
+        internal static string InternshipPhase_CannotUpdateLockedFields {
+            get {
+                return ResourceManager.GetString("InternshipPhase.CannotUpdateLockedFields", resourceCulture);
             }
         }
         
@@ -645,7 +663,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Đợt thực tập có tên &apos;{0}&apos; đã tồn tại trong doanh nghiệp này. Vui lòng chọn một tên khác..
+        ///   Looks up a localized string similar to Cảnh báo: Đợt thực tập có tên &apos;{0}&apos; đã tồn tại trong doanh nghiệp {1}..
         /// </summary>
         internal static string InternshipPhase_DuplicateName {
             get {
@@ -654,11 +672,29 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Không thể đổi tên thành &apos;{0}&apos; vì đã có đợt thực tập khác trong doanh nghiệp này sử dụng tên này..
+        ///   Looks up a localized string similar to Đã có đợt thực tập khác dùng tên &apos;{0}&apos;. Bạn vẫn có thể tiếp tục..
         /// </summary>
         internal static string InternshipPhase_DuplicateNameOnUpdate {
             get {
                 return ResourceManager.GetString("InternshipPhase.DuplicateNameOnUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Intern Phase tối đa 12 tháng..
+        /// </summary>
+        internal static string InternshipPhase_DurationMaxDays {
+            get {
+                return ResourceManager.GetString("InternshipPhase.DurationMaxDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Intern Phase tối thiểu 4 tuần..
+        /// </summary>
+        internal static string InternshipPhase_DurationMinDays {
+            get {
+                return ResourceManager.GetString("InternshipPhase.DurationMinDays", resourceCulture);
             }
         }
         
@@ -780,7 +816,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Từ chối xóa đợt thực tập &apos;{0}&apos; (ID: {1}) — hiện có {2} nhóm thực tập đang hoạt động..
+        ///   Looks up a localized string similar to Từ chối xóa đợt thực tập &apos;{0}&apos; (ID: {1}) — hiện có {2} nhóm thực tập liên quan..
         /// </summary>
         internal static string InternshipPhase_Log_DeleteHasActiveGroups {
             get {
@@ -834,7 +870,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Đợt thực tập có tên &apos;{0}&apos; đã tồn tại trong doanh nghiệp {1}. Từ chối tạo mới..
+        ///   Looks up a localized string similar to Cảnh báo: Đợt thực tập có tên &apos;{0}&apos; đã tồn tại trong doanh nghiệp {1}..
         /// </summary>
         internal static string InternshipPhase_Log_DuplicateName {
             get {
@@ -960,7 +996,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Từ chối cập nhật đợt thực tập {0} — tên &apos;{1}&apos; đã được sử dụng bởi đợt thực tập khác trong doanh nghiệp {2}..
+        ///   Looks up a localized string similar to Cảnh báo: Đợt thực tập {0} có tên &apos;{1}&apos; đã được sử dụng bởi đợt thực tập khác trong doanh nghiệp {2}..
         /// </summary>
         internal static string InternshipPhase_Log_UpdateDuplicateName {
             get {
@@ -1014,7 +1050,25 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Số lượng sinh viên tối đa (MaxStudents) phải lớn hơn 0..
+        ///   Looks up a localized string similar to Ngành nhận không được vượt quá 1000 ký tự..
+        /// </summary>
+        internal static string InternshipPhase_MajorFieldsMaxLength {
+            get {
+                return ResourceManager.GetString("InternshipPhase.MajorFieldsMaxLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngành nhận không được để trống..
+        /// </summary>
+        internal static string InternshipPhase_MajorFieldsRequired {
+            get {
+                return ResourceManager.GetString("InternshipPhase.MajorFieldsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Số lượng nhận phải ít nhất là 1..
         /// </summary>
         internal static string InternshipPhase_MaxStudentsGreaterThanZero {
             get {

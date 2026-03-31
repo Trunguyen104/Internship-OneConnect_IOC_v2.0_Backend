@@ -1,3 +1,5 @@
+using IOCv2.Domain.Enums;
+
 namespace IOCv2.Application.Features.InternshipPhases.Common;
 
 public static class InternshipPhaseCacheKeys
@@ -17,11 +19,12 @@ public static class InternshipPhaseCacheKeys
     public static string PhaseForEnterprise(Guid phaseId, Guid enterpriseId)
         => $"{PhaseEnterprisePrefix}:{enterpriseId}:{phaseId}";
 
-    public static string PhaseList(Guid? enterpriseId, int? status, int pageNumber, int pageSize)
+    public static string PhaseList(Guid? enterpriseId, InternshipPhaseLifecycleStatus? status, bool includeEnded, int pageNumber, int pageSize)
     {
         var statusPart = status?.ToString() ?? "all";
         var enterprisePart = enterpriseId?.ToString() ?? "all";
-        return $"{PhaseListPrefix}:enterprise:{enterprisePart}:status:{statusPart}:page:{pageNumber}:size:{pageSize}";
+        var endedPart = includeEnded ? "with-ended" : "no-ended";
+        return $"{PhaseListPrefix}:enterprise:{enterprisePart}:status:{statusPart}:ended:{endedPart}:page:{pageNumber}:size:{pageSize}";
     }
 
     public static string PhaseListPattern() => $"{PhaseListPrefix}:*";

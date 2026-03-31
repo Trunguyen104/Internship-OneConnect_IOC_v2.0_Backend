@@ -3,7 +3,6 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
-using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -42,6 +41,7 @@ public class DeleteInternshipPhaseHandler
 
         var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
             .Include(p => p.InternshipGroups)
+                .ThenInclude(g => g.Members)
             .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
 
         if (phase == null)
@@ -92,7 +92,14 @@ public class DeleteInternshipPhaseHandler
         var existingGroupCount = phase.InternshipGroups
             .Count(g => g.DeletedAt == null);
 
-        if (existingGroupCount > 0)
+        var placedCount = phase.InternshipGroups
+            .Where(g => g.DeletedAt == null)
+            .SelectMany(g => g.Members)
+            .Select(m => m.StudentId)
+            .Distinct()
+            .Count();
+
+        if (existingGroupCount > 0 || placedCount > 0)
         {
             _logger.LogWarning(
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteHasActiveGroups),
@@ -102,22 +109,11 @@ public class DeleteInternshipPhaseHandler
                 ResultErrorType.BadRequest);
         }
 
-        // Block deletion of InProgress phases
-        if (phase.Status == InternshipPhaseStatus.InProgress)
-        {
-            _logger.LogWarning(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteInProgress),
-                phase.Name, request.PhaseId);
-            return Result<bool>.Failure(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteInProgress, phase.Name),
-                ResultErrorType.BadRequest);
-        }
-
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            await _unitOfWork.Repository<InternshipPhase>().DeleteAsync(phase);
+            await _unitOfWork.Repository<InternshipPhase>().HardDeleteAsync(phase, cancellationToken);
             var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
             if (saved > 0)

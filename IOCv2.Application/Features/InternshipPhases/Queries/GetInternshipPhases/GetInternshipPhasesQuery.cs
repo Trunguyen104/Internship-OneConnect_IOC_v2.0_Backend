@@ -7,7 +7,8 @@ namespace IOCv2.Application.Features.InternshipPhases.Queries.GetInternshipPhase
 public record GetInternshipPhasesQuery : IRequest<Result<PaginatedResult<GetInternshipPhasesResponse>>>
 {
     public Guid? EnterpriseId { get; init; }
-    public InternshipPhaseStatus? Status { get; init; }
+    public InternshipPhaseLifecycleStatus? Status { get; init; }
+    public bool IncludeEnded { get; init; } = false;
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
 }

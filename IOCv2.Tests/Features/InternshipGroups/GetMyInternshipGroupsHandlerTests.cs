@@ -65,8 +65,11 @@ public class GetMyInternshipGroupsHandlerTests
         var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", null, enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
         group.Enterprise = new Enterprise { EnterpriseId = enterpriseId, Name = "Rikasoft" };
         var phase = InternshipPhase.Create(enterpriseId, "FU Cần Thơ - Mùa xuân 2026",
-            DateOnly.FromDateTime(new DateTime(2026, 1, 1)),
-            DateOnly.FromDateTime(new DateTime(2026, 4, 30)), null, null);
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)),
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(70)),
+            "CNTT",
+            20,
+            "Test phase");
         typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, termId);
         group.InternshipPhase = phase;
         group.Mentor = mentor;

@@ -612,23 +612,41 @@
   <data name="InternshipPhase.EndDateAfterStartDate" xml:space="preserve">
     <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
   </data>
+  <data name="InternshipPhase.DurationMinDays" xml:space="preserve">
+    <value>Intern Phase tối thiểu 4 tuần.</value>
+  </data>
+  <data name="InternshipPhase.DurationMaxDays" xml:space="preserve">
+    <value>Intern Phase tối đa 12 tháng.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsRequired" xml:space="preserve">
+    <value>Ngành nhận không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsMaxLength" xml:space="preserve">
+    <value>Ngành nhận không được vượt quá 1000 ký tự.</value>
+  </data>
   <data name="InternshipPhase.MaxStudentsGreaterThanZero" xml:space="preserve">
-    <value>Số lượng sinh viên tối đa (MaxStudents) phải lớn hơn 0.</value>
+    <value>Số lượng nhận phải ít nhất là 1.</value>
   </data>
   <data name="InternshipPhase.NotFound" xml:space="preserve">
     <value>Không tìm thấy đợt thực tập.</value>
   </data>
   <data name="InternshipPhase.DuplicateName" xml:space="preserve">
-    <value>Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp này. Vui lòng chọn một tên khác.</value>
+    <value>Cảnh báo: Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp {1}.</value>
   </data>
   <data name="InternshipPhase.DuplicateNameOnUpdate" xml:space="preserve">
-    <value>Không thể đổi tên thành '{0}' vì đã có đợt thực tập khác trong doanh nghiệp này sử dụng tên này.</value>
+    <value>Đã có đợt thực tập khác dùng tên '{0}'. Bạn vẫn có thể tiếp tục.</value>
   </data>
   <data name="InternshipPhase.CannotUpdateClosed" xml:space="preserve">
-    <value>Không thể cập nhật đợt thực tập '{0}' vì đợt này đã ở trạng thái Đã đóng (Closed). Chỉ có thể chỉnh sửa đợt thực tập đang ở trạng thái Nháp (Draft) hoặc Đang mở (Open).</value>
+    <value>Không thể cập nhật đợt thực tập '{0}' vì đợt này đã kết thúc.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateEnded" xml:space="preserve">
+    <value>Không thể cập nhật đợt thực tập '{0}' vì đợt này đã kết thúc.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateLockedFields" xml:space="preserve">
+    <value>Intern Phase này đã có sinh viên được nhận / nhóm thực tập. Không thể thay đổi thời gian hoặc số lượng. Nếu cần thay đổi, hãy xử lý dứt điểm các sinh viên liên quan trước.</value>
   </data>
   <data name="InternshipPhase.CannotDeleteHasActiveGroups" xml:space="preserve">
-    <value>Không thể xóa đợt thực tập '{0}' vì hiện có {1} nhóm thực tập đang hoạt động (Active). Vui lòng kết thúc hoặc lưu trữ tất cả nhóm trước khi thực hiện xóa.</value>
+    <value>Intern Phase '{0}' đang có {1} nhóm thực tập. Không thể xóa khi còn dữ liệu liên quan.</value>
   </data>
   <data name="InternshipPhase.CannotDeleteInProgress" xml:space="preserve">
     <value>Không thể xóa đợt thực tập '{0}' vì đợt đang ở trạng thái Đang thực tập (InProgress). Vui lòng đóng đợt thực tập trước khi xóa.</value>
@@ -658,7 +676,7 @@
     <value>Không tìm thấy doanh nghiệp có ID {0}. Không thể tạo đợt thực tập.</value>
   </data>
   <data name="InternshipPhase.Log.DuplicateName" xml:space="preserve">
-    <value>Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp {1}. Từ chối tạo mới.</value>
+    <value>Cảnh báo: Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp {1}.</value>
   </data>
   <data name="InternshipPhase.Log.CreateSuccess" xml:space="preserve">
     <value>Tạo đợt thực tập thành công — PhaseId: {0}, Tên: '{1}', Doanh nghiệp: {2}.</value>
@@ -676,7 +694,7 @@
     <value>Từ chối cập nhật đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái Đã đóng (Closed).</value>
   </data>
   <data name="InternshipPhase.Log.UpdateDuplicateName" xml:space="preserve">
-    <value>Từ chối cập nhật đợt thực tập {0} — tên '{1}' đã được sử dụng bởi đợt thực tập khác trong doanh nghiệp {2}.</value>
+    <value>Cảnh báo: Đợt thực tập {0} có tên '{1}' đã được sử dụng bởi đợt thực tập khác trong doanh nghiệp {2}.</value>
   </data>
   <data name="InternshipPhase.Log.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật đợt thực tập thành công — PhaseId: {0}, Tên: '{1}'.</value>
@@ -694,7 +712,7 @@
     <value>Không tìm thấy đợt thực tập với ID {0}. Yêu cầu xóa bị từ chối.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteHasActiveGroups" xml:space="preserve">
-    <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — hiện có {2} nhóm thực tập đang hoạt động.</value>
+    <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — hiện có {2} nhóm thực tập liên quan.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteSuccess" xml:space="preserve">
     <value>Xóa đợt thực tập thành công — PhaseId: {0}, Tên: '{1}', Doanh nghiệp: {2}.</value>
@@ -1018,6 +1036,75 @@
   </data>
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>Không tìm thấy User {UserId} khi lấy profile</value>
+  </data>
+
+  <!-- UniAdminInternship — Success messages -->
+  <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách sinh viên thực tập thành công.</value>
+  </data>
+  <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
+    <value>Lấy thông tin chi tiết sinh viên thành công.</value>
+  </data>
+  <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách đánh giá sinh viên thành công.</value>
+  </data>
+  <data name="UniAdminInternship.ViolationsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách vi phạm sinh viên thành công.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>Không có kỳ thực tập nào đang mở cho trường của bạn. Danh sách trống.</value>
+  </data>
+
+  <!-- UniAdminInternship — Log messages -->
+  <data name="UniAdminInternship.Log.GetStudentList" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy danh sách sinh viên thực tập kỳ {1}, tổng {2} bản ghi.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy chi tiết sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy đánh giá sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetViolations" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy vi phạm sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.UniversityUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy UniversityUser cho userId={0}. Từ chối truy cập.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ học với termId={0}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermAccessDenied" xml:space="preserve">
+    <value>SchoolAdmin {0} cố truy cập kỳ học {1} không thuộc trường {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.StudentNotFound" xml:space="preserve">
+    <value>Sinh viên {0} không tìm thấy trong kỳ {1} của trường {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập đang mở cho trường {0}.</value>
+  </data>
+
+  <!-- UniAdminInternship — Logbook weekly display badges -->
+  <data name="UniAdminInternship.StatusBadge.Late" xml:space="preserve">
+    <value>Trễ hạn</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Submitted" xml:space="preserve">
+    <value>Đã nộp</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Weekend" xml:space="preserve">
+    <value>Cuối tuần</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Holiday" xml:space="preserve">
+    <value>Ngày lễ</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Pending" xml:space="preserve">
+    <value>Chờ nộp</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Missing" xml:space="preserve">
+    <value>Chưa nộp</value>
+  </data>
+  <data name="UniAdminInternship.WeekTitle" xml:space="preserve">
+    <value>Tuần {0}: {1} - {2}</value>
   </data>
 
 </root>

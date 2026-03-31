@@ -74,9 +74,15 @@ namespace IOCv2.Tests.Features.InternshipGroups
 
         private static InternshipPhase CreateOpenPhase(Guid phaseId, Guid enterpriseId)
         {
-            var phase = InternshipPhase.Create(enterpriseId, "Test Phase",
-                DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)),
-                DateOnly.FromDateTime(DateTime.UtcNow.AddDays(60)), null, null);
+            var phase = InternshipPhase.Create(
+                enterpriseId,
+                "Test Phase",
+                DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)),
+                DateOnly.FromDateTime(DateTime.UtcNow.AddDays(70)),
+                "CNTT",
+                10,
+                "Test phase description");
+
             typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, phaseId);
             typeof(InternshipPhase).GetProperty("Status")!.SetValue(phase, InternshipPhaseStatus.Open);
             return phase;

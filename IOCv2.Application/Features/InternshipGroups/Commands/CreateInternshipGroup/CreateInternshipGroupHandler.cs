@@ -94,7 +94,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipG
                         _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUnauthorizedEnterpriseAccess),
                             currentUserId, request.EnterpriseId.Value);
                         return Result<CreateInternshipGroupResponse>.Failure(
-                            _messageService.GetMessage(MessageKeys.InternshipGroups.EnterpriseNotFound),
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise),
                             ResultErrorType.Forbidden);
                     }
                 }
