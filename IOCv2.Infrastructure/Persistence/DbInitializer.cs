@@ -561,8 +561,74 @@ namespace IOCv2.Infrastructure.Persistence
                 "Rikkeisoft Summer 2026",
                 new DateOnly(2026, 6, 1), new DateOnly(2026, 9, 30),
                 "Software Engineering", 15,
-                "Đợt thực tập Summer 2026 của Rikkeisoft — bản nháp",
+                "t thc tp Summer 2026 ca Rikkeisoft €” bn nhp",
                 InternshipPhaseStatus.Draft);
+
+            // HAPPY CASES
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Software Autumn 2026",
+                new DateOnly(2026, 9, 1), new DateOnly(2026, 12, 31),
+                "Software Engineering, Cyber Security", 60,
+                "Đợt thực tập Mùa Thu 2026 - Tương lai xán lạn",
+                InternshipPhaseStatus.Draft);
+
+            await EnsurePhase(
+                rikkeisoft.EnterpriseId,
+                "Rikkeisoft Autumn 2026",
+                new DateOnly(2026, 9, 1), new DateOnly(2026, 12, 31),
+                "Artificial Intelligence, Software Engineering", 25,
+                "Đợt thực tập Mùa Thu 2026 - Cơ hội mới",
+                InternshipPhaseStatus.Open);
+
+            // UNHAPPY/EDGE CASES
+            
+            // 1. Minimum capacity (1) and very short duration (1 week)
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Micro Internship Express",
+                new DateOnly(2026, 10, 1), new DateOnly(2026, 10, 7),
+                "Software Engineering", 1,
+                "Chương trình thực tập siêu tốc 1 tuần cho 1 sinh viên xuất sắc nhất.",
+                InternshipPhaseStatus.Draft);
+
+            // 2. Maximum capacity and very long duration (1 year)
+            await EnsurePhase(
+                rikkeisoft.EnterpriseId,
+                "Rikkeisoft Mega-Internship 2027",
+                new DateOnly(2027, 1, 1), new DateOnly(2027, 12, 31),
+                "All IT Majors, Business, Design, HR, Marketing", 9999,
+                "Đợt thực tập lớn nhất lịch sử với 9999 sinh viên trong suốt 1 năm tròn",
+                InternshipPhaseStatus.Draft);
+
+            // 3. Past Start Date and End Date but accidentally status is Open (Simulating forgotten close edge case)
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Software Forgotten Phase 2024",
+                new DateOnly(2024, 1, 1), new DateOnly(2024, 6, 30),
+                "Software Engineering", 10,
+                "Đã qua rất lâu nhưng trạng thái chưa được update thành Closed",
+                InternshipPhaseStatus.Open);
+
+            // 4. End Date is same as Start Date (1 day duration)
+            await EnsurePhase(
+                rikkeisoft.EnterpriseId,
+                "Rikkeisoft One Day Challenge",
+                new DateOnly(2026, 11, 11), new DateOnly(2026, 11, 11),
+                "Data Science", 5,
+                "Thực tập trong vỏn vẹn 1 ngày duy nhất!",
+                InternshipPhaseStatus.Closed);
+
+            // 5. Very long Major fields string and description
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Software Specialized Tech Hub 2026",
+                new DateOnly(2026, 8, 1), new DateOnly(2026, 11, 30),
+                "Software Engineering, Information Technology, Computer Science, Data Engineering, Cyber Security, Artificial Intelligence, Machine Learning, Cloud Computing, DevOps, Blockchain, Internet of Things (IoT), Robotics, Embedded Systems, Game Development, UI/UX Design", 100,
+                "Đợt thực tập quy tụ tất cả các chuyên ngành từ cơ bản đến nâng cao. " +
+                "Sinh viên sẽ được làm việc trong các lab nghiên cứu sâu về các công nghệ xu hướng mới nhất. " +
+                "Yêu cầu: Sinh viên có GPA cao, tiếng Anh tốt và đam mê mãnh liệt với công nghệ.",
+                InternshipPhaseStatus.InProgress);
 
             await _context.SaveChangesAsync();
         }
@@ -1510,9 +1576,21 @@ namespace IOCv2.Infrastructure.Persistence
                 Guid evaluatorId, string note,
                 List<(Guid CriteriaId, decimal Score, decimal Weight, string Comment)> details)
             {
-                bool exists = await _context.Set<Evaluation>().AnyAsync(
-                    e => e.CycleId == cycleId && e.StudentId == studentId && e.Status == EvaluationStatus.Published);
-                if (exists) return;
+                var existingEval = await _context.Set<Evaluation>().FirstOrDefaultAsync(
+                    e => e.CycleId == cycleId && e.StudentId == studentId);
+                
+                if (existingEval != null)
+                {
+                    // If it exists but is not published, we update it
+                    if (existingEval.Status != EvaluationStatus.Published)
+                    {
+                        existingEval.Status = EvaluationStatus.Published;
+                        existingEval.Note = note;
+                        existingEval.EvaluatorId = evaluatorId;
+                        _context.Set<Evaluation>().Update(existingEval);
+                    }
+                    return;
+                }
 
                 var eval = new Evaluation
                 {
@@ -1949,3 +2027,4 @@ namespace IOCv2.Infrastructure.Persistence
         }
     }
 }
+
