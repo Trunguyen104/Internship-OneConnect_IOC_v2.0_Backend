@@ -19,7 +19,6 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
         public string? Requirements { get; set; }
         public string? Location { get; set; }
         public string? Benefit { get; set; }
-        public int? Quantity { get; set; }
         public DateTime? ExpireDate { get; set; }
 
         // New: internship date range

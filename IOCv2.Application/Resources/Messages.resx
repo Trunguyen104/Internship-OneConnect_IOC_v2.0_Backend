@@ -1108,3 +1108,44 @@
   </data>
 
 </root>
+  <data name="InternshipPhase.InternshipPhaseIdRequired" xml:space="preserve">
+    <value>Mã giai đoạn thực tập là bắt buộc.</value>
+  </data>
+  <data name="JobPosting.UpdateNotifyStudentSubject" xml:space="preserve">
+    <value>Thông báo: Bài đăng tuyển dụng đã được cập nhật</value>
+  </data>
+  <data name="JobPosting.UpdateNotifyStudentBody" xml:space="preserve">
+    <value>Job Posting [{0}] tại {1} vừa được cập nhật nội dung. Vui lòng xem lại thông tin tuyển dụng.</value>
+  </data>
+  <data name="JobPosting.InvalidStatus" xml:space="preserve">
+    <value>Trạng thái tin tuyển dụng không hợp lệ.</value>
+  </data>
+  <data name="JobPosting.ChangeInternPhaseBlockedDueToActiveApplications" xml:space="preserve">
+    <value>Bài đăng đang có {0} ứng viên. Không thể thay đổi Intern Phase khi đã có ứng viên đang xử lý. Vui lòng đóng bài đăng và xử lý các ứng viên trước.</value>
+  </data>
+  <data name="JobPosting.InvalidStatusForReopen" xml:space="preserve">
+    <value>Không thể mở lại bài đăng tuyển dụng do trạng thái không hợp lệ.</value>
+  </data>
+  <data name="JobPosting.ExpireDateMustBeFuture" xml:space="preserve">
+    <value>Ngày hết hạn phải là ngày trong tương lai.</value>
+  </data>
+  <data name="JobPosting.ExpireDateExceedsPhaseEndDate" xml:space="preserve">
+    <value>Ngày hết hạn không thể vượt quá ngày kết thúc của giai đoạn thực tập.</value>
+  </data>
+  <data name="JobPosting.ReopenJobPostingSuccessNotificationMessage" xml:space="preserve">
+    <value>Tin tuyển dụng đã được mở lại thành công.</value>
+  </data>
+  <data name="JobPosting.QuantityCannotBeLessThanPlaced" xml:space="preserve">
+    <value>Số lượng không thể nhỏ hơn số lượng ứng viên đã được bố trí.</value>
+  </data>
+  <data name="JobPosting.DraftNoApplications" xml:space="preserve">
+    <value>Bản nháp công việc không được phép có đơn ứng tuyển.</value>
+  </data>
+  <data name="JobPosting.JobPlacedMaxed" xml:space="preserve">
+    <value>Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ.
+</value>
+  </data>
+  <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
+    <value>Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động).</value>
+  </data>
+</root>
