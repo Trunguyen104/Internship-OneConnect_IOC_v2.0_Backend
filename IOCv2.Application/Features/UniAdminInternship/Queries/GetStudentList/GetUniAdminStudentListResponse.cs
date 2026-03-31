@@ -13,9 +13,9 @@ public class GetUniAdminStudentListResponse
 public class SummaryCardsDto
 {
     public int TotalStudents { get; set; }
-    public int ActiveInternship { get; set; }
-    public int MissingLogbook { get; set; }
+    public int Placed { get; set; }
     public int Unplaced { get; set; }
+    public int NoMentor { get; set; }
 }
 
 public class StudentListItemDto

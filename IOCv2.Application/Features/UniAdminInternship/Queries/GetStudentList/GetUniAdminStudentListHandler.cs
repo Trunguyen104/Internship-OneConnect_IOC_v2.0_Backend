@@ -225,6 +225,7 @@ public class GetUniAdminStudentListHandler
 
         // 9. Build list items
         var allItems = new List<StudentListItemDto>();
+        var noMentorCount = 0;
         foreach (var st in studentTerms)
         {
             var student = st.Student;
@@ -235,6 +236,9 @@ public class GetUniAdminStudentListHandler
             var group = internStudent?.InternshipGroup;
             var hasGroup = internStudent != null && group != null;
             var hasPendingApp = pendingAppStudentIds.Contains(st.StudentId);
+
+            if (st.PlacementStatus == PlacementStatus.Placed && hasGroup && group!.MentorId == null)
+                noMentorCount++;
 
             var uiStatus = DeriveUiStatus(st.PlacementStatus, hasGroup, hasPendingApp, term.Status);
 
@@ -272,11 +276,9 @@ public class GetUniAdminStudentListHandler
         var summary = new SummaryCardsDto
         {
             TotalStudents = allItems.Count,
-            ActiveInternship = allItems.Count(i => i.InternshipStatus == InternshipUiStatus.Active),
-            MissingLogbook = allItems.Count(i => i.Logbook != null && i.Logbook.Missing > 0),
-            Unplaced = allItems.Count(i =>
-                i.InternshipStatus == InternshipUiStatus.Unplaced
-                || i.InternshipStatus == InternshipUiStatus.PendingConfirmation)
+            Placed = studentTerms.Count(st => st.PlacementStatus == PlacementStatus.Placed),
+            Unplaced = studentTerms.Count(st => st.PlacementStatus == PlacementStatus.Unplaced),
+            NoMentor = noMentorCount
         };
 
         // 11. Apply filters in-memory
@@ -301,10 +303,10 @@ public class GetUniAdminStudentListHandler
         {
             filtered = request.LogbookStatus.Value switch
             {
-                LogbookFilterStatus.Sufficient     => filtered.Where(i => i.Logbook != null && i.Logbook.Missing == 0),
-                LogbookFilterStatus.SlightlyMissing => filtered.Where(i => i.Logbook != null && i.Logbook.Missing > 0 && i.Logbook.Missing <= 3),
-                LogbookFilterStatus.MissingMany    => filtered.Where(i => i.Logbook != null && i.Logbook.Missing > 3),
-                _                                  => filtered
+                LogbookFilterStatus.Sufficient      => filtered.Where(i => i.Logbook != null && i.Logbook.PercentComplete >= 75),
+                LogbookFilterStatus.SlightlyMissing => filtered.Where(i => i.Logbook != null && i.Logbook.PercentComplete >= 50 && i.Logbook.PercentComplete < 75),
+                LogbookFilterStatus.MissingMany     => filtered.Where(i => i.Logbook != null && i.Logbook.PercentComplete < 50),
+                _                                   => filtered
             };
         }
 
@@ -318,6 +320,10 @@ public class GetUniAdminStudentListHandler
             ("enterprise", "desc") => filtered.OrderByDescending(i => i.EnterpriseName),
             ("logbook",    "asc")  => filtered.OrderBy(i => i.Logbook?.PercentComplete ?? 0),
             ("logbook",    "desc") => filtered.OrderByDescending(i => i.Logbook?.PercentComplete ?? 0),
+            ("violations", "asc")  => filtered.OrderBy(i => i.ViolationCount),
+            ("violations", "desc") => filtered.OrderByDescending(i => i.ViolationCount),
+            ("violationcount", "asc")  => filtered.OrderBy(i => i.ViolationCount),
+            ("violationcount", "desc") => filtered.OrderByDescending(i => i.ViolationCount),
             _                      => filtered.OrderBy(i => i.FullName)   // default asc fullname
         };
 

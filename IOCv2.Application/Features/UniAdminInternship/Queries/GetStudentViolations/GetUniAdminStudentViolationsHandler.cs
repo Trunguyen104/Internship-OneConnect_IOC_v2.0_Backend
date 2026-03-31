@@ -109,6 +109,32 @@ public class GetUniAdminStudentViolationsHandler
 
         if (studentTerm == null)
         {
+            var studentExists = await _unitOfWork.Repository<Student>().Query()
+                .AsNoTracking()
+                .AnyAsync(s => s.StudentId == request.StudentId && s.DeletedAt == null, cancellationToken);
+
+            if (studentExists)
+            {
+                var belongsToAnotherUniversity = await _unitOfWork.Repository<StudentTerm>().Query()
+                    .AsNoTracking()
+                    .AnyAsync(st =>
+                        st.StudentId == request.StudentId
+                        && st.EnrollmentStatus == EnrollmentStatus.Active
+                        && st.DeletedAt == null
+                        && st.Term.UniversityId != universityId,
+                        cancellationToken);
+
+                if (belongsToAnotherUniversity)
+                {
+                    _logger.LogWarning(
+                        _messageService.GetMessage(MessageKeys.UniAdminInternship.LogTermAccessDenied),
+                        currentUserId, term.TermId, universityId);
+                    return Result<GetUniAdminStudentViolationsResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentNotInUniversity),
+                        ResultErrorType.Forbidden);
+                }
+            }
+
             _logger.LogWarning(
                 _messageService.GetMessage(MessageKeys.UniAdminInternship.LogStudentNotFound),
                 request.StudentId, term.TermId, universityId);
