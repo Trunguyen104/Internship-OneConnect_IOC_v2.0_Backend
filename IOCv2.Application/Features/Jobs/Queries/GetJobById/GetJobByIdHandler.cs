@@ -123,8 +123,8 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
             // AC-11: compute Placed count and set banner when Placed == Quantity
             var placedCount = job.InternshipApplications.Count(a => a.Status == InternshipApplicationStatus.Placed);
             response.PlacedCount = placedCount;
-            var maxStudents = job.InternshipPhase.MaxStudents;
-            if (maxStudents is not null && placedCount == maxStudents)
+            var maxStudents = job.InternshipPhase?.Capacity;
+            if (maxStudents is not null && placedCount >= maxStudents)
             {
                 response.FilledBanner = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.JobPlacedMaxed, job.InternshipPhase.Name, placedCount, maxStudents);
             }

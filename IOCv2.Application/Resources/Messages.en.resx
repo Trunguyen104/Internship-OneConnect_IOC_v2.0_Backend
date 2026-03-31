@@ -1050,6 +1050,7 @@
   <!-- InternshipPhase — missing EN key -->
   <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
     <value>Rejected deletion of internship phase '{0}' (ID: {1}) — phase is in InProgress status and cannot be deleted.</value>
+    </data>
   <data name="InternshipPhase.InternshipPhaseIdRequired" xml:space="preserve">
     <value>Internship Phase ID is required.</value>
   </data>

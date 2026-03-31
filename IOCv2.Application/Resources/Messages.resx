@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1106,8 +1106,6 @@
   <data name="UniAdminInternship.WeekTitle" xml:space="preserve">
     <value>Tuần {0}: {1} - {2}</value>
   </data>
-
-</root>
   <data name="InternshipPhase.InternshipPhaseIdRequired" xml:space="preserve">
     <value>Mã giai đoạn thực tập là bắt buộc.</value>
   </data>
