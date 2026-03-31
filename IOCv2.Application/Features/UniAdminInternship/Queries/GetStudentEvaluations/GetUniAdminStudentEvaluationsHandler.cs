@@ -127,7 +127,7 @@ public class GetUniAdminStudentEvaluationsHandler
                 if (belongsToAnotherUniversity)
                 {
                     _logger.LogWarning(
-                        _messageService.GetMessage(MessageKeys.UniAdminInternship.LogTermAccessDenied),
+                        _messageService.GetMessage(MessageKeys.UniAdminInternship.LogStudentNotInUniversity),
                         currentUserId, term.TermId, universityId);
                     return Result<GetUniAdminStudentEvaluationsResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentNotInUniversity),

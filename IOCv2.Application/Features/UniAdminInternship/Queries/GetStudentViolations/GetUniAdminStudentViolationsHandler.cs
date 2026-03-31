@@ -127,7 +127,7 @@ public class GetUniAdminStudentViolationsHandler
                 if (belongsToAnotherUniversity)
                 {
                     _logger.LogWarning(
-                        _messageService.GetMessage(MessageKeys.UniAdminInternship.LogTermAccessDenied),
+                        _messageService.GetMessage(MessageKeys.UniAdminInternship.LogStudentNotInUniversity),
                         currentUserId, term.TermId, universityId);
                     return Result<GetUniAdminStudentViolationsResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentNotInUniversity),
@@ -178,6 +178,28 @@ public class GetUniAdminStudentViolationsHandler
             Description = v.Description,
             InternshipGroupName = v.InternshipGroup.GroupName
         }).ToList();
+
+        var reporterIds = violations
+            .Where(v => v.CreatedBy.HasValue)
+            .Select(v => v.CreatedBy!.Value)
+            .Distinct()
+            .ToList();
+
+        var reporterNameById = reporterIds.Any()
+            ? await _unitOfWork.Repository<User>().Query()
+                .AsNoTracking()
+                .Where(u => reporterIds.Contains(u.UserId) && u.DeletedAt == null)
+                .ToDictionaryAsync(u => u.UserId, u => u.FullName, cancellationToken)
+            : new Dictionary<Guid, string>();
+
+        foreach (var item in items)
+        {
+            var source = violations.First(v => v.ViolationReportId == item.ViolationReportId);
+            if (source.CreatedBy.HasValue && reporterNameById.TryGetValue(source.CreatedBy.Value, out var reporterName))
+            {
+                item.ReporterName = reporterName;
+            }
+        }
 
         _logger.LogInformation(
             _messageService.GetMessage(MessageKeys.UniAdminInternship.LogGetViolations),

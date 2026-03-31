@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentDetail;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentEvaluations;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentList;
+using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentLogbook;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentViolations;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -51,6 +52,30 @@ public class UniAdminInternshipController : Controllers.ApiControllerBase
         {
             StudentId = studentId,
             TermId = termId
+        };
+
+        return HandleResult(await _mediator.Send(query, cancellationToken));
+    }
+
+    [HttpGet("{studentId:guid}/logbook")]
+    [ProducesResponseType(typeof(ApiResponse<GetUniAdminStudentLogbookResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetStudentLogbook(
+        [FromRoute] Guid studentId,
+        [FromQuery] Guid? termId,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 4,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetUniAdminStudentLogbookQuery
+        {
+            StudentId = studentId,
+            TermId = termId,
+            PageNumber = pageNumber,
+            PageSize = pageSize
         };
 
         return HandleResult(await _mediator.Send(query, cancellationToken));

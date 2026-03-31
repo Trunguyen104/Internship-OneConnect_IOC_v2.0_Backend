@@ -172,21 +172,23 @@ public class GetUniAdminStudentListHandler
             .Distinct()
             .ToList();
 
-        var logbookCountDict = new Dictionary<(Guid InternshipId, Guid StudentId), int>();
+        var logbookSubmittedDatesDict = new Dictionary<(Guid InternshipId, Guid StudentId), List<DateTime>>();
         if (groupIds.Any())
         {
-            var rawCounts = await _unitOfWork.Repository<Logbook>().Query()
+            var rawSubmittedDates = await _unitOfWork.Repository<Logbook>().Query()
                 .AsNoTracking()
                 .Where(l => groupIds.Contains(l.InternshipId)
                          && l.StudentId.HasValue
                          && studentIds.Contains(l.StudentId!.Value)
+                         && UniAdminInternshipRules.IsSubmittedLogbookStatus(l.Status)
                          && l.DeletedAt == null)
-                .GroupBy(l => new { l.InternshipId, StudentId = l.StudentId!.Value })
-                .Select(g => new { g.Key.InternshipId, g.Key.StudentId, Count = g.Count() })
                 .ToListAsync(cancellationToken);
 
-            foreach (var item in rawCounts)
-                logbookCountDict[(item.InternshipId, item.StudentId)] = item.Count;
+            logbookSubmittedDatesDict = rawSubmittedDates
+                .GroupBy(l => new { l.InternshipId, StudentId = l.StudentId!.Value })
+                .ToDictionary(
+                    g => (g.Key.InternshipId, g.Key.StudentId),
+                    g => g.Select(x => x.DateReport).ToList());
         }
 
         // 7. Load ViolationReport counts scoped to selected internship group
@@ -212,10 +214,7 @@ public class GetUniAdminStudentListHandler
             .Where(app => studentIds.Contains(app.StudentId)
                        && app.TermId == resolvedTermId
                        && app.DeletedAt == null
-                       && (app.Status == InternshipApplicationStatus.Applied
-                           || app.Status == InternshipApplicationStatus.Interviewing
-                           || app.Status == InternshipApplicationStatus.Offered
-                           || app.Status == InternshipApplicationStatus.PendingAssignment))
+                       && UniAdminInternshipRules.IsPendingApplicationStatus(app.Status))
             .ToListAsync(cancellationToken);
 
         var pendingAppStudentIds = activeApplications.Select(a => a.StudentId).ToHashSet();
@@ -240,13 +239,14 @@ public class GetUniAdminStudentListHandler
             if (st.PlacementStatus == PlacementStatus.Placed && hasGroup && group!.MentorId == null)
                 noMentorCount++;
 
-            var uiStatus = DeriveUiStatus(st.PlacementStatus, hasGroup, hasPendingApp, term.Status);
+            var uiStatus = UniAdminInternshipRules.DeriveUiStatus(st.PlacementStatus, group, hasPendingApp);
 
-            var logbookCount = (internStudent != null && group != null
-                && logbookCountDict.TryGetValue((internStudent.InternshipId, st.StudentId), out var lc))
-                ? lc : 0;
+            var submittedDates = (internStudent != null
+                && logbookSubmittedDatesDict.TryGetValue((internStudent.InternshipId, st.StudentId), out var dates))
+                ? dates
+                : new List<DateTime>();
 
-            var logbookSummary = CalculateLogbookSummary(internStudent, group, logbookCount);
+            var logbookSummary = UniAdminInternshipRules.CalculateLogbookSummary(internStudent, group, submittedDates);
             var vioCount = internStudent != null
                 && violationCountDict.TryGetValue((st.StudentId, internStudent.InternshipId), out var scopedCount)
                 ? scopedCount
@@ -268,6 +268,11 @@ public class GetUniAdminStudentListHandler
                 Logbook = logbookSummary,
                 InternshipStatus = uiStatus,
                 ApplicationSource = activeApp?.Source.ToString(),
+                ApplicationSourceLabel = activeApp?.Source == ApplicationSource.SelfApply
+                    ? _messageService.GetMessage(MessageKeys.UniAdminInternship.ApplicationSourceSelfApply)
+                    : activeApp?.Source == ApplicationSource.UniAssign
+                        ? _messageService.GetMessage(MessageKeys.UniAdminInternship.ApplicationSourceUniAssign)
+                        : null,
                 ViolationCount = vioCount
             });
         }
@@ -352,58 +357,4 @@ public class GetUniAdminStudentListHandler
             _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentsRetrieved));
     }
 
-    private static InternshipUiStatus DeriveUiStatus(
-        PlacementStatus placementStatus,
-        bool hasGroup,
-        bool hasPendingApp,
-        TermStatus termStatus)
-    {
-        if (placementStatus == PlacementStatus.Unplaced)
-            return hasPendingApp ? InternshipUiStatus.PendingConfirmation : InternshipUiStatus.Unplaced;
-
-        // PlacementStatus.Placed
-        if (termStatus == TermStatus.Closed)
-            return InternshipUiStatus.Completed;
-
-        return hasGroup ? InternshipUiStatus.Active : InternshipUiStatus.NoGroup;
-    }
-
-    private static LogbookSummaryDto? CalculateLogbookSummary(
-        InternshipStudent? internStudent,
-        InternshipGroup? group,
-        int submittedCount)
-    {
-        if (internStudent == null || group == null)
-            return null;
-
-        var joinedAt = internStudent.JoinedAt.Date;
-        var phaseEnd = group.EndDate?.Date ?? DateTime.UtcNow.Date;
-        var effectiveEnd = DateTime.UtcNow.Date < phaseEnd ? DateTime.UtcNow.Date : phaseEnd;
-
-        if (joinedAt > effectiveEnd)
-            return new LogbookSummaryDto { Missing = 0, Submitted = submittedCount, Total = 0, PercentComplete = 0 };
-
-        var total = CountBusinessDays(joinedAt, effectiveEnd);
-        var missing = Math.Max(0, total - submittedCount);
-        var percent = total > 0 ? (int)Math.Round((double)submittedCount / total * 100) : 0;
-
-        return new LogbookSummaryDto
-        {
-            Missing = missing,
-            Submitted = submittedCount,
-            Total = total,
-            PercentComplete = percent
-        };
-    }
-
-    private static int CountBusinessDays(DateTime start, DateTime end)
-    {
-        int count = 0;
-        for (var d = start.Date; d <= end.Date; d = d.AddDays(1))
-        {
-            if (d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday)
-                count++;
-        }
-        return count;
-    }
 }

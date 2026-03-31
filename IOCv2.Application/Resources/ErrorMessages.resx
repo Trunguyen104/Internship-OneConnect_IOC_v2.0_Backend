@@ -1481,4 +1481,13 @@
   <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
     <value>Mã sinh viên không được để trống.</value>
   </data>
+  <data name="UniAdminInternship.PageSizeTooLargeLogbook" xml:space="preserve">
+    <value>Kích thước trang nhật ký không được vượt quá 12.</value>
+  </data>
+  <data name="UniAdminInternship.StatusInvalid" xml:space="preserve">
+    <value>Giá trị trạng thái thực tập không hợp lệ.</value>
+  </data>
+  <data name="UniAdminInternship.LogbookStatusInvalid" xml:space="preserve">
+    <value>Giá trị bộ lọc trạng thái nhật ký không hợp lệ.</value>
+  </data>
 </root>

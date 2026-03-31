@@ -131,7 +131,7 @@ public class GetUniAdminStudentDetailHandler
                 if (belongsToAnotherUniversity)
                 {
                     _logger.LogWarning(
-                        _messageService.GetMessage(MessageKeys.UniAdminInternship.LogTermAccessDenied),
+                        _messageService.GetMessage(MessageKeys.UniAdminInternship.LogStudentNotInUniversity),
                         currentUserId, term.TermId, universityId);
                     return Result<GetUniAdminStudentDetailResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentNotInUniversity),
@@ -177,17 +177,14 @@ public class GetUniAdminStudentDetailHandler
                 app.StudentId == request.StudentId
                 && app.TermId == term.TermId
                 && app.DeletedAt == null
-                && (app.Status == InternshipApplicationStatus.Applied
-                    || app.Status == InternshipApplicationStatus.Interviewing
-                    || app.Status == InternshipApplicationStatus.Offered
-                    || app.Status == InternshipApplicationStatus.PendingAssignment),
+                && UniAdminInternshipRules.IsPendingApplicationStatus(app.Status),
                 cancellationToken);
 
-        var uiStatus = DeriveUiStatus(studentTerm.PlacementStatus, hasGroup, hasPendingApp, term.Status);
+        var uiStatus = UniAdminInternshipRules.DeriveUiStatus(studentTerm.PlacementStatus, group, hasPendingApp);
 
         // Logbook count
-        var logbookCount = 0;
         var weeklyLogbooks = new List<UniAdminWeeklyLogbookDto>();
+        List<DateTime> submittedDates = new();
         if (internStudent != null && group != null)
         {
             var studentLogbooks = await _unitOfWork.Repository<Logbook>().Query()
@@ -199,11 +196,20 @@ public class GetUniAdminStudentDetailHandler
                 .OrderBy(l => l.DateReport)
                 .ToListAsync(cancellationToken);
 
-            logbookCount = studentLogbooks.Count;
-            weeklyLogbooks = BuildWeeklyLogbooks(studentLogbooks, group.StartDate);
+            submittedDates = studentLogbooks
+                .Where(x => UniAdminInternshipRules.IsSubmittedLogbookStatus(x.Status))
+                .Select(x => x.DateReport)
+                .ToList();
+
+            var today = DateTime.UtcNow.Date;
+            var joinedAt = internStudent.JoinedAt.Date;
+            var phaseEnd = group.EndDate?.Date ?? today;
+            var effectiveEnd = today < phaseEnd ? today : phaseEnd;
+
+            weeklyLogbooks = BuildWeeklyLogbooks(studentLogbooks, joinedAt, effectiveEnd);
         }
 
-        var logbookSummary = CalculateLogbookSummary(internStudent, group, logbookCount);
+        var logbookSummary = UniAdminInternshipRules.CalculateLogbookSummary(internStudent, group, submittedDates);
 
         // Violation count
         var violationCount = group != null
@@ -252,6 +258,8 @@ public class GetUniAdminStudentDetailHandler
             MentorId = group?.MentorId,
             MentorName = group?.Mentor?.User?.FullName,
             MentorEmail = group?.Mentor?.User?.Email,
+            InternshipPhaseStartDate = group?.StartDate,
+            InternshipPhaseEndDate = group?.EndDate,
             Logbook = logbookSummary,
             LogbookWeeks = weeklyLogbooks,
             ViolationCount = violationCount,
@@ -267,131 +275,94 @@ public class GetUniAdminStudentDetailHandler
             _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentDetailRetrieved));
     }
 
-    private static InternshipUiStatus DeriveUiStatus(
-        PlacementStatus placementStatus,
-        bool hasGroup,
-        bool hasPendingApp,
-        TermStatus termStatus)
-    {
-        if (placementStatus == PlacementStatus.Unplaced)
-            return hasPendingApp ? InternshipUiStatus.PendingConfirmation : InternshipUiStatus.Unplaced;
-
-        if (termStatus == TermStatus.Closed)
-            return InternshipUiStatus.Completed;
-
-        return hasGroup ? InternshipUiStatus.Active : InternshipUiStatus.NoGroup;
-    }
-
-    private static LogbookSummaryDto? CalculateLogbookSummary(
-        InternshipStudent? internStudent,
-        InternshipGroup? group,
-        int submittedCount)
-    {
-        if (internStudent == null || group == null)
-            return null;
-
-        var joinedAt = internStudent.JoinedAt.Date;
-        var phaseEnd = group.EndDate?.Date ?? DateTime.UtcNow.Date;
-        var effectiveEnd = DateTime.UtcNow.Date < phaseEnd ? DateTime.UtcNow.Date : phaseEnd;
-
-        if (joinedAt > effectiveEnd)
-            return new LogbookSummaryDto { Missing = 0, Submitted = submittedCount, Total = 0, PercentComplete = 0 };
-
-        var total = CountBusinessDays(joinedAt, effectiveEnd);
-        var missing = Math.Max(0, total - submittedCount);
-        var percent = total > 0 ? (int)Math.Round((double)submittedCount / total * 100) : 0;
-
-        return new LogbookSummaryDto
-        {
-            Missing = missing,
-            Submitted = submittedCount,
-            Total = total,
-            PercentComplete = percent
-        };
-    }
-
-    private static int CountBusinessDays(DateTime start, DateTime end)
-    {
-        int count = 0;
-        for (var d = start.Date; d <= end.Date; d = d.AddDays(1))
-        {
-            if (d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday)
-                count++;
-        }
-        return count;
-    }
-
-    private static List<UniAdminWeeklyLogbookDto> BuildWeeklyLogbooks(
+    private List<UniAdminWeeklyLogbookDto> BuildWeeklyLogbooks(
         List<Logbook> logbooks,
-        DateTime? groupStartDate)
+        DateTime windowStart,
+        DateTime windowEnd)
     {
-        if (logbooks.Count == 0)
+        if (windowStart > windowEnd)
             return new List<UniAdminWeeklyLogbookDto>();
 
-        var anchor = GetStartOfWeek((groupStartDate ?? logbooks.Min(x => x.DateReport)).Date);
+        var logbookByDate = logbooks
+            .GroupBy(x => x.DateReport.Date)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.CreatedAt).First());
 
-        return logbooks
-            .GroupBy(x => GetWeekNumber(x.DateReport, anchor))
-            .OrderBy(x => x.Key)
-            .Select(g =>
-            {
-                var weekStart = anchor.AddDays((g.Key - 1) * 7);
-                var weekEnd = weekStart.AddDays(4);
+        var weeks = new List<UniAdminWeeklyLogbookDto>();
+        var currentWeekStart = windowStart.Date;
+        var weekNumber = 1;
+        var today = DateTime.UtcNow.Date;
 
-                var entries = g
-                    .OrderBy(x => x.DateReport)
-                    .Select(x => new UniAdminWeeklyLogbookEntryDto
-                    {
-                        LogbookId = x.LogbookId,
-                        DateReport = x.DateReport,
-                        Summary = x.Summary,
-                        Issue = x.Issue,
-                        Plan = x.Plan,
-                        Status = x.Status,
-                        StatusBadge = x.Status == LogbookStatus.LATE ? "Late" : "Submitted"
-                    })
-                    .ToList();
-
-                var submittedCount = entries.Count(x => x.Status != LogbookStatus.LATE);
-                var lateCount = entries.Count(x => x.Status == LogbookStatus.LATE);
-                var totalCount = entries.Count;
-
-                return new UniAdminWeeklyLogbookDto
-                {
-                    WeekNumber = g.Key,
-                    WeekTitle = $"Week {g.Key}: {GetWeekTheme(g.Key)}",
-                    WeekStartDate = weekStart,
-                    WeekEndDate = weekEnd,
-                    SubmittedCount = submittedCount,
-                    LateCount = lateCount,
-                    TotalCount = totalCount,
-                    CompletionRatio = $"{submittedCount}/{totalCount}",
-                    Entries = entries
-                };
-            })
-            .ToList();
-    }
-
-    private static DateTime GetStartOfWeek(DateTime date)
-    {
-        var diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
-        return date.Date.AddDays(-diff);
-    }
-
-    private static int GetWeekNumber(DateTime date, DateTime anchor)
-    {
-        return ((date.Date - anchor).Days / 7) + 1;
-    }
-
-    private static string GetWeekTheme(int weekNumber)
-    {
-        return weekNumber switch
+        while (currentWeekStart <= windowEnd.Date)
         {
-            1 => "Kickoff & Research",
-            2 => "Implementation & Testing",
-            3 => "Optimization & Stabilization",
-            4 => "Release & Handover",
-            _ => "Execution"
-        };
+            var currentWeekEnd = EndOfWeekSunday(currentWeekStart);
+            if (currentWeekEnd > windowEnd.Date)
+                currentWeekEnd = windowEnd.Date;
+
+            var entries = new List<UniAdminWeeklyLogbookEntryDto>();
+            var submittedCount = 0;
+            var lateCount = 0;
+            var requiredCount = 0;
+
+            for (var date = currentWeekStart; date <= currentWeekEnd; date = date.AddDays(1))
+            {
+                var isWeekend = date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+                if (!isWeekend)
+                    requiredCount++;
+
+                logbookByDate.TryGetValue(date, out var existingLogbook);
+
+                if (existingLogbook != null && UniAdminInternshipRules.IsSubmittedLogbookStatus(existingLogbook.Status) && !isWeekend)
+                {
+                    submittedCount++;
+                    if (existingLogbook.Status == LogbookStatus.LATE)
+                        lateCount++;
+                }
+
+                var statusBadge = isWeekend
+                    ? "Off"
+                    : existingLogbook != null
+                        ? existingLogbook.Status == LogbookStatus.LATE ? "SubmittedLate" : "Submitted"
+                        : date < today ? "Missing" : "Pending";
+
+                entries.Add(new UniAdminWeeklyLogbookEntryDto
+                {
+                    LogbookId = existingLogbook?.LogbookId,
+                    DateReport = date,
+                    Summary = existingLogbook?.Summary ?? string.Empty,
+                    Issue = existingLogbook?.Issue,
+                    Plan = existingLogbook?.Plan ?? string.Empty,
+                    Status = existingLogbook?.Status,
+                    StatusBadge = statusBadge
+                });
+            }
+
+            weeks.Add(new UniAdminWeeklyLogbookDto
+            {
+                WeekNumber = weekNumber,
+                WeekTitle = string.Format(
+                    _messageService.GetMessage(MessageKeys.UniAdminInternship.WeekTitleFormat),
+                    weekNumber,
+                    currentWeekStart.ToString("dd/MM"),
+                    currentWeekEnd.ToString("dd/MM/yyyy")),
+                WeekStartDate = currentWeekStart,
+                WeekEndDate = currentWeekEnd,
+                SubmittedCount = submittedCount,
+                LateCount = lateCount,
+                TotalCount = requiredCount,
+                CompletionRatio = $"{submittedCount}/{requiredCount}",
+                Entries = entries
+            });
+
+            currentWeekStart = currentWeekEnd.AddDays(1);
+            weekNumber++;
+        }
+
+        return weeks;
+    }
+
+    private static DateTime EndOfWeekSunday(DateTime date)
+    {
+        var diff = DayOfWeek.Sunday - date.DayOfWeek;
+        return date.Date.AddDays(diff < 0 ? diff + 7 : diff);
     }
 }

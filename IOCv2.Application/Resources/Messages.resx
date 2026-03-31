@@ -1063,4 +1063,64 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>Không tìm thấy User {UserId} khi lấy profile</value>
   </data>
+  <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
+    <value>Danh sách sinh viên thực tập đã được tải thành công.</value>
+  </data>
+  <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
+    <value>Thông tin chi tiết sinh viên đã được tải thành công.</value>
+  </data>
+  <data name="UniAdminInternship.LogbookRetrieved" xml:space="preserve">
+    <value>Dữ liệu nhật ký thực tập đã được tải thành công.</value>
+  </data>
+  <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
+    <value>Danh sách đánh giá sinh viên đã được tải thành công.</value>
+  </data>
+  <data name="UniAdminInternship.ViolationsRetrieved" xml:space="preserve">
+    <value>Danh sách vi phạm sinh viên đã được tải thành công.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>Không có kỳ thực tập đang mở cho trường của bạn. Danh sách trống.</value>
+  </data>
+  <data name="UniAdminInternship.ApplicationSource.SelfApply" xml:space="preserve">
+    <value>Tự ứng tuyển</value>
+  </data>
+  <data name="UniAdminInternship.ApplicationSource.UniAssign" xml:space="preserve">
+    <value>Trường phân công</value>
+  </data>
+  <data name="UniAdminInternship.WeekTitleFormat" xml:space="preserve">
+    <value>Tuần {0}: {1} - {2}</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetStudentList" xml:space="preserve">
+    <value>SchoolAdmin {0} đã xem danh sách sinh viên thực tập của kỳ {1}, tổng số {2} bản ghi.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
+    <value>SchoolAdmin {0} đã xem thông tin chi tiết sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbook" xml:space="preserve">
+    <value>SchoolAdmin {0} đã xem nhật ký thực tập của sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
+    <value>SchoolAdmin {0} đã xem đánh giá của sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetViolations" xml:space="preserve">
+    <value>SchoolAdmin {0} đã xem vi phạm của sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.UniversityUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy UniversityUser với userId={0}. Từ chối truy cập.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập với termId={0}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermAccessDenied" xml:space="preserve">
+    <value>SchoolAdmin {0} cố gắng truy cập kỳ thực tập {1} không thuộc trường {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.StudentNotInUniversity" xml:space="preserve">
+    <value>SchoolAdmin {0} cố gắng xem thông tin sinh viên thuộc trường khác trong kỳ {1}, universityId={2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên {0} trong kỳ {1} thuộc trường {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập đang mở cho trường {0}.</value>
+  </data>
 </root>

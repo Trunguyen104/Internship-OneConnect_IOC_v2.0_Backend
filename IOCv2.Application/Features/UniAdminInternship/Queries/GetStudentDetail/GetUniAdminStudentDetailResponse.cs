@@ -32,6 +32,8 @@ public class GetUniAdminStudentDetailResponse
     public Guid? MentorId { get; set; }
     public string? MentorName { get; set; }
     public string? MentorEmail { get; set; }
+    public DateTime? InternshipPhaseStartDate { get; set; }
+    public DateTime? InternshipPhaseEndDate { get; set; }
 
     // Logbook summary (null if Unplaced/no group)
     public LogbookSummaryDto? Logbook { get; set; }
@@ -57,12 +59,12 @@ public class UniAdminWeeklyLogbookDto
 
 public class UniAdminWeeklyLogbookEntryDto
 {
-    public Guid LogbookId { get; set; }
+    public Guid? LogbookId { get; set; }
     public DateTime DateReport { get; set; }
     public string Summary { get; set; } = string.Empty;
     public string? Issue { get; set; }
     public string Plan { get; set; } = string.Empty;
-    public LogbookStatus Status { get; set; }
+    public LogbookStatus? Status { get; set; }
     public string StatusBadge { get; set; } = string.Empty;
 }
 

@@ -51,6 +51,15 @@ namespace IOCv2.Infrastructure.Persistence
 
             // Deterministic id for the sixth seeded student (used for job-apply tests)
             public static readonly Guid Student6UserId = new Guid("66666666-6666-6666-6666-666666660006");
+
+            // Deterministic IDs for UniAdmin monitoring test scenario students (s11–s16)
+            // s11=NoGroup, s12=PendingConfirmation, s13=Unplaced, s14=Completed, s15=100%Logbook, s16=NoMentor
+            public static readonly Guid Student11UserId = new Guid("66666666-6666-6666-6666-666666660011");
+            public static readonly Guid Student12UserId = new Guid("66666666-6666-6666-6666-666666660012");
+            public static readonly Guid Student13UserId = new Guid("66666666-6666-6666-6666-666666660013");
+            public static readonly Guid Student14UserId = new Guid("66666666-6666-6666-6666-666666660014");
+            public static readonly Guid Student15UserId = new Guid("66666666-6666-6666-6666-666666660015");
+            public static readonly Guid Student16UserId = new Guid("66666666-6666-6666-6666-666666660016");
         }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
@@ -72,6 +81,7 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedProjectsAndWorkItems();
             await SeedManageIGProjectData();
             await SeedInternshipStudents();
+            await SeedUniAdminTestScenarios();
             await SeedLogbooks();
             await SeedStakeholdersAndIssues();
             await SeedProjectResources();
@@ -312,7 +322,7 @@ namespace IOCv2.Infrastructure.Persistence
                 }
             }
 
-            // 4. Seed 10 specific students
+            // 4. Seed 16 specific students (s1-10: original; s11-16: UniAdmin monitoring test scenarios)
             string[] studentEmails = {
                 "student1@fptu.edu.vn",
                 "student2@fptu.edu.vn",
@@ -323,7 +333,13 @@ namespace IOCv2.Infrastructure.Persistence
                 "student7@fptu.edu.vn",
                 "student8@fptu.edu.vn",
                 "student9@fptu.edu.vn",
-                "student10@fptu.edu.vn"
+                "student10@fptu.edu.vn",
+                "student11@fptu.edu.vn",
+                "student12@fptu.edu.vn",
+                "student13@fptu.edu.vn",
+                "student14@fptu.edu.vn",
+                "student15@fptu.edu.vn",
+                "student16@fptu.edu.vn"
             };
 
             string[] studentNames = {
@@ -336,30 +352,45 @@ namespace IOCv2.Infrastructure.Persistence
                 "Vũ Văn Giang",
                 "Bùi Thị Hoa",
                 "Đinh Văn Nghĩa",
-                "Ngô Thị Kiều"
+                "Ngô Thị Kiều",
+                "Phạm Minh Khôi",          // s11 – NoGroup scenario
+                "Vũ Thị Lan",               // s12 – PendingConfirmation scenario
+                "Đặng Văn Mạnh",            // s13 – Unplaced scenario
+                "Hoàng Thị Ngọc",           // s14 – Completed scenario
+                "Bùi Văn Phong",            // s15 – 100% Logbook scenario
+                "Lý Thị Quỳnh"             // s16 – NoMentor group scenario
             };
 
             string[] studentClasses = {
                 "SE1616", "SE1617", "SE1616", "SE1618", "SE1617",
-                "SE1619", "SE1616", "SE1618", "SE1619", "SE1617"
+                "SE1619", "SE1616", "SE1618", "SE1619", "SE1617",
+                "SE1620", "SE1620", "SE1621", "SE1621", "SE1620", "SE1621"
             };
 
             string[] studentMajors = {
                 "Software Engineering", "Software Engineering", "Information Technology",
                 "Software Engineering", "Information Technology", "Software Engineering",
-                "Computer Science", "Information Technology", "Software Engineering", "Computer Science"
+                "Computer Science", "Information Technology", "Software Engineering", "Computer Science",
+                "Software Engineering", "Information Technology", "Software Engineering",
+                "Computer Science", "Information Technology", "Software Engineering"
             };
 
             for (int i = 0; i < studentEmails.Length; i++)
             {
                 if (!existingEmails.Contains(studentEmails[i]))
                 {
-                    // Keep student6 deterministic for job-apply tests.
+                    // Keep student6 deterministic for job-apply tests; s11-16 deterministic for UniAdmin tests.
                     var userId = i switch
                     {
-                        < 5 => SeedIds.StudentIds[i],
-                        5 => SeedIds.Student6UserId,
-                        _ => Guid.NewGuid()
+                        < 5  => SeedIds.StudentIds[i],
+                        5    => SeedIds.Student6UserId,
+                        10   => SeedIds.Student11UserId,
+                        11   => SeedIds.Student12UserId,
+                        12   => SeedIds.Student13UserId,
+                        13   => SeedIds.Student14UserId,
+                        14   => SeedIds.Student15UserId,
+                        15   => SeedIds.Student16UserId,
+                        _    => Guid.NewGuid()
                     };
                     var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
                     var user = new User(userId, userCode, studentEmails[i], studentNames[i], UserRole.Student, passHash);
@@ -496,11 +527,11 @@ namespace IOCv2.Infrastructure.Persistence
             var fsoft = await _context.Enterprises.FirstAsync(e => e.Name == "FPT Software");
             var rikkeisoft = await _context.Enterprises.FirstAsync(e => e.Name == "Rikkeisoft");
 
-            // Helper: create a phase via factory, then advance status via UpdateInfo
+            // Helper: create a phase via new API (majorFields + capacity), then advance status
             async Task EnsurePhase(
                 Guid enterpriseId, string name,
                 DateOnly start, DateOnly end,
-                int? maxStudents, string? description,
+                string majorFields, int capacity, string? description,
                 InternshipPhaseStatus targetStatus)
             {
                 if (await _context.InternshipPhases
@@ -508,11 +539,11 @@ namespace IOCv2.Infrastructure.Persistence
                     return;
 
                 // Create always starts at Draft
-                var phase = InternshipPhase.Create(enterpriseId, name, start, end, maxStudents, description);
+                var phase = InternshipPhase.Create(enterpriseId, name, start, end, majorFields, capacity, description);
 
                 // Advance to target status via UpdateInfo
                 if (targetStatus != InternshipPhaseStatus.Draft)
-                    phase.UpdateInfo(name, start, end, maxStudents, description, targetStatus);
+                    phase.UpdateInfo(name, start, end, majorFields, capacity, description, targetStatus);
 
                 _context.InternshipPhases.Add(phase);
             }
@@ -522,43 +553,57 @@ namespace IOCv2.Infrastructure.Persistence
                 fsoft.EnterpriseId,
                 "FPT Software Fall 2025",
                 new DateOnly(2025, 9, 1), new DateOnly(2025, 12, 31),
-                30, "Đợt thực tập Fall 2025 của FPT Software — đã kết thúc",
+                "Software Engineering,Information Technology", 30,
+                "Đợt thực tập Fall 2025 của FPT Software — đã kết thúc",
                 InternshipPhaseStatus.Closed);
 
             await EnsurePhase(
                 fsoft.EnterpriseId,
                 "FPT Software Spring 2026",
                 new DateOnly(2026, 1, 15), new DateOnly(2026, 4, 30),
-                50, "Đợt thực tập Spring 2026 của FPT Software — đang diễn ra",
+                "Software Engineering,Information Technology,Computer Science", 50,
+                "Đợt thực tập Spring 2026 của FPT Software — đang diễn ra",
                 InternshipPhaseStatus.InProgress);
 
             await EnsurePhase(
                 fsoft.EnterpriseId,
                 "FPT Software Summer 2026",
                 new DateOnly(2026, 5, 1), new DateOnly(2026, 8, 31),
-                40, "Đợt thực tập Summer 2026 của FPT Software — đang tuyển",
+                "Software Engineering,Information Technology", 40,
+                "Đợt thực tập Summer 2026 của FPT Software — đang tuyển",
                 InternshipPhaseStatus.Open);
+
+            await EnsurePhase(
+                fsoft.EnterpriseId,
+                "FPT Software Winter 2026",
+                new DateOnly(2026, 9, 1), new DateOnly(2026, 12, 31),
+                "Software Engineering", 20,
+                "Đợt thực tập Winter 2026 của FPT Software — bản nháp (edge case: Draft phase)",
+                InternshipPhaseStatus.Draft);
 
             // ── Rikkeisoft phases ────────────────────────────────────────────────
             await EnsurePhase(
                 rikkeisoft.EnterpriseId,
                 "Rikkeisoft Fall 2025",
                 new DateOnly(2025, 9, 1), new DateOnly(2025, 12, 31),
-                20, "Đợt thực tập Fall 2025 của Rikkeisoft — đã kết thúc",
+                "Software Engineering,Information Technology", 20,
+                "Đợt thực tập Fall 2025 của Rikkeisoft — đã kết thúc",
                 InternshipPhaseStatus.Closed);
 
             await EnsurePhase(
                 rikkeisoft.EnterpriseId,
                 "Rikkeisoft Spring 2026",
                 new DateOnly(2026, 2, 1), new DateOnly(2026, 5, 31),
-                20, "Đợt thực tập Spring 2026 của Rikkeisoft — đang diễn ra",
+                "Software Engineering,Computer Science", 20,
+                "Đợt thực tập Spring 2026 của Rikkeisoft — đang diễn ra",
                 InternshipPhaseStatus.InProgress);
 
             await EnsurePhase(
                 rikkeisoft.EnterpriseId,
                 "Rikkeisoft Summer 2026",
                 new DateOnly(2026, 6, 1), new DateOnly(2026, 9, 30),
-                15, "Đợt thực tập Summer 2026 của Rikkeisoft — bản nháp",
+                "Information Technology", 15,
+                "Đợt thực tập Summer 2026 của Rikkeisoft — bản nháp",
                 InternshipPhaseStatus.Draft);
 
             await _context.SaveChangesAsync();
@@ -638,6 +683,15 @@ namespace IOCv2.Infrastructure.Persistence
                 archivedGroup = InternshipGroup.Create(phaseClosedFpt.PhaseId, "FPT Archived Project", "Old project idea", fsoft.EnterpriseId, mentorFptEuId, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10));
                 archivedGroup.UpdateStatus(GroupStatus.Archived);
                 _context.InternshipGroups.Add(archivedGroup);
+            }
+
+            // FPT OJT Team Beta — owned by AltMentor, test "mentor chỉ thấy project của mình"
+            var fptAltBetaGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Beta");
+            if (fptAltBetaGroup == null)
+            {
+                fptAltBetaGroup = InternshipGroup.Create(phaseInProgressFpt.PhaseId, "FPT Software OJT Team Beta", "Data engineering track for FPT Spring 2026", fsoft.EnterpriseId, SeedIds.MentorFptAltEuId, DateTime.UtcNow.AddDays(-15), DateTime.UtcNow.AddMonths(3));
+                fptAltBetaGroup.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(fptAltBetaGroup);
             }
 
             await _context.SaveChangesAsync();
@@ -924,6 +978,53 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Projects.Add(draftUnassigned);
             }
 
+            // Project owned by AltMentor (MentorFptAltEuId) — test "mentor chỉ thấy project của mình"
+            var fptAltGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Beta");
+            if (fptAltGroup != null && !await _context.Projects.AnyAsync(p => p.ProjectName == "FPT Analytics Dashboard"))
+            {
+                var altMentorProj = Project.Create(
+                    "FPT Analytics Dashboard",
+                    "Dashboard phân tích dữ liệu intern cho FPT Software Team Beta",
+                    "PRJ-FPTSOF_FPT_6",
+                    "Data Engineering",
+                    "Xây dựng dashboard visualize KPI và tiến độ dự án bằng React + ECharts.",
+                    mentorId: SeedIds.MentorFptAltEuId);
+                altMentorProj.AssignToGroup(fptAltGroup.InternshipId, DateTime.UtcNow.AddDays(-15), DateTime.UtcNow.AddMonths(3));
+                altMentorProj.Publish();
+                _context.Projects.Add(altMentorProj);
+                await _context.SaveChangesAsync(); // flush để có ProjectId
+
+                var altProj = await _context.Projects.FirstAsync(p => p.ProjectName == "FPT Analytics Dashboard");
+                if (!await _context.Sprints.AnyAsync(s => s.ProjectId == altProj.ProjectId))
+                {
+                    // Sprint variety: Completed + Active + Planned
+                    var sprint1 = new Sprint(altProj.ProjectId, "Sprint 1 – Data Collection", "Thu thập và làm sạch dữ liệu nguồn");
+                    sprint1.Start(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-14)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-8)));
+                    sprint1.Complete();
+
+                    var sprint2 = new Sprint(altProj.ProjectId, "Sprint 2 – Visualization", "Xây dựng các chart components");
+                    sprint2.Start(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)));
+
+                    var sprint3 = new Sprint(altProj.ProjectId, "Sprint 3 – Integration", "Tích hợp API và deploy staging");
+                    // Planned = default
+
+                    _context.Sprints.AddRange(sprint1, sprint2, sprint3);
+                    await _context.SaveChangesAsync();
+
+                    // WorkItem type variety (Epic, UserStory, Task, Subtask) for the project
+                    if (!await _context.WorkItems.AnyAsync(w => w.ProjectId == altProj.ProjectId))
+                    {
+                        _context.WorkItems.AddRange(
+                            new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = altProj.ProjectId, Type = WorkItemType.Epic,      Title = "Dashboard Module",                  Priority = Priority.High,   BacklogOrder = 1 },
+                            new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = altProj.ProjectId, Type = WorkItemType.UserStory,  Title = "Hiển thị KPI tổng quan",           Priority = Priority.High,   BacklogOrder = 2 },
+                            new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = altProj.ProjectId, Type = WorkItemType.Task,       Title = "Tích hợp ECharts bar chart",        Priority = Priority.Medium, BacklogOrder = 3 },
+                            new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = altProj.ProjectId, Type = WorkItemType.Task,       Title = "Fix lỗi data null khi filter",      Priority = Priority.High,   BacklogOrder = 4 },
+                            new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = altProj.ProjectId, Type = WorkItemType.Subtask,    Title = "Nghiên cứu React Query caching",    Priority = Priority.Low,    BacklogOrder = 5 }
+                        );
+                    }
+                }
+            }
+
             await _context.SaveChangesAsync();
         }
 
@@ -1075,6 +1176,170 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Seeds UniAdmin monitoring test scenarios for students s11–s16.
+        /// Must run AFTER SeedInternshipStudents (so StudentTerms exist).
+        ///
+        /// Scenarios:
+        ///   s11 – NoGroup        : Placed + EnterpriseId set, but no group membership
+        ///   s12 – PendingConf.   : Unplaced + pending application
+        ///   s13 – Unplaced       : Unplaced, no pending application
+        ///   s14 – Completed      : in Finished group (UniAdmin Completed Group)
+        ///   s15 – 100% Logbook   : Active group, all logbooks submitted
+        ///   s16 – NoMentor       : Active group with MentorId = null
+        /// </summary>
+        private async Task SeedUniAdminTestScenarios()
+        {
+            // Guard: skip if already seeded (check by group name)
+            if (await _context.InternshipGroups.AnyAsync(g => g.GroupName == "UniAdmin Completed Group"))
+                return;
+
+            var fsoft = await _context.Enterprises.FirstAsync(e => e.Name == "FPT Software");
+            var spring2026 = await _context.Terms
+                .Include(t => t.University)
+                .FirstAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU");
+
+            var phaseInProgress = await _context.InternshipPhases.FirstAsync(
+                p => p.EnterpriseId == fsoft.EnterpriseId && p.Name == "FPT Software Spring 2026");
+            var phaseClosed = await _context.InternshipPhases.FirstAsync(
+                p => p.EnterpriseId == fsoft.EnterpriseId && p.Name == "FPT Software Fall 2025");
+
+            var fptJob = await _context.Jobs.FirstAsync(j => j.EnterpriseId == fsoft.EnterpriseId);
+
+            // Load students
+            var s11 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student11@fptu.edu.vn");
+            var s12 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student12@fptu.edu.vn");
+            var s13 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student13@fptu.edu.vn");
+            var s14 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student14@fptu.edu.vn");
+            var s15 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student15@fptu.edu.vn");
+            var s16 = await _context.Students.Include(s => s.User).FirstAsync(s => s.User.Email == "student16@fptu.edu.vn");
+
+            // ──────────────────────────────────────────────────────────────────
+            // Fix StudentTerms: SeedTerms enrolls ALL students with PlacementStatus.Placed.
+            // s12 and s13 need Unplaced; s11/s14/s15/s16 need EnterpriseId set for group matching.
+            // ──────────────────────────────────────────────────────────────────
+            var studentTerms = await _context.StudentTerms
+                .Where(st => st.TermId == spring2026.TermId
+                          && (st.StudentId == s11.StudentId
+                           || st.StudentId == s12.StudentId
+                           || st.StudentId == s13.StudentId
+                           || st.StudentId == s14.StudentId
+                           || st.StudentId == s15.StudentId
+                           || st.StudentId == s16.StudentId)
+                          && st.DeletedAt == null)
+                .ToListAsync();
+
+            foreach (var st in studentTerms)
+            {
+                if (st.StudentId == s12.StudentId || st.StudentId == s13.StudentId)
+                {
+                    st.PlacementStatus = PlacementStatus.Unplaced;
+                    st.EnterpriseId = null;
+                }
+                else
+                {
+                    // s11/s14/s15/s16: Placed at FPT Software
+                    st.EnterpriseId = fsoft.EnterpriseId;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // ──────────────────────────────────────────────────────────────────
+            // s12: PendingConfirmation — Unplaced + pending application
+            // ──────────────────────────────────────────────────────────────────
+            if (!await _context.InternshipApplications.AnyAsync(
+                a => a.StudentId == s12.StudentId && a.TermId == spring2026.TermId
+                  && (a.Status == InternshipApplicationStatus.Applied || a.Status == InternshipApplicationStatus.PendingAssignment)))
+            {
+                _context.InternshipApplications.Add(new InternshipApplication
+                {
+                    ApplicationId = Guid.NewGuid(),
+                    EnterpriseId = fsoft.EnterpriseId,
+                    TermId = spring2026.TermId,
+                    StudentId = s12.StudentId,
+                    JobId = fptJob.JobId,
+                    Status = InternshipApplicationStatus.Applied,
+                    Source = ApplicationSource.SelfApply,
+                    AppliedAt = DateTime.UtcNow.AddDays(-3)
+                });
+            }
+
+            // ──────────────────────────────────────────────────────────────────
+            // s14: Completed — Finished group (phase = Fall 2025, ended 1 month ago)
+            // ──────────────────────────────────────────────────────────────────
+            var completedGroup = InternshipGroup.Create(
+                phaseClosed.PhaseId, "UniAdmin Completed Group",
+                "Test group for Completed scenario — ended 1 month ago",
+                fsoft.EnterpriseId, SeedIds.MentorFptEuId,
+                DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddDays(-30));
+            completedGroup.UpdateStatus(GroupStatus.Finished);
+            completedGroup.AddMember(s14.StudentId, InternshipRole.Member);
+            _context.InternshipGroups.Add(completedGroup);
+
+            // ──────────────────────────────────────────────────────────────────
+            // s15: Active + 100% Logbook — joined 5 business days ago, all submitted
+            // ──────────────────────────────────────────────────────────────────
+            var logbookGroup = InternshipGroup.Create(
+                phaseInProgress.PhaseId, "UniAdmin Active Group",
+                "Test group for 100% logbook scenario",
+                fsoft.EnterpriseId, SeedIds.MentorFptEuId,
+                DateTime.UtcNow.AddDays(-14), DateTime.UtcNow.AddMonths(3));
+            logbookGroup.UpdateStatus(GroupStatus.Active);
+            logbookGroup.AddMember(s15.StudentId, InternshipRole.Member);
+            _context.InternshipGroups.Add(logbookGroup);
+
+            // ──────────────────────────────────────────────────────────────────
+            // s16: Active + NoMentor group
+            // ──────────────────────────────────────────────────────────────────
+            var noMentorGroup = InternshipGroup.Create(
+                phaseInProgress.PhaseId, "UniAdmin NoMentor Group",
+                "Test group for NoMentor scenario — no mentor assigned",
+                fsoft.EnterpriseId, mentorId: null,
+                DateTime.UtcNow.AddDays(-10), DateTime.UtcNow.AddMonths(3));
+            noMentorGroup.UpdateStatus(GroupStatus.Active);
+            noMentorGroup.AddMember(s16.StudentId, InternshipRole.Member);
+            _context.InternshipGroups.Add(noMentorGroup);
+
+            await _context.SaveChangesAsync();
+
+            // ──────────────────────────────────────────────────────────────────
+            // s15: Fix JoinedAt to 5 business days ago, then seed 100% logbooks
+            // ──────────────────────────────────────────────────────────────────
+            var s15Membership = await _context.InternshipStudents
+                .FirstOrDefaultAsync(m => m.InternshipId == logbookGroup.InternshipId && m.StudentId == s15.StudentId);
+            if (s15Membership != null)
+            {
+                // Set JoinedAt to 7 calendar days ago (≈5 business days)
+                s15Membership.JoinedAt = DateTime.UtcNow.AddDays(-7);
+                await _context.SaveChangesAsync();
+
+                // Seed logbooks for every business day from JoinedAt to yesterday
+                var joinedDate = s15Membership.JoinedAt.Date;
+                var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+                for (var day = joinedDate; day <= yesterday; day = day.AddDays(1))
+                {
+                    if (day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday)
+                        continue;
+                    if (await _context.Logbooks.AnyAsync(l =>
+                            l.InternshipId == logbookGroup.InternshipId
+                            && l.StudentId == s15.StudentId
+                            && l.DateReport.Date == day))
+                        continue;
+
+                    _context.Logbooks.Add(Logbook.Create(
+                        logbookGroup.InternshipId,
+                        s15.StudentId,
+                        $"Hoàn thành các task trong sprint — {day:dd/MM/yyyy}",
+                        null,
+                        "Tiếp tục công việc ngày hôm sau",
+                        day));
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task SeedLogbooks()

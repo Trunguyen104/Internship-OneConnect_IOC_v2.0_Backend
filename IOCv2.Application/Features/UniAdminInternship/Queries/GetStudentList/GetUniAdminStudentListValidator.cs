@@ -20,10 +20,12 @@ internal class GetUniAdminStudentListValidator : AbstractValidator<GetUniAdminSt
 
         RuleFor(x => x.Status)
             .IsInEnum()
+            .WithMessage(messageService.GetMessage(MessageKeys.UniAdminInternship.StatusInvalid))
             .When(x => x.Status.HasValue);
 
         RuleFor(x => x.LogbookStatus)
             .IsInEnum()
+            .WithMessage(messageService.GetMessage(MessageKeys.UniAdminInternship.LogbookStatusInvalid))
             .When(x => x.LogbookStatus.HasValue);
     }
 }

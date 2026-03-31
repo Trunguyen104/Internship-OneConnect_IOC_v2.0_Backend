@@ -32,5 +32,6 @@ public class StudentListItemDto
     public LogbookSummaryDto? Logbook { get; set; }
     public InternshipUiStatus InternshipStatus { get; set; }
     public string? ApplicationSource { get; set; }
+    public string? ApplicationSourceLabel { get; set; }
     public int ViolationCount { get; set; }
 }

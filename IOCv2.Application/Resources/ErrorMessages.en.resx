@@ -1425,4 +1425,13 @@
   <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
     <value>Student ID is required.</value>
   </data>
+  <data name="UniAdminInternship.PageSizeTooLargeLogbook" xml:space="preserve">
+    <value>Page size for logbook cannot exceed 12.</value>
+  </data>
+  <data name="UniAdminInternship.StatusInvalid" xml:space="preserve">
+    <value>Invalid internship status value.</value>
+  </data>
+  <data name="UniAdminInternship.LogbookStatusInvalid" xml:space="preserve">
+    <value>Invalid logbook status filter value.</value>
+  </data>
 </root>
