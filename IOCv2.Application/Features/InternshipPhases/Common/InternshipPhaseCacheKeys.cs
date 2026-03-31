@@ -17,9 +17,9 @@ public static class InternshipPhaseCacheKeys
     public static string PhaseForEnterprise(Guid phaseId, Guid enterpriseId)
         => $"{PhaseEnterprisePrefix}:{enterpriseId}:{phaseId}";
 
-    public static string PhaseList(Guid? enterpriseId, int? status, int pageNumber, int pageSize)
+    public static string PhaseList(Guid? enterpriseId, string? status, int pageNumber, int pageSize)
     {
-        var statusPart = status?.ToString() ?? "all";
+        var statusPart = string.IsNullOrWhiteSpace(status) ? "all" : status.Trim().ToLowerInvariant();
         var enterprisePart = enterpriseId?.ToString() ?? "all";
         return $"{PhaseListPrefix}:enterprise:{enterprisePart}:status:{statusPart}:page:{pageNumber}:size:{pageSize}";
     }

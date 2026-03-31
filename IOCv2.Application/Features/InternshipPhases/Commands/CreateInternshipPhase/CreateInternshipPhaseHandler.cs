@@ -92,7 +92,6 @@ public class CreateInternshipPhaseHandler
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            // ── BUG-03 FIX: Duplicate check inside transaction to prevent race condition ──
             var isDuplicate = await _unitOfWork.Repository<InternshipPhase>().Query()
                 .AnyAsync(p => p.EnterpriseId == request.EnterpriseId
                             && p.Name.ToLower() == request.Name.ToLower()
@@ -100,12 +99,12 @@ public class CreateInternshipPhaseHandler
 
             if (isDuplicate)
             {
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogWarning(
                     _messageService.GetMessage(MessageKeys.InternshipPhase.LogDuplicateName),
                     request.Name, request.EnterpriseId);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 return Result<CreateInternshipPhaseResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.DuplicateName, request.Name),
+                    string.Format(_messageService.GetMessage(MessageKeys.InternshipPhase.DuplicateName), request.Name),
                     ResultErrorType.Conflict);
             }
 
@@ -114,7 +113,8 @@ public class CreateInternshipPhaseHandler
                 request.Name,
                 request.StartDate,
                 request.EndDate,
-                request.MaxStudents,
+                request.MajorFields,
+                request.Capacity,
                 request.Description);
 
             await _unitOfWork.Repository<InternshipPhase>().AddAsync(phase, cancellationToken);
@@ -127,6 +127,13 @@ public class CreateInternshipPhaseHandler
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogCreateSuccess),
                 phase.PhaseId, phase.Name, phase.EnterpriseId);
 
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var lifecycleStatus = phase.IsUpcoming(today)
+                ? InternshipPhaseLifecycleStatus.Upcoming
+                : phase.IsActive(today)
+                    ? InternshipPhaseLifecycleStatus.Active
+                    : InternshipPhaseLifecycleStatus.Ended;
+
             return Result<CreateInternshipPhaseResponse>.Success(new CreateInternshipPhaseResponse
             {
                 PhaseId = phase.PhaseId,
@@ -134,10 +141,13 @@ public class CreateInternshipPhaseHandler
                 Name = phase.Name,
                 StartDate = phase.StartDate,
                 EndDate = phase.EndDate,
-                MaxStudents = phase.MaxStudents,
+                MajorFields = phase.MajorFields,
+                Capacity = phase.Capacity,
+                RemainingCapacity = phase.Capacity,
                 Description = phase.Description,
-                Status = phase.Status,
-                CreatedAt = phase.CreatedAt
+                Status = lifecycleStatus,
+                CreatedAt = phase.CreatedAt,
+                DuplicateNameWarning = isDuplicate
             },
             _messageService.GetMessage(MessageKeys.InternshipPhase.CreateSuccess));
         }

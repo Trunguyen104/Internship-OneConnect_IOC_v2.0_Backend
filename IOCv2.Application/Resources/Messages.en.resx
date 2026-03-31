@@ -711,6 +711,40 @@
   <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
     <value>Rejected status transition of internship phase {0} from '{1}' to '{2}' — invalid transition.</value>
   </data>
+  <!-- BUG-12 FIX: Missing EN keys -->
+  <data name="InternshipPhase.EndDateInPastForActivePhase" xml:space="preserve">
+    <value>Cannot set an end date in the past for internship phase '{0}' which is in Open or InProgress status.</value>
+  </data>
+  <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
+    <value>Rejecting deletion of internship phase '{0}' (ID: {1}) — phase is in InProgress status and cannot be deleted.</value>
+  </data>
+  <!-- New validation keys -->
+  <data name="InternshipPhase.DurationTooShort" xml:space="preserve">
+    <value>Internship phase must last at least 4 weeks (28 days).</value>
+  </data>
+  <data name="InternshipPhase.DurationTooLong" xml:space="preserve">
+    <value>Internship phase must not exceed 12 months (365 days).</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsRequired" xml:space="preserve">
+    <value>Major fields (MajorFields) is required and cannot be empty.</value>
+  </data>
+  <data name="InternshipPhase.CapacityMinValue" xml:space="preserve">
+    <value>Capacity must be greater than or equal to 1.</value>
+  </data>
+  <!-- New business error keys -->
+  <data name="InternshipPhase.CannotUpdateEnded" xml:space="preserve">
+    <value>Cannot edit internship phase '{0}' because the phase has already ended (end date has passed). Only phases that have not yet ended can be edited.</value>
+  </data>
+  <data name="InternshipPhase.CannotChangeDateCapacityWhenPlaced" xml:space="preserve">
+    <value>Cannot change the dates or capacity of internship phase '{0}' because {1} student(s) have already been placed or internship group(s) exist.</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteHasPlacedStudents" xml:space="preserve">
+    <value>Cannot delete this internship phase because {0} student(s) are currently interning. Please complete or transition all student statuses before deleting.</value>
+  </data>
+  <!-- New log keys -->
+  <data name="InternshipPhase.Log.UpdateWithQueueApplications" xml:space="preserve">
+    <value>Warning: Internship phase {0} date/capacity was updated while pending applications exist in queue.</value>
+  </data>
   <data name="Terms.NameExists" xml:space="preserve">
     <value>Term name already exists. Please choose a different name.</value>
   </data>

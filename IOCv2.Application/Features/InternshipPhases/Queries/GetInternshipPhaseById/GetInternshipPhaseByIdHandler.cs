@@ -3,9 +3,11 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace IOCv2.Application.Features.InternshipPhases.Queries.GetInternshipPhaseById;
 
@@ -113,6 +115,14 @@ public class GetInternshipPhaseByIdHandler
                     ResultErrorType.Forbidden);
             }
 
+            var placedCount = await _unitOfWork.Repository<InternshipApplication>().Query()
+                .AsNoTracking()
+                .CountAsync(a => a.TermId == phase.PhaseId
+                              && a.Status == InternshipApplicationStatus.Placed
+                              && a.DeletedAt == null, cancellationToken);
+
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
             var response = new GetInternshipPhaseByIdResponse
             {
                 PhaseId = phase.PhaseId,
@@ -121,9 +131,12 @@ public class GetInternshipPhaseByIdHandler
                 Name = phase.Name,
                 StartDate = phase.StartDate,
                 EndDate = phase.EndDate,
-                MaxStudents = phase.MaxStudents,
+                MajorFields = phase.MajorFields,
+                Capacity = phase.Capacity,
+                RemainingCapacity = Math.Max(phase.Capacity - placedCount, 0),
                 Description = phase.Description,
-                Status = phase.Status,
+                Status = ToLifecycleStatus(phase, today),
+                JobPostingCount = 0,
                 GroupCount = phase.InternshipGroups.Count(g => g.DeletedAt == null),
                 CreatedAt = phase.CreatedAt,
                 UpdatedAt = phase.UpdatedAt
@@ -164,6 +177,14 @@ public class GetInternshipPhaseByIdHandler
                 _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound));
         }
 
+        var adminPlacedCount = await _unitOfWork.Repository<InternshipApplication>().Query()
+            .AsNoTracking()
+            .CountAsync(a => a.TermId == phaseAdmin.PhaseId
+                          && a.Status == InternshipApplicationStatus.Placed
+                          && a.DeletedAt == null, cancellationToken);
+
+        var adminToday = DateOnly.FromDateTime(DateTime.UtcNow);
+
         var adminResponse = new GetInternshipPhaseByIdResponse
         {
             PhaseId = phaseAdmin.PhaseId,
@@ -172,9 +193,12 @@ public class GetInternshipPhaseByIdHandler
             Name = phaseAdmin.Name,
             StartDate = phaseAdmin.StartDate,
             EndDate = phaseAdmin.EndDate,
-            MaxStudents = phaseAdmin.MaxStudents,
+            MajorFields = phaseAdmin.MajorFields,
+            Capacity = phaseAdmin.Capacity,
+            RemainingCapacity = Math.Max(phaseAdmin.Capacity - adminPlacedCount, 0),
             Description = phaseAdmin.Description,
-            Status = phaseAdmin.Status,
+            Status = ToLifecycleStatus(phaseAdmin, adminToday),
+            JobPostingCount = 0,
             GroupCount = phaseAdmin.InternshipGroups.Count(g => g.DeletedAt == null),
             CreatedAt = phaseAdmin.CreatedAt,
             UpdatedAt = phaseAdmin.UpdatedAt
@@ -187,5 +211,12 @@ public class GetInternshipPhaseByIdHandler
             phaseAdmin.PhaseId, phaseAdmin.Name, adminResponse.EnterpriseName, phaseAdmin.Status, adminResponse.GroupCount);
 
         return Result<GetInternshipPhaseByIdResponse>.Success(adminResponse);
+    }
+
+    private static InternshipPhaseLifecycleStatus ToLifecycleStatus(InternshipPhase phase, DateOnly today)
+    {
+        if (phase.IsUpcoming(today)) return InternshipPhaseLifecycleStatus.Upcoming;
+        if (phase.IsActive(today)) return InternshipPhaseLifecycleStatus.Active;
+        return InternshipPhaseLifecycleStatus.Ended;
     }
 }

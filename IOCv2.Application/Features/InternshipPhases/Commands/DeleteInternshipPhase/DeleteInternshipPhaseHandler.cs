@@ -3,7 +3,6 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
-using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -102,14 +101,19 @@ public class DeleteInternshipPhaseHandler
                 ResultErrorType.BadRequest);
         }
 
-        // Block deletion of InProgress phases
-        if (phase.Status == InternshipPhaseStatus.InProgress)
+        var placedCount = await _unitOfWork.Repository<InternshipApplication>().Query()
+            .AsNoTracking()
+            .CountAsync(a => a.TermId == phase.PhaseId
+                          && a.Status == Domain.Enums.InternshipApplicationStatus.Placed
+                          && a.DeletedAt == null, cancellationToken);
+
+        if (placedCount > 0)
         {
             _logger.LogWarning(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogDeleteInProgress),
-                phase.Name, request.PhaseId);
+                "Refusing to delete phase {PhaseId} — {PlacedCount} student(s) currently placed.",
+                request.PhaseId, placedCount);
             return Result<bool>.Failure(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteInProgress, phase.Name),
+                string.Format(_messageService.GetMessage(MessageKeys.InternshipPhase.CannotDeleteHasPlacedStudents), placedCount),
                 ResultErrorType.BadRequest);
         }
 
@@ -117,7 +121,7 @@ public class DeleteInternshipPhaseHandler
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            await _unitOfWork.Repository<InternshipPhase>().DeleteAsync(phase);
+            await _unitOfWork.Repository<InternshipPhase>().HardDeleteAsync(phase, cancellationToken);
             var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
             if (saved > 0)

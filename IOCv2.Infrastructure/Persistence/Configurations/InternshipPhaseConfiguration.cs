@@ -17,9 +17,11 @@ public class InternshipPhaseConfiguration : IEntityTypeConfiguration<InternshipP
         builder.Property(e => e.Name).HasColumnName("name").HasMaxLength(255).IsRequired();
         builder.Property(e => e.StartDate).HasColumnName("start_date").HasColumnType("date").IsRequired();
         builder.Property(e => e.EndDate).HasColumnName("end_date").HasColumnType("date").IsRequired();
-        builder.Property(e => e.MaxStudents).HasColumnName("max_students");
+        builder.Property(e => e.MajorFields).HasColumnName("major_fields").HasColumnType("text").IsRequired();
+        builder.Property(e => e.Capacity).HasColumnName("capacity").IsRequired();
         builder.Property(e => e.Description).HasColumnName("description");
         builder.Property(e => e.Status).HasColumnName("status").HasConversion<short>().IsRequired();
+        builder.ToTable(t => t.HasCheckConstraint("ck_internship_phases_capacity_min", "capacity >= 1"));
 
         // Audit columns
         builder.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()").IsRequired();
@@ -51,7 +53,6 @@ public class InternshipPhaseConfiguration : IEntityTypeConfiguration<InternshipP
         builder.HasIndex(e => new { e.StartDate, e.EndDate }).HasDatabaseName("ix_internship_phases_dates");
         builder.HasIndex(e => new { e.EnterpriseId, e.Name })
             .HasFilter("deleted_at IS NULL")
-            .IsUnique()
             .HasDatabaseName("ix_internship_phases_enterprise_name_unique");
     }
 }

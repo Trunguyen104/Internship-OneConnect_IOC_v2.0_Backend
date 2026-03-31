@@ -29,7 +29,7 @@ public class InternshipPhasesController : ApiControllerBase
     /// Get paginated list of internship phases for an enterprise.
     /// </summary>
     [HttpGet]
-    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin")]
     [RateLimit(maxRequests: 60, windowMinutes: 1)]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetInternshipPhasesResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -46,7 +46,7 @@ public class InternshipPhasesController : ApiControllerBase
     /// Get details of an internship phase by ID.
     /// </summary>
     [HttpGet("{phaseId:guid}", Name = "GetInternshipPhaseById")]
-    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<GetInternshipPhaseByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

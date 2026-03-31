@@ -9,7 +9,10 @@ namespace IOCv2.Domain.Entities
         public string Name { get; private set; } = string.Empty;
         public DateOnly StartDate { get; private set; }
         public DateOnly EndDate { get; private set; }
-        public int? MaxStudents { get; private set; }
+        public string MajorFields { get; private set; } = string.Empty;
+        public int Capacity { get; private set; }
+        // Legacy compatibility for code paths not migrated yet.
+        public int? MaxStudents => Capacity;
         public string? Description { get; private set; }
         public InternshipPhaseStatus Status { get; private set; } = InternshipPhaseStatus.Draft;
 
@@ -34,7 +37,8 @@ namespace IOCv2.Domain.Entities
             string name,
             DateOnly startDate,
             DateOnly endDate,
-            int? maxStudents,
+            string majorFields,
+            int capacity,
             string? description)
         {
             return new InternshipPhase
@@ -44,11 +48,28 @@ namespace IOCv2.Domain.Entities
                 Name = name,
                 StartDate = startDate,
                 EndDate = endDate,
-                MaxStudents = maxStudents,
+                MajorFields = majorFields,
+                Capacity = capacity,
                 Description = description,
                 Status = InternshipPhaseStatus.Draft
             };
         }
+
+        // Legacy overload kept to avoid touching unrelated call sites.
+        public static InternshipPhase Create(
+            Guid enterpriseId,
+            string name,
+            DateOnly startDate,
+            DateOnly endDate,
+            int? maxStudents,
+            string? description)
+            => Create(enterpriseId, name, startDate, endDate, string.Empty, maxStudents ?? 1, description);
+
+        public bool IsUpcoming(DateOnly today) => StartDate > today;
+
+        public bool IsActive(DateOnly today) => StartDate <= today && EndDate >= today;
+
+        public bool IsEnded(DateOnly today) => EndDate < today;
 
         /// <summary>
         /// Check if a status transition is allowed.
@@ -64,6 +85,43 @@ namespace IOCv2.Domain.Entities
             string name,
             DateOnly startDate,
             DateOnly endDate,
+            string majorFields,
+            int capacity,
+            string? description,
+            InternshipPhaseStatus status)
+        {
+            Name = name;
+            StartDate = startDate;
+            EndDate = endDate;
+            MajorFields = majorFields;
+            Capacity = capacity;
+            Description = description;
+            Status = status;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void UpdateInfo(
+            string name,
+            DateOnly startDate,
+            DateOnly endDate,
+            string majorFields,
+            int capacity,
+            string? description)
+        {
+            Name = name;
+            StartDate = startDate;
+            EndDate = endDate;
+            MajorFields = majorFields;
+            Capacity = capacity;
+            Description = description;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        // Legacy overload kept for existing seed/init paths.
+        public void UpdateInfo(
+            string name,
+            DateOnly startDate,
+            DateOnly endDate,
             int? maxStudents,
             string? description,
             InternshipPhaseStatus status)
@@ -71,7 +129,7 @@ namespace IOCv2.Domain.Entities
             Name = name;
             StartDate = startDate;
             EndDate = endDate;
-            MaxStudents = maxStudents;
+            Capacity = maxStudents ?? 1;
             Description = description;
             Status = status;
             UpdatedAt = DateTime.UtcNow;

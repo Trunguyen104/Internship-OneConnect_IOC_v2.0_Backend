@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -778,6 +778,33 @@
   <!-- B-05 FIX: Dedicated log key for InProgress phase deletion block -->
   <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
     <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái InProgress và không thể xóa.</value>
+  </data>
+  <!-- New validation keys -->
+  <data name="InternshipPhase.DurationTooShort" xml:space="preserve">
+    <value>Đợt thực tập phải kéo dài tối thiểu 4 tuần (28 ngày).</value>
+  </data>
+  <data name="InternshipPhase.DurationTooLong" xml:space="preserve">
+    <value>Đợt thực tập không được kéo dài quá 12 tháng (365 ngày).</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsRequired" xml:space="preserve">
+    <value>Ngành nghề tiếp nhận (MajorFields) không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.CapacityMinValue" xml:space="preserve">
+    <value>Số lượng tiếp nhận (Capacity) phải lớn hơn hoặc bằng 1.</value>
+  </data>
+  <!-- New business error keys -->
+  <data name="InternshipPhase.CannotUpdateEnded" xml:space="preserve">
+    <value>Không thể chỉnh sửa đợt thực tập '{0}' vì đợt đã kết thúc (ngày kết thúc đã qua). Chỉ có thể chỉnh sửa các đợt chưa kết thúc.</value>
+  </data>
+  <data name="InternshipPhase.CannotChangeDateCapacityWhenPlaced" xml:space="preserve">
+    <value>Không thể thay đổi ngày hoặc số lượng tiếp nhận của đợt thực tập '{0}' vì đã có {1} sinh viên được xếp chỗ hoặc tồn tại nhóm thực tập.</value>
+  </data>
+  <data name="InternshipPhase.CannotDeleteHasPlacedStudents" xml:space="preserve">
+    <value>Không thể xóa đợt thực tập vì hiện có {0} sinh viên đang thực tập. Vui lòng hoàn tất hoặc chuyển đổi trạng thái sinh viên trước khi xóa.</value>
+  </data>
+  <!-- New log keys -->
+  <data name="InternshipPhase.Log.UpdateWithQueueApplications" xml:space="preserve">
+    <value>Cảnh báo: Đợt thực tập {0} được cập nhật ngày/số lượng trong khi có đơn ứng tuyển đang chờ xử lý.</value>
   </data>
   <data name="Terms.NameExists" xml:space="preserve">
     <value>Tên kỳ thực tập đã tồn tại, vui lòng chọn tên khác.</value>

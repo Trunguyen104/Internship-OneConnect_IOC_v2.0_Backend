@@ -986,6 +986,10 @@ namespace IOCv2.Application.Constants
             public const string StartDateNotInPast = "InternshipPhase.StartDateNotInPast";
             public const string EndDateRequired = "InternshipPhase.EndDateRequired";
             public const string EndDateAfterStartDate = "InternshipPhase.EndDateAfterStartDate";
+            public const string DurationTooShort = "InternshipPhase.DurationTooShort";
+            public const string DurationTooLong = "InternshipPhase.DurationTooLong";
+            public const string MajorFieldsRequired = "InternshipPhase.MajorFieldsRequired";
+            public const string CapacityMinValue = "InternshipPhase.CapacityMinValue";
             public const string MaxStudentsGreaterThanZero = "InternshipPhase.MaxStudentsGreaterThanZero";
             public const string StatusInvalid = "InternshipPhase.StatusInvalid";
             public const string DescriptionMaxLength = "InternshipPhase.DescriptionMaxLength";
@@ -997,6 +1001,9 @@ namespace IOCv2.Application.Constants
             public const string DuplicateName = "InternshipPhase.DuplicateName";
             public const string DuplicateNameOnUpdate = "InternshipPhase.DuplicateNameOnUpdate";
             public const string CannotUpdateClosed = "InternshipPhase.CannotUpdateClosed";
+            public const string CannotUpdateEnded = "InternshipPhase.CannotUpdateEnded";
+            public const string CannotChangeDateCapacityWhenPlaced = "InternshipPhase.CannotChangeDateCapacityWhenPlaced";
+            public const string CannotDeleteHasPlacedStudents = "InternshipPhase.CannotDeleteHasPlacedStudents";
             public const string InvalidStatusTransition = "InternshipPhase.InvalidStatusTransition";
             public const string CannotDeleteHasActiveGroups = "InternshipPhase.CannotDeleteHasActiveGroups";
             public const string CannotDeleteInProgress = "InternshipPhase.CannotDeleteInProgress";
@@ -1029,6 +1036,7 @@ namespace IOCv2.Application.Constants
             public const string LogUpdateDuplicateName = "InternshipPhase.Log.UpdateDuplicateName";
             public const string LogUpdateSuccess = "InternshipPhase.Log.UpdateSuccess";
             public const string LogUpdateNoChanges = "InternshipPhase.Log.UpdateNoChanges";
+            public const string LogUpdateWithQueueApplications = "InternshipPhase.Log.UpdateWithQueueApplications";
             public const string LogUpdateError = "InternshipPhase.Log.UpdateError";
 
             // Log - Delete

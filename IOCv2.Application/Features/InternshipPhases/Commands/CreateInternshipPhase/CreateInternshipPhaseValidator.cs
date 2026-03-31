@@ -18,19 +18,20 @@ public class CreateInternshipPhaseValidator : AbstractValidator<CreateInternship
         RuleFor(x => x.StartDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateRequired));
 
-        RuleFor(x => x.StartDate)
-            .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow))
-                .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast))
-            .When(x => x.StartDate != default);
-
         RuleFor(x => x.EndDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateRequired))
             .GreaterThan(x => x.StartDate)
-                .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateAfterStartDate));
+                .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateAfterStartDate))
+            .Must((x, endDate) => (endDate.DayNumber - x.StartDate.DayNumber) >= 28)
+                .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DurationTooShort))
+            .Must((x, endDate) => (endDate.DayNumber - x.StartDate.DayNumber) <= 365)
+                .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DurationTooLong));
 
-        RuleFor(x => x.MaxStudents)
-            .GreaterThan(0).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MaxStudentsGreaterThanZero))
-            .When(x => x.MaxStudents.HasValue);
+        RuleFor(x => x.MajorFields)
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MajorFieldsRequired));
+
+        RuleFor(x => x.Capacity)
+            .GreaterThanOrEqualTo(1).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.CapacityMinValue));
 
         RuleFor(x => x.Description)
             .MaximumLength(2000).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DescriptionMaxLength))

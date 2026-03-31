@@ -3,6 +3,8 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
+using System;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -38,7 +40,7 @@ public class GetInternshipPhasesHandler
         _logger.LogInformation(
             _messageService.GetMessage(MessageKeys.InternshipPhase.LogGettingList),
             request.EnterpriseId?.ToString() ?? "All",
-            request.Status.HasValue ? request.Status.Value.ToString() : "All",
+            string.IsNullOrWhiteSpace(request.Status) ? "All" : request.Status,
             request.PageNumber);
 
         var role = _currentUserService.Role;
@@ -84,7 +86,7 @@ public class GetInternshipPhasesHandler
 
         var cacheKey = InternshipPhaseCacheKeys.PhaseList(
             targetEnterpriseId,
-            request.Status.HasValue ? (int)request.Status.Value : null,
+            request.Status,
             request.PageNumber,
             request.PageSize);
 
@@ -108,17 +110,42 @@ public class GetInternshipPhasesHandler
             query = query.Where(p => p.EnterpriseId == targetEnterpriseId.Value);
         }
 
-        if (request.Status.HasValue)
-            query = query.Where(p => p.Status == request.Status.Value);
-
         query = query.OrderByDescending(p => p.StartDate);
 
-        var totalCount = await query.CountAsync(cancellationToken);
+        var phasesForFilter = await query.ToListAsync(cancellationToken);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        var phases = await query
+        var filtered = phasesForFilter.Where(p =>
+        {
+            var lifecycle = ToLifecycleStatus(p, today);
+
+            if (!request.IncludeEnded && lifecycle == InternshipPhaseLifecycleStatus.Ended)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(request.Status))
+                return true;
+
+            return lifecycle.ToString().Equals(request.Status, StringComparison.OrdinalIgnoreCase);
+        }).ToList();
+
+        var totalCount = filtered.Count;
+
+        var phases = filtered
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .ToListAsync(cancellationToken);
+            .ToList();
+
+        var phaseIds = phases.Select(p => p.PhaseId).ToList();
+        var placedLookup = phaseIds.Count == 0
+            ? new Dictionary<Guid, int>()
+            : await _unitOfWork.Repository<InternshipApplication>().Query()
+                .AsNoTracking()
+                .Where(a => phaseIds.Contains(a.TermId)
+                            && a.Status == InternshipApplicationStatus.Placed
+                            && a.DeletedAt == null)
+                .GroupBy(a => a.TermId)
+                .Select(g => new { PhaseId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.PhaseId, x => x.Count, cancellationToken);
 
         var items = phases.Select(p => new GetInternshipPhasesResponse
         {
@@ -128,9 +155,12 @@ public class GetInternshipPhasesHandler
             Name = p.Name,
             StartDate = p.StartDate,
             EndDate = p.EndDate,
-            MaxStudents = p.MaxStudents,
+            MajorFields = p.MajorFields,
+            Capacity = p.Capacity,
+            RemainingCapacity = Math.Max(p.Capacity - placedLookup.GetValueOrDefault(p.PhaseId), 0),
             Description = p.Description,
-            Status = p.Status,
+            Status = ToLifecycleStatus(p, today),
+            JobPostingCount = 0,
             GroupCount = p.InternshipGroups.Count(g => g.DeletedAt == null),
             CreatedAt = p.CreatedAt
         }).ToList();
@@ -144,5 +174,12 @@ public class GetInternshipPhasesHandler
             targetEnterpriseId?.ToString() ?? "All", items.Count, totalCount, request.PageNumber);
 
         return Result<PaginatedResult<GetInternshipPhasesResponse>>.Success(result);
+    }
+
+    private static InternshipPhaseLifecycleStatus ToLifecycleStatus(InternshipPhase phase, DateOnly today)
+    {
+        if (phase.IsUpcoming(today)) return InternshipPhaseLifecycleStatus.Upcoming;
+        if (phase.IsActive(today)) return InternshipPhaseLifecycleStatus.Active;
+        return InternshipPhaseLifecycleStatus.Ended;
     }
 }

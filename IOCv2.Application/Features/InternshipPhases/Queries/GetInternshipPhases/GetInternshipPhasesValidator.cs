@@ -1,6 +1,7 @@
 using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
+using System;
 
 namespace IOCv2.Application.Features.InternshipPhases.Queries.GetInternshipPhases;
 
@@ -15,7 +16,10 @@ public class GetInternshipPhasesValidator : AbstractValidator<GetInternshipPhase
             .InclusiveBetween(1, 50).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.PageSizeRange));
 
         RuleFor(x => x.Status)
-            .IsInEnum().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StatusInvalid))
-            .When(x => x.Status.HasValue);
+            .Must(status => string.IsNullOrWhiteSpace(status)
+                || status.Equals("Upcoming", StringComparison.OrdinalIgnoreCase)
+                || status.Equals("Active", StringComparison.OrdinalIgnoreCase)
+                || status.Equals("Ended", StringComparison.OrdinalIgnoreCase))
+            .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StatusInvalid));
     }
 }
