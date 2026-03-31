@@ -25,7 +25,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
         public string? Description { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public ProjectStatus? Status { get; set; }
+        public VisibilityStatus VisibilityStatus { get; set; }
+        public OperationalStatus OperationalStatus { get; set; }
         public ProjectTemplate Template { get; set; }
         public DateTime CreatedAt { get; set; }
 

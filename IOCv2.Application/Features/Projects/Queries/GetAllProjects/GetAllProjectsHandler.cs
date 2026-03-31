@@ -165,7 +165,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 
                 if (mentorEnterpriseUser != null)
                 {
-                    query = query.Where(p => p.MentorId == mentorEnterpriseUser.EnterpriseUserId);
+                    query = query.Where(ProjectOwnershipPolicy.BuildMentorVisibility(mentorEnterpriseUser.EnterpriseUserId));
                 }
                 else
                 {

@@ -58,7 +58,33 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
                 .Where(p => p.InternshipId == request.InternshipId)
                 .AsNoTracking();
 
+                var isMentor = string.Equals(_currentUserService?.Role, "Mentor", StringComparison.OrdinalIgnoreCase);
                 var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
+                if (isMentor)
+                {
+                    if (!Guid.TryParse(_currentUserService?.UserId, out var currentMentorUserId))
+                        return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+                    var mentorEnterpriseUserId = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                        .AsNoTracking()
+                        .Where(eu => eu.UserId == currentMentorUserId)
+                        .Select(eu => eu.EnterpriseUserId)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (mentorEnterpriseUserId == Guid.Empty)
+                        return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                    var isMentorOfGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
+                        .AsNoTracking()
+                        .AnyAsync(g => g.InternshipId == request.InternshipId && g.MentorId == mentorEnterpriseUserId, cancellationToken);
+
+                    if (!isMentorOfGroup)
+                        return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
+                            _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+                }
+
                 if (isStudent)
                 {
                     if (!Guid.TryParse(_currentUserService?.UserId, out var currentUserId))
@@ -83,15 +109,25 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
                         return Result<PaginatedResult<GetProjectsByInternshipIdResponse>>.Failure(
                             _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
-                    query = query.Where(p => p.Status == ProjectStatus.Published || p.Status == ProjectStatus.Completed);
+                    query = query.Where(p => p.VisibilityStatus == VisibilityStatus.Published &&
+                                             (p.OperationalStatus == OperationalStatus.Active ||
+                                              p.OperationalStatus == OperationalStatus.Completed));
                 }
 
                 // Apply search term
                 if (!string.IsNullOrWhiteSpace(request.SearchTerm)) { var term = request.SearchTerm.Trim().ToLower(); 
                     query = query.Where(p => p.ProjectName.ToLower().Contains(term) || (p.Description != null && p.Description.ToLower().Contains(term))); }
 
-                // Apply status filter
-                if (request.Status.HasValue) { query = query.Where(p => p.Status == request.Status.Value); }
+                // Apply two-layer status filters
+                if (request.VisibilityStatus.HasValue)
+                {
+                    query = query.Where(p => p.VisibilityStatus == request.VisibilityStatus.Value);
+                }
+
+                if (request.OperationalStatus.HasValue)
+                {
+                    query = query.Where(p => p.OperationalStatus == request.OperationalStatus.Value);
+                }
 
                 // Apply date range filter
                 if (request.FromDate.HasValue) { query = query.Where(p => p.StartDate >= request.FromDate.Value); }
@@ -128,8 +164,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
                 ("enddate", true) => query.OrderByDescending(p => p.EndDate),
                 ("enddate", false) => query.OrderBy(p => p.EndDate),
 
-                ("status", true) => query.OrderByDescending(p => p.Status),
-                ("status", false) => query.OrderBy(p => p.Status),
+                ("visibilitystatus", true) => query.OrderByDescending(p => p.VisibilityStatus),
+                ("visibilitystatus", false) => query.OrderBy(p => p.VisibilityStatus),
+
+                ("operationalstatus", true) => query.OrderByDescending(p => p.OperationalStatus),
+                ("operationalstatus", false) => query.OrderBy(p => p.OperationalStatus),
 
                 ("createdat", true) => query.OrderByDescending(p => p.CreatedAt),
                 ("createdat", false) => query.OrderBy(p => p.CreatedAt),

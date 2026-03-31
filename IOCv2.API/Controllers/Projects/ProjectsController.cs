@@ -32,7 +32,7 @@ public class ProjectsController : ApiControllerBase
     public ProjectsController(IMediator mediator) => _mediator = mediator;
 
     /// <summary>
-    /// Get paginated list of all projects with optional filters.
+    /// Get a paginated list of all projects with optional filters.
     /// </summary>
     [HttpGet]
     [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor,Student")]
@@ -65,7 +65,7 @@ public class ProjectsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get list of students in the project's internship group.
+    /// Get a list of students in the project's internship group.
     /// </summary>
     [HttpGet("{projectId:guid}/students")]
     [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor,Student")]
@@ -83,7 +83,7 @@ public class ProjectsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get paginated list of projects visible to the currently authenticated student.
+    /// Get a paginated list of projects visible to the currently authenticated student.
     /// </summary>
     [HttpGet("my")]
     [Authorize(Roles = "Student")]
@@ -101,7 +101,7 @@ public class ProjectsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get paginated list of projects belonging to a specific internship group.
+    /// Get a paginated list of projects belonging to a specific internship group.
     /// </summary>
     [HttpGet("internship-group")]
     [Authorize(Roles = "SuperAdmin,SchoolAdmin,HR,EnterpriseAdmin,Mentor,Student")]
@@ -146,7 +146,7 @@ public class ProjectsController : ApiControllerBase
     /// Update an existing project. Only the project's Mentor can update.
     /// Also supports resource operations in the same request body:
     /// - resourceUpdates: rename resource, and update externalUrl for LINK resources
-    /// - resourceDeleteIds: remove resources from project
+    /// - resourceDeleteIds: remove resources from a project
     /// </summary>
     [HttpPut("{projectId:guid}")]
     [Authorize(Roles = "Mentor")]
@@ -245,7 +245,7 @@ public class ProjectsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Swap a project's assigned group. Only available when project has no student data.
+    /// Swap a project's assigned group. Only available when a project has no student data.
     /// </summary>
     [HttpPatch("{projectId:guid}/change-group")]
     [Authorize(Roles = "Mentor")]
@@ -284,7 +284,7 @@ public class ProjectsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Delete a project. Only the project's Mentor can delete.
+    /// Delete a project. Only the project's Mentor can delete it.
     /// </summary>
     [HttpDelete("{projectId:guid}")]
     [Authorize(Roles = "Mentor")]

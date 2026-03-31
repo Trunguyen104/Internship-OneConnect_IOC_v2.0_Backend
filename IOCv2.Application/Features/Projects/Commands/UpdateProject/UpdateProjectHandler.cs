@@ -64,8 +64,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            // B9: Scope check — chỉ Mentor tạo project mới được edit (AC-08, AC-14)
-            if (project.MentorId != enterpriseUser.EnterpriseUserId)
+            // Ownership: Unstarted theo created_by; assigned project theo current mentor của group.
+            if (!ProjectOwnershipPolicy.CanManage(project, enterpriseUser.EnterpriseUserId))
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Block nếu project không còn editable (OperationalStatus không phải Unstarted/Active)

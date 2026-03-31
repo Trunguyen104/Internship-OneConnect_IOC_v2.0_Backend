@@ -28,7 +28,7 @@ public class ProjectResourcesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get paginated list of project resources with optional filters.
+    /// Get a paginated list of project resources with optional filters.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(Result<PaginatedResult<GetAllProjectResourcesResponse>>), StatusCodes.Status200OK)]

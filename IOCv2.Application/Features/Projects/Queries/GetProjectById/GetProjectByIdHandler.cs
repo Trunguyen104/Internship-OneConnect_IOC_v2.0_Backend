@@ -82,7 +82,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
                     .AsNoTracking()
                     .FirstOrDefaultAsync(eu => eu.UserId == mentorUserId, cancellationToken);
 
-                if (mentorEnterpriseUser == null || project.MentorId != mentorEnterpriseUser.EnterpriseUserId)
+                if (mentorEnterpriseUser == null || !ProjectOwnershipPolicy.CanManage(project, mentorEnterpriseUser.EnterpriseUserId))
                     return Result<GetProjectByIdResponse>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
             }

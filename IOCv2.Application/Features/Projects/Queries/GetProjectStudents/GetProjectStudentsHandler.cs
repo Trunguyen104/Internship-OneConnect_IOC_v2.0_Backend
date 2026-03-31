@@ -1,5 +1,6 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -33,6 +34,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectStudents
             CancellationToken cancellationToken)
         {
             var project = await _unitOfWork.Repository<Project>().Query()
+                .Include(p => p.InternshipGroup)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
@@ -46,10 +48,30 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectStudents
                 return Result<List<GetProjectStudentsResponse>>.Success(new List<GetProjectStudentsResponse>());
             }
 
+            var isMentor = string.Equals(_currentUserService?.Role, "Mentor", StringComparison.OrdinalIgnoreCase);
+            if (isMentor)
+            {
+                if (!Guid.TryParse(_currentUserService?.UserId, out var mentorUserId))
+                    return Result<List<GetProjectStudentsResponse>>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
+                var mentorEnterpriseUserId = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .Where(eu => eu.UserId == mentorUserId)
+                    .Select(eu => eu.EnterpriseUserId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (mentorEnterpriseUserId == Guid.Empty || !ProjectOwnershipPolicy.CanManage(project, mentorEnterpriseUserId))
+                    return Result<List<GetProjectStudentsResponse>>.Failure(
+                        _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+            }
+
             var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
             if (isStudent)
             {
-                if (project.Status != ProjectStatus.Published && project.Status != ProjectStatus.Completed)
+                if (project.VisibilityStatus != VisibilityStatus.Published ||
+                    (project.OperationalStatus != OperationalStatus.Active &&
+                     project.OperationalStatus != OperationalStatus.Completed))
                     return Result<List<GetProjectStudentsResponse>>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 

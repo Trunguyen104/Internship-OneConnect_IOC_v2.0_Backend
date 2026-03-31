@@ -48,13 +48,14 @@ namespace IOCv2.Application.Features.Projects.Commands.ArchiveProject
                 return Result<ArchiveProjectResponse>.Failure(_message.GetMessage(MessageKeys.Projects.MentorNotFound), ResultErrorType.Forbidden);
 
             var project = await _unitOfWork.Repository<Project>().Query()
+                .Include(p => p.InternshipGroup)
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 
             if (project == null)
                 return Result<ArchiveProjectResponse>.NotFound(_message.GetMessage(MessageKeys.Projects.NotFound));
 
-            // Scope: chỉ Mentor tạo project
-            if (project.MentorId != enterpriseUser.EnterpriseUserId)
+            // Ownership: Unstarted theo created_by; assigned project theo current mentor của group.
+            if (!ProjectOwnershipPolicy.CanManage(project, enterpriseUser.EnterpriseUserId))
                 return Result<ArchiveProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Điều kiện: project phải ở trạng thái Completed

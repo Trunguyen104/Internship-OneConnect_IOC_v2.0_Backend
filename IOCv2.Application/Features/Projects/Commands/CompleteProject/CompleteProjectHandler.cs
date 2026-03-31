@@ -54,9 +54,8 @@ namespace IOCv2.Application.Features.Projects.Commands.CompleteProject
             if (project == null)
                 return Result<CompleteProjectResponse>.NotFound(_message.GetMessage(MessageKeys.Projects.NotFound));
 
-            // Scope check
-            if (project.MentorId != enterpriseUser.EnterpriseUserId &&
-                project.InternshipGroup?.MentorId != enterpriseUser.EnterpriseUserId)
+            // Ownership: Unstarted theo created_by; assigned project theo current mentor của group.
+            if (!ProjectOwnershipPolicy.CanManage(project, enterpriseUser.EnterpriseUserId))
                 return Result<CompleteProjectResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             if (project.OperationalStatus != OperationalStatus.Active)

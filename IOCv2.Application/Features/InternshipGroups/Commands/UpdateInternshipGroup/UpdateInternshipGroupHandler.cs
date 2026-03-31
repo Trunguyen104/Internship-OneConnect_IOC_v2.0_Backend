@@ -146,14 +146,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
 
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(entity);
 
-                if (mentorOwnershipChanged)
-                {
-                    await _unitOfWork.Repository<Project>().ExecuteUpdateAsync(
-                        p => p.InternshipId == entity.InternshipId,
-                        s => s.SetProperty(p => p.MentorId, resolvedMentorId)
-                              .SetProperty(p => p.UpdatedAt, DateTime.UtcNow),
-                        cancellationToken);
-                }
 
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
 
