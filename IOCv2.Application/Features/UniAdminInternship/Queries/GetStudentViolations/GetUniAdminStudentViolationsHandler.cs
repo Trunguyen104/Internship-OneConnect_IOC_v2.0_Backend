@@ -144,13 +144,29 @@ public class GetUniAdminStudentViolationsHandler
                 .OrderByDescending(v => v.OccurredDate)
                 .ToListAsync(cancellationToken);
 
+        var reporterIds = violations
+            .Where(v => v.CreatedBy.HasValue)
+            .Select(v => v.CreatedBy!.Value)
+            .Distinct()
+            .ToList();
+
+        var reporterLookup = reporterIds.Count == 0
+            ? new Dictionary<Guid, string>()
+            : await _unitOfWork.Repository<User>().Query()
+                .AsNoTracking()
+                .Where(u => reporterIds.Contains(u.UserId))
+                .ToDictionaryAsync(u => u.UserId, u => u.FullName, cancellationToken);
+
         var items = violations.Select(v => new ViolationItemDto
         {
             ViolationReportId = v.ViolationReportId,
             OccurredDate = v.OccurredDate,
             ReportedAt = v.CreatedAt,
             Description = v.Description,
-            InternshipGroupName = v.InternshipGroup.GroupName
+            InternshipGroupName = v.InternshipGroup.GroupName,
+            ReporterName = v.CreatedBy.HasValue && reporterLookup.TryGetValue(v.CreatedBy.Value, out var name)
+                ? name
+                : null
         }).ToList();
 
         _logger.LogInformation(

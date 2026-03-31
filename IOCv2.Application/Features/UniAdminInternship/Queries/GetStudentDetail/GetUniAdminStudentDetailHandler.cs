@@ -157,7 +157,7 @@ public class GetUniAdminStudentDetailHandler
                     || app.Status == InternshipApplicationStatus.PendingAssignment),
                 cancellationToken);
 
-        var uiStatus = DeriveUiStatus(studentTerm.PlacementStatus, hasGroup, hasPendingApp, term.Status);
+        var uiStatus = DeriveUiStatus(studentTerm.PlacementStatus, hasGroup, hasPendingApp, group?.EndDate);
 
         // Logbook count
         var logbookCount = 0;
@@ -174,7 +174,7 @@ public class GetUniAdminStudentDetailHandler
                 .ToListAsync(cancellationToken);
 
             logbookCount = studentLogbooks.Count;
-            weeklyLogbooks = BuildWeeklyLogbooks(studentLogbooks, group.StartDate);
+            weeklyLogbooks = BuildWeeklyLogbooks(studentLogbooks, internStudent.JoinedAt, group.EndDate);
         }
 
         var logbookSummary = CalculateLogbookSummary(internStudent, group, logbookCount);
@@ -223,6 +223,8 @@ public class GetUniAdminStudentDetailHandler
             EnterpriseId = studentTerm.EnterpriseId,
             EnterpriseName = studentTerm.Enterprise?.Name,
             EnterprisePosition = group?.Description,
+            InternshipPhaseStartDate = group?.StartDate,
+            InternshipPhaseEndDate = group?.EndDate,
             MentorId = group?.MentorId,
             MentorName = group?.Mentor?.User?.FullName,
             MentorEmail = group?.Mentor?.User?.Email,
@@ -245,12 +247,12 @@ public class GetUniAdminStudentDetailHandler
         PlacementStatus placementStatus,
         bool hasGroup,
         bool hasPendingApp,
-        TermStatus termStatus)
+        DateTime? groupEndDate)
     {
         if (placementStatus == PlacementStatus.Unplaced)
             return hasPendingApp ? InternshipUiStatus.PendingConfirmation : InternshipUiStatus.Unplaced;
 
-        if (termStatus == TermStatus.Closed)
+        if (hasGroup && groupEndDate.HasValue && groupEndDate.Value.Date < DateTime.UtcNow.Date)
             return InternshipUiStatus.Completed;
 
         return hasGroup ? InternshipUiStatus.Active : InternshipUiStatus.NoGroup;
@@ -297,75 +299,112 @@ public class GetUniAdminStudentDetailHandler
 
     private static List<UniAdminWeeklyLogbookDto> BuildWeeklyLogbooks(
         List<Logbook> logbooks,
-        DateTime? groupStartDate)
+        DateTime joinedAt,
+        DateTime? phaseEndDate)
     {
-        if (logbooks.Count == 0)
+        var startDate = joinedAt.Date;
+        var endDate = (phaseEndDate?.Date ?? DateTime.UtcNow.Date);
+        if (endDate < startDate)
             return new List<UniAdminWeeklyLogbookDto>();
 
-        var anchor = GetStartOfWeek((groupStartDate ?? logbooks.Min(x => x.DateReport)).Date);
+        var today = DateTime.UtcNow.Date;
+        var logbookByDate = logbooks
+            .GroupBy(x => x.DateReport.Date)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.CreatedAt).First());
 
-        return logbooks
-            .GroupBy(x => GetWeekNumber(x.DateReport, anchor))
-            .OrderBy(x => x.Key)
-            .Select(g =>
+        var weeks = new List<UniAdminWeeklyLogbookDto>();
+        var weekStart = GetStartOfWeek(startDate);
+        var weekNumber = 1;
+
+        while (weekStart.Date <= endDate)
+        {
+            var weekEnd = weekStart.AddDays(6);
+            var rangeStart = weekStart.Date < startDate ? startDate : weekStart.Date;
+            var rangeEnd = weekEnd.Date > endDate ? endDate : weekEnd.Date;
+
+            var entries = new List<UniAdminWeeklyLogbookEntryDto>();
+            for (var d = rangeStart; d <= rangeEnd; d = d.AddDays(1))
             {
-                var weekStart = anchor.AddDays((g.Key - 1) * 7);
-                var weekEnd = weekStart.AddDays(4);
+                var isWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+                var isHoliday = false;
+                var isRequired = !isWeekend && !isHoliday;
 
-                var entries = g
-                    .OrderBy(x => x.DateReport)
-                    .Select(x => new UniAdminWeeklyLogbookEntryDto
-                    {
-                        LogbookId = x.LogbookId,
-                        DateReport = x.DateReport,
-                        Summary = x.Summary,
-                        Issue = x.Issue,
-                        Plan = x.Plan,
-                        Status = x.Status,
-                        StatusBadge = x.Status == LogbookStatus.LATE ? "Late" : "Submitted"
-                    })
-                    .ToList();
-
-                var submittedCount = entries.Count(x => x.Status != LogbookStatus.LATE);
-                var lateCount = entries.Count(x => x.Status == LogbookStatus.LATE);
-                var totalCount = entries.Count;
-
-                return new UniAdminWeeklyLogbookDto
+                if (logbookByDate.TryGetValue(d, out var logbook))
                 {
-                    WeekNumber = g.Key,
-                    WeekTitle = $"Week {g.Key}: {GetWeekTheme(g.Key)}",
-                    WeekStartDate = weekStart,
-                    WeekEndDate = weekEnd,
-                    SubmittedCount = submittedCount,
-                    LateCount = lateCount,
-                    TotalCount = totalCount,
-                    CompletionRatio = $"{submittedCount}/{totalCount}",
-                    Entries = entries
-                };
-            })
-            .ToList();
+                    var isLate = logbook.Status == LogbookStatus.LATE;
+                    entries.Add(new UniAdminWeeklyLogbookEntryDto
+                    {
+                        LogbookId = logbook.LogbookId,
+                        DateReport = d,
+                        Summary = logbook.Summary,
+                        Issue = logbook.Issue,
+                        Plan = logbook.Plan,
+                        Status = logbook.Status,
+                        StatusBadge = isLate ? "Late" : "Submitted",
+                        SubmittedAt = logbook.CreatedAt,
+                        IsSubmitted = true,
+                        IsLate = isLate,
+                        IsMissing = false,
+                        IsFuture = false,
+                        IsWeekend = isWeekend,
+                        IsHoliday = isHoliday,
+                        IsRequired = isRequired
+                    });
+                }
+                else
+                {
+                    var isFuture = d >= today;
+                    var statusBadge = isWeekend ? "Weekend" : isHoliday ? "Holiday" : isFuture ? "Pending" : "Missing";
+
+                    entries.Add(new UniAdminWeeklyLogbookEntryDto
+                    {
+                        LogbookId = Guid.Empty,
+                        DateReport = d,
+                        Summary = string.Empty,
+                        Issue = null,
+                        Plan = string.Empty,
+                        Status = null,
+                        StatusBadge = statusBadge,
+                        SubmittedAt = null,
+                        IsSubmitted = false,
+                        IsLate = false,
+                        IsMissing = !isFuture && isRequired,
+                        IsFuture = isFuture && isRequired,
+                        IsWeekend = isWeekend,
+                        IsHoliday = isHoliday,
+                        IsRequired = isRequired
+                    });
+                }
+            }
+
+            var submittedCount = entries.Count(x => x.IsSubmitted);
+            var lateCount = entries.Count(x => x.IsLate);
+            var requiredCount = entries.Count(x => x.IsRequired);
+
+            weeks.Add(new UniAdminWeeklyLogbookDto
+            {
+                WeekNumber = weekNumber,
+                WeekTitle = $"Week {weekNumber}: {rangeStart:dd/MM} - {rangeEnd:dd/MM/yyyy}",
+                WeekStartDate = rangeStart,
+                WeekEndDate = rangeEnd,
+                SubmittedCount = submittedCount,
+                LateCount = lateCount,
+                TotalCount = requiredCount,
+                CompletionRatio = requiredCount == 0 ? "0/0" : $"{submittedCount}/{requiredCount}",
+                IsCurrentWeek = today >= rangeStart && today <= rangeEnd,
+                Entries = entries
+            });
+
+            weekStart = weekStart.AddDays(7);
+            weekNumber++;
+        }
+
+        return weeks;
     }
 
     private static DateTime GetStartOfWeek(DateTime date)
     {
         var diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
         return date.Date.AddDays(-diff);
-    }
-
-    private static int GetWeekNumber(DateTime date, DateTime anchor)
-    {
-        return ((date.Date - anchor).Days / 7) + 1;
-    }
-
-    private static string GetWeekTheme(int weekNumber)
-    {
-        return weekNumber switch
-        {
-            1 => "Kickoff & Research",
-            2 => "Implementation & Testing",
-            3 => "Optimization & Stabilization",
-            4 => "Release & Handover",
-            _ => "Execution"
-        };
     }
 }

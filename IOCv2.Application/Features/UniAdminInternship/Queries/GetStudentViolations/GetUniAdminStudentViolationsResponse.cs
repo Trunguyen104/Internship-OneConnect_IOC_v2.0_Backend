@@ -12,4 +12,5 @@ public class ViolationItemDto
     public DateTime ReportedAt { get; set; }
     public string Description { get; set; } = string.Empty;
     public string InternshipGroupName { get; set; } = string.Empty;
+    public string? ReporterName { get; set; }
 }

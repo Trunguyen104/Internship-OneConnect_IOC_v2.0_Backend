@@ -28,6 +28,10 @@ public class GetUniAdminStudentDetailResponse
     public string? EnterpriseName { get; set; }
     public string? EnterprisePosition { get; set; }
 
+    // Internship phase
+    public DateTime? InternshipPhaseStartDate { get; set; }
+    public DateTime? InternshipPhaseEndDate { get; set; }
+
     // Mentor
     public Guid? MentorId { get; set; }
     public string? MentorName { get; set; }
@@ -52,6 +56,7 @@ public class UniAdminWeeklyLogbookDto
     public int LateCount { get; set; }
     public int TotalCount { get; set; }
     public string CompletionRatio { get; set; } = string.Empty;
+    public bool IsCurrentWeek { get; set; }
     public List<UniAdminWeeklyLogbookEntryDto> Entries { get; set; } = new();
 }
 
@@ -62,7 +67,14 @@ public class UniAdminWeeklyLogbookEntryDto
     public string Summary { get; set; } = string.Empty;
     public string? Issue { get; set; }
     public string Plan { get; set; } = string.Empty;
-    public LogbookStatus Status { get; set; }
+    public LogbookStatus? Status { get; set; }
     public string StatusBadge { get; set; } = string.Empty;
+    public DateTime? SubmittedAt { get; set; }
+    public bool IsSubmitted { get; set; }
+    public bool IsLate { get; set; }
+    public bool IsMissing { get; set; }
+    public bool IsFuture { get; set; }
+    public bool IsWeekend { get; set; }
+    public bool IsHoliday { get; set; }
+    public bool IsRequired { get; set; }
 }
-
