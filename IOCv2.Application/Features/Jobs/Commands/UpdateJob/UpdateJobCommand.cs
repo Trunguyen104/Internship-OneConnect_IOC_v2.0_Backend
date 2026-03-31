@@ -13,18 +13,21 @@ namespace IOCv2.Application.Features.Jobs.Commands.UpdateJob
     {
         [JsonIgnore]
         public Guid JobId { get; init; }
-        public string Title { get; init; } = string.Empty;
+        public string? Title { get; init; } = string.Empty;
         public string? Position { get; init; }
         public string? Description { get; init; }
         public string? Requirements { get; init; }
         public string? Benefit { get; init; }
         public string? Location { get; init; }
-        public int? Quantity { get; init; }
         public JobStatus Status { get; init; }
         public DateTime? ExpireDate { get; init; }
-        public DateTime? StartDate { get; init; }
-        public DateTime? EndDate { get; init; }
         public JobAudience Audience { get; init; }
+
+        /// <summary>
+        /// Selected internship phase for this job posting (nullable).
+        /// AC-05 requires special handling when changing this for Published jobs with active applications.
+        /// </summary>
+        public Guid? InternshipPhaseId { get; init; }
 
         /// <summary>
         /// When Audience == Targeted this should contain the single target university id.

@@ -48,6 +48,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
                 .Include(j => j.Enterprise)
                 .Include(j => j.Universities)
                 .Include(j => j.InternshipApplications)
+                .Include(j => j.InternshipPhase)
                 .FirstOrDefaultAsync(j => j.JobId == request.JobId, cancellationToken);
 
             if (job == null)
@@ -122,13 +123,11 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
             // AC-11: compute Placed count and set banner when Placed == Quantity
             var placedCount = job.InternshipApplications.Count(a => a.Status == InternshipApplicationStatus.Placed);
             response.PlacedCount = placedCount;
-
-            if (job.Quantity.HasValue && placedCount == job.Quantity.Value)
+            var maxStudents = job.InternshipPhase.MaxStudents;
+            if (maxStudents is not null && placedCount == maxStudents)
             {
-                // localized banner: "Số lượng sinh viên đã Placed đã đạt tối đa [N]/[N]..."
-                response.FilledBanner = _messageService.GetMessage("Job.Banner.Filled", placedCount, job.Quantity.Value);
+                response.FilledBanner = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.JobPlacedMaxed, job.InternshipPhase.Name, placedCount, maxStudents);
             }
-
             return Result<GetJobByIdResponse>.Success(response);
         }
     }

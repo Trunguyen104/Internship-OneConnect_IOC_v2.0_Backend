@@ -87,6 +87,11 @@ namespace IOCv2.Application.Features.Jobs.Commands.PublishJobPosting
 
             if (job == null)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.JobPostingNotFound));
+
+            // Block publish when internship phase not selected
+            if (!job.InternshipPhaseId.HasValue || job.InternshipPhaseId == Guid.Empty)
+                throw new Exception(_messageService.GetMessage(MessageKeys.InternshipPhase.InternshipPhaseIdRequired));
+
             if (job.Status == JobStatus.PUBLISHED)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.AlreadyPublished));
             if (string.IsNullOrWhiteSpace(job.Title))
@@ -101,22 +106,10 @@ namespace IOCv2.Application.Features.Jobs.Commands.PublishJobPosting
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.LocationRequired));
             if (job.Location.Length > 255)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.LocationTooLong));
-            if (job.Quantity <= 0)
-                throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.QuantityMustBePositive));
             if (!job.ExpireDate.HasValue)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ExpireDateRequired));
             if (job.ExpireDate.Value <= DateTime.UtcNow)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ExpireDateMustBeTodayOrLater));
-            if (!job.StartDate.HasValue)
-                throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.StartDateRequired));
-            if (job.StartDate.Value <= DateTime.UtcNow)
-                throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.StartDateMustBeTodayOrLater));
-            if (!job.EndDate.HasValue)
-                throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateRequired));
-            if (job.EndDate.Value.Day < job.StartDate.Value.Day + JobsPostingParam.Common.MinimumDurationDays)
-                throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMinDuration, JobsPostingParam.Common.MinimumDurationDays));
-            if (job.EndDate.Value.Day > job.StartDate.Value.Day + JobsPostingParam.Common.MaximumDurationDays)
-                throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.EndDateMaxDuration, JobsPostingParam.Common.MaximumDurationDays));
             if (job.Audience == null)
                 throw new Exception(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.AudienceRequired));
         }
