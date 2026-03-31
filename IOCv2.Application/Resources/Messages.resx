@@ -1045,6 +1045,12 @@
   <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
     <value>Lấy thông tin chi tiết sinh viên thành công.</value>
   </data>
+  <data name="UniAdminInternship.StudentLogbookTotalRetrieved" xml:space="preserve">
+    <value>Lấy tổng quan logbook sinh viên thành công.</value>
+  </data>
+  <data name="UniAdminInternship.StudentLogbookWeeklyRetrieved" xml:space="preserve">
+    <value>Lấy logbook theo tuần của sinh viên thành công.</value>
+  </data>
   <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
     <value>Lấy danh sách đánh giá sinh viên thành công.</value>
   </data>
@@ -1061,6 +1067,12 @@
   </data>
   <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
     <value>SchoolAdmin {0} lấy chi tiết sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbookTotal" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy tổng quan logbook sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbookWeekly" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy logbook theo tuần của sinh viên {1} trong kỳ {2}.</value>
   </data>
   <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
     <value>SchoolAdmin {0} lấy đánh giá sinh viên {1} trong kỳ {2}.</value>

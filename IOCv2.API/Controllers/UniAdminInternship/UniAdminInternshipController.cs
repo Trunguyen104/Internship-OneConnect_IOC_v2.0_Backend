@@ -2,6 +2,8 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentDetail;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentEvaluations;
+using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentLogbookTotal;
+using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentLogbookWeekly;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentList;
 using IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentViolations;
 using MediatR;
@@ -68,6 +70,46 @@ public class UniAdminInternshipController : Controllers.ApiControllerBase
         CancellationToken cancellationToken = default)
     {
         var query = new GetUniAdminStudentEvaluationsQuery
+        {
+            StudentId = studentId,
+            TermId = termId
+        };
+
+        return HandleResult(await _mediator.Send(query, cancellationToken));
+    }
+
+    [HttpGet("{studentId:guid}/logbook/total")]
+    [ProducesResponseType(typeof(ApiResponse<GetUniAdminStudentLogbookTotalResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetStudentLogbookTotal(
+        [FromRoute] Guid studentId,
+        [FromQuery] Guid? termId,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetUniAdminStudentLogbookTotalQuery
+        {
+            StudentId = studentId,
+            TermId = termId
+        };
+
+        return HandleResult(await _mediator.Send(query, cancellationToken));
+    }
+
+    [HttpGet("{studentId:guid}/logbook/weekly")]
+    [ProducesResponseType(typeof(ApiResponse<GetUniAdminStudentLogbookWeeklyResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetStudentLogbookWeekly(
+        [FromRoute] Guid studentId,
+        [FromQuery] Guid? termId,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetUniAdminStudentLogbookWeeklyQuery
         {
             StudentId = studentId,
             TermId = termId

@@ -1,4 +1,4 @@
-namespace IOCv2.Application.Constants
+﻿namespace IOCv2.Application.Constants
 {
     public static class MessageKeys
     {
@@ -1163,12 +1163,16 @@ namespace IOCv2.Application.Constants
             // Success
             public const string StudentsRetrieved = "UniAdminInternship.StudentsRetrieved";
             public const string StudentDetailRetrieved = "UniAdminInternship.StudentDetailRetrieved";
+            public const string StudentLogbookTotalRetrieved = "UniAdminInternship.StudentLogbookTotalRetrieved";
+            public const string StudentLogbookWeeklyRetrieved = "UniAdminInternship.StudentLogbookWeeklyRetrieved";
             public const string EvaluationsRetrieved = "UniAdminInternship.EvaluationsRetrieved";
             public const string ViolationsRetrieved = "UniAdminInternship.ViolationsRetrieved";
 
             // Log
             public const string LogGetStudentList = "UniAdminInternship.Log.GetStudentList";
             public const string LogGetStudentDetail = "UniAdminInternship.Log.GetStudentDetail";
+            public const string LogGetLogbookTotal = "UniAdminInternship.Log.GetLogbookTotal";
+            public const string LogGetLogbookWeekly = "UniAdminInternship.Log.GetLogbookWeekly";
             public const string LogGetEvaluations = "UniAdminInternship.Log.GetEvaluations";
             public const string LogGetViolations = "UniAdminInternship.Log.GetViolations";
             public const string LogUniversityUserNotFound = "UniAdminInternship.Log.UniversityUserNotFound";

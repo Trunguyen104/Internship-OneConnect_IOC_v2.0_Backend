@@ -1,5 +1,6 @@
-using IOCv2.Application.Common.Models;
+﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.UniAdminInternship.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -7,21 +8,21 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentEvaluations;
+namespace IOCv2.Application.Features.UniAdminInternship.Queries.GetStudentLogbookTotal;
 
-public class GetUniAdminStudentEvaluationsHandler
-    : IRequestHandler<GetUniAdminStudentEvaluationsQuery, Result<GetUniAdminStudentEvaluationsResponse>>
+public class GetUniAdminStudentLogbookTotalHandler
+    : IRequestHandler<GetUniAdminStudentLogbookTotalQuery, Result<GetUniAdminStudentLogbookTotalResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
-    private readonly ILogger<GetUniAdminStudentEvaluationsHandler> _logger;
+    private readonly ILogger<GetUniAdminStudentLogbookTotalHandler> _logger;
 
-    public GetUniAdminStudentEvaluationsHandler(
+    public GetUniAdminStudentLogbookTotalHandler(
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
         IMessageService messageService,
-        ILogger<GetUniAdminStudentEvaluationsHandler> logger)
+        ILogger<GetUniAdminStudentLogbookTotalHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
@@ -29,16 +30,15 @@ public class GetUniAdminStudentEvaluationsHandler
         _logger = logger;
     }
 
-    public async Task<Result<GetUniAdminStudentEvaluationsResponse>> Handle(
-        GetUniAdminStudentEvaluationsQuery request,
+    public async Task<Result<GetUniAdminStudentLogbookTotalResponse>> Handle(
+        GetUniAdminStudentLogbookTotalQuery request,
         CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
-            return Result<GetUniAdminStudentEvaluationsResponse>.Failure(
+            return Result<GetUniAdminStudentLogbookTotalResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.Common.Unauthorized),
                 ResultErrorType.Unauthorized);
 
-        // Get UniversityId
         var universityUser = await _unitOfWork.Repository<UniversityUser>().Query()
             .AsNoTracking()
             .FirstOrDefaultAsync(uu => uu.UserId == currentUserId, cancellationToken);
@@ -48,14 +48,13 @@ public class GetUniAdminStudentEvaluationsHandler
             _logger.LogWarning(
                 _messageService.GetMessage(MessageKeys.UniAdminInternship.LogUniversityUserNotFound),
                 currentUserId);
-            return Result<GetUniAdminStudentEvaluationsResponse>.Failure(
+            return Result<GetUniAdminStudentLogbookTotalResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.UniAdminInternship.UniversityUserNotFound),
                 ResultErrorType.Forbidden);
         }
 
         var universityId = universityUser.UniversityId;
 
-        // Resolve Term
         Term? term;
         if (request.TermId.HasValue)
         {
@@ -68,7 +67,7 @@ public class GetUniAdminStudentEvaluationsHandler
                 _logger.LogWarning(
                     _messageService.GetMessage(MessageKeys.UniAdminInternship.LogTermNotFound),
                     request.TermId.Value);
-                return Result<GetUniAdminStudentEvaluationsResponse>.Failure(
+                return Result<GetUniAdminStudentLogbookTotalResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.UniAdminInternship.TermNotFound),
                     ResultErrorType.NotFound);
             }
@@ -78,7 +77,7 @@ public class GetUniAdminStudentEvaluationsHandler
                 _logger.LogWarning(
                     _messageService.GetMessage(MessageKeys.UniAdminInternship.LogTermAccessDenied),
                     currentUserId, term.TermId, universityId);
-                return Result<GetUniAdminStudentEvaluationsResponse>.Failure(
+                return Result<GetUniAdminStudentLogbookTotalResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.UniAdminInternship.TermAccessDenied),
                     ResultErrorType.Forbidden);
             }
@@ -92,19 +91,18 @@ public class GetUniAdminStudentEvaluationsHandler
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (term == null)
-                return Result<GetUniAdminStudentEvaluationsResponse>.Failure(
+                return Result<GetUniAdminStudentLogbookTotalResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.UniAdminInternship.NoOpenTermFound),
                     ResultErrorType.NotFound);
         }
 
-        // Verify student belongs to this term
         var studentTerm = await _unitOfWork.Repository<StudentTerm>().Query()
             .AsNoTracking()
             .FirstOrDefaultAsync(st =>
-                st.TermId == term.TermId
-                && st.StudentId == request.StudentId
-                && st.EnrollmentStatus == EnrollmentStatus.Active
-                && st.DeletedAt == null,
+                    st.TermId == term.TermId
+                    && st.StudentId == request.StudentId
+                    && st.EnrollmentStatus == EnrollmentStatus.Active
+                    && st.DeletedAt == null,
                 cancellationToken);
 
         if (studentTerm == null)
@@ -112,16 +110,20 @@ public class GetUniAdminStudentEvaluationsHandler
             _logger.LogWarning(
                 _messageService.GetMessage(MessageKeys.UniAdminInternship.LogStudentNotFound),
                 request.StudentId, term.TermId, universityId);
-            return Result<GetUniAdminStudentEvaluationsResponse>.Failure(
+            return Result<GetUniAdminStudentLogbookTotalResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentNotFound),
                 ResultErrorType.NotFound);
         }
 
-        // Find student's InternshipGroup for this term
         InternshipStudent? internStudent = null;
         if (studentTerm.EnterpriseId.HasValue)
         {
             internStudent = await _unitOfWork.Repository<InternshipStudent>().Query()
+                .Include(isv => isv.InternshipGroup)
+                    .ThenInclude(ig => ig.Enterprise)
+                .Include(isv => isv.InternshipGroup)
+                    .ThenInclude(ig => ig.Mentor)
+                        .ThenInclude(m => m!.User)
                 .AsNoTracking()
                 .Where(isv =>
                     isv.StudentId == request.StudentId
@@ -131,68 +133,55 @@ public class GetUniAdminStudentEvaluationsHandler
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        if (internStudent == null)
+        var submittedCount = 0;
+        var lateCount = 0;
+        if (internStudent != null)
         {
-            // No group — no evaluations
-            return Result<GetUniAdminStudentEvaluationsResponse>.Success(
-                new GetUniAdminStudentEvaluationsResponse(),
-                _messageService.GetMessage(MessageKeys.UniAdminInternship.EvaluationsRetrieved));
+            submittedCount = await _unitOfWork.Repository<Logbook>().Query()
+                .AsNoTracking()
+                .CountAsync(l =>
+                    l.InternshipId == internStudent.InternshipId
+                    && l.StudentId == request.StudentId
+                    && l.DeletedAt == null,
+                    cancellationToken);
+
+            lateCount = await _unitOfWork.Repository<Logbook>().Query()
+                .AsNoTracking()
+                .CountAsync(l =>
+                    l.InternshipId == internStudent.InternshipId
+                    && l.StudentId == request.StudentId
+                    && l.Status == LogbookStatus.LATE
+                    && l.DeletedAt == null,
+                    cancellationToken);
         }
 
-        // Load published evaluations for this student in their group
-        var evaluations = await _unitOfWork.Repository<Evaluation>().Query()
-            .Include(e => e.Cycle)
-            .Include(e => e.Evaluator)
-            .Include(e => e.Details)
-                .ThenInclude(d => d.Criteria)
-            .AsNoTracking()
-            .Where(e =>
-                e.InternshipId == internStudent.InternshipId
-                && e.StudentId == request.StudentId
-                && e.Status == EvaluationStatus.Published
-                && e.DeletedAt == null)
-            .OrderBy(e => e.Cycle.StartDate)
-            .ToListAsync(cancellationToken);
-
-        var cycles = evaluations.Select(e => new EvaluationCycleDto
+        var group = internStudent?.InternshipGroup;
+        var response = new GetUniAdminStudentLogbookTotalResponse
         {
-            EvaluationId = e.EvaluationId,
-            CycleId = e.CycleId,
-            CycleName = e.Cycle.Name,
-            CycleStartDate = e.Cycle.StartDate,
-            CycleEndDate = e.Cycle.EndDate,
-            EvaluationStatus = e.Status,
-            EvaluatorName = e.Evaluator.FullName,
-            TotalScore = e.TotalScore,
-            GeneralComment = e.Note,
-            PublishedAt = e.UpdatedAt ?? e.CreatedAt,
-            Details = e.Details.Select(d => new EvaluationDetailDto
-            {
-                CriteriaName = d.Criteria.Name,
-                CriteriaDescription = d.Criteria.Description,
-                MaxScore = d.Criteria.MaxScore,
-                Weight = d.Criteria.Weight,
-                Score = d.Score,
-                WeightedScore = d.Score * d.Criteria.Weight,
-                Comment = d.Comment
-            }).ToList()
-        }).ToList();
-
-        var averageScore = cycles.Count > 0 && cycles.Any(c => c.TotalScore.HasValue)
-            ? cycles.Where(c => c.TotalScore.HasValue).Average(c => c.TotalScore!.Value)
-            : (decimal?)null;
+            StudentId = request.StudentId,
+            ResolvedTermId = term.TermId,
+            InternshipGroupId = group?.InternshipId,
+            InternshipGroupName = group?.GroupName,
+            EnterpriseName = group?.Enterprise?.Name,
+            MentorName = group?.Mentor?.User?.FullName,
+            GroupStartDate = group?.StartDate,
+            GroupEndDate = group?.EndDate,
+            InternshipRole = internStudent?.Role.ToString(),
+            JoinedAt = internStudent?.JoinedAt,
+            Logbook = UniAdminLogbookCalculator.CalculateLogbookSummary(
+                internStudent,
+                group,
+                submittedCount,
+                lateCount)
+        };
 
         _logger.LogInformation(
-            _messageService.GetMessage(MessageKeys.UniAdminInternship.LogGetEvaluations),
+            _messageService.GetMessage(MessageKeys.UniAdminInternship.LogGetLogbookTotal),
             currentUserId, request.StudentId, term.TermId);
 
-        return Result<GetUniAdminStudentEvaluationsResponse>.Success(
-            new GetUniAdminStudentEvaluationsResponse
-            {
-                TotalCycles = cycles.Count,
-                AverageScore = averageScore.HasValue ? Math.Round(averageScore.Value, 2) : null,
-                Cycles = cycles
-            },
-            _messageService.GetMessage(MessageKeys.UniAdminInternship.EvaluationsRetrieved));
+        return Result<GetUniAdminStudentLogbookTotalResponse>.Success(
+            response,
+            _messageService.GetMessage(MessageKeys.UniAdminInternship.StudentLogbookTotalRetrieved));
     }
 }
+

@@ -75,6 +75,7 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedProjectResources();
             await SeedViolationReports();
             await SeedEvaluations();
+            await SeedUniAdminTestData();
             await SeedNotifications();
             await SeedSprintWorkItems();
             await SeedAuditLogs();
@@ -500,17 +501,17 @@ namespace IOCv2.Infrastructure.Persistence
             async Task EnsurePhase(
                 Guid enterpriseId, string name,
                 DateOnly start, DateOnly end,
-                int? maxStudents, string? description,
+                string majorFields, int capacity, string? description,
                 InternshipPhaseStatus targetStatus)
             {
                 if (await _context.InternshipPhases
                         .AnyAsync(p => p.EnterpriseId == enterpriseId && p.Name == name))
                     return;
 
-                var phase = InternshipPhase.Create(enterpriseId, name, start, end, "Software Enginee", maxStudents ?? 0, description);
+                var phase = InternshipPhase.Create(enterpriseId, name, start, end, majorFields, capacity, description);
 
                 if (targetStatus != InternshipPhaseStatus.Draft)
-                    phase.UpdateInfo(name, start, end, "Software Enginee", maxStudents ?? 0, description, targetStatus);
+                    phase.UpdateInfo(name, start, end, majorFields, capacity, description, targetStatus);
 
                 _context.InternshipPhases.Add(phase);
             }
@@ -519,42 +520,48 @@ namespace IOCv2.Infrastructure.Persistence
                 fsoft.EnterpriseId,
                 "FPT Software Fall 2025",
                 new DateOnly(2025, 9, 1), new DateOnly(2025, 12, 31),
-                30, "Đợt thực tập Fall 2025 của FPT Software — đã kết thúc",
+                "Software Engineering, Information Technology", 30,
+                "Đợt thực tập Fall 2025 của FPT Software — đã kết thúc",
                 InternshipPhaseStatus.Closed);
 
             await EnsurePhase(
                 fsoft.EnterpriseId,
                 "FPT Software Spring 2026",
                 new DateOnly(2026, 1, 15), new DateOnly(2026, 4, 30),
-                50, "Đợt thực tập Spring 2026 của FPT Software — đang diễn ra",
+                "Software Engineering, Information Technology, Computer Science", 50,
+                "Đợt thực tập Spring 2026 của FPT Software — đang diễn ra",
                 InternshipPhaseStatus.InProgress);
 
             await EnsurePhase(
                 fsoft.EnterpriseId,
                 "FPT Software Summer 2026",
                 new DateOnly(2026, 5, 1), new DateOnly(2026, 8, 31),
-                40, "Đợt thực tập Summer 2026 của FPT Software — đang tuyển",
+                "Software Engineering, Data Engineering", 40,
+                "Đợt thực tập Summer 2026 của FPT Software — đang tuyển",
                 InternshipPhaseStatus.Open);
 
             await EnsurePhase(
                 rikkeisoft.EnterpriseId,
                 "Rikkeisoft Fall 2025",
                 new DateOnly(2025, 9, 1), new DateOnly(2025, 12, 31),
-                20, "Đợt thực tập Fall 2025 của Rikkeisoft — đã kết thúc",
+                "Software Engineering, Information Technology", 20,
+                "Đợt thực tập Fall 2025 của Rikkeisoft — đã kết thúc",
                 InternshipPhaseStatus.Closed);
 
             await EnsurePhase(
                 rikkeisoft.EnterpriseId,
                 "Rikkeisoft Spring 2026",
                 new DateOnly(2026, 2, 1), new DateOnly(2026, 5, 31),
-                20, "Đợt thực tập Spring 2026 của Rikkeisoft — đang diễn ra",
+                "Software Engineering, Computer Science", 20,
+                "Đợt thực tập Spring 2026 của Rikkeisoft — đang diễn ra",
                 InternshipPhaseStatus.InProgress);
 
             await EnsurePhase(
                 rikkeisoft.EnterpriseId,
                 "Rikkeisoft Summer 2026",
                 new DateOnly(2026, 6, 1), new DateOnly(2026, 9, 30),
-                15, "Đợt thực tập Summer 2026 của Rikkeisoft — bản nháp",
+                "Software Engineering", 15,
+                "Đợt thực tập Summer 2026 của Rikkeisoft — bản nháp",
                 InternshipPhaseStatus.Draft);
 
             await _context.SaveChangesAsync();
@@ -1135,7 +1142,680 @@ namespace IOCv2.Infrastructure.Persistence
             await _context.SaveChangesAsync();
         }
 
-         private async Task SeedNotifications()
+         /// <summary>
+        /// Seeds detailed test data for feat/uni-admin-monitor-internship-activities.
+        /// Covers happy / unhappy / edge cases for logbook-total, logbook-weekly, evaluations.
+        ///
+        /// Students in FPT Alpha (s1, s2, s3, s6) and Rikkei Spring (s4, s5, s7):
+        ///   s1 – Sufficient  (≥75 %)  : 17 logbooks / ~20 required days
+        ///   s2 – SlightlyMissing (50–75%) : 12 logbooks
+        ///   s3 – MissingMany (<50%)    :  8 logbooks + violations
+        ///   s6 – Edge: just joined today, 0 logbooks
+        ///   s4 – Sufficient  (≥75%)    : 11 logbooks / ~13 required days
+        ///   s5 – MissingMany (<50%)    :  3 logbooks (Rikkei active group)
+        ///   s7 – Edge: just joined today, 0 logbooks
+        ///
+        /// Evaluations (Published, visible to UniAdmin):
+        ///   FPT Mid-term cycle  : s1 (8.8), s3 (7.7) — Published
+        ///   FPT Final cycle     : s1 (9.3), s3 (7.6) — Published
+        ///   Rikkei Mid-term     : s4 (8.3)            — Published
+        ///   s2 — only group evaluation (studentId=null), returns empty for individual
+        ///   s5 — Draft only, not visible
+        /// </summary>
+        private async Task SeedUniAdminTestData()
+        {
+            var fptGroup = await _context.InternshipGroups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
+            var rikkeiGroup = await _context.InternshipGroups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
+
+            if (fptGroup == null || rikkeiGroup == null) return;
+
+            var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
+            var s2 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student2@fptu.edu.vn");
+            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
+            var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
+            var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            var s6 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student6@fptu.edu.vn");
+            var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
+            var mentorFpt = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
+            var mentorRikkei = await _context.Users.FirstOrDefaultAsync(u => u.Email == "mentor@rikkeisoft.com");
+
+            if (s1 == null || s2 == null || s3 == null || s4 == null || s5 == null || s6 == null || s7 == null
+                || mentorFpt == null || mentorRikkei == null) return;
+
+            var spring2026 = await _context.Terms
+                .Include(t => t.University)
+                .FirstOrDefaultAsync(t => t.Name == "Spring 2026" && t.University.Code == "FPTU");
+            if (spring2026 == null) return;
+
+            // ── 1. Set StudentTerm.EnterpriseId so logbook/evaluation handlers can find internship groups ──
+            var fptStudentIds    = new[] { s1.StudentId, s2.StudentId, s3.StudentId, s6.StudentId };
+            var rikkeiStudentIds = new[] { s4.StudentId, s5.StudentId, s7.StudentId };
+
+            var termsToUpdate = await _context.StudentTerms
+                .Where(st => st.TermId == spring2026.TermId
+                          && (fptStudentIds.Contains(st.StudentId) || rikkeiStudentIds.Contains(st.StudentId))
+                          && st.EnterpriseId == null)
+                .ToListAsync();
+
+            foreach (var st in termsToUpdate)
+            {
+                st.EnterpriseId = fptStudentIds.Contains(st.StudentId)
+                    ? SeedIds.FptSoftwareId
+                    : SeedIds.RikkeisoftId;
+            }
+            await _context.SaveChangesAsync();
+
+            // ── 2. Update InternshipStudent.JoinedAt for realistic logbook periods ──
+            //   FPT Alpha: s1/s2/s3 joined 28 days ago; s6 joined today (edge: very recent joiner)
+            //   Rikkei:    s4/s5   joined 18 days ago; s7 joined today
+            var fptJoinedAt    = DateTime.UtcNow.AddDays(-28);
+            var rikkeiJoinedAt = DateTime.UtcNow.AddDays(-18);
+
+            var fptMembers = await _context.InternshipStudents
+                .Where(m => m.InternshipId == fptGroup.InternshipId)
+                .ToListAsync();
+            var rikkeiMembers = await _context.InternshipStudents
+                .Where(m => m.InternshipId == rikkeiGroup.InternshipId)
+                .ToListAsync();
+
+            foreach (var m in fptMembers)
+            {
+                if (m.StudentId == s1.StudentId || m.StudentId == s2.StudentId || m.StudentId == s3.StudentId)
+                    m.JoinedAt = fptJoinedAt;
+                // s6 keeps JoinedAt = UtcNow (just joined today — edge case)
+            }
+            foreach (var m in rikkeiMembers)
+            {
+                if (m.StudentId == s4.StudentId || m.StudentId == s5.StudentId)
+                    m.JoinedAt = rikkeiJoinedAt;
+                // s7 keeps JoinedAt = UtcNow (just joined today)
+            }
+            await _context.SaveChangesAsync();
+
+            // ── 3. Detailed logbooks ──
+            // Guard: skip if s1 already has detailed logbooks in fptGroup
+            bool alreadyDetailed = await _context.Logbooks.CountAsync(
+                l => l.InternshipId == fptGroup.InternshipId && l.StudentId == s1.StudentId) >= 5;
+            if (!alreadyDetailed)
+            {
+                // Helper: create logbook with a DateReport N days ago (Status=LATE since CreatedAt=now)
+                // DateReport = today  → PUNCTUAL (same date as CreatedAt at seed time)
+                // DateReport = past   → LATE
+
+                var fptId    = fptGroup.InternshipId;
+                var rikkeiId = rikkeiGroup.InternshipId;
+
+                // ── s1 (Nguyễn Văn An) — HIGH COMPLETION ~81%, Leader FPT ──
+                // 16 LATE (past days) + 1 PUNCTUAL (today) = 17 submitted / ~21 required
+                var s1Logbooks = new[]
+                {
+                    (-27, s1.StudentId, fptId, "Kickoff: phân tích yêu cầu hệ thống và lên kế hoạch sprint.",                     null,                                  "Hoàn thiện SRS draft."),
+                    (-26, s1.StudentId, fptId, "Thiết kế kiến trúc microservice và xác định bounded contexts.",                    null,                                  "Vẽ diagram C4 Model."),
+                    (-25, s1.StudentId, fptId, "Setup môi trường CI/CD pipeline với GitHub Actions.",                              "Pipeline test đang chậm.",             "Tối ưu cache Docker layer."),
+                    (-24, s1.StudentId, fptId, "Xây dựng base project .NET 8 với Clean Architecture.",                            null,                                  "Implement repository pattern."),
+                    (-21, s1.StudentId, fptId, "Cài đặt EF Core + migrations ban đầu.",                                          "Conflict migration khi merge.",        "Fix migration conflict và viết integration test."),
+                    (-20, s1.StudentId, fptId, "Implement Identity module: register, login, JWT.",                                null,                                  "Thêm refresh token và logout."),
+                    (-19, s1.StudentId, fptId, "Viết unit test cho AuthService — coverage 85%.",                                  "Một số mock khó setup.",              "Refactor để dễ test hơn."),
+                    (-18, s1.StudentId, fptId, "Code review PR của s3, đề xuất cải tiến xử lý exception.",                       null,                                  "Merge PR sau khi s3 fix."),
+                    (-17, s1.StudentId, fptId, "Implement API endpoint CRUD cho Student module.",                                 null,                                  "Viết Swagger docs và integration test."),
+                    (-14, s1.StudentId, fptId, "Fix bug pagination trả về sai totalPages.",                                      "Lỗi do off-by-one trong query.",      "Thêm edge-case test."),
+                    (-13, s1.StudentId, fptId, "Tối ưu query N+1 bằng eager loading Include().",                                 null,                                  "Benchmark trước và sau tối ưu."),
+                    (-12, s1.StudentId, fptId, "Implement file upload lên S3 cho CV sinh viên.",                                  "Cần config CORS bucket policy.",      "Test với nhiều loại file."),
+                    (-11, s1.StudentId, fptId, "Chuẩn bị báo cáo mid-term, review toàn bộ tính năng đã làm.",                   null,                                  "Demo với mentor vào ngày mai."),
+                    (-10, s1.StudentId, fptId, "Demo mid-term với mentor — nhận phản hồi cải thiện UI/UX.",                      null,                                  "Triển khai theo góp ý của mentor."),
+                    (-7,  s1.StudentId, fptId, "Implement notification module — SignalR real-time alerts.",                      "SignalR hub cần authenticate.",       "Thêm JWT middleware cho hub."),
+                    (-4,  s1.StudentId, fptId, "Viết E2E test cho luồng apply internship.",                                      null,                                  "Hoàn thành toàn bộ test suite."),
+                    (0,   s1.StudentId, fptId, "Review tổng thể code và chuẩn bị deploy staging environment.",                   null,                                  "Deploy và smoke test."),
+                };
+
+                // ── s2 (Trần Thị Bình) — MEDIUM COMPLETION ~57%, Member FPT ──
+                // 12 submitted / ~21 required  →  SlightlyMissing
+                var s2Logbooks = new[]
+                {
+                    (-27, s2.StudentId, fptId, "Nghiên cứu Figma design system và bắt đầu wireframe.",                           null,                                  "Hoàn thiện wireframe màn hình dashboard."),
+                    (-26, s2.StudentId, fptId, "Thiết kế UI/UX cho màn hình danh sách sinh viên.",                               "Mentor chưa approve design.",         "Chỉnh sửa theo feedback."),
+                    (-24, s2.StudentId, fptId, "Code React component cho StudentListPage.",                                      null,                                  "Kết nối API và xử lý loading state."),
+                    (-21, s2.StudentId, fptId, "Implement filter và search trên StudentList.",                                   "API filter chưa đồng bộ với FE.",     "Làm việc với s1 để align API contract."),
+                    (-19, s2.StudentId, fptId, "Xây dựng StudentDetailPage với tab navigation.",                                 null,                                  "Thêm tab Logbook và Evaluation."),
+                    (-14, s2.StudentId, fptId, "Fix responsive layout trên màn hình mobile.",                                   "Breakpoint 375px bị vỡ layout.",      "Test trên nhiều thiết bị."),
+                    (-13, s2.StudentId, fptId, "Tích hợp Chart.js vẽ biểu đồ logbook completion.",                              null,                                  "Thêm tooltip và legend."),
+                    (-10, s2.StudentId, fptId, "Demo UI mid-term với mentor — nhận feedback về accessibility.",                  null,                                  "Thêm aria-label và keyboard navigation."),
+                    (-7,  s2.StudentId, fptId, "Implement WeeklyLogbook component — dạng calendar view.",                       "Dữ liệu tuần hiện tại bị sai timezone.", "Debug UTC vs local timezone."),
+                    (-4,  s2.StudentId, fptId, "Refactor component structure — tách BusinessLogic ra hook.",                    null,                                  "Viết storybook docs."),
+                    (-3,  s2.StudentId, fptId, "Tích hợp EvaluationPanel hiển thị điểm đánh giá.",                              "API response format khác expected.", "Align với s1 về DTO structure."),
+                    (0,   s2.StudentId, fptId, "Kiểm thử toàn bộ luồng từ student login đến view logbook.",                     null,                                  "Viết báo cáo test cases."),
+                };
+
+                // ── s3 (Lê Văn Cường) — LOW COMPLETION ~38%, Member FPT — plus violations ──
+                // 2 existing (days -7, -1) + 6 new = 8 total submitted / ~21 required → MissingMany
+                // Add 6 new logbooks for days not yet seeded
+                var s3ExistingDates = await _context.Logbooks
+                    .Where(l => l.InternshipId == fptId && l.StudentId == s3.StudentId)
+                    .Select(l => l.DateReport.Date)
+                    .ToListAsync();
+
+                var s3NewLogbooks = new[]
+                {
+                    (-25, s3.StudentId, fptId, "Bắt đầu task Implement JWT refresh token.",                                      "Chưa hiểu rõ flow token rotation.",   "Đọc RFC 6819 và trao đổi với s1."),
+                    (-20, s3.StudentId, fptId, "Implement middleware xử lý exception toàn cục.",                                 null,                                  "Viết unit test cho middleware."),
+                    (-15, s3.StudentId, fptId, "Debug lỗi 500 Internal Server Error khi upload file lớn.",                      "File > 10MB bị timeout.",             "Config request size limit và test lại."),
+                    (-10, s3.StudentId, fptId, "Fix lỗi migration conflict sau khi merge nhánh feature.",                       "EF Core migration xung đột.",         "Xóa migration cũ và re-generate."),
+                    (-4,  s3.StudentId, fptId, "Viết integration test cho Authentication module.",                               "Mock HttpContext phức tạp.",          "Dùng WebApplicationFactory thay mock."),
+                    (-2,  s3.StudentId, fptId, "Cải thiện coverage unit test từ 40% lên 60%.",                                  null,                                  "Tiếp tục đến 80% theo yêu cầu mentor."),
+                };
+
+                // ── s4 (Phạm Thị Dung) — HIGH COMPLETION ~85%, Leader Rikkei ──
+                // 11 submitted / ~13 required days (joined 18 days ago)
+                var s4Logbooks = new[]
+                {
+                    (-17, s4.StudentId, rikkeiId, "Kickoff Rikkeisoft Internal Portal — phân tích yêu cầu HR module.",          null,                                  "Lên ERD cho module nhân sự."),
+                    (-16, s4.StudentId, rikkeiId, "Thiết kế database schema: Employee, Department, LeaveRequest.",              "Cần xác nhận business rules từ PO.",  "Meeting với PO ngày mai."),
+                    (-15, s4.StudentId, rikkeiId, "Setup Spring Boot project + Docker Compose.",                                 null,                                  "Config Flyway migration."),
+                    (-14, s4.StudentId, rikkeiId, "Implement Employee CRUD API.",                                                null,                                  "Thêm validation và error handling."),
+                    (-11, s4.StudentId, rikkeiId, "Implement Leave Request module — submit, approve, reject flow.",             "Logic approval phức tạp với nhiều level.", "Refactor state machine."),
+                    (-10, s4.StudentId, rikkeiId, "Viết API test với Postman, tạo collection chia sẻ team.",                    null,                                  "Thêm environment variables."),
+                    (-9,  s4.StudentId, rikkeiId, "Tích hợp JWT authentication cho toàn bộ API.",                               null,                                  "Kiểm tra bảo mật endpoint."),
+                    (-8,  s4.StudentId, rikkeiId, "Demo sprint 1 cho mentor — nhận feedback về API design.",                    null,                                  "Áp dụng REST best practices theo góp ý."),
+                    (-7,  s4.StudentId, rikkeiId, "Implement Timesheet module — clock in/out, overtime calculation.",           "Timezone handling phức tạp.",         "Dùng UTC internally, convert khi display."),
+                    (-4,  s4.StudentId, rikkeiId, "Viết unit test JUnit 5 cho service layer — coverage 78%.",                   null,                                  "Đẩy lên 85%."),
+                    (0,   s4.StudentId, rikkeiId, "Review code toàn bộ team, chuẩn bị mid-term evaluation.",                   null,                                  "Hoàn thiện tài liệu API Swagger."),
+                };
+
+                // ── s5 (Hoàng Văn Em) — POOR COMPLETION, Member Rikkei active group ──
+                // 3 logbooks / ~13 required → MissingMany (many absences)
+                var s5RikkeiLogbooks = new[]
+                {
+                    (-15, s5.StudentId, rikkeiId, "Nghiên cứu framework Flutter cơ bản cho mobile app.",                        "Chưa có kinh nghiệm Flutter.",        "Hoàn thành tutorial counter app."),
+                    (-8,  s5.StudentId, rikkeiId, "Xây dựng màn hình đăng nhập Flutter — kết nối REST API.",                   "State management chưa chọn được.",    "Thử nghiệm Provider vs Riverpod."),
+                    (-3,  s5.StudentId, rikkeiId, "Implement màn hình Employee List với lazy loading.",                          null,                                  "Tiếp tục các màn hình còn lại."),
+                };
+
+                // Add s1 logbooks
+                foreach (var (daysAgo, studentId, groupId, summary, issue, plan) in s1Logbooks)
+                {
+                    var dateReport = DateTime.UtcNow.AddDays(daysAgo);
+                    _context.Logbooks.Add(Logbook.Create(groupId, studentId, summary, issue, plan, dateReport));
+                }
+
+                // Add s2 logbooks
+                foreach (var (daysAgo, studentId, groupId, summary, issue, plan) in s2Logbooks)
+                {
+                    var dateReport = DateTime.UtcNow.AddDays(daysAgo);
+                    _context.Logbooks.Add(Logbook.Create(groupId, studentId, summary, issue, plan, dateReport));
+                }
+
+                // Add s3 NEW logbooks (skip dates already seeded)
+                foreach (var (daysAgo, studentId, groupId, summary, issue, plan) in s3NewLogbooks)
+                {
+                    var dateReport = DateTime.UtcNow.AddDays(daysAgo).Date;
+                    if (!s3ExistingDates.Contains(dateReport))
+                        _context.Logbooks.Add(Logbook.Create(groupId, studentId, summary, issue, plan, dateReport));
+                }
+
+                // Add s4 logbooks
+                foreach (var (daysAgo, studentId, groupId, summary, issue, plan) in s4Logbooks)
+                {
+                    var dateReport = DateTime.UtcNow.AddDays(daysAgo);
+                    _context.Logbooks.Add(Logbook.Create(groupId, studentId, summary, issue, plan, dateReport));
+                }
+
+                // Add s5 logbooks in Rikkei active group
+                foreach (var (daysAgo, studentId, groupId, summary, issue, plan) in s5RikkeiLogbooks)
+                {
+                    var dateReport = DateTime.UtcNow.AddDays(daysAgo);
+                    _context.Logbooks.Add(Logbook.Create(groupId, studentId, summary, issue, plan, dateReport));
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            // ── 4. Violation Reports (thêm cho s3 và s2 để test) ──
+            bool hasExtraViolations = await _context.Set<ViolationReport>()
+                .AnyAsync(v => v.StudentId == s3.StudentId && v.OccurredDate < DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)));
+            if (!hasExtraViolations)
+            {
+                // s3: thêm 2 violation nữa (tổng 3) — pattern tái phạm
+                _context.Set<ViolationReport>().AddRange(
+                    new ViolationReport
+                    {
+                        ViolationReportId = Guid.NewGuid(),
+                        StudentId = s3.StudentId,
+                        InternshipGroupId = fptGroup.InternshipId,
+                        OccurredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-14)),
+                        Description = "Nộp báo cáo logbook trễ 3 ngày liên tiếp mà không thông báo với mentor."
+                    },
+                    new ViolationReport
+                    {
+                        ViolationReportId = Guid.NewGuid(),
+                        StudentId = s3.StudentId,
+                        InternshipGroupId = fptGroup.InternshipId,
+                        OccurredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)),
+                        Description = "Không tham gia daily standup trong tuần mà không có lý do chính đáng."
+                    }
+                );
+
+                // s2: 1 violation nhỏ
+                bool s2HasViolation = await _context.Set<ViolationReport>().AnyAsync(v => v.StudentId == s2.StudentId);
+                if (!s2HasViolation)
+                {
+                    _context.Set<ViolationReport>().Add(new ViolationReport
+                    {
+                        ViolationReportId = Guid.NewGuid(),
+                        StudentId = s2.StudentId,
+                        InternshipGroupId = fptGroup.InternshipId,
+                        OccurredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)),
+                        Description = "Nộp báo cáo tuần trễ 1 ngày."
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            // ── 5. Evaluations: thêm Published evaluations để UniAdmin có thể xem ──
+            var midTermCycle = await _context.Set<EvaluationCycle>()
+                .Include(c => c.Criteria)
+                .FirstOrDefaultAsync(c => c.Name == "Mid-term Spring 2026");
+
+            if (midTermCycle == null) return;
+
+            // Fix MaxScore trên criteria hiện tại (nếu chưa có)
+            foreach (var crit in midTermCycle.Criteria)
+            {
+                if (crit.MaxScore == 0m) crit.MaxScore = 10m;
+            }
+
+            // Tạo Final Evaluation cycle nếu chưa có
+            var finalCycle = await _context.Set<EvaluationCycle>()
+                .Include(c => c.Criteria)
+                .FirstOrDefaultAsync(c => c.Name == "Final Evaluation Spring 2026");
+
+            var phaseFptSpring = await _context.InternshipPhases
+                .FirstOrDefaultAsync(p => p.Name == "FPT Software Spring 2026");
+            if (phaseFptSpring == null) return;
+
+            if (finalCycle == null)
+            {
+                finalCycle = new EvaluationCycle
+                {
+                    CycleId   = Guid.NewGuid(),
+                    PhaseId   = phaseFptSpring.PhaseId,
+                    Name      = "Final Evaluation Spring 2026",
+                    StartDate = DateTime.UtcNow.AddDays(5),
+                    EndDate   = DateTime.UtcNow.AddDays(25),
+                    Status    = EvaluationCycleStatus.Grading
+                };
+                finalCycle.Criteria.Add(new EvaluationCriteria
+                {
+                    CriteriaId  = Guid.NewGuid(), CycleId = finalCycle.CycleId,
+                    Name        = "Technical Skills",
+                    Description = "Code quality, architecture, and problem-solving",
+                    MaxScore    = 10m, Weight = 0.60m
+                });
+                finalCycle.Criteria.Add(new EvaluationCriteria
+                {
+                    CriteriaId  = Guid.NewGuid(), CycleId = finalCycle.CycleId,
+                    Name        = "Soft Skills",
+                    Description = "Communication, teamwork, and attitude",
+                    MaxScore    = 10m, Weight = 0.40m
+                });
+                _context.Set<EvaluationCycle>().Add(finalCycle);
+                await _context.SaveChangesAsync();
+            }
+
+            // Tạo Rikkei Mid-term cycle nếu chưa có
+            var phaseRikkeiSpring = await _context.InternshipPhases
+                .FirstOrDefaultAsync(p => p.Name == "Rikkeisoft Spring 2026");
+            if (phaseRikkeiSpring == null) return;
+
+            var rikkeiMidCycle = await _context.Set<EvaluationCycle>()
+                .Include(c => c.Criteria)
+                .FirstOrDefaultAsync(c => c.Name == "Mid-term Rikkeisoft Spring 2026");
+
+            if (rikkeiMidCycle == null)
+            {
+                rikkeiMidCycle = new EvaluationCycle
+                {
+                    CycleId   = Guid.NewGuid(),
+                    PhaseId   = phaseRikkeiSpring.PhaseId,
+                    Name      = "Mid-term Rikkeisoft Spring 2026",
+                    StartDate = DateTime.UtcNow.AddDays(-8),
+                    EndDate   = DateTime.UtcNow.AddDays(12),
+                    Status    = EvaluationCycleStatus.Grading
+                };
+                rikkeiMidCycle.Criteria.Add(new EvaluationCriteria
+                {
+                    CriteriaId  = Guid.NewGuid(), CycleId = rikkeiMidCycle.CycleId,
+                    Name        = "Technical Skills",
+                    Description = "Backend development skills and code quality",
+                    MaxScore    = 10m, Weight = 0.60m
+                });
+                rikkeiMidCycle.Criteria.Add(new EvaluationCriteria
+                {
+                    CriteriaId  = Guid.NewGuid(), CycleId = rikkeiMidCycle.CycleId,
+                    Name        = "Professional Skills",
+                    Description = "Professionalism, punctuality, and collaboration",
+                    MaxScore    = 10m, Weight = 0.40m
+                });
+                _context.Set<EvaluationCycle>().Add(rikkeiMidCycle);
+                await _context.SaveChangesAsync();
+            }
+
+            // Helper để thêm Published evaluation nếu chưa tồn tại
+            async Task EnsurePublishedEval(
+                Guid cycleId, Guid internshipId, Guid studentId,
+                Guid evaluatorId, string note,
+                List<(Guid CriteriaId, decimal Score, decimal Weight, string Comment)> details)
+            {
+                bool exists = await _context.Set<Evaluation>().AnyAsync(
+                    e => e.CycleId == cycleId && e.StudentId == studentId && e.Status == EvaluationStatus.Published);
+                if (exists) return;
+
+                var eval = new Evaluation
+                {
+                    EvaluationId  = Guid.NewGuid(),
+                    CycleId       = cycleId,
+                    InternshipId  = internshipId,
+                    StudentId     = studentId,
+                    EvaluatorId   = evaluatorId,
+                    Status        = EvaluationStatus.Published,
+                    Note          = note
+                };
+                decimal total = 0;
+                foreach (var (criteriaId, score, weight, comment) in details)
+                {
+                    eval.Details.Add(new EvaluationDetail
+                    {
+                        DetailId     = Guid.NewGuid(),
+                        EvaluationId = eval.EvaluationId,
+                        CriteriaId   = criteriaId,
+                        Score        = score,
+                        Comment      = comment
+                    });
+                    total += score * weight;
+                }
+                eval.TotalScore = Math.Round(total, 2);
+                _context.Set<Evaluation>().Add(eval);
+            }
+
+            var midCriteria   = midTermCycle.Criteria.OrderBy(c => c.Name).ToList(); // Soft Skills, Technical Skills
+            var finalCriteria = finalCycle.Criteria.OrderBy(c => c.Name).ToList();
+            var rikkeiCriteria = rikkeiMidCycle.Criteria.OrderBy(c => c.Name).ToList();
+
+            // Tìm Technical và Soft criteria cho từng cycle
+            var midTech   = midCriteria.FirstOrDefault(c => c.Name.Contains("Technical"));
+            var midSoft   = midCriteria.FirstOrDefault(c => c.Name.Contains("Soft") || c.Name.Contains("Soft"));
+            var finalTech = finalCriteria.FirstOrDefault(c => c.Name.Contains("Technical"));
+            var finalSoft = finalCriteria.FirstOrDefault(c => c.Name.Contains("Soft"));
+            var rikkeiTech = rikkeiCriteria.FirstOrDefault(c => c.Name.Contains("Technical"));
+            var rikkeiProf = rikkeiCriteria.FirstOrDefault(c => c.Name.Contains("Professional") || c.Name.Contains("Soft"));
+
+            if (midTech == null || midSoft == null || finalTech == null || finalSoft == null
+                || rikkeiTech == null || rikkeiProf == null) return;
+
+            // ── s1 Mid-term: Published — Technical=9.0, Soft=8.5 → Total=8.80 ──
+            await EnsurePublishedEval(
+                midTermCycle.CycleId, fptGroup.InternshipId, s1.StudentId, mentorFpt.UserId,
+                "An thể hiện kỹ năng kỹ thuật xuất sắc, chủ động giải quyết vấn đề phức tạp.",
+                new List<(Guid, decimal, decimal, string)>
+                {
+                    (midTech.CriteriaId, 9.0m, midTech.Weight, "Kiến trúc clean, code rõ ràng, unit test đầy đủ."),
+                    (midSoft.CriteriaId, 8.5m, midSoft.Weight, "Giao tiếp tốt, hỗ trợ tích cực các thành viên khác.")
+                });
+
+            // ── s3 Mid-term: Published — Technical=7.5, Soft=8.0 → Total=7.70 ──
+            await EnsurePublishedEval(
+                midTermCycle.CycleId, fptGroup.InternshipId, s3.StudentId, mentorFpt.UserId,
+                "Cường có tiến bộ nhưng cần chủ động hơn trong việc báo cáo vấn đề kịp thời.",
+                new List<(Guid, decimal, decimal, string)>
+                {
+                    (midTech.CriteriaId, 7.5m, midTech.Weight, "Code chức năng nhưng thiếu test coverage và error handling."),
+                    (midSoft.CriteriaId, 8.0m, midSoft.Weight, "Thái độ tốt, chịu học hỏi, cần cải thiện chủ động báo cáo.")
+                });
+
+            // ── s1 Final: Published — Technical=9.5, Soft=9.0 → Total=9.30 ──
+            await EnsurePublishedEval(
+                finalCycle.CycleId, fptGroup.InternshipId, s1.StudentId, mentorFpt.UserId,
+                "Kết quả xuất sắc. An hoàn thành tất cả tasks đúng hạn với chất lượng cao.",
+                new List<(Guid, decimal, decimal, string)>
+                {
+                    (finalTech.CriteriaId, 9.5m, finalTech.Weight, "Implement feature phức tạp, tối ưu performance, viết test toàn diện."),
+                    (finalSoft.CriteriaId, 9.0m, finalSoft.Weight, "Leadership tốt, hướng dẫn nhiệt tình cho đồng nghiệp.")
+                });
+
+            // ── s3 Final: Published — Technical=8.0, Soft=7.0 → Total=7.60 ──
+            await EnsurePublishedEval(
+                finalCycle.CycleId, fptGroup.InternshipId, s3.StudentId, mentorFpt.UserId,
+                "Cường cải thiện đáng kể so với mid-term nhưng vẫn còn một số điểm cần phát huy.",
+                new List<(Guid, decimal, decimal, string)>
+                {
+                    (finalTech.CriteriaId, 8.0m, finalTech.Weight, "Cải thiện rõ rệt về code quality và testing."),
+                    (finalSoft.CriteriaId, 7.0m, finalSoft.Weight, "Vẫn còn trường hợp vắng standup, cần kỷ luật hơn.")
+                });
+
+            // ── s4 Rikkei Mid-term: Published — Technical=8.5, Professional=8.0 → Total=8.30 ──
+            await EnsurePublishedEval(
+                rikkeiMidCycle.CycleId, rikkeiGroup.InternshipId, s4.StudentId, mentorRikkei.UserId,
+                "Dung thể hiện tốt vai trò team leader, quản lý tốt tiến độ nhóm.",
+                new List<(Guid, decimal, decimal, string)>
+                {
+                    (rikkeiTech.CriteriaId, 8.5m, rikkeiTech.Weight, "API design tốt, biết áp dụng design patterns phù hợp."),
+                    (rikkeiProf.CriteriaId, 8.0m, rikkeiProf.Weight, "Đúng giờ, chủ động, phối hợp nhóm hiệu quả.")
+                });
+
+            // s5 Rikkei Mid-term: Draft only — KHÔNG Published, UniAdmin không thấy
+            bool s5DraftExists = await _context.Set<Evaluation>().AnyAsync(
+                e => e.CycleId == rikkeiMidCycle.CycleId && e.StudentId == s5.StudentId);
+            if (!s5DraftExists)
+            {
+                var s5Draft = new Evaluation
+                {
+                    EvaluationId = Guid.NewGuid(),
+                    CycleId      = rikkeiMidCycle.CycleId,
+                    InternshipId = rikkeiGroup.InternshipId,
+                    StudentId    = s5.StudentId,
+                    EvaluatorId  = mentorRikkei.UserId,
+                    Status       = EvaluationStatus.Draft,
+                    Note         = "Em cần cải thiện nhiều hơn về chuyên cần.",
+                    TotalScore   = null
+                };
+                _context.Set<Evaluation>().Add(s5Draft);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // ── 6. WorkItems cho s1/s2 (FPT) và s4/s5 (Rikkei) + link to logbooks ──
+            var proj3Detail = await _context.Projects
+                .FirstOrDefaultAsync(p => p.ProjectName == "IOC v2.0 Platform");
+            var rikkeiPortalProj = await _context.Projects
+                .FirstOrDefaultAsync(p => p.ProjectName == "Rikkeisoft Internal Portal");
+
+            if (proj3Detail != null)
+            {
+                // 6a. WorkItems cho s1 (FPT Leader)
+                bool s1WiExists = await _context.WorkItems
+                    .AnyAsync(w => w.ProjectId == proj3Detail.ProjectId && w.AssigneeId == s1.StudentId);
+                if (!s1WiExists)
+                {
+                    _context.WorkItems.AddRange(
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "Setup CI/CD pipeline GitHub Actions", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 3, AssigneeId = s1.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-24)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "Implement Identity module (JWT + refresh token)", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 8, AssigneeId = s1.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-18)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "CRUD API Student module + Swagger docs", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 5, AssigneeId = s1.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-15)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "Fix bug pagination off-by-one", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.Medium, StoryPoint = 2, AssigneeId = s1.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-12)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "Notification module — SignalR real-time", Type = WorkItemType.Task, Status = WorkItemStatus.InProgress, Priority = Priority.Medium, StoryPoint = 5, AssigneeId = s1.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5)) }
+                    );
+                }
+
+                // 6b. WorkItems cho s2 (FPT Frontend)
+                bool s2WiExists = await _context.WorkItems
+                    .AnyAsync(w => w.ProjectId == proj3Detail.ProjectId && w.AssigneeId == s2.StudentId);
+                if (!s2WiExists)
+                {
+                    _context.WorkItems.AddRange(
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "Thiết kế wireframe & Figma dashboard", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 3, AssigneeId = s2.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-25)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "React component StudentListPage", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 5, AssigneeId = s2.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-22)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "Fix responsive layout mobile breakpoint 375px", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.Medium, StoryPoint = 2, AssigneeId = s2.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-12)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = proj3Detail.ProjectId, Title = "WeeklyLogbook calendar component", Type = WorkItemType.Task, Status = WorkItemStatus.InProgress, Priority = Priority.High, StoryPoint = 8, AssigneeId = s2.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)) }
+                    );
+                }
+
+                await _context.SaveChangesAsync();
+
+                // 6c. Link WorkItems → FPT logbooks
+                bool fptLogbooksLinked = await _context.Logbooks
+                    .AnyAsync(l => l.InternshipId == fptGroup.InternshipId
+                                && l.StudentId == s1.StudentId
+                                && l.WorkItems.Any());
+                if (!fptLogbooksLinked)
+                {
+                    var s1Wi = await _context.WorkItems
+                        .Where(w => w.ProjectId == proj3Detail.ProjectId && w.AssigneeId == s1.StudentId).ToListAsync();
+                    var s2Wi = await _context.WorkItems
+                        .Where(w => w.ProjectId == proj3Detail.ProjectId && w.AssigneeId == s2.StudentId).ToListAsync();
+                    var s3Wi = await _context.WorkItems
+                        .Where(w => w.ProjectId == proj3Detail.ProjectId && w.AssigneeId == s3.StudentId).ToListAsync();
+
+                    var fptLogbooks = await _context.Logbooks
+                        .Include(l => l.WorkItems)
+                        .Where(l => l.InternshipId == fptGroup.InternshipId)
+                        .ToListAsync();
+
+                    // Mỗi logbook của student liên kết với 1-2 WorkItem của họ (phản ánh thực tế)
+                    foreach (var lb in fptLogbooks.Where(l => l.StudentId == s1.StudentId))
+                        foreach (var wi in s1Wi.Take(2))
+                            if (!lb.WorkItems.Any(x => x.WorkItemId == wi.WorkItemId))
+                                lb.WorkItems.Add(wi);
+
+                    foreach (var lb in fptLogbooks.Where(l => l.StudentId == s2.StudentId))
+                        foreach (var wi in s2Wi.Take(2))
+                            if (!lb.WorkItems.Any(x => x.WorkItemId == wi.WorkItemId))
+                                lb.WorkItems.Add(wi);
+
+                    foreach (var lb in fptLogbooks.Where(l => l.StudentId == s3.StudentId))
+                        foreach (var wi in s3Wi.Take(2))
+                            if (!lb.WorkItems.Any(x => x.WorkItemId == wi.WorkItemId))
+                                lb.WorkItems.Add(wi);
+
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            if (rikkeiPortalProj != null)
+            {
+                // 6d. WorkItems cho s4 (Rikkei Leader — Java backend)
+                bool s4WiExists = await _context.WorkItems
+                    .AnyAsync(w => w.ProjectId == rikkeiPortalProj.ProjectId && w.AssigneeId == s4.StudentId);
+                if (!s4WiExists)
+                {
+                    _context.WorkItems.AddRange(
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "ERD & database schema cho HR module", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 3, AssigneeId = s4.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-16)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "Employee CRUD API (Spring Boot)", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 5, AssigneeId = s4.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-13)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "Leave Request module (submit/approve/reject)", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 8, AssigneeId = s4.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-9)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "JWT authentication toàn bộ REST API", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 5, AssigneeId = s4.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "Timesheet module — clock in/out & overtime", Type = WorkItemType.Task, Status = WorkItemStatus.InProgress, Priority = Priority.Medium, StoryPoint = 8, AssigneeId = s4.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5)) }
+                    );
+                }
+
+                // 6e. WorkItems cho s5 (Rikkei — Flutter mobile)
+                bool s5WiExists = await _context.WorkItems
+                    .AnyAsync(w => w.ProjectId == rikkeiPortalProj.ProjectId && w.AssigneeId == s5.StudentId);
+                if (!s5WiExists)
+                {
+                    _context.WorkItems.AddRange(
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "Flutter tutorial & setup môi trường", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.Low, StoryPoint = 2, AssigneeId = s5.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-14)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "Màn hình đăng nhập Flutter + REST API", Type = WorkItemType.Task, Status = WorkItemStatus.Done, Priority = Priority.High, StoryPoint = 5, AssigneeId = s5.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-6)) },
+                        new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = rikkeiPortalProj.ProjectId, Title = "Employee List screen với lazy loading", Type = WorkItemType.Task, Status = WorkItemStatus.InProgress, Priority = Priority.High, StoryPoint = 5, AssigneeId = s5.StudentId, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)) }
+                    );
+                }
+
+                await _context.SaveChangesAsync();
+
+                // 6f. Link WorkItems → Rikkei logbooks
+                bool rikkeiLogbooksLinked = await _context.Logbooks
+                    .AnyAsync(l => l.InternshipId == rikkeiGroup.InternshipId
+                                && l.StudentId == s4.StudentId
+                                && l.WorkItems.Any());
+                if (!rikkeiLogbooksLinked)
+                {
+                    var s4Wi = await _context.WorkItems
+                        .Where(w => w.ProjectId == rikkeiPortalProj.ProjectId && w.AssigneeId == s4.StudentId).ToListAsync();
+                    var s5Wi = await _context.WorkItems
+                        .Where(w => w.ProjectId == rikkeiPortalProj.ProjectId && w.AssigneeId == s5.StudentId).ToListAsync();
+
+                    var rikkeiLogbooks = await _context.Logbooks
+                        .Include(l => l.WorkItems)
+                        .Where(l => l.InternshipId == rikkeiGroup.InternshipId)
+                        .ToListAsync();
+
+                    foreach (var lb in rikkeiLogbooks.Where(l => l.StudentId == s4.StudentId))
+                        foreach (var wi in s4Wi.Take(2))
+                            if (!lb.WorkItems.Any(x => x.WorkItemId == wi.WorkItemId))
+                                lb.WorkItems.Add(wi);
+
+                    foreach (var lb in rikkeiLogbooks.Where(l => l.StudentId == s5.StudentId))
+                        foreach (var wi in s5Wi.Take(2))
+                            if (!lb.WorkItems.Any(x => x.WorkItemId == wi.WorkItemId))
+                                lb.WorkItems.Add(wi);
+
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            // ── 7. Violations cho Rikkei (s5 vắng nhiều, poor performer) ──
+            bool rikkeiS5ViolationExists = await _context.Set<ViolationReport>()
+                .AnyAsync(v => v.StudentId == s5.StudentId && v.InternshipGroupId == rikkeiGroup.InternshipId);
+            if (!rikkeiS5ViolationExists)
+            {
+                _context.Set<ViolationReport>().AddRange(
+                    new ViolationReport
+                    {
+                        ViolationReportId = Guid.NewGuid(),
+                        StudentId         = s5.StudentId,
+                        InternshipGroupId = rikkeiGroup.InternshipId,
+                        OccurredDate      = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-12)),
+                        Description       = "Vắng buổi weekly meeting không thông báo trước.",
+                        CreatedBy         = mentorRikkei.UserId,
+                        CreatedAt         = DateTime.UtcNow.AddDays(-11)
+                    },
+                    new ViolationReport
+                    {
+                        ViolationReportId = Guid.NewGuid(),
+                        StudentId         = s5.StudentId,
+                        InternshipGroupId = rikkeiGroup.InternshipId,
+                        OccurredDate      = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)),
+                        Description       = "Nộp task trễ deadline 2 ngày liên tiếp mà không có báo cáo.",
+                        CreatedBy         = mentorRikkei.UserId,
+                        CreatedAt         = DateTime.UtcNow.AddDays(-4)
+                    }
+                );
+                await _context.SaveChangesAsync();
+            }
+
+            // ── 8. Gán CreatedBy cho các violations chưa có reporter ──
+            var unattributedFptViolations = await _context.Set<ViolationReport>()
+                .Where(v => v.CreatedBy == null
+                         && (v.StudentId == s2.StudentId || v.StudentId == s3.StudentId))
+                .ToListAsync();
+            foreach (var v in unattributedFptViolations)
+            {
+                v.CreatedBy = mentorFpt.UserId;
+                v.UpdatedAt = v.CreatedAt.AddMinutes(5);
+            }
+
+            // ── 9. Set UpdatedAt trên Published evaluations (simulate thời gian publish) ──
+            var evalsMissingPublishTime = await _context.Set<Evaluation>()
+                .Where(e => e.Status == EvaluationStatus.Published && e.UpdatedAt == null)
+                .ToListAsync();
+            foreach (var eval in evalsMissingPublishTime)
+                eval.UpdatedAt = eval.CreatedAt.AddHours(2);
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedNotifications()
         {
             var users = await _context.Users.ToListAsync();
             var notifications = new List<Notification>();

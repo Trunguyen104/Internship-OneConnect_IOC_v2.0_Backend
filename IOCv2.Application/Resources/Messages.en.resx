@@ -987,6 +987,12 @@
   <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
     <value>Student detail retrieved successfully.</value>
   </data>
+  <data name="UniAdminInternship.StudentLogbookTotalRetrieved" xml:space="preserve">
+    <value>Student logbook summary retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.StudentLogbookWeeklyRetrieved" xml:space="preserve">
+    <value>Student weekly logbook retrieved successfully.</value>
+  </data>
   <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
     <value>Student evaluations retrieved successfully.</value>
   </data>
@@ -1001,6 +1007,12 @@
   </data>
   <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
     <value>SchoolAdmin {0} retrieved student detail for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbookTotal" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved logbook summary for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbookWeekly" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved weekly logbook for student {1} in term {2}.</value>
   </data>
   <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
     <value>SchoolAdmin {0} retrieved evaluations for student {1} in term {2}.</value>

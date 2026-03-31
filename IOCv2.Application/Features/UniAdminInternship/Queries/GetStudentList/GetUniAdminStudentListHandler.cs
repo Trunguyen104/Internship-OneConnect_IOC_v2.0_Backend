@@ -114,15 +114,46 @@ public class GetUniAdminStudentListHandler
         var resolvedTermId = term.TermId;
 
         // 4. Load StudentTerms
+        var initialResolvedTermId = resolvedTermId;
         var studentTerms = await _unitOfWork.Repository<StudentTerm>().Query()
             .Include(st => st.Student)
                 .ThenInclude(s => s.User)
             .Include(st => st.Enterprise)
             .AsNoTracking()
-            .Where(st => st.TermId == resolvedTermId
+            .Where(st => st.TermId == initialResolvedTermId
                       && st.EnrollmentStatus == EnrollmentStatus.Active
                       && st.DeletedAt == null)
             .ToListAsync(cancellationToken);
+
+        // If client does not pin a term and the current open term has no data,
+        // fallback to the latest term (same university) that has active student enrollments.
+        if (!request.TermId.HasValue && !studentTerms.Any())
+        {
+            var fallbackTerm = await _unitOfWork.Repository<Term>().Query()
+                .AsNoTracking()
+                .Where(t => t.UniversityId == universityId)
+                .Where(t => _unitOfWork.Repository<StudentTerm>().Query()
+                    .Any(st => st.TermId == t.TermId
+                               && st.EnrollmentStatus == EnrollmentStatus.Active
+                               && st.DeletedAt == null))
+                .OrderByDescending(t => t.StartDate)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (fallbackTerm != null && fallbackTerm.TermId != resolvedTermId)
+            {
+                resolvedTermId = fallbackTerm.TermId;
+
+                studentTerms = await _unitOfWork.Repository<StudentTerm>().Query()
+                    .Include(st => st.Student)
+                        .ThenInclude(s => s.User)
+                    .Include(st => st.Enterprise)
+                    .AsNoTracking()
+                    .Where(st => st.TermId == resolvedTermId
+                              && st.EnrollmentStatus == EnrollmentStatus.Active
+                              && st.DeletedAt == null)
+                    .ToListAsync(cancellationToken);
+            }
+        }
 
         if (!studentTerms.Any())
         {

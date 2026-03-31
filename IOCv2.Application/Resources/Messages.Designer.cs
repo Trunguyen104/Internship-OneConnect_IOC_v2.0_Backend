@@ -2698,6 +2698,24 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SchoolAdmin {0} lấy tổng quan logbook sinh viên {1} trong kỳ {2}..
+        /// </summary>
+        internal static string UniAdminInternship_Log_GetLogbookTotal {
+            get {
+                return ResourceManager.GetString("UniAdminInternship.Log.GetLogbookTotal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SchoolAdmin {0} lấy logbook theo tuần của sinh viên {1} trong kỳ {2}..
+        /// </summary>
+        internal static string UniAdminInternship_Log_GetLogbookWeekly {
+            get {
+                return ResourceManager.GetString("UniAdminInternship.Log.GetLogbookWeekly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SchoolAdmin {0} lấy chi tiết sinh viên {1} trong kỳ {2}..
         /// </summary>
         internal static string UniAdminInternship_Log_GetStudentDetail {
@@ -2838,6 +2856,24 @@ namespace IOCv2.Application.Resources {
         internal static string UniAdminInternship_StudentDetailRetrieved {
             get {
                 return ResourceManager.GetString("UniAdminInternship.StudentDetailRetrieved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lấy tổng quan logbook sinh viên thành công..
+        /// </summary>
+        internal static string UniAdminInternship_StudentLogbookTotalRetrieved {
+            get {
+                return ResourceManager.GetString("UniAdminInternship.StudentLogbookTotalRetrieved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lấy logbook theo tuần của sinh viên thành công..
+        /// </summary>
+        internal static string UniAdminInternship_StudentLogbookWeeklyRetrieved {
+            get {
+                return ResourceManager.GetString("UniAdminInternship.StudentLogbookWeeklyRetrieved", resourceCulture);
             }
         }
         

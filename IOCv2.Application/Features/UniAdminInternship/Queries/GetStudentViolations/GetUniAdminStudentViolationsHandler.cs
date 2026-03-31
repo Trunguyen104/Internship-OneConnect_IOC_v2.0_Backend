@@ -136,6 +136,7 @@ public class GetUniAdminStudentViolationsHandler
             ? new List<ViolationReport>()
             : await _unitOfWork.Repository<ViolationReport>().Query()
                 .Include(v => v.InternshipGroup)
+                    .ThenInclude(ig => ig.Enterprise)
                 .AsNoTracking()
                 .Where(v =>
                     v.StudentId == request.StudentId
@@ -163,7 +164,9 @@ public class GetUniAdminStudentViolationsHandler
             OccurredDate = v.OccurredDate,
             ReportedAt = v.CreatedAt,
             Description = v.Description,
+            InternshipGroupId = v.InternshipGroupId,
             InternshipGroupName = v.InternshipGroup.GroupName,
+            EnterpriseName = v.InternshipGroup.Enterprise?.Name,
             ReporterName = v.CreatedBy.HasValue && reporterLookup.TryGetValue(v.CreatedBy.Value, out var name)
                 ? name
                 : null
@@ -174,7 +177,11 @@ public class GetUniAdminStudentViolationsHandler
             currentUserId, request.StudentId, term.TermId);
 
         return Result<GetUniAdminStudentViolationsResponse>.Success(
-            new GetUniAdminStudentViolationsResponse { Violations = items },
+            new GetUniAdminStudentViolationsResponse
+            {
+                TotalViolations = items.Count,
+                Violations = items
+            },
             _messageService.GetMessage(MessageKeys.UniAdminInternship.ViolationsRetrieved));
     }
 }
