@@ -28,16 +28,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("fk_jobs_enterprises_enterprise_id");
 
-        builder.Property(j => j.InternshipPhaseId)
-               .HasColumnName("internship_phase_id")
-               .IsRequired();
-
-        builder.HasOne(j => j.InternshipPhase)
-               .WithMany(p => p.Jobs)
-               .HasForeignKey(j => j.InternshipPhaseId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
-
             // Fields
             builder.Property(j => j.Title)
                .HasColumnName("title")
@@ -91,13 +81,12 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .HasConversion<short>()
                .IsRequired(false);
 
-        // New: intern phase FK
         builder.Property(j => j.InternPhaseId)
                .HasColumnName("intern_phase_id")
                .IsRequired(false);
 
         builder.HasOne(j => j.InternPhase)
-               .WithMany()
+               .WithMany(p => p.Jobs)
                .HasForeignKey(j => j.InternPhaseId)
                .OnDelete(DeleteBehavior.SetNull)
                .HasConstraintName("fk_jobs_internship_phases_phase_id");

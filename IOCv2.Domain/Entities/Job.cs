@@ -8,7 +8,22 @@ namespace IOCv2.Domain.Entities
     {
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
-        public Guid? InternshipPhaseId { get; set; }
+
+        // Intern phase this job belongs to (optional)
+        public Guid? InternPhaseId { get; set; }
+
+        /// <summary>Alias kept for backward compatibility with develop-branch handlers.</summary>
+        public Guid? InternshipPhaseId
+        {
+            get => InternPhaseId;
+            set => InternPhaseId = value;
+        }
+
+        public virtual InternshipPhase? InternPhase { get; set; }
+
+        /// <summary>Alias navigation kept for backward compatibility.</summary>
+        public virtual InternshipPhase? InternshipPhase => InternPhase;
+
         public string? Title { get; set; }
         public string? Position { get; set; }
         public string? Description { get; set; }
@@ -18,28 +33,19 @@ namespace IOCv2.Domain.Entities
         public DateTime? ExpireDate { get; set; }
         public JobStatus? Status { get; set; }
 
-        // New: internship date range
+        // Internship date range
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        // New: audience (public / targeted)
+        // Audience (public / targeted)
         public JobAudience? Audience { get; set; }
-
-        // New: intern phase this job belongs to
-        public Guid? InternPhaseId { get; set; }
-        public virtual InternshipPhase? InternPhase { get; set; }
 
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;
-
-        // Applications for this job (EF-mapped navigation)
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
-
-        // Many-to-many: Jobs <-> Universities
         public virtual ICollection<University> Universities { get; set; } = new List<University>();
-        public virtual InternshipPhase InternshipPhase { get; set; } = null!;
 
-        // Factory method for creating a Job (used by application layer)
+        // Factory method for creating a Job
         public static Job Create(
             Guid enterpriseId,
             Guid? internshipPhase,
@@ -54,7 +60,7 @@ namespace IOCv2.Domain.Entities
             {
                 JobId = Guid.NewGuid(),
                 EnterpriseId = enterpriseId,
-                InternshipPhaseId = internshipPhase,
+                InternPhaseId = internshipPhase,
                 Title = title,
                 Description = description,
                 Requirements = requirements,
