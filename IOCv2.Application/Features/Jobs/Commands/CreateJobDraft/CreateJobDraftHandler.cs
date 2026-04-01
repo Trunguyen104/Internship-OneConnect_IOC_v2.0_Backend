@@ -81,8 +81,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
                         ResultErrorType.NotFound);
                 }
 
-                job.StartDate = internshipPhase.StartDate.ToDateTime(TimeOnly.MinValue);
-                job.EndDate = internshipPhase.EndDate.ToDateTime(TimeOnly.MinValue);
+                job.StartDate = DateTime.SpecifyKind(internshipPhase.StartDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+                job.EndDate = DateTime.SpecifyKind(internshipPhase.EndDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
             }
 
             // Additional optional properties for draft
