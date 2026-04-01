@@ -68,3 +68,12 @@ public record ApplicationWithdrawnByStudentEvent(
     string JobTitle,
     Guid ApplicationId
 ) : INotification;
+
+/// <summary>HR xóa SV khỏi danh sách Placed (Uni Assign) — notify SV + Uni Admin (AC-C05).</summary>
+public record PlacedStudentRemovedEvent(
+    Guid StudentUserId,
+    Guid ApplicationId,
+    string EnterpriseName,
+    Guid? UniversityId,
+    string StudentName
+) : INotification;

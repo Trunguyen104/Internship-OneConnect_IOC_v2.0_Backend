@@ -8,7 +8,7 @@ public record GetSelfApplyApplicationsQuery : IRequest<Result<PaginatedResult<Ge
 {
     public string? SearchTerm { get; init; }
 
-    /// <summary>Filter by specific status values (comma-separated or repeated). If null, defaults to active stages only.</summary>
+    /// <summary>Filter by specific status values. If null, defaults to active stages only.</summary>
     public string? Status { get; init; }
 
     public Guid? UniversityId { get; init; }
@@ -19,6 +19,12 @@ public record GetSelfApplyApplicationsQuery : IRequest<Result<PaginatedResult<Ge
     public string? JobTitle { get; set; }
 
     public Guid? JobId { get; set; }
+
+    /// <summary>Filter by Intern Phase. Only shows applications for jobs belonging to this phase.</summary>
+    public Guid? InternshipPhaseId { get; init; }
+
+    /// <summary>Filter by job audience: Public or Targeted.</summary>
+    public JobAudience? Audience { get; init; }
 
     /// <summary>When true, includes terminal states (Placed, Rejected, Withdrawn). Default: false.</summary>
     public bool IncludeTerminal { get; init; } = false;
