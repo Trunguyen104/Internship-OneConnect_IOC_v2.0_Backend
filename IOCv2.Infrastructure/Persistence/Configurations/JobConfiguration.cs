@@ -1,7 +1,6 @@
 using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 
 namespace IOCv2.Infrastructure.Persistence.Configurations
@@ -29,8 +28,8 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("fk_jobs_enterprises_enterprise_id");
 
-        // Fields
-        builder.Property(j => j.Title)
+            // Fields
+            builder.Property(j => j.Title)
                .HasColumnName("title")
                .HasMaxLength(255)
                .IsRequired(false);
@@ -60,10 +59,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .HasColumnType("text")
                .IsRequired(false);
 
-        builder.Property(j => j.Quantity)
-               .HasColumnName("quantity")
-               .IsRequired(false);
-
         builder.Property(j => j.ExpireDate)
                .HasColumnName("expire_date")
                .HasColumnType("timestamp with time zone")
@@ -85,6 +80,19 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .HasColumnName("audience")
                .HasConversion<short>()
                .IsRequired(false);
+
+        builder.Property(j => j.InternshipPhaseId)
+               .HasColumnName("internship_phase_id")
+               .IsRequired(false);
+
+        builder.HasOne(j => j.InternshipPhase)
+               .WithMany(p => p.Jobs)
+               .HasForeignKey(j => j.InternshipPhaseId)
+               .OnDelete(DeleteBehavior.SetNull)
+               .HasConstraintName("fk_jobs_internship_phases_phase_id");
+
+        builder.HasIndex(j => j.InternshipPhaseId)
+               .HasDatabaseName("ix_jobs_internship_phase_id");
 
         // Enum stored as short (repository convention)
             builder.Property(j => j.Status)

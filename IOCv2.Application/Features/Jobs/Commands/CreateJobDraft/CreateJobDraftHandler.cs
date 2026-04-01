@@ -62,18 +62,31 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
             // Create base job via factory (factory sets Draft status)
             var job = Job.Create(
                 enterpriseId: enterpriseId,
+                internshipPhase: request.InternshipPhaseId,
                 title: request.Title,
                 description: request.Description,
                 requirements: request.Requirements,
                 benefit: request.Benefit,
                 location: request.Location,
-                quantity: request.Quantity,
                 expireDate: request.ExpireDate);
+
+            if (request.InternshipPhaseId.HasValue)
+            {
+                var internshipPhase = await _unitOfWork.Repository<InternshipPhase>().GetByIdAsync(request.InternshipPhaseId.Value, cancellationToken);
+                if (internshipPhase == null || internshipPhase.DeletedAt != null)
+                {
+                    _logger.LogWarning("Internship phase {InternshipPhaseId} not found or deleted when saving draft.", request.InternshipPhaseId);
+                    return Result<CreateJobDraftResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipPhase.NotFound),
+                        ResultErrorType.NotFound);
+                }
+
+                job.StartDate = DateTime.SpecifyKind(internshipPhase.StartDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+                job.EndDate = DateTime.SpecifyKind(internshipPhase.EndDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+            }
 
             // Additional optional properties for draft
             job.Position = request.Position ?? string.Empty;
-            if (request.StartDate.HasValue) job.StartDate = request.StartDate.Value;
-            if (request.EndDate.HasValue) job.EndDate = request.EndDate.Value;
             job.Audience = request.Audience;
 
             // If targeted and university provided, validate and attach; if not provided, still allow draft but log

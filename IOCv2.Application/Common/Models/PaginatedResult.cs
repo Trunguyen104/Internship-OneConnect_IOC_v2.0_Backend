@@ -10,6 +10,9 @@ namespace IOCv2.Application.Common.Models
         public bool HasPreviousPage => PageNumber > 1;
         public bool HasNextPage => PageNumber < TotalPages;
 
+        /// <summary>Badge counts per status string. Populated by list handlers that support it; null otherwise.</summary>
+        public Dictionary<string, int>? BadgeCounts { get; set; }
+
         public PaginatedResult()
         {
             Items = new List<T>();

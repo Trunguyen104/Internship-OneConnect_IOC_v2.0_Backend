@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace IOCv2.API.Controllers.Universities;
 
 [Tags("Universities Management")]
-[Authorize(Roles = "SuperAdmin")]
+[Authorize]
 public class UniversitiesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -25,6 +25,7 @@ public class UniversitiesController : ApiControllerBase
     /// Get a paginated list of universities.
     /// </summary>
     [HttpGet]
+    [Authorize(Roles ="SuperAdmin,HR")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetUniversitiesResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUniversities([FromQuery] GetUniversitiesQuery query)
     {
@@ -35,6 +36,7 @@ public class UniversitiesController : ApiControllerBase
     /// Get university by ID.
     /// </summary>
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
     [ProducesResponseType(typeof(ApiResponse<GetUniversityByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUniversity(Guid id)
@@ -46,6 +48,7 @@ public class UniversitiesController : ApiControllerBase
     /// Create a new university.
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "SuperAdmin")]
     [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateUniversity([FromBody] CreateUniversityCommand command)
     {
@@ -57,6 +60,7 @@ public class UniversitiesController : ApiControllerBase
     /// Update an existing university.
     /// </summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateUniversity(Guid id, [FromBody] UpdateUniversityCommand command)
@@ -72,6 +76,7 @@ public class UniversitiesController : ApiControllerBase
     /// Soft delete a university.
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteUniversity(Guid id)

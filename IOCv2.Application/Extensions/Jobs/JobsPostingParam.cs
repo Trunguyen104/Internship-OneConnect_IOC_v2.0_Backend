@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IOCv2.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,19 @@ namespace IOCv2.Application.Extensions.Jobs
         {
             public const string Draft = "DRAFT";
             public const string Published = "PUBLISHED";
+        }
+
+        public class UpdateJobPosting
+        {
+            public static readonly string[] AllowedStatusForUpdate = { "DRAFT", "PUBLISHED", "CLOSED" };
+            // Notify only active applicants (Applied, Interviewing, Offered)
+            public static readonly InternshipApplicationStatus[] ActiveStatuses = new[]
+            {
+                    InternshipApplicationStatus.Applied,
+                    InternshipApplicationStatus.Interviewing,
+                    InternshipApplicationStatus.Offered,
+                    InternshipApplicationStatus.PendingAssignment
+            };
         }
     }
 }
