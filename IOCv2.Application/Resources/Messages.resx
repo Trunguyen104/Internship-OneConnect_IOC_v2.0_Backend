@@ -192,7 +192,7 @@
   <data name="SortOrder.AllowedValues" xml:space="preserve">
     <value>Sort order must be either 'asc' or 'desc'</value>
   </data>
-  <data name="Projects.DeleteSuccess" xml:space="preserve">
+    <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Xóa dự án thành công</value>
   </data>
   <data name="Projects.LogDelete" xml:space="preserve">
@@ -612,23 +612,41 @@
   <data name="InternshipPhase.EndDateAfterStartDate" xml:space="preserve">
     <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
   </data>
+  <data name="InternshipPhase.DurationMinDays" xml:space="preserve">
+    <value>Intern Phase tối thiểu 4 tuần.</value>
+  </data>
+  <data name="InternshipPhase.DurationMaxDays" xml:space="preserve">
+    <value>Intern Phase tối đa 12 tháng.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsRequired" xml:space="preserve">
+    <value>Ngành nhận không được để trống.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsMaxLength" xml:space="preserve">
+    <value>Ngành nhận không được vượt quá 1000 ký tự.</value>
+  </data>
   <data name="InternshipPhase.MaxStudentsGreaterThanZero" xml:space="preserve">
-    <value>Số lượng sinh viên tối đa (MaxStudents) phải lớn hơn 0.</value>
+    <value>Số lượng nhận phải ít nhất là 1.</value>
   </data>
   <data name="InternshipPhase.NotFound" xml:space="preserve">
     <value>Không tìm thấy đợt thực tập.</value>
   </data>
   <data name="InternshipPhase.DuplicateName" xml:space="preserve">
-    <value>Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp này. Vui lòng chọn một tên khác.</value>
+    <value>Cảnh báo: Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp {1}.</value>
   </data>
   <data name="InternshipPhase.DuplicateNameOnUpdate" xml:space="preserve">
-    <value>Không thể đổi tên thành '{0}' vì đã có đợt thực tập khác trong doanh nghiệp này sử dụng tên này.</value>
+    <value>Đã có đợt thực tập khác dùng tên '{0}'. Bạn vẫn có thể tiếp tục.</value>
   </data>
   <data name="InternshipPhase.CannotUpdateClosed" xml:space="preserve">
-    <value>Không thể cập nhật đợt thực tập '{0}' vì đợt này đã ở trạng thái Đã đóng (Closed). Chỉ có thể chỉnh sửa đợt thực tập đang ở trạng thái Nháp (Draft) hoặc Đang mở (Open).</value>
+    <value>Không thể cập nhật đợt thực tập '{0}' vì đợt này đã kết thúc.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateEnded" xml:space="preserve">
+    <value>Không thể cập nhật đợt thực tập '{0}' vì đợt này đã kết thúc.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateLockedFields" xml:space="preserve">
+    <value>Intern Phase này đã có sinh viên được nhận / nhóm thực tập. Không thể thay đổi thời gian hoặc số lượng. Nếu cần thay đổi, hãy xử lý dứt điểm các sinh viên liên quan trước.</value>
   </data>
   <data name="InternshipPhase.CannotDeleteHasActiveGroups" xml:space="preserve">
-    <value>Không thể xóa đợt thực tập '{0}' vì hiện có {1} nhóm thực tập đang hoạt động (Active). Vui lòng kết thúc hoặc lưu trữ tất cả nhóm trước khi thực hiện xóa.</value>
+    <value>Intern Phase '{0}' đang có {1} nhóm thực tập. Không thể xóa khi còn dữ liệu liên quan.</value>
   </data>
   <data name="InternshipPhase.CannotDeleteInProgress" xml:space="preserve">
     <value>Không thể xóa đợt thực tập '{0}' vì đợt đang ở trạng thái Đang thực tập (InProgress). Vui lòng đóng đợt thực tập trước khi xóa.</value>
@@ -658,7 +676,7 @@
     <value>Không tìm thấy doanh nghiệp có ID {0}. Không thể tạo đợt thực tập.</value>
   </data>
   <data name="InternshipPhase.Log.DuplicateName" xml:space="preserve">
-    <value>Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp {1}. Từ chối tạo mới.</value>
+    <value>Cảnh báo: Đợt thực tập có tên '{0}' đã tồn tại trong doanh nghiệp {1}.</value>
   </data>
   <data name="InternshipPhase.Log.CreateSuccess" xml:space="preserve">
     <value>Tạo đợt thực tập thành công — PhaseId: {0}, Tên: '{1}', Doanh nghiệp: {2}.</value>
@@ -676,7 +694,7 @@
     <value>Từ chối cập nhật đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái Đã đóng (Closed).</value>
   </data>
   <data name="InternshipPhase.Log.UpdateDuplicateName" xml:space="preserve">
-    <value>Từ chối cập nhật đợt thực tập {0} — tên '{1}' đã được sử dụng bởi đợt thực tập khác trong doanh nghiệp {2}.</value>
+    <value>Cảnh báo: Đợt thực tập {0} có tên '{1}' đã được sử dụng bởi đợt thực tập khác trong doanh nghiệp {2}.</value>
   </data>
   <data name="InternshipPhase.Log.UpdateSuccess" xml:space="preserve">
     <value>Cập nhật đợt thực tập thành công — PhaseId: {0}, Tên: '{1}'.</value>
@@ -694,7 +712,7 @@
     <value>Không tìm thấy đợt thực tập với ID {0}. Yêu cầu xóa bị từ chối.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteHasActiveGroups" xml:space="preserve">
-    <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — hiện có {2} nhóm thực tập đang hoạt động.</value>
+    <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — hiện có {2} nhóm thực tập liên quan.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteSuccess" xml:space="preserve">
     <value>Xóa đợt thực tập thành công — PhaseId: {0}, Tên: '{1}', Doanh nghiệp: {2}.</value>
@@ -771,9 +789,11 @@
   <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
     <value>Từ chối chuyển trạng thái đợt thực tập {0} từ '{1}' sang '{2}' — không hợp lệ.</value>
   </data>
+  <!-- B-02 FIX: EndDate in past for active phase -->
   <data name="InternshipPhase.EndDateInPastForActivePhase" xml:space="preserve">
     <value>Không thể đặt ngày kết thúc trong quá khứ cho đợt thực tập '{0}' đang ở trạng thái Open hoặc InProgress.</value>
   </data>
+  <!-- B-05 FIX: Dedicated log key for InProgress phase deletion block -->
   <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
     <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái InProgress và không thể xóa.</value>
   </data>
@@ -840,11 +860,68 @@
   <data name="InternshipGroup.NotificationProjectCleanupContent" xml:space="preserve">
     <value>{0} đã bị xóa khỏi nhóm thực tập.</value>
   </data>
+  <data name="InternshipGroup.NotificationGroupArchivedTitle" xml:space="preserve">
+    <value>Nhóm thực tập đã lưu trữ</value>
+  </data>
+  <data name="InternshipGroup.NotificationGroupArchivedContent" xml:space="preserve">
+    <value>Nhóm [{0}] đã được lưu trữ. Các dự án hiện tại vẫn được giữ nguyên nhưng bạn không thể gán dự án mới cho nhóm này.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorTitle" xml:space="preserve">
+    <value>Sinh viên rời nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorContent" xml:space="preserve">
+    <value>{0} đã bị xóa khỏi [{1}] bởi HR. Sinh viên không còn truy cập các project của nhóm.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentTitle" xml:space="preserve">
+    <value>Bạn đã bị xóa khỏi nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentContent" xml:space="preserve">
+    <value>Bạn đã được xóa khỏi [{0}]. Bạn không còn truy cập các dự án của nhóm này.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedTitle" xml:space="preserve">
+    <value>Bạn đã được chuyển nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedContent" xml:space="preserve">
+    <value>Bạn đã được chuyển sang [{0}]. Danh sách dự án đã được cập nhật.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupTitle" xml:space="preserve">
+    <value>Sinh viên đã được chuyển nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupContent" xml:space="preserve">
+    <value>{0} đã được chuyển sang nhóm khác.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupTitle" xml:space="preserve">
+    <value>Sinh viên mới vào nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupContent" xml:space="preserve">
+    <value>{0} vừa được thêm vào [{1}] và đã tự động tham gia các dự án đang Published.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldTitle" xml:space="preserve">
+    <value>Bạn không còn phụ trách nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldContent" xml:space="preserve">
+    <value>Nhóm [{0}] đã được chuyển cho mentor khác. Nhóm và các dự án liên kết sẽ không còn hiển thị trong danh sách của bạn.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewTitle" xml:space="preserve">
+    <value>Bạn được phân công phụ trách nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewContent" xml:space="preserve">
+    <value>Bạn vừa được phân công phụ trách nhóm [{0}] (thay thế {1}) và có toàn quyền chỉnh sửa các dự án liên kết.</value>
+  </data>
   <data name="InternshipGroup.LogProjectAssignmentsCleanup" xml:space="preserve">
     <value>Đã tự động gỡ {0} assignment của sinh viên {1} sau khi rời nhóm.</value>
   </data>
   <data name="InternshipGroup.LogProjectsArchived" xml:space="preserve">
     <value>Đã lưu trữ {0} dự án Draft/Published sau khi nhóm {1} bị archived.</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveNotifyFailed" xml:space="preserve">
+    <value>Lưu trữ nhóm thành công nhưng gửi thông báo cho mentor thất bại. InternshipId: {0}.</value>
+  </data>
+  <data name="InternshipGroup.LogMoveNotificationFailed" xml:space="preserve">
+    <value>Chuyển sinh viên thành công nhưng gửi thông báo thất bại. FromGroup: {0}, ToGroup: {1}.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorSwapNotificationFailed" xml:space="preserve">
+    <value>Đổi mentor thành công nhưng gửi thông báo thất bại cho nhóm {0}.</value>
   </data>
   <data name="Projects.LogOrphanized" xml:space="preserve">
     <value>Project {0} đã bị tách khỏi group (orphan) do group bị xóa.</value>
@@ -940,10 +1017,22 @@
     <value>Nhóm thực tập bị xóa</value>
   </data>
   <data name="InternshipGroups.NotificationOrphanContent" xml:space="preserve">
-    <value>Nhóm "{0}" đã bị xóa. {1} project của bạn đã được chuyển về trạng thái Draft và tách khỏi nhóm.</value>
+    <value>Nhóm [{0}] đã bị giải thể. Các dự án liên kết đã tự động về trạng thái Unstarted. Vui lòng gán nhóm mới.</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentTitle" xml:space="preserve">
+    <value>Dự án không còn khả dụng</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentContent" xml:space="preserve">
+    <value>Dự án [{0}] không còn khả dụng do nhóm thực tập của bạn đã bị giải thể.</value>
   </data>
   <data name="InternshipGroups.LogOrphanizeProjects" xml:space="preserve">
     <value>{0} project đã được tách khỏi group do group {1} bị xóa.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteStudentNotificationFailed" xml:space="preserve">
+    <value>Xóa nhóm thành công nhưng gửi thông báo cho sinh viên thất bại. InternshipId: {0}.</value>
+  </data>
+  <data name="Projects.CannotAssignArchivedGroup" xml:space="preserve">
+    <value>Không thể gán dự án cho nhóm đã lưu trữ.</value>
   </data>
   <data name="Projects.LogGetAll" xml:space="preserve">
     <value>Đang lấy danh sách tất cả dự án. Từ khóa: {0}, Trạng thái: {1}.</value>
@@ -1017,35 +1106,86 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>Không tìm thấy User {UserId} khi lấy profile</value>
   </data>
-  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
-    <value>Bạn chưa có CV. Vui lòng upload CV trước khi ứng tuyển.</value>
+
+  <!-- UniAdminInternship — Success messages -->
+  <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách sinh viên thực tập thành công.</value>
   </data>
-  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
-    <value>Bạn đã ở trạng thái Placed và không được phép nộp đơn.</value>
+  <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
+    <value>Lấy thông tin chi tiết sinh viên thành công.</value>
   </data>
-  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
-    <value>Vị trí hiện không mở để ứng tuyển.</value>
+  <data name="UniAdminInternship.StudentLogbookTotalRetrieved" xml:space="preserve">
+    <value>Lấy tổng quan logbook sinh viên thành công.</value>
   </data>
-  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
-    <value>Hạn nộp đơn đã kết thúc.</value>
+  <data name="UniAdminInternship.StudentLogbookWeeklyRetrieved" xml:space="preserve">
+    <value>Lấy logbook theo tuần của sinh viên thành công.</value>
   </data>
-  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
-    <value>Hiện không có kỳ thực tập active để nộp đơn.</value>
+  <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách đánh giá sinh viên thành công.</value>
   </data>
-  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
-    <value>Bạn hiện đã có đơn đang ở trạng thái active và không thể nộp thêm.</value>
+  <data name="UniAdminInternship.ViolationsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách vi phạm sinh viên thành công.</value>
   </data>
-  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
-    <value>Bạn đã đạt giới hạn ứng tuyển cho vị trí này.</value>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>Không có kỳ thực tập nào đang mở cho trường của bạn. Danh sách trống.</value>
   </data>
-  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
-    <value>{0} đã nộp đơn ứng tuyển tại {1} — {2}. Vui lòng xem xét.</value>
+
+  <!-- UniAdminInternship — Log messages -->
+  <data name="UniAdminInternship.Log.GetStudentList" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy danh sách sinh viên thực tập kỳ {1}, tổng {2} bản ghi.</value>
   </data>
-  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
-    <value>Apply thành công! Đơn của bạn đang chờ HR xem xét.</value>
+  <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy chi tiết sinh viên {1} trong kỳ {2}.</value>
   </data>
-  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
-    <value>Bạn đang trong kỳ thực tập.</value>
+  <data name="UniAdminInternship.Log.GetLogbookTotal" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy tổng quan logbook sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbookWeekly" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy logbook theo tuần của sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy đánh giá sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetViolations" xml:space="preserve">
+    <value>SchoolAdmin {0} lấy vi phạm sinh viên {1} trong kỳ {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.UniversityUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy UniversityUser cho userId={0}. Từ chối truy cập.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ học với termId={0}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermAccessDenied" xml:space="preserve">
+    <value>SchoolAdmin {0} cố truy cập kỳ học {1} không thuộc trường {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.StudentNotFound" xml:space="preserve">
+    <value>Sinh viên {0} không tìm thấy trong kỳ {1} của trường {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập đang mở cho trường {0}.</value>
+  </data>
+
+  <!-- UniAdminInternship — Logbook weekly display badges -->
+  <data name="UniAdminInternship.StatusBadge.Late" xml:space="preserve">
+    <value>Trễ hạn</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Submitted" xml:space="preserve">
+    <value>Đã nộp</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Weekend" xml:space="preserve">
+    <value>Cuối tuần</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Holiday" xml:space="preserve">
+    <value>Ngày lễ</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Pending" xml:space="preserve">
+    <value>Chờ nộp</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Missing" xml:space="preserve">
+    <value>Chưa nộp</value>
+  </data>
+  <data name="UniAdminInternship.WeekTitle" xml:space="preserve">
+    <value>Tuần {0}: {1} - {2}</value>
   </data>
   <data name="InternshipPhase.InternshipPhaseIdRequired" xml:space="preserve">
     <value>Mã giai đoạn thực tập là bắt buộc.</value>
@@ -1081,63 +1221,13 @@
     <value>Bản nháp công việc không được phép có đơn ứng tuyển.</value>
   </data>
   <data name="JobPosting.JobPlacedMaxed" xml:space="preserve">
-    <value>Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ.</value>
+    <value>Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ.
+</value>
   </data>
   <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
     <value>Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động).</value>
   </data>
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Đã lấy chi tiết nhóm thực tập {0} — {1} bài đăng tuyển dụng, {2} sinh viên đã được bố trí.</value>
-  </data>
-  <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
-    <value>Phase thực tập đã đủ số lượng nhận.</value>
-  </data>
-  <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
-    <value>Đơn ứng tuyển chưa ở trạng thái Đã nhận (Placed).</value>
-  </data>
-  <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
-    <value>HR đã xóa sinh viên khỏi danh sách Placed (ApplicationId: {0}, ByUserId: {1}).</value>
-  </data>
-  <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
-    <value>Kính gửi sinh viên, doanh nghiệp {EnterpriseName} đã xóa bạn khỏi danh sách tiếp nhận thực tập.</value>
-  </data>
-  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
-    <value>Sinh viên {StudentName} đã bị doanh nghiệp {EnterpriseName} xóa khỏi danh sách tiếp nhận thực tập.</value>
-  </data>
-  <data name="StudentApplications.NotFound" xml:space="preserve">
-    <value>Không tìm thấy đơn ứng tuyển.</value>
-  </data>
-  <data name="StudentApplications.NotOwner" xml:space="preserve">
-    <value>Bạn không có quyền thao tác trên đơn ứng tuyển này.</value>
-  </data>
-  <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
-    <value>Chỉ có thể rút đơn khi ở trạng thái Đã nộp (Applied).</value>
-  </data>
-  <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
-    <value>Không thể ẩn đơn đã được nhận thực tập (Placed).</value>
-  </data>
-  <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
-    <value>Chỉ có thể ẩn đơn đã kết thúc (Rejected hoặc Withdrawn).</value>
-  </data>
-  <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
-    <value>Đã rút đơn thành công.</value>
-  </data>
-  <data name="StudentApplications.HideSuccess" xml:space="preserve">
-    <value>Đã ẩn khỏi danh sách.</value>
-  </data>
-  <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
-    <value>{StudentName} đã rút đơn ứng tuyển vị trí {JobTitle}.</value>
-  </data>
-  <data name="Validation.IdRequired" xml:space="preserve">
-    <value>Yêu cầu cung cấp Application ID.</value>
-  </data>
-  <data name="Validation.PageNumberInvalid" xml:space="preserve">
-    <value>PageNumber phải lớn hơn hoặc bằng 1.</value>
-  </data>
-  <data name="Validation.PageSizeInvalid" xml:space="preserve">
-    <value>PageSize phải lớn hơn hoặc bằng 1.</value>
-  </data>
-  <data name="Validation.InvalidStatus" xml:space="preserve">
-    <value>Status không hợp lệ.</value>
   </data>
 </root>
