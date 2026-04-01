@@ -774,54 +774,6 @@
   <data name="InternshipGroup.NotificationProjectCleanupContent" xml:space="preserve">
     <value>{0} was removed from the internship group.</value>
   </data>
-  <data name="InternshipGroup.NotificationGroupArchivedTitle" xml:space="preserve">
-    <value>Internship group archived</value>
-  </data>
-  <data name="InternshipGroup.NotificationGroupArchivedContent" xml:space="preserve">
-    <value>Group [{0}] has been archived. Existing projects are kept, but you cannot assign new projects to this group.</value>
-  </data>
-  <data name="InternshipGroup.NotificationStudentRemovedMentorTitle" xml:space="preserve">
-    <value>Student removed from group</value>
-  </data>
-  <data name="InternshipGroup.NotificationStudentRemovedMentorContent" xml:space="preserve">
-    <value>{0} was removed from [{1}] by HR. The student can no longer access the group's projects.</value>
-  </data>
-  <data name="InternshipGroup.NotificationStudentRemovedStudentTitle" xml:space="preserve">
-    <value>You were removed from group</value>
-  </data>
-  <data name="InternshipGroup.NotificationStudentRemovedStudentContent" xml:space="preserve">
-    <value>You were removed from [{0}]. You can no longer access this group's projects.</value>
-  </data>
-  <data name="InternshipGroup.NotificationStudentMovedTitle" xml:space="preserve">
-    <value>You were moved to another group</value>
-  </data>
-  <data name="InternshipGroup.NotificationStudentMovedContent" xml:space="preserve">
-    <value>You were moved to [{0}]. Your project list has been updated.</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorOldGroupTitle" xml:space="preserve">
-    <value>Student transferred out</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorOldGroupContent" xml:space="preserve">
-    <value>{0} has been moved to another group.</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorNewGroupTitle" xml:space="preserve">
-    <value>Student added to your group</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorNewGroupContent" xml:space="preserve">
-    <value>{0} was added to [{1}] and automatically joined currently published projects.</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorReplacedOldTitle" xml:space="preserve">
-    <value>You are no longer assigned to this group</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorReplacedOldContent" xml:space="preserve">
-    <value>Group [{0}] has been reassigned to another mentor. The group and linked projects are removed from your view.</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorReplacedNewTitle" xml:space="preserve">
-    <value>You were assigned as group mentor</value>
-  </data>
-  <data name="InternshipGroup.NotificationMentorReplacedNewContent" xml:space="preserve">
-    <value>You were assigned to group [{0}] (replacing {1}) and now have full edit rights on linked projects.</value>
-  </data>
   <data name="InternshipGroup.LogProjectAssignmentsCleanup" xml:space="preserve">
     <value>Auto-removed {0} assignment(s) for student {1} after leaving group.</value>
   </data>
@@ -1174,5 +1126,56 @@
   </data>
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Internship phase {0} detail loaded — {1} job posting(s), {2} placed student(s).</value>
+  </data>
+  <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
+    <value>The internship phase has reached its maximum capacity.</value>
+  </data>
+  <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
+    <value>The application is not in Placed status.</value>
+  </data>
+  <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
+    <value>HR removed student from Placed list (ApplicationId: {0}, ByUserId: {1}).</value>
+  </data>
+  <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
+    <value>Dear student, enterprise {EnterpriseName} has removed you from their internship acceptance list.</value>
+  </data>
+  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
+    <value>Student {StudentName} has been removed from the internship acceptance list by enterprise {EnterpriseName}.</value>
+  </data>
+  <data name="StudentApplications.NotFound" xml:space="preserve">
+    <value>Application not found.</value>
+  </data>
+  <data name="StudentApplications.NotOwner" xml:space="preserve">
+    <value>You do not have permission to perform this action on this application.</value>
+  </data>
+  <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
+    <value>Only applications in Applied status can be withdrawn.</value>
+  </data>
+  <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
+    <value>Placed applications cannot be hidden.</value>
+  </data>
+  <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
+    <value>Only terminal applications (Rejected or Withdrawn) can be hidden.</value>
+  </data>
+  <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
+    <value>Application withdrawn successfully.</value>
+  </data>
+  <data name="StudentApplications.HideSuccess" xml:space="preserve">
+    <value>Application hidden from your list.</value>
+  </data>
+  <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
+    <value>{StudentName} has withdrawn their application for {JobTitle}.</value>
+  </data>
+  <data name="Validation.IdRequired" xml:space="preserve">
+    <value>Application ID is required.</value>
+  </data>
+  <data name="Validation.PageNumberInvalid" xml:space="preserve">
+    <value>PageNumber must be greater than or equal to 1.</value>
+  </data>
+  <data name="Validation.PageSizeInvalid" xml:space="preserve">
+    <value>PageSize must be greater than or equal to 1.</value>
+  </data>
+  <data name="Validation.InvalidStatus" xml:space="preserve">
+    <value>Status is invalid.</value>
   </data>
 </root>

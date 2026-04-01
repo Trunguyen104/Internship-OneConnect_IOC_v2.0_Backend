@@ -16,7 +16,8 @@ public class HRApplicationEventHandlers :
     INotificationHandler<ApplicationPlacedUniAssignEvent>,
     INotificationHandler<ApplicationRejectedUniAssignEvent>,
     INotificationHandler<ApplicationApprovedNotifyUniAdminEvent>,
-    INotificationHandler<ApplicationWithdrawnByStudentEvent>
+    INotificationHandler<ApplicationWithdrawnByStudentEvent>,
+    INotificationHandler<PlacedStudentRemovedEvent>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly INotificationPushService _pushService;
@@ -236,6 +237,46 @@ public class HRApplicationEventHandlers :
                 NotificationType.ApplicationStatusChanged,
                 notification.ApplicationId,
                 cancellationToken);
+        }
+    }
+
+    /// <summary>AC-C05: HR xóa SV Placed — notify SV + tất cả Uni Admin của trường đó.</summary>
+    public async Task Handle(PlacedStudentRemovedEvent notification, CancellationToken cancellationToken)
+    {
+        // Notify student
+        var studentContent = _messageService.GetMessage(MessageKeys.StudentApplications.NotifyStudentRemovedPlaced)
+            .Replace("{EnterpriseName}", notification.EnterpriseName);
+
+        await CreateAndPushNotificationAsync(
+            notification.StudentUserId,
+            "Thông báo về trạng thái thực tập",
+            studentContent,
+            NotificationType.ApplicationStatusChanged,
+            notification.ApplicationId,
+            cancellationToken);
+
+        // Notify all Uni Admins of the university
+        if (notification.UniversityId.HasValue)
+        {
+            var uniAdmins = await _unitOfWork.Repository<UniversityUser>().Query()
+                .Where(uu => uu.UniversityId == notification.UniversityId.Value)
+                .Select(uu => uu.UserId)
+                .ToListAsync(cancellationToken);
+
+            var uniAdminContent = _messageService.GetMessage(MessageKeys.StudentApplications.NotifyUniAdminRemovedPlaced)
+                .Replace("{EnterpriseName}", notification.EnterpriseName)
+                .Replace("{StudentName}", notification.StudentName);
+
+            foreach (var adminUserId in uniAdmins)
+            {
+                await CreateAndPushNotificationAsync(
+                    adminUserId,
+                    "Sinh viên bị xóa khỏi danh sách thực tập",
+                    uniAdminContent,
+                    NotificationType.ApplicationStatusChanged,
+                    notification.ApplicationId,
+                    cancellationToken);
+            }
         }
     }
 }

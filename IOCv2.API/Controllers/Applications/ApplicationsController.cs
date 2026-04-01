@@ -7,6 +7,7 @@ using IOCv2.Application.Features.HRApplications.SelfApply.Commands.SendOffer;
 using IOCv2.Application.Features.HRApplications.SelfApply.Queries.GetSelfApplyApplications;
 using IOCv2.Application.Features.HRApplications.UniAssign.Commands.ApproveUniAssign;
 using IOCv2.Application.Features.HRApplications.UniAssign.Commands.RejectUniAssign;
+using IOCv2.Application.Features.HRApplications.UniAssign.Commands.RemovePlacedUniAssign;
 using IOCv2.Application.Features.HRApplications.UniAssign.Queries.GetUniAssignApplications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -100,6 +101,14 @@ public class ApplicationsController : ApiControllerBase
     [ProducesResponseType(typeof(Result<RejectUniAssignResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> RejectUniAssign(Guid id, [FromBody] RejectApplicationRequest body)
         => HandleResult(await _mediator.Send(new RejectUniAssignCommand { ApplicationId = id, RejectReason = body.RejectReason ?? string.Empty }));
+
+    /// <summary>
+    /// Xóa sinh viên đã được Placed ra khỏi danh sách (Uni Assign). Trạng thái chuyển về Rejected và SV được thông báo. (AC-C05)
+    /// </summary>
+    [HttpPatch("{id}/remove-placed-uni-assign")]
+    [ProducesResponseType(typeof(Result<RemovePlacedUniAssignResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RemovePlacedUniAssign(Guid id)
+        => HandleResult(await _mediator.Send(new RemovePlacedUniAssignCommand { ApplicationId = id }));
 }
 
 public class RejectApplicationRequest

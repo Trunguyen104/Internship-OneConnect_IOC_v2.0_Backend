@@ -45,7 +45,7 @@ public class GetApplicationDetailHandler : IRequestHandler<GetApplicationDetailQ
                     _messageService.GetMessage(MessageKeys.HRApplications.EnterpriseUserNotFound), ResultErrorType.Forbidden);
 
             var app = await _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
-                .Include(a => a.Job)
+                .Include(a => a.Job).ThenInclude(j => j!.InternshipPhase)
                 .Include(a => a.Student).ThenInclude(s => s.User)
                 .Include(a => a.Student).ThenInclude(s => s.StudentTerms).ThenInclude(st => st.Term).ThenInclude(t => t.University)
                 .Include(a => a.StatusHistories.OrderBy(h => h.CreatedAt))
@@ -78,6 +78,12 @@ public class GetApplicationDetailHandler : IRequestHandler<GetApplicationDetailQ
                 IsJobClosed = app.Job?.Status == JobStatus.CLOSED,
                 IsJobDeleted = app.JobId.HasValue && app.Job == null,
                 CvSnapshotUrl = app.CvSnapshotUrl,
+                InternshipPhaseId = app.Job?.InternshipPhaseId,
+                InternPhaseName = app.Job?.InternshipPhase?.Name,
+                InternPhaseStartDate = app.Job?.InternshipPhase?.StartDate,
+                InternPhaseEndDate = app.Job?.InternshipPhase?.EndDate,
+                Audience = app.Job?.Audience,
+                AudienceLabel = app.Job?.Audience?.ToString(),
                 Status = app.Status,
                 StatusLabel = app.Status.ToString(),
                 AppliedAt = app.AppliedAt,
