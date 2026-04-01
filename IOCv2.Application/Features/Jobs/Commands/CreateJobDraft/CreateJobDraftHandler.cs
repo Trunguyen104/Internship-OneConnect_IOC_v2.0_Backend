@@ -55,7 +55,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
             {
                 _logger.LogWarning("Attempt to save draft without a title.");
                 return Result<CreateJobDraftResponse>.Failure(
-                    _messageService.GetMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.TitleRequired)),
+                    _messageService.GetMessage(MessageKeys.JobPostingMessageKey.TitleRequired),
                     ResultErrorType.BadRequest);
             }
 
