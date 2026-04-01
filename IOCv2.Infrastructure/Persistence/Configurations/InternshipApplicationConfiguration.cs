@@ -62,7 +62,7 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
             .IsRequired(false);
 
         builder.HasOne(x => x.Job)
-            .WithMany(j => j.Applications)
+            .WithMany(j => j.InternshipApplications)
             .HasForeignKey(x => x.JobId)
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);

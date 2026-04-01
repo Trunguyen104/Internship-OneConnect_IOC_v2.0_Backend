@@ -28,16 +28,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("fk_jobs_enterprises_enterprise_id");
 
-        builder.Property(j => j.InternshipPhaseId)
-               .HasColumnName("internship_phase_id")
-               .IsRequired();
-
-        builder.HasOne(j => j.InternshipPhase)
-               .WithMany(p => p.Jobs)
-               .HasForeignKey(j => j.InternshipPhaseId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
-
             // Fields
             builder.Property(j => j.Title)
                .HasColumnName("title")
@@ -90,6 +80,19 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .HasColumnName("audience")
                .HasConversion<short>()
                .IsRequired(false);
+
+        builder.Property(j => j.InternshipPhaseId)
+               .HasColumnName("internship_phase_id")
+               .IsRequired(false);
+
+        builder.HasOne(j => j.InternshipPhase)
+               .WithMany(p => p.Jobs)
+               .HasForeignKey(j => j.InternshipPhaseId)
+               .OnDelete(DeleteBehavior.SetNull)
+               .HasConstraintName("fk_jobs_internship_phases_phase_id");
+
+        builder.HasIndex(j => j.InternshipPhaseId)
+               .HasDatabaseName("ix_jobs_internship_phase_id");
 
         // Enum stored as short (repository convention)
             builder.Property(j => j.Status)

@@ -8,7 +8,10 @@ namespace IOCv2.Domain.Entities
     {
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
+
+        // FK to InternshipPhase (required by domain, optional at DB level)
         public Guid? InternshipPhaseId { get; set; }
+
         public string? Title { get; set; }
         public string? Position { get; set; }
         public string? Description { get; set; }
@@ -18,24 +21,20 @@ namespace IOCv2.Domain.Entities
         public DateTime? ExpireDate { get; set; }
         public JobStatus? Status { get; set; }
 
-        // New: internship date range
+        // Internship date range
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        // New: audience (public / targeted)
+        // Audience (public / targeted)
         public JobAudience? Audience { get; set; }
 
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;
-
-        // Added: applications for this job
+        public virtual InternshipPhase? InternshipPhase { get; set; }
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
-
-        // Many-to-many: Jobs <-> Universities
         public virtual ICollection<University> Universities { get; set; } = new List<University>();
-        public virtual InternshipPhase InternshipPhase { get; set; } = null!;
 
-        // Factory method for creating a Job (used by application layer)
+        // Factory method
         public static Job Create(
             Guid enterpriseId,
             Guid? internshipPhase,
@@ -60,7 +59,5 @@ namespace IOCv2.Domain.Entities
                 Status = JobStatus.DRAFT
             };
         }
-        public virtual ICollection<InternshipApplication> Applications { get; set; } = new List<InternshipApplication>();
     }
-
 }
