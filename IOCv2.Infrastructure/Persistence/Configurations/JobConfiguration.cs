@@ -92,6 +92,9 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .HasConversion<short>()
                .IsRequired(false);
 
+        builder.HasIndex(j => j.InternshipPhaseId)
+               .HasDatabaseName("ix_jobs_internship_phase_id");
+
         // Enum stored as short (repository convention)
             builder.Property(j => j.Status)
                 .HasColumnName("status")

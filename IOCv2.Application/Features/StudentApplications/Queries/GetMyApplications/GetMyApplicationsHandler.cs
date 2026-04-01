@@ -46,14 +46,16 @@ public class GetMyApplicationsHandler
             .Include(a => a.Job)
             .Where(a => a.StudentId == student.StudentId && !a.IsHiddenByStudent);
 
-        // Default: only active statuses
+        // Default: always show active + Placed. IncludeTerminal toggles visibility of Rejected/Withdrawn.
+        // Placed (✅) luôn hiển thị theo AC-01 — đây là milestone quan trọng nhất.
         if (!request.IncludeTerminal)
         {
             query = query.Where(a =>
                 a.Status == InternshipApplicationStatus.Applied ||
                 a.Status == InternshipApplicationStatus.Interviewing ||
                 a.Status == InternshipApplicationStatus.Offered ||
-                a.Status == InternshipApplicationStatus.PendingAssignment);
+                a.Status == InternshipApplicationStatus.PendingAssignment ||
+                a.Status == InternshipApplicationStatus.Placed);
         }
 
         // Filter by explicit status string

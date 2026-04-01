@@ -10,6 +10,9 @@ public record GetUniAssignApplicationsQuery : IRequest<Result<PaginatedResult<Ge
     public Guid? UniversityId { get; init; }
     public string? MonthYear { get; init; }
 
+    /// <summary>Filter by Intern Phase.</summary>
+    public Guid? InternshipPhaseId { get; init; }
+
     /// <summary>When true, includes Placed and Rejected. Default: only PendingAssignment.</summary>
     public bool IncludeTerminal { get; init; } = false;
 

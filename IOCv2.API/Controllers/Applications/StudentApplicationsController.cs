@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.StudentApplications.Commands.HideApplication;
 using IOCv2.Application.Features.StudentApplications.Commands.WithdrawApplication;
+using IOCv2.Application.Features.StudentApplications.Queries.GetMyApplicationDetail;
 using IOCv2.Application.Features.StudentApplications.Queries.GetMyApplications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -27,6 +28,14 @@ public class StudentApplicationsController : ApiControllerBase
     [ProducesResponseType(typeof(Result<PaginatedResult<GetMyApplicationsResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyApplications([FromQuery] GetMyApplicationsQuery query)
         => HandleResult(await _mediator.Send(query));
+
+    /// <summary>
+    /// Lấy chi tiết một đơn ứng tuyển của sinh viên hiện tại, bao gồm lịch sử trạng thái.
+    /// </summary>
+    [HttpGet("my-applications/{id}")]
+    [ProducesResponseType(typeof(Result<GetMyApplicationDetailResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMyApplicationDetail(Guid id)
+        => HandleResult(await _mediator.Send(new GetMyApplicationDetailQuery(id)));
 
     /// <summary>
     /// Sinh viên rút đơn ứng tuyển đang ở trạng thái Applied (AC-02). Không cần lý do.
