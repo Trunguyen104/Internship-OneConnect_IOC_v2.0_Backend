@@ -70,7 +70,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
                 location: request.Location,
                 expireDate: request.ExpireDate);
 
-            if (request.InternshipPhaseId.HasValue)
+            if (request.InternshipPhaseId.HasValue && request.InternshipPhaseId != Guid.Empty)
             {
                 var internshipPhase = await _unitOfWork.Repository<InternshipPhase>().GetByIdAsync(request.InternshipPhaseId.Value, cancellationToken);
                 if (internshipPhase == null || internshipPhase.DeletedAt != null)

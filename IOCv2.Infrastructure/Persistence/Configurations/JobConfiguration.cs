@@ -30,13 +30,14 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
         builder.Property(j => j.InternshipPhaseId)
                .HasColumnName("internship_phase_id")
-               .IsRequired();
+               .IsRequired(false);
 
         builder.HasOne(j => j.InternshipPhase)
                .WithMany(p => p.Jobs)
                .HasForeignKey(j => j.InternshipPhaseId)
                .OnDelete(DeleteBehavior.Cascade)
-               .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
+               .HasConstraintName("fk_jobs_internship_phases_internship_phase_id")
+               .IsRequired(false);
 
             // Fields
             builder.Property(j => j.Title)
