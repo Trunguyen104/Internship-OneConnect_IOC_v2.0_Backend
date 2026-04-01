@@ -53,6 +53,7 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
 
             var app = await _unitOfWork.Repository<InternshipApplication>().Query()
                 .Include(a => a.Student).ThenInclude(s => s.User)
+                .Include(a => a.Job)
                 .Include(a => a.Enterprise)
                 .Include(a => a.University)
                 .FirstOrDefaultAsync(a =>
@@ -65,11 +66,11 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
 
             if (app.Source != ApplicationSource.UniAssign)
                 return Result<ApproveUniAssignResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.HRApplications.NotUniAssignApplication), ResultErrorType.BadRequest);
+                    _messageService.GetMessage(MessageKeys.HRApplications.NotUniAssignApplication));
 
             if (app.Status != InternshipApplicationStatus.PendingAssignment)
                 return Result<ApproveUniAssignResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.HRApplications.InvalidTransition), ResultErrorType.BadRequest);
+                    _messageService.GetMessage(MessageKeys.HRApplications.InvalidTransition));
 
             // Capacity check: if job belongs to a phase with MaxStudents, ensure there is still room
             if (app.Job?.InternshipPhaseId.HasValue == true)
@@ -77,17 +78,16 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
                 var phase = await _unitOfWork.Repository<InternshipPhase>().Query().AsNoTracking()
                     .FirstOrDefaultAsync(p => p.PhaseId == app.Job.InternshipPhaseId!.Value, cancellationToken);
 
-                if (phase?.MaxStudents.HasValue == true)
+                if (phase != null)
                 {
                     var placedCount = await _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
                         .CountAsync(a => a.Job != null
                             && a.Job.InternshipPhaseId == phase.PhaseId
                             && a.Status == InternshipApplicationStatus.Placed, cancellationToken);
 
-                    if (placedCount >= phase.MaxStudents.Value)
+                    if (placedCount >= phase.Capacity)
                         return Result<ApproveUniAssignResponse>.Failure(
-                            _messageService.GetMessage(MessageKeys.HRApplications.InternPhaseAtCapacity),
-                            ResultErrorType.BadRequest);
+                            _messageService.GetMessage(MessageKeys.HRApplications.InternPhaseAtCapacity));
                 }
             }
 
@@ -98,7 +98,7 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
                 ApplicationId = app.ApplicationId,
                 FromStatus = app.Status,
                 ToStatus = InternshipApplicationStatus.Placed,
-                ChangedByName = enterpriseUser.User?.FullName ?? "HR",
+                ChangedByName = enterpriseUser.User.FullName,
                 TriggerSource = "HR"
             };
 
@@ -106,20 +106,19 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
             app.ReviewedAt = DateTime.UtcNow;
             app.ReviewedBy = enterpriseUser.EnterpriseUserId;
 
-            if (app.Student != null)
-                app.Student.InternshipStatus = StudentStatus.Placed;
+            app.Student.InternshipStatus = StudentStatus.Placed;
 
             await _unitOfWork.Repository<ApplicationStatusHistory>().AddAsync(approveHistory, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
 
             // 3. Send notifications
-            var studentUserId = app.Student?.UserId;
-            var enterpriseName = app.Enterprise?.Name ?? string.Empty;
+            var studentUserId = app.Student.UserId;
+            var enterpriseName = app.Enterprise.Name;
 
-            if (studentUserId.HasValue)
+            if (studentUserId != Guid.Empty)
             {
                 await _publisher.Publish(new ApplicationPlacedUniAssignEvent(
-                    studentUserId.Value,
+                    studentUserId,
                     app.ApplicationId,
                     enterpriseName), cancellationToken);
             }
@@ -129,7 +128,7 @@ public class ApproveUniAssignHandler : IRequestHandler<ApproveUniAssignCommand, 
             {
                 await _publisher.Publish(new ApplicationApprovedNotifyUniAdminEvent(
                     app.UniversityId,
-                    app.Student?.User?.FullName ?? string.Empty,
+                    app.Student.User.FullName,
                     enterpriseName,
                     app.ApplicationId), cancellationToken);
             }

@@ -188,7 +188,7 @@ public class GetUniAdminStudentListHandler
         {
             if (!studentTermDict.TryGetValue(isv.StudentId, out var st)) continue;
             if (!st.EnterpriseId.HasValue) continue;
-            if (isv.InternshipGroup?.EnterpriseId != st.EnterpriseId) continue;
+            if (isv.InternshipGroup.EnterpriseId != st.EnterpriseId) continue;
 
             if (!internStudentDict.TryGetValue(isv.StudentId, out var existing)
                 || isv.JoinedAt > existing.JoinedAt)
@@ -218,6 +218,25 @@ public class GetUniAdminStudentListHandler
 
             foreach (var item in rawCounts)
                 logbookCountDict[(item.InternshipId, item.StudentId)] = item.Count;
+        }
+
+        // 7a. Load Late logbook counts (bulk, avoid N+1)
+        var lateCountDict = new Dictionary<(Guid InternshipId, Guid StudentId), int>();
+        if (groupIds.Any())
+        {
+            var rawLateCounts = await _unitOfWork.Repository<Logbook>().Query()
+                .AsNoTracking()
+                .Where(l => groupIds.Contains(l.InternshipId)
+                         && l.StudentId.HasValue
+                         && studentIds.Contains(l.StudentId!.Value)
+                         && l.Status == LogbookStatus.LATE
+                         && l.DeletedAt == null)
+                .GroupBy(l => new { l.InternshipId, StudentId = l.StudentId!.Value })
+                .Select(g => new { g.Key.InternshipId, g.Key.StudentId, Count = g.Count() })
+                .ToListAsync(cancellationToken);
+
+            foreach (var item in rawLateCounts)
+                lateCountDict[(item.InternshipId, item.StudentId)] = item.Count;
         }
 
         // 7. Load ViolationReport counts scoped to selected internship group
@@ -262,8 +281,7 @@ public class GetUniAdminStudentListHandler
         foreach (var st in studentTerms)
         {
             var student = st.Student;
-            var user = student?.User;
-            if (student == null || user == null) continue;
+            var user = student.User;
 
             internStudentDict.TryGetValue(st.StudentId, out var internStudent);
             var group = internStudent?.InternshipGroup;
@@ -276,7 +294,11 @@ public class GetUniAdminStudentListHandler
                 && logbookCountDict.TryGetValue((internStudent.InternshipId, st.StudentId), out var lc))
                 ? lc : 0;
 
-            var logbookSummary = CalculateLogbookSummary(internStudent, group, logbookCount);
+            var lateLogbookCount = (internStudent != null && group != null
+                && lateCountDict.TryGetValue((internStudent.InternshipId, st.StudentId), out var llc))
+                ? llc : 0;
+
+            var logbookSummary = CalculateLogbookSummary(internStudent, group, logbookCount, lateLogbookCount);
             var vioCount = internStudent != null
                 && violationCountDict.TryGetValue((st.StudentId, internStudent.InternshipId), out var scopedCount)
                 ? scopedCount
@@ -305,7 +327,7 @@ public class GetUniAdminStudentListHandler
                 Major = student.Major,
                 EnterpriseId = st.EnterpriseId,
                 EnterpriseName = st.Enterprise?.Name,
-                MentorName = group?.Mentor?.User?.FullName,
+                MentorName = group?.Mentor?.User.FullName,
                 Logbook = logbookSummary,
                 InternshipStatus = uiStatus,
                 ApplicationSource = activeApp?.Source.ToString(),
@@ -409,7 +431,8 @@ public class GetUniAdminStudentListHandler
     private static LogbookSummaryDto? CalculateLogbookSummary(
         InternshipStudent? internStudent,
         InternshipGroup? group,
-        int submittedCount)
+        int submittedCount,
+        int lateCount)
     {
         if (internStudent == null || group == null)
             return null;
@@ -419,7 +442,15 @@ public class GetUniAdminStudentListHandler
         var effectiveEnd = DateTime.UtcNow.Date < phaseEnd ? DateTime.UtcNow.Date : phaseEnd;
 
         if (joinedAt > effectiveEnd)
-            return new LogbookSummaryDto { Missing = 0, Submitted = submittedCount, Total = 0, PercentComplete = 0 };
+            return new LogbookSummaryDto
+            {
+                Missing = 0,
+                Submitted = submittedCount,
+                Total = 0,
+                PercentComplete = 0,
+                Late = lateCount,
+                OnTime = Math.Max(0, submittedCount - lateCount)
+            };
 
         var total = CountBusinessDays(joinedAt, effectiveEnd);
         var missing = Math.Max(0, total - submittedCount);
@@ -430,7 +461,9 @@ public class GetUniAdminStudentListHandler
             Missing = missing,
             Submitted = submittedCount,
             Total = total,
-            PercentComplete = percent
+            PercentComplete = percent,
+            Late = lateCount,
+            OnTime = Math.Max(0, submittedCount - lateCount)
         };
     }
 
