@@ -48,7 +48,8 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
                 request.Code.Trim(),
                 request.Name.Trim(),
                 request.Address?.Trim(),
-                null);
+                null,
+                request.ContactEmail?.Trim());
 
             await _unitOfWork.Repository<University>().AddAsync(university, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);

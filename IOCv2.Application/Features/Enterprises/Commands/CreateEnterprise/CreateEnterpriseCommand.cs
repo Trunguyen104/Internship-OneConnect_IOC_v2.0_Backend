@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -16,5 +16,6 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
         public string? Description { get; set; }
         public string? Address { get; set; }
         public string? Website { get; set; }
+        public string? ContactEmail { get; set; }
     }
 }

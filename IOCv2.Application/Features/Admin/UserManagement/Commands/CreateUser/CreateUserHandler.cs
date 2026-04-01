@@ -154,7 +154,30 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser
 
                     if (targetRole == UserRole.Student)
                     {
-                        await _unitOfWork.Repository<Student>().AddAsync(new Student { StudentId = Guid.NewGuid(), UserId = user.UserId, InternshipStatus = StudentStatus.NO_INTERNSHIP }, cancellationToken);
+                        // Validate Term exists and belongs to the same University
+                        if (!request.TermId.HasValue)
+                            throw new BusinessException("TermId is required for student accounts.");
+
+                        var termExists = await _unitOfWork.Repository<Term>()
+                            .ExistsAsync(t => t.TermId == request.TermId.Value && t.UniversityId == request.UnitId.Value, cancellationToken);
+                        if (!termExists)
+                            throw new NotFoundException("Term not found or does not belong to the selected university.");
+
+                        var student = new Student { StudentId = Guid.NewGuid(), UserId = user.UserId, InternshipStatus = StudentStatus.NO_INTERNSHIP };
+                        await _unitOfWork.Repository<Student>().AddAsync(student, cancellationToken);
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                        // Link Student to Term
+                        var studentTerm = new StudentTerm
+                        {
+                            StudentTermId = Guid.NewGuid(),
+                            StudentId = student.StudentId,
+                            TermId = request.TermId.Value,
+                            EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            EnrollmentStatus = EnrollmentStatus.Active,
+                            PlacementStatus = PlacementStatus.Unplaced
+                        };
+                        await _unitOfWork.Repository<StudentTerm>().AddAsync(studentTerm, cancellationToken);
                     }
                 }
                 else if ((targetRole == UserRole.EnterpriseAdmin || targetRole == UserRole.HR || targetRole == UserRole.Mentor) && request.UnitId.HasValue)
