@@ -251,14 +251,35 @@ namespace IOCv2.Application.Constants
             // Phase 4 side-effects
             public const string NotificationProjectCleanupTitle = "InternshipGroup.NotificationProjectCleanupTitle";
             public const string NotificationProjectCleanupContent = "InternshipGroup.NotificationProjectCleanupContent";
+            public const string NotificationGroupArchivedTitle = "InternshipGroup.NotificationGroupArchivedTitle";
+            public const string NotificationGroupArchivedContent = "InternshipGroup.NotificationGroupArchivedContent";
+            public const string NotificationStudentRemovedMentorTitle = "InternshipGroup.NotificationStudentRemovedMentorTitle";
+            public const string NotificationStudentRemovedMentorContent = "InternshipGroup.NotificationStudentRemovedMentorContent";
+            public const string NotificationStudentRemovedStudentTitle = "InternshipGroup.NotificationStudentRemovedStudentTitle";
+            public const string NotificationStudentRemovedStudentContent = "InternshipGroup.NotificationStudentRemovedStudentContent";
+            public const string NotificationStudentMovedTitle = "InternshipGroup.NotificationStudentMovedTitle";
+            public const string NotificationStudentMovedContent = "InternshipGroup.NotificationStudentMovedContent";
+            public const string NotificationMentorOldGroupTitle = "InternshipGroup.NotificationMentorOldGroupTitle";
+            public const string NotificationMentorOldGroupContent = "InternshipGroup.NotificationMentorOldGroupContent";
+            public const string NotificationMentorNewGroupTitle = "InternshipGroup.NotificationMentorNewGroupTitle";
+            public const string NotificationMentorNewGroupContent = "InternshipGroup.NotificationMentorNewGroupContent";
+            public const string NotificationMentorReplacedOldTitle = "InternshipGroup.NotificationMentorReplacedOldTitle";
+            public const string NotificationMentorReplacedOldContent = "InternshipGroup.NotificationMentorReplacedOldContent";
+            public const string NotificationMentorReplacedNewTitle = "InternshipGroup.NotificationMentorReplacedNewTitle";
+            public const string NotificationMentorReplacedNewContent = "InternshipGroup.NotificationMentorReplacedNewContent";
             public const string LogProjectAssignmentsCleanup = "InternshipGroup.LogProjectAssignmentsCleanup";
             public const string LogProjectsArchived = "InternshipGroup.LogProjectsArchived";
+            public const string LogArchiveNotifyFailed = "InternshipGroup.LogArchiveNotifyFailed";
+            public const string LogMoveNotificationFailed = "InternshipGroup.LogMoveNotificationFailed";
+            public const string LogMentorSwapNotificationFailed = "InternshipGroup.LogMentorSwapNotificationFailed";
             public const string GroupNotActive = "InternshipGroup.GroupNotActive";
 
             // New US keys
             public const string CannotDeleteNotActive      = "InternshipGroups.CannotDeleteNotActive";
             public const string NotificationOrphanTitle    = "InternshipGroups.NotificationOrphanTitle";
             public const string NotificationOrphanContent  = "InternshipGroups.NotificationOrphanContent";
+            public const string NotificationGroupDeletedStudentTitle = "InternshipGroups.NotificationGroupDeletedStudentTitle";
+            public const string NotificationGroupDeletedStudentContent = "InternshipGroups.NotificationGroupDeletedStudentContent";
             public const string LogOrphanizeProjects       = "InternshipGroups.LogOrphanizeProjects";
 
             // Log messages — GetInternshipGroupByIdHandler
@@ -269,6 +290,7 @@ namespace IOCv2.Application.Constants
 
             // Log messages — DeleteInternshipGroupHandler
             public const string LogDeleteNotificationFailed    = "InternshipGroup.LogDeleteNotificationFailed";
+            public const string LogDeleteStudentNotificationFailed = "InternshipGroup.LogDeleteStudentNotificationFailed";
 
             // Log messages — GetInternshipGroupsHandler
             public const string LogScopedHrEnterprise          = "InternshipGroup.LogScopedHrEnterprise";
@@ -452,6 +474,7 @@ namespace IOCv2.Application.Constants
             public const string AssignGroupSuccess         = "Projects.AssignGroupSuccess";
             public const string AlreadyAssignedToGroup     = "Projects.AlreadyAssignedToGroup";
             public const string GroupNotActive             = "Projects.GroupNotActive";
+            public const string CannotAssignArchivedGroup  = "Projects.CannotAssignArchivedGroup";
             public const string GroupPhaseEnded            = "Projects.GroupPhaseEnded";
             public const string LogAssignGroupSuccess      = "Projects.LogAssignGroupSuccess";
             public const string LogAssignGroupError        = "Projects.LogAssignGroupError";

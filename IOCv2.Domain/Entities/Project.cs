@@ -150,6 +150,8 @@ namespace IOCv2.Domain.Entities
         public void SetOrphan()
         {
             InternshipId      = null;
+            StartDate         = null;
+            EndDate           = null;
             OperationalStatus = OperationalStatus.Unstarted;
             IsOrphaned        = true;
             UpdatedAt         = DateTime.UtcNow;

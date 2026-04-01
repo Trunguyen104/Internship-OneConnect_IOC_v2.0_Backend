@@ -774,11 +774,68 @@
   <data name="InternshipGroup.NotificationProjectCleanupContent" xml:space="preserve">
     <value>{0} was removed from the internship group.</value>
   </data>
+  <data name="InternshipGroup.NotificationGroupArchivedTitle" xml:space="preserve">
+    <value>Internship group archived</value>
+  </data>
+  <data name="InternshipGroup.NotificationGroupArchivedContent" xml:space="preserve">
+    <value>Group [{0}] has been archived. Existing projects are kept, but you cannot assign new projects to this group.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorTitle" xml:space="preserve">
+    <value>Student removed from group</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorContent" xml:space="preserve">
+    <value>{0} was removed from [{1}] by HR. The student can no longer access the group's projects.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentTitle" xml:space="preserve">
+    <value>You were removed from group</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentContent" xml:space="preserve">
+    <value>You were removed from [{0}]. You can no longer access this group's projects.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedTitle" xml:space="preserve">
+    <value>You were moved to another group</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedContent" xml:space="preserve">
+    <value>You were moved to [{0}]. Your project list has been updated.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupTitle" xml:space="preserve">
+    <value>Student transferred out</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupContent" xml:space="preserve">
+    <value>{0} has been moved to another group.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupTitle" xml:space="preserve">
+    <value>Student added to your group</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupContent" xml:space="preserve">
+    <value>{0} was added to [{1}] and automatically joined currently published projects.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldTitle" xml:space="preserve">
+    <value>You are no longer assigned to this group</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldContent" xml:space="preserve">
+    <value>Group [{0}] has been reassigned to another mentor. The group and linked projects are removed from your view.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewTitle" xml:space="preserve">
+    <value>You were assigned as group mentor</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewContent" xml:space="preserve">
+    <value>You were assigned to group [{0}] (replacing {1}) and now have full edit rights on linked projects.</value>
+  </data>
   <data name="InternshipGroup.LogProjectAssignmentsCleanup" xml:space="preserve">
     <value>Auto-removed {0} assignment(s) for student {1} after leaving group.</value>
   </data>
   <data name="InternshipGroup.LogProjectsArchived" xml:space="preserve">
     <value>Archived {0} Draft/Published project(s) after group {1} was archived.</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveNotifyFailed" xml:space="preserve">
+    <value>Group archived but mentor notification failed. InternshipId: {0}.</value>
+  </data>
+  <data name="InternshipGroup.LogMoveNotificationFailed" xml:space="preserve">
+    <value>Student move succeeded but notification failed. FromGroup: {0}, ToGroup: {1}.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorSwapNotificationFailed" xml:space="preserve">
+    <value>Mentor reassignment succeeded but notification failed for group {0}.</value>
   </data>
   <data name="Projects.LogOrphanized" xml:space="preserve">
     <value>Project {0} was orphaned because its group was deleted.</value>
@@ -874,10 +931,22 @@
     <value>Internship group deleted</value>
   </data>
   <data name="InternshipGroups.NotificationOrphanContent" xml:space="preserve">
-    <value>Group "{0}" has been deleted. {1} of your project(s) have been moved back to Draft and detached from the group.</value>
+    <value>Group [{0}] was dissolved. Linked projects were moved to Unstarted. Please assign a new group.</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentTitle" xml:space="preserve">
+    <value>Project no longer available</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentContent" xml:space="preserve">
+    <value>Project [{0}] is no longer available because your internship group was dissolved.</value>
   </data>
   <data name="InternshipGroups.LogOrphanizeProjects" xml:space="preserve">
     <value>{0} project(s) orphaned due to group {1} deletion.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteStudentNotificationFailed" xml:space="preserve">
+    <value>Group deleted but student notification failed. InternshipId: {0}.</value>
+  </data>
+  <data name="Projects.CannotAssignArchivedGroup" xml:space="preserve">
+    <value>Cannot assign project to an archived group.</value>
   </data>
   <data name="Projects.LogGetAll" xml:space="preserve">
     <value>Retrieving all projects. SearchTerm: {0}, Status: {1}.</value>

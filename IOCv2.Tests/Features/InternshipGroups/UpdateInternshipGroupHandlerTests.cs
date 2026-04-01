@@ -28,6 +28,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ILogger<UpdateInternshipGroupHandler>> _mockLogger;
         private readonly Mock<ICacheService> _mockCacheService;
+        private readonly Mock<INotificationPushService> _mockPushService;
         private readonly UpdateInternshipGroupHandler _handler;
 
         public UpdateInternshipGroupHandlerTests()
@@ -37,13 +38,15 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockMapper = new Mock<IMapper>();
             _mockLogger = new Mock<ILogger<UpdateInternshipGroupHandler>>();
             _mockCacheService = new Mock<ICacheService>();
+            _mockPushService = new Mock<INotificationPushService>();
 
             _handler = new UpdateInternshipGroupHandler(
                 _mockUnitOfWork.Object,
                 _mockMessageService.Object,
                 _mockMapper.Object,
                 _mockLogger.Object,
-                _mockCacheService.Object);
+                _mockCacheService.Object,
+                _mockPushService.Object);
         }
 
         [Fact]

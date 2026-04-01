@@ -860,11 +860,68 @@
   <data name="InternshipGroup.NotificationProjectCleanupContent" xml:space="preserve">
     <value>{0} đã bị xóa khỏi nhóm thực tập.</value>
   </data>
+  <data name="InternshipGroup.NotificationGroupArchivedTitle" xml:space="preserve">
+    <value>Nhóm thực tập đã lưu trữ</value>
+  </data>
+  <data name="InternshipGroup.NotificationGroupArchivedContent" xml:space="preserve">
+    <value>Nhóm [{0}] đã được lưu trữ. Các dự án hiện tại vẫn được giữ nguyên nhưng bạn không thể gán dự án mới cho nhóm này.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorTitle" xml:space="preserve">
+    <value>Sinh viên rời nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorContent" xml:space="preserve">
+    <value>{0} đã bị xóa khỏi [{1}] bởi HR. Sinh viên không còn truy cập các project của nhóm.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentTitle" xml:space="preserve">
+    <value>Bạn đã bị xóa khỏi nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentContent" xml:space="preserve">
+    <value>Bạn đã được xóa khỏi [{0}]. Bạn không còn truy cập các dự án của nhóm này.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedTitle" xml:space="preserve">
+    <value>Bạn đã được chuyển nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedContent" xml:space="preserve">
+    <value>Bạn đã được chuyển sang [{0}]. Danh sách dự án đã được cập nhật.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupTitle" xml:space="preserve">
+    <value>Sinh viên đã được chuyển nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupContent" xml:space="preserve">
+    <value>{0} đã được chuyển sang nhóm khác.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupTitle" xml:space="preserve">
+    <value>Sinh viên mới vào nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupContent" xml:space="preserve">
+    <value>{0} vừa được thêm vào [{1}] và đã tự động tham gia các dự án đang Published.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldTitle" xml:space="preserve">
+    <value>Bạn không còn phụ trách nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldContent" xml:space="preserve">
+    <value>Nhóm [{0}] đã được chuyển cho mentor khác. Nhóm và các dự án liên kết sẽ không còn hiển thị trong danh sách của bạn.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewTitle" xml:space="preserve">
+    <value>Bạn được phân công phụ trách nhóm</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewContent" xml:space="preserve">
+    <value>Bạn vừa được phân công phụ trách nhóm [{0}] (thay thế {1}) và có toàn quyền chỉnh sửa các dự án liên kết.</value>
+  </data>
   <data name="InternshipGroup.LogProjectAssignmentsCleanup" xml:space="preserve">
     <value>Đã tự động gỡ {0} assignment của sinh viên {1} sau khi rời nhóm.</value>
   </data>
   <data name="InternshipGroup.LogProjectsArchived" xml:space="preserve">
     <value>Đã lưu trữ {0} dự án Draft/Published sau khi nhóm {1} bị archived.</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveNotifyFailed" xml:space="preserve">
+    <value>Lưu trữ nhóm thành công nhưng gửi thông báo cho mentor thất bại. InternshipId: {0}.</value>
+  </data>
+  <data name="InternshipGroup.LogMoveNotificationFailed" xml:space="preserve">
+    <value>Chuyển sinh viên thành công nhưng gửi thông báo thất bại. FromGroup: {0}, ToGroup: {1}.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorSwapNotificationFailed" xml:space="preserve">
+    <value>Đổi mentor thành công nhưng gửi thông báo thất bại cho nhóm {0}.</value>
   </data>
   <data name="Projects.LogOrphanized" xml:space="preserve">
     <value>Project {0} đã bị tách khỏi group (orphan) do group bị xóa.</value>
@@ -960,10 +1017,22 @@
     <value>Nhóm thực tập bị xóa</value>
   </data>
   <data name="InternshipGroups.NotificationOrphanContent" xml:space="preserve">
-    <value>Nhóm "{0}" đã bị xóa. {1} project của bạn đã được chuyển về trạng thái Draft và tách khỏi nhóm.</value>
+    <value>Nhóm [{0}] đã bị giải thể. Các dự án liên kết đã tự động về trạng thái Unstarted. Vui lòng gán nhóm mới.</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentTitle" xml:space="preserve">
+    <value>Dự án không còn khả dụng</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentContent" xml:space="preserve">
+    <value>Dự án [{0}] không còn khả dụng do nhóm thực tập của bạn đã bị giải thể.</value>
   </data>
   <data name="InternshipGroups.LogOrphanizeProjects" xml:space="preserve">
     <value>{0} project đã được tách khỏi group do group {1} bị xóa.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteStudentNotificationFailed" xml:space="preserve">
+    <value>Xóa nhóm thành công nhưng gửi thông báo cho sinh viên thất bại. InternshipId: {0}.</value>
+  </data>
+  <data name="Projects.CannotAssignArchivedGroup" xml:space="preserve">
+    <value>Không thể gán dự án cho nhóm đã lưu trữ.</value>
   </data>
   <data name="Projects.LogGetAll" xml:space="preserve">
     <value>Đang lấy danh sách tất cả dự án. Từ khóa: {0}, Trạng thái: {1}.</value>

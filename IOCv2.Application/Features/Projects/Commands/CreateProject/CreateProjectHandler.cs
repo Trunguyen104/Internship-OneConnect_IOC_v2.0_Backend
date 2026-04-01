@@ -123,7 +123,11 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound);
 
-                if (assignedGroup.Status == GroupStatus.Archived || assignedGroup.Status == GroupStatus.Finished)
+                if (assignedGroup.Status == GroupStatus.Archived)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Projects.CannotAssignArchivedGroup), ResultErrorType.BadRequest);
+
+                if (assignedGroup.Status == GroupStatus.Finished)
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
 

@@ -19,19 +19,22 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         private readonly IMapper _mapper;
         private readonly ILogger<UpdateInternshipGroupHandler> _logger;
         private readonly ICacheService _cacheService;
+        private readonly INotificationPushService _pushService;
 
         public UpdateInternshipGroupHandler(
             IUnitOfWork unitOfWork,
             IMessageService messageService,
             IMapper mapper,
             ILogger<UpdateInternshipGroupHandler> logger,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            INotificationPushService pushService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _mapper = mapper;
             _logger = logger;
             _cacheService = cacheService;
+            _pushService = pushService;
         }
 
         public async Task<Result<UpdateInternshipGroupResponse>> Handle(UpdateInternshipGroupCommand request, CancellationToken cancellationToken)
@@ -59,6 +62,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                 }
 
                 var oldMentorId = entity.MentorId;
+                string oldMentorName = string.Empty;
 
                 // Validate PhaseId
                 var phaseExists = await _unitOfWork.Repository<InternshipPhase>()
@@ -168,6 +172,91 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                         await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
                         foreach (var projectId in projectIdsInGroup)
                             await _cacheService.RemoveAsync(ProjectCacheKeys.Project(projectId), cancellationToken);
+
+                        try
+                        {
+                            var mentorIds = new[] { oldMentorId, resolvedMentorId }
+                                .Where(x => x.HasValue)
+                                .Select(x => x!.Value)
+                                .Distinct()
+                                .ToList();
+
+                            var mentorUsers = mentorIds.Any()
+                                ? await _unitOfWork.Repository<EnterpriseUser>().Query()
+                                    .Include(eu => eu.User)
+                                    .Where(eu => mentorIds.Contains(eu.EnterpriseUserId))
+                                    .ToListAsync(cancellationToken)
+                                : new List<EnterpriseUser>();
+
+                            var oldMentor = oldMentorId.HasValue
+                                ? mentorUsers.FirstOrDefault(x => x.EnterpriseUserId == oldMentorId.Value)
+                                : null;
+                            var newMentor = resolvedMentorId.HasValue
+                                ? mentorUsers.FirstOrDefault(x => x.EnterpriseUserId == resolvedMentorId.Value)
+                                : null;
+
+                            oldMentorName = oldMentor != null ? oldMentor.User.FullName : oldMentorName;
+
+                            var notifications = new List<Notification>();
+                            if (oldMentor != null)
+                            {
+                                notifications.Add(new Notification
+                                {
+                                    NotificationId = Guid.NewGuid(),
+                                    UserId = oldMentor.UserId,
+                                    Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationMentorReplacedOldTitle),
+                                    Content = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationMentorReplacedOldContent, entity.GroupName),
+                                    Type = NotificationType.General,
+                                    ReferenceType = nameof(InternshipGroup),
+                                    ReferenceId = entity.InternshipId,
+                                    IsRead = false
+                                });
+                            }
+
+                            if (newMentor != null)
+                            {
+                                notifications.Add(new Notification
+                                {
+                                    NotificationId = Guid.NewGuid(),
+                                    UserId = newMentor.UserId,
+                                    Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationMentorReplacedNewTitle),
+                                    Content = _messageService.GetMessage(
+                                        MessageKeys.InternshipGroups.NotificationMentorReplacedNewContent,
+                                        entity.GroupName,
+                                        string.IsNullOrWhiteSpace(oldMentorName) ? _messageService.GetMessage(MessageKeys.InternshipGroups.Unassigned) : oldMentorName),
+                                    Type = NotificationType.General,
+                                    ReferenceType = nameof(InternshipGroup),
+                                    ReferenceId = entity.InternshipId,
+                                    IsRead = false
+                                });
+                            }
+
+                            foreach (var notification in notifications)
+                                await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+
+                            if (notifications.Any())
+                            {
+                                await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                                foreach (var recipientUserId in notifications.Select(n => n.UserId).Distinct())
+                                {
+                                    var unreadCount = await _unitOfWork.Repository<Notification>()
+                                        .CountAsync(n => n.UserId == recipientUserId && !n.IsRead, cancellationToken);
+
+                                    await _pushService.PushNewNotificationAsync(recipientUserId, new
+                                    {
+                                        type = NotificationType.General,
+                                        referenceType = nameof(InternshipGroup),
+                                        referenceId = entity.InternshipId,
+                                        currentUnreadCount = unreadCount
+                                    }, cancellationToken);
+                                }
+                            }
+                        }
+                        catch (Exception notifyEx)
+                        {
+                            _logger.LogWarning(notifyEx, _messageService.GetMessage(MessageKeys.InternshipGroups.LogMentorSwapNotificationFailed), entity.InternshipId);
+                        }
                     }
 
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdatedSuccess), entity.InternshipId);

@@ -12,6 +12,8 @@ namespace IOCv2.Application.Features.InternshipPhases.Commands.CreateInternshipP
 public class CreateInternshipPhaseHandler
     : IRequestHandler<CreateInternshipPhaseCommand, Result<CreateInternshipPhaseResponse>>
 {
+    private const string DefaultMajorField = "Software Engineering";
+
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
@@ -108,12 +110,16 @@ public class CreateInternshipPhaseHandler
                     ResultErrorType.BadRequest);
             }
 
+            var majorFields = string.IsNullOrWhiteSpace(request.MajorFields)
+                ? DefaultMajorField
+                : request.MajorFields.Trim();
+
             var phase = InternshipPhase.Create(
                 request.EnterpriseId,
                 request.Name,
                 request.StartDate,
                 request.EndDate,
-                request.MajorFields,
+                majorFields,
                 request.Capacity,
                 request.Description);
 

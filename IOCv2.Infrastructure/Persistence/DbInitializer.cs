@@ -138,42 +138,134 @@ namespace IOCv2.Infrastructure.Persistence
         // New: seed a couple of test jobs tied to seeded enterprises (use EF entities)
         private async Task SeedJobs()
         {
-            if (await _context.Jobs.AnyAsync()) return;
+            var fptSpring = await _context.InternshipPhases
+                .FirstOrDefaultAsync(p => p.Name == "FPT Software Spring 2026");
+            var fptSummer = await _context.InternshipPhases
+                .FirstOrDefaultAsync(p => p.Name == "FPT Software Summer 2026");
+            var rikkeiSpring = await _context.InternshipPhases
+                .FirstOrDefaultAsync(p => p.Name == "Rikkeisoft Spring 2026");
 
-            // Get a valid InternshipPhaseId for each job (required by Job.Create signature)
-            var fptPhase = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.EnterpriseId == SeedIds.FptSoftwareId);
-            var rikkeiPhase = await _context.InternshipPhases.FirstOrDefaultAsync(p => p.EnterpriseId == SeedIds.RikkeisoftId);
+            if (fptSpring == null || fptSummer == null || rikkeiSpring == null)
+                return;
 
-            if (fptPhase == null || rikkeiPhase == null)
-                return; // phases not ready
+            async Task EnsureJob(
+                Guid enterpriseId,
+                Guid internshipPhaseId,
+                string title,
+                string position,
+                JobStatus status,
+                string description,
+                string requirements,
+                string benefit,
+                string location,
+                DateTime? expireDate,
+                DateTime? startDate,
+                DateTime? endDate)
+            {
+                var job = await _context.Jobs.FirstOrDefaultAsync(j => j.EnterpriseId == enterpriseId && j.Title == title);
+                if (job == null)
+                {
+                    job = Job.Create(enterpriseId, internshipPhaseId, title, description, requirements, benefit, location, expireDate);
+                    _context.Jobs.Add(job);
+                }
 
-            var job1 = Job.Create(
+                job.InternshipPhaseId = internshipPhaseId;
+                job.Title = title;
+                job.Position = position;
+                job.Status = status;
+                job.Description = description;
+                job.Requirements = requirements;
+                job.Benefit = benefit;
+                job.Location = location;
+                job.ExpireDate = expireDate;
+                job.StartDate = startDate;
+                job.EndDate = endDate;
+            }
+
+            await EnsureJob(
                 SeedIds.FptSoftwareId,
-                fptPhase.PhaseId,
-                "Junior .NET Intern",
-                "Assist backend team building APIs for the IOC v2 platform.",
-                "C#, .NET, EF Core, REST, basic SQL",
-                "Monthly stipend, mentorship, certificate",
-                "Hà Nội (Hybrid)",
-                DateTime.UtcNow.AddMonths(2)
-            );
-            job1.Position = "Backend Intern";
-            job1.Status = JobStatus.PUBLISHED;
+                fptSpring.PhaseId,
+                "FPT Backend Platform Intern",
+                "Backend Intern",
+                JobStatus.PUBLISHED,
+                "Build and maintain internship platform APIs, workflows, and reporting.",
+                "C#, ASP.NET Core, EF Core, PostgreSQL, REST",
+                "Mentorship, stipend, certificate, real product ownership",
+                "Ha Noi (Hybrid)",
+                DateTime.UtcNow.AddDays(25),
+                DateTime.UtcNow.AddDays(-20),
+                DateTime.UtcNow.AddDays(70));
 
-            var job2 = Job.Create(
+            await EnsureJob(
+                SeedIds.FptSoftwareId,
+                fptSpring.PhaseId,
+                "FPT QA Automation Intern",
+                "QA Intern",
+                JobStatus.PUBLISHED,
+                "Build API/UI automation suites and improve regression quality.",
+                "Postman, Playwright, C#, test design",
+                "Mentorship and cross-team testing exposure",
+                "Ha Noi (On-site)",
+                DateTime.UtcNow.AddDays(18),
+                DateTime.UtcNow.AddDays(-18),
+                DateTime.UtcNow.AddDays(72));
+
+            await EnsureJob(
+                SeedIds.FptSoftwareId,
+                fptSummer.PhaseId,
+                "FPT Data Engineering Intern",
+                "Data Intern",
+                JobStatus.DRAFT,
+                "Prepare ETL and analytics pipelines for internship KPI dashboards.",
+                "SQL, Python, data modeling",
+                "Stipend and technical coaching",
+                "Ha Noi",
+                DateTime.UtcNow.AddDays(55),
+                DateTime.UtcNow.AddDays(30),
+                DateTime.UtcNow.AddDays(120));
+
+            await EnsureJob(
                 SeedIds.RikkeisoftId,
-                rikkeiPhase.PhaseId,
-                "Frontend Intern (Angular)",
-                "Work on feature improvements and UI polishing for legacy CRM.",
-                "Angular, TypeScript, HTML/CSS, basic RxJS",
-                "Stipend, mentorship, certificate",
-                "Hà Nội (On-site)",
-                DateTime.UtcNow.AddMonths(2)
-            );
-            job2.Position = "Frontend Intern";
-            job2.Status = JobStatus.PUBLISHED;
+                rikkeiSpring.PhaseId,
+                "Rikkeisoft Java Backend Intern",
+                "Backend Intern",
+                JobStatus.PUBLISHED,
+                "Develop service modules for internal platforms and APIs.",
+                "Java/Spring Boot, SQL, Git",
+                "Mentorship, weekly review and stipend",
+                "Ha Noi (On-site)",
+                DateTime.UtcNow.AddDays(20),
+                DateTime.UtcNow.AddDays(-15),
+                DateTime.UtcNow.AddDays(65));
 
-            await _context.Jobs.AddRangeAsync(job1, job2);
+            await EnsureJob(
+                SeedIds.RikkeisoftId,
+                rikkeiSpring.PhaseId,
+                "Rikkeisoft Mobile Flutter Intern",
+                "Mobile Intern",
+                JobStatus.PUBLISHED,
+                "Develop and maintain Flutter modules for employee apps.",
+                "Flutter, Dart, REST API",
+                "Stipend and real mobile project experience",
+                "Ha Noi",
+                DateTime.UtcNow.AddDays(15),
+                DateTime.UtcNow.AddDays(-12),
+                DateTime.UtcNow.AddDays(66));
+
+            await EnsureJob(
+                SeedIds.RikkeisoftId,
+                rikkeiSpring.PhaseId,
+                "Rikkeisoft Product Analyst Intern",
+                "Business Analyst Intern",
+                JobStatus.CLOSED,
+                "Support requirement gathering and product process documentation.",
+                "Communication, documentation, analytical thinking",
+                "Mentorship and BA process training",
+                "Ha Noi",
+                DateTime.UtcNow.AddDays(-5),
+                DateTime.UtcNow.AddDays(-30),
+                DateTime.UtcNow.AddDays(30));
+
             await _context.SaveChangesAsync();
         }
 
@@ -711,91 +803,176 @@ namespace IOCv2.Infrastructure.Persistence
 
             await _context.SaveChangesAsync();
 
-            // Seed some applications (guarding jobs exist)
-            var fptJob = await _context.Jobs.FirstOrDefaultAsync(j => j.EnterpriseId == SeedIds.FptSoftwareId);
-            var rikkeiJob = await _context.Jobs.FirstOrDefaultAsync(j => j.EnterpriseId == SeedIds.RikkeisoftId);
+            var fptBackendJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT Backend Platform Intern");
+            var fptQaJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT QA Automation Intern");
+            var rikkeiBackendJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "Rikkeisoft Java Backend Intern");
+            var rikkeiMobileJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "Rikkeisoft Mobile Flutter Intern");
 
-            var s1 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student1@fptu.edu.vn");
-            var s2 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student2@fptu.edu.vn");
-            var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
-            var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
-            var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            if (fptBackendJob == null || fptQaJob == null || rikkeiBackendJob == null || rikkeiMobileJob == null)
+                return;
 
-            if (fptJob != null && rikkeiJob != null && s2 != null && s3 != null)
-            {
-                if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s3.StudentId && a.TermId == spring2026.TermId))
-                    _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s3.StudentId, JobId = fptJob.JobId, Status = InternshipApplicationStatus.Placed, AppliedAt = DateTime.UtcNow.AddDays(-40) });
-
-                if (!await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s2.StudentId && a.TermId == spring2026.TermId))
-                    _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s2.StudentId, JobId = rikkeiJob.JobId, Status = InternshipApplicationStatus.PendingAssignment, AppliedAt = DateTime.UtcNow.AddDays(-10) });
-            }
-
-            if (rikkeiJob != null && s4 != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == rikkeisoft.EnterpriseId && a.StudentId == s4.StudentId && a.TermId == spring2026.TermId))
-            {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = rikkeisoft.EnterpriseId, TermId = spring2026.TermId, StudentId = s4.StudentId, Status = InternshipApplicationStatus.Applied, AppliedAt = DateTime.UtcNow.AddDays(-2) });
-            }
-
-            if (fptJob != null && s2 != null && !await _context.InternshipApplications.AnyAsync(a => a.EnterpriseId == fsoft.EnterpriseId && a.StudentId == s2.StudentId))
-            {
-                _context.InternshipApplications.Add(new InternshipApplication { ApplicationId = Guid.NewGuid(), EnterpriseId = fsoft.EnterpriseId, TermId = fall2025.TermId, StudentId = s2.StudentId, Status = InternshipApplicationStatus.Rejected, RejectReason = "Not a good fit for this semester", AppliedAt = DateTime.UtcNow.AddDays(-100) });
-            }
-
-            await _context.SaveChangesAsync();
-
-            // Assign Approved/Placed applications deterministically
-            var allStudents = await _context.Students
+            var students = await _context.Students
                 .Include(s => s.User)
                 .Where(s => s.User.Email.StartsWith("student") && s.User.Email.EndsWith("@fptu.edu.vn"))
-                .ToListAsync();
+                .ToDictionaryAsync(s => s.User.Email);
 
-            var orderedStudents = allStudents
-                .OrderBy(s => int.Parse(System.Text.RegularExpressions.Regex.Match(s.User.Email, @"\d+").Value))
-                .ToList();
-
-            var fstudents = new[] { 0, 1, 2, 5, 6, 7 };
-            var rstudents = new[] { 3, 4, 8, 9 };
-
-            foreach (var idx in fstudents)
+            if (!students.TryGetValue("student1@fptu.edu.vn", out var s1) ||
+                !students.TryGetValue("student2@fptu.edu.vn", out var s2) ||
+                !students.TryGetValue("student3@fptu.edu.vn", out var s3) ||
+                !students.TryGetValue("student4@fptu.edu.vn", out var s4) ||
+                !students.TryGetValue("student5@fptu.edu.vn", out var s5) ||
+                !students.TryGetValue("student6@fptu.edu.vn", out var s6) ||
+                !students.TryGetValue("student7@fptu.edu.vn", out var s7) ||
+                !students.TryGetValue("student8@fptu.edu.vn", out var s8) ||
+                !students.TryGetValue("student9@fptu.edu.vn", out var s9) ||
+                !students.TryGetValue("student10@fptu.edu.vn", out var s10))
             {
-                if (idx >= orderedStudents.Count) continue;
-                var stu = orderedStudents[idx];
-                if (!await _context.InternshipApplications.AnyAsync(
-                    a => a.EnterpriseId == fsoft.EnterpriseId
-                      && a.TermId == spring2026!.TermId
-                      && a.StudentId == stu.StudentId))
-                {
-                    _context.InternshipApplications.Add(new InternshipApplication
-                    {
-                        ApplicationId = Guid.NewGuid(),
-                        EnterpriseId = fsoft.EnterpriseId,
-                        TermId = spring2026!.TermId,
-                        StudentId = stu.StudentId,
-                        Status = InternshipApplicationStatus.Placed,
-                        AppliedAt = DateTime.UtcNow.AddDays(-30)
-                    });
-                }
+                return;
             }
 
-            foreach (var idx in rstudents)
+            var fptUniversity = await _context.Universities.FirstOrDefaultAsync(u => u.Code == "FPTU");
+            if (fptUniversity == null)
+                return;
+
+            var hrFptEu = await _context.EnterpriseUsers
+                .Include(eu => eu.User)
+                .FirstOrDefaultAsync(eu => eu.EnterpriseId == fsoft.EnterpriseId && eu.User.Role == UserRole.HR);
+            var hrRikkeiEu = await _context.EnterpriseUsers
+                .Include(eu => eu.User)
+                .FirstOrDefaultAsync(eu => eu.EnterpriseId == rikkeisoft.EnterpriseId && eu.User.Role == UserRole.HR);
+
+            async Task EnsureApplication(
+                Guid enterpriseId,
+                Guid termId,
+                Guid studentId,
+                Guid? jobId,
+                InternshipApplicationStatus status,
+                ApplicationSource source,
+                DateTime appliedAt,
+                DateTime? reviewedAt,
+                Guid? reviewedBy,
+                Guid? universityId,
+                string? rejectReason,
+                string? cvSnapshotUrl,
+                string? jobPostingTitle,
+                bool isHiddenByStudent = false)
             {
-                if (idx >= orderedStudents.Count) continue;
-                var stu = orderedStudents[idx];
-                if (!await _context.InternshipApplications.AnyAsync(
-                    a => a.EnterpriseId == rikkeisoft.EnterpriseId
-                      && a.TermId == spring2026.TermId
-                      && a.StudentId == stu.StudentId))
+                var application = await _context.InternshipApplications.FirstOrDefaultAsync(a =>
+                    a.EnterpriseId == enterpriseId &&
+                    a.TermId == termId &&
+                    a.StudentId == studentId &&
+                    a.Source == source &&
+                    a.JobId == jobId);
+
+                if (application == null)
                 {
-                    _context.InternshipApplications.Add(new InternshipApplication
-                    {
-                        ApplicationId = Guid.NewGuid(),
-                        EnterpriseId = rikkeisoft.EnterpriseId,
-                        TermId = spring2026.TermId,
-                        StudentId = stu.StudentId,
-                        Status = InternshipApplicationStatus.Placed,
-                        AppliedAt = DateTime.UtcNow.AddDays(-25)
-                    });
+                    application = new InternshipApplication { ApplicationId = Guid.NewGuid() };
+                    _context.InternshipApplications.Add(application);
                 }
+
+                application.EnterpriseId = enterpriseId;
+                application.TermId = termId;
+                application.StudentId = studentId;
+                application.JobId = jobId;
+                application.Status = status;
+                application.Source = source;
+                application.AppliedAt = appliedAt;
+                application.ReviewedAt = reviewedAt;
+                application.ReviewedBy = reviewedBy;
+                application.UniversityId = universityId;
+                application.RejectReason = rejectReason;
+                application.CvSnapshotUrl = cvSnapshotUrl;
+                application.JobPostingTitle = jobPostingTitle;
+                application.IsHiddenByStudent = isHiddenByStudent;
             }
+
+            // FPT Spring 2026: placed from BOTH flows + returned capacity scenarios.
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s1.StudentId,
+                fptBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.SelfApply,
+                DateTime.UtcNow.AddDays(-35), DateTime.UtcNow.AddDays(-30), hrFptEu?.EnterpriseUserId,
+                null, null,
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student1_cv.pdf", fptBackendJob.Title);
+
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s2.StudentId,
+                fptQaJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
+                DateTime.UtcNow.AddDays(-26), DateTime.UtcNow.AddDays(-24), hrFptEu?.EnterpriseUserId,
+                fptUniversity.UniversityId, null,
+                null, fptQaJob.Title);
+
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s3.StudentId,
+                fptBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.SelfApply,
+                DateTime.UtcNow.AddDays(-22), DateTime.UtcNow.AddDays(-20), hrFptEu?.EnterpriseUserId,
+                null, null,
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student3_cv.pdf", fptBackendJob.Title);
+
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s6.StudentId,
+                fptQaJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
+                DateTime.UtcNow.AddDays(-16), DateTime.UtcNow.AddDays(-15), hrFptEu?.EnterpriseUserId,
+                fptUniversity.UniversityId, null,
+                null, fptQaJob.Title);
+
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s4.StudentId,
+                fptBackendJob.JobId, InternshipApplicationStatus.Rejected, ApplicationSource.SelfApply,
+                DateTime.UtcNow.AddDays(-12), DateTime.UtcNow.AddDays(-10), hrFptEu?.EnterpriseUserId,
+                null, "Không phù hợp stack backend của đợt này.",
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student4_cv.pdf", fptBackendJob.Title);
+
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s5.StudentId,
+                fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                DateTime.UtcNow.AddDays(-9), null, null,
+                fptUniversity.UniversityId, null,
+                null, fptQaJob.Title);
+
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s8.StudentId,
+                fptBackendJob.JobId, InternshipApplicationStatus.Withdrawn, ApplicationSource.SelfApply,
+                DateTime.UtcNow.AddDays(-14), DateTime.UtcNow.AddDays(-7), hrFptEu?.EnterpriseUserId,
+                null, "Sinh viên rút hồ sơ theo nguyện vọng cá nhân.",
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student8_cv.pdf", fptBackendJob.Title,
+                isHiddenByStudent: true);
+
+            await EnsureApplication(
+                fsoft.EnterpriseId, spring2026.TermId, s9.StudentId,
+                fptQaJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
+                DateTime.UtcNow.AddDays(-3), null, null,
+                null, null,
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student9_cv.pdf", fptQaJob.Title);
+
+            // Rikkeisoft Spring 2026: mix of self-apply and uni-assign placements.
+            await EnsureApplication(
+                rikkeisoft.EnterpriseId, spring2026.TermId, s7.StudentId,
+                rikkeiBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.SelfApply,
+                DateTime.UtcNow.AddDays(-18), DateTime.UtcNow.AddDays(-16), hrRikkeiEu?.EnterpriseUserId,
+                null, null,
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student7_cv.pdf", rikkeiBackendJob.Title);
+
+            await EnsureApplication(
+                rikkeisoft.EnterpriseId, spring2026.TermId, s10.StudentId,
+                rikkeiMobileJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
+                DateTime.UtcNow.AddDays(-11), DateTime.UtcNow.AddDays(-8), hrRikkeiEu?.EnterpriseUserId,
+                fptUniversity.UniversityId, null,
+                null, rikkeiMobileJob.Title);
+
+            await EnsureApplication(
+                rikkeisoft.EnterpriseId, spring2026.TermId, s2.StudentId,
+                rikkeiMobileJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                DateTime.UtcNow.AddDays(-5), null, null,
+                fptUniversity.UniversityId, null,
+                null, rikkeiMobileJob.Title);
+
+            // Historical record for old term.
+            await EnsureApplication(
+                fsoft.EnterpriseId, fall2025.TermId, s2.StudentId,
+                fptBackendJob.JobId, InternshipApplicationStatus.Rejected, ApplicationSource.SelfApply,
+                DateTime.UtcNow.AddDays(-100), DateTime.UtcNow.AddDays(-95), hrFptEu?.EnterpriseUserId,
+                null, "Not a good fit for this semester",
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student2_cv.pdf", fptBackendJob.Title);
 
             await _context.SaveChangesAsync();
         }

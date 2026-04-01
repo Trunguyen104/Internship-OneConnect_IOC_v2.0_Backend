@@ -161,7 +161,7 @@ public class GetInternshipPhaseByIdHandler(
         return await unitOfWork.Repository<InternshipPhase>().Query()
             // Basic phase info
             .Include(p => p.Enterprise)
-            // InternshipGroups → Members (for GroupCount + placed-count)
+            // InternshipGroups -> Members (for GroupCount)
             .Include(p => p.InternshipGroups)
                 .ThenInclude(g => g.Members)
             // Job Postings tab: Jobs → Applications count
@@ -189,13 +189,16 @@ public class GetInternshipPhaseByIdHandler(
         InternshipPhase phase,
         DateOnly today)
     {
-        // ── Placed-count from InternshipGroups (existing logic) ────────────────
-        var placedCount = phase.InternshipGroups
-            .Where(g => g.DeletedAt == null)
-            .SelectMany(g => g.Members)
-            .Select(m => m.StudentId)
-            .Distinct()
-            .Count();
+        // Build a canonical placed set from applications in this phase.
+        // This keeps remaining capacity in sync with both self-apply and uni-assign flows.
+        var latestPlacedApplications = phase.Jobs
+            .SelectMany(j => j.InternshipApplications
+                .Where(a => a.Status == InternshipApplicationStatus.Placed))
+            .GroupBy(a => a.StudentId)
+            .Select(g => g.OrderByDescending(a => a.ReviewedAt).First())
+            .ToList();
+
+        var placedCount = latestPlacedApplications.Count;
 
         // ── Tab: Job Postings ─────────────────────────────────────────────────
         var jobPostings = phase.Jobs
@@ -210,18 +213,12 @@ public class GetInternshipPhaseByIdHandler(
             .ToList();
 
         // ── Tab: Placed Students ──────────────────────────────────────────────
-        // Collect all Placed applications from ALL jobs in this phase,
-        // deduplicate by StudentId (a student can only be Placed once).
-        var placedStudents = phase.Jobs
-            .SelectMany(j => j.InternshipApplications
-                .Where(a => a.Status == InternshipApplicationStatus.Placed))
-            .GroupBy(a => a.StudentId)
-            .Select(g => g.OrderByDescending(a => a.ReviewedAt).First()) // latest placement entry
+        var placedStudents = latestPlacedApplications
             .Select<InternshipApplication, PhasePlacedStudentDto>(a => new PhasePlacedStudentDto
             {
                 StudentId = a.StudentId,
                 FullName = a.Student.User.FullName,
-                UniversityName = a.University.Name,
+                UniversityName = a.University?.Name ?? string.Empty,
                 Source = a.Source,
                 PlacedAt = a.ReviewedAt
             })

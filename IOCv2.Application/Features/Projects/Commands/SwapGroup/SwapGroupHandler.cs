@@ -81,7 +81,10 @@ namespace IOCv2.Application.Features.Projects.Commands.SwapGroup
             if (newGroup == null)
                 return Result<SwapGroupResponse>.NotFound(_message.GetMessage(MessageKeys.Internships.NotFound));
 
-            if (newGroup.Status == GroupStatus.Archived || newGroup.Status == GroupStatus.Finished)
+            if (newGroup.Status == GroupStatus.Archived)
+                return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.CannotAssignArchivedGroup), ResultErrorType.BadRequest);
+
+            if (newGroup.Status == GroupStatus.Finished)
                 return Result<SwapGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
 
             if (newGroup.EndDate.HasValue && newGroup.EndDate.Value.Date < DateTime.UtcNow.Date)

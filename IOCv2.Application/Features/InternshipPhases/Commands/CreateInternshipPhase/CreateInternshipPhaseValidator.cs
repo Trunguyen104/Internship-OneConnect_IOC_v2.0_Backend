@@ -34,7 +34,6 @@ public class CreateInternshipPhaseValidator : AbstractValidator<CreateInternship
             .When(x => x.StartDate != default && x.EndDate != default);
 
         RuleFor(x => x.MajorFields)
-            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MajorFieldsRequired))
             .MaximumLength(1000).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MajorFieldsMaxLength));
 
         RuleFor(x => x.Capacity)

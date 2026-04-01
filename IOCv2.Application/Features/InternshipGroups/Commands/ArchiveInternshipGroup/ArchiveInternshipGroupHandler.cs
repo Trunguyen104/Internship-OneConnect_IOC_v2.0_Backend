@@ -18,19 +18,22 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
         private readonly IMessageService _messageService;
         private readonly ILogger<ArchiveInternshipGroupHandler> _logger;
         private readonly ICacheService _cacheService;
+        private readonly INotificationPushService _pushService;
 
         public ArchiveInternshipGroupHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUserService,
             IMessageService messageService,
             ILogger<ArchiveInternshipGroupHandler> logger,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            INotificationPushService pushService)
         {
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _logger = logger;
             _cacheService = cacheService;
+            _pushService = pushService;
         }
 
         public async Task<Result<ArchiveInternshipGroupResponse>> Handle(ArchiveInternshipGroupCommand request, CancellationToken cancellationToken)
@@ -54,6 +57,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
             }
 
             var group = await _unitOfWork.Repository<InternshipGroup>().Query()
+                .Include(g => g.Mentor)
                 .FirstOrDefaultAsync(g => g.InternshipId == request.InternshipGroupId && g.DeletedAt == null, cancellationToken);
 
             if (group == null)
@@ -77,10 +81,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
 
             group.UpdateStatus(GroupStatus.Archived);
 
-            // Lấy project IDs cần archive trước để invalidate cache sau commit
-            var projectIdsToArchive = await _unitOfWork.Repository<Project>().Query()
-                .Where(p => p.InternshipId == request.InternshipGroupId
-                         && (p.Status == ProjectStatus.Draft || p.Status == ProjectStatus.Published))
+            var projectIdsInGroup = await _unitOfWork.Repository<Project>().Query()
+                .Where(p => p.InternshipId == request.InternshipGroupId)
                 .Select(p => p.ProjectId)
                 .ToListAsync(cancellationToken);
 
@@ -88,19 +90,6 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
             try
             {
                 await _unitOfWork.Repository<InternshipGroup>().UpdateAsync(group);
-
-                // Batch archive Draft/Published projects trong group này
-                var archivedCount = await _unitOfWork.Repository<Project>().ExecuteUpdateAsync(
-                    p => p.InternshipId == request.InternshipGroupId
-                         && (p.Status == ProjectStatus.Draft || p.Status == ProjectStatus.Published),
-                    s => s.SetProperty(p => p.Status, ProjectStatus.Archived)
-                          .SetProperty(p => p.UpdatedAt, DateTime.UtcNow),
-                    cancellationToken);
-
-                if (archivedCount > 0)
-                    _logger.LogInformation(
-                        _messageService.GetMessage(MessageKeys.InternshipGroups.LogProjectsArchived),
-                        archivedCount, request.InternshipGroupId);
 
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
@@ -118,8 +107,45 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternship
             await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.InternshipGroupId), cancellationToken);
             await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
             await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
-            foreach (var projectId in projectIdsToArchive)
+            foreach (var projectId in projectIdsInGroup)
                 await _cacheService.RemoveAsync(ProjectCacheKeys.Project(projectId), cancellationToken);
+
+            if (group.MentorId.HasValue && group.Mentor != null)
+            {
+                try
+                {
+                    var mentorUserId = group.Mentor.UserId;
+                    var notification = new Notification
+                    {
+                        NotificationId = Guid.NewGuid(),
+                        UserId = mentorUserId,
+                        Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationGroupArchivedTitle),
+                        Content = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationGroupArchivedContent, group.GroupName),
+                        Type = NotificationType.General,
+                        ReferenceType = nameof(InternshipGroup),
+                        ReferenceId = group.InternshipId,
+                        IsRead = false
+                    };
+
+                    await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+                    await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                    var unreadCount = await _unitOfWork.Repository<Notification>()
+                        .CountAsync(n => n.UserId == mentorUserId && !n.IsRead, cancellationToken);
+
+                    await _pushService.PushNewNotificationAsync(mentorUserId, new
+                    {
+                        type = NotificationType.General,
+                        referenceType = nameof(InternshipGroup),
+                        referenceId = group.InternshipId,
+                        currentUnreadCount = unreadCount
+                    }, cancellationToken);
+                }
+                catch (Exception notifyEx)
+                {
+                    _logger.LogWarning(notifyEx, _messageService.GetMessage(MessageKeys.InternshipGroups.LogArchiveNotifyFailed), request.InternshipGroupId);
+                }
+            }
 
             return Result<ArchiveInternshipGroupResponse>.Success(
                 new ArchiveInternshipGroupResponse { InternshipGroupId = request.InternshipGroupId },
