@@ -1,11 +1,13 @@
 ﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.Jobs;
 using IOCv2.Application.Features.Notifications.Events;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -21,22 +23,24 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
         private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<ApplyJobHandler> _logger;
         private readonly IPublisher _publisher;
-
-        // TODO: Make configurable
-        private const int ReapplyLimit = 3;
+        private readonly int _reapplyLimit;
 
         public ApplyJobHandler(
             IUnitOfWork unitOfWork,
             IMessageService messageService,
             ICurrentUserService currentUserService,
             ILogger<ApplyJobHandler> logger,
-            IPublisher publisher)
+            IPublisher publisher,
+            IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _currentUserService = currentUserService;
             _logger = logger;
             _publisher = publisher;
+
+            // Read re-apply limit from configuration. Fallback to 3 if not configured or invalid.
+            _reapplyLimit = configuration.GetValue<int?>("JobPosting:ReapplyLimit") ?? 3;
         }
 
         public async Task<Result<ApplyJobResponse>> Handle(ApplyJobCommand request, CancellationToken cancellationToken)
@@ -118,13 +122,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
             }
 
             // 8. Check for any active application for this student (global)
-            var activeStatuses = new[]
-            {
-                InternshipApplicationStatus.Applied,
-                InternshipApplicationStatus.Interviewing,
-                InternshipApplicationStatus.Offered,
-                InternshipApplicationStatus.PendingAssignment
-            };
+
+            var activeStatuses = JobsPostingParam.UpdateJobPosting.ActiveStatuses;
 
             var hasActiveApp = await _unitOfWork.Repository<InternshipApplication>()
                 .Query()
@@ -138,15 +137,19 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
             }
 
             // 9. Re-apply limit: count previous applications for same job in same phase
+            // Note: The AC requires "lần đầu apply + re-apply after Withdrawn or Rejected".
+            // We count existing application records for the student/job/term. Active statuses were blocked above,
+            // so this effectively limits total attempts across Withdrawn/Rejected/other past statuses.
             var reapplyCount = await _unitOfWork.Repository<InternshipApplication>()
                 .Query()
                 .AsNoTracking()
                 .CountAsync(a => a.StudentId == student.StudentId && a.JobId == job.JobId && a.TermId == currentPhase.PhaseId, cancellationToken);
 
-            if (reapplyCount >= ReapplyLimit)
+            if (reapplyCount >= _reapplyLimit)
             {
-                _logger.LogInformation("Student {StudentId} reached reapply limit ({Limit}) for job {JobId}", student.StudentId, ReapplyLimit, job.JobId);
-                return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ApplicationLimitReached), ResultErrorType.BadRequest);
+                _logger.LogInformation("Student {StudentId} reached reapply limit ({Limit}) for job {JobId}", student.StudentId, _reapplyLimit, job.JobId);
+                // Pass configured limit to message service so UI can display the value if resource supports formatting.
+                return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.ApplicationLimitReached, _reapplyLimit), ResultErrorType.BadRequest);
             }
 
             // 10. Create application

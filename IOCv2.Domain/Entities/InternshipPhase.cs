@@ -17,6 +17,7 @@ namespace IOCv2.Domain.Entities
         public virtual Enterprise? Enterprise { get; set; }
         public virtual ICollection<InternshipGroup> InternshipGroups { get; set; } = new List<InternshipGroup>();
         public virtual ICollection<EvaluationCycle> EvaluationCycles { get; set; } = new List<EvaluationCycle>();
+        public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 
         // Valid status transitions
         private static readonly Dictionary<InternshipPhaseStatus, InternshipPhaseStatus[]> _allowedTransitions = new()

@@ -981,14 +981,54 @@
   <data name="JobPosting.InternshipInProgress" xml:space="preserve">
     <value>You are currently doing an internship.</value>
   </data>
+  <data name="InternshipPhase.InternshipPhaseIdRequired" xml:space="preserve">
+    <value>Internship Phase ID is required.</value>
+  </data>
+  <data name="JobPosting.UpdateNotifyStudentSubject" xml:space="preserve">
+    <value>Job Posting Updated</value>
+  </data>
+  <data name="JobPosting.UpdateNotifyStudentBody" xml:space="preserve">
+    <value>Job Posting [{0}] at {1} has been updated. Please review the job posting details.</value>
+  </data>
+  <data name="JobPosting.InvalidStatus" xml:space="preserve">
+    <value>Job posting status is invalid.</value>
+  </data>
+  <data name="JobPosting.ChangeInternPhaseBlockedDueToActiveApplications" xml:space="preserve">
+    <value>The post currently has {0} candidates. It's not possible to change the Intern Phase while candidates are being processed. Please close the post and process the candidates first.</value>
+  </data>
+  <data name="JobPosting.InvalidStatusForReopen" xml:space="preserve">
+    <value>Invalid job posting status for reopen operation.</value>
+  </data>
+  <data name="JobPosting.ExpireDateMustBeFuture" xml:space="preserve">
+    <value>Expiration date must be a future date.</value>
+  </data>
+  <data name="JobPosting.ExpireDateExceedsPhaseEndDate" xml:space="preserve">
+    <value>Expiration date cannot exceed the internship phase end date.</value>
+  </data>
+  <data name="JobPosting.ReopenJobPostingSuccessNotificationMessage" xml:space="preserve">
+    <value>Job posting has been successfully reopened.</value>
+  </data>
+  <data name="JobPosting.QuantityCannotBeLessThanPlaced" xml:space="preserve">
+    <value>Quantity cannot be less than the number of candidates already placed.</value>
+  </data>
+  <data name="JobPosting.DraftNoApplications" xml:space="preserve">
+    <value>Draft job must not have applications.</value>
+  </data>
+  <data name="JobPosting.JobPlacedMaxed" xml:space="preserve">
+    <value>Internship period {0} is full ([{1}]/[{2}] students have been booked). You can close job postings during this period if you do not wish to receive more applications.
+</value>
+  </data>
+  <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
+    <value>Only allow selecting phases that are Open (Upcoming) or InProgress (Active)</value>
+  </data>
   <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
     <value>The internship phase has reached its maximum capacity.</value>
   </data>
   <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
-    <value>The application is not in the Placed status.</value>
+    <value>The application is not in Placed status.</value>
   </data>
   <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
-    <value>HR has removed the student from the Placed list (ApplicationId: {0}, ByUserId: {1}).</value>
+    <value>HR removed student from Placed list (ApplicationId: {0}, ByUserId: {1}).</value>
   </data>
   <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
     <value>Dear student, enterprise {EnterpriseName} has removed you from their internship acceptance list.</value>

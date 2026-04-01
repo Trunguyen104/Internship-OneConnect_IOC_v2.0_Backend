@@ -1,7 +1,6 @@
 using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 
 namespace IOCv2.Infrastructure.Persistence.Configurations
@@ -29,8 +28,18 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                .OnDelete(DeleteBehavior.Cascade)
                .HasConstraintName("fk_jobs_enterprises_enterprise_id");
 
-        // Fields
-        builder.Property(j => j.Title)
+        builder.Property(j => j.InternshipPhaseId)
+               .HasColumnName("internship_phase_id")
+               .IsRequired();
+
+        builder.HasOne(j => j.InternshipPhase)
+               .WithMany(p => p.Jobs)
+               .HasForeignKey(j => j.InternshipPhaseId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
+
+            // Fields
+            builder.Property(j => j.Title)
                .HasColumnName("title")
                .HasMaxLength(255)
                .IsRequired(false);
@@ -58,10 +67,6 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
         builder.Property(j => j.Benefit)
                .HasColumnName("benefit")
                .HasColumnType("text")
-               .IsRequired(false);
-
-        builder.Property(j => j.Quantity)
-               .HasColumnName("quantity")
                .IsRequired(false);
 
         builder.Property(j => j.ExpireDate)

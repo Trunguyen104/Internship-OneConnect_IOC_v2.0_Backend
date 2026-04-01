@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Persistence.Migrations
+namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddinternshipPhaseToJobPosting : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -123,41 +123,6 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         principalTable: "enterprises",
                         principalColumn: "enterprise_id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "jobs",
-                columns: table => new
-                {
-                    job_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    enterprise_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    position = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    description = table.Column<string>(type: "text", nullable: true),
-                    requirements = table.Column<string>(type: "text", nullable: true),
-                    location = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    benefit = table.Column<string>(type: "text", nullable: true),
-                    quantity = table.Column<int>(type: "integer", nullable: true),
-                    expire_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    status = table.Column<short>(type: "smallint", nullable: true),
-                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    audience = table.Column<short>(type: "smallint", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_jobs", x => x.job_id);
-                    table.ForeignKey(
-                        name: "fk_jobs_enterprises_enterprise_id",
-                        column: x => x.enterprise_id,
-                        principalTable: "enterprises",
-                        principalColumn: "enterprise_id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -425,26 +390,44 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "job_universities",
+                name: "jobs",
                 columns: table => new
                 {
                     job_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    uni_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    enterprise_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    internship_phase_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    position = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    requirements = table.Column<string>(type: "text", nullable: true),
+                    location = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    benefit = table.Column<string>(type: "text", nullable: true),
+                    quantity = table.Column<int>(type: "integer", nullable: true),
+                    expire_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    status = table.Column<short>(type: "smallint", nullable: true),
+                    start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    audience = table.Column<short>(type: "smallint", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_job_universities", x => new { x.job_id, x.uni_id });
+                    table.PrimaryKey("pk_jobs", x => x.job_id);
                     table.ForeignKey(
-                        name: "fk_job_universities_job_id",
-                        column: x => x.job_id,
-                        principalTable: "jobs",
-                        principalColumn: "job_id",
+                        name: "fk_jobs_enterprises_enterprise_id",
+                        column: x => x.enterprise_id,
+                        principalTable: "enterprises",
+                        principalColumn: "enterprise_id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "fk_job_universities_university_id",
-                        column: x => x.uni_id,
-                        principalTable: "universities",
-                        principalColumn: "uni_id",
+                        name: "fk_jobs_internship_phases_internship_phase_id",
+                        column: x => x.internship_phase_id,
+                        principalTable: "internship_phases",
+                        principalColumn: "phase_id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -558,6 +541,30 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         column: x => x.cycle_id,
                         principalTable: "evaluation_cycles",
                         principalColumn: "cycle_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "job_universities",
+                columns: table => new
+                {
+                    job_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    uni_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_job_universities", x => new { x.job_id, x.uni_id });
+                    table.ForeignKey(
+                        name: "fk_job_universities_job_id",
+                        column: x => x.job_id,
+                        principalTable: "jobs",
+                        principalColumn: "job_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_job_universities_university_id",
+                        column: x => x.uni_id,
+                        principalTable: "universities",
+                        principalColumn: "uni_id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -1302,6 +1309,11 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                 name: "ix_jobs_enterprise_id",
                 table: "jobs",
                 column: "enterprise_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_jobs_internship_phase_id",
+                table: "jobs",
+                column: "internship_phase_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_jobs_status",

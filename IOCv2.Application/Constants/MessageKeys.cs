@@ -930,6 +930,7 @@ namespace IOCv2.Application.Constants
             public const string AudienceRequired = "JobPosting.AudienceRequired";
             public const string UniversityRequiredForTargetAudience = "JobPosting.UniversityRequiredForTargetAudience";
             public const string NotAllowed = "JobPosting.NotAllowed";
+            public const string InvalidStatus = "JobPosting.InvalidStatus";
             //Apply job
             public const string CvRequired = "JobPosting.CvRequired";
             public const string AlreadyPlaced = "JobPosting.AlreadyPlaced";
@@ -943,6 +944,7 @@ namespace IOCv2.Application.Constants
             public const string DraftSavedSuccess = "JobPosting.DraftSavedSuccess";
             // Create Job
             public const string CreateSuccess = "JobPosting.CreateSuccess";
+            public const string InternshipPhaseStatusAllowed = "JobPosting.InternshipPhaseStatusAllowed";
             // Delete
             public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
             public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";
@@ -962,6 +964,11 @@ namespace IOCv2.Application.Constants
             public const string ReopenNotifyStudentSubject = "JobPosting.ReopenNotifyStudentSubject";
             public const string ReopenNotifyStudentBody = "JobPosting.ReopenNotifyStudentBody";
             public const string ReopenSuccess = "JobPosting.ReopenSuccess";
+            public const string UpdateNotifyStudentSubject = "JobPosting.UpdateNotifyStudentSubject";
+            public const string UpdateNotifyStudentBody = "JobPosting.UpdateNotifyStudentBody";
+            public const string ChangeInternPhaseBlockedDueToActiveApplications = "JobPosting.ChangeInternPhaseBlockedDueToActiveApplications";
+            public const string QuantityCannotBeLessThanPlaced = "JobPosting.QuantityCannotBeLessThanPlaced";
+            public const string DraftNoApplications = "JobPosting.DraftNoApplications";
             // Apply Job
             public const string UploadCVRequired = "JobPosting.UploadCVRequired";
             public const string CannotApplyWhenPlaced = "JobPosting.CannotApplyWhenPlaced";
@@ -974,6 +981,12 @@ namespace IOCv2.Application.Constants
             public const string ApplySuccessPendingHR = "JobPosting.ApplySuccessPendingHR";
             // Get Jobs
             public const string InternshipInProgress = "JobPosting.InternshipInProgress";
+            public const string JobPlacedMaxed = "JobPosting.JobPlacedMaxed";
+            // Reopen Job
+            public const string InvalidStatusForReopen = "JobPosting.InvalidStatusForReopen";
+            public const string ExpireDateMustBeFuture = "JobPosting.ExpireDateMustBeFuture";
+            public const string ExpireDateExceedsPhaseEndDate = "JobPosting.ExpireDateExceedsPhaseEndDate";
+            public const string ReopenJobPostingSuccessNotificationMessage = "JobPosting.ReopenJobPostingSuccessNotificationMessage";
         }
         public static class InternshipPhase
         {
@@ -991,6 +1004,7 @@ namespace IOCv2.Application.Constants
             public const string DescriptionMaxLength = "InternshipPhase.DescriptionMaxLength";
             public const string PageNumberMinValue = "InternshipPhase.PageNumberMinValue";
             public const string PageSizeRange = "InternshipPhase.PageSizeRange";
+            public const string InternshipPhaseIdRequired = "InternshipPhase.InternshipPhaseIdRequired";
 
             // Business errors
             public const string NotFound = "InternshipPhase.NotFound";
