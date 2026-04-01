@@ -930,6 +930,7 @@ namespace IOCv2.Application.Constants
             public const string AudienceRequired = "JobPosting.AudienceRequired";
             public const string UniversityRequiredForTargetAudience = "JobPosting.UniversityRequiredForTargetAudience";
             public const string NotAllowed = "JobPosting.NotAllowed";
+            public const string InvalidStatus = "JobPosting.InvalidStatus";
             //Apply job
             public const string CvRequired = "JobPosting.CvRequired";
             public const string AlreadyPlaced = "JobPosting.AlreadyPlaced";
@@ -943,6 +944,7 @@ namespace IOCv2.Application.Constants
             public const string DraftSavedSuccess = "JobPosting.DraftSavedSuccess";
             // Create Job
             public const string CreateSuccess = "JobPosting.CreateSuccess";
+            public const string InternshipPhaseStatusAllowed = "JobPosting.InternshipPhaseStatusAllowed";
             // Delete
             public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
             public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";
@@ -962,6 +964,29 @@ namespace IOCv2.Application.Constants
             public const string ReopenNotifyStudentSubject = "JobPosting.ReopenNotifyStudentSubject";
             public const string ReopenNotifyStudentBody = "JobPosting.ReopenNotifyStudentBody";
             public const string ReopenSuccess = "JobPosting.ReopenSuccess";
+            public const string UpdateNotifyStudentSubject = "JobPosting.UpdateNotifyStudentSubject";
+            public const string UpdateNotifyStudentBody = "JobPosting.UpdateNotifyStudentBody";
+            public const string ChangeInternPhaseBlockedDueToActiveApplications = "JobPosting.ChangeInternPhaseBlockedDueToActiveApplications";
+            public const string QuantityCannotBeLessThanPlaced = "JobPosting.QuantityCannotBeLessThanPlaced";
+            public const string DraftNoApplications = "JobPosting.DraftNoApplications";
+            // Apply Job
+            public const string UploadCVRequired = "JobPosting.UploadCVRequired";
+            public const string CannotApplyWhenPlaced = "JobPosting.CannotApplyWhenPlaced";
+            public const string PositionNotOpenForApplication = "JobPosting.PositionNotOpenForApplication";
+            public const string ApplicationDeadlinePassed = "JobPosting.ApplicationDeadlinePassed";
+            public const string NoActiveInternshipPeriod = "JobPosting.NoActiveInternshipPeriod";
+            public const string AlreadyHaveActiveApplication = "JobPosting.AlreadyHaveActiveApplication";
+            public const string ApplicationLimitReached = "JobPosting.ApplicationLimitReached";
+            public const string StudentAppliedToEnterpriseJob = "JobPosting.StudentAppliedToEnterpriseJob";
+            public const string ApplySuccessPendingHR = "JobPosting.ApplySuccessPendingHR";
+            // Get Jobs
+            public const string InternshipInProgress = "JobPosting.InternshipInProgress";
+            public const string JobPlacedMaxed = "JobPosting.JobPlacedMaxed";
+            // Reopen Job
+            public const string InvalidStatusForReopen = "JobPosting.InvalidStatusForReopen";
+            public const string ExpireDateMustBeFuture = "JobPosting.ExpireDateMustBeFuture";
+            public const string ExpireDateExceedsPhaseEndDate = "JobPosting.ExpireDateExceedsPhaseEndDate";
+            public const string ReopenJobPostingSuccessNotificationMessage = "JobPosting.ReopenJobPostingSuccessNotificationMessage";
         }
         public static class InternshipPhase
         {
@@ -979,6 +1004,7 @@ namespace IOCv2.Application.Constants
             public const string DescriptionMaxLength = "InternshipPhase.DescriptionMaxLength";
             public const string PageNumberMinValue = "InternshipPhase.PageNumberMinValue";
             public const string PageSizeRange = "InternshipPhase.PageSizeRange";
+            public const string InternshipPhaseIdRequired = "InternshipPhase.InternshipPhaseIdRequired";
 
             // Business errors
             public const string NotFound = "InternshipPhase.NotFound";
@@ -1069,7 +1095,6 @@ namespace IOCv2.Application.Constants
             public const string RejectReasonMaxLength = "HRApplications.RejectReasonMaxLength";
             public const string RejectReasonMinLength = "HRApplications.RejectReasonMinLength";
 
-            // Business errors
             public const string NotFound = "HRApplications.NotFound";
             public const string EnterpriseUserNotFound = "HRApplications.EnterpriseUserNotFound";
             public const string InvalidTransition = "HRApplications.InvalidTransition";
@@ -1077,6 +1102,8 @@ namespace IOCv2.Application.Constants
             public const string NotSelfApplyApplication = "HRApplications.NotSelfApplyApplication";
             public const string NotUniAssignApplication = "HRApplications.NotUniAssignApplication";
             public const string ApplicationNotActive = "HRApplications.ApplicationNotActive";
+            public const string ApplicationNotPlaced = "HRApplications.ApplicationNotPlaced";
+            public const string InternPhaseAtCapacity = "HRApplications.InternPhaseAtCapacity";
 
             // Notification message templates
             public const string NotifyInterviewing = "HRApplications.Notify.Interviewing";
@@ -1097,6 +1124,7 @@ namespace IOCv2.Application.Constants
             public const string LogReject = "HRApplications.Log.Reject";
             public const string LogApproveUniAssign = "HRApplications.Log.ApproveUniAssign";
             public const string LogRejectUniAssign = "HRApplications.Log.RejectUniAssign";
+            public const string LogRemovePlacedUniAssign = "HRApplications.Log.RemovePlacedUniAssign";
             public const string LogCascadeWithdraw = "HRApplications.Log.CascadeWithdraw";
             public const string LogInvalidUserId = "HRApplications.Log.InvalidUserId";
         }
@@ -1116,6 +1144,10 @@ namespace IOCv2.Application.Constants
 
             // Notify HR (AC-07)
             public const string NotifyHRWithdrawn = "StudentApplications.Notify.HR.Withdrawn";
+
+            // Notify SV + Uni Admin when HR removes a Placed student (AC-C05)
+            public const string NotifyStudentRemovedPlaced = "StudentApplications.Notify.Student.RemovedPlaced";
+            public const string NotifyUniAdminRemovedPlaced = "StudentApplications.Notify.UniAdmin.RemovedPlaced";
         }
     }
 }

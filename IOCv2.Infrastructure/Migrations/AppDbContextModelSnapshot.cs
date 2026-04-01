@@ -3,20 +3,17 @@ using System;
 using IOCv2.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Persistence.Migrations
+namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260329122330_InitialCreate")]
-    partial class InitialCreate
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -958,6 +955,10 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expire_date");
 
+                    b.Property<Guid>("InternshipPhaseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_phase_id");
+
                     b.Property<string>("Location")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -967,10 +968,6 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("position");
-
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("quantity");
 
                     b.Property<string>("Requirements")
                         .HasColumnType("text")
@@ -1002,6 +999,9 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("EnterpriseId")
                         .HasDatabaseName("ix_jobs_enterprise_id");
+
+                    b.HasIndex("InternshipPhaseId")
+                        .HasDatabaseName("ix_jobs_internship_phase_id");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_jobs_status");
@@ -2699,7 +2699,16 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_jobs_enterprises_enterprise_id");
 
+                    b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternshipPhase")
+                        .WithMany("Jobs")
+                        .HasForeignKey("InternshipPhaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
+
                     b.Navigation("Enterprise");
+
+                    b.Navigation("InternshipPhase");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
@@ -3062,6 +3071,8 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.Navigation("EvaluationCycles");
 
                     b.Navigation("InternshipGroups");
+
+                    b.Navigation("Jobs");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>

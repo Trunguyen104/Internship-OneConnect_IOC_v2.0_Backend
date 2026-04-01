@@ -72,11 +72,12 @@ public class WithdrawApplicationHandler
         student.InternshipStatus = StudentStatus.Unplaced;
 
         // Log status history
+        var previousStatus = application.Status;
         await _unitOfWork.Repository<ApplicationStatusHistory>().AddAsync(new ApplicationStatusHistory
         {
             HistoryId = Guid.NewGuid(),
             ApplicationId = application.ApplicationId,
-            FromStatus = InternshipApplicationStatus.Applied,
+            FromStatus = previousStatus,
             ToStatus = InternshipApplicationStatus.Withdrawn,
             TriggerSource = "Student",
             ChangedByName = application.Student.User.FullName,
@@ -86,7 +87,7 @@ public class WithdrawApplicationHandler
 
         await _unitOfWork.SaveChangeAsync(cancellationToken);
 
-        // Notify HR (AC-07)
+        // Notify HR (AC-02)
         var studentName = application.Student.User.FullName;
         var jobTitle = application.Job?.Title ?? "(chưa rõ vị trí)";
         await _publisher.Publish(new ApplicationWithdrawnByStudentEvent(

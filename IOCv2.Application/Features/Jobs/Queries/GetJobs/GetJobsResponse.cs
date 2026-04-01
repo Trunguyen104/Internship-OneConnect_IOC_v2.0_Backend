@@ -16,9 +16,6 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
         public string? CompanyLogoUrl { get; set; }
         public DateTime? ExpireDate { get; set; }
 
-        // Quantity to hire (Số lượng tuyển)
-        public int? Quantity { get; set; }
-
         // Number of applications for this job (Số application)
         public int ApplicationCount { get; set; }
 
@@ -35,8 +32,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
             profile.CreateMap<Job, GetJobsResponse>()
                 .ForMember(d => d.CompanyName, opt => opt.MapFrom(s => s.Enterprise.Name))
                 .ForMember(d => d.CompanyLogoUrl, opt => opt.MapFrom(s => s.Enterprise.LogoUrl))
-                .ForMember(d => d.Status, opt => opt.MapFrom(s => (short)s.Status))
-                .ForMember(d => d.Quantity, opt => opt.MapFrom(s => s.Quantity))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => (short)(s.Status ?? JobStatus.DRAFT)))
                 .ForMember(d => d.ApplicationCount, opt => opt.MapFrom(s => s.InternshipApplications.Count))
                 // Map an enterprise active term name (first open term) if present
                 .ForMember(d => d.TermName, opt => opt.MapFrom(s =>
