@@ -1062,4 +1062,40 @@
   <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
     <value>Sinh viên {StudentName} đã bị doanh nghiệp {EnterpriseName} xóa khỏi danh sách tiếp nhận thực tập.</value>
   </data>
+  <data name="StudentApplications.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đơn ứng tuyển.</value>
+  </data>
+  <data name="StudentApplications.NotOwner" xml:space="preserve">
+    <value>Bạn không có quyền thao tác trên đơn ứng tuyển này.</value>
+  </data>
+  <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
+    <value>Chỉ có thể rút đơn khi ở trạng thái Đã nộp (Applied).</value>
+  </data>
+  <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
+    <value>Không thể ẩn đơn đã được nhận thực tập (Placed).</value>
+  </data>
+  <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
+    <value>Chỉ có thể ẩn đơn đã kết thúc (Rejected hoặc Withdrawn).</value>
+  </data>
+  <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
+    <value>Đã rút đơn thành công.</value>
+  </data>
+  <data name="StudentApplications.HideSuccess" xml:space="preserve">
+    <value>Đã ẩn khỏi danh sách.</value>
+  </data>
+  <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
+    <value>{StudentName} đã rút đơn ứng tuyển vị trí {JobTitle}.</value>
+  </data>
+  <data name="Validation.IdRequired" xml:space="preserve">
+    <value>Yêu cầu cung cấp Application ID.</value>
+  </data>
+  <data name="Validation.PageNumberInvalid" xml:space="preserve">
+    <value>PageNumber phải lớn hơn hoặc bằng 1.</value>
+  </data>
+  <data name="Validation.PageSizeInvalid" xml:space="preserve">
+    <value>PageSize phải lớn hơn hoặc bằng 1.</value>
+  </data>
+  <data name="Validation.InvalidStatus" xml:space="preserve">
+    <value>Status không hợp lệ.</value>
+  </data>
 </root>
