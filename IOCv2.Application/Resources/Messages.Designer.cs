@@ -319,7 +319,65 @@ namespace IOCv2.Application.Resources {
                 return ResourceManager.GetString("InternshipGroup.LateLogbookSubmission", resourceCulture);
             }
         }
-        
+
+        internal static string InternshipGroup_AssignMentorSuccess {
+            get { return ResourceManager.GetString("InternshipGroup.AssignMentorSuccess", resourceCulture); }
+        }
+        internal static string InternshipGroup_AssignMentorGroupNotFound {
+            get { return ResourceManager.GetString("InternshipGroup.AssignMentorGroupNotFound", resourceCulture); }
+        }
+        internal static string InternshipGroup_AssignMentorGroupNotActive {
+            get { return ResourceManager.GetString("InternshipGroup.AssignMentorGroupNotActive", resourceCulture); }
+        }
+        internal static string InternshipGroup_AssignMentorGroupIdRequired {
+            get { return ResourceManager.GetString("InternshipGroup.AssignMentorGroupIdRequired", resourceCulture); }
+        }
+        internal static string InternshipGroup_AssignMentorMentorRequired {
+            get { return ResourceManager.GetString("InternshipGroup.AssignMentorMentorRequired", resourceCulture); }
+        }
+        internal static string InternshipGroup_AssignMentorSameMentor {
+            get { return ResourceManager.GetString("InternshipGroup.AssignMentorSameMentor", resourceCulture); }
+        }
+        internal static string InternshipGroup_Log_AssignMentorSuccess {
+            get { return ResourceManager.GetString("InternshipGroup.Log.AssignMentorSuccess", resourceCulture); }
+        }
+        internal static string InternshipGroup_Log_AssignMentorFailed {
+            get { return ResourceManager.GetString("InternshipGroup.Log.AssignMentorFailed", resourceCulture); }
+        }
+        internal static string InternshipGroup_Log_AssignMentorNotifyFailed {
+            get { return ResourceManager.GetString("InternshipGroup.Log.AssignMentorNotifyFailed", resourceCulture); }
+        }
+        internal static string InternshipGroup_Log_AssignMentorSameMentor {
+            get { return ResourceManager.GetString("InternshipGroup.Log.AssignMentorSameMentor", resourceCulture); }
+        }
+        internal static string InternshipGroup_AvailableMentorsRetrieved {
+            get { return ResourceManager.GetString("InternshipGroup.AvailableMentorsRetrieved", resourceCulture); }
+        }
+        internal static string InternshipGroup_Log_GetAvailableMentors {
+            get { return ResourceManager.GetString("InternshipGroup.Log.GetAvailableMentors", resourceCulture); }
+        }
+        internal static string InternshipGroup_Log_GetAvailableMentorsAccessDenied {
+            get { return ResourceManager.GetString("InternshipGroup.Log.GetAvailableMentorsAccessDenied", resourceCulture); }
+        }
+        internal static string InternshipGroup_NotificationMentorAssignedFirstTitle {
+            get { return ResourceManager.GetString("InternshipGroup.NotificationMentorAssignedFirstTitle", resourceCulture); }
+        }
+        internal static string InternshipGroup_NotificationMentorAssignedFirstContent {
+            get { return ResourceManager.GetString("InternshipGroup.NotificationMentorAssignedFirstContent", resourceCulture); }
+        }
+        internal static string InternshipGroup_NotificationStudentMentorAssignedTitle {
+            get { return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorAssignedTitle", resourceCulture); }
+        }
+        internal static string InternshipGroup_NotificationStudentMentorAssignedContent {
+            get { return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorAssignedContent", resourceCulture); }
+        }
+        internal static string InternshipGroup_NotificationStudentMentorChangedTitle {
+            get { return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorChangedTitle", resourceCulture); }
+        }
+        internal static string InternshipGroup_NotificationStudentMentorChangedContent {
+            get { return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorChangedContent", resourceCulture); }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Đã thêm thành công {Count} sinh viên vào nhóm: {InternshipId}.
         /// </summary>

@@ -1082,6 +1082,63 @@
   <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
     <value>Nộp nhật ký thực tập trễ</value>
   </data>
+  <data name="InternshipGroup.AssignMentorSuccess" xml:space="preserve">
+    <value>Gán Mentor thành công.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotActive" xml:space="preserve">
+    <value>Chỉ có thể gán Mentor cho nhóm đang hoạt động.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupIdRequired" xml:space="preserve">
+    <value>Mã nhóm thực tập không được để trống.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorMentorRequired" xml:space="preserve">
+    <value>Vui lòng chọn Mentor để gán cho nhóm.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSameMentor" xml:space="preserve">
+    <value>Mentor này đã đang phụ trách nhóm thực tập, không thể gán trùng.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Gán Mentor {MentorName} cho nhóm {GroupId} thành công.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorFailed" xml:space="preserve">
+    <value>Gán Mentor cho nhóm {GroupId} thất bại do lỗi hệ thống.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorNotifyFailed" xml:space="preserve">
+    <value>Gửi thông báo sau khi gán Mentor cho nhóm {GroupId} thất bại, tiếp tục xử lý.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSameMentor" xml:space="preserve">
+    <value>AssignMentor: Mentor {MentorUserId} đã là người hướng dẫn hiện tại của nhóm {GroupId}, bỏ qua thao tác.</value>
+  </data>
+  <data name="InternshipGroup.AvailableMentorsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách Mentor khả dụng thành công.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentors" xml:space="preserve">
+    <value>GetAvailableMentors: trả về {Count} Mentor khả dụng cho nhóm {GroupId}.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentorsAccessDenied" xml:space="preserve">
+    <value>GetAvailableMentors: Người dùng {UserId} không thuộc doanh nghiệp của nhóm {GroupId}, từ chối truy cập.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstTitle" xml:space="preserve">
+    <value>Bạn được phân công phụ trách nhóm mới</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstContent" xml:space="preserve">
+    <value>Bạn được phân công phụ trách nhóm {0} ({1} sinh viên). Kỳ thực tập: {2} → {3}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedTitle" xml:space="preserve">
+    <value>Nhóm của bạn vừa có Mentor</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedContent" xml:space="preserve">
+    <value>Nhóm {0} của bạn vừa có Mentor mới: {1}. Liên hệ: {2}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedTitle" xml:space="preserve">
+    <value>Mentor nhóm bạn vừa được thay đổi</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedContent" xml:space="preserve">
+    <value>Mentor của nhóm {0} vừa được thay đổi. Mentor mới: {1}. Liên hệ: {2}.</value>
+  </data>
   <data name="Profile.LogUpdateStart" xml:space="preserve">
     <value>[START] UpdateMyProfile cho User: {UserId}</value>
   </data>

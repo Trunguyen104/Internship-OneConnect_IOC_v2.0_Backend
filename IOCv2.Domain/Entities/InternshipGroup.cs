@@ -101,5 +101,15 @@ namespace IOCv2.Domain.Entities
         {
             Status = status;
         }
+
+        /// <summary>
+        /// Chỉ thay đổi MentorId. Dùng cho quick-action assign/change mentor.
+        /// Không thay đổi các trường khác của group.
+        /// </summary>
+        public void AssignMentor(Guid? newMentorEnterpriseUserId)
+        {
+            MentorId = newMentorEnterpriseUserId;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 }

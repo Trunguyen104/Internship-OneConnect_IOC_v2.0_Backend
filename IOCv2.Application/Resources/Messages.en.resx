@@ -996,6 +996,63 @@
   <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
     <value>Late logbook submission</value>
   </data>
+  <data name="InternshipGroup.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotFound" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotActive" xml:space="preserve">
+    <value>Can only assign mentor to active groups.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupIdRequired" xml:space="preserve">
+    <value>Internship group ID must not be empty.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorMentorRequired" xml:space="preserve">
+    <value>Please select a mentor to assign.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSameMentor" xml:space="preserve">
+    <value>This mentor is already assigned to the group and cannot be assigned again.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor {MentorName} assigned to group {GroupId} successfully.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorFailed" xml:space="preserve">
+    <value>Failed to assign mentor to group {GroupId} due to a system error.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorNotifyFailed" xml:space="preserve">
+    <value>Failed to send notifications after mentor assignment for group {GroupId}, continuing.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSameMentor" xml:space="preserve">
+    <value>AssignMentor: Mentor {MentorUserId} is already the current mentor of group {GroupId}, skipping.</value>
+  </data>
+  <data name="InternshipGroup.AvailableMentorsRetrieved" xml:space="preserve">
+    <value>Available mentors retrieved successfully.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentors" xml:space="preserve">
+    <value>GetAvailableMentors: returned {Count} available mentor(s) for group {GroupId}.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentorsAccessDenied" xml:space="preserve">
+    <value>GetAvailableMentors: User {UserId} does not belong to the enterprise of group {GroupId}, access denied.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstTitle" xml:space="preserve">
+    <value>You have been assigned a new group</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstContent" xml:space="preserve">
+    <value>You have been assigned to mentor group {0} ({1} students). Internship period: {2} → {3}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedTitle" xml:space="preserve">
+    <value>Your group now has a mentor</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedContent" xml:space="preserve">
+    <value>Your group {0} now has a mentor: {1}. Contact: {2}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedTitle" xml:space="preserve">
+    <value>Your group's mentor has changed</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedContent" xml:space="preserve">
+    <value>The mentor of group {0} has changed. New mentor: {1}. Contact: {2}.</value>
+  </data>
   <data name="Profile.LogUpdateStart" xml:space="preserve">
     <value>[START] UpdateMyProfile for User: {UserId}</value>
   </data>

@@ -20,6 +20,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         private readonly ILogger<UpdateInternshipGroupHandler> _logger;
         private readonly ICacheService _cacheService;
         private readonly INotificationPushService _pushService;
+        private readonly ICurrentUserService _currentUserService;
 
         public UpdateInternshipGroupHandler(
             IUnitOfWork unitOfWork,
@@ -27,7 +28,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
             IMapper mapper,
             ILogger<UpdateInternshipGroupHandler> logger,
             ICacheService cacheService,
-            INotificationPushService pushService)
+            INotificationPushService pushService,
+            ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
@@ -35,11 +37,17 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
             _logger = logger;
             _cacheService = cacheService;
             _pushService = pushService;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Result<UpdateInternshipGroupResponse>> Handle(UpdateInternshipGroupCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogUpdating), request.InternshipId);
+
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+                return Result<UpdateInternshipGroupResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Unauthorized),
+                    ResultErrorType.Unauthorized);
 
             try
             {
@@ -157,6 +165,12 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                         s => s.SetProperty(p => p.MentorId, resolvedMentorId)
                               .SetProperty(p => p.UpdatedAt, DateTime.UtcNow),
                         cancellationToken);
+
+                    // Ghi audit log GroupMentorHistory
+                    var historyActionType = oldMentorId == null ? MentorActionType.Assign : MentorActionType.Change;
+                    var historyRecord = GroupMentorHistory.Create(
+                        entity.InternshipId, oldMentorId, resolvedMentorId, currentUserId, historyActionType);
+                    await _unitOfWork.Repository<GroupMentorHistory>().AddAsync(historyRecord, cancellationToken);
                 }
 
                 var saved = await _unitOfWork.SaveChangeAsync(cancellationToken);
@@ -224,6 +238,39 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
                                         MessageKeys.InternshipGroups.NotificationMentorReplacedNewContent,
                                         entity.GroupName,
                                         string.IsNullOrWhiteSpace(oldMentorName) ? _messageService.GetMessage(MessageKeys.InternshipGroups.Unassigned) : oldMentorName),
+                                    Type = NotificationType.General,
+                                    ReferenceType = nameof(InternshipGroup),
+                                    ReferenceId = entity.InternshipId,
+                                    IsRead = false
+                                });
+                            }
+
+                            // AC-04/AC-05: Notify sinh viên trong nhóm
+                            var memberStudentUserIds = await _unitOfWork.Repository<InternshipStudent>().Query()
+                                .AsNoTracking()
+                                .Where(m => m.InternshipId == entity.InternshipId && m.DeletedAt == null)
+                                .Select(m => m.Student.UserId)
+                                .ToListAsync(cancellationToken);
+
+                            var isFirstAssign = oldMentorId == null;
+                            foreach (var studentUserId in memberStudentUserIds)
+                            {
+                                var titleKey = isFirstAssign
+                                    ? MessageKeys.InternshipGroups.NotificationStudentMentorAssignedTitle
+                                    : MessageKeys.InternshipGroups.NotificationStudentMentorChangedTitle;
+                                var contentKey = isFirstAssign
+                                    ? MessageKeys.InternshipGroups.NotificationStudentMentorAssignedContent
+                                    : MessageKeys.InternshipGroups.NotificationStudentMentorChangedContent;
+
+                                notifications.Add(new Notification
+                                {
+                                    NotificationId = Guid.NewGuid(),
+                                    UserId = studentUserId,
+                                    Title = _messageService.GetMessage(titleKey),
+                                    Content = _messageService.GetMessage(contentKey,
+                                        entity.GroupName,
+                                        newMentor?.User?.FullName ?? string.Empty,
+                                        newMentor?.User?.Email ?? string.Empty),
                                     Type = NotificationType.General,
                                     ReferenceType = nameof(InternshipGroup),
                                     ReferenceId = entity.InternshipId,

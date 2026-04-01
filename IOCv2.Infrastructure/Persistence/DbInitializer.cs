@@ -22,9 +22,11 @@ namespace IOCv2.Infrastructure.Persistence
             public static readonly Guid SchoolAdminFptId = new Guid("33333333-3333-3333-3333-333333330001");
             public static readonly Guid EntAdminFptId = new Guid("44444444-4444-4444-4444-444444440001");
             public static readonly Guid MentorFptId = new Guid("55555555-5555-5555-5555-555555550001");
+            public static readonly Guid MentorFptBackupId = new Guid("55555555-5555-5555-5555-555555550011");
             public static readonly Guid SchoolAdminFptCtId = new Guid("33333333-3333-3333-3333-333333330002");
             public static readonly Guid EntAdminRikkeisoftId = new Guid("44444444-4444-4444-4444-444444440002");
             public static readonly Guid MentorRikkeisoftId = new Guid("55555555-5555-5555-5555-555555550002");
+            public static readonly Guid MentorRikkeisoftBackupId = new Guid("55555555-5555-5555-5555-555555550012");
 
             // Added HR seed ids for deterministic seeding
             public static readonly Guid HrFptId = new Guid("77777777-7777-7777-7777-777777770001");
@@ -35,6 +37,14 @@ namespace IOCv2.Infrastructure.Persistence
             // mentor@rikkeisoft.com   → dùng EnterpriseUserId này khi tạo project cho Rikkeisoft groups
             public static readonly Guid MentorFptEuId = new Guid("88888888-8888-8888-8888-888888880001");
             public static readonly Guid MentorRikkeisoftEuId = new Guid("88888888-8888-8888-8888-888888880002");
+            public static readonly Guid MentorFptBackupEuId = new Guid("88888888-8888-8888-8888-888888880011");
+            public static readonly Guid MentorRikkeisoftBackupEuId = new Guid("88888888-8888-8888-8888-888888880012");
+
+            // Swagger unhappy-path fixtures for inline assign/reassign mentor
+            public static readonly Guid SwaggerWrongEnterpriseMentorUserId = new Guid("95555555-5555-5555-5555-555555550001");
+            public static readonly Guid SwaggerWrongEnterpriseMentorEuId = new Guid("98888888-8888-8888-8888-888888880001");
+            public static readonly Guid SwaggerNotMentorUserId = new Guid("96666666-6666-6666-6666-666666660001");
+            public static readonly Guid SwaggerNotMentorEuId = new Guid("98888888-8888-8888-8888-888888880002");
 
             public static readonly List<Guid> StudentIds = new()
             {
@@ -349,6 +359,37 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = mentorEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
                 }
 
+                // Additional mentors make inline assign/reassign happy/unhappy paths reproducible.
+                var backupMentorEmail = $"mentor.backup@{baseName}.com";
+                if (!existingEmails.Contains(backupMentorEmail))
+                {
+                    var backupMentorId = ent.EnterpriseId == SeedIds.FptSoftwareId
+                        ? SeedIds.MentorFptBackupId
+                        : ent.EnterpriseId == SeedIds.RikkeisoftId
+                            ? SeedIds.MentorRikkeisoftBackupId
+                            : Guid.NewGuid();
+
+                    var backupMentorEuId = ent.EnterpriseId == SeedIds.FptSoftwareId
+                        ? SeedIds.MentorFptBackupEuId
+                        : ent.EnterpriseId == SeedIds.RikkeisoftId
+                            ? SeedIds.MentorRikkeisoftBackupEuId
+                            : Guid.NewGuid();
+
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
+                    var user = new User(backupMentorId, userCode, backupMentorEmail, $"Backup Mentor {ent.Name}", UserRole.Mentor, passHash);
+                    user.UpdateProfile(user.FullName, $"098765{phoneCounter++}", null, UserGender.Female, new DateOnly(1991, 6, 1), ent.Address);
+                    user.SetStatus(UserStatus.Active);
+                    _context.Users.Add(user);
+                    existingEmails.Add(backupMentorEmail);
+                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    {
+                        EnterpriseUserId = backupMentorEuId,
+                        UserId = user.UserId,
+                        EnterpriseId = ent.EnterpriseId,
+                        Position = "Senior Technical Mentor"
+                    });
+                }
+
                 // HR account
                 var hrEmail = $"hr@{baseName}.com";
                 if (!existingEmails.Contains(hrEmail))
@@ -360,6 +401,95 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.Users.Add(user);
                     existingEmails.Add(hrEmail);
                     _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "HR" });
+                }
+            }
+
+            // Swagger labels for direct unhappy testing of AssignMentor endpoint:
+            // 1) wrong-enterprise mentor: role Mentor nhưng thuộc enterprise khác
+            // 2) not-mentor user: cùng enterprise nhưng role != Mentor
+            var fptEnterprise = enterpriseList.FirstOrDefault(e => e.EnterpriseId == SeedIds.FptSoftwareId);
+            var rikkeiEnterprise = enterpriseList.FirstOrDefault(e => e.EnterpriseId == SeedIds.RikkeisoftId);
+
+            if (fptEnterprise != null && rikkeiEnterprise != null)
+            {
+                var wrongEnterpriseMentorEmail = "swagger.unhappy.wrong-enterprise.mentor@rikkeisoft.com";
+                var wrongEnterpriseMentorUser = await _context.Users
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(u => u.Email == wrongEnterpriseMentorEmail, cancellationToken);
+
+                if (wrongEnterpriseMentorUser == null)
+                {
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.Mentor, cancellationToken);
+                    wrongEnterpriseMentorUser = new User(
+                        SeedIds.SwaggerWrongEnterpriseMentorUserId,
+                        userCode,
+                        wrongEnterpriseMentorEmail,
+                        "[SWAGGER-UNHAPPY] Wrong Enterprise Mentor",
+                        UserRole.Mentor,
+                        passHash);
+                    wrongEnterpriseMentorUser.UpdateProfile(
+                        wrongEnterpriseMentorUser.FullName,
+                        $"098765{phoneCounter++}",
+                        null,
+                        UserGender.Female,
+                        new DateOnly(1992, 2, 2),
+                        rikkeiEnterprise.Address);
+                    wrongEnterpriseMentorUser.SetStatus(UserStatus.Active);
+                    _context.Users.Add(wrongEnterpriseMentorUser);
+                    existingEmails.Add(wrongEnterpriseMentorEmail);
+                }
+
+                bool hasWrongEnterpriseEu = await _context.EnterpriseUsers
+                    .AnyAsync(eu => eu.UserId == wrongEnterpriseMentorUser.UserId && eu.EnterpriseId == rikkeiEnterprise.EnterpriseId, cancellationToken);
+                if (!hasWrongEnterpriseEu)
+                {
+                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    {
+                        EnterpriseUserId = SeedIds.SwaggerWrongEnterpriseMentorEuId,
+                        UserId = wrongEnterpriseMentorUser.UserId,
+                        EnterpriseId = rikkeiEnterprise.EnterpriseId,
+                        Position = "[SWAGGER-UNHAPPY] Mentor belongs to other enterprise"
+                    });
+                }
+
+                var notMentorEmail = "swagger.unhappy.not-mentor@fptsoftware.com";
+                var notMentorUser = await _context.Users
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(u => u.Email == notMentorEmail, cancellationToken);
+
+                if (notMentorUser == null)
+                {
+                    var userCode = await _userService.GenerateUserCodeAsync(UserRole.HR, cancellationToken);
+                    notMentorUser = new User(
+                        SeedIds.SwaggerNotMentorUserId,
+                        userCode,
+                        notMentorEmail,
+                        "[SWAGGER-UNHAPPY] Same Enterprise Non-Mentor",
+                        UserRole.HR,
+                        passHash);
+                    notMentorUser.UpdateProfile(
+                        notMentorUser.FullName,
+                        $"098765{phoneCounter++}",
+                        null,
+                        UserGender.Male,
+                        new DateOnly(1991, 3, 3),
+                        fptEnterprise.Address);
+                    notMentorUser.SetStatus(UserStatus.Active);
+                    _context.Users.Add(notMentorUser);
+                    existingEmails.Add(notMentorEmail);
+                }
+
+                bool hasNotMentorEu = await _context.EnterpriseUsers
+                    .AnyAsync(eu => eu.UserId == notMentorUser.UserId && eu.EnterpriseId == fptEnterprise.EnterpriseId, cancellationToken);
+                if (!hasNotMentorEu)
+                {
+                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    {
+                        EnterpriseUserId = SeedIds.SwaggerNotMentorEuId,
+                        UserId = notMentorUser.UserId,
+                        EnterpriseId = fptEnterprise.EnterpriseId,
+                        Position = "[SWAGGER-UNHAPPY] Role is HR, not Mentor"
+                    });
                 }
             }
            
@@ -801,6 +931,52 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.InternshipGroups.Add(archivedGroup);
             }
 
+            // Inline assign/reassign mentor scenarios.
+            var mentorPendingGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
+            if (mentorPendingGroup == null)
+            {
+                mentorPendingGroup = InternshipGroup.Create(
+                    phaseInProgressFpt.PhaseId,
+                    "FPT Software Mentor Pending Team",
+                    "Active team intentionally seeded without mentor for first-assign tests",
+                    fsoft.EnterpriseId,
+                    null,
+                    DateTime.UtcNow.AddDays(-12),
+                    DateTime.UtcNow.AddMonths(2));
+                mentorPendingGroup.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(mentorPendingGroup);
+            }
+
+            var zeroMemberGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Zero Member Team");
+            if (zeroMemberGroup == null)
+            {
+                zeroMemberGroup = InternshipGroup.Create(
+                    phaseInProgressFpt.PhaseId,
+                    "FPT Software Zero Member Team",
+                    "Edge case group: active, no mentor, and no members",
+                    fsoft.EnterpriseId,
+                    null,
+                    DateTime.UtcNow.AddDays(-9),
+                    DateTime.UtcNow.AddMonths(1));
+                zeroMemberGroup.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(zeroMemberGroup);
+            }
+
+            var multiProjectGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Multi Project Team");
+            if (multiProjectGroup == null)
+            {
+                multiProjectGroup = InternshipGroup.Create(
+                    phaseInProgressFpt.PhaseId,
+                    "FPT Software Multi Project Team",
+                    "Active team with multiple active projects to validate mentor cascade update",
+                    fsoft.EnterpriseId,
+                    mentorFptEuId,
+                    DateTime.UtcNow.AddDays(-18),
+                    DateTime.UtcNow.AddMonths(2));
+                multiProjectGroup.UpdateStatus(GroupStatus.Active);
+                _context.InternshipGroups.Add(multiProjectGroup);
+            }
+
             await _context.SaveChangesAsync();
 
             var fptBackendJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT Backend Platform Intern");
@@ -1072,6 +1248,60 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedManageIGProjectData()
         {
+            var mentorPendingGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
+            if (mentorPendingGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == mentorPendingGroup.InternshipId))
+            {
+                var pendingProj = Project.Create(
+                    "FPT Mentor Pending Commerce",
+                    "Commerce mini-platform reserved for first mentor assignment flow",
+                    "PRJ-FPTSOF_FPT_6",
+                    "CNTT",
+                    "Seeded for AC-04 first assign mentor + project mentor sync.");
+                pendingProj.AssignToGroup(mentorPendingGroup.InternshipId, DateTime.UtcNow.AddDays(-10), DateTime.UtcNow.AddMonths(1));
+                pendingProj.Publish();
+                _context.Projects.Add(pendingProj);
+            }
+
+            var zeroMemberGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Zero Member Team");
+            if (zeroMemberGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == zeroMemberGroup.InternshipId))
+            {
+                var zeroMemberProj = Project.Create(
+                    "FPT Zero Member Automation",
+                    "Edge scenario project for group without members",
+                    "PRJ-FPTSOF_FPT_7",
+                    "Automation",
+                    "Validate assign mentor still updates project even when member list is empty.");
+                zeroMemberProj.AssignToGroup(zeroMemberGroup.InternshipId, DateTime.UtcNow.AddDays(-8), DateTime.UtcNow.AddMonths(1));
+                zeroMemberProj.Publish();
+                _context.Projects.Add(zeroMemberProj);
+            }
+
+            var multiProjectGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Multi Project Team");
+            if (multiProjectGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == multiProjectGroup.InternshipId))
+            {
+                var multiProj1 = Project.Create(
+                    "FPT Mentor Rotation Platform",
+                    "Primary API project used for mentor reassign project-sync tests",
+                    "PRJ-FPTSOF_FPT_8",
+                    "CNTT",
+                    "Back-end platform with active sprint cadence.",
+                    mentorId: SeedIds.MentorFptEuId);
+                multiProj1.AssignToGroup(multiProjectGroup.InternshipId, DateTime.UtcNow.AddDays(-16), DateTime.UtcNow.AddMonths(2));
+                multiProj1.Publish();
+                _context.Projects.Add(multiProj1);
+
+                var multiProj2 = Project.Create(
+                    "FPT Mentor Rotation Analytics",
+                    "Secondary analytics project in same group to verify bulk mentor update",
+                    "PRJ-FPTSOF_FPT_9",
+                    "Data",
+                    "Analytics and reporting track for internship outcomes.",
+                    mentorId: SeedIds.MentorFptEuId);
+                multiProj2.AssignToGroup(multiProjectGroup.InternshipId, DateTime.UtcNow.AddDays(-14), DateTime.UtcNow.AddMonths(2));
+                multiProj2.Publish();
+                _context.Projects.Add(multiProj2);
+            }
+
             var rikkeiGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
             if (rikkeiGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == rikkeiGroup.InternshipId))
             {
@@ -1161,6 +1391,9 @@ namespace IOCv2.Infrastructure.Persistence
             var fptGroup = await _context.InternshipGroups
                 .Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
+            var mentorPendingGroup = await _context.InternshipGroups
+                .Include(g => g.Members)
+                .FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
             var rikkeiGroup = await _context.InternshipGroups
                 .Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
@@ -1174,6 +1407,8 @@ namespace IOCv2.Infrastructure.Persistence
             var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
             var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
+            var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
 
             // FPT Software OJT Team Alpha: s1(Leader), s2(Member), s3(Member), s6(Member)
             bool fptHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == fptGroup.InternshipId);
@@ -1194,6 +1429,18 @@ namespace IOCv2.Infrastructure.Persistence
                 if (s5 != null) rikkeiGroup.AddMember(s5.StudentId, InternshipRole.Member);
                 if (s7 != null) rikkeiGroup.AddMember(s7.StudentId, InternshipRole.Member);
                 _context.InternshipGroups.Update(rikkeiGroup);
+            }
+
+            // Group without mentor but with members for first-assign and student-notify test path.
+            if (mentorPendingGroup != null)
+            {
+                bool pendingGroupHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == mentorPendingGroup.InternshipId);
+                if (!pendingGroupHasStudents)
+                {
+                    if (s8 != null) mentorPendingGroup.AddMember(s8.StudentId, InternshipRole.Leader);
+                    if (s9 != null) mentorPendingGroup.AddMember(s9.StudentId, InternshipRole.Member);
+                    _context.InternshipGroups.Update(mentorPendingGroup);
+                }
             }
 
             await _context.SaveChangesAsync();

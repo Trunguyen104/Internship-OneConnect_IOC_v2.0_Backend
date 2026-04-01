@@ -324,6 +324,33 @@ namespace IOCv2.Application.Constants
             // UI labels
             public const string Unassigned                    = "InternshipGroup.Unassigned";
             public const string LateLogbookSubmission         = "InternshipGroup.LateLogbookSubmission";
+
+            // ── AssignMentorToGroup ───────────────────────────────────────────────
+            public const string AssignMentorSuccess              = "InternshipGroup.AssignMentorSuccess";
+            public const string AssignMentorGroupNotFound        = "InternshipGroup.AssignMentorGroupNotFound";
+            public const string AssignMentorGroupNotActive       = "InternshipGroup.AssignMentorGroupNotActive";
+            public const string AssignMentorGroupIdRequired      = "InternshipGroup.AssignMentorGroupIdRequired";
+            public const string AssignMentorMentorRequired       = "InternshipGroup.AssignMentorMentorRequired";
+            public const string AssignMentorSameMentor           = "InternshipGroup.AssignMentorSameMentor";
+            public const string LogAssignMentorSuccess           = "InternshipGroup.Log.AssignMentorSuccess";
+            public const string LogAssignMentorFailed            = "InternshipGroup.Log.AssignMentorFailed";
+            public const string LogAssignMentorNotifyFailed      = "InternshipGroup.Log.AssignMentorNotifyFailed";
+            public const string LogAssignMentorSameMentor        = "InternshipGroup.Log.AssignMentorSameMentor";
+
+            // ── GetAvailableMentors ───────────────────────────────────────────────
+            public const string AvailableMentorsRetrieved        = "InternshipGroup.AvailableMentorsRetrieved";
+            public const string LogGetAvailableMentors           = "InternshipGroup.Log.GetAvailableMentors";
+            public const string LogGetAvailableMentorsAccessDenied = "InternshipGroup.Log.GetAvailableMentorsAccessDenied";
+
+            // ── AC-04: Notification — Gán Mentor lần đầu ─────────────────────────
+            public const string NotificationMentorAssignedFirstTitle   = "InternshipGroup.NotificationMentorAssignedFirstTitle";
+            public const string NotificationMentorAssignedFirstContent = "InternshipGroup.NotificationMentorAssignedFirstContent";
+            public const string NotificationStudentMentorAssignedTitle   = "InternshipGroup.NotificationStudentMentorAssignedTitle";
+            public const string NotificationStudentMentorAssignedContent = "InternshipGroup.NotificationStudentMentorAssignedContent";
+
+            // ── AC-05: Notification — Sinh viên khi đổi Mentor ───────────────────
+            public const string NotificationStudentMentorChangedTitle   = "InternshipGroup.NotificationStudentMentorChangedTitle";
+            public const string NotificationStudentMentorChangedContent = "InternshipGroup.NotificationStudentMentorChangedContent";
         }
 
         public static class Terms
