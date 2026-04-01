@@ -9,20 +9,8 @@ namespace IOCv2.Domain.Entities
         public Guid JobId { get; set; }
         public Guid EnterpriseId { get; set; }
 
-        // Intern phase this job belongs to (optional)
-        public Guid? InternPhaseId { get; set; }
-
-        /// <summary>Alias kept for backward compatibility with develop-branch handlers.</summary>
-        public Guid? InternshipPhaseId
-        {
-            get => InternPhaseId;
-            set => InternPhaseId = value;
-        }
-
-        public virtual InternshipPhase? InternPhase { get; set; }
-
-        /// <summary>Alias navigation kept for backward compatibility.</summary>
-        public virtual InternshipPhase? InternshipPhase => InternPhase;
+        // FK to InternshipPhase (required by domain, optional at DB level)
+        public Guid? InternshipPhaseId { get; set; }
 
         public string? Title { get; set; }
         public string? Position { get; set; }
@@ -42,10 +30,11 @@ namespace IOCv2.Domain.Entities
 
         // Navigation
         public virtual Enterprise Enterprise { get; set; } = null!;
+        public virtual InternshipPhase? InternshipPhase { get; set; }
         public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
         public virtual ICollection<University> Universities { get; set; } = new List<University>();
 
-        // Factory method for creating a Job
+        // Factory method
         public static Job Create(
             Guid enterpriseId,
             Guid? internshipPhase,
@@ -60,7 +49,7 @@ namespace IOCv2.Domain.Entities
             {
                 JobId = Guid.NewGuid(),
                 EnterpriseId = enterpriseId,
-                InternPhaseId = internshipPhase,
+                InternshipPhaseId = internshipPhase,
                 Title = title,
                 Description = description,
                 Requirements = requirements,
@@ -71,5 +60,4 @@ namespace IOCv2.Domain.Entities
             };
         }
     }
-
 }

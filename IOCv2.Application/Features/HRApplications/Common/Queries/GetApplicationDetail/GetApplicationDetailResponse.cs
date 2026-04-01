@@ -24,7 +24,7 @@ public class GetApplicationDetailResponse
     public string? CvSnapshotUrl { get; set; }
 
     // Intern Phase info (from job.InternPhase)
-    public Guid? InternPhaseId { get; set; }
+    public Guid? InternshipPhaseId { get; set; }
     public string? InternPhaseName { get; set; }
     public DateOnly? InternPhaseStartDate { get; set; }
     public DateOnly? InternPhaseEndDate { get; set; }

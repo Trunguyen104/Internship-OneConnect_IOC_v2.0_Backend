@@ -46,7 +46,7 @@ public class GetUniAssignApplicationsHandler
                     _messageService.GetMessage(MessageKeys.HRApplications.EnterpriseUserNotFound), ResultErrorType.Forbidden);
 
             var query = _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
-                .Include(a => a.Job).ThenInclude(j => j!.InternPhase)
+                .Include(a => a.Job).ThenInclude(j => j!.InternshipPhase)
                 .Include(a => a.Student).ThenInclude(s => s.User)
                 .Include(a => a.University)
                 .Where(a => a.EnterpriseId == enterpriseUser.EnterpriseId
@@ -63,8 +63,8 @@ public class GetUniAssignApplicationsHandler
                 query = query.Where(a => a.UniversityId == request.UniversityId);
 
             // Intern Phase filter
-            if (request.InternPhaseId.HasValue)
-                query = query.Where(a => a.Job != null && a.Job.InternPhaseId == request.InternPhaseId);
+            if (request.InternshipPhaseId.HasValue)
+                query = query.Where(a => a.Job != null && a.Job.InternshipPhaseId == request.InternshipPhaseId);
 
             if (!string.IsNullOrWhiteSpace(request.MonthYear) &&
                 DateOnly.TryParseExact(request.MonthYear + "-01", "yyyy-MM-dd", out var monthDate))
@@ -123,10 +123,10 @@ public class GetUniAssignApplicationsHandler
                     StudentCode = a.Student?.User?.UserCode ?? string.Empty,
                     StudentEmail = a.Student?.User?.Email ?? string.Empty,
                     UniversityName = a.University?.Name ?? string.Empty,
-                    InternPhaseId = a.Job?.InternPhaseId,
-                    InternPhaseName = a.Job?.InternPhase?.Name,
-                    InternPhaseStartDate = a.Job?.InternPhase?.StartDate,
-                    InternPhaseEndDate = a.Job?.InternPhase?.EndDate,
+                    InternshipPhaseId = a.Job?.InternshipPhaseId,
+                    InternPhaseName = a.Job?.InternshipPhase?.Name,
+                    InternPhaseStartDate = a.Job?.InternshipPhase?.StartDate,
+                    InternPhaseEndDate = a.Job?.InternshipPhase?.EndDate,
                     AppliedAt = a.AppliedAt,
                     Status = a.Status,
                     StatusLabel = a.Status.ToString(),

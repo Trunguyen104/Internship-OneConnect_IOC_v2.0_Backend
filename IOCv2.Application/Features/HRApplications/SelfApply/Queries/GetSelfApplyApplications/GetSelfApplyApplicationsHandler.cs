@@ -47,7 +47,7 @@ public class GetSelfApplyApplicationsHandler
 
             // Base query: only SelfApply applications for this enterprise
             var query = _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
-                .Include(a => a.Job).ThenInclude(j => j!.InternPhase)
+                .Include(a => a.Job).ThenInclude(j => j!.InternshipPhase)
                 .Include(a => a.Student).ThenInclude(s => s.User)
                 .Include(a => a.Student).ThenInclude(s => s.StudentTerms).ThenInclude(st => st.Term).ThenInclude(t => t.University)
                 .Where(a => a.EnterpriseId == enterpriseUser.EnterpriseId
@@ -77,9 +77,9 @@ public class GetSelfApplyApplicationsHandler
             }
 
             // Intern Phase filter
-            if (request.InternPhaseId.HasValue)
+            if (request.InternshipPhaseId.HasValue)
             {
-                query = query.Where(a => a.Job != null && a.Job.InternPhaseId == request.InternPhaseId);
+                query = query.Where(a => a.Job != null && a.Job.InternshipPhaseId == request.InternshipPhaseId);
             }
 
             // Audience filter (Public / Targeted)
@@ -158,10 +158,10 @@ public class GetSelfApplyApplicationsHandler
                     JobPostingTitle = a.Job?.Title ?? string.Empty,
                     IsJobClosed = a.Job?.Status == JobStatus.CLOSED,
                     IsJobDeleted = a.JobId.HasValue && a.Job == null,
-                    InternPhaseId = a.Job?.InternPhaseId,
-                    InternPhaseName = a.Job?.InternPhase?.Name,
-                    InternPhaseStartDate = a.Job?.InternPhase?.StartDate,
-                    InternPhaseEndDate = a.Job?.InternPhase?.EndDate,
+                    InternshipPhaseId = a.Job?.InternshipPhaseId,
+                    InternPhaseName = a.Job?.InternshipPhase?.Name,
+                    InternPhaseStartDate = a.Job?.InternshipPhase?.StartDate,
+                    InternPhaseEndDate = a.Job?.InternshipPhase?.EndDate,
                     Audience = audience,
                     AudienceLabel = audience?.ToString(),
                     AppliedAt = a.AppliedAt,

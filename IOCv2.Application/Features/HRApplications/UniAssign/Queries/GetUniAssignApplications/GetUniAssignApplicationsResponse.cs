@@ -12,7 +12,7 @@ public class GetUniAssignApplicationsResponse
     public string UniversityName { get; set; } = string.Empty;
 
     // Intern Phase info (from job.InternPhase — Uni Assign thường không có Job nhưng vẫn map nếu có)
-    public Guid? InternPhaseId { get; set; }
+    public Guid? InternshipPhaseId { get; set; }
     public string? InternPhaseName { get; set; }
     public DateOnly? InternPhaseStartDate { get; set; }
     public DateOnly? InternPhaseEndDate { get; set; }

@@ -21,7 +21,7 @@ public record GetSelfApplyApplicationsQuery : IRequest<Result<PaginatedResult<Ge
     public Guid? JobId { get; set; }
 
     /// <summary>Filter by Intern Phase. Only shows applications for jobs belonging to this phase.</summary>
-    public Guid? InternPhaseId { get; init; }
+    public Guid? InternshipPhaseId { get; init; }
 
     /// <summary>Filter by job audience: Public or Targeted.</summary>
     public JobAudience? Audience { get; init; }
