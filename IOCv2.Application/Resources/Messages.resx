@@ -1081,61 +1081,60 @@
     <value>Bản nháp công việc không được phép có đơn ứng tuyển.</value>
   </data>
   <data name="JobPosting.JobPlacedMaxed" xml:space="preserve">
-    <value>Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ.
-</value>
+    <value>Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ.</value>
   </data>
   <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
-    <value>Chi cho phep chon cac giai doan dang Mo (Sap dien ra) hoac Dang tien hanh (Dang hoat dong).</value>
+    <value>Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động).</value>
   </data>
   <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
-    <value>Phase thuc tap da du so luong nhan.</value>
+    <value>Phase thực tập đã đủ số lượng nhận.</value>
   </data>
   <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
-    <value>Don ung tuyen chua o trang thai Da nhan (Placed).</value>
+    <value>Đơn ứng tuyển chưa ở trạng thái Đã nhận (Placed).</value>
   </data>
   <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
-    <value>HR da xoa sinh vien khoi danh sach Placed (ApplicationId: {0}, ByUserId: {1}).</value>
+    <value>HR đã xóa sinh viên khỏi danh sách Placed (ApplicationId: {0}, ByUserId: {1}).</value>
   </data>
   <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
-    <value>Kinh gui sinh vien, doanh nghiep {EnterpriseName} da xoa ban khoi danh sach tiep nhan thuc tap.</value>
+    <value>Kính gửi sinh viên, doanh nghiệp {EnterpriseName} đã xóa bạn khỏi danh sách tiếp nhận thực tập.</value>
   </data>
   <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
-    <value>Sinh vien {StudentName} da bi doanh nghiep {EnterpriseName} xoa khoi danh sach tiep nhan thuc tap.</value>
+    <value>Sinh viên {StudentName} đã bị doanh nghiệp {EnterpriseName} xóa khỏi danh sách tiếp nhận thực tập.</value>
   </data>
   <data name="StudentApplications.NotFound" xml:space="preserve">
-    <value>Khong tim thay don ung tuyen.</value>
+    <value>Không tìm thấy đơn ứng tuyển.</value>
   </data>
   <data name="StudentApplications.NotOwner" xml:space="preserve">
-    <value>Ban khong co quyen thao tac tren don ung tuyen nay.</value>
+    <value>Bạn không có quyền thao tác trên đơn ứng tuyển này.</value>
   </data>
   <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
-    <value>Chi co the rut don khi o trang thai Da nop (Applied).</value>
+    <value>Chỉ có thể rút đơn khi ở trạng thái Đã nộp (Applied).</value>
   </data>
   <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
-    <value>Khong the an don da duoc nhan thuc tap (Placed).</value>
+    <value>Không thể ẩn đơn đã được nhận thực tập (Placed).</value>
   </data>
   <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
-    <value>Chi co the an don da ket thuc (Rejected hoac Withdrawn).</value>
+    <value>Chỉ có thể ẩn đơn đã kết thúc (Rejected hoặc Withdrawn).</value>
   </data>
   <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
-    <value>Da rut don thanh cong.</value>
+    <value>Đã rút đơn thành công.</value>
   </data>
   <data name="StudentApplications.HideSuccess" xml:space="preserve">
-    <value>Da an khoi danh sach.</value>
+    <value>Đã ẩn khỏi danh sách.</value>
   </data>
   <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
-    <value>{StudentName} da rut don ung tuyen vi tri {JobTitle}.</value>
+    <value>{StudentName} đã rút đơn ứng tuyển vị trí {JobTitle}.</value>
   </data>
   <data name="Validation.IdRequired" xml:space="preserve">
-    <value>Yeu cau cung cap Application ID.</value>
+    <value>Yêu cầu cung cấp Application ID.</value>
   </data>
   <data name="Validation.PageNumberInvalid" xml:space="preserve">
-    <value>PageNumber phai lon hon hoac bang 1.</value>
+    <value>PageNumber phải lớn hơn hoặc bằng 1.</value>
   </data>
   <data name="Validation.PageSizeInvalid" xml:space="preserve">
-    <value>PageSize phai lon hon hoac bang 1.</value>
+    <value>PageSize phải lớn hơn hoặc bằng 1.</value>
   </data>
   <data name="Validation.InvalidStatus" xml:space="preserve">
-    <value>Status khong hop le.</value>
+    <value>Status không hợp lệ.</value>
   </data>
 </root>
