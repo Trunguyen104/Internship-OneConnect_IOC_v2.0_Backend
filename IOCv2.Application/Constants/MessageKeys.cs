@@ -534,6 +534,7 @@ namespace IOCv2.Application.Constants
             public const string StudentNotFound = "Logbooks.StudentNotFound";
             public const string UpdateForbidden = "Logbooks.UpdateForbidden";
             public const string DeleteForbidden = "Logbooks.DeleteForbidden";
+            public const string NoActiveInternship = "Logbooks.NoActiveInternship";
         }
 
         public static class Page
