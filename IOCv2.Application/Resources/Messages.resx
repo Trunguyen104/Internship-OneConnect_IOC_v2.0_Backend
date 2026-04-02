@@ -312,12 +312,6 @@
   <data name="StudentTerms.Email.BodyWithdraw" xml:space="preserve">
     <value>Bạn đã bị rút khỏi đợt thực tập '{0}'. Vui lòng liên hệ nhà trường nếu có thắc mắc.</value>
   </data>
-  <data name="StudentTerms.Email.SubjectRestore" xml:space="preserve">
-    <value>Thông báo khôi phục ghi danh đợt thực tập</value>
-  </data>
-  <data name="StudentTerms.Email.BodyRestore" xml:space="preserve">
-    <value>Bạn đã được khôi phục vào đợt thực tập '{0}'.</value>
-  </data>
   <data name="StudentTerms.Excel.HeaderStudentCode" xml:space="preserve">
     <value>Mã sinh viên</value>
   </data>

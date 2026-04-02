@@ -252,12 +252,6 @@
   <data name="StudentTerms.Email.BodyWithdraw" xml:space="preserve">
     <value>You have been withdrawn from internship term '{0}'. Please contact your university if you have any questions.</value>
   </data>
-  <data name="StudentTerms.Email.SubjectRestore" xml:space="preserve">
-    <value>Notice: Enrollment Restored for Internship Term</value>
-  </data>
-  <data name="StudentTerms.Email.BodyRestore" xml:space="preserve">
-    <value>Your enrollment in internship term '{0}' has been restored.</value>
-  </data>
   <data name="StudentTerms.Excel.HeaderStudentCode" xml:space="preserve">
     <value>Student Code</value>
   </data>

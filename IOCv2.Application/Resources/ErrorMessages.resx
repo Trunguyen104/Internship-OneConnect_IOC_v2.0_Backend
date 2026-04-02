@@ -720,9 +720,6 @@
   <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
     <value>Không thể xóa sinh viên khỏi hệ thống vì sinh viên vẫn còn đăng ký ở kỳ thực tập khác.</value>
   </data>
-  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
-    <value>Đăng ký thực tập đã được khôi phục thành công. Sinh viên trở lại trạng thái Active trong kỳ thực tập.</value>
-  </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
     <value>Rút hàng loạt sinh viên thành công. Các sinh viên đang có vị trí thực tập (Placed) đã được bỏ qua tự động và không bị ảnh hưởng.</value>
   </data>
@@ -749,9 +746,6 @@
   </data>
   <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
     <value>Sinh viên {0} đã bị rút khỏi kỳ thực tập bởi {1}.</value>
-  </data>
-  <data name="StudentTerms.Log.Restored" xml:space="preserve">
-    <value>Sinh viên {0} đã được khôi phục vào kỳ thực tập bởi {1}.</value>
   </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
     <value>Đã rút {0} sinh viên khỏi kỳ thực tập {1} bởi {2}.</value>

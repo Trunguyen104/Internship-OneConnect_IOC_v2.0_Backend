@@ -2,6 +2,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,9 @@ public class GetStudentTermDetailHandler : IRequestHandler<GetStudentTermDetailQ
             .Include(st => st.Student).ThenInclude(s => s.User)
             .Include(st => st.Term)
             .Include(st => st.Enterprise)
-            .FirstOrDefaultAsync(st => st.StudentTermId == request.StudentTermId, cancellationToken);
+            .FirstOrDefaultAsync(
+                st => st.StudentTermId == request.StudentTermId && st.EnrollmentStatus == EnrollmentStatus.Active,
+                cancellationToken);
 
         if (studentTerm == null)
             return Result<GetStudentTermDetailResponse>.Failure(

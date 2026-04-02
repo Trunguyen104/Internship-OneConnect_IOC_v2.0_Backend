@@ -586,9 +586,6 @@
   <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
     <value>Cannot delete this student from the system because they are still enrolled in another term.</value>
   </data>
-  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
-    <value>Enrollment has been successfully restored. The student is now Active in the term again.</value>
-  </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
     <value>Bulk withdrawal completed successfully. Students with an active placement (Placed) were automatically skipped and remain unaffected.</value>
   </data>
@@ -615,9 +612,6 @@
   </data>
   <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
     <value>Student {0} withdrawn from term by {1}.</value>
-  </data>
-  <data name="StudentTerms.Log.Restored" xml:space="preserve">
-    <value>Student {0} restored to term by {1}.</value>
   </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
     <value>{0} students withdrawn from term {1} by {2}.</value>

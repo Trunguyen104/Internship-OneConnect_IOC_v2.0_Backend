@@ -872,7 +872,6 @@ namespace IOCv2.Application.Constants
             public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
             public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
             public const string WithdrawDeleteWarning = "StudentTerms.WithdrawDeleteWarning";
-            public const string RestoreSuccess = "StudentTerms.RestoreSuccess";
             public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
             public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
             public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
@@ -883,8 +882,6 @@ namespace IOCv2.Application.Constants
             // Email notifications
             public const string EmailSubjectWithdraw = "StudentTerms.Email.SubjectWithdraw";
             public const string EmailBodyWithdraw = "StudentTerms.Email.BodyWithdraw";
-            public const string EmailSubjectRestore = "StudentTerms.Email.SubjectRestore";
-            public const string EmailBodyRestore = "StudentTerms.Email.BodyRestore";
 
             // Excel headers
             public const string ExcelHeaderStudentCode = "StudentTerms.Excel.HeaderStudentCode";
@@ -901,7 +898,6 @@ namespace IOCv2.Application.Constants
             public const string LogAdded = "StudentTerms.Log.Added";
             public const string LogUpdated = "StudentTerms.Log.Updated";
             public const string LogWithdrawn = "StudentTerms.Log.Withdrawn";
-            public const string LogRestored = "StudentTerms.Log.Restored";
             public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
             public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
             public const string LogAddManualError = "StudentTerms.Log.AddManualError";
