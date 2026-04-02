@@ -714,6 +714,12 @@
   <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
     <value>Sinh viên đã được rút khỏi kỳ thực tập thành công và chuyển sang trạng thái Withdrawn.</value>
   </data>
+  <data name="StudentTerms.WithdrawDeleteWarning" xml:space="preserve">
+    <value>Cảnh báo: thao tác này sẽ xóa sinh viên khỏi hệ thống (thay đổi tổng sinh viên hệ thống: {0}).</value>
+  </data>
+  <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
+    <value>Không thể xóa sinh viên khỏi hệ thống vì sinh viên vẫn còn đăng ký ở kỳ thực tập khác.</value>
+  </data>
   <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
     <value>Đăng ký thực tập đã được khôi phục thành công. Sinh viên trở lại trạng thái Active trong kỳ thực tập.</value>
   </data>
@@ -725,6 +731,15 @@
   </data>
   <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
     <value>Import sinh viên vào kỳ thực tập thành công. Các sinh viên hợp lệ đã được ghi danh và sẵn sàng tham gia thực tập.</value>
+  </data>
+  <data name="StudentTerms.GetStudentsSuccess" xml:space="preserve">
+    <value>Lấy danh sách sinh viên theo kỳ thực tập thành công. Tổng số bản ghi phù hợp: {0}.</value>
+  </data>
+  <data name="StudentTerms.GetStudentTermDetailSuccess" xml:space="preserve">
+    <value>Lấy chi tiết sinh viên trong kỳ thực tập thành công (StudentTermId: {0}).</value>
+  </data>
+  <data name="StudentTerms.DownloadTemplateSuccess" xml:space="preserve">
+    <value>Tải mẫu import sinh viên thành công cho kỳ thực tập (TermId: {0}).</value>
   </data>
   <data name="StudentTerms.Log.Added" xml:space="preserve">
     <value>Sinh viên {0} đã được thêm vào kỳ thực tập {1} bởi {2}.</value>
@@ -743,6 +758,12 @@
   </data>
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>Đã import {0} sinh viên vào kỳ thực tập {1} bởi {2}.</value>
+  </data>
+  <data name="StudentTerms.Log.AddManualError" xml:space="preserve">
+    <value>Lỗi khi thêm thủ công sinh viên vào kỳ thực tập {0}.</value>
+  </data>
+  <data name="StudentTerms.Log.ImportConfirmError" xml:space="preserve">
+    <value>Lỗi khi xác nhận import sinh viên cho kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Không tìm thấy kỳ thực tập. Vui lòng kiểm tra lại ID hoặc tải lại trang.</value>

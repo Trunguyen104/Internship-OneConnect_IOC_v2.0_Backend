@@ -822,6 +822,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidExcelHeaderDetail = "StudentTerms.InvalidExcelHeaderDetail";
             public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
             public const string TooManyRows = "StudentTerms.TooManyRows";
+            public const string CannotDeleteFromSystemHasOtherTerms = "StudentTerms.CannotDeleteFromSystemHasOtherTerms";
 
             // Validation — TermId / StudentTermId
             public const string TermIdRequired = "StudentTerms.TermIdRequired";
@@ -870,10 +871,14 @@ namespace IOCv2.Application.Constants
             public const string AddSuccess = "StudentTerms.AddSuccess";
             public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
             public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
+            public const string WithdrawDeleteWarning = "StudentTerms.WithdrawDeleteWarning";
             public const string RestoreSuccess = "StudentTerms.RestoreSuccess";
             public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
             public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
             public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
+            public const string GetStudentsSuccess = "StudentTerms.GetStudentsSuccess";
+            public const string GetStudentTermDetailSuccess = "StudentTerms.GetStudentTermDetailSuccess";
+            public const string DownloadTemplateSuccess = "StudentTerms.DownloadTemplateSuccess";
 
             // Email notifications
             public const string EmailSubjectWithdraw = "StudentTerms.Email.SubjectWithdraw";
@@ -899,6 +904,8 @@ namespace IOCv2.Application.Constants
             public const string LogRestored = "StudentTerms.Log.Restored";
             public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
             public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
+            public const string LogAddManualError = "StudentTerms.Log.AddManualError";
+            public const string LogImportConfirmError = "StudentTerms.Log.ImportConfirmError";
         }
         public static class ActiveTerms
         {
@@ -1257,3 +1264,4 @@ namespace IOCv2.Application.Constants
         }
     }
 }
+

@@ -59,7 +59,9 @@ public class StudentTermsController : Controllers.ApiControllerBase
     }
 
     /// <summary>
-    /// Withdraw a student from their term enrollment (must be Active and Unplaced)
+    /// Withdraw a student from their term enrollment (must be Active and Unplaced).
+    /// Optionally set deleteFromSystem=true to also soft-delete the student's account/profile.
+    /// Response includes warning metadata for FE popup (e.g. system delta = -1).
     /// </summary>
     [HttpPatch("{id:guid}/withdraw")]
     [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
@@ -69,9 +71,10 @@ public class StudentTermsController : Controllers.ApiControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> WithdrawStudent(
         [FromRoute] Guid id,
+        [FromQuery] bool deleteFromSystem = false,
         CancellationToken cancellationToken = default)
     {
-        return HandleResult(await _mediator.Send(new WithdrawStudentCommand(id), cancellationToken));
+        return HandleResult(await _mediator.Send(new WithdrawStudentCommand(id, deleteFromSystem), cancellationToken));
     }
 
     /// <summary>

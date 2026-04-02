@@ -90,7 +90,11 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
         var crossTermActive = await _unitOfWork.Repository<StudentTerm>()
             .Query()
             .Include(st => st.Student).ThenInclude(s => s.User)
-            .Where(st => st.TermId != request.TermId && st.EnrollmentStatus == EnrollmentStatus.Active)
+            .Include(st => st.Term)
+            .Where(st =>
+                st.TermId != request.TermId &&
+                st.EnrollmentStatus == EnrollmentStatus.Active &&
+                st.Term.UniversityId == term.UniversityId)
             .Select(st => new { Code = st.Student.User.UserCode.ToLower(), Email = st.Student.User.Email.ToLower() })
             .ToListAsync(cancellationToken);
 
@@ -151,7 +155,6 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
                 existingUsersByEmail.TryGetValue(emailLower, out var existingUser);
 
                 Guid studentId;
-                string? tempPassword = null;
 
                 if (existingUser != null)
                 {
@@ -175,7 +178,7 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
                     }
 
                     // Create new User + Student
-                    tempPassword = _passwordService.GenerateRandomPassword();
+                    var tempPassword = _passwordService.GenerateRandomPassword();
                     var passwordHash = _passwordService.HashPassword(tempPassword);
                     var newUserId = Guid.NewGuid();
 
@@ -308,7 +311,7 @@ public class ImportStudentsConfirmHandler : IRequestHandler<ImportStudentsConfir
         catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogError(ex, "Error confirming import for term {TermId}", request.TermId);
+            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.StudentTerms.LogImportConfirmError), request.TermId);
             throw;
         }
     }

@@ -138,7 +138,11 @@ public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPrevie
         var existingInActiveTerms = await _unitOfWork.Repository<StudentTerm>()
             .Query()
             .Include(st => st.Student).ThenInclude(s => s.User)
-            .Where(st => st.TermId != request.TermId && st.EnrollmentStatus == EnrollmentStatus.Active)
+            .Include(st => st.Term)
+            .Where(st =>
+                st.TermId != request.TermId &&
+                st.EnrollmentStatus == EnrollmentStatus.Active &&
+                st.Term.UniversityId == term.UniversityId)
             .Select(st => new { Code = st.Student.User.UserCode, Email = st.Student.User.Email })
             .ToListAsync(cancellationToken);
 
