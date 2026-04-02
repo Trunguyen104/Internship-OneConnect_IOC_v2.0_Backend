@@ -25,9 +25,22 @@ public class ToggleUserStatusHandlerTests
         var auditRepo = new Mock<IGenericRepository<AuditLog>>();
         auditRepo.Setup(x => x.AddAsync(It.IsAny<AuditLog>(), It.IsAny<CancellationToken>())).ReturnsAsync((AuditLog a, CancellationToken _) => a);
 
+        var refreshToken = new RefreshToken
+        {
+            RefreshTokenId = Guid.NewGuid(),
+            Token = "rt",
+            UserId = user.UserId,
+            Expires = DateTime.UtcNow.AddDays(7),
+            IsRevoked = false
+        };
+        var refreshRepo = new Mock<IGenericRepository<RefreshToken>>();
+        refreshRepo.Setup(x => x.Query()).Returns(new List<RefreshToken> { refreshToken }.AsQueryable().BuildMock());
+        refreshRepo.Setup(x => x.UpdateAsync(It.IsAny<RefreshToken>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(x => x.Repository<User>()).Returns(userRepo.Object);
         uow.Setup(x => x.Repository<AuditLog>()).Returns(auditRepo.Object);
+        uow.Setup(x => x.Repository<RefreshToken>()).Returns(refreshRepo.Object);
         uow.Setup(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         uow.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
         uow.Setup(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);

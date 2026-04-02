@@ -9,6 +9,7 @@ public record CreateInternshipPhaseCommand : IRequest<Result<CreateInternshipPha
     public string Name { get; init; } = string.Empty;
     public DateOnly StartDate { get; init; }
     public DateOnly EndDate { get; init; }
-    public int? MaxStudents { get; init; }
+    public string MajorFields { get; init; } = string.Empty;
+    public int Capacity { get; init; }
     public string? Description { get; init; }
 }

@@ -16,6 +16,8 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
 {
     public class CreateProjectHandler : IRequestHandler<CreateProjectCommand, Result<CreateProjectResponse>>
     {
+        private const string DefaultProjectField = "Software Engineering";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateProjectHandler> _logger;
@@ -121,7 +123,11 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound);
 
-                if (assignedGroup.Status == GroupStatus.Archived || assignedGroup.Status == GroupStatus.Finished)
+                if (assignedGroup.Status == GroupStatus.Archived)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Projects.CannotAssignArchivedGroup), ResultErrorType.BadRequest);
+
+                if (assignedGroup.Status == GroupStatus.Finished)
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
 
@@ -135,9 +141,13 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             }
 
             // 6. Create + Persist
+            var projectRequirements = string.IsNullOrWhiteSpace(request.Requirements)
+                ? string.Empty
+                : request.Requirements.Trim();
+
             var newProject = Project.Create(
                 request.ProjectName, request.Description,
-                projectCode, request.Field, request.Requirements,
+                projectCode, DefaultProjectField, projectRequirements,
                 request.Deliverables, mentorId: enterpriseUser.EnterpriseUserId,
                 startDate: request.StartDate, endDate: request.EndDate);
 
@@ -163,7 +173,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                         var fileName = FileParams.GetFileName(file.FileName);
                         var fileUrl = await _fileStorage.UploadFileAsync(
                             file, FileParams.GetFolder(newProject.ProjectId), fileName, cancellationToken);
-                        uploadedFiles.Add((fileUrl, file.FileName, FileValidationHelper.GetFileType(fileUrl)!.Value));
+                        uploadedFiles.Add((fileUrl, file.FileName, FileValidationHelper.GetFileType(file.FileName)!.Value));
 
                         var resource = new IOCv2.Domain.Entities.ProjectResources(newProject.ProjectId, file.FileName, uploadedFiles[^1].type, fileUrl);
                         await _unitOfWork.Repository<IOCv2.Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);

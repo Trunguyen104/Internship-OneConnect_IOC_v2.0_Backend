@@ -9,8 +9,10 @@ public class UpdateInternshipPhaseResponse
     public string Name { get; set; } = string.Empty;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public int? MaxStudents { get; set; }
+    public string MajorFields { get; set; } = string.Empty;
+    public int Capacity { get; set; }
+    public int RemainingCapacity { get; set; }
     public string? Description { get; set; }
-    public InternshipPhaseStatus Status { get; set; }
+    public InternshipPhaseLifecycleStatus Status { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

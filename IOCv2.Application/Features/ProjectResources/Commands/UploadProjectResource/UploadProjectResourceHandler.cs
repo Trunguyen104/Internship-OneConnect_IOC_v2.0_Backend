@@ -119,17 +119,16 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                             FileParams.GetFolder(request.ProjectId),
                             fileName,
                             cancellationToken);
-                        // Automatically detect file type based on file extension
-                        var detectedType = FileValidationHelper.GetFileType(fileUrl);
-                        if (detectedType == null)
+                        // Keep the original validated file type from the incoming file name.
+                        if (fileValidation?.FileType == null)
                         {
-                            _logger.LogWarning("Unsupported file type for uploaded file: {FileUrl}", fileUrl);
+                            _logger.LogWarning("Unsupported file type for uploaded file: {FileName}", request.File.FileName);
                             return Result<UploadProjectResourceResponse>.Failure(
                                 _messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType),
                                 ResultErrorType.BadRequest);
                         }
 
-                        fileType = detectedType.Value;
+                        fileType = fileValidation.FileType.Value;
                     }
 
                     // Create ProjectResources entity

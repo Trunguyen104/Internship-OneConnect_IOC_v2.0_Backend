@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -59,15 +59,15 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
         {
             // 1) Base query: include navigation properties used for filtering/mapping.
             var query = _unitOfWork.Repository<ViolationReport>().Query()
-                .Include(x => x.Student).ThenInclude(s => s.User)
-                .Include(x => x.InternshipGroup).ThenInclude(g => g.Mentor).ThenInclude(m => m.User)
+                .Include(x => x.Student!).ThenInclude(s => s!.User!)
+                .Include(x => x.InternshipGroup!).ThenInclude(g => g!.Mentor!).ThenInclude(m => m!.User!)
                 .AsNoTracking();
 
             // 2) Role-based access: Mentors only see reports for their groups.
             if (UserRole.Mentor.ToString().Equals(_currentUserService.Role))
             {
                 var currentUserId = Guid.Parse(_currentUserService.UserId!);
-                query = query.Where(x => x.InternshipGroup.Mentor != null && x.InternshipGroup.Mentor.UserId == currentUserId);
+                query = query.Where(x => x.InternshipGroup!.Mentor != null && x.InternshipGroup!.Mentor!.UserId == currentUserId);
             }
 
             // 3) Search: match student full name or user code (case-insensitive).

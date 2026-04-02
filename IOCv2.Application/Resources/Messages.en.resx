@@ -774,11 +774,68 @@
   <data name="InternshipGroup.NotificationProjectCleanupContent" xml:space="preserve">
     <value>{0} was removed from the internship group.</value>
   </data>
+  <data name="InternshipGroup.NotificationGroupArchivedTitle" xml:space="preserve">
+    <value>Internship group archived</value>
+  </data>
+  <data name="InternshipGroup.NotificationGroupArchivedContent" xml:space="preserve">
+    <value>Group [{0}] has been archived. Existing projects are kept, but you cannot assign new projects to this group.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorTitle" xml:space="preserve">
+    <value>Student removed from group</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedMentorContent" xml:space="preserve">
+    <value>{0} was removed from [{1}] by HR. The student can no longer access the group's projects.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentTitle" xml:space="preserve">
+    <value>You were removed from group</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentRemovedStudentContent" xml:space="preserve">
+    <value>You were removed from [{0}]. You can no longer access this group's projects.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedTitle" xml:space="preserve">
+    <value>You were moved to another group</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMovedContent" xml:space="preserve">
+    <value>You were moved to [{0}]. Your project list has been updated.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupTitle" xml:space="preserve">
+    <value>Student transferred out</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorOldGroupContent" xml:space="preserve">
+    <value>{0} has been moved to another group.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupTitle" xml:space="preserve">
+    <value>Student added to your group</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorNewGroupContent" xml:space="preserve">
+    <value>{0} was added to [{1}] and automatically joined currently published projects.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldTitle" xml:space="preserve">
+    <value>You are no longer assigned to this group</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedOldContent" xml:space="preserve">
+    <value>Group [{0}] has been reassigned to another mentor. The group and linked projects are removed from your view.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewTitle" xml:space="preserve">
+    <value>You were assigned as group mentor</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorReplacedNewContent" xml:space="preserve">
+    <value>You were assigned to group [{0}] (replacing {1}) and now have full edit rights on linked projects.</value>
+  </data>
   <data name="InternshipGroup.LogProjectAssignmentsCleanup" xml:space="preserve">
     <value>Auto-removed {0} assignment(s) for student {1} after leaving group.</value>
   </data>
   <data name="InternshipGroup.LogProjectsArchived" xml:space="preserve">
     <value>Archived {0} Draft/Published project(s) after group {1} was archived.</value>
+  </data>
+  <data name="InternshipGroup.LogArchiveNotifyFailed" xml:space="preserve">
+    <value>Group archived but mentor notification failed. InternshipId: {0}.</value>
+  </data>
+  <data name="InternshipGroup.LogMoveNotificationFailed" xml:space="preserve">
+    <value>Student move succeeded but notification failed. FromGroup: {0}, ToGroup: {1}.</value>
+  </data>
+  <data name="InternshipGroup.LogMentorSwapNotificationFailed" xml:space="preserve">
+    <value>Mentor reassignment succeeded but notification failed for group {0}.</value>
   </data>
   <data name="Projects.LogOrphanized" xml:space="preserve">
     <value>Project {0} was orphaned because its group was deleted.</value>
@@ -874,10 +931,22 @@
     <value>Internship group deleted</value>
   </data>
   <data name="InternshipGroups.NotificationOrphanContent" xml:space="preserve">
-    <value>Group "{0}" has been deleted. {1} of your project(s) have been moved back to Draft and detached from the group.</value>
+    <value>Group [{0}] was dissolved. Linked projects were moved to Unstarted. Please assign a new group.</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentTitle" xml:space="preserve">
+    <value>Project no longer available</value>
+  </data>
+  <data name="InternshipGroups.NotificationGroupDeletedStudentContent" xml:space="preserve">
+    <value>Project [{0}] is no longer available because your internship group was dissolved.</value>
   </data>
   <data name="InternshipGroups.LogOrphanizeProjects" xml:space="preserve">
     <value>{0} project(s) orphaned due to group {1} deletion.</value>
+  </data>
+  <data name="InternshipGroup.LogDeleteStudentNotificationFailed" xml:space="preserve">
+    <value>Group deleted but student notification failed. InternshipId: {0}.</value>
+  </data>
+  <data name="Projects.CannotAssignArchivedGroup" xml:space="preserve">
+    <value>Cannot assign project to an archived group.</value>
   </data>
   <data name="Projects.LogGetAll" xml:space="preserve">
     <value>Retrieving all projects. SearchTerm: {0}, Status: {1}.</value>
@@ -926,6 +995,63 @@
   </data>
   <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
     <value>Late logbook submission</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotFound" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotActive" xml:space="preserve">
+    <value>Can only assign mentor to active groups.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupIdRequired" xml:space="preserve">
+    <value>Internship group ID must not be empty.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorMentorRequired" xml:space="preserve">
+    <value>Please select a mentor to assign.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSameMentor" xml:space="preserve">
+    <value>This mentor is already assigned to the group and cannot be assigned again.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor {MentorName} assigned to group {GroupId} successfully.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorFailed" xml:space="preserve">
+    <value>Failed to assign mentor to group {GroupId} due to a system error.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorNotifyFailed" xml:space="preserve">
+    <value>Failed to send notifications after mentor assignment for group {GroupId}, continuing.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSameMentor" xml:space="preserve">
+    <value>AssignMentor: Mentor {MentorUserId} is already the current mentor of group {GroupId}, skipping.</value>
+  </data>
+  <data name="InternshipGroup.AvailableMentorsRetrieved" xml:space="preserve">
+    <value>Available mentors retrieved successfully.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentors" xml:space="preserve">
+    <value>GetAvailableMentors: returned {Count} available mentor(s) for group {GroupId}.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentorsAccessDenied" xml:space="preserve">
+    <value>GetAvailableMentors: User {UserId} does not belong to the enterprise of group {GroupId}, access denied.</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstTitle" xml:space="preserve">
+    <value>You have been assigned a new group</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstContent" xml:space="preserve">
+    <value>You have been assigned to mentor group {0} ({1} students). Internship period: {2} → {3}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedTitle" xml:space="preserve">
+    <value>Your group now has a mentor</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedContent" xml:space="preserve">
+    <value>Your group {0} now has a mentor: {1}. Contact: {2}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedTitle" xml:space="preserve">
+    <value>Your group's mentor has changed</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedContent" xml:space="preserve">
+    <value>The mentor of group {0} has changed. New mentor: {1}. Contact: {2}.</value>
   </data>
   <data name="Profile.LogUpdateStart" xml:space="preserve">
     <value>[START] UpdateMyProfile for User: {UserId}</value>
@@ -981,6 +1107,88 @@
   <data name="JobPosting.InternshipInProgress" xml:space="preserve">
     <value>You are currently doing an internship.</value>
   </data>
+  <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
+    <value>Student internship list retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.StudentDetailRetrieved" xml:space="preserve">
+    <value>Student detail retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.StudentLogbookTotalRetrieved" xml:space="preserve">
+    <value>Student logbook summary retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.StudentLogbookWeeklyRetrieved" xml:space="preserve">
+    <value>Student weekly logbook retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.EvaluationsRetrieved" xml:space="preserve">
+    <value>Student evaluations retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.ViolationsRetrieved" xml:space="preserve">
+    <value>Student violations retrieved successfully.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>No open internship term found for your university. List is empty.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetStudentList" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved internship student list for term {1}, total {2} records.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetStudentDetail" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved student detail for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbookTotal" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved logbook summary for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetLogbookWeekly" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved weekly logbook for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetEvaluations" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved evaluations for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.GetViolations" xml:space="preserve">
+    <value>SchoolAdmin {0} retrieved violations for student {1} in term {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.UniversityUserNotFound" xml:space="preserve">
+    <value>UniversityUser not found for userId={0}. Access denied.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermNotFound" xml:space="preserve">
+    <value>Term not found for termId={0}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.TermAccessDenied" xml:space="preserve">
+    <value>SchoolAdmin {0} attempted to access term {1} not belonging to university {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.StudentNotFound" xml:space="preserve">
+    <value>Student {0} not found in term {1} for university {2}.</value>
+  </data>
+  <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
+    <value>No open internship term found for university {0}.</value>
+  </data>
+
+  <!-- UniAdminInternship — Logbook weekly display badges -->
+  <data name="UniAdminInternship.StatusBadge.Late" xml:space="preserve">
+    <value>Late</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Submitted" xml:space="preserve">
+    <value>Submitted</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Weekend" xml:space="preserve">
+    <value>Weekend</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Holiday" xml:space="preserve">
+    <value>Holiday</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="UniAdminInternship.StatusBadge.Missing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="UniAdminInternship.WeekTitle" xml:space="preserve">
+    <value>Week {0}: {1} - {2}</value>
+  </data>
+
+  <!-- InternshipPhase — missing EN key -->
+  <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
+    <value>Rejected deletion of internship phase '{0}' (ID: {1}) — phase is in InProgress status and cannot be deleted.</value>
+    </data>
   <data name="InternshipPhase.InternshipPhaseIdRequired" xml:space="preserve">
     <value>Internship Phase ID is required.</value>
   </data>
@@ -1020,6 +1228,9 @@
   </data>
   <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
     <value>Only allow selecting phases that are Open (Upcoming) or InProgress (Active)</value>
+  </data>
+  <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
+    <value>Internship phase {0} detail loaded — {1} job posting(s), {2} placed student(s).</value>
   </data>
   <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
     <value>The internship phase has reached its maximum capacity.</value>

@@ -56,6 +56,7 @@ public class UserManagementController : ApiControllerBase
     /// Create a new account (SuperAdmin creates all, SchoolAdmin creates Students, EnterpriseAdmin creates HR/Mentors).
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateUser(
@@ -84,6 +85,7 @@ public class UserManagementController : ApiControllerBase
     /// Soft delete an account with hierarchical validation.
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<DeleteUserResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteUser(
         [FromRoute] Guid id,
@@ -111,6 +113,7 @@ public class UserManagementController : ApiControllerBase
     /// Reset the password of an account.
     /// </summary>
     [HttpPost("{id:guid}/reset-password")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<ResetUserPasswordResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ResetPassword(
         [FromRoute] Guid id,

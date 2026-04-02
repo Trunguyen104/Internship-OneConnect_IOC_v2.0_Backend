@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260330142222_RemoveQuantityJobPosting")]
-    partial class RemoveQuantityJobPosting
+    [Migration("20260402105659_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -178,6 +178,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("background_url");
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -574,6 +578,58 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("evaluation_details", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.GroupMentorHistory", b =>
+                {
+                    b.Property<Guid>("HistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("history_id");
+
+                    b.Property<short>("ActionType")
+                        .HasColumnType("smallint")
+                        .HasColumnName("action_type");
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("actor_id");
+
+                    b.Property<Guid>("InternshipGroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("internship_group_id");
+
+                    b.Property<Guid?>("NewMentorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("new_mentor_id");
+
+                    b.Property<Guid?>("OldMentorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("old_mentor_id");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("timestamp");
+
+                    b.HasKey("HistoryId")
+                        .HasName("pk_group_mentor_history");
+
+                    b.HasIndex("ActorId")
+                        .HasDatabaseName("ix_group_mentor_history_actor_id");
+
+                    b.HasIndex("InternshipGroupId")
+                        .HasDatabaseName("ix_group_mentor_history_group_id");
+
+                    b.HasIndex("NewMentorId")
+                        .HasDatabaseName("ix_group_mentor_history_new_mentor_id");
+
+                    b.HasIndex("OldMentorId")
+                        .HasDatabaseName("ix_group_mentor_history_old_mentor_id");
+
+                    b.HasIndex("Timestamp")
+                        .HasDatabaseName("ix_group_mentor_history_timestamp");
+
+                    b.ToTable("group_mentor_history", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipApplication", b =>
                 {
                     b.Property<Guid>("ApplicationId")
@@ -621,10 +677,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<Guid?>("JobId")
                         .HasColumnType("uuid")
                         .HasColumnName("job_id");
-
-                    b.Property<Guid?>("JobId1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("job_id1");
 
                     b.Property<string>("JobPostingTitle")
                         .HasColumnType("text")
@@ -679,9 +731,6 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("JobId")
                         .HasDatabaseName("ix_internship_applications_job_id");
-
-                    b.HasIndex("JobId1")
-                        .HasDatabaseName("ix_internship_applications_job_id1");
 
                     b.HasIndex("ReviewedBy")
                         .HasDatabaseName("ix_internship_applications_reviewed_by");
@@ -790,6 +839,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("phase_id");
 
+                    b.Property<int>("Capacity")
+                        .HasColumnType("integer")
+                        .HasColumnName("capacity");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -816,9 +869,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_id");
 
-                    b.Property<int?>("MaxStudents")
-                        .HasColumnType("integer")
-                        .HasColumnName("max_students");
+                    b.Property<string>("MajorFields")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("major_fields");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -849,8 +903,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasDatabaseName("ix_internship_phases_enterprise_id");
 
                     b.HasIndex("EnterpriseId", "Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_internship_phases_enterprise_name_unique")
+                        .HasDatabaseName("ix_internship_phases_enterprise_name")
                         .HasFilter("deleted_at IS NULL");
 
                     b.HasIndex("EnterpriseId", "Status")
@@ -958,7 +1011,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expire_date");
 
-                    b.Property<Guid>("InternshipPhaseId")
+                    b.Property<Guid?>("InternshipPhaseId")
                         .HasColumnType("uuid")
                         .HasColumnName("internship_phase_id");
 
@@ -1999,6 +2052,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("code");
 
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -2570,6 +2627,43 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("Evaluation");
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.GroupMentorHistory", b =>
+                {
+                    b.HasOne("IOCv2.Domain.Entities.User", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_group_mentor_history_users_actor_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.InternshipGroup", "InternshipGroup")
+                        .WithMany()
+                        .HasForeignKey("InternshipGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_group_mentor_history_internship_groups_internship_group_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "NewMentor")
+                        .WithMany()
+                        .HasForeignKey("NewMentorId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_group_mentor_history_enterprise_users_new_mentor_id");
+
+                    b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "OldMentor")
+                        .WithMany()
+                        .HasForeignKey("OldMentorId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_group_mentor_history_enterprise_users_old_mentor_id");
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("InternshipGroup");
+
+                    b.Navigation("NewMentor");
+
+                    b.Navigation("OldMentor");
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.InternshipApplication", b =>
                 {
                     b.HasOne("IOCv2.Domain.Entities.Enterprise", "Enterprise")
@@ -2585,15 +2679,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasConstraintName("fk_internship_applications_internship_groups_internship_group_");
 
                     b.HasOne("IOCv2.Domain.Entities.Job", "Job")
-                        .WithMany("Applications")
+                        .WithMany("InternshipApplications")
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_internship_applications_jobs_job_id");
-
-                    b.HasOne("IOCv2.Domain.Entities.Job", null)
-                        .WithMany("InternshipApplications")
-                        .HasForeignKey("JobId1")
-                        .HasConstraintName("fk_internship_applications_jobs_job_id1");
 
                     b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "Reviewer")
                         .WithMany("ReviewedApplications")
@@ -2706,7 +2795,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithMany("Jobs")
                         .HasForeignKey("InternshipPhaseId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
 
                     b.Navigation("Enterprise");
@@ -3080,8 +3168,6 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
                 {
-                    b.Navigation("Applications");
-
                     b.Navigation("InternshipApplications");
                 });
 

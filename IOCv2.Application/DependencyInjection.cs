@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using IOCv2.Application.Common.Behaviors;
 using IOCv2.Application.Extensions.Mappings;

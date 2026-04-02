@@ -3,7 +3,9 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Universities.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.Universities.Commands.DeleteUniversity;
@@ -39,7 +41,31 @@ public class DeleteUniversityHandler : IRequestHandler<DeleteUniversityCommand, 
             throw new NotFoundException(nameof(University), request.UniversityId);
         }
 
-        await _unitOfWork.BeginTransactionAsync();
+        // BR-UNI-DL-02: Dependency Guard
+        // 1) Refuse delete if university has active terms (Open)
+        var hasActiveTerms = await _unitOfWork.Repository<Term>()
+            .Query()
+            .AnyAsync(t => t.UniversityId == request.UniversityId && t.Status == TermStatus.Open, cancellationToken);
+
+        if (hasActiveTerms)
+        {
+            return Result<bool>.Failure("Cannot delete university: active terms exist.", ResultErrorType.Forbidden);
+        }
+
+        // 2) Refuse delete if any student is currently interning under those terms
+        var hasInterningStudents = await _unitOfWork.Repository<StudentTerm>()
+            .Query()
+            .AnyAsync(
+                st => st.Term.UniversityId == request.UniversityId &&
+                      st.Student.InternshipStatus == StudentStatus.INTERNSHIP_IN_PROGRESS,
+                cancellationToken);
+
+        if (hasInterningStudents)
+        {
+            return Result<bool>.Failure("Cannot delete university: students are interning.", ResultErrorType.Forbidden);
+        }
+
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
             university.Delete();

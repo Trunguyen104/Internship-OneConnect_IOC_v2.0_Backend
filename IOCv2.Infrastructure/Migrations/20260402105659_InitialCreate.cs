@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddinternshipPhaseToJobPosting : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,6 +24,7 @@ namespace IOCv2.Infrastructure.Migrations
                     website = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     logo_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     background_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    contact_email = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)2),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -45,6 +46,7 @@ namespace IOCv2.Infrastructure.Migrations
                     name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     logo_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    contact_email = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -105,7 +107,8 @@ namespace IOCv2.Infrastructure.Migrations
                     name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     start_date = table.Column<DateOnly>(type: "date", nullable: false),
                     end_date = table.Column<DateOnly>(type: "date", nullable: false),
-                    max_students = table.Column<int>(type: "integer", nullable: true),
+                    major_fields = table.Column<string>(type: "text", nullable: false),
+                    capacity = table.Column<int>(type: "integer", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
@@ -395,14 +398,13 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     job_id = table.Column<Guid>(type: "uuid", nullable: false),
                     enterprise_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    internship_phase_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    internship_phase_id = table.Column<Guid>(type: "uuid", nullable: true),
                     title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     position = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     description = table.Column<string>(type: "text", nullable: true),
                     requirements = table.Column<string>(type: "text", nullable: true),
                     location = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     benefit = table.Column<string>(type: "text", nullable: true),
-                    quantity = table.Column<int>(type: "integer", nullable: true),
                     expire_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: true),
                     start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -616,6 +618,47 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "group_mentor_history",
+                columns: table => new
+                {
+                    history_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    internship_group_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    old_mentor_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    new_mentor_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    actor_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    action_type = table.Column<short>(type: "smallint", nullable: false),
+                    timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_group_mentor_history", x => x.history_id);
+                    table.ForeignKey(
+                        name: "fk_group_mentor_history_enterprise_users_new_mentor_id",
+                        column: x => x.new_mentor_id,
+                        principalTable: "enterprise_users",
+                        principalColumn: "enterprise_user_id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_group_mentor_history_enterprise_users_old_mentor_id",
+                        column: x => x.old_mentor_id,
+                        principalTable: "enterprise_users",
+                        principalColumn: "enterprise_user_id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "fk_group_mentor_history_internship_groups_internship_group_id",
+                        column: x => x.internship_group_id,
+                        principalTable: "internship_groups",
+                        principalColumn: "internship_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_group_mentor_history_users_actor_id",
+                        column: x => x.actor_id,
+                        principalTable: "users",
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "internship_applications",
                 columns: table => new
                 {
@@ -635,7 +678,6 @@ namespace IOCv2.Infrastructure.Migrations
                     reviewed_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
                     reviewed_by = table.Column<Guid>(type: "uuid", nullable: true),
                     internship_group_internship_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    job_id1 = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -668,11 +710,6 @@ namespace IOCv2.Infrastructure.Migrations
                         principalTable: "jobs",
                         principalColumn: "job_id",
                         onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "fk_internship_applications_jobs_job_id1",
-                        column: x => x.job_id1,
-                        principalTable: "jobs",
-                        principalColumn: "job_id");
                     table.ForeignKey(
                         name: "fk_internship_applications_students_student_id",
                         column: x => x.student_id,
@@ -1204,6 +1241,31 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "student_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_group_mentor_history_actor_id",
+                table: "group_mentor_history",
+                column: "actor_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_group_mentor_history_group_id",
+                table: "group_mentor_history",
+                column: "internship_group_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_group_mentor_history_new_mentor_id",
+                table: "group_mentor_history",
+                column: "new_mentor_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_group_mentor_history_old_mentor_id",
+                table: "group_mentor_history",
+                column: "old_mentor_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_group_mentor_history_timestamp",
+                table: "group_mentor_history",
+                column: "timestamp");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_internship_applications_enterprise_id_status",
                 table: "internship_applications",
                 columns: new[] { "enterprise_id", "status" });
@@ -1217,11 +1279,6 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_internship_applications_job_id",
                 table: "internship_applications",
                 column: "job_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_internship_applications_job_id1",
-                table: "internship_applications",
-                column: "job_id1");
 
             migrationBuilder.CreateIndex(
                 name: "ix_internship_applications_reviewed_by",
@@ -1279,10 +1336,9 @@ namespace IOCv2.Infrastructure.Migrations
                 column: "enterprise_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_internship_phases_enterprise_name_unique",
+                name: "ix_internship_phases_enterprise_name",
                 table: "internship_phases",
                 columns: new[] { "enterprise_id", "name" },
-                unique: true,
                 filter: "deleted_at IS NULL");
 
             migrationBuilder.CreateIndex(
@@ -1614,6 +1670,9 @@ namespace IOCv2.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "evaluation_details");
+
+            migrationBuilder.DropTable(
+                name: "group_mentor_history");
 
             migrationBuilder.DropTable(
                 name: "internship_students");
