@@ -47,6 +47,12 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.ToggleUserSta
                 return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.InvalidAuditor), ResultErrorType.Unauthorized);
             }
 
+            // BR-USR-TG-01: Self-harm protection for status toggle
+            if (request.UserId == auditorId)
+            {
+                return Result<ToggleUserStatusResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+            }
+
             var auditorRoleStr = _currentUserService.Role;
             if (!Enum.TryParse<UserRole>(auditorRoleStr, true, out var auditorRole))
             {
@@ -96,6 +102,22 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.ToggleUserSta
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
                 
                 await _unitOfWork.Repository<User>().UpdateAsync(user, cancellationToken);
+
+                // BR-USR-DL-04: Cleanup sessions when disabling/suspending
+                if (request.NewStatus != UserStatus.Active)
+                {
+                    var activeTokens = await _unitOfWork.Repository<RefreshToken>()
+                        .Query()
+                        .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var token in activeTokens)
+                    {
+                        token.IsRevoked = true;
+                        token.UpdatedAt = DateTime.UtcNow;
+                        await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
+                    }
+                }
 
                 var auditLog = new AuditLog
                 {

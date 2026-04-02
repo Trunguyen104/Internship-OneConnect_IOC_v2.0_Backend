@@ -9,6 +9,7 @@ using IOCv2.Application.Services;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,10 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
                 return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.NotFound), ResultErrorType.NotFound);
             }
 
+            var previousEnterpriseStatus = (EnterpriseStatus)enterprise.Status;
+            var isSuperAdmin = _currentUserService.Role != null &&
+                               _currentUserService.Role.Equals(UserRole.SuperAdmin.ToString(), StringComparison.OrdinalIgnoreCase);
+
             if (!_currentUserService.Role!.Equals(UserRole.SuperAdmin.ToString()))
             {
                 bool canUpdate = await _unitOfWork.Repository<EnterpriseUser>().ExistsAsync(x => x.UserId == Guid.Parse(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
@@ -80,6 +85,72 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
             try
             {
                 _mapper.Map(request, enterprise);
+
+                // BR-ENT-TG-01: Cascading suspend/block enterprise
+                if (isSuperAdmin &&
+                    previousEnterpriseStatus != EnterpriseStatus.Suspended &&
+                    request.Status == EnterpriseStatus.Suspended)
+                {
+                    var performedById = Guid.Parse(_currentUserService.UserId!);
+
+                    // 1) Suspend all Enterprise-linked accounts
+                    var enterpriseUserIds = await _unitOfWork.Repository<EnterpriseUser>()
+                        .Query()
+                        .Where(eu => eu.EnterpriseId == request.EnterpriseId)
+                        .Select(eu => eu.UserId)
+                        .ToListAsync(cancellationToken);
+
+                    if (enterpriseUserIds.Count > 0)
+                    {
+                        var users = await _unitOfWork.Repository<User>()
+                            .Query()
+                            .Where(u => enterpriseUserIds.Contains(u.UserId))
+                            .ToListAsync(cancellationToken);
+
+                        foreach (var u in users)
+                        {
+                            u.SetStatus(UserStatus.Suspended);
+                            await _unitOfWork.Repository<User>().UpdateAsync(u, cancellationToken);
+                        }
+
+                        // 2) Revoke all refresh tokens for those users
+                        var activeTokens = await _unitOfWork.Repository<RefreshToken>()
+                            .Query()
+                            .Where(rt => enterpriseUserIds.Contains(rt.UserId) && !rt.IsRevoked)
+                            .ToListAsync(cancellationToken);
+
+                        foreach (var token in activeTokens)
+                        {
+                            token.IsRevoked = true;
+                            token.UpdatedAt = DateTime.UtcNow;
+                            await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
+                        }
+
+                        // 3) Close all enterprise job postings so no one can apply
+                        var jobs = await _unitOfWork.Repository<Job>()
+                            .Query()
+                            .Where(j => j.EnterpriseId == request.EnterpriseId && j.Status == JobStatus.PUBLISHED)
+                            .ToListAsync(cancellationToken);
+
+                        foreach (var job in jobs)
+                        {
+                            job.Status = JobStatus.CLOSED;
+                            await _unitOfWork.Repository<Job>().UpdateAsync(job, cancellationToken);
+                        }
+                    }
+
+                    // 4) Audit log
+                    await _unitOfWork.Repository<AuditLog>().AddAsync(new AuditLog
+                    {
+                        AuditLogId = Guid.NewGuid(),
+                        Action = AuditAction.Deactivate,
+                        EntityType = nameof(Enterprise),
+                        EntityId = request.EnterpriseId,
+                        PerformedById = performedById,
+                        Reason = $"Enterprise suspended with cascade for {request.EnterpriseId}",
+                        CreatedAt = DateTime.UtcNow
+                    }, cancellationToken);
+                }
 
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);

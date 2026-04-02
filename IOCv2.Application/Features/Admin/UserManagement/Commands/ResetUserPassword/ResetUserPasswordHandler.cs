@@ -85,14 +85,16 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.ResetUserPass
                     return Result<ResetUserPasswordResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied), ResultErrorType.Forbidden);
                 }
             }
-            else if (auditorRole != UserRole.SuperAdmin && auditorRole != UserRole.Moderator)
+            else if (auditorRole != UserRole.SuperAdmin)
             {
                 return Result<ResetUserPasswordResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied), ResultErrorType.Forbidden);
             }
 
             if (user.Status != UserStatus.Active)
             {
-                return Result<ResetUserPasswordResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.NotActive));
+                return Result<ResetUserPasswordResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Users.NotActive),
+                    ResultErrorType.Forbidden);
             }
 
             // 4. Execution
