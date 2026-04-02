@@ -1,4 +1,5 @@
 using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
 using FluentAssertions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Sprints.Queries.GetSprints;
@@ -37,7 +38,7 @@ namespace IOCv2.Tests.Features.Sprints.Queries.GetSprints
             _mockMessageService = new Mock<IMessageService>();
             _mockLogger = new Mock<ILogger<GetSprintsHandler>>();
 
-            var mapperCfg = new MapperConfiguration(c => c.AddProfile<MappingProfile>(), null);
+            var mapperCfg = new MapperConfiguration(c => c.AddProfile<MappingProfile>());
             _mapper = mapperCfg.CreateMapper();
 
             _dbOptions = new DbContextOptionsBuilder<TestDbContext>()
