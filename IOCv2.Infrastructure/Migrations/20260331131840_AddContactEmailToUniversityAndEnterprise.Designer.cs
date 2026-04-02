@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260330045808_AddinternshipPhaseToJobPosting")]
-    partial class AddinternshipPhaseToJobPosting
+    [Migration("20260331131840_AddContactEmailToUniversityAndEnterprise")]
+    partial class AddContactEmailToUniversityAndEnterprise
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -178,6 +178,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("background_url");
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -958,10 +962,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expire_date");
 
-                    b.Property<Guid>("InternshipPhaseId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("internship_phase_id");
-
                     b.Property<string>("Location")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -1006,9 +1006,6 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("EnterpriseId")
                         .HasDatabaseName("ix_jobs_enterprise_id");
-
-                    b.HasIndex("InternshipPhaseId")
-                        .HasDatabaseName("ix_jobs_internship_phase_id");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_jobs_status");
@@ -2003,6 +2000,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("code");
 
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -2706,16 +2707,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_jobs_enterprises_enterprise_id");
 
-                    b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternshipPhase")
-                        .WithMany("Jobs")
-                        .HasForeignKey("InternshipPhaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
-
                     b.Navigation("Enterprise");
-
-                    b.Navigation("InternshipPhase");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
@@ -3078,8 +3070,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Navigation("EvaluationCycles");
 
                     b.Navigation("InternshipGroups");
-
-                    b.Navigation("Jobs");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>

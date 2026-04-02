@@ -1,13 +1,11 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternshipGroup;
-using IOCv2.Application.Features.InternshipGroups.Commands.AssignMentorToGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetweenGroups;
 using IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup;
-using IOCv2.Application.Features.InternshipGroups.Queries.GetAvailableMentors;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetDashboard;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
@@ -234,42 +232,6 @@ public class InternshipGroupsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get available mentors for an internship group (with current group count).
-    /// Dùng để populate dropdown khi HR gán/đổi Mentor.
-    /// </summary>
-    [HttpGet("{id:guid}/available-mentors")]
-    [Authorize(Roles = "HR,EnterpriseAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<List<AvailableMentorDto>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAvailableMentors(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return HandleResult(await _mediator.Send(new GetAvailableMentorsQuery(id), cancellationToken));
-    }
-
-    /// <summary>
-    /// Assign or change the mentor of an internship group (quick-action — không cần full edit form).
-    /// Tự động xác định Assign (lần đầu) hoặc Change (đã có mentor).
-    /// </summary>
-    [HttpPatch("{id:guid}/mentor")]
-    [Authorize(Roles = "HR,EnterpriseAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<AssignMentorToGroupResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AssignMentorToGroup(
-        [FromRoute] Guid id,
-        [FromBody] AssignMentorToGroupRequest body,
-        CancellationToken cancellationToken = default)
-    {
-        return HandleResult(await _mediator.Send(
-            new AssignMentorToGroupCommand(id, body.MentorUserId),
-            cancellationToken));
-    }
-
-    /// <summary>
     /// Get dashboard statistics for an internship group.
     /// </summary>
     /// <param name="id">Internship group ID.</param>
@@ -284,10 +246,4 @@ public class InternshipGroupsController : ApiControllerBase
         _logger.LogInformation("Request to get dashboard for internship group ID: {Id}", id);
         return HandleResult(await _mediator.Send(new GetInternshipGroupDashboardQuery(id), cancellationToken));
     }
-}
-
-/// <summary>Request body cho PATCH {id}/mentor — GroupId được lấy từ route parameter</summary>
-public class AssignMentorToGroupRequest
-{
-    public Guid MentorUserId { get; set; }
 }

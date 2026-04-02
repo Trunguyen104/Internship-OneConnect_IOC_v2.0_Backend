@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddinternshipPhaseToJobPosting : Migration
+    public partial class CanNullFKInternshipPhaseJob : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -395,14 +395,13 @@ namespace IOCv2.Infrastructure.Migrations
                 {
                     job_id = table.Column<Guid>(type: "uuid", nullable: false),
                     enterprise_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    internship_phase_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    internship_phase_id = table.Column<Guid>(type: "uuid", nullable: true),
                     title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     position = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     description = table.Column<string>(type: "text", nullable: true),
                     requirements = table.Column<string>(type: "text", nullable: true),
                     location = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     benefit = table.Column<string>(type: "text", nullable: true),
-                    quantity = table.Column<int>(type: "integer", nullable: true),
                     expire_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: true),
                     start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

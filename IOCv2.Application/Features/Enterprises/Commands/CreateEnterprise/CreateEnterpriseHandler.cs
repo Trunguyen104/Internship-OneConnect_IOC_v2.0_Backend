@@ -54,6 +54,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                     Description = request.Description,
                     Address = request.Address,
                     Website = request.Website,
+                    ContactEmail = request.ContactEmail,
                     Status = (short)EnterpriseStatus.Active
                 };
 
