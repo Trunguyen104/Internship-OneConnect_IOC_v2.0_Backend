@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IOCv2.API.Controllers;
+namespace IOCv2.API.Controllers.Evaluations;
 
 /// <summary>
 /// Evaluation Management — manage evaluation cycles, criteria, and mentor grading.
@@ -42,9 +42,9 @@ public class EvaluationsController : ApiControllerBase
     /// </summary>
     [HttpGet("cycles")]
     [ProducesResponseType(typeof(ApiResponse<List<GetEvaluationCyclesResponse>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetEvaluationCycles([FromQuery] Guid termId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetEvaluationCycles([FromQuery] Guid phaseId, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetEvaluationCyclesQuery { TermId = termId }, cancellationToken);
+        var result = await _mediator.Send(new GetEvaluationCyclesQuery { PhaseId = phaseId }, cancellationToken);
         return HandleResult(result);
     }
 
@@ -156,7 +156,7 @@ public class EvaluationsController : ApiControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command with { CycleId = cycleId }, cancellationToken);
-        return HandleCreateResult(result, nameof(GetEvaluationCriteria), new { cycleId = cycleId, version = "1" });
+        return HandleCreateResult(result, nameof(GetEvaluationCriteria), new { cycleId, version = "1" });
     }
 
     /// <summary>
@@ -279,11 +279,63 @@ public class EvaluationsController : ApiControllerBase
     public async Task<IActionResult> PublishEvaluation(
         [FromRoute] Guid cycleId,
         [FromRoute] Guid internshipId,
+        [FromBody] PublishEvaluationCommand command,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
-            new PublishEvaluationCommand { CycleId = cycleId, InternshipId = internshipId },
+            command with { CycleId = cycleId, InternshipId = internshipId },
             cancellationToken);
         return HandleResult(result);
     }
+
+    /// <summary>
+    /// Chấm điểm cá nhân cho một sinh viên (Issue 93).
+    /// </summary>
+    [HttpPost("cycles/{cycleId:guid}/evaluations/individual")]
+    [ProducesResponseType(typeof(ApiResponse<List<SaveEvaluationsResponse>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> IndividualSaveEvaluation(
+        [FromRoute] Guid cycleId,
+        [FromBody] IndividualEvaluationRequest request,
+        CancellationToken cancellationToken)
+    {
+        var evaluatorId = GetCurrentUserId();
+        if (evaluatorId == null)
+            return Unauthorized(ApiResponse<object>.Fail("Unauthorized access."));
+
+        // Map to standard SaveEvaluationsCommand
+        var command = new SaveEvaluationsCommand
+        {
+            CycleId = cycleId,
+            InternshipId = request.InternshipId,
+            EvaluatorId = evaluatorId.Value,
+            Evaluations = new List<StudentEvaluationInput>
+            {
+                new StudentEvaluationInput
+                {
+                    StudentId = request.StudentId,
+                    Note = request.GeneralComment,
+                    Details = request.Scores.Select(s => new EvaluationDetailInput
+                    {
+                        CriteriaId = s.CriteriaId,
+                        Score = s.Score,
+                        Comment = s.Comment
+                    }).ToList()
+                }
+            }
+        };
+
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
 }
+
+public record IndividualEvaluationRequest(
+    Guid InternshipId, 
+    Guid StudentId, 
+    string? GeneralComment, 
+    List<IndividualScoreInput> Scores);
+
+public record IndividualScoreInput(
+    Guid CriteriaId, 
+    decimal Score, 
+    string? Comment);

@@ -32,32 +32,26 @@ namespace IOCv2.Application.Features.Users.Queries.GetMyProfile
 
         public async Task<Result<GetMyProfileResponse>> Handle(GetMyProfileQuery request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting profile for User {UserId}", request.UserId);
+            _logger.LogInformation(_messageService.GetMessage(MessageKeys.Profile.LogGetProfile), request.UserId);
 
-            try
+
+            var user = await _unitOfWork.Repository<User>()
+                .Query()
+                .Include(u => u.Student)
+                .Include(u => u.UniversityUser)
+                .Include(u => u.EnterpriseUser)
+                .AsNoTracking()
+                .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
+
+            if (user == null)
             {
-                var user = await _unitOfWork.Repository<User>()
-                    .Query()
-                    .Include(u => u.Student)
-                    .Include(u => u.UniversityUser)
-                    .Include(u => u.EnterpriseUser)
-                    .AsNoTracking()
-                    .ProjectTo<GetMyProfileResponse>(_mapper.ConfigurationProvider)
-                    .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
-
-                if (user == null)
-                {
-                    _logger.LogWarning("User {UserId} not found when fetching profile", request.UserId);
-                    return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
-                }
-
-                return Result<GetMyProfileResponse>.Success(user);
+                _logger.LogWarning(_messageService.GetMessage(MessageKeys.Profile.LogGetProfileUserNotFound), request.UserId);
+                return Result<GetMyProfileResponse>.NotFound(_messageService.GetMessage(MessageKeys.Users.NotFound));
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while getting profile for User {UserId}", request.UserId);
-                return Result<GetMyProfileResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError));
-            }
+
+            return Result<GetMyProfileResponse>.Success(user);
+
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.Admin.Users.Queries.GetAdminUsers;
+using IOCv2.Application.Features.Admin.UserManagement.Queries.GetUsers;
 using IOCv2.Domain.Enums;
 using MediatR;
 using System;
@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
 {
     /// <summary>
-    /// Query to get paginated logbooks for an internship group.
+    /// Query to get logbooks grouped by week for an internship group.
     /// </summary>
-    public record GetLogbooksQuery : IRequest<Result<PaginatedResult<GetLogbooksResponse>>>
+    public record GetLogbooksQuery : IRequest<Result<GetLogbooksByWeekResponse>>
     {
         /// <summary>
         /// Internship group ID from route.
@@ -26,14 +26,10 @@ namespace IOCv2.Application.Features.Logbooks.Queries.GetLogbooks
         public LogbookStatus? Status { get; init; }
 
         /// <summary>
-        /// Page number (default 1).
+        /// Optional internship week filter as CSV (e.g. "1,2").
         /// </summary>
-        public int PageNumber { get; init; } = 1;
+        public string? WeekFilter { get; init; }
 
-        /// <summary>
-        /// Items per page (default 10).
-        /// </summary>
-        public int PageSize { get; init; } = 10;
 
         /// <summary>
         /// Column to sort by.

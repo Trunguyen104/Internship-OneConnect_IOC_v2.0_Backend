@@ -15,18 +15,32 @@ public class GetProjectByIdHandlerTests
     [Fact]
     public async Task Handle_ReturnsCached_WhenCacheHit()
     {
+        var projectId = Guid.NewGuid();
         var cache = new Mock<ICacheService>();
         cache.Setup(x => x.GetAsync<GetProjectByIdResponse>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new GetProjectByIdResponse { ProjectName = "Cached Project" });
 
+        var project = Project.Create("Test", "Test", "Test", "Test", "Test");
+        var propertyInfo = typeof(Project).GetProperty("ProjectId");
+        propertyInfo?.SetValue(project, projectId);
+        project.Publish();
+
+        var repo = new Mock<IGenericRepository<Project>>();
+        var projects = new List<Project> { project }.AsQueryable().BuildMock();
+        repo.Setup(x => x.Query()).Returns(projects);
+
+        var uow = new Mock<IUnitOfWork>();
+        uow.Setup(x => x.Repository<Project>()).Returns(repo.Object);
+
         var handler = new GetProjectByIdHandler(
-            Mock.Of<IUnitOfWork>(),
+            uow.Object,
             Mock.Of<IMapper>(),
             Mock.Of<ILogger<GetProjectByIdHandler>>(),
             Mock.Of<IMessageService>(),
-            cache.Object);
+            cache.Object,
+            Mock.Of<ICurrentUserService>());
 
-        var result = await handler.Handle(new GetProjectByIdQuery { ProjectId = Guid.NewGuid() }, CancellationToken.None);
+        var result = await handler.Handle(new GetProjectByIdQuery { ProjectId = projectId }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Data!.ProjectName.Should().Be("Cached Project");

@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCycles.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -15,15 +16,18 @@ public class UpdateEvaluationCycleHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<UpdateEvaluationCycleHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public UpdateEvaluationCycleHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<UpdateEvaluationCycleHandler> logger)
+        ILogger<UpdateEvaluationCycleHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<UpdateEvaluationCycleResponse>> Handle(
@@ -67,12 +71,15 @@ public class UpdateEvaluationCycleHandler
         await _unitOfWork.SaveChangeAsync(cancellationToken);
         await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+        await _cacheService.RemoveByPatternAsync(EvaluationCycleCacheKeys.CycleListPattern(), cancellationToken);
+        await _cacheService.RemoveByPatternAsync(EvaluationCycleCacheKeys.CyclePattern(), cancellationToken);
+
         _logger.LogInformation("Successfully updated EvaluationCycle {CycleId}", request.CycleId);
 
         return Result<UpdateEvaluationCycleResponse>.Success(new UpdateEvaluationCycleResponse
         {
             CycleId = cycle.CycleId,
-            TermId = cycle.TermId,
+            PhaseId = cycle.PhaseId,
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,

@@ -1,6 +1,8 @@
 using IOCv2.API.Configurations;
 using IOCv2.API.Middlewares;
+using IOCv2.API.Services;
 using IOCv2.Application;
+using IOCv2.Application.Interfaces;
 using IOCv2.Infrastructure;
 using IOCv2.Infrastructure.Services.Logging;
 using Serilog;
@@ -32,11 +34,18 @@ builder.Services.AddSecurityConfig(builder.Configuration);
 builder.Services.AddRedisConfig(builder.Configuration);
 builder.Services.AddForwardedHeadersConfig();
 builder.Services.AddLocalizationConfig();
+builder.Services.AddSignalRConfig();
 builder.Services.AddHealthChecksConfig(builder.Configuration);
+
+// Register API-layer services (depend on SignalR Hub, cannot go in Infrastructure)
+builder.Services.AddScoped<INotificationPushService, SignalRNotificationPushService>();
 
 var app = builder.Build();
 
 // Configure Middleware Pipeline
+// /health phải map TRƯỚC các middleware logic (auth, rate limit, etc.)
+app.UseHealthChecksConfig();
+
 app.UseLocalizationConfig();
 app.UseForwardedHeaders();
 
@@ -65,9 +74,6 @@ if (app.Environment.IsDevelopment())
         await next();
     });
 }
-// /health phải map TRƯỚC auth — healthcheck không cần JWT
-app.UseHealthChecksConfig();
-
 app.UseCors("AllowReact");
 
 // KHÔNG dùng UseHttpsRedirection — backend chạy sau nginx proxy (HTTP nội bộ)
@@ -86,5 +92,8 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/uploads"
 });
 app.MapControllers();
+app.UseSignalRConfig();
 
 app.Run();
+
+public partial class Program { }

@@ -20,7 +20,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             // Properties
             builder.Property(x => x.InternshipId)
                 .HasColumnName("internship_id")
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(x => x.ProjectName)
                 .HasColumnName("project_name")
@@ -37,9 +37,20 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(x => x.EndDate)
                 .HasColumnName("end_date");
 
-            builder.Property(x => x.Status)
-                .HasColumnName("status")
-                .HasConversion<short>();
+            // Explicitly ignore the legacy Status property (replaced by two-layer model)
+            builder.Ignore(x => x.Status);
+
+            builder.Property(x => x.VisibilityStatus)
+                .HasColumnName("visibility_status")
+                .HasConversion<short>()
+                .HasDefaultValue(VisibilityStatus.Draft)
+                .IsRequired();
+
+            builder.Property(x => x.OperationalStatus)
+                .HasColumnName("operational_status")
+                .HasConversion<short>()
+                .HasDefaultValue(OperationalStatus.Unstarted)
+                .IsRequired();
 
             // Audit fields from BaseEntity
             builder.Property(x => x.CreatedAt)
@@ -61,16 +72,20 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
 
             // FK
             builder.HasOne(p => p.InternshipGroup)
-                .WithMany()
+                .WithMany(g => g.Projects)
                 .HasForeignKey(p => p.InternshipId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Indexes
             builder.HasIndex(x => x.InternshipId)
                 .HasDatabaseName("ix_projects_internship_id");
 
-            builder.HasIndex(x => x.Status)
-                .HasDatabaseName("ix_projects_status");
+            builder.HasIndex(x => x.VisibilityStatus)
+                .HasDatabaseName("ix_projects_visibility_status");
+
+            builder.HasIndex(x => x.OperationalStatus)
+                .HasDatabaseName("ix_projects_operational_status");
 
             builder.HasIndex(x => x.CreatedAt)
                 .HasDatabaseName("ix_projects_created_at");
@@ -79,6 +94,53 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
                 .WithOne(pr => pr.Project)
                 .HasForeignKey(pr => pr.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+        // New fields
+        builder.Property(x => x.MentorId)
+            .HasColumnName("mentor_id");
+
+        builder.Property(x => x.ProjectCode)
+            .HasColumnName("project_code")
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.Field)
+            .HasColumnName("field")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(x => x.Template)
+            .HasColumnName("template")
+            .HasConversion<short>()
+            .HasDefaultValue(ProjectTemplate.None);
+
+        builder.Property(x => x.Requirements)
+            .HasColumnName("requirements")
+            .HasMaxLength(2000)
+            .IsRequired();
+
+        builder.Property(x => x.Deliverables)
+            .HasColumnName("deliverables")
+            .HasMaxLength(2000);
+
+        // F4: IsOrphaned flag (AC-16) — phân biệt "chưa gán nhóm" vs "nhóm bị xóa"
+        builder.Property(x => x.IsOrphaned)
+            .HasColumnName("is_orphaned")
+            .HasDefaultValue(false)
+            .IsRequired();
+
+        // FK: MentorId → enterprise_users ON DELETE SET NULL
+        builder.HasOne<EnterpriseUser>()
+            .WithMany()
+            .HasForeignKey(p => p.MentorId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+
+        // Unique partial index: project_code WHERE deleted_at IS NULL
+        builder.HasIndex(x => x.ProjectCode)
+            .HasDatabaseName("uix_projects_project_code_active")
+            .HasFilter("deleted_at IS NULL")
+            .IsUnique();
         }
     }
 }

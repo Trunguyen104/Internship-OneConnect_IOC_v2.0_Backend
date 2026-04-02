@@ -1,9 +1,11 @@
 using IOCv2.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace IOCv2.Domain.Entities
 {
     public class StakeholderIssue : BaseEntity
     {
+        [Key]
         public Guid Id { get; private set; }
         public Guid StakeholderId { get; private set; }
         public string Title { get; private set; } = null!;

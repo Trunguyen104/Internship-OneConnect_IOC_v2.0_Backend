@@ -1,4 +1,5 @@
 using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
 using FluentAssertions;
 using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
 using IOCv2.Application.Interfaces;
@@ -49,7 +50,8 @@ public class GetAllProjectsHandlerTests
     [Fact]
     public async Task Handle_ReturnsPagedResult_WhenCacheMiss()
     {
-        var project = Project.Create(Guid.NewGuid(), "P1", "Desc", DateTime.UtcNow, DateTime.UtcNow.AddDays(1));
+        var project = Project.Create("P1", "Desc", "PRJ-TEST_TST_1", "IT", "Requirements", null, ProjectTemplate.None, null, DateTime.UtcNow, DateTime.UtcNow.AddDays(1));
+        project.Publish();
         var data = new List<Project> { project };
         var mockQuery = data.AsQueryable().BuildMock();
 
@@ -59,8 +61,8 @@ public class GetAllProjectsHandlerTests
         _projectRepo.Setup(x => x.Query()).Returns(mockQuery);
         _unitOfWork.Setup(x => x.Repository<Project>()).Returns(_projectRepo.Object);
 
-        var cfg = new MapperConfiguration(c => c.CreateMap<Project, GetAllProjectsResponse>());
-        var mapper = cfg.CreateMapper();
+        var mapperCfg = new MapperConfiguration(c => c.AddProfile<MappingProfile>());
+        var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetAllProjectsHandler(
             _unitOfWork.Object,

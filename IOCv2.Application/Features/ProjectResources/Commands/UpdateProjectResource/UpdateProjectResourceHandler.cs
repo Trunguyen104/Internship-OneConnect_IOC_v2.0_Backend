@@ -44,11 +44,11 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogProjectResourceNotFound), request.ProjectResourceId);
                     return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound), ResultErrorType.NotFound);
                 }
-                var projectExists = await _unitOfWork.Repository<Domain.Entities.Project>().ExistsAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
-                if (!projectExists)
+                if (projectResource.ProjectId != request.ProjectId)
                 {
-                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.Projects.LogNotFound), request.ProjectId);
-                    return Result<UpdateProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
+                    return Result<UpdateProjectResourceResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
+                        ResultErrorType.BadRequest);
                 }
 
                 var hasAccess = await HasProjectAccessAsync(request.ProjectId, cancellationToken);
@@ -61,8 +61,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-                // Update the project resource properties
-                projectResource.UpdateInfo(request.ProjectId, request.ResourceName, request.ResourceType);
+                // Resource type and project binding are immutable; only allow metadata rename.
+                projectResource.UpdateInfo(projectResource.ProjectId, request.ResourceName, projectResource.ResourceType);
 
                 
                 await _unitOfWork.Repository<Domain.Entities.ProjectResources>().UpdateAsync(projectResource, cancellationToken);

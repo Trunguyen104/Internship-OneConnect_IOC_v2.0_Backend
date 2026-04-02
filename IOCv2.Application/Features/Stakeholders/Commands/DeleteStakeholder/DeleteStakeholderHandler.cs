@@ -1,6 +1,7 @@
 ﻿﻿using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Stakeholders.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -16,19 +17,22 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.DeleteStakeholder
         private readonly IMessageService _messageService;
         private readonly ILogger<DeleteStakeholderHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
         public DeleteStakeholderHandler(
-            IUnitOfWork unitOfWork, 
-            IMapper mapper, 
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
             IMessageService messageService,
             ILogger<DeleteStakeholderHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<DeleteStakeholderResponse>> Handle(DeleteStakeholderCommand request, CancellationToken cancellationToken)
@@ -81,6 +85,9 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.DeleteStakeholder
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                await _cacheService.RemoveByPatternAsync(StakeholderCacheKeys.StakeholderListPattern(stakeholder.InternshipId), cancellationToken);
+                await _cacheService.RemoveAsync(StakeholderCacheKeys.Stakeholder(request.StakeholderId), cancellationToken);
 
                 _logger.LogInformation("Successfully deleted stakeholder {Id}", request.StakeholderId);
 

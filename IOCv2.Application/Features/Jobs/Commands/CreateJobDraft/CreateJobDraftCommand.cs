@@ -1,0 +1,27 @@
+﻿using MediatR;
+using IOCv2.Domain.Enums;
+using System;
+using IOCv2.Application.Common.Models;
+
+namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
+{
+    public record CreateJobDraftCommand : IRequest<Result<CreateJobDraftResponse>>
+    {
+        public Guid? InternshipPhaseId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string? Position { get; set; }
+        public string? Description { get; set; }
+        public string? Requirements { get; set; }
+        public string? Benefit { get; set; }
+        public string? Location { get; set; }
+        public DateTime? ExpireDate { get; set; }
+
+        // Internship period optional for draft (can be provided)
+
+        // Audience: optional, defaults to Public
+        public JobAudience Audience { get; set; } = JobAudience.Public;
+
+        // Optional when Audience == Targeted
+        public Guid? UniversityId { get; set; }
+    }
+}

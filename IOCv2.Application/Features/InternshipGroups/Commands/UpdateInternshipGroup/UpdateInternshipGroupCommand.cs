@@ -16,14 +16,19 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipG
         public Guid InternshipId { get; init; }
 
         /// <summary>
-        /// Identity of the academic term.
+        /// Identity of the internship phase.
         /// </summary>
-        public Guid TermId { get; init; }
+        public Guid PhaseId { get; init; }
 
         /// <summary>
         /// Updated name of the internship group.
         /// </summary>
         public string GroupName { get; init; } = string.Empty;
+
+        /// <summary>
+        /// Updated description.
+        /// </summary>
+        public string? Description { get; init; }
 
         /// <summary>
         /// Updated enterprise identity.

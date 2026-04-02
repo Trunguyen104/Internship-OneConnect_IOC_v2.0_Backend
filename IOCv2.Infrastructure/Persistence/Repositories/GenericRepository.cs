@@ -1,6 +1,7 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace IOCv2.Infrastructure.Persistence.Repositories
@@ -88,6 +89,17 @@ namespace IOCv2.Infrastructure.Persistence.Repositories
         public IQueryable<T> Query()
         {
             return _dbSet.AsQueryable();
+        }
+
+        public virtual async Task<int> ExecuteUpdateAsync(
+            Expression<Func<T, bool>> predicate,
+            Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls,
+            CancellationToken cancellationToken = default)
+        {
+            // Bypass ChangeTracker — sinh thẳng câu SQL UPDATE ... WHERE ...
+            return await _dbSet
+                .Where(predicate)
+                .ExecuteUpdateAsync(setPropertyCalls, cancellationToken);
         }
     }
 }

@@ -9,8 +9,8 @@ public class GetMyInternshipGroupsResponse
     public string Name { get; set; } = string.Empty;
     public Guid? EnterpriseId { get; set; }
     public Guid SchoolId { get; set; }
-    public Guid TermId { get; set; }
-    public InternshipStatus GroupStatus { get; set; }
+    public Guid InternshipPhaseId { get; set; }
+    public GroupStatus GroupStatus { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Description { get; set; } = string.Empty;
@@ -19,8 +19,9 @@ public class GetMyInternshipGroupsResponse
     public DateTime? UpdatedAt { get; set; }
     public MineEnterpriseDto? Enterprise { get; set; }
     public MineSchoolDto? School { get; set; }
-    public MineTermDto? Term { get; set; }
+    public MinePhaseDto? InternshipPhase { get; set; }
     public MineProjectDto? Project { get; set; }
+    public MineTermDto? Term { get; set; }
     public List<MineMentorDto> Mentors { get; set; } = new();
     public int StudentCount { get; set; }
     public int EvaluationCount { get; set; }
@@ -29,19 +30,19 @@ public class GetMyInternshipGroupsResponse
     public Guid? CreatedBy { get; set; }
     public Guid? UpdatedBy { get; set; }
 
-    public static GetMyInternshipGroupsResponse FromEntity(InternshipGroup group, Project? project)
+    public static GetMyInternshipGroupsResponse FromEntity(InternshipGroup group, Project? project, University? university = null, Term? term = null)
     {
         return new GetMyInternshipGroupsResponse
         {
             Id = group.InternshipId,
             Name = group.GroupName,
             EnterpriseId = group.EnterpriseId,
-            SchoolId = group.Term.UniversityId,
-            TermId = group.TermId,
+            SchoolId = university?.UniversityId ?? Guid.Empty,
+            InternshipPhaseId = group.PhaseId,
             GroupStatus = group.Status,
             StartDate = group.StartDate,
             EndDate = group.EndDate,
-            Description = string.Empty,
+            Description = group.Description ?? string.Empty,
             AllowLecturerView = false,
             CreatedAt = group.CreatedAt,
             UpdatedAt = group.UpdatedAt,
@@ -52,17 +53,17 @@ public class GetMyInternshipGroupsResponse
                     Id = group.Enterprise.EnterpriseId,
                     Name = group.Enterprise.Name
                 },
-            School = group.Term.University == null
+            School = university == null
                 ? null
                 : new MineSchoolDto
                 {
-                    Id = group.Term.University.UniversityId,
-                    Name = group.Term.University.Name
+                    Id = university.UniversityId,
+                    Name = university.Name
                 },
-            Term = new MineTermDto
+            InternshipPhase = new MinePhaseDto
             {
-                Id = group.Term.TermId,
-                Name = group.Term.Name
+                Id = group.InternshipPhase?.PhaseId ?? Guid.Empty,
+                Name = group.InternshipPhase?.Name ?? string.Empty
             },
             Project = project == null
                 ? null
@@ -71,8 +72,18 @@ public class GetMyInternshipGroupsResponse
                     Id = project.ProjectId,
                     Name = project.ProjectName,
                     Domain = project.InternshipId,
-                    SpaceTemplate = null
+                    SpaceTemplate = new MineSpaceTemplateDto 
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Scrum Workflow",
+                        BoardType = "SCRUM"
+                    }
                 },
+            Term = term == null ? null : new MineTermDto
+            {
+                Id = term.TermId,
+                Name = term.Name
+            },
             Mentors = group.Mentor == null || group.Mentor.User == null
                 ? new List<MineMentorDto>()
                 : new List<MineMentorDto>
@@ -107,6 +118,12 @@ public class MineSchoolDto
 }
 
 public class MineTermDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
+public class MinePhaseDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;

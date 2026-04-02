@@ -13,9 +13,11 @@ namespace IOCv2.Domain.Entities
         public string? Website { get; set; }
         public string? LogoUrl { get; set; }
         public string? BackgroundUrl { get; set; }
-        public bool IsVerified { get; set; } = false;
+        public string? ContactEmail { get; set; }
         public short Status { get; set; } = (short)EnterpriseStatus.Active;
         public virtual ICollection<EnterpriseUser> EnterpriseUsers { get; set; } = new List<EnterpriseUser>();
         public virtual ICollection<InternshipGroup> InternshipGroups { get; set; } = new List<InternshipGroup>();
+        public virtual ICollection<InternshipApplication> InternshipApplications { get; set; } = new List<InternshipApplication>();
+        public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
     }
 }

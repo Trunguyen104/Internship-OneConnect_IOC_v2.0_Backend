@@ -13,7 +13,7 @@ public static class ControllerConfig
         .AddJsonOptions(options =>
         {
             // By default, enums are serialized as integers. 
-            // If you want them as strings, uncomment the line below:
+            // We keep it as integers according to the team communication contract.
             // options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 

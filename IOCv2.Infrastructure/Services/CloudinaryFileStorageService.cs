@@ -136,7 +136,39 @@ public class CloudinaryFileStorageService : IFileStorageService
         }
     }
 
-    public string GetFileUrl(string filePath) => filePath;
+    public string GetFileUrl(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            return filePath;
+        }
+
+        var (resourceType, deliveryType, publicIdWithoutExtension, publicIdWithExtension) =
+            ExtractResourceInfo(filePath);
+
+        if (string.IsNullOrWhiteSpace(publicIdWithoutExtension) &&
+            string.IsNullOrWhiteSpace(publicIdWithExtension))
+        {
+            return filePath;
+        }
+
+        var requiresSignedUrl = resourceType == ResourceType.Raw ||
+                                !string.Equals(deliveryType, "upload", StringComparison.OrdinalIgnoreCase);
+        if (!requiresSignedUrl)
+        {
+            return filePath;
+        }
+
+        var publicId = !string.IsNullOrWhiteSpace(publicIdWithExtension)
+            ? publicIdWithExtension
+            : publicIdWithoutExtension;
+        var resourceTypeValue = resourceType == ResourceType.Raw ? "raw" : "image";
+
+        // Use inline signed URL so browsers can preview PDFs/images in a new tab,
+        // while still allowing users to click the browser's built-in download action.
+        var signedUrl = _cloudinary.DownloadPrivate(publicId!, false, null, deliveryType, null, resourceTypeValue);
+        return string.IsNullOrWhiteSpace(signedUrl) ? filePath : signedUrl;
+    }
 
     public async Task<Stream> GetFileAsync(string fileUrl, CancellationToken cancellationToken = default)
     {

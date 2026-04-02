@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -30,35 +31,56 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
 
     public async Task<Result<List<GetMyInternshipGroupsResponse>>> Handle(GetMyInternshipGroupsQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting mine internship groups query.");
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogStartQueryMine));
 
         if (string.IsNullOrWhiteSpace(_currentUserService.UserId) || !Guid.TryParse(_currentUserService.UserId, out var userId))
         {
-            _logger.LogWarning("Mine internship groups query denied because current user is unavailable.");
+            _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogQueryMineDenied));
             throw new UnauthorizedAccessException(_messageService.GetMessage(MessageKeys.Common.Unauthorized));
         }
 
-        var studentId = await _unitOfWork.Repository<Student>()
+        var user = await _unitOfWork.Repository<User>()
             .Query()
-            .Where(student => student.UserId == userId)
-            .Select(student => (Guid?)student.StudentId)
+            .Include(u => u.Student)
+            .Include(u => u.UniversityUser)
+                .ThenInclude(uu => uu!.University)
+            .Include(u => u.EnterpriseUser)
+            .Where(u => u.UserId == userId)
+            .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (!studentId.HasValue)
+        if (user == null)
         {
-            _logger.LogWarning("Mine internship groups query failed because student profile was not found for current user.");
+            _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogQueryMineStudentNotFound));
             throw new NotFoundException(_messageService.GetMessage(MessageKeys.Users.NotFound));
         }
 
-        var groups = await _unitOfWork.Repository<InternshipGroup>()
+        var query = _unitOfWork.Repository<InternshipGroup>()
             .Query()
             .Include(group => group.Enterprise)
             .Include(group => group.Mentor)
                 .ThenInclude(mentor => mentor!.User)
-            .Include(group => group.Term)
-                .ThenInclude(term => term.University)
+            .Include(group => group.InternshipPhase)
             .Include(group => group.Members)
-            .Where(group => group.DeletedAt == null && group.Members.Any(member => member.StudentId == studentId.Value))
+            .Where(group => group.DeletedAt == null);
+
+        if (user.Role == UserRole.Student && user.Student != null)
+        {
+            var studentId = user.Student.StudentId;
+            query = query.Where(group => group.Members.Any(member => member.StudentId == studentId));
+        }
+        else if (user.Role == UserRole.Mentor && user.EnterpriseUser != null)
+        {
+            var mentorId = user.EnterpriseUser.EnterpriseUserId;
+            query = query.Where(group => group.MentorId == mentorId);
+        }
+        else if ((user.Role == UserRole.EnterpriseAdmin || user.Role == UserRole.HR) && user.EnterpriseUser != null)
+        {
+            var enterpriseId = user.EnterpriseUser.EnterpriseId;
+            query = query.Where(group => group.EnterpriseId == enterpriseId);
+        }
+
+        var groups = await query
             .OrderByDescending(group => group.CreatedAt)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
@@ -67,36 +89,57 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
 
         var projectLookup = internshipIds.Count == 0
             ? new Dictionary<Guid, Project>()
-            : await _unitOfWork.Repository<Project>()
+            : (await _unitOfWork.Repository<Project>()
                 .Query()
-                .Where(project => project.DeletedAt == null && internshipIds.Contains(project.InternshipId))
+                .Where(project => project.DeletedAt == null && project.InternshipId.HasValue && internshipIds.Contains(project.InternshipId.Value))
                 .OrderByDescending(project => project.CreatedAt)
                 .AsNoTracking()
-                .GroupBy(project => project.InternshipId)
-                .Select(group => group.First())
-                .ToDictionaryAsync(project => project.InternshipId, cancellationToken);
+                .ToListAsync(cancellationToken))
+                .GroupBy(project => project.InternshipId!.Value)
+                .ToDictionary(group => group.Key, group => group.First());
 
-        var termIds = groups.Select(group => group.TermId).Distinct().ToList();
-        var evaluationCycleLookup = termIds.Count == 0
+
+        var phaseIds = groups.Select(group => group.PhaseId).Distinct().ToList();
+        var evaluationCycleLookup = phaseIds.Count == 0
             ? new Dictionary<Guid, int>()
             : await _unitOfWork.Repository<EvaluationCycle>()
                 .Query()
-                .Where(cycle => termIds.Contains(cycle.TermId))
-                .GroupBy(cycle => cycle.TermId)
-                .Select(group => new { TermId = group.Key, Count = group.Count() })
-                .ToDictionaryAsync(x => x.TermId, x => x.Count, cancellationToken);
+                .Where(cycle => phaseIds.Contains(cycle.PhaseId))
+                .GroupBy(cycle => cycle.PhaseId)
+                .Select(group => new { PhaseId = group.Key, Count = group.Count() })
+                .ToDictionaryAsync(x => x.PhaseId, x => x.Count, cancellationToken);
+                
+        List<Term> studentTerms = new();
+        if (user.Role == UserRole.Student && user.Student != null)
+        {
+            studentTerms = await _unitOfWork.Repository<StudentTerm>()
+                .Query()
+                .Include(st => st.Term)
+                .Where(st => st.StudentId == user.Student.StudentId)
+                .OrderByDescending(st => st.Term.StartDate)
+                .Select(st => st.Term)
+                .ToListAsync(cancellationToken);
+        }
 
-        var response = groups
-            .Select(group => {
-                var res = GetMyInternshipGroupsResponse.FromEntity(
-                    group,
-                    projectLookup.GetValueOrDefault(group.InternshipId));
-                res.EvaluationCount = evaluationCycleLookup.GetValueOrDefault(group.TermId);
-                return res;
-            })
-            .ToList();
+        var university = user.Role == UserRole.Student ? user.UniversityUser?.University : null;
 
-        _logger.LogInformation("Completed mine internship groups query with {Count} groups.", response.Count);
+        var response = groups.Select((group, index) => {
+            Term? term = null;
+            if (user.Role == UserRole.Student && index < studentTerms.Count)
+            {
+                term = studentTerms[index];
+            }
+            
+            var res = GetMyInternshipGroupsResponse.FromEntity(
+                group,
+                projectLookup.GetValueOrDefault(group.InternshipId),
+                university,
+                term);
+            res.EvaluationCount = evaluationCycleLookup.GetValueOrDefault(group.PhaseId);
+            return res;
+        }).ToList();
+
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogQueryMineCompleted), response.Count);
 
         return Result<List<GetMyInternshipGroupsResponse>>.Success(response);
     }

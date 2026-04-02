@@ -1,6 +1,8 @@
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.Enterprises.Common;
+using IOCv2.Application.Features.Terms.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -16,17 +18,20 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
     private readonly ILogger<CloseTermHandler> _logger;
     private readonly IMessageService _messageService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     public CloseTermHandler(
         IUnitOfWork unitOfWork,
         IMessageService messageService,
         ILogger<CloseTermHandler> logger,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
         _currentUserService = currentUserService;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<CloseTermResponse>> Handle(CloseTermCommand request, CancellationToken cancellationToken)
@@ -80,8 +85,10 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
                     ResultErrorType.Conflict);
             }
 
-            // Check if term is Active using TermStatusHelper
-            if (!TermStatusHelper.IsActive(term.StartDate, term.EndDate, term.Status))
+            // Only Active or Ended terms (still Open status) can be closed
+            var isActiveOrEnded = TermStatusHelper.IsActive(term.StartDate, term.EndDate, term.Status) ||
+                                  TermStatusHelper.IsEnded(term.StartDate, term.EndDate, term.Status);
+            if (!isActiveOrEnded)
                 return Result<CloseTermResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Terms.OnlyActiveCanBeClosed));
 
@@ -94,6 +101,11 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
 
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
+            // Invalidate enterprise active-terms cache (AC-07: closed term must disappear from HR/Mentor view)
+            await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.AllActiveTermsPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermClosed), term.TermId, userId);
 
@@ -117,7 +129,9 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
         catch (Exception ex)
         {
             _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Terms.LogErrorClosingTerm), request.TermId);
-            throw;
+            return Result<CloseTermResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.InternalError),
+                ResultErrorType.InternalServerError);
         }
     }
 }

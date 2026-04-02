@@ -1,6 +1,7 @@
 using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.StakeholderIssues.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -16,19 +17,22 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
         private readonly IMessageService _messageService;
         private readonly ILogger<CreateStakeholderIssueCommandHandler> _logger;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ICacheService _cacheService;
 
         public CreateStakeholderIssueCommandHandler(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IMessageService messageService,
             ILogger<CreateStakeholderIssueCommandHandler> logger,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _messageService = messageService;
             _logger = logger;
             _currentUserService = currentUserService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<CreateStakeholderIssueResponse>> Handle(CreateStakeholderIssueCommand request, CancellationToken cancellationToken)
@@ -70,7 +74,9 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                _logger.LogInformation("Successfully created StakeholderIssue {Id} for Stakeholder {StakeholderId}", 
+                await _cacheService.RemoveByPatternAsync(StakeholderIssueCacheKeys.IssueListPattern(), cancellationToken);
+
+                _logger.LogInformation("Successfully created StakeholderIssue {Id} for Stakeholder {StakeholderId}",
                     issue.Id, request.StakeholderId);
 
                 var response = _mapper.Map<CreateStakeholderIssueResponse>(issue);

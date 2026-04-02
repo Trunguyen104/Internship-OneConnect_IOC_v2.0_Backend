@@ -1,4 +1,5 @@
 using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
 using FluentAssertions;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
 using IOCv2.Application.Interfaces;
@@ -12,6 +13,17 @@ namespace IOCv2.Tests.Features.InternshipGroups.Queries;
 
 public class GetInternshipGroupsHandlerCacheTests
 {
+    private static readonly Guid _superAdminId = Guid.NewGuid();
+
+    // Helper: tạo mock ICurrentUserService mặc định là SuperAdmin
+    private static Mock<ICurrentUserService> SuperAdminUser()
+    {
+        var mock = new Mock<ICurrentUserService>();
+        mock.Setup(x => x.UserId).Returns(_superAdminId.ToString());
+        mock.Setup(x => x.Role).Returns("SuperAdmin");
+        return mock;
+    }
+
     [Fact]
     public async Task Handle_UsesCache_WhenAvailable()
     {
@@ -27,7 +39,9 @@ public class GetInternshipGroupsHandlerCacheTests
             Mock.Of<IUnitOfWork>(),
             Mock.Of<IMapper>(),
             cache.Object,
-            Mock.Of<ILogger<GetInternshipGroupsHandler>>());
+            Mock.Of<ILogger<GetInternshipGroupsHandler>>(),
+            SuperAdminUser().Object,
+            Mock.Of<IMessageService>());
 
         var result = await handler.Handle(new GetInternshipGroupsQuery(), CancellationToken.None);
 
@@ -49,15 +63,16 @@ public class GetInternshipGroupsHandlerCacheTests
         cache.Setup(x => x.GetAsync<IOCv2.Application.Common.Models.PaginatedResult<GetInternshipGroupsResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((IOCv2.Application.Common.Models.PaginatedResult<GetInternshipGroupsResponse>?)null);
 
-        var cfg = new MapperConfiguration(cfg =>
-            cfg.CreateMap<InternshipGroup, GetInternshipGroupsResponse>());
-        var mapper = cfg.CreateMapper();
+        var mapperCfg = new MapperConfiguration(c => c.AddProfile<MappingProfile>());
+        var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetInternshipGroupsHandler(
             uow.Object,
             mapper,
             cache.Object,
-            Mock.Of<ILogger<GetInternshipGroupsHandler>>());
+            Mock.Of<ILogger<GetInternshipGroupsHandler>>(),
+            SuperAdminUser().Object,
+            Mock.Of<IMessageService>());
 
         var result = await handler.Handle(new GetInternshipGroupsQuery { PageNumber = 1, PageSize = 10 }, CancellationToken.None);
 

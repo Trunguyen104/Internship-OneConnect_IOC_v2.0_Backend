@@ -1,5 +1,6 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Features.EvaluationCycles.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -14,15 +15,18 @@ public class GetEvaluationCycleByIdHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
     private readonly ILogger<GetEvaluationCycleByIdHandler> _logger;
+    private readonly ICacheService _cacheService;
 
     public GetEvaluationCycleByIdHandler(
-        IUnitOfWork unitOfWork, 
+        IUnitOfWork unitOfWork,
         IMessageService messageService,
-        ILogger<GetEvaluationCycleByIdHandler> logger)
+        ILogger<GetEvaluationCycleByIdHandler> logger,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _messageService = messageService;
         _logger = logger;
+        _cacheService = cacheService;
     }
 
     public async Task<Result<GetEvaluationCycleByIdResponse>> Handle(
@@ -30,27 +34,30 @@ public class GetEvaluationCycleByIdHandler
     {
         _logger.LogInformation("Getting EvaluationCycle {CycleId}", request.CycleId);
 
-        try
-        {
+            var cacheKey = EvaluationCycleCacheKeys.Cycle(request.CycleId);
+            var cached = await _cacheService.GetAsync<GetEvaluationCycleByIdResponse>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return Result<GetEvaluationCycleByIdResponse>.Success(cached);
+
             var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
                 .AsNoTracking()
-                .Include(c => c.Term)
+                .Include(c => c.InternshipPhase)
                 .Include(c => c.Criteria)
                 .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
-            if (cycle is null)
-            {
-                _logger.LogWarning("EvaluationCycle {CycleId} not found", request.CycleId);
-                return Result<GetEvaluationCycleByIdResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
-                    ResultErrorType.NotFound);
-            }
+        if (cycle is null)
+        {
+            _logger.LogWarning("EvaluationCycle {CycleId} not found", request.CycleId);
+            return Result<GetEvaluationCycleByIdResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.EvaluationCycle.NotFound),
+                ResultErrorType.NotFound);
+        }
 
         var response = new GetEvaluationCycleByIdResponse
         {
             CycleId = cycle.CycleId,
-            TermId = cycle.TermId,
-            TermName = cycle.Term.Name,
+            PhaseId = cycle.PhaseId,
+            PhaseName = cycle.InternshipPhase?.Name ?? string.Empty,
             Name = cycle.Name,
             StartDate = cycle.StartDate,
             EndDate = cycle.EndDate,
@@ -71,12 +78,8 @@ public class GetEvaluationCycleByIdHandler
                 .ToList()
         };
 
+            await _cacheService.SetAsync(cacheKey, response, EvaluationCycleCacheKeys.Expiration.Cycle, cancellationToken);
+
             return Result<GetEvaluationCycleByIdResponse>.Success(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while getting EvaluationCycle {CycleId}", request.CycleId);
-            return Result<GetEvaluationCycleByIdResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.Conflict);
-        }
     }
 }

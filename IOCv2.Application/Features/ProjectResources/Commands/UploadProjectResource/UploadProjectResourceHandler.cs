@@ -2,7 +2,9 @@ using AutoMapper;
 using IOCv2.Application.Common.Helpers;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
+using IOCv2.Application.Extensions.ProjectResources;
 using IOCv2.Application.Features.ProjectResources.Common;
+using IOCv2.Application.Features.Projects.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -117,17 +119,16 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                             FileParams.GetFolder(request.ProjectId),
                             fileName,
                             cancellationToken);
-                        // Automatically detect file type based on file extension
-                        var detectedType = FileValidationHelper.GetFileType(fileUrl);
-                        if (detectedType == null)
+                        // Keep the original validated file type from the incoming file name.
+                        if (fileValidation?.FileType == null)
                         {
-                            _logger.LogWarning("Unsupported file type for uploaded file: {FileUrl}", fileUrl);
+                            _logger.LogWarning("Unsupported file type for uploaded file: {FileName}", request.File.FileName);
                             return Result<UploadProjectResourceResponse>.Failure(
                                 _messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType),
                                 ResultErrorType.BadRequest);
                         }
 
-                        fileType = detectedType.Value;
+                        fileType = fileValidation.FileType.Value;
                     }
 
                     // Create ProjectResources entity
@@ -144,12 +145,18 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
                     // Map entity to response DTO
                     var response = _mapper.Map<UploadProjectResourceResponse>(resource);
+                    if (response.ResourceType != FileType.LINK && !string.IsNullOrWhiteSpace(response.ResourceUrl))
+                    {
+                        response.ResourceUrl = _fileStorageService.GetFileUrl(response.ResourceUrl);
+                    }
                     // Log successful upload
                     _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.LogUploadSuccess),
                         request.File?.FileName ?? request.ExternalUrl, request.ProjectId);
 
                     await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(request.ProjectId), cancellationToken);
                     await _cacheService.RemoveByPatternAsync(ProjectResourceCacheKeys.ListPattern(null), cancellationToken);
+                    await _cacheService.RemoveAsync(ProjectCacheKeys.Project(request.ProjectId), cancellationToken);
+                    await _cacheService.RemoveByPatternAsync(ProjectCacheKeys.ProjectListPattern(), cancellationToken);
 
                     return Result<UploadProjectResourceResponse>.Success(response);
                 }
@@ -189,6 +196,24 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
             {
                 return false;
+            }
+
+            if (string.Equals(_currentUserService.Role, "Mentor", StringComparison.OrdinalIgnoreCase))
+            {
+                var enterpriseUserId = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .Where(eu => eu.UserId == currentUserId)
+                    .Select(eu => eu.EnterpriseUserId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (enterpriseUserId == Guid.Empty)
+                {
+                    return false;
+                }
+
+                return await _unitOfWork.Repository<Project>().Query()
+                    .AsNoTracking()
+                    .AnyAsync(p => p.ProjectId == projectId && p.MentorId == enterpriseUserId, cancellationToken);
             }
 
             var studentId = await _unitOfWork.Repository<Student>().Query()

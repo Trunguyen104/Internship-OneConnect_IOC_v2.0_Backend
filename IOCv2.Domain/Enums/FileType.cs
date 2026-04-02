@@ -21,7 +21,10 @@ namespace IOCv2.Domain.Enums
         JPG = 6,
         PNG = 7,
 
+        // Spreadsheet
+        XLSX = 9,
+
         // External links (Docs, Figma, ...)
-        LINK = 8
+        LINK = 10
     }
 }

@@ -1,4 +1,4 @@
-﻿using IOCv2.Domain.Enums;
+using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
 {
@@ -11,6 +11,7 @@ namespace IOCv2.Domain.Entities
         public string FullName { get; private set; } = null!;
         public string? PhoneNumber { get; private set; }
         public string? AvatarUrl { get; private set; }
+        public string? Address { get; private set; }
         public DateOnly? DateOfBirth { get; private set; }
         public UserGender Gender { get; private set; }
         public UserStatus Status { get; private set; } = UserStatus.Active;
@@ -37,13 +38,28 @@ namespace IOCv2.Domain.Entities
             Status = UserStatus.Active;
         }
 
-        public void UpdateProfile(string fullName, string? phoneNumber, string? avatarUrl, UserGender? gender, DateOnly? dateOfBirth)
+        // Static factory used in tests to create a minimal user instance
+        public static User Create(Guid userId, string email)
+        {
+            var u = new User();
+            u.UserId = userId;
+            u.Email = email;
+            u.UserCode = userId.ToString();
+            u.FullName = string.Empty;
+            u.PasswordHash = string.Empty;
+            u.Role = default;
+            u.Status = UserStatus.Active;
+            return u;
+        }
+
+        public void UpdateProfile(string fullName, string? phoneNumber, string? avatarUrl, UserGender? gender, DateOnly? dateOfBirth, string? address)
         {
             FullName = fullName;
             if (phoneNumber != null) PhoneNumber = phoneNumber;
             if (avatarUrl != null) AvatarUrl = avatarUrl;
             if (gender.HasValue) Gender = gender.Value;
             if (dateOfBirth.HasValue) DateOfBirth = dateOfBirth.Value;
+            if (address != null) Address = address;
         }
 
         public void SetStatus(UserStatus status)
@@ -54,6 +70,16 @@ namespace IOCv2.Domain.Entities
         public void UpdatePassword(string passwordHash)
         {
             PasswordHash = passwordHash;
+        }
+
+        public void UpdateEmail(string email)
+        {
+            Email = email;
+        }
+
+        public void UpdateUserCode(string userCode)
+        {
+            UserCode = userCode;
         }
     }
 }

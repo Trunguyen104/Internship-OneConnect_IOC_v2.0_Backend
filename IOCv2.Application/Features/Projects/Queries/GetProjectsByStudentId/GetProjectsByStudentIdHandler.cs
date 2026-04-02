@@ -4,6 +4,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -41,55 +42,54 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             GetProjectsByStudentIdQuery request,
             CancellationToken cancellationToken)
         {
-            var userId = Guid.Parse(_currentUserService.UserId!);
+            if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
             var studentId = await _unitOfWork.Repository<Student>().Query().Where(s => s.UserId == userId).Select(s => s.StudentId).FirstOrDefaultAsync(cancellationToken);
-            try
+
+            // Student visibility: only Published + (Active|Completed).
+            IQueryable<Project> query = _unitOfWork.Repository<Project>().Query()
+                .Where(p => p.InternshipId != null
+                         && p.InternshipGroup != null
+                         && p.InternshipGroup.Members.Any(s => s.StudentId == studentId)
+                         && p.VisibilityStatus == VisibilityStatus.Published
+                         && (p.OperationalStatus == OperationalStatus.Active || p.OperationalStatus == OperationalStatus.Completed))
+                .AsNoTracking();
+
+            if (request.VisibilityStatus.HasValue)
+                query = query.Where(p => p.VisibilityStatus == request.VisibilityStatus.Value);
+
+            if (request.OperationalStatus.HasValue)
+                query = query.Where(p => p.OperationalStatus == request.OperationalStatus.Value);
+
+            // Apply search term
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                // Build base query
-                var query = _unitOfWork.Repository<Project>().Query()
-                    .Where(i => i.InternshipGroup.Members.Any(s => s.StudentId == studentId))
-                    .Select(p => p).AsNoTracking();
-
-
-                // Apply status filter
-                if (request.Status.HasValue)
-                {
-                    query = query.Where(p => p.Status == request.Status.Value);
-                }
-
-                // Apply search term
-                if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-                {
-                    var term = request.SearchTerm.Trim().ToLower();
-                    query = query.Where(p =>
-                        p.ProjectName.ToLower().Contains(term) ||
-                        (p.Description != null && p.Description.ToLower().Contains(term)));
-                }
-
-                // Get total count before pagination
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                // Apply sorting
-                query = ApplySorting(query, request.SortColumn, request.SortOrder);
-
-                // Apply pagination
-                var items = await query
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .ProjectTo<GetProjectsByStudentIdResponse>(_mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken);
-
-                // Create paginated result
-                var result = PaginatedResult<GetProjectsByStudentIdResponse>.Create(
-                    items, totalCount, request.PageNumber, request.PageSize);
-
-                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Success(result);
+                var term = request.SearchTerm.Trim().ToLower();
+                query = query.Where(p =>
+                    p.ProjectName.ToLower().Contains(term) ||
+                    (p.Description != null && p.Description.ToLower().Contains(term)));
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, _messageService.GetMessage(MessageKeys.Projects.GetByStuIdEr), studentId);
-                return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
-            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            // Apply sorting
+            query = ApplySorting(query, request.SortColumn, request.SortOrder);
+
+            // Apply pagination
+            var items = await query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ProjectTo<GetProjectsByStudentIdResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+            // Create paginated result
+            var result = PaginatedResult<GetProjectsByStudentIdResponse>.Create(
+                items, totalCount, request.PageNumber, request.PageSize);
+
+            return Result<PaginatedResult<GetProjectsByStudentIdResponse>>.Success(result);
         }
 
         private IQueryable<Project> ApplySorting(IQueryable<Project> query, string? sortColumn, string? sortOrder)
@@ -107,8 +107,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
                 ("enddate", true) => query.OrderByDescending(p => p.EndDate),
                 ("enddate", false) => query.OrderBy(p => p.EndDate),
 
-                ("status", true) => query.OrderByDescending(p => p.Status),
-                ("status", false) => query.OrderBy(p => p.Status),
+                ("visibilitystatus", true) => query.OrderByDescending(p => p.VisibilityStatus),
+                ("visibilitystatus", false) => query.OrderBy(p => p.VisibilityStatus),
+
+                ("operationalstatus", true) => query.OrderByDescending(p => p.OperationalStatus),
+                ("operationalstatus", false) => query.OrderBy(p => p.OperationalStatus),
 
                 ("createdat", true) => query.OrderByDescending(p => p.CreatedAt),
                 ("createdat", false) => query.OrderBy(p => p.CreatedAt),

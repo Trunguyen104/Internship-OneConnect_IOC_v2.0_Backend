@@ -21,6 +21,7 @@ namespace IOCv2.Tests.Features.Logbooks
         private readonly Mock<IGenericRepository<Student>> _mockStudentRepo;
         private readonly Mock<IGenericRepository<Logbook>> _mockLogbookRepo;
         private readonly Mock<IGenericRepository<AuditLog>> _mockAuditLogRepo;
+        private readonly Mock<ICacheService> _mockCacheService;
         private readonly UpdateLogbookHandler _handler;
 
         public UpdateLogbookHandlerTests()
@@ -30,7 +31,8 @@ namespace IOCv2.Tests.Features.Logbooks
             _mockCurrentUserService = new Mock<ICurrentUserService>();
             _mockMessageService = new Mock<IMessageService>();
             _mockLogger = new Mock<ILogger<UpdateLogbookHandler>>();
-            
+            _mockCacheService = new Mock<ICacheService>();
+
             _mockStudentRepo = new Mock<IGenericRepository<Student>>();
             _mockLogbookRepo = new Mock<IGenericRepository<Logbook>>();
             _mockAuditLogRepo = new Mock<IGenericRepository<AuditLog>>();
@@ -44,7 +46,8 @@ namespace IOCv2.Tests.Features.Logbooks
                 _mockMapper.Object,
                 _mockCurrentUserService.Object,
                 _mockMessageService.Object,
-                _mockLogger.Object);
+                _mockLogger.Object,
+                _mockCacheService.Object);
         }
 
         [Fact]

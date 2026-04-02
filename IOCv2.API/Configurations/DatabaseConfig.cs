@@ -24,7 +24,14 @@ public static class DatabaseConfig
                     var initializer = services.GetRequiredService<DbInitializer>();
 
                     // Ensure database exists before migrating
-                    await context.Database.MigrateAsync();
+                    if (context.Database.IsRelational())
+                    {
+                        await context.Database.MigrateAsync();
+                    }
+                    else
+                    {
+                        await context.Database.EnsureCreatedAsync();
+                    }
                     
                     await initializer.InitializeAsync();
                     

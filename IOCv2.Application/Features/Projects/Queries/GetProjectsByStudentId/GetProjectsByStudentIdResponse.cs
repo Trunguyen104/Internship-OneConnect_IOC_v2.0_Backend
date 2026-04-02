@@ -20,7 +20,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         /// <summary>
         /// Identity of the internship group associated with this project.
         /// </summary>
-        public Guid InternshipId { get; set; }
+        public Guid? InternshipId { get; set; }
 
         /// <summary>
         /// Name of the project.
@@ -43,9 +43,19 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Current lifecycle status of the project.
+        /// Visibility status of the project.
         /// </summary>
-        public ProjectStatus? Status { get; set; }
+        public VisibilityStatus VisibilityStatus { get; set; }
+
+        /// <summary>
+        /// Operational status of the project.
+        /// </summary>
+        public OperationalStatus OperationalStatus { get; set; }
+
+        /// <summary>
+        /// Workflow template used by the project.
+        /// </summary>
+        public ProjectTemplate Template { get; set; }
 
         /// <summary>
         /// Date and time when the project record was created.
@@ -58,6 +68,16 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         public List<ProjectResourcesDTO> ProjectResources { get; set; } = new();
 
         /// <summary>
+        /// Name of the internship group this project belongs to.
+        /// </summary>
+        public string? GroupName { get; set; }
+
+        /// <summary>
+        /// Full name of the mentor managing this project.
+        /// </summary>
+        public string? MentorName { get; set; }
+
+        /// <summary>
         /// Configures the mapping between Project entity and this response DTO.
         /// </summary>
         /// <param name="profile">The Automapper profile.</param>
@@ -67,7 +87,13 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
 
             profile.CreateMap<Project, GetProjectsByStudentIdResponse>()
                    .ForMember(dest => dest.ProjectResources,
-                               opt => opt.MapFrom(src => src.ProjectResources));
+                               opt => opt.MapFrom(src => src.ProjectResources))
+                   .ForMember(dest => dest.GroupName,
+                               opt => opt.MapFrom(src => src.InternshipGroup != null ? src.InternshipGroup.GroupName : null))
+                   .ForMember(dest => dest.MentorName,
+                               opt => opt.MapFrom(src => src.InternshipGroup != null && src.InternshipGroup.Mentor != null
+                                   ? src.InternshipGroup.Mentor.User.FullName
+                                   : null));
         }
 
     }
