@@ -67,6 +67,9 @@ namespace IOCv2.Infrastructure
             // Cache Service
             services.AddScoped<ICacheService, RedisCacheService>();
 
+            // Public Holiday External API
+            services.AddScoped<IPublicHolidayApiService, CalendarificService>();
+
             // File
             services.AddHttpClient();
 
