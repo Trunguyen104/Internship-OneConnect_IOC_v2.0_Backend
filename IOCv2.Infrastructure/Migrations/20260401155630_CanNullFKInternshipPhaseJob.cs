@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -24,6 +24,7 @@ namespace IOCv2.Infrastructure.Migrations
                     website = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     logo_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     background_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    contact_email = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)2),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -45,6 +46,7 @@ namespace IOCv2.Infrastructure.Migrations
                     name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     logo_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    contact_email = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
