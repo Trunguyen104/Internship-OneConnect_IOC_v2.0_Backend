@@ -162,6 +162,7 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 User = mentorUser
             };
             var mockProjectRepo = new Mock<IGenericRepository<Project>>();
+            var mockGroupMentorHistoryRepo = new Mock<IGenericRepository<GroupMentorHistory>>();
 
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>().Query())
                 .Returns(new List<InternshipGroup> { existingGroup }.BuildMock());
@@ -179,6 +180,11 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 .Returns(mockProjectRepo.Object);
             mockProjectRepo.Setup(x => x.Query())
                 .Returns(new List<Project> { project }.BuildMock());
+
+            _mockUnitOfWork.Setup(x => x.Repository<GroupMentorHistory>())
+                .Returns(mockGroupMentorHistoryRepo.Object);
+            mockGroupMentorHistoryRepo.Setup(x => x.AddAsync(It.IsAny<GroupMentorHistory>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((GroupMentorHistory history, CancellationToken _) => history);
 
             mockProjectRepo.Setup(x => x.ExecuteUpdateAsync(
                     It.IsAny<Expression<Func<Project, bool>>>(),
