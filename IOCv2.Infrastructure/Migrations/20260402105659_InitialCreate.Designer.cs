@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260401054108_AddGroupMentorHistory")]
-    partial class AddGroupMentorHistory
+    [Migration("20260402105659_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -178,6 +178,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("background_url");
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -2048,6 +2052,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("code");
 
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -2786,8 +2794,8 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternshipPhase")
                         .WithMany("Jobs")
                         .HasForeignKey("InternshipPhaseId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_jobs_internship_phases_phase_id");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
 
                     b.Navigation("Enterprise");
 
