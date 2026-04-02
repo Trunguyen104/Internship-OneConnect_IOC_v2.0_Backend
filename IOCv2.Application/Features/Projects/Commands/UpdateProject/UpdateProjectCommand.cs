@@ -30,7 +30,9 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
         // Status không được phép thay đổi qua UpdateProject.
         // Dùng PublishProject / CompleteProject / ArchiveProject để chuyển trạng thái.
-        // Group assignment giờ qua AssignGroup/SwapGroup riêng.
+
+        // Optional reassignment target. When provided, UpdateProject will move the project to this group.
+        public Guid? InternshipGroupId { get; set; }
 
         // New fields
         public string? Field { get; set; }

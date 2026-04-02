@@ -18,12 +18,11 @@ public class GetMyInternshipGroupsHandlerTests
     private readonly Mock<ICurrentUserService> _mockCurrentUserService;
     private readonly Mock<IMessageService> _mockMessageService;
     private readonly Mock<ILogger<GetMyInternshipGroupsHandler>> _mockLogger;
-    private readonly Mock<IGenericRepository<Student>> _mockStudentRepository;
+    private readonly Mock<IGenericRepository<User>> _mockUserRepository;
+    private readonly Mock<IGenericRepository<StudentTerm>> _mockStudentTermRepository;
     private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipGroupRepository;
     private readonly Mock<IGenericRepository<Project>> _mockProjectRepository;
     private readonly Mock<IGenericRepository<EvaluationCycle>> _mockEvaluationCycleRepository;
-    private readonly Mock<IGenericRepository<StudentTerm>> _mockStudentTermRepository;
-    private readonly Mock<IGenericRepository<User>> _mockUserRepository;
     private readonly GetMyInternshipGroupsHandler _handler;
 
     public GetMyInternshipGroupsHandlerTests()
@@ -32,19 +31,17 @@ public class GetMyInternshipGroupsHandlerTests
         _mockCurrentUserService = new Mock<ICurrentUserService>();
         _mockMessageService = new Mock<IMessageService>();
         _mockLogger = new Mock<ILogger<GetMyInternshipGroupsHandler>>();
-        _mockStudentRepository = new Mock<IGenericRepository<Student>>();
+        _mockUserRepository = new Mock<IGenericRepository<User>>();
+        _mockStudentTermRepository = new Mock<IGenericRepository<StudentTerm>>();
         _mockInternshipGroupRepository = new Mock<IGenericRepository<InternshipGroup>>();
         _mockProjectRepository = new Mock<IGenericRepository<Project>>();
         _mockEvaluationCycleRepository = new Mock<IGenericRepository<EvaluationCycle>>();
-        _mockUserRepository = new Mock<IGenericRepository<User>>();
-        _mockStudentTermRepository = new Mock<IGenericRepository<StudentTerm>>();
 
-        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Student>()).Returns(_mockStudentRepository.Object);
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<User>()).Returns(_mockUserRepository.Object);
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<StudentTerm>()).Returns(_mockStudentTermRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<InternshipGroup>()).Returns(_mockInternshipGroupRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Project>()).Returns(_mockProjectRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<EvaluationCycle>()).Returns(_mockEvaluationCycleRepository.Object);
-        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<User>()).Returns(_mockUserRepository.Object);
-        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<StudentTerm>()).Returns(_mockStudentTermRepository.Object);
 
         _handler = new GetMyInternshipGroupsHandler(
             _mockUnitOfWork.Object,
@@ -71,8 +68,11 @@ public class GetMyInternshipGroupsHandlerTests
         var group = InternshipGroup.Create(termId, "FU Cần Thơ - Mùa xuân 2026 - IOC (C#, React)", null, enterpriseId, mentorId, new DateTime(2026, 1, 13), new DateTime(2026, 4, 11));
         group.Enterprise = new Enterprise { EnterpriseId = enterpriseId, Name = "Rikasoft" };
         var phase = InternshipPhase.Create(enterpriseId, "FU Cần Thơ - Mùa xuân 2026",
-            DateOnly.FromDateTime(new DateTime(2026, 1, 1)),
-            DateOnly.FromDateTime(new DateTime(2026, 4, 30)), null, null);
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)),
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(70)),
+            "CNTT",
+            20,
+            "Test phase");
         typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, termId);
         group.InternshipPhase = phase;
         group.Mentor = mentor;
@@ -89,6 +89,15 @@ public class GetMyInternshipGroupsHandlerTests
         typeof(User).GetProperty(nameof(User.Student))!.SetValue(user, new Student { StudentId = studentId, UserId = userId });
 
         _mockCurrentUserService.Setup(service => service.UserId).Returns(userId.ToString());
+        var studentUser = new User(userId, "STU001", "student@fpt.edu.vn", "Student Name", IOCv2.Domain.Enums.UserRole.Student, "hash");
+        var studentProfile = new Student { StudentId = studentId, UserId = userId };
+        typeof(User).GetProperty(nameof(User.Student))!.SetValue(studentUser, studentProfile);
+
+        _mockUserRepository.Setup(repository => repository.Query())
+            .Returns(new List<User> { studentUser }.AsQueryable().BuildMock());
+
+        _mockStudentTermRepository.Setup(repository => repository.Query())
+            .Returns(new List<StudentTerm>().AsQueryable().BuildMock());
         _mockUserRepository.Setup(repository => repository.Query())
             .Returns(new List<User> { user }.AsQueryable().BuildMock());
         _mockInternshipGroupRepository.Setup(repository => repository.Query())

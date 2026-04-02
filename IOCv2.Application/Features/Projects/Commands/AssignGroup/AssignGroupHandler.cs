@@ -65,7 +65,10 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
             if (group == null)
                 return Result<AssignGroupResponse>.NotFound(_message.GetMessage(MessageKeys.Internships.NotFound));
 
-            if (group.Status == GroupStatus.Archived || group.Status == GroupStatus.Finished)
+            if (group.Status == GroupStatus.Archived)
+                return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.CannotAssignArchivedGroup), ResultErrorType.BadRequest);
+
+            if (group.Status == GroupStatus.Finished)
                 return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
 
             if (group.EndDate.HasValue && group.EndDate.Value.Date < DateTime.UtcNow.Date)

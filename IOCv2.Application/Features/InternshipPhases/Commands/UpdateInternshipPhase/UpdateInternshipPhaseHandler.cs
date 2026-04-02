@@ -38,9 +38,11 @@ public class UpdateInternshipPhaseHandler
     {
         _logger.LogInformation(
             _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdating),
-            request.PhaseId, request.Name, request.Status);
+            request.PhaseId, request.Name, "Lifecycle");
 
         var phase = await _unitOfWork.Repository<InternshipPhase>().Query()
+            .Include(p => p.InternshipGroups)
+                .ThenInclude(g => g.Members)
             .FirstOrDefaultAsync(p => p.PhaseId == request.PhaseId && p.DeletedAt == null, cancellationToken);
 
         if (phase == null)
@@ -85,50 +87,47 @@ public class UpdateInternshipPhaseHandler
             }
         }
 
-        // ── BUG-01 FIX: Block ALL updates when phase is Closed ──
-        if (phase.Status == InternshipPhaseStatus.Closed)
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var lifecycleStatus = phase.GetLifecycleStatus(today);
+
+        if (lifecycleStatus == InternshipPhaseLifecycleStatus.Ended)
         {
             _logger.LogWarning(
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateClosed),
                 phase.Name, request.PhaseId);
             return Result<UpdateInternshipPhaseResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotUpdateClosed, phase.Name),
+                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotUpdateEnded, phase.Name),
                 ResultErrorType.BadRequest);
         }
 
-        // ── BUG-02 FIX: Block EndDate regression on active/in-progress phases ──
-        // BUG-C FIX: Use dedicated log key instead of the misleading LogUpdateClosed key
-        if ((phase.Status == InternshipPhaseStatus.InProgress || phase.Status == InternshipPhaseStatus.Open)
-            && request.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
+        var hasGroups = phase.InternshipGroups.Any(g => g.DeletedAt == null);
+        var placedCount = phase.InternshipGroups
+            .Where(g => g.DeletedAt == null)
+            .SelectMany(g => g.Members)
+            .Select(m => m.StudentId)
+            .Distinct()
+            .Count();
+
+        var lockFields = hasGroups || placedCount > 0;
+        var isLockedFieldChange =
+            request.StartDate != phase.StartDate ||
+            request.EndDate != phase.EndDate ||
+            request.Capacity != phase.Capacity;
+
+        if (lockFields && isLockedFieldChange)
         {
-            _logger.LogWarning(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateDuplicateName), // intentional reuse — no dedicated EndDateInPast log key
-                request.PhaseId, request.EndDate, phase.Status);
             return Result<UpdateInternshipPhaseResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.EndDateInPastForActivePhase, phase.Name),
+                _messageService.GetMessage(MessageKeys.InternshipPhase.CannotUpdateLockedFields),
                 ResultErrorType.BadRequest);
         }
 
-        // ── Status transition validation ──
-        if (!phase.CanTransitionTo(request.Status))
-        {
-            _logger.LogWarning(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogInvalidStatusTransition),
-                request.PhaseId, phase.Status, request.Status);
-            return Result<UpdateInternshipPhaseResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.InvalidStatusTransition, phase.Status, request.Status),
-                ResultErrorType.BadRequest);
-        }
-
-        // ── BUG-H FIX: No-op guard — skip DB write and cache invalidation if nothing changed ──
-        // Previously a request with identical values would still update UpdatedAt, creating a false audit trail.
         var hasChanges =
             !string.Equals(phase.Name, request.Name, StringComparison.OrdinalIgnoreCase) ||
             phase.StartDate != request.StartDate ||
             phase.EndDate != request.EndDate ||
-            phase.MaxStudents != request.MaxStudents ||
-            phase.Description != request.Description ||
-            phase.Status != request.Status;
+            phase.MajorFields != request.MajorFields ||
+            phase.Capacity != request.Capacity ||
+            phase.Description != request.Description;
 
         if (!hasChanges)
         {
@@ -142,24 +141,20 @@ public class UpdateInternshipPhaseHandler
                 Name = phase.Name,
                 StartDate = phase.StartDate,
                 EndDate = phase.EndDate,
-                MaxStudents = phase.MaxStudents,
+                MajorFields = phase.MajorFields,
+                Capacity = phase.Capacity,
+                RemainingCapacity = Math.Max(phase.Capacity - placedCount, 0),
                 Description = phase.Description,
-                Status = phase.Status,
+                Status = lifecycleStatus,
                 UpdatedAt = phase.UpdatedAt
             },
             _messageService.GetMessage(MessageKeys.InternshipPhase.UpdateNoChanges));
         }
 
-        // ── BUG-D FIX: Removed redundant outer duplicate-name check (outside transaction) ──
-        // The pre-transaction check provided no race-condition protection. The real guard is
-        // the DB-level UNIQUE INDEX on (enterprise_id, name) filtered by deleted_at IS NULL.
-        // A DbUpdateException from the index violation is now caught and mapped to Conflict.
-
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            // Inner duplicate name check — inside transaction for best-effort soft-lock
             if (!string.Equals(phase.Name, request.Name, StringComparison.OrdinalIgnoreCase))
             {
                 var isDuplicateName = await _unitOfWork.Repository<InternshipPhase>().Query()
@@ -170,13 +165,13 @@ public class UpdateInternshipPhaseHandler
 
                 if (isDuplicateName)
                 {
-                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                     _logger.LogWarning(
                         _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateDuplicateName),
                         request.PhaseId, request.Name, phase.EnterpriseId);
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                     return Result<UpdateInternshipPhaseResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.InternshipPhase.DuplicateNameOnUpdate, request.Name),
-                        ResultErrorType.Conflict);
+                        _messageService.GetMessage(MessageKeys.InternshipPhase.DuplicateNameOnUpdate),
+                        ResultErrorType.BadRequest);
                 }
             }
 
@@ -184,9 +179,10 @@ public class UpdateInternshipPhaseHandler
                 request.Name,
                 request.StartDate,
                 request.EndDate,
-                request.MaxStudents,
+                request.MajorFields,
+                request.Capacity,
                 request.Description,
-                request.Status);
+                phase.Status);
 
             await _unitOfWork.Repository<InternshipPhase>().UpdateAsync(phase);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
@@ -194,12 +190,14 @@ public class UpdateInternshipPhaseHandler
 
             await _cacheService.RemoveAsync(InternshipPhaseCacheKeys.Phase(phase.PhaseId), cancellationToken);
             await _cacheService.RemoveByPatternAsync(InternshipPhaseCacheKeys.PhaseListPattern(), cancellationToken);
-            // BUG-F FIX: Also invalidate enterprise-scoped GetById caches (non-admin path uses different key prefix)
             await _cacheService.RemoveByPatternAsync(InternshipPhaseCacheKeys.PhaseEnterprisePattern(), cancellationToken);
 
             _logger.LogInformation(
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateSuccess),
                 phase.PhaseId, phase.Name);
+
+            var updatedStatus = phase.GetLifecycleStatus(today);
+            var remainingCapacity = Math.Max(phase.Capacity - placedCount, 0);
 
             return Result<UpdateInternshipPhaseResponse>.Success(new UpdateInternshipPhaseResponse
             {
@@ -208,24 +206,14 @@ public class UpdateInternshipPhaseHandler
                 Name = phase.Name,
                 StartDate = phase.StartDate,
                 EndDate = phase.EndDate,
-                MaxStudents = phase.MaxStudents,
+                MajorFields = phase.MajorFields,
+                Capacity = phase.Capacity,
+                RemainingCapacity = remainingCapacity,
                 Description = phase.Description,
-                Status = phase.Status,
+                Status = updatedStatus,
                 UpdatedAt = phase.UpdatedAt
             },
             _messageService.GetMessage(MessageKeys.InternshipPhase.UpdateSuccess));
-        }
-        catch (DbUpdateException dbEx) when (dbEx.InnerException?.Message.Contains("ix_internship_phases_enterprise_name_unique") == true)
-        {
-            // BUG-D FIX: The DB unique index (enterprise_id + name) is the true race-condition guard.
-            // Previously this exception was swallowed into a 500. Now it maps to a proper 409 Conflict.
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogWarning(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.LogUpdateDuplicateName),
-                request.PhaseId, request.Name, Guid.Empty);
-            return Result<UpdateInternshipPhaseResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.InternshipPhase.DuplicateNameOnUpdate, request.Name),
-                ResultErrorType.Conflict);
         }
         catch (Exception ex)
         {

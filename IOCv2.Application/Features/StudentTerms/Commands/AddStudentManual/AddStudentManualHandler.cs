@@ -16,7 +16,6 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
     private readonly IPasswordService _passwordService;
-    private readonly IUserServices _userServices;
     private readonly IBackgroundEmailSender _emailSender;
     private readonly ICacheService _cacheService;
     private readonly ILogger<AddStudentManualHandler> _logger;
@@ -26,7 +25,6 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
         ICurrentUserService currentUserService,
         IMessageService messageService,
         IPasswordService passwordService,
-        IUserServices userServices,
         IBackgroundEmailSender emailSender,
         ICacheService cacheService,
         ILogger<AddStudentManualHandler> logger)
@@ -35,7 +33,6 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
         _currentUserService = currentUserService;
         _messageService = messageService;
         _passwordService = passwordService;
-        _userServices = userServices;
         _emailSender = emailSender;
         _cacheService = cacheService;
         _logger = logger;
@@ -111,6 +108,11 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
 
         // 7. Create User → Student → StudentTerm
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        Guid createdUserId;
+        string createdEmail;
+        string createdFullName;
+        string tempPasswordToSend;
+        Guid studentTermId;
         try
         {
             var tempPassword = _passwordService.GenerateRandomPassword();
@@ -120,6 +122,10 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
             var user = new User(newUserId, request.StudentCode, request.Email, request.FullName, UserRole.Student, passwordHash);
             user.UpdateProfile(request.FullName, request.Phone, null, null, request.DateOfBirth, null);
             await _unitOfWork.Repository<User>().AddAsync(user, cancellationToken);
+            createdUserId = user.UserId;
+            createdEmail = user.Email;
+            createdFullName = user.FullName;
+            tempPasswordToSend = tempPassword;
 
             var student = new Student
             {
@@ -139,7 +145,7 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
             };
             await _unitOfWork.Repository<UniversityUser>().AddAsync(universityUserLink, cancellationToken);
 
-            var studentTermId = Guid.NewGuid();
+            studentTermId = Guid.NewGuid();
             var studentTerm = new StudentTerm
             {
                 StudentTermId = studentTermId,
@@ -158,35 +164,41 @@ public class AddStudentManualHandler : IRequestHandler<AddStudentManualCommand, 
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
-
-            await _emailSender.EnqueueAccountCreationEmailAsync(
-                user.Email,
-                user.FullName,
-                user.Email,
-                UserRole.Student.ToString(),
-                tempPassword,
-                user.UserId,
-                userId,
-                cancellationToken);
-
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
-            await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
-
-            _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogAdded), studentTermId, userId);
-
-            return Result<AddStudentManualResponse>.Success(
-                new AddStudentManualResponse { StudentTermId = studentTermId, TemporaryPassword = tempPassword },
-                _messageService.GetMessage(MessageKeys.StudentTerms.AddSuccess));
         }
         catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogError(ex, "Error adding student manually to term {TermId}", request.TermId);
+            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.StudentTerms.LogAddManualError), request.TermId);
             return Result<AddStudentManualResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.Common.InternalError),
                 ResultErrorType.InternalServerError);
         }
+
+        try
+        {
+            await _emailSender.EnqueueAccountCreationEmailAsync(
+                createdEmail,
+                createdFullName,
+                createdEmail,
+                UserRole.Student.ToString(),
+                tempPasswordToSend,
+                createdUserId,
+                userId,
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, _messageService.GetMessage(MessageKeys.StudentTerms.LogAddManualError), request.TermId);
+        }
+
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
+        await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
+
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogAdded), studentTermId, userId);
+
+        return Result<AddStudentManualResponse>.Success(
+            new AddStudentManualResponse { StudentTermId = studentTermId, TemporaryPassword = tempPasswordToSend },
+            _messageService.GetMessage(MessageKeys.StudentTerms.AddSuccess));
     }
 }

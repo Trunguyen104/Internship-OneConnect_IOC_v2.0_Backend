@@ -47,7 +47,7 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
             if (string.IsNullOrWhiteSpace(sortColumn))
                 return true;
 
-            var validColumns = new[] { "projectname", "startdate", "enddate", "status", "createdat" };
+            var validColumns = new[] { "projectname", "startdate", "enddate", "visibilitystatus", "operationalstatus", "createdat" };
             return validColumns.Contains(sortColumn.ToLower());
         }
 

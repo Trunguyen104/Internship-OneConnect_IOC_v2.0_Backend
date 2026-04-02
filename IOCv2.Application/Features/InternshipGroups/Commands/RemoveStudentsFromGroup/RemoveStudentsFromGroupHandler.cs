@@ -117,26 +117,50 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                     if (group.MentorId.HasValue && group.Mentor != null && membersToRemove.Any())
                     {
                         var mentorUserId = group.Mentor.UserId;
+                        var removedStudentNames = membersToRemove
+                            .Select(m => string.IsNullOrWhiteSpace(m.Student.User.FullName) ? m.StudentId.ToString() : m.Student.User.FullName)
+                            .Distinct()
+                            .ToList();
+
+                        var mentorNotification = new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId = mentorUserId,
+                            Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationStudentRemovedMentorTitle),
+                            Content = _messageService.GetMessage(
+                                MessageKeys.InternshipGroups.NotificationStudentRemovedMentorContent,
+                                string.Join(", ", removedStudentNames.Any() ? removedStudentNames : membersToRemove.Select(m => m.StudentId.ToString())),
+                                group.GroupName),
+                            Type = NotificationType.General,
+                            ReferenceType = nameof(InternshipGroup),
+                            ReferenceId = group.InternshipId,
+                            IsRead = false
+                        };
+
+                        await _unitOfWork.Repository<Notification>().AddAsync(mentorNotification, cancellationToken);
 
                         foreach (var member in membersToRemove)
                         {
-                            var studentName = member.Student?.User?.FullName ?? member.StudentId.ToString();
+                            var studentUserId = member.Student.UserId;
+                            if (studentUserId == Guid.Empty)
+                            {
+                                continue;
+                            }
 
-                            var notification = new Notification
+                            var studentNotification = new Notification
                             {
                                 NotificationId = Guid.NewGuid(),
-                                UserId = mentorUserId,
-                                Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationProjectCleanupTitle),
-                                Content = string.Format(
-                                    _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationProjectCleanupContent),
-                                    studentName),
+                                UserId = studentUserId,
+                                Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationStudentRemovedStudentTitle),
+                                Content = _messageService.GetMessage(
+                                    MessageKeys.InternshipGroups.NotificationStudentRemovedStudentContent,
+                                    group.GroupName),
                                 Type = NotificationType.General,
                                 ReferenceType = nameof(InternshipGroup),
                                 ReferenceId = group.InternshipId,
                                 IsRead = false
                             };
-
-                            await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+                            await _unitOfWork.Repository<Notification>().AddAsync(studentNotification, cancellationToken);
                         }
 
                         await _unitOfWork.SaveChangeAsync(cancellationToken);
@@ -151,6 +175,26 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFro
                             referenceId = group.InternshipId,
                             currentUnreadCount = unreadCount
                         }, cancellationToken);
+
+                        foreach (var member in membersToRemove)
+                        {
+                            var studentUserId = member.Student.UserId;
+                            if (studentUserId == Guid.Empty)
+                            {
+                                continue;
+                            }
+
+                            var studentUnreadCount = await _unitOfWork.Repository<Notification>()
+                                .CountAsync(n => n.UserId == studentUserId && !n.IsRead, cancellationToken);
+
+                            await _pushService.PushNewNotificationAsync(studentUserId, new
+                            {
+                                type = NotificationType.General,
+                                referenceType = nameof(InternshipGroup),
+                                referenceId = group.InternshipId,
+                                currentUnreadCount = studentUnreadCount
+                            }, cancellationToken);
+                        }
                     }
 
                     await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(group.InternshipId), cancellationToken);

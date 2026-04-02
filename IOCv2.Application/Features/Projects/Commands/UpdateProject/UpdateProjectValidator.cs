@@ -96,7 +96,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                            || x.Field != null
                            || x.Requirements != null
                            || x.Deliverables != null
-                           || x.Template.HasValue)
+                           || x.Template.HasValue
+                           || x.InternshipGroupId.HasValue)
                 .WithMessage(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));
         }
     }
