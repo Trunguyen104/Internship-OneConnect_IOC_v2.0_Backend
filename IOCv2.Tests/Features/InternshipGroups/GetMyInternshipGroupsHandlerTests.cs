@@ -23,8 +23,6 @@ public class GetMyInternshipGroupsHandlerTests
     private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipGroupRepository;
     private readonly Mock<IGenericRepository<Project>> _mockProjectRepository;
     private readonly Mock<IGenericRepository<EvaluationCycle>> _mockEvaluationCycleRepository;
-    private readonly Mock<IGenericRepository<StudentTerm>> _mockStudentTermRepository;
-    private readonly Mock<IGenericRepository<User>> _mockUserRepository;
     private readonly GetMyInternshipGroupsHandler _handler;
 
     public GetMyInternshipGroupsHandlerTests()
@@ -38,16 +36,12 @@ public class GetMyInternshipGroupsHandlerTests
         _mockInternshipGroupRepository = new Mock<IGenericRepository<InternshipGroup>>();
         _mockProjectRepository = new Mock<IGenericRepository<Project>>();
         _mockEvaluationCycleRepository = new Mock<IGenericRepository<EvaluationCycle>>();
-        _mockUserRepository = new Mock<IGenericRepository<User>>();
-        _mockStudentTermRepository = new Mock<IGenericRepository<StudentTerm>>();
 
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<User>()).Returns(_mockUserRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<StudentTerm>()).Returns(_mockStudentTermRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<InternshipGroup>()).Returns(_mockInternshipGroupRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Project>()).Returns(_mockProjectRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<EvaluationCycle>()).Returns(_mockEvaluationCycleRepository.Object);
-        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<User>()).Returns(_mockUserRepository.Object);
-        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<StudentTerm>()).Returns(_mockStudentTermRepository.Object);
 
         _handler = new GetMyInternshipGroupsHandler(
             _mockUnitOfWork.Object,
