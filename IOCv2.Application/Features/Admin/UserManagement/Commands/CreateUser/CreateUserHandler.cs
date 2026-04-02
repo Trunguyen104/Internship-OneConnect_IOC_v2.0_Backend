@@ -96,7 +96,7 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser
                     throw new BusinessException(_messageService.GetMessage(MessageKeys.Common.AccessDenied));
                 }
             }
-            else if (auditorRole != UserRole.SuperAdmin && auditorRole != UserRole.Moderator)
+            else if (auditorRole != UserRole.SuperAdmin)
             {
                 _logger.LogWarning("Access Denied: Auditor with role {AuditorRole} attempted to create user", auditorRole);
                 throw new BusinessException(_messageService.GetMessage(MessageKeys.Common.AccessDenied));

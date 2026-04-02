@@ -95,15 +95,72 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.DeleteUser
                     return Result<DeleteUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied), ResultErrorType.Forbidden);
                 }
             }
-            else if (auditorRole != UserRole.SuperAdmin && auditorRole != UserRole.Moderator)
+            else if (auditorRole != UserRole.SuperAdmin)
             {
                 return Result<DeleteUserResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied), ResultErrorType.Forbidden);
+            }
+
+            // 3.1 Self-delete & Last-man-standing protection
+            if (request.UserId == auditorId)
+            {
+                _logger.LogWarning("Self-delete blocked for user {UserId}", request.UserId);
+                return Result<DeleteUserResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                    ResultErrorType.Forbidden);
+            }
+
+            if (user.Role == UserRole.SuperAdmin && user.Status == UserStatus.Active)
+            {
+                var otherActiveSuperAdminsCount = await _unitOfWork.Repository<User>()
+                    .Query()
+                    .CountAsync(
+                        u => u.Role == UserRole.SuperAdmin
+                             && u.Status == UserStatus.Active
+                             && u.UserId != user.UserId,
+                        cancellationToken);
+
+                if (otherActiveSuperAdminsCount == 0)
+                {
+                    return Result<DeleteUserResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
             }
 
             // 4. Delete Execution
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                // BR-USR-DL-04 & BR-USR-DL-05: revoke sessions + free unique constraints after soft delete
+                var now = DateTime.UtcNow;
+                var suffix = $"_deleted_{now:yyyyMMddHHmmssfff}";
+
+                // Update email/phone before soft-delete so unique indexes won't block future re-use
+                user.UpdateEmail($"{user.Email}{suffix}");
+                if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
+                {
+                    var newPhone = $"{user.PhoneNumber}{suffix}";
+                    user.UpdateProfile(
+                        user.FullName,
+                        newPhone,
+                        user.AvatarUrl,
+                        user.Gender,
+                        user.DateOfBirth,
+                        user.Address);
+                }
+
+                var activeTokens = await _unitOfWork.Repository<RefreshToken>()
+                    .Query()
+                    .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
+                    .ToListAsync(cancellationToken);
+
+                foreach (var token in activeTokens)
+                {
+                    token.IsRevoked = true;
+                    token.UpdatedAt = now;
+                    await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
+                }
+
                 await _unitOfWork.Repository<User>().DeleteAsync(user, cancellationToken);
 
                 var auditLog = new AuditLog
