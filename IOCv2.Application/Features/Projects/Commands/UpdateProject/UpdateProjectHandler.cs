@@ -78,6 +78,47 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 return Result<UpdateProjectResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Projects.InvalidStatusForUpdate), ResultErrorType.BadRequest);
 
+            InternshipGroup? targetGroup = null;
+            var hasGroupChangeRequested = request.InternshipGroupId.HasValue
+                                          && request.InternshipGroupId.Value != project.InternshipId;
+
+            if (hasGroupChangeRequested)
+            {
+                targetGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(g => g.InternshipId == request.InternshipGroupId!.Value, cancellationToken);
+
+                if (targetGroup == null)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound);
+
+                if (targetGroup.Status == GroupStatus.Archived)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.CannotAssignArchivedGroup), ResultErrorType.BadRequest);
+
+                if (targetGroup.Status == GroupStatus.Finished)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
+
+                if (targetGroup.EndDate.HasValue && targetGroup.EndDate.Value.Date < DateTime.UtcNow.Date)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
+
+                if (targetGroup.MentorId != enterpriseUser.EnterpriseUserId)
+                    return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                var hasActiveProjectInTargetGroup = await _unitOfWork.Repository<Project>().Query()
+                    .AnyAsync(p => p.InternshipId == targetGroup.InternshipId
+                                && p.ProjectId != project.ProjectId
+                                && p.OperationalStatus == OperationalStatus.Active,
+                        cancellationToken);
+
+                if (hasActiveProjectInTargetGroup)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.AlreadyAssignedToGroup),
+                        ResultErrorType.Conflict);
+            }
+
             var assignedCount = 0;
             var resourceReadCacheKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var filesToDelete = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -110,6 +151,9 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                     request.Requirements,
                     request.Deliverables,
                     request.Template);
+
+                if (targetGroup != null)
+                    project.AssignToGroup(targetGroup.InternshipId, targetGroup.StartDate, targetGroup.EndDate);
 
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);

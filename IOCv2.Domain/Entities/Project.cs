@@ -122,15 +122,6 @@ namespace IOCv2.Domain.Entities
             UpdatedAt         = DateTime.UtcNow;
         }
 
-        public void SwapGroup(Guid newInternshipId, DateTime? startDate, DateTime? endDate)
-        {
-            InternshipId = newInternshipId;
-            StartDate    = startDate;
-            EndDate      = endDate;
-            OperationalStatus = OperationalStatus.Active;
-            IsOrphaned = false;
-            UpdatedAt    = DateTime.UtcNow;
-        }
 
         public void UnassignFromGroup()
         {
