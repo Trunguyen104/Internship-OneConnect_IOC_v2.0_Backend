@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260330142222_RemoveQuantityJobPosting")]
-    partial class RemoveQuantityJobPosting
+    [Migration("20260401155630_CanNullFKInternshipPhaseJob")]
+    partial class CanNullFKInternshipPhaseJob
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -958,7 +958,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expire_date");
 
-                    b.Property<Guid>("InternshipPhaseId")
+                    b.Property<Guid?>("InternshipPhaseId")
                         .HasColumnType("uuid")
                         .HasColumnName("internship_phase_id");
 
@@ -2706,7 +2706,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithMany("Jobs")
                         .HasForeignKey("InternshipPhaseId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
 
                     b.Navigation("Enterprise");

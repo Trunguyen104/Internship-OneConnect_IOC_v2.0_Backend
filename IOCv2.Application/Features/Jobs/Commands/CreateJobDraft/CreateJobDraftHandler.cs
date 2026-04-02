@@ -55,7 +55,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
             {
                 _logger.LogWarning("Attempt to save draft without a title.");
                 return Result<CreateJobDraftResponse>.Failure(
-                    _messageService.GetMessage(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.TitleRequired)),
+                    _messageService.GetMessage(MessageKeys.JobPostingMessageKey.TitleRequired),
                     ResultErrorType.BadRequest);
             }
 
@@ -70,7 +70,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobDraft
                 location: request.Location,
                 expireDate: request.ExpireDate);
 
-            if (request.InternshipPhaseId.HasValue)
+            if (request.InternshipPhaseId.HasValue && request.InternshipPhaseId != Guid.Empty)
             {
                 var internshipPhase = await _unitOfWork.Repository<InternshipPhase>().GetByIdAsync(request.InternshipPhaseId.Value, cancellationToken);
                 if (internshipPhase == null || internshipPhase.DeletedAt != null)
