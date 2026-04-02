@@ -52,7 +52,7 @@ public class GetUsersHandlerTests
         cache.Setup(x => x.GetAsync<Application.Common.Models.PaginatedResult<GetUsersResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Application.Common.Models.PaginatedResult<GetUsersResponse>?)null);
 
-        var mapperCfg = new MapperConfiguration(c => c.CreateMap<User, GetUsersResponse>(), null);
+        var mapperCfg = new MapperConfiguration(c => c.CreateMap<User, GetUsersResponse>());
         var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetUsersHandler(
