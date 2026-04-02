@@ -57,6 +57,10 @@ namespace IOCv2.Infrastructure.Persistence
 
             // Deterministic id for the sixth seeded student (used for job-apply tests)
             public static readonly Guid Student6UserId = new Guid("66666666-6666-6666-6666-666666660006");
+
+            // Deterministic ids for student11 (UniAssign) and student12 (SelfApply) placement tests
+            public static readonly Guid Student11UserId = new Guid("66666666-6666-6666-6666-666666660011");
+            public static readonly Guid Student12UserId = new Guid("66666666-6666-6666-6666-666666660012");
         }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
@@ -619,6 +623,54 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Students.Add(student6);
             }
 
+            // Student11 — seeded for UniAssign placement flow
+            var student11Email = "student11@fptu.edu.vn";
+            if (!existingEmails.Contains(student11Email))
+            {
+                var userId11 = SeedIds.Student11UserId;
+                var userCode11 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user11 = new User(userId11, userCode11, student11Email, "Lý Thị Mai", UserRole.Student, passHash);
+                user11.UpdateProfile(user11.FullName, $"098765{phoneCounter++}", null, UserGender.Female, new DateOnly(2003, 5, 15), "Hà Nội");
+                user11.SetStatus(UserStatus.Active);
+                _context.Users.Add(user11);
+                existingEmails.Add(student11Email);
+                var uni11 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user11.UserId, UniversityId = uni11.UniversityId });
+                _context.Students.Add(new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user11.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Information Technology",
+                    ClassName = "IT1620"
+                });
+            }
+
+            // Student12 — seeded for SelfApply placement flow (has CV)
+            var student12Email = "student12@fptu.edu.vn";
+            if (!existingEmails.Contains(student12Email))
+            {
+                var userId12 = SeedIds.Student12UserId;
+                var userCode12 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user12 = new User(userId12, userCode12, student12Email, "Phan Văn Khoa", UserRole.Student, passHash);
+                user12.UpdateProfile(user12.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(2003, 8, 20), "TP. Hồ Chí Minh");
+                user12.SetStatus(UserStatus.Active);
+                _context.Users.Add(user12);
+                existingEmails.Add(student12Email);
+                var uni12 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user12.UserId, UniversityId = uni12.UniversityId });
+                var student12Rec = new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user12.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Software Engineering",
+                    ClassName = "SE1621"
+                };
+                student12Rec.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf");
+                _context.Students.Add(student12Rec);
+            }
+
             await _context.SaveChangesAsync();
         }
 
@@ -1010,6 +1062,9 @@ namespace IOCv2.Infrastructure.Persistence
             if (fptUniversity == null)
                 return;
 
+            students.TryGetValue("student11@fptu.edu.vn", out var s11);
+            students.TryGetValue("student12@fptu.edu.vn", out var s12);
+
             var hrFptEu = await _context.EnterpriseUsers
                 .Include(eu => eu.User)
                 .FirstOrDefaultAsync(eu => eu.EnterpriseId == fsoft.EnterpriseId && eu.User.Role == UserRole.HR);
@@ -1099,11 +1154,11 @@ namespace IOCv2.Infrastructure.Persistence
                 "https://iocv2-test-resources.s3.amazonaws.com/resumes/student4_cv.pdf", fptBackendJob.Title);
 
             await EnsureApplication(
-                fsoft.EnterpriseId, spring2026.TermId, s5.StudentId,
-                fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
-                DateTime.UtcNow.AddDays(-9), null, null,
+                rikkeisoft.EnterpriseId, spring2026.TermId, s5.StudentId,
+                rikkeiBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
+                DateTime.UtcNow.AddDays(-18), DateTime.UtcNow.AddDays(-15), hrRikkeiEu?.EnterpriseUserId,
                 fptUniversity.UniversityId, null,
-                null, fptQaJob.Title);
+                null, rikkeiBackendJob.Title);
 
             await EnsureApplication(
                 fsoft.EnterpriseId, spring2026.TermId, s8.StudentId,
@@ -1141,6 +1196,28 @@ namespace IOCv2.Infrastructure.Persistence
                 DateTime.UtcNow.AddDays(-5), null, null,
                 fptUniversity.UniversityId, null,
                 null, rikkeiMobileJob.Title);
+
+            // Student 11: UniAssign placement flow -> FPT Software Spring 2026 (Job: FPT QA Automation Intern)
+            if (s11 != null)
+            {
+                 await EnsureApplication(
+                    fsoft.EnterpriseId, spring2026.TermId, s11.StudentId,
+                    fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                    DateTime.UtcNow.AddDays(-4), null, null,
+                    fptUniversity.UniversityId, null,
+                    null, fptQaJob.Title);
+            }
+
+            // Student 12: SelfApply flow -> FPT Software Spring 2026 (Job: FPT Backend Platform Intern)
+            if (s12 != null)
+            {
+                 await EnsureApplication(
+                    fsoft.EnterpriseId, spring2026.TermId, s12.StudentId,
+                    fptBackendJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
+                    DateTime.UtcNow.AddDays(-2), null, null,
+                    null, null,
+                    "https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf", fptBackendJob.Title);
+            }
 
             // Historical record for old term.
             await EnsureApplication(
@@ -1406,6 +1483,8 @@ namespace IOCv2.Infrastructure.Persistence
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
             var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
             var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
+            var s11 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student11@fptu.edu.vn");
+            var s12 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student12@fptu.edu.vn");
 
             // FPT Software OJT Team Alpha: s1(Leader), s2(Member), s3(Member), s6(Member)
             bool fptHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == fptGroup.InternshipId);
@@ -1451,6 +1530,7 @@ namespace IOCv2.Infrastructure.Persistence
             var s2 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student2@fptu.edu.vn");
             var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            var s12 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student12@fptu.edu.vn");
 
             if (proj3 == null || proj5 == null || s3 == null || s5 == null || !proj3.InternshipId.HasValue || !proj5.InternshipId.HasValue) return;
 
