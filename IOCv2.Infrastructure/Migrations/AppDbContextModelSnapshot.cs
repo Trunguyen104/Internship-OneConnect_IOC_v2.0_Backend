@@ -176,6 +176,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("background_url");
 
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -955,7 +959,7 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expire_date");
 
-                    b.Property<Guid>("InternshipPhaseId")
+                    b.Property<Guid?>("InternshipPhaseId")
                         .HasColumnType("uuid")
                         .HasColumnName("internship_phase_id");
 
@@ -1996,6 +2000,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("code");
 
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_email");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -2703,7 +2711,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .WithMany("Jobs")
                         .HasForeignKey("InternshipPhaseId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
 
                     b.Navigation("Enterprise");

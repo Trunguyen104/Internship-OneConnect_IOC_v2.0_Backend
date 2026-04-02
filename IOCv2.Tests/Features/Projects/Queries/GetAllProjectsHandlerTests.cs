@@ -60,8 +60,8 @@ public class GetAllProjectsHandlerTests
         _projectRepo.Setup(x => x.Query()).Returns(mockQuery);
         _unitOfWork.Setup(x => x.Repository<Project>()).Returns(_projectRepo.Object);
 
-        var cfg = new MapperConfiguration(c => c.CreateMap<Project, GetAllProjectsResponse>());
-        var mapper = cfg.CreateMapper();
+        var mapperCfg = new MapperConfiguration(c => c.CreateMap<Project, GetAllProjectsResponse>(), null);
+        var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetAllProjectsHandler(
             _unitOfWork.Object,
