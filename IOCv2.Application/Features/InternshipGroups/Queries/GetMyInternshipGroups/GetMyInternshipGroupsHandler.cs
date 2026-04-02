@@ -3,6 +3,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -40,7 +41,9 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
 
         var user = await _unitOfWork.Repository<User>()
             .Query()
-            .Include(u => u.Student).ThenInclude(s => s!.UniversityUser).ThenInclude(uu => uu!.University)
+            .Include(u => u.Student)
+            .Include(u => u.UniversityUser)
+                .ThenInclude(uu => uu!.University)
             .Include(u => u.EnterpriseUser)
             .Where(u => u.UserId == userId)
             .AsNoTracking()
@@ -118,7 +121,7 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
                 .ToListAsync(cancellationToken);
         }
 
-        var university = user.Role == UserRole.Student ? user.Student?.UniversityUser?.University : null;
+        var university = user.Role == UserRole.Student ? user.UniversityUser?.University : null;
 
         var response = groups.Select((group, index) => {
             Term? term = null;

@@ -1210,7 +1210,6 @@ namespace IOCv2.Infrastructure.Persistence
 
             // Pending project example
             var projPending = Project.Create("FPT Future System", "Next phase architecture", "PRJ-FPTSOF_FPT_2", "CNTT", "Design next phase architecture.", mentorId: SeedIds.MentorFptEuId);
-            projPending.AssignToGroup(group3.InternshipId, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(30));
             if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT Future System"))
             {
                 _context.Projects.Add(projPending);
@@ -1297,7 +1296,6 @@ namespace IOCv2.Infrastructure.Persistence
                     "Data",
                     "Analytics and reporting track for internship outcomes.",
                     mentorId: SeedIds.MentorFptEuId);
-                multiProj2.AssignToGroup(multiProjectGroup.InternshipId, DateTime.UtcNow.AddDays(-14), DateTime.UtcNow.AddMonths(2));
                 multiProj2.Publish();
                 _context.Projects.Add(multiProj2);
             }
@@ -1323,7 +1321,6 @@ namespace IOCv2.Infrastructure.Persistence
                     "Mobile",
                     "Phát triển ứng dụng mobile cross-platform bằng Flutter.",
                     mentorId: SeedIds.MentorRikkeisoftEuId);
-                rikkeiProj2.AssignToGroup(rikkeiGroup.InternshipId, null, null);
                 _context.Projects.Add(rikkeiProj2);
             }
 
