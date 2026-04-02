@@ -1,4 +1,5 @@
 using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
 using FluentAssertions;
 using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
 using IOCv2.Application.Interfaces;
@@ -60,7 +61,7 @@ public class GetAllProjectsHandlerTests
         _projectRepo.Setup(x => x.Query()).Returns(mockQuery);
         _unitOfWork.Setup(x => x.Repository<Project>()).Returns(_projectRepo.Object);
 
-        var mapperCfg = new MapperConfiguration(c => c.CreateMap<Project, GetAllProjectsResponse>(), null);
+        var mapperCfg = new MapperConfiguration(c => c.AddProfile<MappingProfile>());
         var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetAllProjectsHandler(

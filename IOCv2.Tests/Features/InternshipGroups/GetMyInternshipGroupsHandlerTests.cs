@@ -23,6 +23,8 @@ public class GetMyInternshipGroupsHandlerTests
     private readonly Mock<IGenericRepository<InternshipGroup>> _mockInternshipGroupRepository;
     private readonly Mock<IGenericRepository<Project>> _mockProjectRepository;
     private readonly Mock<IGenericRepository<EvaluationCycle>> _mockEvaluationCycleRepository;
+    private readonly Mock<IGenericRepository<StudentTerm>> _mockStudentTermRepository;
+    private readonly Mock<IGenericRepository<User>> _mockUserRepository;
     private readonly GetMyInternshipGroupsHandler _handler;
 
     public GetMyInternshipGroupsHandlerTests()
@@ -36,12 +38,16 @@ public class GetMyInternshipGroupsHandlerTests
         _mockInternshipGroupRepository = new Mock<IGenericRepository<InternshipGroup>>();
         _mockProjectRepository = new Mock<IGenericRepository<Project>>();
         _mockEvaluationCycleRepository = new Mock<IGenericRepository<EvaluationCycle>>();
+        _mockUserRepository = new Mock<IGenericRepository<User>>();
+        _mockStudentTermRepository = new Mock<IGenericRepository<StudentTerm>>();
 
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<User>()).Returns(_mockUserRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<StudentTerm>()).Returns(_mockStudentTermRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<InternshipGroup>()).Returns(_mockInternshipGroupRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<Project>()).Returns(_mockProjectRepository.Object);
         _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<EvaluationCycle>()).Returns(_mockEvaluationCycleRepository.Object);
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<User>()).Returns(_mockUserRepository.Object);
+        _mockUnitOfWork.Setup(unitOfWork => unitOfWork.Repository<StudentTerm>()).Returns(_mockStudentTermRepository.Object);
 
         _handler = new GetMyInternshipGroupsHandler(
             _mockUnitOfWork.Object,
@@ -85,6 +91,9 @@ public class GetMyInternshipGroupsHandlerTests
         project.AssignToGroup(internshipId, null, null);
         typeof(Project).GetProperty(nameof(Project.ProjectId))!.SetValue(project, projectId);
 
+        var user = new User(userId, "STUDENT001", "student@example.com", "Student Name", IOCv2.Domain.Enums.UserRole.Student, "hash");
+        typeof(User).GetProperty(nameof(User.Student))!.SetValue(user, new Student { StudentId = studentId, UserId = userId });
+
         _mockCurrentUserService.Setup(service => service.UserId).Returns(userId.ToString());
         var studentUser = new User(userId, "STU001", "student@fpt.edu.vn", "Student Name", IOCv2.Domain.Enums.UserRole.Student, "hash");
         var studentProfile = new Student { StudentId = studentId, UserId = userId };
@@ -95,12 +104,16 @@ public class GetMyInternshipGroupsHandlerTests
 
         _mockStudentTermRepository.Setup(repository => repository.Query())
             .Returns(new List<StudentTerm>().AsQueryable().BuildMock());
+        _mockUserRepository.Setup(repository => repository.Query())
+            .Returns(new List<User> { user }.AsQueryable().BuildMock());
         _mockInternshipGroupRepository.Setup(repository => repository.Query())
             .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
         _mockProjectRepository.Setup(repository => repository.Query())
             .Returns(new List<Project> { project }.AsQueryable().BuildMock());
         _mockEvaluationCycleRepository.Setup(repository => repository.Query())
             .Returns(new List<EvaluationCycle>().AsQueryable().BuildMock());
+        _mockStudentTermRepository.Setup(repository => repository.Query())
+            .Returns(new List<StudentTerm>().AsQueryable().BuildMock());
 
         var result = await _handler.Handle(new GetMyInternshipGroupsQuery(), CancellationToken.None);
 
