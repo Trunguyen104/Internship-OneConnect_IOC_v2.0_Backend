@@ -62,9 +62,9 @@ public class GetInternshipGroupsHandlerCacheTests
         cache.Setup(x => x.GetAsync<IOCv2.Application.Common.Models.PaginatedResult<GetInternshipGroupsResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((IOCv2.Application.Common.Models.PaginatedResult<GetInternshipGroupsResponse>?)null);
 
-        var cfg = new MapperConfiguration(cfg =>
-            cfg.CreateMap<InternshipGroup, GetInternshipGroupsResponse>());
-        var mapper = cfg.CreateMapper();
+        var mapperCfg = new MapperConfiguration(c =>
+            c.CreateMap<InternshipGroup, GetInternshipGroupsResponse>(), null);
+        var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetInternshipGroupsHandler(
             uow.Object,

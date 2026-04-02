@@ -50,11 +50,11 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectById
             var project = await _unitOfWork.Repository<Domain.Entities.Project>()
                 .Query()
                 .Include(x => x.ProjectResources)
-                .Include(x => x.InternshipGroup)
-                    .ThenInclude(g => g.Mentor)
-                        .ThenInclude(m => m.User)
-                .Include(x => x.InternshipGroup)
-                    .ThenInclude(g => g.Members)
+                .Include(x => x.InternshipGroup!)
+                    .ThenInclude(g => g.Mentor!)
+                        .ThenInclude(m => m.User!)
+                .Include(x => x.InternshipGroup!)
+                    .ThenInclude(g => g.Members!)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
 

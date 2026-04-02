@@ -50,8 +50,8 @@ public class GetUserByIdHandlerTests
         var message = new Mock<IMessageService>();
         message.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("User not found");
 
-        var cfg = new MapperConfiguration(cfg => cfg.CreateMap<User, GetUserByIdResponse>());
-        var mapper = cfg.CreateMapper();
+        var mapperCfg = new MapperConfiguration(c => c.CreateMap<User, GetUserByIdResponse>(), null);
+        var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetUserByIdHandler(
             uow.Object,

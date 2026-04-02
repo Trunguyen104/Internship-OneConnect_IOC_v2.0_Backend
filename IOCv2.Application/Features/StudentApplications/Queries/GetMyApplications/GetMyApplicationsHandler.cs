@@ -70,8 +70,8 @@ public class GetMyApplicationsHandler
         {
             var term = request.SearchTerm.Trim().ToLower();
             query = query.Where(a =>
-                a.Enterprise.Name.ToLower().Contains(term) ||
-                (a.Job != null && a.Job.Title.ToLower().Contains(term)));
+                a.Enterprise!.Name.ToLower().Contains(term) ||
+                (a.Job != null && a.Job!.Title.ToLower().Contains(term)));
         }
 
         query = query.OrderByDescending(a => a.AppliedAt);
