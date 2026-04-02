@@ -21,9 +21,14 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByInternshipId
         public string? SearchTerm { get; set; }
 
         /// <summary>
-        /// Filter by project lifecycle status.
+        /// Filter by project visibility status.
         /// </summary>
-        public ProjectStatus? Status { get; init; }
+        public VisibilityStatus? VisibilityStatus { get; init; }
+
+        /// <summary>
+        /// Filter by project operational status.
+        /// </summary>
+        public OperationalStatus? OperationalStatus { get; init; }
 
         /// <summary>
         /// Lower bound for project start date filter.

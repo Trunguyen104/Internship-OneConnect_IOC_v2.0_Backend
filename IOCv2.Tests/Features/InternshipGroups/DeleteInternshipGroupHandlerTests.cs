@@ -31,6 +31,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
         private readonly Mock<IGenericRepository<Project>> _mockProjectRepository;
         private readonly Mock<IGenericRepository<EnterpriseUser>> _mockEnterpriseUserRepo;
         private readonly Mock<IGenericRepository<InternshipGroup>> _mockGroupRepo;
+        private readonly Mock<IGenericRepository<InternshipStudent>> _mockInternshipStudentRepo;
+        private readonly Mock<IGenericRepository<Notification>> _mockNotificationRepo;
         private readonly DeleteInternshipGroupHandler _handler;
 
         private readonly Guid _currentUserId = Guid.NewGuid();
@@ -48,11 +50,15 @@ namespace IOCv2.Tests.Features.InternshipGroups
             _mockProjectRepository = new Mock<IGenericRepository<Project>>();
             _mockEnterpriseUserRepo = new Mock<IGenericRepository<EnterpriseUser>>();
             _mockGroupRepo = new Mock<IGenericRepository<InternshipGroup>>();
+            _mockInternshipStudentRepo = new Mock<IGenericRepository<InternshipStudent>>();
+            _mockNotificationRepo = new Mock<IGenericRepository<Notification>>();
 
             // Wire up repositories via explicit mocks (avoid chained setup issues)
             _mockUnitOfWork.Setup(x => x.Repository<EnterpriseUser>()).Returns(_mockEnterpriseUserRepo.Object);
             _mockUnitOfWork.Setup(x => x.Repository<Project>()).Returns(_mockProjectRepository.Object);
             _mockUnitOfWork.Setup(x => x.Repository<InternshipGroup>()).Returns(_mockGroupRepo.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipStudent>()).Returns(_mockInternshipStudentRepo.Object);
+            _mockUnitOfWork.Setup(x => x.Repository<Notification>()).Returns(_mockNotificationRepo.Object);
             _mockUnitOfWork.Setup(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             _mockUnitOfWork.Setup(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             _mockUnitOfWork.Setup(x => x.RollbackTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
@@ -73,6 +79,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
             }.AsQueryable().BuildMock());
 
             _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns(string.Empty);
+            _mockInternshipStudentRepo.Setup(x => x.Query()).Returns(new List<InternshipStudent>().AsQueryable().BuildMock());
+            _mockNotificationRepo.Setup(x => x.Query()).Returns(new List<Notification>().AsQueryable().BuildMock());
             _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 

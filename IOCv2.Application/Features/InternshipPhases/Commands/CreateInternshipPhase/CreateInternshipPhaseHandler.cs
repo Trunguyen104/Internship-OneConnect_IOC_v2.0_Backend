@@ -12,6 +12,8 @@ namespace IOCv2.Application.Features.InternshipPhases.Commands.CreateInternshipP
 public class CreateInternshipPhaseHandler
     : IRequestHandler<CreateInternshipPhaseCommand, Result<CreateInternshipPhaseResponse>>
 {
+    private const string DefaultMajorField = "Software Engineering";
+
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
@@ -92,29 +94,33 @@ public class CreateInternshipPhaseHandler
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            // ── BUG-03 FIX: Duplicate check inside transaction to prevent race condition ──
-            var isDuplicate = await _unitOfWork.Repository<InternshipPhase>().Query()
+            var hasDuplicateName = await _unitOfWork.Repository<InternshipPhase>().Query()
                 .AnyAsync(p => p.EnterpriseId == request.EnterpriseId
                             && p.Name.ToLower() == request.Name.ToLower()
                             && p.DeletedAt == null, cancellationToken);
 
-            if (isDuplicate)
+            if (hasDuplicateName)
             {
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogWarning(
                     _messageService.GetMessage(MessageKeys.InternshipPhase.LogDuplicateName),
                     request.Name, request.EnterpriseId);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 return Result<CreateInternshipPhaseResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.InternshipPhase.DuplicateName, request.Name),
-                    ResultErrorType.Conflict);
+                    _messageService.GetMessage(MessageKeys.InternshipPhase.DuplicateName),
+                    ResultErrorType.BadRequest);
             }
+
+            var majorFields = string.IsNullOrWhiteSpace(request.MajorFields)
+                ? DefaultMajorField
+                : request.MajorFields.Trim();
 
             var phase = InternshipPhase.Create(
                 request.EnterpriseId,
                 request.Name,
                 request.StartDate,
                 request.EndDate,
-                request.MaxStudents,
+                majorFields,
+                request.Capacity,
                 request.Description);
 
             await _unitOfWork.Repository<InternshipPhase>().AddAsync(phase, cancellationToken);
@@ -127,6 +133,9 @@ public class CreateInternshipPhaseHandler
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogCreateSuccess),
                 phase.PhaseId, phase.Name, phase.EnterpriseId);
 
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var lifecycleStatus = phase.GetLifecycleStatus(today);
+
             return Result<CreateInternshipPhaseResponse>.Success(new CreateInternshipPhaseResponse
             {
                 PhaseId = phase.PhaseId,
@@ -134,9 +143,11 @@ public class CreateInternshipPhaseHandler
                 Name = phase.Name,
                 StartDate = phase.StartDate,
                 EndDate = phase.EndDate,
-                MaxStudents = phase.MaxStudents,
+                MajorFields = phase.MajorFields,
+                Capacity = phase.Capacity,
+                RemainingCapacity = phase.Capacity,
                 Description = phase.Description,
-                Status = phase.Status,
+                Status = lifecycleStatus,
                 CreatedAt = phase.CreatedAt
             },
             _messageService.GetMessage(MessageKeys.InternshipPhase.CreateSuccess));

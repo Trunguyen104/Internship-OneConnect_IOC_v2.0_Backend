@@ -42,6 +42,8 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
         var user = await _unitOfWork.Repository<User>()
             .Query()
             .Include(u => u.Student)
+            .Include(u => u.UniversityUser)
+                .ThenInclude(uu => uu!.University)
             .Include(u => u.EnterpriseUser)
             .Where(u => u.UserId == userId)
             .AsNoTracking()
@@ -113,14 +115,13 @@ public class GetMyInternshipGroupsHandler : IRequestHandler<GetMyInternshipGroup
             studentTerms = await _unitOfWork.Repository<StudentTerm>()
                 .Query()
                 .Include(st => st.Term)
-                    .ThenInclude(t => t.University)
                 .Where(st => st.StudentId == user.Student.StudentId)
                 .OrderByDescending(st => st.Term.StartDate)
                 .Select(st => st.Term)
                 .ToListAsync(cancellationToken);
         }
 
-        var university = user.Role == UserRole.Student ? studentTerms.FirstOrDefault()?.University : null;
+        var university = user.Role == UserRole.Student ? user.UniversityUser?.University : null;
 
         var response = groups.Select((group, index) => {
             Term? term = null;

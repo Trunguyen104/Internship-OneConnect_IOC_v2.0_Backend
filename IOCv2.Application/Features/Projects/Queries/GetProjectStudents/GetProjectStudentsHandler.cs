@@ -49,7 +49,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectStudents
             var isStudent = string.Equals(_currentUserService?.Role, "Student", StringComparison.OrdinalIgnoreCase);
             if (isStudent)
             {
-                if (project.Status != ProjectStatus.Published && project.Status != ProjectStatus.Completed)
+                if (project.VisibilityStatus != VisibilityStatus.Published ||
+                    (project.OperationalStatus != OperationalStatus.Active && project.OperationalStatus != OperationalStatus.Completed))
                     return Result<List<GetProjectStudentsResponse>>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
@@ -86,7 +87,8 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectStudents
                     StudentId = s.StudentId,
                     FullName = s.Student.User.FullName,
                     Email = s.Student.User.Email,
-                    ClassName = s.Student.ClassName
+                    ClassName = s.Student.ClassName,
+                    EnrollmentStatus = s.Status
                 })
                 .ToListAsync(cancellationToken);
 

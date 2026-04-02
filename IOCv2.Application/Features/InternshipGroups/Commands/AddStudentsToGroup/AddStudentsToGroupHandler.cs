@@ -75,6 +75,14 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGrou
                     return Result<AddStudentsToGroupResponse>.NotFound(_messageService.GetMessage(MessageKeys.Common.NotFound));
                 }
 
+                if (group.EnterpriseId != enterpriseUser.EnterpriseId)
+                {
+                    _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogAccessDeniedHrEnterprise), currentUserId, group.InternshipId);
+                    return Result<AddStudentsToGroupResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise),
+                        ResultErrorType.Forbidden);
+                }
+
                 if (group.Status != GroupStatus.Active)
                 {
                     _logger.LogWarning(_messageService.GetMessage(MessageKeys.InternshipGroups.LogGroupNotActive), group.InternshipId);

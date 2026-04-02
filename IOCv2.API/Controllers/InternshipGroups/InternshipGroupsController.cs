@@ -9,8 +9,6 @@ using IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup
 using IOCv2.Application.Features.InternshipGroups.Queries.GetDashboard;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
-using IOCv2.Application.Features.InternshipGroups.Queries.GetMyInternshipGroups;
-using IOCv2.Application.Features.InternshipGroups.Queries.GetMyInternshipTerms;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -248,36 +246,4 @@ public class InternshipGroupsController : ApiControllerBase
         _logger.LogInformation("Request to get dashboard for internship group ID: {Id}", id);
         return HandleResult(await _mediator.Send(new GetInternshipGroupDashboardQuery(id), cancellationToken));
     }
-
-    /// <summary>
-    /// Get all internship terms the current student is enrolled in,
-    /// together with their group assignment and placement status.
-    /// Used by the Student Home page to render the InternshipCard list.
-    /// </summary>
-    [HttpGet("mine/internship-terms")]
-    [Authorize(Roles = "Student")]
-    [ProducesResponseType(typeof(ApiResponse<List<GetMyInternshipTermsResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetMyInternshipTerms(
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Request to get internship terms for current student.");
-        return HandleResult(await _mediator.Send(new GetMyInternshipTermsQuery(), cancellationToken));
-    }
-
-    /// <summary>
-    /// Get internship groups the current user (Student/Mentor/HR) is a member of.
-    /// </summary>
-    [HttpGet("mine")]
-    [Authorize(Roles = "Student,Mentor,HR,EnterpriseAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<List<GetMyInternshipGroupsResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetMyInternshipGroups(
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Request to get internship groups for current user.");
-        return HandleResult(await _mediator.Send(new GetMyInternshipGroupsQuery(), cancellationToken));
-    }
 }
-

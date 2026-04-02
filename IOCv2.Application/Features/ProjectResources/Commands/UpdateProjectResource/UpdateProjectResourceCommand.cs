@@ -15,7 +15,10 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
         public Guid ProjectResourceId { get; init; }
         public Guid ProjectId { get; init; }
         public string ResourceName { get; init; } = string.Empty;
-        /// <summary>Type of file: DocumentFile, Image, Video, Other</summary>
+        /// <summary>
+        /// Deprecated: file type is immutable after upload and this field is ignored.
+        /// Kept for backward compatibility with existing clients.
+        /// </summary>
         public FileType ResourceType { get; init; }
     }
 }

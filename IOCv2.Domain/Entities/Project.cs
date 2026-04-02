@@ -1,4 +1,4 @@
-using IOCv2.Domain.Enums;
+﻿using IOCv2.Domain.Enums;
 
 namespace IOCv2.Domain.Entities
 {
@@ -122,12 +122,15 @@ namespace IOCv2.Domain.Entities
             UpdatedAt         = DateTime.UtcNow;
         }
 
-        public void SwapGroup(Guid newInternshipId, DateTime? startDate, DateTime? endDate)
+
+        public void UnassignFromGroup()
         {
-            InternshipId = newInternshipId;
-            StartDate    = startDate;
-            EndDate      = endDate;
-            UpdatedAt    = DateTime.UtcNow;
+            InternshipId = null;
+            StartDate = null;
+            EndDate = null;
+            OperationalStatus = OperationalStatus.Unstarted;
+            IsOrphaned = false;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -138,6 +141,8 @@ namespace IOCv2.Domain.Entities
         public void SetOrphan()
         {
             InternshipId      = null;
+            StartDate         = null;
+            EndDate           = null;
             OperationalStatus = OperationalStatus.Unstarted;
             IsOrphaned        = true;
             UpdatedAt         = DateTime.UtcNow;

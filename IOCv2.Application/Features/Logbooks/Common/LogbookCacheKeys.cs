@@ -12,13 +12,15 @@ public static class LogbookCacheKeys
         int pageNumber,
         int pageSize,
         int? status,
+        string? weekFilter,
         string? sortColumn,
         string? sortOrder)
     {
         var statusPart = status?.ToString() ?? "all";
+        var weekFilterPart = string.IsNullOrWhiteSpace(weekFilter) ? "all" : weekFilter.Replace(" ", string.Empty);
         var sortColPart = string.IsNullOrWhiteSpace(sortColumn) ? "none" : sortColumn.ToLowerInvariant();
         var sortOrderPart = string.IsNullOrWhiteSpace(sortOrder) ? "none" : sortOrder.ToLowerInvariant();
-        return $"{LogbookListPrefix}:internship:{internshipId}:status:{statusPart}:page:{pageNumber}:size:{pageSize}:sort:{sortColPart}:order:{sortOrderPart}";
+        return $"{LogbookListPrefix}:internship:{internshipId}:status:{statusPart}:weeks:{weekFilterPart}:page:{pageNumber}:size:{pageSize}:sort:{sortColPart}:order:{sortOrderPart}";
     }
 
     public static string LogbookListPattern(Guid internshipId) =>

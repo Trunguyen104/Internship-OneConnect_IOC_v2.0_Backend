@@ -75,6 +75,8 @@ public class GetStudentTermDetailHandler : IRequestHandler<GetStudentTermDetailQ
             UpdatedAt = studentTerm.UpdatedAt
         };
 
-        return Result<GetStudentTermDetailResponse>.Success(response);
+        return Result<GetStudentTermDetailResponse>.Success(
+            response,
+            _messageService.GetMessage(MessageKeys.StudentTerms.GetStudentTermDetailSuccess, request.StudentTermId));
     }
 }

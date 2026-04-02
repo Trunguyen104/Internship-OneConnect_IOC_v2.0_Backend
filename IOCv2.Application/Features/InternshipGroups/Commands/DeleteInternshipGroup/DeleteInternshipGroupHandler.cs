@@ -60,6 +60,8 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                     ResultErrorType.Forbidden);
 
             List<Project> projectsToOrphan = new();
+            List<Guid> affectedStudentUserIds = new();
+            List<string> publishedProjectNames = new();
             try
             {
                 var entity = await _unitOfWork.Repository<InternshipGroup>().Query()
@@ -79,6 +81,11 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                         _messageService.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise),
                         ResultErrorType.Forbidden);
 
+                affectedStudentUserIds = await _unitOfWork.Repository<InternshipStudent>().Query()
+                    .Where(m => m.InternshipId == entity.InternshipId)
+                    .Select(m => m.Student.UserId)
+                    .ToListAsync(cancellationToken);
+
                 // AC-13: Group có thể bị xóa kể cả khi còn sinh viên.
                 // Khi xóa → projects bị orphan-ize, mentor được thông báo.
                 if (entity.Status == GroupStatus.Archived || entity.Status == GroupStatus.Finished)
@@ -96,6 +103,12 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                         .Where(p => p.InternshipId == request.InternshipId
                                  && p.OperationalStatus == OperationalStatus.Active)
                         .ToListAsync(cancellationToken);
+
+                    publishedProjectNames = projectsToOrphan
+                        .Where(p => p.VisibilityStatus == VisibilityStatus.Published)
+                        .Select(p => p.ProjectName)
+                        .Distinct()
+                        .ToList();
 
                     foreach (var project in projectsToOrphan)
                     {
@@ -139,8 +152,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                             Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationOrphanTitle),
                             Content = string.Format(
                                 _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationOrphanContent),
-                                entity.GroupName,
-                                projectsToOrphan.Count),
+                                entity.GroupName),
                             Type = NotificationType.General,
                             ReferenceType = nameof(InternshipGroup),
                             ReferenceId = entity.InternshipId,
@@ -165,6 +177,53 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipG
                     {
                         _logger.LogWarning(notifyEx,
                             _messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteNotificationFailed),
+                            request.InternshipId);
+                    }
+                }
+
+                if (publishedProjectNames.Any() && affectedStudentUserIds.Any())
+                {
+                    try
+                    {
+                        foreach (var userId in affectedStudentUserIds.Distinct())
+                        {
+                            foreach (var projectName in publishedProjectNames)
+                            {
+                                var notification = new Notification
+                                {
+                                    NotificationId = Guid.NewGuid(),
+                                    UserId = userId,
+                                    Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationGroupDeletedStudentTitle),
+                                    Content = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationGroupDeletedStudentContent, projectName),
+                                    Type = NotificationType.General,
+                                    ReferenceType = nameof(InternshipGroup),
+                                    ReferenceId = entity.InternshipId,
+                                    IsRead = false
+                                };
+                                await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+                            }
+                        }
+
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                        foreach (var userId in affectedStudentUserIds.Distinct())
+                        {
+                            var unreadCount = await _unitOfWork.Repository<Notification>()
+                                .CountAsync(n => n.UserId == userId && !n.IsRead, cancellationToken);
+
+                            await _pushService.PushNewNotificationAsync(userId, new
+                            {
+                                type = NotificationType.General,
+                                referenceType = nameof(InternshipGroup),
+                                referenceId = entity.InternshipId,
+                                currentUnreadCount = unreadCount
+                            }, cancellationToken);
+                        }
+                    }
+                    catch (Exception notifyStudentsEx)
+                    {
+                        _logger.LogWarning(notifyStudentsEx,
+                            _messageService.GetMessage(MessageKeys.InternshipGroups.LogDeleteStudentNotificationFailed),
                             request.InternshipId);
                     }
                 }

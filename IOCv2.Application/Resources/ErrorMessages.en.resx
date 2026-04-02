@@ -580,6 +580,12 @@
   <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
     <value>Student has been successfully withdrawn from the term and their status has been updated to Withdrawn.</value>
   </data>
+  <data name="StudentTerms.WithdrawDeleteWarning" xml:space="preserve">
+    <value>Warning: this action will delete the student from the system (system student delta: {0}).</value>
+  </data>
+  <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
+    <value>Cannot delete this student from the system because they are still enrolled in another term.</value>
+  </data>
   <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
     <value>Enrollment has been successfully restored. The student is now Active in the term again.</value>
   </data>
@@ -591,6 +597,15 @@
   </data>
   <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
     <value>Students imported into the term successfully. All valid students have been enrolled and are ready to begin their internship.</value>
+  </data>
+  <data name="StudentTerms.GetStudentsSuccess" xml:space="preserve">
+    <value>Student list retrieved successfully for the term. Total matched records: {0}.</value>
+  </data>
+  <data name="StudentTerms.GetStudentTermDetailSuccess" xml:space="preserve">
+    <value>Student term detail retrieved successfully (StudentTermId: {0}).</value>
+  </data>
+  <data name="StudentTerms.DownloadTemplateSuccess" xml:space="preserve">
+    <value>Student import template downloaded successfully for the term (TermId: {0}).</value>
   </data>
   <data name="StudentTerms.Log.Added" xml:space="preserve">
     <value>Student {0} added to term {1} by {2}.</value>
@@ -609,6 +624,12 @@
   </data>
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>{0} students imported into term {1} by {2}.</value>
+  </data>
+  <data name="StudentTerms.Log.AddManualError" xml:space="preserve">
+    <value>Error adding student manually to term {0}.</value>
+  </data>
+  <data name="StudentTerms.Log.ImportConfirmError" xml:space="preserve">
+    <value>Error confirming student import for term {0}.</value>
   </data>
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Term not found. Please verify the ID or reload the page.</value>
@@ -1394,5 +1415,35 @@
   </data>
   <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
     <value>File not found in storage.</value>
+  </data>
+  <data name="UniAdminInternship.UniversityUserNotFound" xml:space="preserve">
+    <value>University administrator profile not found. Please contact system administrator.</value>
+  </data>
+  <data name="UniAdminInternship.TermNotFound" xml:space="preserve">
+    <value>Internship term not found with the provided ID.</value>
+  </data>
+  <data name="UniAdminInternship.TermAccessDenied" xml:space="preserve">
+    <value>You do not have permission to access this internship term. The term does not belong to your university.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotFound" xml:space="preserve">
+    <value>Student not found in this internship term or student does not belong to your university.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotInUniversity" xml:space="preserve">
+    <value>This student does not belong to your university.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>No open internship term found for your university.</value>
+  </data>
+  <data name="UniAdminInternship.PageNumberInvalid" xml:space="preserve">
+    <value>Page number must be greater than 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeInvalid" xml:space="preserve">
+    <value>Page size must be greater than 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeTooLarge" xml:space="preserve">
+    <value>Page size cannot exceed 100.</value>
+  </data>
+  <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
+    <value>Student ID is required.</value>
   </data>
 </root>
