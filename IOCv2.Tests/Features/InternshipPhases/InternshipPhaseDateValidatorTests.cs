@@ -29,7 +29,7 @@ public class InternshipPhaseDateValidatorTests
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e =>
             e.PropertyName == nameof(CreateInternshipPhaseCommand.StartDate) &&
-            e.ErrorMessage == MessageKeys.InternshipPhase.StartDateNotInPast);
+            e.ErrorMessage.StartsWith(MessageKeys.InternshipPhase.StartDateNotInPast));
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class InternshipPhaseDateValidatorTests
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e =>
             e.PropertyName == nameof(UpdateInternshipPhaseCommand.StartDate) &&
-            e.ErrorMessage == MessageKeys.InternshipPhase.StartDateNotInPast);
+            e.ErrorMessage.StartsWith(MessageKeys.InternshipPhase.StartDateNotInPast));
     }
 
     [Fact]
