@@ -21,6 +21,8 @@ public class GetMyApplicationDetailResponse
     public string EnterpriseName { get; set; } = string.Empty;
     public string? EnterpriseLogoUrl { get; set; }
 
+    public string? CvSnapshotUrl { get; set; }
+
     public InternshipApplicationStatus Status { get; set; }
     public string? RejectReason { get; set; }
     public DateTime AppliedAt { get; set; }

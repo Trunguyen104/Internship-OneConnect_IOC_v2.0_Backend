@@ -60,6 +60,7 @@ public class GetMyApplicationDetailHandler : IRequestHandler<GetMyApplicationDet
             InternPhaseEndDate = application.Job?.InternshipPhase?.EndDate,
             EnterpriseName = application.Enterprise.Name,
             EnterpriseLogoUrl = application.Enterprise.LogoUrl,
+            CvSnapshotUrl = application.CvSnapshotUrl,
             Status = application.Status,
             RejectReason = application.RejectReason,
             AppliedAt = application.AppliedAt,
