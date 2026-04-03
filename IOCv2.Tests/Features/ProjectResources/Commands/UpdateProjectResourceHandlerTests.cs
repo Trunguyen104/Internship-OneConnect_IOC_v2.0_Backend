@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using IOCv2.Application.Common.Models;
-using IOCv2.Application.Constants;
 using IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectResource;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MockQueryable;
 using MockQueryable.Moq;
 using Moq;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Tests.Features.ProjectResources.Commands;
 
@@ -283,5 +283,4 @@ public class UpdateProjectResourceHandlerTests
         resource.ResourceName.Should().Be("avatar.png");
     }
 }
-
 

@@ -1461,6 +1461,53 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("project_resources", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.PublicHoliday", b =>
+                {
+                    b.Property<Guid>("PublicHolidayId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_holiday_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("PublicHolidayId")
+                        .HasName("pk_public_holidays");
+
+                    b.HasIndex("Date")
+                        .IsUnique()
+                        .HasDatabaseName("ix_public_holidays_date")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.ToTable("public_holidays", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("RefreshTokenId")

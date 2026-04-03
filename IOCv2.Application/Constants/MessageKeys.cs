@@ -585,6 +585,26 @@ namespace IOCv2.Application.Constants
             public const string StudentNotFound = "Logbooks.StudentNotFound";
             public const string UpdateForbidden = "Logbooks.UpdateForbidden";
             public const string DeleteForbidden = "Logbooks.DeleteForbidden";
+            public const string NoActiveInternship = "Logbooks.NoActiveInternship";
+        }
+
+        public static class PublicHolidays
+        {
+            // CRUD
+            public const string NotFound          = "PublicHolidays.NotFound";
+            public const string AlreadyExists     = "PublicHolidays.AlreadyExists";
+            public const string CreateSuccess     = "PublicHolidays.CreateSuccess";
+            public const string DeleteSuccess     = "PublicHolidays.DeleteSuccess";
+
+            // Sync
+            public const string SyncSuccess      = "PublicHolidays.SyncSuccess";
+            public const string SyncApiError     = "PublicHolidays.SyncApiError";
+            public const string SyncApiKeyMissing = "PublicHolidays.SyncApiKeyMissing";
+
+            // Validation
+            public const string YearInvalid      = "PublicHolidays.YearInvalid";
+            public const string DateRequired      = "PublicHolidays.DateRequired";
+            public const string DescriptionMaxLength = "PublicHolidays.DescriptionMaxLength";
         }
 
         public static class Page
@@ -999,6 +1019,7 @@ namespace IOCv2.Application.Constants
             // Create Job
             public const string CreateSuccess = "JobPosting.CreateSuccess";
             public const string InternshipPhaseStatusAllowed = "JobPosting.InternshipPhaseStatusAllowed";
+            public const string ExpireDateCanNotBeAfterPhaseStartDate = "JobPosting.ExpireDateCanNotBeAfterPhaseStartDate";
             // Delete
             public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
             public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";

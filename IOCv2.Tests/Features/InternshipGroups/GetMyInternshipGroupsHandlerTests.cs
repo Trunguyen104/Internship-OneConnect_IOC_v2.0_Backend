@@ -72,7 +72,8 @@ public class GetMyInternshipGroupsHandlerTests
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(70)),
             "CNTT",
             20,
-            "Test phase");
+            "Test phase",
+            null);
         typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, termId);
         group.InternshipPhase = phase;
         group.Mentor = mentor;

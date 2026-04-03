@@ -25,6 +25,6 @@ namespace IOCv2.Domain.Enums
         XLSX = 9,
 
         // External links (Docs, Figma, ...)
-        LINK = 10
+        LINK = 8
     }
 }

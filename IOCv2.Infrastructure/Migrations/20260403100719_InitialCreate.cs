@@ -38,6 +38,24 @@ namespace IOCv2.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "public_holidays",
+                columns: table => new
+                {
+                    public_holiday_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    date = table.Column<DateOnly>(type: "date", nullable: false),
+                    description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_public_holidays", x => x.public_holiday_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "universities",
                 columns: table => new
                 {
@@ -46,7 +64,7 @@ namespace IOCv2.Infrastructure.Migrations
                     name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     logo_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    contact_email = table.Column<string>(type: "text", nullable: true),
+                    contact_email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -1465,6 +1483,13 @@ namespace IOCv2.Infrastructure.Migrations
                 filter: "deleted_at IS NULL");
 
             migrationBuilder.CreateIndex(
+                name: "ix_public_holidays_date",
+                table: "public_holidays",
+                column: "date",
+                unique: true,
+                filter: "deleted_at IS NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_refresh_tokens_token",
                 table: "refresh_tokens",
                 column: "token",
@@ -1691,6 +1716,9 @@ namespace IOCv2.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "project_resources");
+
+            migrationBuilder.DropTable(
+                name: "public_holidays");
 
             migrationBuilder.DropTable(
                 name: "refresh_tokens");

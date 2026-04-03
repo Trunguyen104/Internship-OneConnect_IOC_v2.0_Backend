@@ -67,7 +67,8 @@ public class DeleteInternshipPhaseHandlerTests
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(100)),
             "Software Engineering",
             10,
-            "Description");
+            "Description",
+            null);
 
         typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, _phaseId);
         typeof(InternshipPhase).GetProperty("Status")!.SetValue(phase, InternshipPhaseStatus.Open);

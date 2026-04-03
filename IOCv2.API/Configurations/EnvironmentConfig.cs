@@ -97,6 +97,14 @@ public static class EnvironmentConfig
         if (!string.IsNullOrEmpty(logLevelDefault))
             builder.Configuration["Logging:LogLevel:Default"] = logLevelDefault;
             
+        // Map Calendarific (Public Holiday API)
+        var calendarificApiKey = Environment.GetEnvironmentVariable("CALENDARIFIC_API_KEY");
+        if (!string.IsNullOrEmpty(calendarificApiKey))
+        {
+            builder.Configuration["Calendarific:ApiKey"] = calendarificApiKey;
+            Log.Information("Environment Variable Mapping: Calendarific API Key configured via environment variables.");
+        }
+
         Log.Information("Environment Variable Mapping: Completed.");
     }
 

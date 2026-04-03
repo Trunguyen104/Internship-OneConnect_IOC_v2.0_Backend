@@ -115,7 +115,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                 {
                     _logger.LogWarning("ExpireDate {ExpireDate} cannot be after internship phase start date {StartDate}.", expireDate, phaseStart);
                     return Result<CreateJobPostingResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
+                        _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ExpireDateCanNotBeAfterPhaseStartDate, expireDate, phaseStart),
                         ResultErrorType.BadRequest);
                 }
 

@@ -220,7 +220,7 @@
     <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
   <data name="ProjectResources.StudentCannotModifyMentorResource" xml:space="preserve">
-    <value>Tài nguyên do mentor upload, sinh viên không được phép chỉnh sửa hoặc xóa.</value>
+    <value>Tài nguyên do mentor tải lên, sinh viên không được chỉnh sửa hoặc xóa.</value>
   </data>
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Tạo Epic thành công.</value>
@@ -1283,5 +1283,8 @@
   </data>
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Đã lấy chi tiết nhóm thực tập {0} — {1} bài đăng tuyển dụng, {2} sinh viên đã được bố trí.</value>
+  </data>
+  <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
+    <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
   </data>
 </root>
