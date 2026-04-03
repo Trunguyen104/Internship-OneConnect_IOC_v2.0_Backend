@@ -251,14 +251,35 @@ namespace IOCv2.Application.Constants
             // Phase 4 side-effects
             public const string NotificationProjectCleanupTitle = "InternshipGroup.NotificationProjectCleanupTitle";
             public const string NotificationProjectCleanupContent = "InternshipGroup.NotificationProjectCleanupContent";
+            public const string NotificationGroupArchivedTitle = "InternshipGroup.NotificationGroupArchivedTitle";
+            public const string NotificationGroupArchivedContent = "InternshipGroup.NotificationGroupArchivedContent";
+            public const string NotificationStudentRemovedMentorTitle = "InternshipGroup.NotificationStudentRemovedMentorTitle";
+            public const string NotificationStudentRemovedMentorContent = "InternshipGroup.NotificationStudentRemovedMentorContent";
+            public const string NotificationStudentRemovedStudentTitle = "InternshipGroup.NotificationStudentRemovedStudentTitle";
+            public const string NotificationStudentRemovedStudentContent = "InternshipGroup.NotificationStudentRemovedStudentContent";
+            public const string NotificationStudentMovedTitle = "InternshipGroup.NotificationStudentMovedTitle";
+            public const string NotificationStudentMovedContent = "InternshipGroup.NotificationStudentMovedContent";
+            public const string NotificationMentorOldGroupTitle = "InternshipGroup.NotificationMentorOldGroupTitle";
+            public const string NotificationMentorOldGroupContent = "InternshipGroup.NotificationMentorOldGroupContent";
+            public const string NotificationMentorNewGroupTitle = "InternshipGroup.NotificationMentorNewGroupTitle";
+            public const string NotificationMentorNewGroupContent = "InternshipGroup.NotificationMentorNewGroupContent";
+            public const string NotificationMentorReplacedOldTitle = "InternshipGroup.NotificationMentorReplacedOldTitle";
+            public const string NotificationMentorReplacedOldContent = "InternshipGroup.NotificationMentorReplacedOldContent";
+            public const string NotificationMentorReplacedNewTitle = "InternshipGroup.NotificationMentorReplacedNewTitle";
+            public const string NotificationMentorReplacedNewContent = "InternshipGroup.NotificationMentorReplacedNewContent";
             public const string LogProjectAssignmentsCleanup = "InternshipGroup.LogProjectAssignmentsCleanup";
             public const string LogProjectsArchived = "InternshipGroup.LogProjectsArchived";
+            public const string LogArchiveNotifyFailed = "InternshipGroup.LogArchiveNotifyFailed";
+            public const string LogMoveNotificationFailed = "InternshipGroup.LogMoveNotificationFailed";
+            public const string LogMentorSwapNotificationFailed = "InternshipGroup.LogMentorSwapNotificationFailed";
             public const string GroupNotActive = "InternshipGroup.GroupNotActive";
 
             // New US keys
             public const string CannotDeleteNotActive      = "InternshipGroups.CannotDeleteNotActive";
             public const string NotificationOrphanTitle    = "InternshipGroups.NotificationOrphanTitle";
             public const string NotificationOrphanContent  = "InternshipGroups.NotificationOrphanContent";
+            public const string NotificationGroupDeletedStudentTitle = "InternshipGroups.NotificationGroupDeletedStudentTitle";
+            public const string NotificationGroupDeletedStudentContent = "InternshipGroups.NotificationGroupDeletedStudentContent";
             public const string LogOrphanizeProjects       = "InternshipGroups.LogOrphanizeProjects";
 
             // Log messages — GetInternshipGroupByIdHandler
@@ -269,6 +290,7 @@ namespace IOCv2.Application.Constants
 
             // Log messages — DeleteInternshipGroupHandler
             public const string LogDeleteNotificationFailed    = "InternshipGroup.LogDeleteNotificationFailed";
+            public const string LogDeleteStudentNotificationFailed = "InternshipGroup.LogDeleteStudentNotificationFailed";
 
             // Log messages — GetInternshipGroupsHandler
             public const string LogScopedHrEnterprise          = "InternshipGroup.LogScopedHrEnterprise";
@@ -302,6 +324,33 @@ namespace IOCv2.Application.Constants
             // UI labels
             public const string Unassigned                    = "InternshipGroup.Unassigned";
             public const string LateLogbookSubmission         = "InternshipGroup.LateLogbookSubmission";
+
+            // ── AssignMentorToGroup ───────────────────────────────────────────────
+            public const string AssignMentorSuccess              = "InternshipGroup.AssignMentorSuccess";
+            public const string AssignMentorGroupNotFound        = "InternshipGroup.AssignMentorGroupNotFound";
+            public const string AssignMentorGroupNotActive       = "InternshipGroup.AssignMentorGroupNotActive";
+            public const string AssignMentorGroupIdRequired      = "InternshipGroup.AssignMentorGroupIdRequired";
+            public const string AssignMentorMentorRequired       = "InternshipGroup.AssignMentorMentorRequired";
+            public const string AssignMentorSameMentor           = "InternshipGroup.AssignMentorSameMentor";
+            public const string LogAssignMentorSuccess           = "InternshipGroup.Log.AssignMentorSuccess";
+            public const string LogAssignMentorFailed            = "InternshipGroup.Log.AssignMentorFailed";
+            public const string LogAssignMentorNotifyFailed      = "InternshipGroup.Log.AssignMentorNotifyFailed";
+            public const string LogAssignMentorSameMentor        = "InternshipGroup.Log.AssignMentorSameMentor";
+
+            // ── GetAvailableMentors ───────────────────────────────────────────────
+            public const string AvailableMentorsRetrieved        = "InternshipGroup.AvailableMentorsRetrieved";
+            public const string LogGetAvailableMentors           = "InternshipGroup.Log.GetAvailableMentors";
+            public const string LogGetAvailableMentorsAccessDenied = "InternshipGroup.Log.GetAvailableMentorsAccessDenied";
+
+            // ── AC-04: Notification — Gán Mentor lần đầu ─────────────────────────
+            public const string NotificationMentorAssignedFirstTitle   = "InternshipGroup.NotificationMentorAssignedFirstTitle";
+            public const string NotificationMentorAssignedFirstContent = "InternshipGroup.NotificationMentorAssignedFirstContent";
+            public const string NotificationStudentMentorAssignedTitle   = "InternshipGroup.NotificationStudentMentorAssignedTitle";
+            public const string NotificationStudentMentorAssignedContent = "InternshipGroup.NotificationStudentMentorAssignedContent";
+
+            // ── AC-05: Notification — Sinh viên khi đổi Mentor ───────────────────
+            public const string NotificationStudentMentorChangedTitle   = "InternshipGroup.NotificationStudentMentorChangedTitle";
+            public const string NotificationStudentMentorChangedContent = "InternshipGroup.NotificationStudentMentorChangedContent";
         }
 
         public static class Terms
@@ -452,6 +501,7 @@ namespace IOCv2.Application.Constants
             public const string AssignGroupSuccess         = "Projects.AssignGroupSuccess";
             public const string AlreadyAssignedToGroup     = "Projects.AlreadyAssignedToGroup";
             public const string GroupNotActive             = "Projects.GroupNotActive";
+            public const string CannotAssignArchivedGroup  = "Projects.CannotAssignArchivedGroup";
             public const string GroupPhaseEnded            = "Projects.GroupPhaseEnded";
             public const string LogAssignGroupSuccess      = "Projects.LogAssignGroupSuccess";
             public const string LogAssignGroupError        = "Projects.LogAssignGroupError";
@@ -515,6 +565,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidExternalUrl = "ProjectResources.InvalidExternalUrl";
             public const string LinkTypeRequired = "ProjectResources.LinkTypeRequired";
             public const string LinkDownloadNotSupported = "ProjectResources.LinkDownloadNotSupported";
+            public const string StudentCannotModifyMentorResource = "ProjectResources.StudentCannotModifyMentorResource";
         }
 
         public static class Internships
@@ -772,6 +823,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidExcelHeaderDetail = "StudentTerms.InvalidExcelHeaderDetail";
             public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
             public const string TooManyRows = "StudentTerms.TooManyRows";
+            public const string CannotDeleteFromSystemHasOtherTerms = "StudentTerms.CannotDeleteFromSystemHasOtherTerms";
 
             // Validation — TermId / StudentTermId
             public const string TermIdRequired = "StudentTerms.TermIdRequired";
@@ -820,16 +872,17 @@ namespace IOCv2.Application.Constants
             public const string AddSuccess = "StudentTerms.AddSuccess";
             public const string UpdateSuccess = "StudentTerms.UpdateSuccess";
             public const string WithdrawSuccess = "StudentTerms.WithdrawSuccess";
-            public const string RestoreSuccess = "StudentTerms.RestoreSuccess";
+            public const string WithdrawDeleteWarning = "StudentTerms.WithdrawDeleteWarning";
             public const string BulkWithdrawSuccess = "StudentTerms.BulkWithdrawSuccess";
             public const string ImportPreviewSuccess = "StudentTerms.ImportPreviewSuccess";
             public const string ImportConfirmSuccess = "StudentTerms.ImportConfirmSuccess";
+            public const string GetStudentsSuccess = "StudentTerms.GetStudentsSuccess";
+            public const string GetStudentTermDetailSuccess = "StudentTerms.GetStudentTermDetailSuccess";
+            public const string DownloadTemplateSuccess = "StudentTerms.DownloadTemplateSuccess";
 
             // Email notifications
             public const string EmailSubjectWithdraw = "StudentTerms.Email.SubjectWithdraw";
             public const string EmailBodyWithdraw = "StudentTerms.Email.BodyWithdraw";
-            public const string EmailSubjectRestore = "StudentTerms.Email.SubjectRestore";
-            public const string EmailBodyRestore = "StudentTerms.Email.BodyRestore";
 
             // Excel headers
             public const string ExcelHeaderStudentCode = "StudentTerms.Excel.HeaderStudentCode";
@@ -846,9 +899,10 @@ namespace IOCv2.Application.Constants
             public const string LogAdded = "StudentTerms.Log.Added";
             public const string LogUpdated = "StudentTerms.Log.Updated";
             public const string LogWithdrawn = "StudentTerms.Log.Withdrawn";
-            public const string LogRestored = "StudentTerms.Log.Restored";
             public const string LogBulkWithdrawn = "StudentTerms.Log.BulkWithdrawn";
             public const string LogImportConfirmed = "StudentTerms.Log.ImportConfirmed";
+            public const string LogAddManualError = "StudentTerms.Log.AddManualError";
+            public const string LogImportConfirmError = "StudentTerms.Log.ImportConfirmError";
         }
         public static class ActiveTerms
         {
@@ -1000,6 +1054,10 @@ namespace IOCv2.Application.Constants
             public const string StartDateNotInPast = "InternshipPhase.StartDateNotInPast";
             public const string EndDateRequired = "InternshipPhase.EndDateRequired";
             public const string EndDateAfterStartDate = "InternshipPhase.EndDateAfterStartDate";
+            public const string DurationMinDays = "InternshipPhase.DurationMinDays";
+            public const string DurationMaxDays = "InternshipPhase.DurationMaxDays";
+            public const string MajorFieldsRequired = "InternshipPhase.MajorFieldsRequired";
+            public const string MajorFieldsMaxLength = "InternshipPhase.MajorFieldsMaxLength";
             public const string MaxStudentsGreaterThanZero = "InternshipPhase.MaxStudentsGreaterThanZero";
             public const string StatusInvalid = "InternshipPhase.StatusInvalid";
             public const string DescriptionMaxLength = "InternshipPhase.DescriptionMaxLength";
@@ -1012,6 +1070,8 @@ namespace IOCv2.Application.Constants
             public const string DuplicateName = "InternshipPhase.DuplicateName";
             public const string DuplicateNameOnUpdate = "InternshipPhase.DuplicateNameOnUpdate";
             public const string CannotUpdateClosed = "InternshipPhase.CannotUpdateClosed";
+            public const string CannotUpdateEnded = "InternshipPhase.CannotUpdateEnded";
+            public const string CannotUpdateLockedFields = "InternshipPhase.CannotUpdateLockedFields";
             public const string InvalidStatusTransition = "InternshipPhase.InvalidStatusTransition";
             public const string CannotDeleteHasActiveGroups = "InternshipPhase.CannotDeleteHasActiveGroups";
             public const string CannotDeleteInProgress = "InternshipPhase.CannotDeleteInProgress";
@@ -1065,6 +1125,9 @@ namespace IOCv2.Application.Constants
             public const string LogByIdFromCache = "InternshipPhase.Log.ByIdFromCache";
             public const string LogByIdNotFound = "InternshipPhase.Log.ByIdNotFound";
             public const string LogByIdSuccess = "InternshipPhase.Log.ByIdSuccess";
+            /// <summary>AC-05: log how many job postings and placed students were loaded.</summary>
+            public const string LogByIdTabsLoaded = "InternshipPhase.Log.ByIdTabsLoaded";
+
 
             // Log - Get My Phases (Student + Mentor)
             public const string LogGettingMyPhases           = "InternshipPhase.Log.GettingMyPhases";
@@ -1150,5 +1213,53 @@ namespace IOCv2.Application.Constants
             public const string NotifyStudentRemovedPlaced = "StudentApplications.Notify.Student.RemovedPlaced";
             public const string NotifyUniAdminRemovedPlaced = "StudentApplications.Notify.UniAdmin.RemovedPlaced";
         }
+
+        public static class UniAdminInternship
+        {
+            // Errors
+            public const string UniversityUserNotFound = "UniAdminInternship.UniversityUserNotFound";
+            public const string TermNotFound = "UniAdminInternship.TermNotFound";
+            public const string TermAccessDenied = "UniAdminInternship.TermAccessDenied";
+            public const string StudentNotFound = "UniAdminInternship.StudentNotFound";
+            public const string StudentNotInUniversity = "UniAdminInternship.StudentNotInUniversity";
+            public const string NoOpenTermFound = "UniAdminInternship.NoOpenTermFound";
+
+            // Success
+            public const string StudentsRetrieved = "UniAdminInternship.StudentsRetrieved";
+            public const string StudentDetailRetrieved = "UniAdminInternship.StudentDetailRetrieved";
+            public const string StudentLogbookTotalRetrieved = "UniAdminInternship.StudentLogbookTotalRetrieved";
+            public const string StudentLogbookWeeklyRetrieved = "UniAdminInternship.StudentLogbookWeeklyRetrieved";
+            public const string EvaluationsRetrieved = "UniAdminInternship.EvaluationsRetrieved";
+            public const string ViolationsRetrieved = "UniAdminInternship.ViolationsRetrieved";
+
+            // Log
+            public const string LogGetStudentList = "UniAdminInternship.Log.GetStudentList";
+            public const string LogGetStudentDetail = "UniAdminInternship.Log.GetStudentDetail";
+            public const string LogGetLogbookTotal = "UniAdminInternship.Log.GetLogbookTotal";
+            public const string LogGetLogbookWeekly = "UniAdminInternship.Log.GetLogbookWeekly";
+            public const string LogGetEvaluations = "UniAdminInternship.Log.GetEvaluations";
+            public const string LogGetViolations = "UniAdminInternship.Log.GetViolations";
+            public const string LogUniversityUserNotFound = "UniAdminInternship.Log.UniversityUserNotFound";
+            public const string LogTermNotFound = "UniAdminInternship.Log.TermNotFound";
+            public const string LogTermAccessDenied = "UniAdminInternship.Log.TermAccessDenied";
+            public const string LogStudentNotFound = "UniAdminInternship.Log.StudentNotFound";
+            public const string LogNoOpenTerm = "UniAdminInternship.Log.NoOpenTerm";
+
+            // Validation
+            public const string PageNumberInvalid = "UniAdminInternship.PageNumberInvalid";
+            public const string PageSizeInvalid = "UniAdminInternship.PageSizeInvalid";
+            public const string PageSizeTooLarge = "UniAdminInternship.PageSizeTooLarge";
+            public const string StudentIdRequired = "UniAdminInternship.StudentIdRequired";
+
+            // Logbook weekly display
+            public const string StatusBadgeLate = "UniAdminInternship.StatusBadge.Late";
+            public const string StatusBadgeSubmitted = "UniAdminInternship.StatusBadge.Submitted";
+            public const string StatusBadgeWeekend = "UniAdminInternship.StatusBadge.Weekend";
+            public const string StatusBadgeHoliday = "UniAdminInternship.StatusBadge.Holiday";
+            public const string StatusBadgePending = "UniAdminInternship.StatusBadge.Pending";
+            public const string StatusBadgeMissing = "UniAdminInternship.StatusBadge.Missing";
+            public const string WeekTitle = "UniAdminInternship.WeekTitle";
+        }
     }
 }
+

@@ -65,7 +65,7 @@ public class GetMyApplicationDetailHandler : IRequestHandler<GetMyApplicationDet
             {
                 Status = h.ToStatus,
                 ChangedAt = h.CreatedAt,
-                ChangedByName = h.ChangedByName,
+                ChangedByName = h.ChangedByName ?? "System",
                 Note = h.TriggerSource == "Student" ? h.Note : null // Do not leak HR notes in MVP, or only leak limited notes.
             }).ToList()
         };

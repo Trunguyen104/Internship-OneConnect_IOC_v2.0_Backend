@@ -5,7 +5,6 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace IOCv2.Application.Features.StudentTerms.Queries.GetStudents;
 
@@ -14,18 +13,15 @@ public class GetStudentsHandler : IRequestHandler<GetStudentsQuery, Result<Pagin
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
-    private readonly ILogger<GetStudentsHandler> _logger;
 
     public GetStudentsHandler(
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
-        IMessageService messageService,
-        ILogger<GetStudentsHandler> logger)
+        IMessageService messageService)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
-        _logger = logger;
     }
 
     public async Task<Result<PaginatedResult<GetStudentsResponse>>> Handle(GetStudentsQuery request, CancellationToken cancellationToken)
@@ -64,6 +60,8 @@ public class GetStudentsHandler : IRequestHandler<GetStudentsQuery, Result<Pagin
         // Filters
         if (request.EnrollmentStatus.HasValue)
             query = query.Where(st => st.EnrollmentStatus == request.EnrollmentStatus.Value);
+        else
+            query = query.Where(st => st.EnrollmentStatus == EnrollmentStatus.Active);
 
         if (request.PlacementStatus.HasValue)
             query = query.Where(st => st.PlacementStatus == request.PlacementStatus.Value);
@@ -122,6 +120,8 @@ public class GetStudentsHandler : IRequestHandler<GetStudentsQuery, Result<Pagin
             .ToListAsync(cancellationToken);
 
         var result = PaginatedResult<GetStudentsResponse>.Create(items, totalCount, request.PageNumber, request.PageSize);
-        return Result<PaginatedResult<GetStudentsResponse>>.Success(result);
+        return Result<PaginatedResult<GetStudentsResponse>>.Success(
+            result,
+            _messageService.GetMessage(MessageKeys.StudentTerms.GetStudentsSuccess, totalCount));
     }
 }

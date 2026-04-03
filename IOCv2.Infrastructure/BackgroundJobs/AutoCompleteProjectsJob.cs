@@ -48,10 +48,10 @@ namespace IOCv2.Infrastructure.BackgroundJobs
                 // Query projects: Active + group ended
                 var expiredProjects = await unitOfWork.Repository<Project>().Query()
                     .Include(p => p.InternshipGroup)
+                    .ThenInclude(g => g!.InternshipPhase)
                     .Where(p => p.OperationalStatus == OperationalStatus.Active
                              && p.InternshipGroup != null
-                             && p.InternshipGroup.EndDate.HasValue
-                             && p.InternshipGroup.EndDate.Value.Date < today)
+                             && p.InternshipGroup.InternshipPhase.EndDate < DateOnly.FromDateTime(today))
                     .ToListAsync(cancellationToken);
 
                 if (!expiredProjects.Any())
@@ -87,7 +87,7 @@ namespace IOCv2.Infrastructure.BackgroundJobs
                                     NotificationId = Guid.NewGuid(),
                                     UserId = mentorEu.UserId,
                                     Title = "Dự án tự động hoàn thành",
-                                    Content = $"Dự án {project.ProjectName} đã tự động hoàn thành.",
+                                    Content = $"Dự án [{project.ProjectName}] đã tự động hoàn thành.",
                                     Type = NotificationType.General,
                                     ReferenceType = "Project",
                                     ReferenceId = project.ProjectId,

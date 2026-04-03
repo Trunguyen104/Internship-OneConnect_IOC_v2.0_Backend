@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using IOCv2.API.Attributes;
 using IOCv2.Application.Common.Models;
-using IOCv2.Application.Features.StudentTerms.Commands.RestoreStudent;
 using IOCv2.Application.Features.StudentTerms.Commands.UpdateStudentTerm;
 using IOCv2.Application.Features.StudentTerms.Commands.WithdrawStudent;
 using IOCv2.Application.Features.StudentTerms.Queries.GetStudentTermDetail;
@@ -59,7 +58,8 @@ public class StudentTermsController : Controllers.ApiControllerBase
     }
 
     /// <summary>
-    /// Withdraw a student from their term enrollment (must be Active and Unplaced)
+    /// Withdraw a student from their term enrollment and remove the student from system data.
+    /// Response includes warning metadata for FE popup (system delta = -1).
     /// </summary>
     [HttpPatch("{id:guid}/withdraw")]
     [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
@@ -72,21 +72,5 @@ public class StudentTermsController : Controllers.ApiControllerBase
         CancellationToken cancellationToken = default)
     {
         return HandleResult(await _mediator.Send(new WithdrawStudentCommand(id), cancellationToken));
-    }
-
-    /// <summary>
-    /// Restore a withdrawn student back to Active/Unplaced (term must still be Open)
-    /// </summary>
-    [HttpPatch("{id:guid}/restore")]
-    [Authorize(Roles = "SchoolAdmin,SuperAdmin")]
-    [RateLimit(maxRequests: 30, windowMinutes: 1)]
-    [ProducesResponseType(typeof(ApiResponse<RestoreStudentResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RestoreStudent(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return HandleResult(await _mediator.Send(new RestoreStudentCommand(id), cancellationToken));
     }
 }

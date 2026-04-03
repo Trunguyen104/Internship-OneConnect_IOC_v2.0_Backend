@@ -16,26 +16,31 @@ public class UpdateInternshipPhaseValidator : AbstractValidator<UpdateInternship
             .MaximumLength(255).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.NameMaxLength));
 
         RuleFor(x => x.StartDate)
-            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateRequired));
-
-        // BUG-B FIX: Add StartDate past-guard (was only in CreateValidator, not UpdateValidator).
-        // Without this, a Draft phase could have its StartDate backdated, creating audit trail inconsistencies.
-        RuleFor(x => x.StartDate)
-            .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow))
-                .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast))
-            .When(x => x.StartDate != default);
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateRequired))
+            .Must(startDate => startDate >= DateOnly.FromDateTime(DateTime.UtcNow))
+            .WithMessage(x => $"{messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast)} (startDate: {x.StartDate:yyyy-MM-dd}, todayUtc: {DateOnly.FromDateTime(DateTime.UtcNow):yyyy-MM-dd})");
 
         RuleFor(x => x.EndDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateRequired))
             .GreaterThan(x => x.StartDate)
                 .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateAfterStartDate));
 
-        RuleFor(x => x.MaxStudents)
-            .GreaterThan(0).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MaxStudentsGreaterThanZero))
-            .When(x => x.MaxStudents.HasValue);
+        RuleFor(x => x)
+            .Must(x => (x.EndDate.DayNumber - x.StartDate.DayNumber) >= 28)
+            .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DurationMinDays))
+            .When(x => x.StartDate != default && x.EndDate != default);
 
-        RuleFor(x => x.Status)
-            .IsInEnum().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StatusInvalid));
+        RuleFor(x => x)
+            .Must(x => (x.EndDate.DayNumber - x.StartDate.DayNumber) <= 365)
+            .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DurationMaxDays))
+            .When(x => x.StartDate != default && x.EndDate != default);
+
+        RuleFor(x => x.MajorFields)
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MajorFieldsRequired))
+            .MaximumLength(1000).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MajorFieldsMaxLength));
+
+        RuleFor(x => x.Capacity)
+            .GreaterThan(0).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.MaxStudentsGreaterThanZero));
 
         RuleFor(x => x.Description)
             .MaximumLength(2000).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.DescriptionMaxLength))

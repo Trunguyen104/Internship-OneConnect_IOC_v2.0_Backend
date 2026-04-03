@@ -165,7 +165,10 @@ namespace IOCv2.Application.Features.Projects.Queries.GetAllProjects
 
                 if (mentorEnterpriseUser != null)
                 {
-                    query = query.Where(p => p.MentorId == mentorEnterpriseUser.EnterpriseUserId);
+                    var mentorId = mentorEnterpriseUser.EnterpriseUserId;
+                    query = query.Where(p =>
+                        (p.InternshipId == null && p.MentorId == mentorId) ||
+                        (p.InternshipId != null && p.InternshipGroup != null && p.InternshipGroup.MentorId == mentorId));
                 }
                 else
                 {

@@ -92,11 +92,13 @@ public class DownloadImportTemplateHandler : IRequestHandler<DownloadImportTempl
         workbook.SaveAs(stream);
         var content = stream.ToArray();
 
-        return Result<DownloadImportTemplateResponse>.Success(new DownloadImportTemplateResponse
-        {
-            FileContent = content,
-            FileName = $"template_import_sinhvien_{DateTime.UtcNow:yyyyMMdd}.xlsx",
-            ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        });
+        return Result<DownloadImportTemplateResponse>.Success(
+            new DownloadImportTemplateResponse
+            {
+                FileContent = content,
+                FileName = $"template_import_sinhvien_{DateTime.UtcNow:yyyyMMdd}.xlsx",
+                ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            },
+            _messageService.GetMessage(MessageKeys.StudentTerms.DownloadTemplateSuccess, request.TermId));
     }
 }

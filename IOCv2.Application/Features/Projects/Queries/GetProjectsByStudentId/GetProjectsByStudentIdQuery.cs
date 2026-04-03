@@ -16,9 +16,14 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         public string? SearchTerm { get; init; }
 
         /// <summary>
-        /// Filter by project lifecycle status.
+        /// Filter by project visibility status (Draft/Published).
         /// </summary>
-        public ProjectStatus? Status { get; init; }
+        public VisibilityStatus? VisibilityStatus { get; init; }
+
+        /// <summary>
+        /// Filter by project operational status (Active/Completed for student view).
+        /// </summary>
+        public OperationalStatus? OperationalStatus { get; init; }
 
         /// <summary>
         /// Page number for pagination.

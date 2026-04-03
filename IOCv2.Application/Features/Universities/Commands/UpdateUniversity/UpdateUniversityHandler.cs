@@ -55,7 +55,8 @@ public class UpdateUniversityHandler : IRequestHandler<UpdateUniversityCommand, 
                 request.Code,
                 request.Name,
                 request.Address,
-                request.LogoUrl);
+                request.LogoUrl,
+                request.ContactEmail);
 
             university.UpdatedBy = _currentUserService.UserId != null ? Guid.Parse(_currentUserService.UserId) : null;
 

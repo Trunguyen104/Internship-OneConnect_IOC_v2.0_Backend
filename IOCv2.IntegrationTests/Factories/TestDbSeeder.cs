@@ -141,12 +141,13 @@ public static class TestDbSeeder
 
         var phase = InternshipPhase.Create(
             fptSoftId, 
-            "Phase 1", 
-            new DateOnly(2026, 1, 1), 
-            new DateOnly(2026, 5, 1), 
-            100, 
-            "Test Phase"
-        );
+            "Test Phase",
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)),
+            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(90)),
+            "CNTT",
+            15,
+            "Test phase for integration tests");
+
         context.InternshipPhases.Add(phase);
 
         context.StudentTerms.Add(new StudentTerm

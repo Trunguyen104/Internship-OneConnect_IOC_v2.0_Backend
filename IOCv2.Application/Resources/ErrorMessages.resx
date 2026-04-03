@@ -714,8 +714,11 @@
   <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
     <value>Sinh viên đã được rút khỏi kỳ thực tập thành công và chuyển sang trạng thái Withdrawn.</value>
   </data>
-  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
-    <value>Đăng ký thực tập đã được khôi phục thành công. Sinh viên trở lại trạng thái Active trong kỳ thực tập.</value>
+  <data name="StudentTerms.WithdrawDeleteWarning" xml:space="preserve">
+    <value>Cảnh báo: thao tác này sẽ xóa sinh viên khỏi hệ thống (thay đổi tổng sinh viên hệ thống: {0}).</value>
+  </data>
+  <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
+    <value>Không thể xóa sinh viên khỏi hệ thống vì sinh viên vẫn còn đăng ký ở kỳ thực tập khác.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
     <value>Rút hàng loạt sinh viên thành công. Các sinh viên đang có vị trí thực tập (Placed) đã được bỏ qua tự động và không bị ảnh hưởng.</value>
@@ -726,6 +729,15 @@
   <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
     <value>Import sinh viên vào kỳ thực tập thành công. Các sinh viên hợp lệ đã được ghi danh và sẵn sàng tham gia thực tập.</value>
   </data>
+  <data name="StudentTerms.GetStudentsSuccess" xml:space="preserve">
+    <value>Lấy danh sách sinh viên theo kỳ thực tập thành công. Tổng số bản ghi phù hợp: {0}.</value>
+  </data>
+  <data name="StudentTerms.GetStudentTermDetailSuccess" xml:space="preserve">
+    <value>Lấy chi tiết sinh viên trong kỳ thực tập thành công (StudentTermId: {0}).</value>
+  </data>
+  <data name="StudentTerms.DownloadTemplateSuccess" xml:space="preserve">
+    <value>Tải mẫu import sinh viên thành công cho kỳ thực tập (TermId: {0}).</value>
+  </data>
   <data name="StudentTerms.Log.Added" xml:space="preserve">
     <value>Sinh viên {0} đã được thêm vào kỳ thực tập {1} bởi {2}.</value>
   </data>
@@ -735,14 +747,17 @@
   <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
     <value>Sinh viên {0} đã bị rút khỏi kỳ thực tập bởi {1}.</value>
   </data>
-  <data name="StudentTerms.Log.Restored" xml:space="preserve">
-    <value>Sinh viên {0} đã được khôi phục vào kỳ thực tập bởi {1}.</value>
-  </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
     <value>Đã rút {0} sinh viên khỏi kỳ thực tập {1} bởi {2}.</value>
   </data>
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>Đã import {0} sinh viên vào kỳ thực tập {1} bởi {2}.</value>
+  </data>
+  <data name="StudentTerms.Log.AddManualError" xml:space="preserve">
+    <value>Lỗi khi thêm thủ công sinh viên vào kỳ thực tập {0}.</value>
+  </data>
+  <data name="StudentTerms.Log.ImportConfirmError" xml:space="preserve">
+    <value>Lỗi khi xác nhận import sinh viên cho kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Không tìm thấy kỳ thực tập. Vui lòng kiểm tra lại ID hoặc tải lại trang.</value>
@@ -1450,5 +1465,35 @@
   </data>
   <data name="Profile.FileNotFoundInStorage" xml:space="preserve">
     <value>Không tìm thấy file tải lên.</value>
+  </data>
+  <data name="UniAdminInternship.UniversityUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin quản trị viên trường học. Vui lòng liên hệ quản trị hệ thống.</value>
+  </data>
+  <data name="UniAdminInternship.TermNotFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập với mã đã cung cấp.</value>
+  </data>
+  <data name="UniAdminInternship.TermAccessDenied" xml:space="preserve">
+    <value>Bạn không có quyền truy cập kỳ thực tập này. Kỳ thực tập không thuộc trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên trong kỳ thực tập này hoặc sinh viên không thuộc trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.StudentNotInUniversity" xml:space="preserve">
+    <value>Sinh viên này không thuộc trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
+    <value>Không tìm thấy kỳ thực tập đang mở cho trường của bạn.</value>
+  </data>
+  <data name="UniAdminInternship.PageNumberInvalid" xml:space="preserve">
+    <value>Số trang phải lớn hơn 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeInvalid" xml:space="preserve">
+    <value>Kích thước trang phải lớn hơn 0.</value>
+  </data>
+  <data name="UniAdminInternship.PageSizeTooLarge" xml:space="preserve">
+    <value>Kích thước trang không được vượt quá 100.</value>
+  </data>
+  <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
+    <value>Mã sinh viên không được để trống.</value>
   </data>
 </root>

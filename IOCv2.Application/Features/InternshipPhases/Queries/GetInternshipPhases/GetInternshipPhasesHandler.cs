@@ -3,6 +3,7 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -84,7 +85,8 @@ public class GetInternshipPhasesHandler
 
         var cacheKey = InternshipPhaseCacheKeys.PhaseList(
             targetEnterpriseId,
-            request.Status.HasValue ? (int)request.Status.Value : null,
+            request.Status,
+            request.IncludeEnded,
             request.PageNumber,
             request.PageSize);
 
@@ -97,9 +99,12 @@ public class GetInternshipPhasesHandler
             return Result<PaginatedResult<GetInternshipPhasesResponse>>.Success(cached);
         }
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
         var query = _unitOfWork.Repository<InternshipPhase>().Query()
             .Include(p => p.Enterprise)
             .Include(p => p.InternshipGroups)
+                .ThenInclude(g => g.Members)
             .Where(p => p.DeletedAt == null)
             .AsNoTracking();
 
@@ -109,7 +114,19 @@ public class GetInternshipPhasesHandler
         }
 
         if (request.Status.HasValue)
-            query = query.Where(p => p.Status == request.Status.Value);
+        {
+            query = request.Status.Value switch
+            {
+                InternshipPhaseLifecycleStatus.Upcoming => query.Where(p => p.StartDate > today),
+                InternshipPhaseLifecycleStatus.Active => query.Where(p => p.StartDate <= today && p.EndDate >= today),
+                InternshipPhaseLifecycleStatus.Ended => query.Where(p => p.EndDate < today),
+                _ => query
+            };
+        }
+        else if (!request.IncludeEnded)
+        {
+            query = query.Where(p => p.EndDate >= today);
+        }
 
         query = query.OrderByDescending(p => p.StartDate);
 
@@ -120,19 +137,32 @@ public class GetInternshipPhasesHandler
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        var items = phases.Select(p => new GetInternshipPhasesResponse
+        var items = phases.Select(p =>
         {
-            PhaseId = p.PhaseId,
-            EnterpriseId = p.EnterpriseId,
-            EnterpriseName = p.Enterprise?.Name ?? string.Empty,
-            Name = p.Name,
-            StartDate = p.StartDate,
-            EndDate = p.EndDate,
-            MaxStudents = p.MaxStudents,
-            Description = p.Description,
-            Status = p.Status,
-            GroupCount = p.InternshipGroups.Count(g => g.DeletedAt == null),
-            CreatedAt = p.CreatedAt
+            var placedCount = p.InternshipGroups
+                .Where(g => g.DeletedAt == null)
+                .SelectMany(g => g.Members)
+                .Select(m => m.StudentId)
+                .Distinct()
+                .Count();
+
+            return new GetInternshipPhasesResponse
+            {
+                PhaseId = p.PhaseId,
+                EnterpriseId = p.EnterpriseId,
+                EnterpriseName = p.Enterprise?.Name ?? string.Empty,
+                Name = p.Name,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                MajorFields = p.MajorFields,
+                Capacity = p.Capacity,
+                RemainingCapacity = Math.Max(p.Capacity - placedCount, 0),
+                JobPostingCount = 0,
+                Description = p.Description,
+                Status = p.GetLifecycleStatus(today),
+                GroupCount = p.InternshipGroups.Count(g => g.DeletedAt == null),
+                CreatedAt = p.CreatedAt
+            };
         }).ToList();
 
         var result = new PaginatedResult<GetInternshipPhasesResponse>(items, totalCount, request.PageNumber, request.PageSize);

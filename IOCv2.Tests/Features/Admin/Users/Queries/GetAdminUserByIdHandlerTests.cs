@@ -1,4 +1,5 @@
 using AutoMapper;
+using IOCv2.Application.Extensions.Mappings;
 using FluentAssertions;
 using IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById;
 using IOCv2.Application.Interfaces;
@@ -50,8 +51,8 @@ public class GetUserByIdHandlerTests
         var message = new Mock<IMessageService>();
         message.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("User not found");
 
-        var cfg = new MapperConfiguration(cfg => cfg.CreateMap<User, GetUserByIdResponse>());
-        var mapper = cfg.CreateMapper();
+        var mapperCfg = new MapperConfiguration(c => c.AddProfile<MappingProfile>());
+        var mapper = mapperCfg.CreateMapper();
 
         var handler = new GetUserByIdHandler(
             uow.Object,
