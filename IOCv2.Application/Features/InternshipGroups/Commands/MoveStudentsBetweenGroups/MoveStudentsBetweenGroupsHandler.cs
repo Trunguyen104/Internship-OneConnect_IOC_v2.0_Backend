@@ -17,19 +17,22 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
         private readonly IMessageService _messageService;
         private readonly ILogger<MoveStudentsBetweenGroupsHandler> _logger;
         private readonly ICacheService _cacheService;
+        private readonly INotificationPushService _pushService;
 
         public MoveStudentsBetweenGroupsHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUserService,
             IMessageService messageService,
             ILogger<MoveStudentsBetweenGroupsHandler> logger,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            INotificationPushService pushService)
         {
             _unitOfWork = unitOfWork;
             _currentUserService = currentUserService;
             _messageService = messageService;
             _logger = logger;
             _cacheService = cacheService;
+            _pushService = pushService;
         }
 
         public async Task<Result<MoveStudentsBetweenGroupsResponse>> Handle(MoveStudentsBetweenGroupsCommand request, CancellationToken cancellationToken)
@@ -61,11 +64,13 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
 
             var fromGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(g => g.Members)
-                .FirstOrDefaultAsync(g => g.InternshipId == request.FromGroupId, cancellationToken);
+                .Include(g => g.Mentor)
+                .FirstOrDefaultAsync(g => g.InternshipId == request.FromGroupId && g.DeletedAt == null, cancellationToken);
 
             var toGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
                 .Include(g => g.Members)
-                .FirstOrDefaultAsync(g => g.InternshipId == request.ToGroupId, cancellationToken);
+                .Include(g => g.Mentor)
+                .FirstOrDefaultAsync(g => g.InternshipId == request.ToGroupId && g.DeletedAt == null, cancellationToken);
 
             if (fromGroup == null || toGroup == null)
             {
@@ -102,6 +107,13 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
                     ResultErrorType.BadRequest);
             }
 
+            var studentInfos = await _unitOfWork.Repository<Student>().Query()
+                .Where(s => distinctRequestedIds.Contains(s.StudentId))
+                .Select(s => new { s.StudentId, s.UserId, StudentName = s.User.FullName })
+                .ToListAsync(cancellationToken);
+
+            var movedStudentNames = studentInfos.Select(s => s.StudentName).Where(n => !string.IsNullOrWhiteSpace(n)).ToList();
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
@@ -127,6 +139,87 @@ namespace IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetwe
                 await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.FromGroupId), cancellationToken);
                 await _cacheService.RemoveAsync(InternshipGroupCacheKeys.Group(request.ToGroupId), cancellationToken);
                 await _cacheService.RemoveByPatternAsync(InternshipGroupCacheKeys.GroupListPattern(), cancellationToken);
+
+                try
+                {
+                    var notifications = new List<Notification>();
+
+                    foreach (var student in studentInfos)
+                    {
+                        notifications.Add(new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId = student.UserId,
+                            Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationStudentMovedTitle),
+                            Content = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationStudentMovedContent, toGroup.GroupName),
+                            Type = NotificationType.General,
+                            ReferenceType = nameof(InternshipGroup),
+                            ReferenceId = toGroup.InternshipId,
+                            IsRead = false
+                        });
+                    }
+
+                    if (fromGroup.MentorId.HasValue && fromGroup.Mentor != null)
+                    {
+                        notifications.Add(new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId = fromGroup.Mentor.UserId,
+                            Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationMentorOldGroupTitle),
+                            Content = _messageService.GetMessage(
+                                MessageKeys.InternshipGroups.NotificationMentorOldGroupContent,
+                                string.Join(", ", movedStudentNames.Any() ? movedStudentNames : distinctRequestedIds.Select(x => x.ToString()))),
+                            Type = NotificationType.General,
+                            ReferenceType = nameof(InternshipGroup),
+                            ReferenceId = fromGroup.InternshipId,
+                            IsRead = false
+                        });
+                    }
+
+                    if (toGroup.MentorId.HasValue && toGroup.Mentor != null)
+                    {
+                        notifications.Add(new Notification
+                        {
+                            NotificationId = Guid.NewGuid(),
+                            UserId = toGroup.Mentor.UserId,
+                            Title = _messageService.GetMessage(MessageKeys.InternshipGroups.NotificationMentorNewGroupTitle),
+                            Content = _messageService.GetMessage(
+                                MessageKeys.InternshipGroups.NotificationMentorNewGroupContent,
+                                string.Join(", ", movedStudentNames.Any() ? movedStudentNames : distinctRequestedIds.Select(x => x.ToString())),
+                                toGroup.GroupName),
+                            Type = NotificationType.General,
+                            ReferenceType = nameof(InternshipGroup),
+                            ReferenceId = toGroup.InternshipId,
+                            IsRead = false
+                        });
+                    }
+
+                    foreach (var notification in notifications)
+                        await _unitOfWork.Repository<Notification>().AddAsync(notification, cancellationToken);
+
+                    if (notifications.Any())
+                    {
+                        await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                        foreach (var recipientUserId in notifications.Select(n => n.UserId).Distinct())
+                        {
+                            var unreadCount = await _unitOfWork.Repository<Notification>()
+                                .CountAsync(n => n.UserId == recipientUserId && !n.IsRead, cancellationToken);
+
+                            await _pushService.PushNewNotificationAsync(recipientUserId, new
+                            {
+                                type = NotificationType.General,
+                                referenceType = nameof(InternshipGroup),
+                                referenceId = toGroup.InternshipId,
+                                currentUnreadCount = unreadCount
+                            }, cancellationToken);
+                        }
+                    }
+                }
+                catch (Exception notifyEx)
+                {
+                    _logger.LogWarning(notifyEx, _messageService.GetMessage(MessageKeys.InternshipGroups.LogMoveNotificationFailed), request.FromGroupId, request.ToGroupId);
+                }
 
                 return Result<MoveStudentsBetweenGroupsResponse>.Success(new MoveStudentsBetweenGroupsResponse
                 {

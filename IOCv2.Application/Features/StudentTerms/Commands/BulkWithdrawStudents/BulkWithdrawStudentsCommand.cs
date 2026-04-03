@@ -12,6 +12,8 @@ public record BulkWithdrawStudentsCommand : IRequest<Result<BulkWithdrawStudents
 public class BulkWithdrawStudentsResponse
 {
     public int WithdrawnCount { get; set; }
+    public int DeletedFromSystemCount { get; set; }
     public int SkippedPlacedCount { get; set; }
     public int SkippedAlreadyWithdrawnCount { get; set; }
+    public int SkippedHasOtherTermsCount { get; set; }
 }

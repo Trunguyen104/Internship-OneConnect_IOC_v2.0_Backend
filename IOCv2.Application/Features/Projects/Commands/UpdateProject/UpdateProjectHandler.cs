@@ -16,6 +16,8 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 {
     public class UpdateProjectHandler : IRequestHandler<UpdateProjectCommand, Result<UpdateProjectResponse>>
     {
+        private const string FixedProjectField = "Software Engineering";
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<UpdateProjectHandler> _logger;
@@ -64,14 +66,58 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            // B9: Scope check — chỉ Mentor tạo project mới được edit (AC-08, AC-14)
-            if (project.MentorId != enterpriseUser.EnterpriseUserId)
+            var canManageProject = project.InternshipId.HasValue
+                ? project.InternshipGroup?.MentorId == enterpriseUser.EnterpriseUserId
+                : project.MentorId == enterpriseUser.EnterpriseUserId;
+
+            if (!canManageProject)
                 return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
             // Block nếu project không còn editable (OperationalStatus không phải Unstarted/Active)
             if (!project.IsEditable)
                 return Result<UpdateProjectResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Projects.InvalidStatusForUpdate), ResultErrorType.BadRequest);
+
+            InternshipGroup? targetGroup = null;
+            var hasGroupChangeRequested = request.InternshipGroupId.HasValue
+                                          && request.InternshipGroupId.Value != project.InternshipId;
+
+            if (hasGroupChangeRequested)
+            {
+                targetGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(g => g.InternshipId == request.InternshipGroupId!.Value, cancellationToken);
+
+                if (targetGroup == null)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Internships.NotFound), ResultErrorType.NotFound);
+
+                if (targetGroup.Status == GroupStatus.Archived)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.CannotAssignArchivedGroup), ResultErrorType.BadRequest);
+
+                if (targetGroup.Status == GroupStatus.Finished)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.GroupNotActive), ResultErrorType.BadRequest);
+
+                if (targetGroup.EndDate.HasValue && targetGroup.EndDate.Value.Date < DateTime.UtcNow.Date)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
+
+                if (targetGroup.MentorId != enterpriseUser.EnterpriseUserId)
+                    return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                var hasActiveProjectInTargetGroup = await _unitOfWork.Repository<Project>().Query()
+                    .AnyAsync(p => p.InternshipId == targetGroup.InternshipId
+                                && p.ProjectId != project.ProjectId
+                                && p.OperationalStatus == OperationalStatus.Active,
+                        cancellationToken);
+
+                if (hasActiveProjectInTargetGroup)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.AlreadyAssignedToGroup),
+                        ResultErrorType.Conflict);
+            }
 
             var assignedCount = 0;
             var resourceReadCacheKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -101,10 +147,13 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                     request.Description,
                     request.StartDate,
                     request.EndDate,
-                    request.Field,
+                    FixedProjectField,
                     request.Requirements,
                     request.Deliverables,
                     request.Template);
+
+                if (targetGroup != null)
+                    project.AssignToGroup(targetGroup.InternshipId, targetGroup.StartDate, targetGroup.EndDate);
 
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
@@ -214,7 +263,16 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
                         if (resourceInput.ResourceName != null)
                         {
-                            resource.ResourceName = resourceInput.ResourceName.Trim();
+                            var trimmedResourceName = resourceInput.ResourceName.Trim();
+                            if (!IsResourceNameExtensionValid(trimmedResourceName, resource.ResourceType))
+                            {
+                                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                                return Result<UpdateProjectResponse>.Failure(
+                                    _messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType),
+                                    ResultErrorType.BadRequest);
+                            }
+
+                            resource.ResourceName = trimmedResourceName;
                         }
 
                         if (resourceInput.ExternalUrl != null)
@@ -355,6 +413,41 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
             response.AssignedStudentCount = assignedCount;
 
             return Result<UpdateProjectResponse>.Success(response);
+        }
+
+        private static bool IsResourceNameExtensionValid(string? resourceName, FileType resourceType)
+        {
+            if (resourceType == FileType.LINK || string.IsNullOrWhiteSpace(resourceName))
+            {
+                return true;
+            }
+
+            var extension = Path.GetExtension(resourceName.Trim());
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                return true;
+            }
+
+            if (resourceType == FileType.JPG)
+            {
+                return extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+                    || extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
+            }
+
+            var expectedExtension = resourceType switch
+            {
+                FileType.PDF => ".pdf",
+                FileType.DOCX => ".docx",
+                FileType.PPTX => ".pptx",
+                FileType.ZIP => ".zip",
+                FileType.RAR => ".rar",
+                FileType.PNG => ".png",
+                FileType.XLSX => ".xlsx",
+                _ => string.Empty
+            };
+
+            return string.IsNullOrEmpty(expectedExtension)
+                || extension.Equals(expectedExtension, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

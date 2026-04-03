@@ -93,7 +93,11 @@ namespace IOCv2.Tests.Features.Projects
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            _mockProjectRepo.Verify(x => x.AddAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockProjectRepo.Verify(
+                x => x.AddAsync(
+                    It.Is<Project>(p => p.Field == "Software Engineering"),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
             _mockUnitOfWork.Verify(x => x.SaveChangeAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 

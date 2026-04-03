@@ -26,6 +26,7 @@ public class StakeholdersController : ApiControllerBase
     /// Get paginated list of stakeholders for an internship group with optional search and sorting.
     /// </summary>
     [HttpGet]
+    [Authorize(Roles = "Student,Mentor,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetStakeholdersResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
@@ -47,6 +48,7 @@ public class StakeholdersController : ApiControllerBase
     /// <param name="internshipId">Internship ID.</param>
     /// <returns code="200">Returns the stakeholder details.</returns>
     [HttpGet("{stakeholderId:guid}", Name = "GetStakeholderById")]
+    [Authorize(Roles = "Student,Mentor,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<GetStakeholderByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetStakeholderById(
@@ -64,6 +66,7 @@ public class StakeholdersController : ApiControllerBase
     /// <param name="command">Stakeholder data.</param>
     /// <returns code="201">Returns the created stakeholder.</returns>
     [HttpPost]
+    [Authorize(Roles = "Student,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<CreateStakeholderResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateStakeholder(
@@ -78,6 +81,7 @@ public class StakeholdersController : ApiControllerBase
     /// Update an existing stakeholder. All fields are optional (partial update).
     /// </summary>
     [HttpPut("{stakeholderId:guid}")]
+    [Authorize(Roles = "Student,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<UpdateStakeholderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
@@ -98,6 +102,7 @@ public class StakeholdersController : ApiControllerBase
     /// Soft delete a stakeholder by ID.
     /// </summary>
     [HttpDelete("{stakeholderId:guid}")]
+    [Authorize(Roles = "Student,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<DeleteStakeholderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]

@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 
@@ -17,6 +17,9 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
             RuleFor(x => x.Description)
                 .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.DescriptionMaxLength));
 
+            RuleFor(x => x.Field)
+                .MaximumLength(100).WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldMaxLength));
+
             RuleFor(x => x.StartDate)
                 .LessThanOrEqualTo(x => x.EndDate)
                 .WithMessage(_messageService.GetMessage(MessageKeys.Projects.StartDateInvalidRange))
@@ -27,17 +30,24 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 .WithMessage(_messageService.GetMessage(MessageKeys.Projects.EndDateInvalidRange))
                 .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
 
-            RuleFor(x => x.Field)
-                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldRequired))
-                .MaximumLength(100).WithMessage(_messageService.GetMessage(MessageKeys.Projects.FieldMaxLength));
 
             RuleFor(x => x.Requirements)
-                .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsRequired))
                 .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsMaxLength));
 
             RuleFor(x => x.Deliverables)
                 .MaximumLength(2000).WithMessage(_messageService.GetMessage(MessageKeys.Projects.DeliverablesMaxLength))
                 .When(x => x.Deliverables != null);
+
+            // Publish flow must satisfy full required fields; draft autosave only needs project name.
+            When(x => x.PublishOnSave, () =>
+            {
+                RuleFor(x => x.Description)
+                    .NotEmpty().WithMessage("Project description is required when publishing.");
+
+
+                RuleFor(x => x.Requirements)
+                    .NotEmpty().WithMessage(_messageService.GetMessage(MessageKeys.Projects.RequirementsRequired));
+            });
         }
     }
 }

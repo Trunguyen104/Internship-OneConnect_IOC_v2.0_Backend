@@ -91,8 +91,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                     ResultErrorType.BadRequest);
             }
 
-            job.StartDate = internshipPhase.StartDate.ToDateTime(TimeOnly.MinValue);
-            job.EndDate = internshipPhase.EndDate.ToDateTime(TimeOnly.MinValue);
+            job.StartDate = DateTime.SpecifyKind(internshipPhase.StartDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+            job.EndDate = DateTime.SpecifyKind(internshipPhase.EndDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
 
             // Validate internship phase date ordering
             if (job.StartDate > job.EndDate)
@@ -115,7 +115,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                 {
                     _logger.LogWarning("ExpireDate {ExpireDate} cannot be after internship phase start date {StartDate}.", expireDate, phaseStart);
                     return Result<CreateJobPostingResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
+                        _messageService.GetMessage(MessageKeys.JobPostingMessageKey.ExpireDateCanNotBeAfterPhaseStartDate, expireDate, phaseStart),
                         ResultErrorType.BadRequest);
                 }
 

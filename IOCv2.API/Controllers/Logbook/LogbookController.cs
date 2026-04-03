@@ -30,10 +30,11 @@ public class LogbookController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get paginated logbooks for an internship group.
+    /// Get logbooks grouped by week for an internship group.
+    /// Use weekFilter (CSV) to select specific weeks, e.g. weekFilter=1,2.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetLogbooksResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetLogbooksByWeekResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetLogbooks([FromQuery] GetLogbooksQuery query)

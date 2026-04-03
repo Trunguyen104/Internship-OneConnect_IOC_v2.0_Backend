@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.StakeholderIssues.Common;
+using IOCv2.Application.Features.Stakeholders.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -40,6 +41,19 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
             _logger.LogInformation("Creating StakeholderIssue for Stakeholder {StakeholderId} (Title: {Title})", 
                 request.StakeholderId, request.Title);
 
+            var authError = StakeholderAccessGuard.EnsureAuthenticated<CreateStakeholderIssueResponse>(_currentUserService, _messageService);
+            if (authError is not null)
+            {
+                return authError;
+            }
+
+            var managePermissionError = StakeholderAccessGuard.EnsureManagePermission<CreateStakeholderIssueResponse>(_currentUserService, _messageService);
+            if (managePermissionError is not null)
+            {
+                _logger.LogWarning("User {UserId} with role {Role} attempted to create stakeholder issue for stakeholder {StakeholderId}", _currentUserService.UserId, _currentUserService.Role, request.StakeholderId);
+                return managePermissionError;
+            }
+
             // Fetch stakeholder with project info for security check
             var stakeholder = await _unitOfWork.Repository<Stakeholder>()
                 .Query()
@@ -53,10 +67,18 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.CreateStakeholde
                     _messageService.GetMessage(MessageKeys.Issue.StakeholderNotFound));
             }
 
-            // Security Check: Verify user belongs to the project
-            // Replace with actual ICurrentUserService check if available, or placeholder for now
-            // var userId = _currentUserService.UserId;
-            // TODO: check project membership
+            var accessError = await StakeholderAccessGuard.EnsureInternshipAccessAsync<CreateStakeholderIssueResponse>(
+                _unitOfWork,
+                _messageService,
+                _currentUserService,
+                stakeholder.InternshipId,
+                cancellationToken);
+
+            if (accessError is not null)
+            {
+                _logger.LogWarning("User {UserId} attempted to create stakeholder issue without permission in internship {InternshipId}", _currentUserService.UserId, stakeholder.InternshipId);
+                return accessError;
+            }
 
             // Create entity using rich domain constructor
             var issue = new StakeholderIssue(

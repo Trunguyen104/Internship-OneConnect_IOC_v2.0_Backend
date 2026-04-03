@@ -18,6 +18,7 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(u => u.Name).IsRequired().HasMaxLength(255).HasColumnName("name");
             builder.Property(u => u.Address).HasMaxLength(500).HasColumnName("address");
             builder.Property(u => u.LogoUrl).HasMaxLength(255).HasColumnName("logo_url");
+            builder.Property(u => u.ContactEmail).HasMaxLength(255).HasColumnName("contact_email");
 
             builder.Property(u => u.Status).HasDefaultValue(1).HasColumnName("status");
 

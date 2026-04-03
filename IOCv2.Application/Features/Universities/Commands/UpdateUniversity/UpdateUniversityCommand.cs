@@ -10,4 +10,5 @@ public record UpdateUniversityCommand : IRequest<Result<bool>>
     public string Name { get; init; } = string.Empty;
     public string? Address { get; init; }
     public string? LogoUrl { get; init; }
+    public string? ContactEmail { get; init; }
 }

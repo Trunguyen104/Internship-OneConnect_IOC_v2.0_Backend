@@ -16,7 +16,6 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
-    private readonly IBackgroundEmailSender _emailSender;
     private readonly ICacheService _cacheService;
     private readonly ILogger<BulkWithdrawStudentsHandler> _logger;
 
@@ -24,14 +23,12 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
         IMessageService messageService,
-        IBackgroundEmailSender emailSender,
         ICacheService cacheService,
         ILogger<BulkWithdrawStudentsHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
-        _emailSender = emailSender;
         _cacheService = cacheService;
         _logger = logger;
     }
@@ -60,80 +57,132 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
                     _messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
         }
 
-        // Do not allow bulk withdraw when the term is Ended or Closed
         if (TermStatusHelper.IsEnded(term.StartDate, term.EndDate, term.Status) ||
             TermStatusHelper.IsClosed(term.Status))
             return Result<BulkWithdrawStudentsResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.TermEndedOrClosed));
 
-        // Load all studentTerms matching the IDs and TermId
         var studentTerms = await _unitOfWork.Repository<StudentTerm>()
             .Query()
             .Include(st => st.Student).ThenInclude(s => s.User)
             .Where(st => request.StudentTermIds.Contains(st.StudentTermId) && st.TermId == request.TermId)
             .ToListAsync(cancellationToken);
 
-        // Check for IDs not found in this term
         var foundIds = studentTerms.Select(st => st.StudentTermId).ToHashSet();
         var notFoundIds = request.StudentTermIds.Where(id => !foundIds.Contains(id)).ToList();
         if (notFoundIds.Count > 0)
             return Result<BulkWithdrawStudentsResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.StudentTerms.NotFound), ResultErrorType.NotFound);
 
-        // Classify
-        var withdrawable = studentTerms
-            .Where(st => st.EnrollmentStatus == EnrollmentStatus.Active && st.PlacementStatus == PlacementStatus.Unplaced)
-            .ToList();
         var skippedPlaced = studentTerms.Count(st => st.PlacementStatus == PlacementStatus.Placed);
         var skippedWithdrawn = studentTerms.Count(st => st.EnrollmentStatus == EnrollmentStatus.Withdrawn);
 
-        if (withdrawable.Count == 0 && skippedPlaced == studentTerms.Count)
-            return Result<BulkWithdrawStudentsResponse>.Failure(
-                _messageService.GetMessage(MessageKeys.StudentTerms.AllStudentsPlaced));
+        var candidates = studentTerms
+            .Where(st => st.EnrollmentStatus == EnrollmentStatus.Active && st.PlacementStatus == PlacementStatus.Unplaced)
+            .ToList();
 
-        // Withdraw all withdrawable
-        foreach (var st in withdrawable)
+        var candidateStudentIds = candidates.Select(st => st.StudentId).Distinct().ToList();
+        var candidateStudentTermIds = candidates.Select(st => st.StudentTermId).ToList();
+
+        var blockedStudentIds = await _unitOfWork.Repository<StudentTerm>()
+            .Query()
+            .Where(st => candidateStudentIds.Contains(st.StudentId) && !candidateStudentTermIds.Contains(st.StudentTermId))
+            .Select(st => st.StudentId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        var blockedIdSet = blockedStudentIds.ToHashSet();
+        var deletable = candidates.Where(st => !blockedIdSet.Contains(st.StudentId)).ToList();
+        var skippedHasOtherTerms = candidates.Count(st => blockedIdSet.Contains(st.StudentId));
+
+        if (deletable.Count == 0)
         {
-            st.EnrollmentStatus = EnrollmentStatus.Withdrawn;
-            st.UpdatedBy = userId;
-            st.UpdatedAt = DateTime.UtcNow;
-            await _unitOfWork.Repository<StudentTerm>().UpdateAsync(st, cancellationToken);
+            if (skippedPlaced == studentTerms.Count)
+                return Result<BulkWithdrawStudentsResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.StudentTerms.AllStudentsPlaced));
+
+            return Result<BulkWithdrawStudentsResponse>.Success(
+                new BulkWithdrawStudentsResponse
+                {
+                    WithdrawnCount = 0,
+                    DeletedFromSystemCount = 0,
+                    SkippedPlacedCount = skippedPlaced,
+                    SkippedAlreadyWithdrawnCount = skippedWithdrawn,
+                    SkippedHasOtherTermsCount = skippedHasOtherTerms
+                },
+                _messageService.GetMessage(MessageKeys.StudentTerms.BulkWithdrawSuccess));
         }
 
-        if (withdrawable.Count > 0)
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        try
         {
-            term.TotalEnrolled -= withdrawable.Count;
-            term.TotalUnplaced -= withdrawable.Count;
+            var now = DateTime.UtcNow;
+            var userIds = deletable.Select(st => st.Student.User.UserId).Distinct().ToList();
+
+            var activeTokens = await _unitOfWork.Repository<RefreshToken>()
+                .Query()
+                .Where(rt => userIds.Contains(rt.UserId) && !rt.IsRevoked)
+                .ToListAsync(cancellationToken);
+
+            foreach (var token in activeTokens)
+            {
+                token.IsRevoked = true;
+                token.UpdatedAt = now;
+                await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
+            }
+
+            foreach (var st in deletable)
+            {
+                st.EnrollmentStatus = EnrollmentStatus.Withdrawn;
+                st.UpdatedBy = userId;
+                st.UpdatedAt = now;
+
+                var user = st.Student.User;
+                var suffix = $"_deleted_{now:yyyyMMddHHmmssfff}";
+                user.UpdateEmail($"{user.Email}{suffix}");
+                if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
+                {
+                    user.UpdateProfile(
+                        user.FullName,
+                        $"{user.PhoneNumber}{suffix}",
+                        user.AvatarUrl,
+                        user.Gender,
+                        user.DateOfBirth,
+                        user.Address);
+                }
+
+                st.DeletedBy = userId;
+                await _unitOfWork.Repository<StudentTerm>().DeleteAsync(st, cancellationToken);
+                await _unitOfWork.Repository<Student>().DeleteAsync(st.Student, cancellationToken);
+                await _unitOfWork.Repository<User>().DeleteAsync(user, cancellationToken);
+            }
+
+            term.TotalEnrolled = Math.Max(0, term.TotalEnrolled - deletable.Count);
+            term.TotalUnplaced = Math.Max(0, term.TotalUnplaced - deletable.Count);
             await _unitOfWork.Repository<Term>().UpdateAsync(term, cancellationToken);
-        }
 
-        await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.SaveChangeAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            throw;
+        }
 
         await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
         await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
-        // Fire-and-forget emails
-        var emailSubject = _messageService.GetMessage(MessageKeys.StudentTerms.EmailSubjectWithdraw);
-        var emailBody = _messageService.GetMessage(MessageKeys.StudentTerms.EmailBodyWithdraw, term.Name);
-        foreach (var st in withdrawable)
-        {
-            _ = _emailSender.EnqueueEmailAsync(
-                st.Student.User.Email,
-                emailSubject,
-                emailBody,
-                st.StudentTermId,
-                userId,
-                CancellationToken.None);
-        }
-
-        _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogBulkWithdrawn), withdrawable.Count, request.TermId, userId);
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.StudentTerms.LogBulkWithdrawn), deletable.Count, request.TermId, userId);
 
         return Result<BulkWithdrawStudentsResponse>.Success(
             new BulkWithdrawStudentsResponse
             {
-                WithdrawnCount = withdrawable.Count,
+                WithdrawnCount = deletable.Count,
+                DeletedFromSystemCount = deletable.Count,
                 SkippedPlacedCount = skippedPlaced,
-                SkippedAlreadyWithdrawnCount = skippedWithdrawn
+                SkippedAlreadyWithdrawnCount = skippedWithdrawn,
+                SkippedHasOtherTermsCount = skippedHasOtherTerms
             },
             _messageService.GetMessage(MessageKeys.StudentTerms.BulkWithdrawSuccess));
     }

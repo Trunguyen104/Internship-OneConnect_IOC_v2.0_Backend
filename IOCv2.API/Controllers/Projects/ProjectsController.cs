@@ -1,11 +1,10 @@
-using IOCv2.Application.Common.Models;
+﻿using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Projects.Commands.ArchiveProject;
 using IOCv2.Application.Features.Projects.Commands.AssignGroup;
 using IOCv2.Application.Features.Projects.Commands.CompleteProject;
 using IOCv2.Application.Features.Projects.Commands.CreateProject;
 using IOCv2.Application.Features.Projects.Commands.DeleteProject;
 using IOCv2.Application.Features.Projects.Commands.PublishProject;
-using IOCv2.Application.Features.Projects.Commands.SwapGroup;
 using IOCv2.Application.Features.Projects.Commands.UnpublishProject;
 using IOCv2.Application.Features.Projects.Commands.UpdateProject;
 using IOCv2.Application.Features.Projects.Queries.GetAllProjects;
@@ -147,6 +146,7 @@ public class ProjectsController : ApiControllerBase
     /// Also supports resource operations in the same request body:
     /// - resourceUpdates: rename resource, and update externalUrl for LINK resources
     /// - resourceDeleteIds: remove resources from project
+    /// - internshipGroupId: optional reassignment to another group (for correcting wrong assignment)
     /// </summary>
     [HttpPut("{projectId:guid}")]
     [Authorize(Roles = "Mentor")]
@@ -237,26 +237,6 @@ public class ProjectsController : ApiControllerBase
     public async Task<IActionResult> AssignGroup(
         [FromRoute] Guid projectId,
         [FromBody] AssignGroupCommand command,
-        CancellationToken cancellationToken)
-    {
-        command.ProjectId = projectId;
-        var result = await _mediator.Send(command, cancellationToken);
-        return HandleResult(result);
-    }
-
-    /// <summary>
-    /// Swap a project's assigned group. Only available when project has no student data.
-    /// </summary>
-    [HttpPatch("{projectId:guid}/change-group")]
-    [Authorize(Roles = "Mentor")]
-    [ProducesResponseType(typeof(ApiResponse<SwapGroupResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> SwapGroup(
-        [FromRoute] Guid projectId,
-        [FromBody] SwapGroupCommand command,
         CancellationToken cancellationToken)
     {
         command.ProjectId = projectId;

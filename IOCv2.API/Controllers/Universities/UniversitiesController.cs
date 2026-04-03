@@ -36,7 +36,7 @@ public class UniversitiesController : ApiControllerBase
     /// Get university by ID.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse<GetUniversityByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUniversity(Guid id)

@@ -43,9 +43,14 @@ namespace IOCv2.Application.Features.Projects.Queries.GetProjectsByStudentId
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Current lifecycle status of the project.
+        /// Visibility status of the project.
         /// </summary>
-        public ProjectStatus? Status { get; set; }
+        public VisibilityStatus VisibilityStatus { get; set; }
+
+        /// <summary>
+        /// Operational status of the project.
+        /// </summary>
+        public OperationalStatus OperationalStatus { get; set; }
 
         /// <summary>
         /// Workflow template used by the project.
