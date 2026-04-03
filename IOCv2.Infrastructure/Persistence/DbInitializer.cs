@@ -61,6 +61,8 @@ namespace IOCv2.Infrastructure.Persistence
             // Deterministic ids for student11 (UniAssign) and student12 (SelfApply) placement tests
             public static readonly Guid Student11UserId = new Guid("66666666-6666-6666-6666-666666660011");
             public static readonly Guid Student12UserId = new Guid("66666666-6666-6666-6666-666666660012");
+            public static readonly Guid Student13UserId = new Guid("66666666-6666-6666-6666-666666660013");
+            public static readonly Guid Student14UserId = new Guid("66666666-6666-6666-6666-666666660014");
         }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
@@ -671,6 +673,54 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Students.Add(student12Rec);
             }
 
+            // Student13 — seeded for UniAssign placement flow
+            var student13Email = "student13@fptu.edu.vn";
+            if (!existingEmails.Contains(student13Email))
+            {
+                var userId13 = SeedIds.Student13UserId;
+                var userCode13 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user13 = new User(userId13, userCode13, student13Email, "Võ Thành Trung", UserRole.Student, passHash);
+                user13.UpdateProfile(user13.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(2003, 11, 10), "Hà Nội");
+                user13.SetStatus(UserStatus.Active);
+                _context.Users.Add(user13);
+                existingEmails.Add(student13Email);
+                var uni13 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user13.UserId, UniversityId = uni13.UniversityId });
+                _context.Students.Add(new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user13.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Information Technology",
+                    ClassName = "IT1621"
+                });
+            }
+
+            // Student14 — seeded for SelfApply placement flow
+            var student14Email = "student14@fptu.edu.vn";
+            if (!existingEmails.Contains(student14Email))
+            {
+                var userId14 = SeedIds.Student14UserId;
+                var userCode14 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user14 = new User(userId14, userCode14, student14Email, "Nguyễn Thảo Ngân", UserRole.Student, passHash);
+                user14.UpdateProfile(user14.FullName, $"098765{phoneCounter++}", null, UserGender.Female, new DateOnly(2003, 12, 12), "TP. Hồ Chí Minh");
+                user14.SetStatus(UserStatus.Active);
+                _context.Users.Add(user14);
+                existingEmails.Add(student14Email);
+                var uni14 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user14.UserId, UniversityId = uni14.UniversityId });
+                var student14Rec = new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user14.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Software Engineering",
+                    ClassName = "SE1622"
+                };
+                student14Rec.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf");
+                _context.Students.Add(student14Rec);
+            }
+
             await _context.SaveChangesAsync();
         }
 
@@ -1064,6 +1114,8 @@ namespace IOCv2.Infrastructure.Persistence
 
             students.TryGetValue("student11@fptu.edu.vn", out var s11);
             students.TryGetValue("student12@fptu.edu.vn", out var s12);
+            students.TryGetValue("student13@fptu.edu.vn", out var s13);
+            students.TryGetValue("student14@fptu.edu.vn", out var s14);
 
             var hrFptEu = await _context.EnterpriseUsers
                 .Include(eu => eu.User)
@@ -1217,6 +1269,28 @@ namespace IOCv2.Infrastructure.Persistence
                     DateTime.UtcNow.AddDays(-2), null, null,
                     null, null,
                     "https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf", fptBackendJob.Title);
+            }
+
+            // Student 13: UniAssign placement flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Java Backend Intern)
+            if (s13 != null)
+            {
+                 await EnsureApplication(
+                    rikkeisoft.EnterpriseId, spring2026.TermId, s13.StudentId,
+                    rikkeiBackendJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                    DateTime.UtcNow.AddDays(-1), null, null,
+                    fptUniversity.UniversityId, null,
+                    null, rikkeiBackendJob.Title);
+            }
+
+            // Student 14: SelfApply flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Mobile Flutter Intern)
+            if (s14 != null)
+            {
+                 await EnsureApplication(
+                    rikkeisoft.EnterpriseId, spring2026.TermId, s14.StudentId,
+                    rikkeiMobileJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
+                    DateTime.UtcNow.AddDays(0), null, null,
+                    null, null,
+                    "https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf", rikkeiMobileJob.Title);
             }
 
             // Historical record for old term.
