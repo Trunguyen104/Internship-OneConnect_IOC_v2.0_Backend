@@ -13,6 +13,12 @@ public class GetMyApplicationsResponse
     public bool? IsJobClosed { get; set; }
     public bool? IsJobDeleted { get; set; }
 
+    // Phase info
+    public Guid? InternshipPhaseId { get; set; }
+    public string? InternPhaseName { get; set; }
+    public DateOnly? InternPhaseStartDate { get; set; }
+    public DateOnly? InternPhaseEndDate { get; set; }
+
     // Enterprise
     public string EnterpriseName { get; set; } = string.Empty;
     public string? EnterpriseLogoUrl { get; set; }
