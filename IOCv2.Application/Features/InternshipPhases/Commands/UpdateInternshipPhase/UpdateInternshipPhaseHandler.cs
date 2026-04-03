@@ -108,6 +108,14 @@ public class UpdateInternshipPhaseHandler
             .Distinct()
             .Count();
 
+        // Defensive rule: only block when user attempts to move StartDate backward into the past.
+        if (request.StartDate != phase.StartDate && request.StartDate < today)
+        {
+            return Result<UpdateInternshipPhaseResponse>.Failure(
+                $"{_messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast)} (startDate: {request.StartDate:yyyy-MM-dd}, currentStartDate: {phase.StartDate:yyyy-MM-dd}, todayUtc: {today:yyyy-MM-dd})",
+                ResultErrorType.BadRequest);
+        }
+
         var lockFields = hasGroups || placedCount > 0;
         var isLockedFieldChange =
             request.StartDate != phase.StartDate ||

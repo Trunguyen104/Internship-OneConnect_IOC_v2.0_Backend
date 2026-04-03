@@ -37,6 +37,14 @@ public class CreateInternshipPhaseHandler
     public async Task<Result<CreateInternshipPhaseResponse>> Handle(
         CreateInternshipPhaseCommand request, CancellationToken cancellationToken)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        if (request.StartDate < today)
+        {
+            return Result<CreateInternshipPhaseResponse>.Failure(
+                $"{_messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast)} (startDate: {request.StartDate:yyyy-MM-dd}, todayUtc: {today:yyyy-MM-dd})",
+                ResultErrorType.BadRequest);
+        }
+
         _logger.LogInformation(
             _messageService.GetMessage(MessageKeys.InternshipPhase.LogCreating),
             request.Name, request.EnterpriseId);
@@ -133,7 +141,6 @@ public class CreateInternshipPhaseHandler
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogCreateSuccess),
                 phase.PhaseId, phase.Name, phase.EnterpriseId);
 
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var lifecycleStatus = phase.GetLifecycleStatus(today);
 
             return Result<CreateInternshipPhaseResponse>.Success(new CreateInternshipPhaseResponse

@@ -50,10 +50,11 @@ public class CloudinaryFileStorageService : IFileStorageService
             : Path.GetFileName(fileName);
 
         var extension = Path.GetExtension(uniqueFileName);
-        var publicIdWithoutExtension = Path.GetFileNameWithoutExtension(uniqueFileName);
         var folderPath = BuildCloudinaryFolder(folder);
-        var publicId = $"{folderPath}/{publicIdWithoutExtension}";
-        var resourceType = ResolveResourceType(file.ContentType, extension);
+        var resourceType = ResolveResourceType(file.ContentType, extension, folder);
+        var publicId = resourceType == "raw"
+            ? $"{folderPath}/{uniqueFileName}"
+            : $"{folderPath}/{Path.GetFileNameWithoutExtension(uniqueFileName)}";
 
         await using var stream = file.OpenReadStream();
 
@@ -239,8 +240,14 @@ public class CloudinaryFileStorageService : IFileStorageService
         return $"{_folderPrefix}/{cleaned}";
     }
 
-    private static string ResolveResourceType(string? contentType, string extension)
+    private static string ResolveResourceType(string? contentType, string extension, string folder)
     {
+        // Project resources must keep original bytes/extension (no image re-encoding).
+        if (folder.Replace('\\', '/').Contains("/resources", StringComparison.OrdinalIgnoreCase))
+        {
+            return "raw";
+        }
+
         if (!string.IsNullOrWhiteSpace(contentType) && contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
         {
             return "image";
@@ -286,9 +293,12 @@ public class CloudinaryFileStorageService : IFileStorageService
             return (string.Empty, resourceType);
         }
 
-        var last = publicIdParts[^1];
-        var lastWithoutExtension = Path.GetFileNameWithoutExtension(last);
-        publicIdParts[^1] = lastWithoutExtension;
+        if (resourceType != ResourceType.Raw)
+        {
+            var last = publicIdParts[^1];
+            var lastWithoutExtension = Path.GetFileNameWithoutExtension(last);
+            publicIdParts[^1] = lastWithoutExtension;
+        }
 
         return (string.Join('/', publicIdParts), resourceType);
     }

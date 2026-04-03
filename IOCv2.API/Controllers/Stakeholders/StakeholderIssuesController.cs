@@ -29,6 +29,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Get a paginated list of stakeholder issues with optional filters (internshipId, stakeholderId, status) and search.
     /// </summary>
     [HttpGet]
+    [Authorize(Roles = "Student,Mentor,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetStakeholderIssuesResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetIssues(
         [FromQuery] Guid? internshipId,
@@ -52,6 +53,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Get a single stakeholder issue by ID.
     /// </summary>
     [HttpGet("{id:guid}", Name = "GetStakeholderIssueById")]
+    [Authorize(Roles = "Student,Mentor,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<GetStakeholderIssueByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetIssueById(
@@ -66,6 +68,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Create a new stakeholder issue.
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "Student,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<CreateStakeholderIssueResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateIssue(
@@ -80,6 +83,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Update the status of a stakeholder issue.
     /// </summary>
     [HttpPatch("{id:guid}/status")]
+    [Authorize(Roles = "Student,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<UpdateStakeholderIssueStatusResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
@@ -101,6 +105,7 @@ public class StakeholderIssuesController : ApiControllerBase
     /// Delete (hard delete) a stakeholder issue by ID.
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Student,SchoolAdmin,SuperAdmin,Moderator")]
     [ProducesResponseType(typeof(ApiResponse<DeleteStakeholderIssueResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteIssue(

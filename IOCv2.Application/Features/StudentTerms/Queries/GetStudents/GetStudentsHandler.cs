@@ -2,6 +2,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,6 +60,8 @@ public class GetStudentsHandler : IRequestHandler<GetStudentsQuery, Result<Pagin
         // Filters
         if (request.EnrollmentStatus.HasValue)
             query = query.Where(st => st.EnrollmentStatus == request.EnrollmentStatus.Value);
+        else
+            query = query.Where(st => st.EnrollmentStatus == EnrollmentStatus.Active);
 
         if (request.PlacementStatus.HasValue)
             query = query.Where(st => st.PlacementStatus == request.PlacementStatus.Value);

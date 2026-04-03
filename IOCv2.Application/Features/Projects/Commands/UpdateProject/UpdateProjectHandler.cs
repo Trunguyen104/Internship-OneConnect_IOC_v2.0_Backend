@@ -263,7 +263,16 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
                         if (resourceInput.ResourceName != null)
                         {
-                            resource.ResourceName = resourceInput.ResourceName.Trim();
+                            var trimmedResourceName = resourceInput.ResourceName.Trim();
+                            if (!IsResourceNameExtensionValid(trimmedResourceName, resource.ResourceType))
+                            {
+                                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                                return Result<UpdateProjectResponse>.Failure(
+                                    _messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType),
+                                    ResultErrorType.BadRequest);
+                            }
+
+                            resource.ResourceName = trimmedResourceName;
                         }
 
                         if (resourceInput.ExternalUrl != null)
@@ -404,6 +413,41 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
             response.AssignedStudentCount = assignedCount;
 
             return Result<UpdateProjectResponse>.Success(response);
+        }
+
+        private static bool IsResourceNameExtensionValid(string? resourceName, FileType resourceType)
+        {
+            if (resourceType == FileType.LINK || string.IsNullOrWhiteSpace(resourceName))
+            {
+                return true;
+            }
+
+            var extension = Path.GetExtension(resourceName.Trim());
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                return true;
+            }
+
+            if (resourceType == FileType.JPG)
+            {
+                return extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+                    || extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
+            }
+
+            var expectedExtension = resourceType switch
+            {
+                FileType.PDF => ".pdf",
+                FileType.DOCX => ".docx",
+                FileType.PPTX => ".pptx",
+                FileType.ZIP => ".zip",
+                FileType.RAR => ".rar",
+                FileType.PNG => ".png",
+                FileType.XLSX => ".xlsx",
+                _ => string.Empty
+            };
+
+            return string.IsNullOrEmpty(expectedExtension)
+                || extension.Equals(expectedExtension, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

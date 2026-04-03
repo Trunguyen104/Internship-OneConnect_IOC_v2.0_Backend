@@ -51,29 +51,30 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.DeleteStakeholder
                     _messageService.GetMessage(MessageKeys.Stakeholder.NotFound));
             }
 
-            // Security: Ownership check (FFA-SEC)
-            var currentUserIdStr = _currentUserService.UserId;
-            if (string.IsNullOrEmpty(currentUserIdStr) || !Guid.TryParse(currentUserIdStr, out var currentUserId))
+            var authError = StakeholderAccessGuard.EnsureAuthenticated<DeleteStakeholderResponse>(_currentUserService, _messageService);
+            if (authError is not null)
             {
-                return Result<DeleteStakeholderResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+                return authError;
             }
 
-            var userRole = _currentUserService.Role;
-            if (userRole != "SchoolAdmin" && userRole != "SuperAdmin" && userRole != "Moderator")
+            var managePermissionError = StakeholderAccessGuard.EnsureManagePermission<DeleteStakeholderResponse>(_currentUserService, _messageService);
+            if (managePermissionError is not null)
             {
-                var isAuthorized = await _unitOfWork.Repository<InternshipGroup>()
-                    .Query()
-                    .AnyAsync(g => g.InternshipId == request.InternshipId &&
-                        (
-                            (g.Mentor != null && g.Mentor.UserId == currentUserId) ||
-                            g.Members.Any(m => m.Student.UserId == currentUserId)
-                        ), cancellationToken);
+                _logger.LogWarning("User {UserId} with role {Role} attempted to delete stakeholder {StakeholderId}", _currentUserService.UserId, _currentUserService.Role, request.StakeholderId);
+                return managePermissionError;
+            }
 
-                if (!isAuthorized)
-                {
-                    _logger.LogWarning("User {UserId} attempted to delete stakeholder in internship {InternshipId} without permission", currentUserId, request.InternshipId);
-                    return Result<DeleteStakeholderResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
-                }
+            var accessError = await StakeholderAccessGuard.EnsureInternshipAccessAsync<DeleteStakeholderResponse>(
+                _unitOfWork,
+                _messageService,
+                _currentUserService,
+                request.InternshipId,
+                cancellationToken);
+
+            if (accessError is not null)
+            {
+                _logger.LogWarning("User {UserId} attempted to delete stakeholder in internship {InternshipId} without permission", _currentUserService.UserId, request.InternshipId);
+                return accessError;
             }
 
             try
