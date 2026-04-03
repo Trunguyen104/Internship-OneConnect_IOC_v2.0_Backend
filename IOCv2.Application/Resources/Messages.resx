@@ -1137,4 +1137,7 @@
   <data name="Validation.InvalidStatus" xml:space="preserve">
     <value>Status không hợp lệ.</value>
   </data>
+  <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
+    <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
+  </data>
 </root>

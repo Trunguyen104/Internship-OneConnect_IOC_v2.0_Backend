@@ -945,6 +945,7 @@ namespace IOCv2.Application.Constants
             // Create Job
             public const string CreateSuccess = "JobPosting.CreateSuccess";
             public const string InternshipPhaseStatusAllowed = "JobPosting.InternshipPhaseStatusAllowed";
+            public const string ExpireDateCanNotBeAfterPhaseStartDate = "JobPosting.ExpireDateCanNotBeAfterPhaseStartDate";
             // Delete
             public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
             public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";

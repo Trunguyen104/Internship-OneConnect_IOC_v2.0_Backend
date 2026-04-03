@@ -619,10 +619,6 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("job_id");
 
-                    b.Property<Guid?>("JobId1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("job_id1");
-
                     b.Property<string>("JobPostingTitle")
                         .HasColumnType("text")
                         .HasColumnName("job_posting_title");
@@ -676,9 +672,6 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.HasIndex("JobId")
                         .HasDatabaseName("ix_internship_applications_job_id");
-
-                    b.HasIndex("JobId1")
-                        .HasDatabaseName("ix_internship_applications_job_id1");
 
                     b.HasIndex("ReviewedBy")
                         .HasDatabaseName("ix_internship_applications_reviewed_by");
@@ -2582,15 +2575,10 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasConstraintName("fk_internship_applications_internship_groups_internship_group_");
 
                     b.HasOne("IOCv2.Domain.Entities.Job", "Job")
-                        .WithMany("Applications")
+                        .WithMany("InternshipApplications")
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_internship_applications_jobs_job_id");
-
-                    b.HasOne("IOCv2.Domain.Entities.Job", null)
-                        .WithMany("InternshipApplications")
-                        .HasForeignKey("JobId1")
-                        .HasConstraintName("fk_internship_applications_jobs_job_id1");
 
                     b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "Reviewer")
                         .WithMany("ReviewedApplications")
@@ -3076,8 +3064,6 @@ namespace IOCv2.Infrastructure.Migrations
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
                 {
-                    b.Navigation("Applications");
-
                     b.Navigation("InternshipApplications");
                 });
 

@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IOCv2.Infrastructure.Persistence.Migrations
+namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260330122312_AddInternPhaseIdToJob")]
-    partial class AddInternPhaseIdToJob
+    [Migration("20260403031818_RefactorMigrationsDb")]
+    partial class RefactorMigrationsDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -622,10 +622,6 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("job_id");
 
-                    b.Property<Guid?>("JobId1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("job_id1");
-
                     b.Property<string>("JobPostingTitle")
                         .HasColumnType("text")
                         .HasColumnName("job_posting_title");
@@ -679,9 +675,6 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("JobId")
                         .HasDatabaseName("ix_internship_applications_job_id");
-
-                    b.HasIndex("JobId1")
-                        .HasDatabaseName("ix_internship_applications_job_id1");
 
                     b.HasIndex("ReviewedBy")
                         .HasDatabaseName("ix_internship_applications_reviewed_by");
@@ -958,9 +951,9 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expire_date");
 
-                    b.Property<Guid?>("InternPhaseId")
+                    b.Property<Guid?>("InternshipPhaseId")
                         .HasColumnType("uuid")
-                        .HasColumnName("intern_phase_id");
+                        .HasColumnName("internship_phase_id");
 
                     b.Property<string>("Location")
                         .HasMaxLength(255)
@@ -971,10 +964,6 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("position");
-
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("quantity");
 
                     b.Property<string>("Requirements")
                         .HasColumnType("text")
@@ -1007,8 +996,8 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.HasIndex("EnterpriseId")
                         .HasDatabaseName("ix_jobs_enterprise_id");
 
-                    b.HasIndex("InternPhaseId")
-                        .HasDatabaseName("ix_jobs_intern_phase_id");
+                    b.HasIndex("InternshipPhaseId")
+                        .HasDatabaseName("ix_jobs_internship_phase_id");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_jobs_status");
@@ -2589,15 +2578,10 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_internship_applications_internship_groups_internship_group_");
 
                     b.HasOne("IOCv2.Domain.Entities.Job", "Job")
-                        .WithMany("Applications")
+                        .WithMany("InternshipApplications")
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_internship_applications_jobs_job_id");
-
-                    b.HasOne("IOCv2.Domain.Entities.Job", null)
-                        .WithMany("InternshipApplications")
-                        .HasForeignKey("JobId1")
-                        .HasConstraintName("fk_internship_applications_jobs_job_id1");
 
                     b.HasOne("IOCv2.Domain.Entities.EnterpriseUser", "Reviewer")
                         .WithMany("ReviewedApplications")
@@ -2706,15 +2690,15 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_jobs_enterprises_enterprise_id");
 
-                    b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternPhase")
-                        .WithMany()
-                        .HasForeignKey("InternPhaseId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_jobs_internship_phases_phase_id");
+                    b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternshipPhase")
+                        .WithMany("Jobs")
+                        .HasForeignKey("InternshipPhaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
 
                     b.Navigation("Enterprise");
 
-                    b.Navigation("InternPhase");
+                    b.Navigation("InternshipPhase");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Logbook", b =>
@@ -3077,12 +3061,12 @@ namespace IOCv2.Infrastructure.Persistence.Migrations
                     b.Navigation("EvaluationCycles");
 
                     b.Navigation("InternshipGroups");
+
+                    b.Navigation("Jobs");
                 });
 
             modelBuilder.Entity("IOCv2.Domain.Entities.Job", b =>
                 {
-                    b.Navigation("Applications");
-
                     b.Navigation("InternshipApplications");
                 });
 

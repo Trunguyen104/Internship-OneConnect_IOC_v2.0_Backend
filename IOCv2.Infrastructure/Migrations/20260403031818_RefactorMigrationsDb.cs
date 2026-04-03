@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class CanNullFKInternshipPhaseJob : Migration
+    public partial class RefactorMigrationsDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -634,7 +634,6 @@ namespace IOCv2.Infrastructure.Migrations
                     reviewed_at = table.Column<DateTime>(type: "timestamptz", nullable: true),
                     reviewed_by = table.Column<Guid>(type: "uuid", nullable: true),
                     internship_group_internship_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    job_id1 = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -667,11 +666,6 @@ namespace IOCv2.Infrastructure.Migrations
                         principalTable: "jobs",
                         principalColumn: "job_id",
                         onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "fk_internship_applications_jobs_job_id1",
-                        column: x => x.job_id1,
-                        principalTable: "jobs",
-                        principalColumn: "job_id");
                     table.ForeignKey(
                         name: "fk_internship_applications_students_student_id",
                         column: x => x.student_id,
@@ -1216,11 +1210,6 @@ namespace IOCv2.Infrastructure.Migrations
                 name: "ix_internship_applications_job_id",
                 table: "internship_applications",
                 column: "job_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_internship_applications_job_id1",
-                table: "internship_applications",
-                column: "job_id1");
 
             migrationBuilder.CreateIndex(
                 name: "ix_internship_applications_reviewed_by",
