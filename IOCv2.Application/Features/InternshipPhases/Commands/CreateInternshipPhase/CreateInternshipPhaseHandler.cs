@@ -3,6 +3,7 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -121,6 +122,10 @@ public class CreateInternshipPhaseHandler
             var majorFields = string.IsNullOrWhiteSpace(request.MajorFields)
                 ? DefaultMajorField
                 : request.MajorFields.Trim();
+            
+            var status = request.StartDate > today
+                ? InternshipPhaseStatus.Open
+                : InternshipPhaseStatus.InProgress;
 
             var phase = InternshipPhase.Create(
                 request.EnterpriseId,
@@ -129,7 +134,10 @@ public class CreateInternshipPhaseHandler
                 request.EndDate,
                 majorFields,
                 request.Capacity,
-                request.Description);
+                request.Description,
+                status
+            );
+           
 
             await _unitOfWork.Repository<InternshipPhase>().AddAsync(phase, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);

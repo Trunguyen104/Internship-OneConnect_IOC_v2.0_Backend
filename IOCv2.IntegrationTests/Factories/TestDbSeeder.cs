@@ -146,7 +146,8 @@ public static class TestDbSeeder
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(90)),
             "CNTT",
             15,
-            "Test phase for integration tests");
+            "Test phase for integration tests",
+            null);
 
         context.InternshipPhases.Add(phase);
 

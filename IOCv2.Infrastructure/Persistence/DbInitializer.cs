@@ -782,7 +782,7 @@ namespace IOCv2.Infrastructure.Persistence
                         .AnyAsync(p => p.EnterpriseId == enterpriseId && p.Name == name))
                     return;
 
-                var phase = InternshipPhase.Create(enterpriseId, name, start, end, majorFields, capacity, description);
+                var phase = InternshipPhase.Create(enterpriseId, name, start, end, majorFields, capacity, description, targetStatus);
 
                 if (targetStatus != InternshipPhaseStatus.Draft)
                     phase.UpdateInfo(name, start, end, majorFields, capacity, description, targetStatus);
