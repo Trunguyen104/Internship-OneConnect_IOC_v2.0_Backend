@@ -2050,7 +2050,8 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("code");
 
                     b.Property<string>("ContactEmail")
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("contact_email");
 
                     b.Property<DateTime>("CreatedAt")
