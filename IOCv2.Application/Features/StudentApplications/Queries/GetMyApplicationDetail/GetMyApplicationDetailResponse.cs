@@ -11,6 +11,13 @@ public class GetMyApplicationDetailResponse
     // Application details
     public string? JobTitle { get; set; }
     public string? JobAudience { get; set; }
+
+    // Phase info
+    public Guid? InternshipPhaseId { get; set; }
+    public string? InternPhaseName { get; set; }
+    public DateOnly? InternPhaseStartDate { get; set; }
+    public DateOnly? InternPhaseEndDate { get; set; }
+
     public string EnterpriseName { get; set; } = string.Empty;
     public string? EnterpriseLogoUrl { get; set; }
 
