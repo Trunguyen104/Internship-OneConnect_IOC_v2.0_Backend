@@ -7,6 +7,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using IOCv2.Application.Features.Admin.UserManagement.Common;
 
 namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById
 {
@@ -47,7 +48,7 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById
                 return Result<GetUserByIdResponse>.Failure("Invalid auditor role", ResultErrorType.Forbidden);
             }
 
-            var cacheKey = $"UserDetail:{auditorRole}:{auditorUnitId}:{request.UserId}";
+            var cacheKey = UserManagementCacheKeys.User(request.UserId);
             var cachedUser = await _cacheService.GetAsync<GetUserByIdResponse>(cacheKey, cancellationToken);
             if (cachedUser != null)
             {
@@ -90,7 +91,7 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById
 
             var response = _mapper.Map<GetUserByIdResponse>(userEntity);
 
-            await _cacheService.SetAsync(cacheKey, response, TimeSpan.FromMinutes(10), cancellationToken);
+            await _cacheService.SetAsync(cacheKey, response, UserManagementCacheKeys.Expiration.User, cancellationToken);
 
             return Result<GetUserByIdResponse>.Success(response);
         }

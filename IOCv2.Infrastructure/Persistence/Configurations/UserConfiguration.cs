@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -13,19 +13,19 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.ToTable("users");
             builder.HasKey(u => u.UserId);
 
-            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(10);
-            builder.HasIndex(u => u.UserCode).IsUnique();
+            builder.Property(u => u.UserCode).IsRequired().HasMaxLength(15);
+            builder.HasIndex(u => u.UserCode).IsUnique().HasFilter("deleted_at IS NULL");
 
 
             builder.Property(u => u.PasswordHash).IsRequired();
 
             builder.Property(u => u.Email).IsRequired().HasMaxLength(150);
-            builder.HasIndex(u => u.Email).IsUnique();
+            builder.HasIndex(u => u.Email).IsUnique().HasFilter("deleted_at IS NULL");
 
             builder.Property(u => u.FullName).IsRequired().HasMaxLength(100);
 
-            builder.Property(u => u.PhoneNumber).IsRequired(false).HasMaxLength(15);
-            builder.HasIndex(u => u.PhoneNumber).IsUnique();
+            builder.Property(u => u.PhoneNumber).IsRequired(false).HasMaxLength(20);
+            builder.HasIndex(u => u.PhoneNumber).IsUnique().HasFilter("deleted_at IS NULL");
 
             builder.Property(u => u.AvatarUrl).HasMaxLength(255);
 

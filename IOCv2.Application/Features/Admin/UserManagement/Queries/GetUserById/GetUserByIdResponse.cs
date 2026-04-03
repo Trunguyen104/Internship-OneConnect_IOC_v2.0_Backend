@@ -29,7 +29,8 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUserById
         public void Mapping(Profile profile)
         {
             profile.CreateMap<User, GetUserByIdResponse>()
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => 
+                    Enum.IsDefined(typeof(UserGender), src.Gender) ? (UserGender?)src.Gender : UserGender.Other))
                 .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
