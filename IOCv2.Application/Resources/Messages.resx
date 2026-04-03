@@ -1284,4 +1284,7 @@
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Đã lấy chi tiết nhóm thực tập {0} — {1} bài đăng tuyển dụng, {2} sinh viên đã được bố trí.</value>
   </data>
+  <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
+    <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
+  </data>
 </root>

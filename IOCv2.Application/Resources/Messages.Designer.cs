@@ -249,6 +249,33 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đơn ứng tuyển chưa ở trạng thái Đã nhận (Placed)..
+        /// </summary>
+        internal static string HRApplications_ApplicationNotPlaced {
+            get {
+                return ResourceManager.GetString("HRApplications.ApplicationNotPlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phase thực tập đã đủ số lượng nhận..
+        /// </summary>
+        internal static string HRApplications_InternPhaseAtCapacity {
+            get {
+                return ResourceManager.GetString("HRApplications.InternPhaseAtCapacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HR đã xóa sinh viên khỏi danh sách Placed (ApplicationId: {0}, ByUserId: {1})..
+        /// </summary>
+        internal static string HRApplications_Log_RemovePlacedUniAssign {
+            get {
+                return ResourceManager.GetString("HRApplications.Log.RemovePlacedUniAssign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đơn ứng tuyển đã được chấp nhận thành công..
         /// </summary>
         internal static string InternshipApplication_AcceptSuccess {
@@ -1797,6 +1824,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}..
+        /// </summary>
+        internal static string JobPosting_ExpireDateCanNotBeAfterPhaseStartDate {
+            get {
+                return ResourceManager.GetString("JobPosting.ExpireDateCanNotBeAfterPhaseStartDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ngày hết hạn không thể vượt quá ngày kết thúc của giai đoạn thực tập..
         /// </summary>
         internal static string JobPosting_ExpireDateExceedsPhaseEndDate {
@@ -1860,8 +1896,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ.
-        ///.
+        ///   Looks up a localized string similar to Giai đoạn thực tập {0} đã đủ chỗ ([{1}]/[{2}] sinh viên đã được đặt). Bạn có thể đóng các Tin tuyển dụng trong giai đoạn này nếu không muốn nhận thêm hồ sơ..
         /// </summary>
         internal static string JobPosting_JobPlacedMaxed {
             get {
@@ -2950,6 +2985,105 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chỉ có thể ẩn đơn đã kết thúc (Rejected hoặc Withdrawn)..
+        /// </summary>
+        internal static string StudentApplications_CannotHideActiveApplication {
+            get {
+                return ResourceManager.GetString("StudentApplications.CannotHideActiveApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể ẩn đơn đã được nhận thực tập (Placed)..
+        /// </summary>
+        internal static string StudentApplications_CannotHidePlaced {
+            get {
+                return ResourceManager.GetString("StudentApplications.CannotHidePlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chỉ có thể rút đơn khi ở trạng thái Đã nộp (Applied)..
+        /// </summary>
+        internal static string StudentApplications_CannotWithdrawNotApplied {
+            get {
+                return ResourceManager.GetString("StudentApplications.CannotWithdrawNotApplied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã ẩn khỏi danh sách..
+        /// </summary>
+        internal static string StudentApplications_HideSuccess {
+            get {
+                return ResourceManager.GetString("StudentApplications.HideSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy đơn ứng tuyển..
+        /// </summary>
+        internal static string StudentApplications_NotFound {
+            get {
+                return ResourceManager.GetString("StudentApplications.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {StudentName} đã rút đơn ứng tuyển vị trí {JobTitle}..
+        /// </summary>
+        internal static string StudentApplications_Notify_HR_Withdrawn {
+            get {
+                return ResourceManager.GetString("StudentApplications.Notify.HR.Withdrawn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kính gửi sinh viên, doanh nghiệp {EnterpriseName} đã xóa bạn khỏi danh sách tiếp nhận thực tập..
+        /// </summary>
+        internal static string StudentApplications_Notify_Student_RemovedPlaced {
+            get {
+                return ResourceManager.GetString("StudentApplications.Notify.Student.RemovedPlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sinh viên {StudentName} đã bị doanh nghiệp {EnterpriseName} xóa khỏi danh sách tiếp nhận thực tập..
+        /// </summary>
+        internal static string StudentApplications_Notify_UniAdmin_RemovedPlaced {
+            get {
+                return ResourceManager.GetString("StudentApplications.Notify.UniAdmin.RemovedPlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn không có quyền thao tác trên đơn ứng tuyển này..
+        /// </summary>
+        internal static string StudentApplications_NotOwner {
+            get {
+                return ResourceManager.GetString("StudentApplications.NotOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã rút đơn thành công..
+        /// </summary>
+        internal static string StudentApplications_WithdrawSuccess {
+            get {
+                return ResourceManager.GetString("StudentApplications.WithdrawSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn đã được khôi phục vào đợt thực tập &apos;{0}&apos;..
+        /// </summary>
+        internal static string StudentTerms_Email_BodyRestore {
+            get {
+                return ResourceManager.GetString("StudentTerms.Email.BodyRestore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bạn đã bị rút khỏi đợt thực tập &apos;{0}&apos;. Vui lòng liên hệ nhà trường nếu có thắc mắc..
         /// </summary>
         internal static string StudentTerms_Email_BodyWithdraw {
@@ -3306,6 +3440,42 @@ namespace IOCv2.Application.Resources {
         internal static string Users_NotFound {
             get {
                 return ResourceManager.GetString("Users.NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yêu cầu cung cấp Application ID..
+        /// </summary>
+        internal static string Validation_IdRequired {
+            get {
+                return ResourceManager.GetString("Validation.IdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status không hợp lệ..
+        /// </summary>
+        internal static string Validation_InvalidStatus {
+            get {
+                return ResourceManager.GetString("Validation.InvalidStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PageNumber phải lớn hơn hoặc bằng 1..
+        /// </summary>
+        internal static string Validation_PageNumberInvalid {
+            get {
+                return ResourceManager.GetString("Validation.PageNumberInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PageSize phải lớn hơn hoặc bằng 1..
+        /// </summary>
+        internal static string Validation_PageSizeInvalid {
+            get {
+                return ResourceManager.GetString("Validation.PageSizeInvalid", resourceCulture);
             }
         }
         

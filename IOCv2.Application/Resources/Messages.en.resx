@@ -1280,4 +1280,7 @@
   <data name="Validation.InvalidStatus" xml:space="preserve">
     <value>Status is invalid.</value>
   </data>
+  <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
+    <value>ExpireDate {0} cannot be after internship phase start date {1}.</value>
+  </data>
 </root>
