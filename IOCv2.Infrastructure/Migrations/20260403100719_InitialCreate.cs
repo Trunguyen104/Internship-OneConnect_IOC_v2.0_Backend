@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrations : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,6 +35,24 @@ namespace IOCv2.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_enterprises", x => x.enterprise_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "public_holidays",
+                columns: table => new
+                {
+                    public_holiday_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    date = table.Column<DateOnly>(type: "date", nullable: false),
+                    description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_public_holidays", x => x.public_holiday_id);
                 });
 
             migrationBuilder.CreateTable(
@@ -1465,6 +1483,13 @@ namespace IOCv2.Infrastructure.Migrations
                 filter: "deleted_at IS NULL");
 
             migrationBuilder.CreateIndex(
+                name: "ix_public_holidays_date",
+                table: "public_holidays",
+                column: "date",
+                unique: true,
+                filter: "deleted_at IS NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_refresh_tokens_token",
                 table: "refresh_tokens",
                 column: "token",
@@ -1691,6 +1716,9 @@ namespace IOCv2.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "project_resources");
+
+            migrationBuilder.DropTable(
+                name: "public_holidays");
 
             migrationBuilder.DropTable(
                 name: "refresh_tokens");
