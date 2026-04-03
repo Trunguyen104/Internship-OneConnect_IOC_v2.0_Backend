@@ -59,6 +59,20 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
                         ResultErrorType.Forbidden);
                 }
 
+                if (request.ResourceType != default && request.ResourceType != projectResource.ResourceType)
+                {
+                    return Result<UpdateProjectResourceResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.InvalidRequest),
+                        ResultErrorType.BadRequest);
+                }
+
+                if (!IsResourceNameExtensionValid(request.ResourceName, projectResource.ResourceType))
+                {
+                    return Result<UpdateProjectResourceResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType),
+                        ResultErrorType.BadRequest);
+                }
+
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
                 // Resource type and project binding are immutable; only allow metadata rename.
@@ -123,6 +137,41 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UpdateProjectReso
             return await _unitOfWork.Repository<Domain.Entities.InternshipStudent>().Query()
                 .AsNoTracking()
                 .AnyAsync(m => m.InternshipId == internshipId && m.StudentId == studentId, cancellationToken);
+        }
+
+        private static bool IsResourceNameExtensionValid(string? resourceName, FileType resourceType)
+        {
+            if (resourceType == FileType.LINK || string.IsNullOrWhiteSpace(resourceName))
+            {
+                return true;
+            }
+
+            var extension = Path.GetExtension(resourceName.Trim());
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                return true;
+            }
+
+            if (resourceType == FileType.JPG)
+            {
+                return extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+                    || extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
+            }
+
+            var expectedExtension = resourceType switch
+            {
+                FileType.PDF => ".pdf",
+                FileType.DOCX => ".docx",
+                FileType.PPTX => ".pptx",
+                FileType.ZIP => ".zip",
+                FileType.RAR => ".rar",
+                FileType.PNG => ".png",
+                FileType.XLSX => ".xlsx",
+                _ => string.Empty
+            };
+
+            return string.IsNullOrEmpty(expectedExtension)
+                || extension.Equals(expectedExtension, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

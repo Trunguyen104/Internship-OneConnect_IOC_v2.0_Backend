@@ -51,29 +51,23 @@ namespace IOCv2.Application.Features.Stakeholders.Queries.GetStakeholders
                 return Result<PaginatedResult<GetStakeholdersResponse>>.NotFound("InternshipGroup not found");
             }
 
-            // Security: Ownership check (FFA-SEC)
-            var currentUserIdStr = _currentUserService.UserId;
-            if (string.IsNullOrEmpty(currentUserIdStr) || !Guid.TryParse(currentUserIdStr, out var currentUserId))
+            var authError = StakeholderAccessGuard.EnsureAuthenticated<PaginatedResult<GetStakeholdersResponse>>(_currentUserService, _messageService);
+            if (authError is not null)
             {
-                return Result<PaginatedResult<GetStakeholdersResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+                return authError;
             }
 
-            var userRole = _currentUserService.Role;
-            if (userRole != "SchoolAdmin" && userRole != "SuperAdmin" && userRole != "Moderator")
-            {
-                var isAuthorized = await _unitOfWork.Repository<InternshipGroup>()
-                    .Query()
-                    .AnyAsync(g => g.InternshipId == request.InternshipId &&
-                        (
-                            (g.Mentor != null && g.Mentor.UserId == currentUserId) ||
-                            g.Members.Any(m => m.Student.UserId == currentUserId)
-                        ), cancellationToken);
+            var accessError = await StakeholderAccessGuard.EnsureInternshipAccessAsync<PaginatedResult<GetStakeholdersResponse>>(
+                _unitOfWork,
+                _messageService,
+                _currentUserService,
+                request.InternshipId,
+                cancellationToken);
 
-                if (!isAuthorized)
-                {
-                    _logger.LogWarning("User {UserId} attempted to get stakeholders in internship {InternshipId} without permission", currentUserId, request.InternshipId);
-                    return Result<PaginatedResult<GetStakeholdersResponse>>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
-                }
+            if (accessError is not null)
+            {
+                _logger.LogWarning("User {UserId} attempted to get stakeholders in internship {InternshipId} without permission", _currentUserService.UserId, request.InternshipId);
+                return accessError;
             }
 
             var cacheKey = StakeholderCacheKeys.StakeholderList(

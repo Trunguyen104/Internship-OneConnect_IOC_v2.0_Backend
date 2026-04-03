@@ -16,7 +16,9 @@ public class CreateInternshipPhaseValidator : AbstractValidator<CreateInternship
             .MaximumLength(255).WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.NameMaxLength));
 
         RuleFor(x => x.StartDate)
-            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateRequired));
+            .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateRequired))
+            .Must(startDate => startDate >= DateOnly.FromDateTime(DateTime.UtcNow))
+            .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast));
 
         RuleFor(x => x.EndDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateRequired))
