@@ -188,7 +188,8 @@ public class CreateInternshipPhaseHandlerTests
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(100)),
             "Software Engineering",
             10,
-            "Description");
+            "Description",
+            null);
 
         _mockPhaseRepo.Setup(x => x.Query())
             .Returns(new List<InternshipPhase> { existingPhase }.AsQueryable().BuildMock());

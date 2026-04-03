@@ -67,7 +67,8 @@ public class UpdateInternshipPhaseHandlerTests
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(100)),
             "Software Engineering",
             10,
-            "Description");
+            "Description",
+            null);
 
         var id = phaseId ?? _phaseId;
         typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, id);
@@ -149,7 +150,8 @@ public class UpdateInternshipPhaseHandlerTests
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-10)),
             "Software Engineering",
             10,
-            "Description");
+            "Description",
+            null);
         typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(endedPhase, _phaseId);
 
         _mockPhaseRepo.Setup(x => x.Query())
