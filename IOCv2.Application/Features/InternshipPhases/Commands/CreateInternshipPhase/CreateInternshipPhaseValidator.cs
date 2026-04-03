@@ -18,7 +18,7 @@ public class CreateInternshipPhaseValidator : AbstractValidator<CreateInternship
         RuleFor(x => x.StartDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateRequired))
             .Must(startDate => startDate >= DateOnly.FromDateTime(DateTime.UtcNow))
-            .WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast));
+            .WithMessage(x => $"{messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast)} (startDate: {x.StartDate:yyyy-MM-dd}, todayUtc: {DateOnly.FromDateTime(DateTime.UtcNow):yyyy-MM-dd})");
 
         RuleFor(x => x.EndDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.InternshipPhase.EndDateRequired))

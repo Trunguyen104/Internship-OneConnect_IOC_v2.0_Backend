@@ -61,6 +61,32 @@ public class CreateInternshipPhaseHandlerTests
     }
 
     [Fact]
+    public async Task Handle_StartDateInPast_ReturnsBadRequest()
+    {
+        // Arrange
+        _mockCurrentUserService.Setup(x => x.Role).Returns("SuperAdmin");
+        _mockCurrentUserService.Setup(x => x.UserId).Returns(_userId.ToString());
+
+        var command = new CreateInternshipPhaseCommand
+        {
+            EnterpriseId = _enterpriseId,
+            Name = "Past Phase",
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+            EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(60)),
+            MajorFields = "Software Engineering",
+            Capacity = 10
+        };
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorType.Should().Be(ResultErrorType.BadRequest);
+        _mockPhaseRepo.Verify(x => x.AddAsync(It.IsAny<InternshipPhase>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Handle_InvalidUserId_ReturnsUnauthorized()
     {
         // Arrange

@@ -77,6 +77,37 @@ public class UpdateInternshipPhaseHandlerTests
     }
 
     [Fact]
+    public async Task Handle_ChangeStartDateToPast_ReturnsBadRequest()
+    {
+        // Arrange
+        _mockCurrentUserService.Setup(x => x.Role).Returns("SuperAdmin");
+        _mockCurrentUserService.Setup(x => x.UserId).Returns(_userId.ToString());
+
+        var phase = CreateActivePhase();
+        _mockPhaseRepo.Setup(x => x.Query())
+            .Returns(new List<InternshipPhase> { phase }.AsQueryable().BuildMock());
+
+        var command = new UpdateInternshipPhaseCommand
+        {
+            PhaseId = _phaseId,
+            Name = phase.Name,
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)),
+            EndDate = phase.EndDate,
+            MajorFields = phase.MajorFields,
+            Capacity = phase.Capacity,
+            Description = phase.Description
+        };
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorType.Should().Be(ResultErrorType.BadRequest);
+        _mockPhaseRepo.Verify(x => x.UpdateAsync(It.IsAny<InternshipPhase>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Handle_PhaseNotFound_ReturnsNotFound()
     {
         // Arrange

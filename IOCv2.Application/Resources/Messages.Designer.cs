@@ -2266,6 +2266,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tài nguyên do mentor upload, sinh viên không được phép chỉnh sửa hoặc xóa..
+        /// </summary>
+        internal static string ProjectResources_StudentCannotModifyMentorResource {
+            get {
+                return ResourceManager.GetString("ProjectResources.StudentCannotModifyMentorResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dự án đã được lưu trữ thành công..
         /// </summary>
         internal static string Projects_ArchiveSuccess {

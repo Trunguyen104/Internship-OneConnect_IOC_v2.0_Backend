@@ -98,6 +98,8 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         ResultErrorType.Forbidden);
                 }
 
+                var mentorUploaderId = await ResolveMentorUploaderIdAsync(cancellationToken);
+
                 // Start database transaction
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
                 string? fileUrl = null;
@@ -137,6 +139,11 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                         request.ResourceName ?? request.File?.FileName ?? fileUrl,
                         fileType,
                         fileUrl);
+
+                    if (mentorUploaderId.HasValue)
+                    {
+                        resource.UploadedBy = mentorUploaderId.Value;
+                    }
 
                     // Save resource metadata to database
                     await _unitOfWork.Repository<Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);
@@ -213,7 +220,11 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
 
                 return await _unitOfWork.Repository<Project>().Query()
                     .AsNoTracking()
-                    .AnyAsync(p => p.ProjectId == projectId && p.MentorId == enterpriseUserId, cancellationToken);
+                    .AnyAsync(p => p.ProjectId == projectId &&
+                        (
+                            p.MentorId == enterpriseUserId ||
+                            (p.InternshipId.HasValue && p.InternshipGroup != null && p.InternshipGroup.MentorId == enterpriseUserId)
+                        ), cancellationToken);
             }
 
             var studentId = await _unitOfWork.Repository<Student>().Query()
@@ -241,6 +252,27 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
             return await _unitOfWork.Repository<InternshipStudent>().Query()
                 .AsNoTracking()
                 .AnyAsync(m => m.InternshipId == internshipId && m.StudentId == studentId, cancellationToken);
+        }
+
+        private async Task<Guid?> ResolveMentorUploaderIdAsync(CancellationToken cancellationToken)
+        {
+            if (!string.Equals(_currentUserService.Role, "Mentor", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
+            {
+                return null;
+            }
+
+            var enterpriseUserId = await _unitOfWork.Repository<EnterpriseUser>().Query()
+                .AsNoTracking()
+                .Where(eu => eu.UserId == currentUserId)
+                .Select(eu => eu.EnterpriseUserId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return enterpriseUserId == Guid.Empty ? null : enterpriseUserId;
         }
 
     }

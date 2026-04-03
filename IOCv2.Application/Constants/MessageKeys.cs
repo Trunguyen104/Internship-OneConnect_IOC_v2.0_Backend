@@ -565,6 +565,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidExternalUrl = "ProjectResources.InvalidExternalUrl";
             public const string LinkTypeRequired = "ProjectResources.LinkTypeRequired";
             public const string LinkDownloadNotSupported = "ProjectResources.LinkDownloadNotSupported";
+            public const string StudentCannotModifyMentorResource = "ProjectResources.StudentCannotModifyMentorResource";
         }
 
         public static class Internships
