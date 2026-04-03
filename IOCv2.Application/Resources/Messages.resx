@@ -220,7 +220,7 @@
     <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
   <data name="ProjectResources.StudentCannotModifyMentorResource" xml:space="preserve">
-    <value>Tài nguyên do mentor upload, sinh viên không được phép chỉnh sửa hoặc xóa.</value>
+    <value>Tài nguyên do mentor tải lên, sinh viên không được chỉnh sửa hoặc xóa.</value>
   </data>
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Tạo Epic thành công.</value>

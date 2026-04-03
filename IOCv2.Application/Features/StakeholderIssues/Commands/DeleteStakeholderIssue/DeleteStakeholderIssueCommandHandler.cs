@@ -53,6 +53,7 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
                 return managePermissionError;
             }
 
+
             var issue = await _unitOfWork.Repository<StakeholderIssue>()
                 .Query()
                 .Include(si => si.Stakeholder)
