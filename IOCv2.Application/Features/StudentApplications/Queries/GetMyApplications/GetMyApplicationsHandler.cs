@@ -43,7 +43,7 @@ public class GetMyApplicationsHandler
         // Base query: own applications, not hidden
         var query = _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
             .Include(a => a.Enterprise)
-            .Include(a => a.Job)
+            .Include(a => a.Job).ThenInclude(j => j!.InternshipPhase)
             .Where(a => a.StudentId == student.StudentId && !a.IsHiddenByStudent);
 
         // Default: always show active + Placed. IncludeTerminal toggles visibility of Rejected/Withdrawn.
@@ -89,6 +89,10 @@ public class GetMyApplicationsHandler
             JobTitle = a.Job?.Title,
             IsJobClosed = a.Job != null ? a.Job.Status == JobStatus.CLOSED : null,
             IsJobDeleted = a.Job != null ? a.Job.DeletedAt != null : null,
+            InternshipPhaseId = a.Job?.InternshipPhaseId,
+            InternPhaseName = a.Job?.InternshipPhase?.Name,
+            InternPhaseStartDate = a.Job?.InternshipPhase?.StartDate,
+            InternPhaseEndDate = a.Job?.InternshipPhase?.EndDate,
             EnterpriseName = a.Enterprise?.Name ?? string.Empty,
             EnterpriseLogoUrl = a.Enterprise?.LogoUrl,
             Status = a.Status,
