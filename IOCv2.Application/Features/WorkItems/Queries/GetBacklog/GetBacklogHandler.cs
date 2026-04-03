@@ -79,6 +79,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
                 .Include(s => s.SprintWorkItems)
                     .ThenInclude(swi => swi.WorkItem)
                         .ThenInclude(w => w.Assignee)
+                            .ThenInclude(a => a!.User)
                 .ToListAsync(cancellationToken);
 
             // All WorkItem IDs assigned to any sprint
@@ -120,7 +121,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
             backlogQuery = backlogQuery.Where(w => w.AssigneeId == request.AssigneeId.Value);
 
         var backlogItems = await backlogQuery
-            .Include(w => w.Assignee)
+            .Include(w => w.Assignee).ThenInclude(a => a!.User)
             .OrderBy(w => w.BacklogOrder)
             .ToListAsync(cancellationToken);
 
@@ -199,6 +200,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         StoryPoint = w.StoryPoint,
         AssigneeId = w.AssigneeId,
         AssigneeName = w.Assignee != null ? $"{w.Assignee.User?.FullName}" : null,
+        AssigneeAvatarUrl = w.Assignee?.User?.AvatarUrl,
         DueDate = w.DueDate,
         Order = order,
         CreatedAt = w.CreatedAt
