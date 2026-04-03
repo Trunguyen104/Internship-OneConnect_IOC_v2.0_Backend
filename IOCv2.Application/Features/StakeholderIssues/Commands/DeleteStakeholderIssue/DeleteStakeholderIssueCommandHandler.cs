@@ -46,6 +46,13 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
                 return authError;
             }
 
+            var managePermissionError = StakeholderAccessGuard.EnsureManagePermission<DeleteStakeholderIssueResponse>(_currentUserService, _messageService);
+            if (managePermissionError is not null)
+            {
+                _logger.LogWarning("User {UserId} with role {Role} attempted to delete stakeholder issue {IssueId}", _currentUserService.UserId, _currentUserService.Role, request.Id);
+                return managePermissionError;
+            }
+
 
             var issue = await _unitOfWork.Repository<StakeholderIssue>()
                 .Query()
