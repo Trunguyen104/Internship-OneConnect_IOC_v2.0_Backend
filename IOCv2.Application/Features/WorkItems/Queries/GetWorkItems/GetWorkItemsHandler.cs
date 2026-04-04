@@ -1,6 +1,7 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,7 +22,7 @@ public class GetWorkItemsHandler : IRequestHandler<GetWorkItemsQuery, Result<Pag
             .AsNoTracking()
             .Include(w => w.Assignee)
                 .ThenInclude(a => a!.User)
-            .Where(w => w.ProjectId == request.ProjectId);
+            .Where(w => w.ProjectId == request.ProjectId && w.Type != WorkItemType.Epic);
 
         // Apply filters
         if (request.Status.HasValue)
