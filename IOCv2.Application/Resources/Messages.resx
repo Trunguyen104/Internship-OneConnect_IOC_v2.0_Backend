@@ -1082,6 +1082,12 @@
   <data name="InternshipGroup.AssignMentorSuccess" xml:space="preserve">
     <value>Gán Mentor thành công.</value>
   </data>
+  <data name="InternshipGroup.AssignMentorFirstAssignSuccess" xml:space="preserve">
+    <value>Đã gán Mentor {0} cho nhóm {1} thành công.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorChangeSuccess" xml:space="preserve">
+    <value>Đã đổi Mentor của nhóm {1} sang {0} thành công.</value>
+  </data>
   <data name="InternshipGroup.AssignMentorGroupNotFound" xml:space="preserve">
     <value>Không tìm thấy nhóm thực tập.</value>
   </data>
@@ -1097,6 +1103,9 @@
   <data name="InternshipGroup.AssignMentorSameMentor" xml:space="preserve">
     <value>Mentor này đã đang phụ trách nhóm thực tập, không thể gán trùng.</value>
   </data>
+  <data name="InternshipGroup.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>Nhóm thực tập vừa được người khác cập nhật. Vui lòng tải lại và thử lại.</value>
+  </data>
   <data name="InternshipGroup.Log.AssignMentorSuccess" xml:space="preserve">
     <value>Gán Mentor {MentorName} cho nhóm {GroupId} thành công.</value>
   </data>
@@ -1107,7 +1116,10 @@
     <value>Gửi thông báo sau khi gán Mentor cho nhóm {GroupId} thất bại, tiếp tục xử lý.</value>
   </data>
   <data name="InternshipGroup.Log.AssignMentorSameMentor" xml:space="preserve">
-    <value>AssignMentor: Mentor {MentorUserId} đã là người hướng dẫn hiện tại của nhóm {GroupId}, bỏ qua thao tác.</value>
+    <value>Gán Mentor: Mentor {MentorUserId} đã là người hướng dẫn hiện tại của nhóm {GroupId}, bỏ qua thao tác.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>Gán Mentor bị xung đột đồng thời cho nhóm {GroupId}.</value>
   </data>
   <data name="InternshipGroup.AvailableMentorsRetrieved" xml:space="preserve">
     <value>Lấy danh sách Mentor khả dụng thành công.</value>
@@ -1117,6 +1129,12 @@
   </data>
   <data name="InternshipGroup.Log.GetAvailableMentorsAccessDenied" xml:space="preserve">
     <value>GetAvailableMentors: Người dùng {UserId} không thuộc doanh nghiệp của nhóm {GroupId}, từ chối truy cập.</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiGetAvailableMentorsRequest" xml:space="preserve">
+    <value>Yêu cầu lấy danh sách Mentor khả dụng cho nhóm: {Id}</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiAssignOrChangeMentorRequest" xml:space="preserve">
+    <value>Yêu cầu gán/đổi Mentor cho nhóm: {Id}</value>
   </data>
   <data name="InternshipGroup.NotificationMentorAssignedFirstTitle" xml:space="preserve">
     <value>Bạn được phân công phụ trách nhóm mới</value>

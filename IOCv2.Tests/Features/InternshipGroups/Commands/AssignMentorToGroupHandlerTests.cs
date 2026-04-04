@@ -76,6 +76,7 @@ namespace IOCv2.Tests.Features.InternshipGroups.Commands
 
             // Default: valid current user (caller = HR/admin in the enterprise)
             _mockCurrentUserService.Setup(x => x.UserId).Returns(_currentUserId.ToString());
+            _mockCurrentUserService.Setup(x => x.Role).Returns(UserRole.HR.ToString());
 
             // Default: caller enterprise user exists
             _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
@@ -195,6 +196,64 @@ namespace IOCv2.Tests.Features.InternshipGroups.Commands
             // Assert
             result.IsSuccess.Should().BeFalse();
             result.ErrorType.Should().Be(ResultErrorType.BadRequest);
+        }
+
+        [Fact]
+        public async Task Handle_FinishedGroupBeforeEndDate_AllowsAssign()
+        {
+            // Arrange
+            var mentorUserId = Guid.NewGuid();
+
+            var group = InternshipGroup.Create(
+                phaseId: Guid.NewGuid(),
+                groupName: "Finished But Still In Date",
+                enterpriseId: _enterpriseId,
+                startDate: DateTime.UtcNow.AddDays(-1),
+                endDate: DateTime.UtcNow.AddDays(7));
+            group.UpdateStatus(GroupStatus.Finished);
+
+            var mentorUser = new User(mentorUserId, "MNT-001", "mentor@test.com", "Mentor User", UserRole.Mentor, "hash");
+            var mentorEnterpriseUser = new EnterpriseUser
+            {
+                UserId = mentorUserId,
+                EnterpriseId = _enterpriseId,
+                EnterpriseUserId = _mentorEnterpriseUserId,
+                User = mentorUser
+            };
+
+            _mockGroupRepo.Setup(x => x.Query())
+                .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
+
+            var callCount = 0;
+            _mockEnterpriseUserRepo.Setup(x => x.Query())
+                .Returns(() =>
+                {
+                    callCount++;
+                    if (callCount == 1)
+                    {
+                        return new List<EnterpriseUser>
+                        {
+                            new EnterpriseUser
+                            {
+                                UserId = _currentUserId,
+                                EnterpriseId = _enterpriseId,
+                                EnterpriseUserId = _callerEnterpriseUserId
+                            }
+                        }.AsQueryable().BuildMock();
+                    }
+
+                    return new List<EnterpriseUser> { mentorEnterpriseUser }.AsQueryable().BuildMock();
+                });
+
+            var command = new AssignMentorToGroupCommand(group.InternshipId, mentorUserId);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().NotBeNull();
+            result.Data!.MentorUserId.Should().Be(mentorUserId);
         }
 
         [Fact]

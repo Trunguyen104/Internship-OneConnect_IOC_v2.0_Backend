@@ -141,6 +141,12 @@
   <data name="Common.NoPermission" xml:space="preserve">
     <value>You do not have permission to perform this action</value>
   </data>
+  <data name="Common.Forbidden" xml:space="preserve">
+    <value>You do not have permission to perform this action.</value>
+  </data>
+  <data name="Common.InternalError" xml:space="preserve">
+    <value>An internal error occurred. Please try again later.</value>
+  </data>
   <data name="Password.MinLength" xml:space="preserve">
     <value>Password must be at least 8 characters long.</value>
   </data>

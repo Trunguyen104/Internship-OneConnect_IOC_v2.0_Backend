@@ -38,6 +38,11 @@ public class GetAvailableMentorsHandler
                 _messageService.GetMessage(MessageKeys.Common.Unauthorized),
                 ResultErrorType.Unauthorized);
 
+        if (!Enum.TryParse<UserRole>(_currentUserService.Role, true, out var currentRole) || currentRole != UserRole.HR)
+            return Result<List<AvailableMentorDto>>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                ResultErrorType.Forbidden);
+
         var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
             .AsNoTracking()
             .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
@@ -67,19 +72,29 @@ public class GetAvailableMentorsHandler
                 ResultErrorType.Forbidden);
         }
 
+        if (group.Status == GroupStatus.Archived || (group.EndDate.HasValue && group.EndDate.Value < DateTime.UtcNow))
+            return Result<List<AvailableMentorDto>>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipGroups.AssignMentorGroupNotActive),
+                ResultErrorType.BadRequest);
+
         // Load tất cả mentors thuộc enterprise này
         var mentors = await _unitOfWork.Repository<EnterpriseUser>().Query()
             .Include(eu => eu.User)
             .AsNoTracking()
             .Where(eu => eu.EnterpriseId == enterpriseUser.EnterpriseId
                       && eu.User.Role == UserRole.Mentor
+                      && eu.User.Status == UserStatus.Active
                       && eu.User.DeletedAt == null)
             .ToListAsync(cancellationToken);
 
-        if (!mentors.Any())
-            return Result<List<AvailableMentorDto>>.Success(
-                new List<AvailableMentorDto>(),
-                _messageService.GetMessage(MessageKeys.InternshipGroups.AvailableMentorsRetrieved));
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            var searchTerm = request.SearchTerm.Trim().ToLower();
+            mentors = mentors
+                .Where(m => m.User.FullName.ToLower().Contains(searchTerm)
+                         || m.User.Email.ToLower().Contains(searchTerm))
+                .ToList();
+        }
 
         // Đếm số nhóm Active mỗi mentor đang phụ trách — 1 query GroupBy
         var mentorEnterpriseUserIds = mentors.Select(m => m.EnterpriseUserId).ToList();

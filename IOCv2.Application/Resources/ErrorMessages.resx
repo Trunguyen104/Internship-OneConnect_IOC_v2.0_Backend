@@ -255,6 +255,9 @@
   <data name="Common.Forbidden" xml:space="preserve">
     <value>Bạn không có quyền thực hiện hành động này.</value>
   </data>
+  <data name="Common.InternalError" xml:space="preserve">
+    <value>Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.</value>
+  </data>
   <data name="Common.AccessDenied" xml:space="preserve">
     <value>Truy cập bị từ chối.</value>
   </data>

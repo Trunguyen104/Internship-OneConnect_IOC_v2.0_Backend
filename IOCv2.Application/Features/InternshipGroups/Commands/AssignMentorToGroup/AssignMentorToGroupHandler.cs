@@ -47,6 +47,11 @@ public class AssignMentorToGroupHandler
                 _messageService.GetMessage(MessageKeys.Common.Unauthorized),
                 ResultErrorType.Unauthorized);
 
+        if (!Enum.TryParse<UserRole>(_currentUserService.Role, true, out var currentRole) || currentRole != UserRole.HR)
+            return Result<AssignMentorToGroupResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                ResultErrorType.Forbidden);
+
         var enterpriseUser = await _unitOfWork.Repository<EnterpriseUser>().Query()
             .AsNoTracking()
             .FirstOrDefaultAsync(eu => eu.UserId == currentUserId, cancellationToken);
@@ -69,7 +74,7 @@ public class AssignMentorToGroupHandler
                 _messageService.GetMessage(MessageKeys.InternshipGroups.MustBelongToYourEnterprise),
                 ResultErrorType.Forbidden);
 
-        if (group.Status != GroupStatus.Active)
+        if (group.Status == GroupStatus.Archived || (group.EndDate.HasValue && group.EndDate.Value < DateTime.UtcNow))
             return Result<AssignMentorToGroupResponse>.Failure(
                 _messageService.GetMessage(MessageKeys.InternshipGroups.AssignMentorGroupNotActive),
                 ResultErrorType.BadRequest);
@@ -93,6 +98,11 @@ public class AssignMentorToGroupHandler
                 _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
                 ResultErrorType.BadRequest);
         }
+
+        if (mentor.User.Status != UserStatus.Active || mentor.User.DeletedAt != null)
+            return Result<AssignMentorToGroupResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipGroups.MentorNotFound),
+                ResultErrorType.BadRequest);
 
         if (mentor.EnterpriseId != group.EnterpriseId)
             return Result<AssignMentorToGroupResponse>.Failure(
@@ -144,6 +154,16 @@ public class AssignMentorToGroupHandler
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogWarning(ex,
+                _messageService.GetMessage(MessageKeys.InternshipGroups.LogAssignMentorConcurrencyConflict),
+                group.InternshipId);
+            return Result<AssignMentorToGroupResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.InternshipGroups.AssignMentorConcurrencyConflict),
+                ResultErrorType.Conflict);
         }
         catch (Exception ex)
         {
@@ -317,6 +337,10 @@ public class AssignMentorToGroupHandler
             _messageService.GetMessage(MessageKeys.InternshipGroups.LogAssignMentorSuccess),
             mentor.User.FullName, group.InternshipId);
 
+        var successMessageKey = isFirstAssign
+            ? MessageKeys.InternshipGroups.AssignMentorFirstAssignSuccess
+            : MessageKeys.InternshipGroups.AssignMentorChangeSuccess;
+
         return Result<AssignMentorToGroupResponse>.Success(
             new AssignMentorToGroupResponse
             {
@@ -328,6 +352,6 @@ public class AssignMentorToGroupHandler
                 ActionType = actionType.ToString(),
                 UpdatedAt = group.UpdatedAt ?? DateTime.UtcNow
             },
-            _messageService.GetMessage(MessageKeys.InternshipGroups.AssignMentorSuccess));
+            _messageService.GetMessage(successMessageKey, mentor.User.FullName, group.GroupName));
     }
 }
