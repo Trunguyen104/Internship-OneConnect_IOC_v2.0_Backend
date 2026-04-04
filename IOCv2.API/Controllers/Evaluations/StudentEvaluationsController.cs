@@ -13,7 +13,7 @@ namespace IOCv2.API.Controllers.Evaluations;
 /// </summary>
 [Tags("student-evaluations")]
 [Authorize(Roles = "Student,SuperAdmin")]
-[Route("api/students/me")]
+[Route("api/v{version:apiVersion}/students/me")]
 public class StudentEvaluationsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
