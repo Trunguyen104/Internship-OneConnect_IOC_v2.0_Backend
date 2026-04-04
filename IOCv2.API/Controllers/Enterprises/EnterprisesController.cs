@@ -3,7 +3,7 @@ using IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.RestoreEnterprise;
 using IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise;
-using IOCv2.Application.Features.Enterprises.Queries.GetActiveTerms;
+using IOCv2.Application.Features.Enterprises.Queries.GetActivePhases;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseById;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterpriseByMine;
 using IOCv2.Application.Features.Enterprises.Queries.GetEnterprises;
@@ -210,23 +210,23 @@ public class EnterprisesController : ApiControllerBase
         return HandleResult(result);
     }
 
-    // ──────── Issue 68: Active Term Timeline for HR/Mentor ────────
+    // ──────── Active Phase Timeline for HR/Mentor ────────
 
     /// <summary>
-    /// Retrieves the list of ongoing (Active) internship terms for the enterprise.
-    /// HR/EnterpriseAdmin can view all terms in which the enterprise has internship groups.
-    /// Mentors can only view terms in which they have an InternshipGroup.
+    /// Retrieves the list of ongoing (Active) internship phases for the enterprise.
+    /// HR/EnterpriseAdmin can view all phases in which the enterprise has internship groups.
+    /// Mentors can only view phases in which they have an InternshipGroup.
     /// Returns timeline information and evaluation/grading deadlines.
     /// </summary>
-    /// <param name="query">UniversityId (optional): filters by a specific university.</param>
-    [HttpGet("me/terms/active")]
+    [HttpGet("me/phases/active")]
+    [HttpGet("me/terms/active")] // Legacy UI compatibility
     [Authorize(Roles = "HR,EnterpriseAdmin,Mentor")]
-    [ProducesResponseType(typeof(ApiResponse<GetActiveTermsForEnterpriseResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetActivePhasesForEnterpriseResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetActiveTerms(
-        [FromQuery] GetActiveTermsForEnterpriseQuery query,
+    public async Task<IActionResult> GetActivePhases(
+        [FromQuery] GetActivePhasesForEnterpriseQuery query,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(query, cancellationToken);

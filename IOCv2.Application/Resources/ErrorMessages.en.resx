@@ -1226,26 +1226,26 @@
     <value>An error occurred while retrieving violation report details.</value>
   </data>
 
-  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
-  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+  <!-- ActivePhases (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Your session is invalid. Please sign out and sign in again.</value>
   </data>
-  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+  <data name="ActivePhases.EnterpriseUserNotFound" xml:space="preserve">
     <value>Your enterprise employee profile was not found. Please contact the administrator to verify your account.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForEnterprise" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForEnterprise" xml:space="preserve">
     <value>Your enterprise currently has no active internship groups in any ongoing term.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForMentor" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForMentor" xml:space="preserve">
     <value>You have not been assigned to any active internship group in the current term.</value>
   </data>
-  <data name="ActiveTerms.SystemError" xml:space="preserve">
+  <data name="ActivePhases.SystemError" xml:space="preserve">
     <value>An error occurred while loading the active internship terms. Please try again later.</value>
   </data>
-  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+  <data name="ActivePhases.Log.Retrieved" xml:space="preserve">
     <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
   </data>
-  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+  <data name="ActivePhases.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
   <data name="Projects.MentorNotFound" xml:space="preserve">

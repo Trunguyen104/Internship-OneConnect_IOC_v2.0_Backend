@@ -138,7 +138,7 @@ public class UpdateTermHandler : IRequestHandler<UpdateTermCommand, Result<Updat
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
             // EndDate thay đổi có thể làm term không còn Active → invalidate enterprise cache
-            await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.AllActiveTermsPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.AllActivePhasesPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermUpdated), term.TermId, userId);
 

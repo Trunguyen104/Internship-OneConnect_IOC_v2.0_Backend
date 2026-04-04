@@ -105,7 +105,7 @@ public class CloseTermHandler : IRequestHandler<CloseTermCommand, Result<CloseTe
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
             await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
             // Invalidate enterprise active-terms cache (AC-07: closed term must disappear from HR/Mentor view)
-            await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.AllActiveTermsPattern(), cancellationToken);
+            await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.AllActivePhasesPattern(), cancellationToken);
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.Terms.LogTermClosed), term.TermId, userId);
 
