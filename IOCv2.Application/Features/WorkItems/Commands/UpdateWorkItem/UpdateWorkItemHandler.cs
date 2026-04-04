@@ -59,7 +59,13 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
                 workItem.StoryPoint = request.StoryPoint;
 
             if (request.AssigneeId.HasValue)
-                workItem.AssigneeId = request.AssigneeId;
+                workItem.AssigneeId = request.AssigneeId.Value == Guid.Empty ? null : request.AssigneeId.Value;
+
+            if (request.ParentId.HasValue)
+                workItem.ParentId = request.ParentId.Value == Guid.Empty ? null : request.ParentId.Value;
+
+            if (request.Type.HasValue)
+                workItem.Type = request.Type.Value;
 
             if (request.DueDate.HasValue)
                 workItem.DueDate = request.DueDate;
