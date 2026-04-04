@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using System;
@@ -12,11 +12,19 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
     public class UpdateEnterpriseValidator : FluentValidation.AbstractValidator<UpdateEnterpriseCommand>
     {
         private readonly IMessageService _messageService;
+        private const string taxCodePattern = @"^\d{10}$|^\d{10}-\d{3}$|^\d{10}-\d{2}-\d{3}$";
         public UpdateEnterpriseValidator(IMessageService messageService) {
             _messageService = messageService;
             RuleFor(x => x.Name)
                 .NotEmpty()
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.NameRequired))
                 .MaximumLength(255);
+            RuleFor(x => x.TaxCode)
+                .NotEmpty()
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.TaxCodeRequired))
+                .MaximumLength(50)
+                .Matches(taxCodePattern)
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.TaxCodeInvalid));
             RuleFor(x => x.Industry)
                 .MaximumLength(150);
             RuleFor(x => x.Description)
@@ -38,6 +46,10 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
                 .Must(BeValidUrl)
                 .When(x => !string.IsNullOrEmpty(x.BackgroundUrl))
                 .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.BackgroundUrlNotValid));
+            RuleFor(x => x.ContactEmail)
+                .EmailAddress()
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.ContactEmailInvalid))
+                .When(x => !string.IsNullOrEmpty(x.ContactEmail));
 
 
         }

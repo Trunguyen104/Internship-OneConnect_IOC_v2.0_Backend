@@ -91,6 +91,8 @@ namespace IOCv2.Application.Constants
             public const string NotFound = "University.NotFound";
             public const string DuplicateCode = "University.DuplicateCode";
             public const string Inactive = "University.Inactive";
+            public const string HasActiveTerms = "University.HasActiveTerms";
+            public const string HasInterningStudents = "University.HasInterningStudents";
         }
 
         public static class Enterprise
@@ -129,7 +131,11 @@ namespace IOCv2.Application.Constants
             public const string RestoreFailed = "Enterprise.RestoreFailed";
             // GetByID
             public const string GetByIDPermissionsNotAllowed = "Enterprise.GetByIDPermissionsNotAllowed";
-
+            public const string HasInterningStudents = "Enterprise.HasInterningStudents";
+            public const string TaxCodeRequired = "Enterprise.TaxCodeRequired";
+            public const string TaxCodeInvalid = "Enterprise.TaxCodeInvalid";
+            public const string NameRequired = "Enterprise.NameRequired";
+            public const string ContactEmailInvalid = "Enterprise.ContactEmailInvalid";
         }
 
         public static class Profile

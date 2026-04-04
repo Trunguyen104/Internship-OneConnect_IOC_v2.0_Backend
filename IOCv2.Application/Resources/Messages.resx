@@ -1305,4 +1305,25 @@
   <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
     <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
   </data>
+  <data name="University.HasActiveTerms" xml:space="preserve">
+    <value>Không thể xóa trường đại học: hiện đang có các học kỳ đang hoạt động.</value>
+  </data>
+  <data name="University.HasInterningStudents" xml:space="preserve">
+    <value>Không thể xóa trường đại học: hiện đang có sinh viên đang trong quá trình thực tập.</value>
+  </data>
+  <data name="Enterprise.HasInterningStudents" xml:space="preserve">
+    <value>Không thể xóa doanh nghiệp: hiện đang có sinh viên đang thực tập tại đây.</value>
+  </data>
+  <data name="Enterprise.TaxCodeRequired" xml:space="preserve">
+    <value>Mã số thuế là bắt buộc.</value>
+  </data>
+  <data name="Enterprise.TaxCodeInvalid" xml:space="preserve">
+    <value>Định dạng mã số thuế không hợp lệ (ví dụ: 10 chữ số hoặc 10 chữ số kèm hậu tố).</value>
+  </data>
+  <data name="Enterprise.NameRequired" xml:space="preserve">
+    <value>Tên doanh nghiệp là bắt buộc.</value>
+  </data>
+  <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
+    <value>Định dạng email liên hệ không hợp lệ.</value>
+  </data>
 </root>

@@ -25,7 +25,8 @@ public abstract class ApiControllerBase : ControllerBase
 
         var code = ResolveStatusCode(result);
         var errors = !string.IsNullOrEmpty(result.Error) ? new List<string> { result.Error } : null;
-        return StatusCode(code, new ErrorResponse(code, result.Message ?? "An error occurred", errors));
+        var message = result.Error ?? result.Message ?? "An error occurred";
+        return StatusCode(code, new ErrorResponse(code, message, errors));
     }
 
     /// <summary>

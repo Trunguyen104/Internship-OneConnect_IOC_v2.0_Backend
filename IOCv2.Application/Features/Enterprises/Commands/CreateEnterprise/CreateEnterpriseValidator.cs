@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using System;
@@ -17,11 +17,14 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
             _messageService = messageService;
             RuleFor(x => x.Name)
                 .NotEmpty()
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.NameRequired))
                 .MaximumLength(255);
             RuleFor(x => x.TaxCode)
                 .NotEmpty()
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.TaxCodeRequired))
                 .MaximumLength(50)
-                .Matches(taxCodePattern);
+                .Matches(taxCodePattern)
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.TaxCodeInvalid));
             RuleFor(x => x.Industry)
                 .MaximumLength(150);
             RuleFor(x => x.Description)
@@ -33,6 +36,10 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                 .Must(BeValidUrl)
                 .When(x => !string.IsNullOrEmpty(x.Website))
                 .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.WebsiteNotValid));
+            RuleFor(x => x.ContactEmail)
+                .EmailAddress()
+                .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.ContactEmailInvalid))
+                .When(x => !string.IsNullOrEmpty(x.ContactEmail));
 
 
         }

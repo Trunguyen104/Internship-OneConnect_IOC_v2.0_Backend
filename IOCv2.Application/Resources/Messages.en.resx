@@ -1301,4 +1301,25 @@
   <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
     <value>ExpireDate {0} cannot be after internship phase start date {1}.</value>
   </data>
-</root>
+  <data name="University.HasActiveTerms" xml:space="preserve">
+    <value>Cannot delete university: active terms exist.</value>
+  </data>
+  <data name="University.HasInterningStudents" xml:space="preserve">
+    <value>Cannot delete university: students are currently interning.</value>
+  </data>
+  <data name="Enterprise.HasInterningStudents" xml:space="preserve">
+    <value>Cannot delete enterprise: students are currently interning.</value>
+  </data>
+  <data name="Enterprise.TaxCodeRequired" xml:space="preserve">
+    <value>Tax Code is required.</value>
+  </data>
+  <data name="Enterprise.TaxCodeInvalid" xml:space="preserve">
+    <value>Invalid Tax Code format (e.g. 10 digits or 10 digits followed by suffix).</value>
+  </data>
+  <data name="Enterprise.NameRequired" xml:space="preserve">
+    <value>Enterprise Name is required.</value>
+  </data>
+  <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
+    <value>Invalid Contact Email format.</value>
+  </data>
+</root>
