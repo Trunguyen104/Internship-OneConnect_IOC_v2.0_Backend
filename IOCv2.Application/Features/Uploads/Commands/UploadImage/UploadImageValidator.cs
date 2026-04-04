@@ -7,7 +7,7 @@ namespace IOCv2.Application.Features.Uploads.Commands.UploadImage;
 
 public class UploadImageValidator : AbstractValidator<UploadImageCommand>
 {
-    private readonly string[] _permittedExtensions = { ".jpg", ".jpeg", ".png", ".webp", ".svg", ".pdf", ".doc", ".docx" };
+    private readonly string[] _permittedExtensions = { ".jpg", ".jpeg", ".png", ".webp", ".svg", ".gif" };
 
     public UploadImageValidator()
     {
