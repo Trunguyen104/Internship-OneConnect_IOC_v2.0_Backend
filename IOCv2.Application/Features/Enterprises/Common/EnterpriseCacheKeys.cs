@@ -29,27 +29,26 @@ public static class EnterpriseCacheKeys
 
     public static string EnterpriseListPattern() => $"{EnterpriseListPrefix}:*";
 
-    private const string ActiveTermsPrefix = "enterprise-active-terms";
+    private const string ActivePhasesPrefix = "enterprise-active-phases";
 
-    public static string ActiveTerms(Guid enterpriseId, Guid enterpriseUserId, bool isMentor, Guid? universityId)
+    public static string ActivePhases(Guid enterpriseId, Guid enterpriseUserId, bool isMentor)
     {
         var scopePart = isMentor ? $"mentor:{enterpriseUserId}" : $"enterprise:{enterpriseId}";
-        var univPart = universityId?.ToString() ?? "all";
-        return $"{ActiveTermsPrefix}:{scopePart}:univ:{univPart}";
+        return $"{ActivePhasesPrefix}:{scopePart}";
     }
 
-    public static string ActiveTermsPattern(Guid enterpriseId) =>
-        $"{ActiveTermsPrefix}:enterprise:{enterpriseId}:*";
+    public static string ActivePhasesPattern(Guid enterpriseId) =>
+        $"{ActivePhasesPrefix}:enterprise:{enterpriseId}:*";
 
-    public static string ActiveTermsMentorPattern(Guid enterpriseUserId) =>
-        $"{ActiveTermsPrefix}:mentor:{enterpriseUserId}:*";
+    public static string ActivePhasesMentorPattern(Guid enterpriseUserId) =>
+        $"{ActivePhasesPrefix}:mentor:{enterpriseUserId}:*";
 
-    /// <summary>Clear all enterprise active-terms cache (used when a term is closed/updated by Uni Admin).</summary>
-    public static string AllActiveTermsPattern() => $"{ActiveTermsPrefix}:*";
+    /// <summary>Clear all enterprise active-phases cache (used when a phase is closed/updated).</summary>
+    public static string AllActivePhasesPattern() => $"{ActivePhasesPrefix}:*";
 
     public static class Expiration
     {
         public static readonly TimeSpan EnterpriseList = TimeSpan.FromMinutes(5);
-        public static readonly TimeSpan ActiveTerms = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan ActivePhases = TimeSpan.FromMinutes(5);
     }
 }

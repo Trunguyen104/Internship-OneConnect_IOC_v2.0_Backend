@@ -6,6 +6,7 @@ using IOCv2.Application.Features.WorkItems.Commands.MoveWorkItemToSprint;
 using IOCv2.Application.Features.WorkItems.Commands.UpdateWorkItem;
 using IOCv2.Application.Features.WorkItems.Queries.GetBacklog;
 using IOCv2.Application.Features.WorkItems.Queries.GetWorkItemById;
+using IOCv2.Application.Features.WorkItems.Queries.GetWorkItems;
 using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -51,6 +52,21 @@ public class WorkItemsController : ApiControllerBase
             Status = status,
             AssigneeId = assigneeId
         };
+        var result = await _mediator.Send(query, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Get a flat, paginated list of work items across the board.
+    /// Supports filtering by Status, Type, Priority, Assignee, and search term.
+    /// This will return work items of all statuses (including Done), unless filtered out.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetWorkItemsResponse>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetWorkItems(
+        [FromQuery] GetWorkItemsQuery query,
+        CancellationToken cancellationToken = default)
+    {
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
