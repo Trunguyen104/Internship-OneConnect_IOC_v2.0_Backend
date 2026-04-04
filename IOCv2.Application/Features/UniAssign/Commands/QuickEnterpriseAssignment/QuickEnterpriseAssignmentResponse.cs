@@ -9,6 +9,6 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
 
     public record QuickEnterpriseAssignmentResponse
     {
-        public Guid ApplicationId { get; init; }
+        public string Message { get; init; }
     }
 }

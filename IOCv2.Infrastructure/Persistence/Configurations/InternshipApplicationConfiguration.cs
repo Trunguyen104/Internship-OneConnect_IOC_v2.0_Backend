@@ -37,6 +37,10 @@ public class InternshipApplicationConfiguration : IEntityTypeConfiguration<Inter
         builder.Property(x => x.ReviewedAt).HasColumnName("reviewed_at").HasColumnType("timestamptz");
         builder.Property(x => x.ReviewedBy).HasColumnName("reviewed_by");
 
+        builder.Property(x => x.InternPhaseId)
+            .HasColumnName("intern_phase_id")
+            .IsRequired(false);
+
         // ===== Audit columns =====
         builder.Property(x => x.CreatedAt).HasColumnName("created_at");
         builder.Property(x => x.UpdatedAt).HasColumnName("updated_at");
