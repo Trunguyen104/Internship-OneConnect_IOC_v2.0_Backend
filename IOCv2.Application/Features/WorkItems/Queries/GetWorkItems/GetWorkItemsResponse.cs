@@ -11,6 +11,7 @@ public class GetWorkItemsResponse
     public WorkItemStatus? Status { get; set; }
     public Priority? Priority { get; set; }
     public int? StoryPoint { get; set; }
+    public Guid? ParentId { get; set; }
     
     public Guid? AssigneeId { get; set; }
     public string? AssigneeName { get; set; }

@@ -73,6 +73,7 @@ public class GetWorkItemsHandler : IRequestHandler<GetWorkItemsQuery, Result<Pag
                 Status = w.Status,
                 Priority = w.Priority,
                 StoryPoint = w.StoryPoint,
+                ParentId = w.ParentId,
                 AssigneeId = w.AssigneeId,
                 AssigneeName = w.Assignee != null && w.Assignee.User != null ? w.Assignee.User.FullName : null,
                 AssigneeAvatarUrl = w.Assignee != null && w.Assignee.User != null ? w.Assignee.User.AvatarUrl : null,
