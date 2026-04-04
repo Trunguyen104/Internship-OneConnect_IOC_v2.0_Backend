@@ -1,15 +1,19 @@
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.InternshipGroups.Commands.AddStudentsToGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.ArchiveInternshipGroup;
+using IOCv2.Application.Features.InternshipGroups.Commands.AssignMentorToGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.CreateInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.DeleteInternshipGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.MoveStudentsBetweenGroups;
 using IOCv2.Application.Features.InternshipGroups.Commands.RemoveStudentsFromGroup;
 using IOCv2.Application.Features.InternshipGroups.Commands.UpdateInternshipGroup;
+using IOCv2.Application.Features.InternshipGroups.Queries.GetAvailableMentors;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetDashboard;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroupById;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroups;
 using IOCv2.Application.Features.InternshipGroups.Queries.GetPlacedStudents;
+using IOCv2.Application.Interfaces;
+using IOCv2.Application.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,11 +32,13 @@ public class InternshipGroupsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger<InternshipGroupsController> _logger;
+    private readonly IMessageService _messageService;
 
-    public InternshipGroupsController(IMediator mediator, ILogger<InternshipGroupsController> logger)
+    public InternshipGroupsController(IMediator mediator, ILogger<InternshipGroupsController> logger, IMessageService messageService)
     {
         _mediator = mediator;
         _logger = logger;
+        _messageService = messageService;
     }
 
     /// <summary>
@@ -246,4 +252,50 @@ public class InternshipGroupsController : ApiControllerBase
         _logger.LogInformation("Request to get dashboard for internship group ID: {Id}", id);
         return HandleResult(await _mediator.Send(new GetInternshipGroupDashboardQuery(id), cancellationToken));
     }
+
+    /// <summary>
+    /// Get available mentors for quick assign/change action.
+    /// </summary>
+    [HttpGet("{id:guid}/available-mentors")]
+    [Authorize(Roles = "HR")]
+    [ProducesResponseType(typeof(ApiResponse<List<AvailableMentorDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAvailableMentors(
+        [FromRoute] Guid id,
+        [FromQuery] string? searchTerm,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogApiGetAvailableMentorsRequest), id);
+        var query = new GetAvailableMentorsQuery
+        {
+            InternshipGroupId = id,
+            SearchTerm = searchTerm
+        };
+        return HandleResult(await _mediator.Send(query, cancellationToken));
+    }
+
+    /// <summary>
+    /// Quick action for HR to assign or change mentor of a group.
+    /// </summary>
+    [HttpPatch("{id:guid}/mentor")]
+    [Authorize(Roles = "HR")]
+    [ProducesResponseType(typeof(ApiResponse<AssignMentorToGroupResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AssignOrChangeMentor(
+        [FromRoute] Guid id,
+        [FromBody] AssignMentorRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(_messageService.GetMessage(MessageKeys.InternshipGroups.LogApiAssignOrChangeMentorRequest), id);
+        var command = new AssignMentorToGroupCommand(id, request.MentorUserId);
+        return HandleResult(await _mediator.Send(command, cancellationToken));
+    }
+}
+
+public class AssignMentorRequest
+{
+    public Guid MentorUserId { get; set; }
 }

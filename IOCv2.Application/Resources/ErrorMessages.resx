@@ -255,6 +255,9 @@
   <data name="Common.Forbidden" xml:space="preserve">
     <value>Bạn không có quyền thực hiện hành động này.</value>
   </data>
+  <data name="Common.InternalError" xml:space="preserve">
+    <value>Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.</value>
+  </data>
   <data name="Common.AccessDenied" xml:space="preserve">
     <value>Truy cập bị từ chối.</value>
   </data>
@@ -1276,26 +1279,26 @@
   <data name="JobPosting.CreateSuccess" xml:space="preserve">
     <value>Đã tạo thành công tin tuyển dụng.</value>
   </data>
-  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
-  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+  <!-- ActivePhases (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Phiên đăng nhập không hợp lệ. Vui lòng đăng xuất và đăng nhập lại.</value>
   </data>
-  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+  <data name="ActivePhases.EnterpriseUserNotFound" xml:space="preserve">
     <value>Không tìm thấy thông tin nhân viên doanh nghiệp của bạn. Vui lòng liên hệ quản trị viên để kiểm tra tài khoản.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForEnterprise" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForEnterprise" xml:space="preserve">
     <value>Doanh nghiệp của bạn hiện chưa có nhóm thực tập nào đang hoạt động trong kỳ thực tập nào.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForMentor" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForMentor" xml:space="preserve">
     <value>Bạn chưa được phân công nhóm thực tập nào đang hoạt động trong kỳ thực tập hiện tại.</value>
   </data>
-  <data name="ActiveTerms.SystemError" xml:space="preserve">
+  <data name="ActivePhases.SystemError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi tải danh sách kỳ thực tập đang hoạt động. Vui lòng thử lại sau.</value>
   </data>
-  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+  <data name="ActivePhases.Log.Retrieved" xml:space="preserve">
     <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
   </data>
-  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+  <data name="ActivePhases.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
   <data name="Projects.MentorNotFound" xml:space="preserve">

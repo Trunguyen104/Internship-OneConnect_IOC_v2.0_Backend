@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,10 +16,10 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
         /// <summary>
         /// Short-lived JWT access token for API authorization. Excluded from JSON response to prevent XSS.
         /// </summary>
-        [System.Text.Json.Serialization.JsonIgnore]
+        //[System.Text.Json.Serialization.JsonIgnore]
         public string AccessToken { get; set; } = string.Empty;
 
-        [System.Text.Json.Serialization.JsonIgnore]
+        //[System.Text.Json.Serialization.JsonIgnore]
         public string RefreshToken { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;

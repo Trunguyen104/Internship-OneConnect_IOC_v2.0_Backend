@@ -327,20 +327,26 @@ namespace IOCv2.Application.Constants
 
             // ── AssignMentorToGroup ───────────────────────────────────────────────
             public const string AssignMentorSuccess              = "InternshipGroup.AssignMentorSuccess";
+            public const string AssignMentorFirstAssignSuccess   = "InternshipGroup.AssignMentorFirstAssignSuccess";
+            public const string AssignMentorChangeSuccess        = "InternshipGroup.AssignMentorChangeSuccess";
             public const string AssignMentorGroupNotFound        = "InternshipGroup.AssignMentorGroupNotFound";
             public const string AssignMentorGroupNotActive       = "InternshipGroup.AssignMentorGroupNotActive";
             public const string AssignMentorGroupIdRequired      = "InternshipGroup.AssignMentorGroupIdRequired";
             public const string AssignMentorMentorRequired       = "InternshipGroup.AssignMentorMentorRequired";
             public const string AssignMentorSameMentor           = "InternshipGroup.AssignMentorSameMentor";
+            public const string AssignMentorConcurrencyConflict   = "InternshipGroup.AssignMentorConcurrencyConflict";
             public const string LogAssignMentorSuccess           = "InternshipGroup.Log.AssignMentorSuccess";
             public const string LogAssignMentorFailed            = "InternshipGroup.Log.AssignMentorFailed";
             public const string LogAssignMentorNotifyFailed      = "InternshipGroup.Log.AssignMentorNotifyFailed";
             public const string LogAssignMentorSameMentor        = "InternshipGroup.Log.AssignMentorSameMentor";
+            public const string LogAssignMentorConcurrencyConflict = "InternshipGroup.Log.AssignMentorConcurrencyConflict";
 
             // ── GetAvailableMentors ───────────────────────────────────────────────
             public const string AvailableMentorsRetrieved        = "InternshipGroup.AvailableMentorsRetrieved";
             public const string LogGetAvailableMentors           = "InternshipGroup.Log.GetAvailableMentors";
             public const string LogGetAvailableMentorsAccessDenied = "InternshipGroup.Log.GetAvailableMentorsAccessDenied";
+            public const string LogApiGetAvailableMentorsRequest = "InternshipGroup.Log.ApiGetAvailableMentorsRequest";
+            public const string LogApiAssignOrChangeMentorRequest = "InternshipGroup.Log.ApiAssignOrChangeMentorRequest";
 
             // ── AC-04: Notification — Gán Mentor lần đầu ─────────────────────────
             public const string NotificationMentorAssignedFirstTitle   = "InternshipGroup.NotificationMentorAssignedFirstTitle";
@@ -924,15 +930,15 @@ namespace IOCv2.Application.Constants
             public const string LogAddManualError = "StudentTerms.Log.AddManualError";
             public const string LogImportConfirmError = "StudentTerms.Log.ImportConfirmError";
         }
-        public static class ActiveTerms
+        public static class ActivePhases
         {
-            public const string InvalidUserId = "ActiveTerms.InvalidUserId";
-            public const string EnterpriseUserNotFound = "ActiveTerms.EnterpriseUserNotFound";
-            public const string NoActiveTermsFoundForEnterprise = "ActiveTerms.NoActiveTermsFoundForEnterprise";
-            public const string NoActiveTermsFoundForMentor = "ActiveTerms.NoActiveTermsFoundForMentor";
-            public const string SystemError = "ActiveTerms.SystemError";
-            public const string LogRetrieved = "ActiveTerms.Log.Retrieved";
-            public const string LogError = "ActiveTerms.Log.Error";
+            public const string InvalidUserId = "ActivePhases.InvalidUserId";
+            public const string EnterpriseUserNotFound = "ActivePhases.EnterpriseUserNotFound";
+            public const string NoActivePhasesFoundForEnterprise = "ActivePhases.NoActivePhasesFoundForEnterprise";
+            public const string NoActivePhasesFoundForMentor = "ActivePhases.NoActivePhasesFoundForMentor";
+            public const string SystemError = "ActivePhases.SystemError";
+            public const string LogRetrieved = "ActivePhases.Log.Retrieved";
+            public const string LogError = "ActivePhases.Log.Error";
         }
 
         public static class ViolationReportKey

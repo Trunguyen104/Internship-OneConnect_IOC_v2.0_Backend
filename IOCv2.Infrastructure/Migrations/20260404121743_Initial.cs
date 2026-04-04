@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -94,11 +94,11 @@ namespace IOCv2.Infrastructure.Migrations
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    user_code = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
                     password_hash = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     full_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    phone_number = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: true),
+                    phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     avatar_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     address = table.Column<string>(type: "text", nullable: true),
                     date_of_birth = table.Column<DateOnly>(type: "date", nullable: true),
