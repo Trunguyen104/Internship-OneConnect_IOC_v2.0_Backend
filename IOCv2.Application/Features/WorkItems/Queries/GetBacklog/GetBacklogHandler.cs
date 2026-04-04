@@ -92,7 +92,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
         var backlogQuery = _unitOfWork.Repository<WorkItem>()
             .Query()
             .AsNoTracking()
-            .Where(w => w.ProjectId == request.ProjectId && !assignedIds.Contains(w.WorkItemId) && w.Type != WorkItemType.Epic);
+            .Where(w => w.ProjectId == request.ProjectId && !assignedIds.Contains(w.WorkItemId) && w.Type != WorkItemType.Epic && w.Status != WorkItemStatus.Done);
 
         // Apply filters
         if (request.EpicId.HasValue)
@@ -173,6 +173,7 @@ public class GetBacklogHandler : IRequestHandler<GetBacklogQuery, Result<GetBack
     private static bool MatchFilters(WorkItem w, GetBacklogQuery req)
     {
         if (w.Type == WorkItemType.Epic) return false;
+        if (w.Status == WorkItemStatus.Done) return false;
 
         if (req.EpicId.HasValue && w.WorkItemId != req.EpicId.Value && w.ParentId != req.EpicId.Value)
             return false;

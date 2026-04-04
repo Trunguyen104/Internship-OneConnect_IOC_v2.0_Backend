@@ -924,15 +924,15 @@ namespace IOCv2.Application.Constants
             public const string LogAddManualError = "StudentTerms.Log.AddManualError";
             public const string LogImportConfirmError = "StudentTerms.Log.ImportConfirmError";
         }
-        public static class ActiveTerms
+        public static class ActivePhases
         {
-            public const string InvalidUserId = "ActiveTerms.InvalidUserId";
-            public const string EnterpriseUserNotFound = "ActiveTerms.EnterpriseUserNotFound";
-            public const string NoActiveTermsFoundForEnterprise = "ActiveTerms.NoActiveTermsFoundForEnterprise";
-            public const string NoActiveTermsFoundForMentor = "ActiveTerms.NoActiveTermsFoundForMentor";
-            public const string SystemError = "ActiveTerms.SystemError";
-            public const string LogRetrieved = "ActiveTerms.Log.Retrieved";
-            public const string LogError = "ActiveTerms.Log.Error";
+            public const string InvalidUserId = "ActivePhases.InvalidUserId";
+            public const string EnterpriseUserNotFound = "ActivePhases.EnterpriseUserNotFound";
+            public const string NoActivePhasesFoundForEnterprise = "ActivePhases.NoActivePhasesFoundForEnterprise";
+            public const string NoActivePhasesFoundForMentor = "ActivePhases.NoActivePhasesFoundForMentor";
+            public const string SystemError = "ActivePhases.SystemError";
+            public const string LogRetrieved = "ActivePhases.Log.Retrieved";
+            public const string LogError = "ActivePhases.Log.Error";
         }
 
         public static class ViolationReportKey
