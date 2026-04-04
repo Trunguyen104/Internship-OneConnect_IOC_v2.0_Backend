@@ -996,6 +996,12 @@
   <data name="InternshipGroup.AssignMentorSuccess" xml:space="preserve">
     <value>Mentor assigned successfully.</value>
   </data>
+  <data name="InternshipGroup.AssignMentorFirstAssignSuccess" xml:space="preserve">
+    <value>Mentor {0} was assigned to group {1} successfully.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorChangeSuccess" xml:space="preserve">
+    <value>The mentor of group {1} was changed to {0} successfully.</value>
+  </data>
   <data name="InternshipGroup.AssignMentorGroupNotFound" xml:space="preserve">
     <value>Internship group not found.</value>
   </data>
@@ -1011,6 +1017,9 @@
   <data name="InternshipGroup.AssignMentorSameMentor" xml:space="preserve">
     <value>This mentor is already assigned to the group and cannot be assigned again.</value>
   </data>
+  <data name="InternshipGroup.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>This internship group was just updated by someone else. Please reload and try again.</value>
+  </data>
   <data name="InternshipGroup.Log.AssignMentorSuccess" xml:space="preserve">
     <value>Mentor {MentorName} assigned to group {GroupId} successfully.</value>
   </data>
@@ -1023,6 +1032,9 @@
   <data name="InternshipGroup.Log.AssignMentorSameMentor" xml:space="preserve">
     <value>AssignMentor: Mentor {MentorUserId} is already the current mentor of group {GroupId}, skipping.</value>
   </data>
+  <data name="InternshipGroup.Log.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>Assign mentor concurrency conflict for group {GroupId}.</value>
+  </data>
   <data name="InternshipGroup.AvailableMentorsRetrieved" xml:space="preserve">
     <value>Available mentors retrieved successfully.</value>
   </data>
@@ -1031,6 +1043,12 @@
   </data>
   <data name="InternshipGroup.Log.GetAvailableMentorsAccessDenied" xml:space="preserve">
     <value>GetAvailableMentors: User {UserId} does not belong to the enterprise of group {GroupId}, access denied.</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiGetAvailableMentorsRequest" xml:space="preserve">
+    <value>Request to get available mentors for group: {Id}</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiAssignOrChangeMentorRequest" xml:space="preserve">
+    <value>Request to assign/change mentor for group: {Id}</value>
   </data>
   <data name="InternshipGroup.NotificationMentorAssignedFirstTitle" xml:space="preserve">
     <value>You have been assigned a new group</value>
