@@ -7,7 +7,7 @@ using IOCv2.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
 using MockQueryable;
-using MockQueryable.Moq;
+using System.Reflection;
 
 namespace IOCv2.Tests.Features.Admin.Users.Queries;
 
@@ -69,12 +69,97 @@ public class GetUsersHandlerTests
         cache.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<Application.Common.Models.PaginatedResult<GetUsersResponse>>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    private Mock<ICurrentUserService> GetMockCurrentUserService()
+    [Fact]
+    public async Task Handle_ReturnsOnlyMentorsInSameEnterprise_WhenAuditorIsHr()
+    {
+        var enterpriseId = Guid.NewGuid();
+
+        var sameEnterpriseMentor = new User(Guid.NewGuid(), "ME0001", "mentor@ioc.com", "Mentor One", UserRole.Mentor, "hash");
+        SetEnterpriseUser(sameEnterpriseMentor, enterpriseId);
+
+        var sameEnterpriseHr = new User(Guid.NewGuid(), "HR0001", "hr@ioc.com", "HR One", UserRole.HR, "hash");
+        SetEnterpriseUser(sameEnterpriseHr, enterpriseId);
+
+        var otherEnterpriseMentor = new User(Guid.NewGuid(), "ME0002", "mentor2@ioc.com", "Mentor Two", UserRole.Mentor, "hash");
+        SetEnterpriseUser(otherEnterpriseMentor, Guid.NewGuid());
+
+        var users = new List<User> { sameEnterpriseMentor, sameEnterpriseHr, otherEnterpriseMentor };
+
+        var repo = new Mock<IGenericRepository<User>>();
+        repo.Setup(x => x.Query()).Returns(users.AsQueryable().BuildMock());
+
+        var uow = new Mock<IUnitOfWork>();
+        uow.Setup(x => x.Repository<User>()).Returns(repo.Object);
+
+        var cache = new Mock<ICacheService>();
+        cache.Setup(x => x.GetAsync<Application.Common.Models.PaginatedResult<GetUsersResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Application.Common.Models.PaginatedResult<GetUsersResponse>?)null);
+
+        var mapperCfg = new MapperConfiguration(c => c.CreateMap<User, GetUsersResponse>());
+        var mapper = mapperCfg.CreateMapper();
+
+        var handler = new GetUsersHandler(
+            uow.Object,
+            mapper,
+            Mock.Of<ILogger<GetUsersHandler>>(),
+            cache.Object,
+            GetMockCurrentUserService(role: "HR", unitId: enterpriseId.ToString()).Object);
+
+        var result = await handler.Handle(new GetUsersQuery { PageNumber = 1, PageSize = 10 }, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Data!.Items.Should().ContainSingle(x => x.UserId == sameEnterpriseMentor.UserId);
+    }
+
+    [Fact]
+    public async Task Handle_ReturnsForbidden_WhenHrFiltersNonMentorRole()
+    {
+        var repo = new Mock<IGenericRepository<User>>();
+        repo.Setup(x => x.Query()).Returns(new List<User>().AsQueryable().BuildMock());
+
+        var uow = new Mock<IUnitOfWork>();
+        uow.Setup(x => x.Repository<User>()).Returns(repo.Object);
+
+        var cache = new Mock<ICacheService>();
+        cache.Setup(x => x.GetAsync<Application.Common.Models.PaginatedResult<GetUsersResponse>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Application.Common.Models.PaginatedResult<GetUsersResponse>?)null);
+
+        var mapperCfg = new MapperConfiguration(c => c.CreateMap<User, GetUsersResponse>());
+        var mapper = mapperCfg.CreateMapper();
+
+        var handler = new GetUsersHandler(
+            uow.Object,
+            mapper,
+            Mock.Of<ILogger<GetUsersHandler>>(),
+            cache.Object,
+            GetMockCurrentUserService(role: "HR").Object);
+
+        var result = await handler.Handle(new GetUsersQuery { Role = UserRole.HR }, CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorType.Should().Be(Application.Common.Models.ResultErrorType.Forbidden);
+    }
+
+    private Mock<ICurrentUserService> GetMockCurrentUserService(string role = "SuperAdmin", string? unitId = null)
     {
         var mock = new Mock<ICurrentUserService>();
         mock.Setup(x => x.UserId).Returns(Guid.NewGuid().ToString());
-        mock.Setup(x => x.Role).Returns("SuperAdmin");
-        mock.Setup(x => x.UnitId).Returns(Guid.NewGuid().ToString());
+        mock.Setup(x => x.Role).Returns(role);
+        mock.Setup(x => x.UnitId).Returns(unitId ?? Guid.NewGuid().ToString());
         return mock;
+    }
+
+    private static void SetEnterpriseUser(User user, Guid enterpriseId)
+    {
+        var enterpriseUser = new EnterpriseUser
+        {
+            EnterpriseId = enterpriseId,
+            UserId = user.UserId,
+            Enterprise = new Enterprise { EnterpriseId = enterpriseId, Name = "Test Enterprise" },
+            User = user
+        };
+
+        typeof(User).GetProperty(nameof(User.EnterpriseUser), BindingFlags.Instance | BindingFlags.Public)!
+            .SetValue(user, enterpriseUser);
     }
 }

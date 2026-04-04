@@ -3,7 +3,7 @@ using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
 {
-    internal class CreateStakeholderValidator : AbstractValidator<CreateStakeholderCommand>
+    public class CreateStakeholderValidator : AbstractValidator<CreateStakeholderCommand>
     {
         public CreateStakeholderValidator()
         {
@@ -44,4 +44,3 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
         }
     }
 }
-
