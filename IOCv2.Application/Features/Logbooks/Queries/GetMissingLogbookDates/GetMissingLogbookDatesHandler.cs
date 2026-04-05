@@ -84,6 +84,8 @@ public class GetMissingLogbookDatesHandler
                         && i.InternshipGroup.Status == GroupStatus.Active)
             .Include(i => i.InternshipGroup)
                 .ThenInclude(g => g.InternshipPhase)
+            .Include(i => i.InternshipGroup)
+                .ThenInclude(g => g.Projects)
             .OrderByDescending(i => i.JoinedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -110,9 +112,16 @@ public class GetMissingLogbookDatesHandler
         }
 
         // Determine effective start date
-        // group.StartDate is DateTime? — guard against default(DateTime) which maps to year 0001
+        // Priority: 1. Min(Project.StartDate), 2. Group.StartDate, 3. Phase.StartDate
         DateOnly startDate;
-        if (group.StartDate.HasValue && group.StartDate.Value > DateTime.MinValue)
+        var validProjectStartDates = group.Projects
+            .Where(p => p.StartDate.HasValue && p.StartDate.Value > DateTime.MinValue)
+            .Select(p => p.StartDate!.Value)
+            .ToList();
+
+        if (validProjectStartDates.Any())
+            startDate = DateOnly.FromDateTime(validProjectStartDates.Min());
+        else if (group.StartDate.HasValue && group.StartDate.Value > DateTime.MinValue)
             startDate = DateOnly.FromDateTime(group.StartDate.Value);
         else
             startDate = phase.StartDate;
@@ -138,9 +147,9 @@ public class GetMissingLogbookDatesHandler
         }
 
         // ── 3. Fetch the dates already submitted by this student in the window ──
-        // Convert boundaries to DateTime for EF Core / Npgsql translation compatibility
-        var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
-        var todayDateTime = today.ToDateTime(TimeOnly.MinValue).AddDays(1); // exclusive upper bound
+        // Convert boundaries to UTC DateTime — Npgsql requires DateTimeKind.Utc for timestamptz columns
+        var startDateTime = DateTime.SpecifyKind(startDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+        var todayDateTime = DateTime.SpecifyKind(today.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc).AddDays(1); // exclusive upper bound
 
         var rawDates = await _unitOfWork.Repository<Logbook>()
             .Query()
@@ -159,14 +168,16 @@ public class GetMissingLogbookDatesHandler
         var submittedSet = new HashSet<DateOnly>(submittedDates);
 
         // ── 4. Fetch public holidays in the window ────────────────────────────
-        var holidays = await _unitOfWork.Repository<PublicHoliday>()
+        // Load ALL holidays (table is small) then filter in-memory to avoid
+        // potential DateOnly-in-SQL translation issues with some Npgsql versions
+        var allHolidayDates = await _unitOfWork.Repository<PublicHoliday>()
             .Query()
             .AsNoTracking()
-            .Where(h => h.Date >= startDate && h.Date <= today)
             .Select(h => h.Date)
             .ToListAsync(cancellationToken);
 
-        var holidaySet = new HashSet<DateOnly>(holidays);
+        var holidaySet = new HashSet<DateOnly>(
+            allHolidayDates.Where(d => d >= startDate && d <= today));
 
         // ── 5. Iterate over each day in [startDate, today] ───────────────────
         var missingDates    = new List<DateOnly>();
