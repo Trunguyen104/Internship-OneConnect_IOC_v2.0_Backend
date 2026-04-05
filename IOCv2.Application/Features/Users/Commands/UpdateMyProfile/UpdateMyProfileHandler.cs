@@ -97,10 +97,8 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
             switch (user.Role)
             {
                 case UserRole.Student when user.Student != null:
-                    if (request.PortfolioUrl != null)
-                    {
-                        user.Student.UpdatePortfolio(string.IsNullOrWhiteSpace(request.PortfolioUrl) ? null : request.PortfolioUrl);
-                    }
+                    // PortfolioUrl is always sent by student profile form
+                    user.Student.UpdatePortfolio(string.IsNullOrWhiteSpace(request.PortfolioUrl) ? null : request.PortfolioUrl);
                     
                     // Handle CV File Upload
                     if (request.CvFile != null)
@@ -108,13 +106,13 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
                         var cvUrl = await _fileStorageService.UploadFileAsync(request.CvFile, "CVs", cancellationToken: cancellationToken);
                         user.Student.UpdateCv(cvUrl);
                     }
-                    else if (request.CvUrl != null)
+                    else if (!string.IsNullOrEmpty(request.CvUrl)) // Only update if a specific URL is provided, or handled by File
                     {
-                        user.Student.UpdateCv(string.IsNullOrWhiteSpace(request.CvUrl) ? null : request.CvUrl);
+                        user.Student.UpdateCv(request.CvUrl);
                     }
                     
-                    if (!string.IsNullOrWhiteSpace(request.Major)) user.Student.Major = request.Major;
-                    if (!string.IsNullOrWhiteSpace(request.ClassName)) user.Student.ClassName = request.ClassName;
+                    user.Student.Major = string.IsNullOrWhiteSpace(request.Major) ? null : request.Major;
+                    user.Student.ClassName = string.IsNullOrWhiteSpace(request.ClassName) ? null : request.ClassName;
                     break;
 
                 case UserRole.Mentor:
@@ -122,14 +120,18 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
                 case UserRole.EnterpriseAdmin:
                     if (user.EnterpriseUser != null)
                     {
-                        user.EnterpriseUser.UpdateMetadata(request.Bio, request.Expertise);
+                        user.EnterpriseUser.UpdateMetadata(
+                            string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio, 
+                            string.IsNullOrWhiteSpace(request.Expertise) ? null : request.Expertise);
                     }
                     break;
 
                 case UserRole.SchoolAdmin:
                     if (user.UniversityUser != null)
                     {
-                        user.UniversityUser.UpdateMetadata(request.Bio, request.Department);
+                        user.UniversityUser.UpdateMetadata(
+                            string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio, 
+                            string.IsNullOrWhiteSpace(request.Department) ? null : request.Department);
                     }
                     break;
             }
