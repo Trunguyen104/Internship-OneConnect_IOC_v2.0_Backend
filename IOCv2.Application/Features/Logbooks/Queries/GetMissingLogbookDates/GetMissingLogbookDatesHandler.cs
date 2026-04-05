@@ -84,6 +84,8 @@ public class GetMissingLogbookDatesHandler
                         && i.InternshipGroup.Status == GroupStatus.Active)
             .Include(i => i.InternshipGroup)
                 .ThenInclude(g => g.InternshipPhase)
+            .Include(i => i.InternshipGroup)
+                .ThenInclude(g => g.Projects)
             .OrderByDescending(i => i.JoinedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -110,9 +112,16 @@ public class GetMissingLogbookDatesHandler
         }
 
         // Determine effective start date
-        // group.StartDate is DateTime? — guard against default(DateTime) which maps to year 0001
+        // Priority: 1. Min(Project.StartDate), 2. Group.StartDate, 3. Phase.StartDate
         DateOnly startDate;
-        if (group.StartDate.HasValue && group.StartDate.Value > DateTime.MinValue)
+        var validProjectStartDates = group.Projects
+            .Where(p => p.StartDate.HasValue && p.StartDate.Value > DateTime.MinValue)
+            .Select(p => p.StartDate!.Value)
+            .ToList();
+
+        if (validProjectStartDates.Any())
+            startDate = DateOnly.FromDateTime(validProjectStartDates.Min());
+        else if (group.StartDate.HasValue && group.StartDate.Value > DateTime.MinValue)
             startDate = DateOnly.FromDateTime(group.StartDate.Value);
         else
             startDate = phase.StartDate;
