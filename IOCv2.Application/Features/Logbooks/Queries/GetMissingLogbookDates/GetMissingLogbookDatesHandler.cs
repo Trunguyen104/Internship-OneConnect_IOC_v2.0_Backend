@@ -76,19 +76,18 @@ public class GetMissingLogbookDatesHandler
         _logger.LogInformation("GetMissingLogbookDates: calculating for StudentId={StudentId}.", studentId);
 
         // ── 2. Find the student's active InternshipGroup (via InternshipStudent) ──
-        //      Priority: use InternshipGroup.StartDate when set,
-        //      otherwise fall back to InternshipPhase.StartDate.
+        //      Query from InternshipGroup side to ensure InternshipPhase is always loaded.
         var internshipStudent = await _unitOfWork.Repository<InternshipStudent>()
             .Query()
             .AsNoTracking()
-            .Include(i => i.InternshipGroup)
-                .ThenInclude(g => g.InternshipPhase)
             .Where(i => i.StudentId == studentId
                         && i.InternshipGroup.Status == GroupStatus.Active)
+            .Include(i => i.InternshipGroup)
+                .ThenInclude(g => g.InternshipPhase)
             .OrderByDescending(i => i.JoinedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (internshipStudent is null)
+        if (internshipStudent is null || internshipStudent.InternshipGroup is null)
         {
             _logger.LogWarning("GetMissingLogbookDates: no active InternshipGroup for StudentId={StudentId}.", studentId);
             return Result<GetMissingLogbookDatesResponse>.Failure(
@@ -99,10 +98,24 @@ public class GetMissingLogbookDatesHandler
         var group = internshipStudent.InternshipGroup;
         var phase = group.InternshipPhase;
 
+        // Guard: InternshipPhase must be loaded (should always be via ThenInclude)
+        if (phase is null)
+        {
+            _logger.LogWarning(
+                "GetMissingLogbookDates: InternshipPhase not loaded for GroupId={GroupId}, StudentId={StudentId}.",
+                group.InternshipId, studentId);
+            return Result<GetMissingLogbookDatesResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Logbooks.NoActiveInternship),
+                ResultErrorType.NotFound);
+        }
+
         // Determine effective start date
-        DateOnly startDate = group.StartDate.HasValue
-            ? DateOnly.FromDateTime(group.StartDate.Value)
-            : phase.StartDate;
+        // group.StartDate is DateTime? — guard against default(DateTime) which maps to year 0001
+        DateOnly startDate;
+        if (group.StartDate.HasValue && group.StartDate.Value > DateTime.MinValue)
+            startDate = DateOnly.FromDateTime(group.StartDate.Value);
+        else
+            startDate = phase.StartDate;
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
