@@ -138,9 +138,9 @@ public class GetMissingLogbookDatesHandler
         }
 
         // ── 3. Fetch the dates already submitted by this student in the window ──
-        // Convert boundaries to DateTime for EF Core / Npgsql translation compatibility
-        var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
-        var todayDateTime = today.ToDateTime(TimeOnly.MinValue).AddDays(1); // exclusive upper bound
+        // Convert boundaries to UTC DateTime — Npgsql requires DateTimeKind.Utc for timestamptz columns
+        var startDateTime = DateTime.SpecifyKind(startDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+        var todayDateTime = DateTime.SpecifyKind(today.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc).AddDays(1); // exclusive upper bound
 
         var rawDates = await _unitOfWork.Repository<Logbook>()
             .Query()
@@ -159,14 +159,16 @@ public class GetMissingLogbookDatesHandler
         var submittedSet = new HashSet<DateOnly>(submittedDates);
 
         // ── 4. Fetch public holidays in the window ────────────────────────────
-        var holidays = await _unitOfWork.Repository<PublicHoliday>()
+        // Load ALL holidays (table is small) then filter in-memory to avoid
+        // potential DateOnly-in-SQL translation issues with some Npgsql versions
+        var allHolidayDates = await _unitOfWork.Repository<PublicHoliday>()
             .Query()
             .AsNoTracking()
-            .Where(h => h.Date >= startDate && h.Date <= today)
             .Select(h => h.Date)
             .ToListAsync(cancellationToken);
 
-        var holidaySet = new HashSet<DateOnly>(holidays);
+        var holidaySet = new HashSet<DateOnly>(
+            allHolidayDates.Where(d => d >= startDate && d <= today));
 
         // ── 5. Iterate over each day in [startDate, today] ───────────────────
         var missingDates    = new List<DateOnly>();
