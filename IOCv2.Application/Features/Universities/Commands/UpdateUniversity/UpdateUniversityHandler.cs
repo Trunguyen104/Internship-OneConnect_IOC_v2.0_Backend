@@ -5,6 +5,7 @@ using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.Universities.Commands.UpdateUniversity;
 
@@ -13,17 +14,20 @@ public class UpdateUniversityHandler : IRequestHandler<UpdateUniversityCommand, 
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateUniversityHandler> _logger;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IMessageService _messageService;
     private readonly ICacheService _cacheService;
 
     public UpdateUniversityHandler(
         IUnitOfWork unitOfWork,
         ILogger<UpdateUniversityHandler> logger,
         ICurrentUserService currentUserService,
+        IMessageService messageService,
         ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _currentUserService = currentUserService;
+        _messageService = messageService;
         _cacheService = cacheService;
     }
 
@@ -48,7 +52,7 @@ public class UpdateUniversityHandler : IRequestHandler<UpdateUniversityCommand, 
             
             if (exists)
             {
-                throw new ConflictException("University code already exists", "Code");
+                throw new ConflictException(_messageService.GetMessage(MessageKeys.University.DuplicateCode), "Code");
             }
 
             university.UpdateInfo(
@@ -56,7 +60,8 @@ public class UpdateUniversityHandler : IRequestHandler<UpdateUniversityCommand, 
                 request.Name,
                 request.Address,
                 request.LogoUrl,
-                request.ContactEmail);
+                request.ContactEmail,
+                request.Status);
 
             university.UpdatedBy = _currentUserService.UserId != null ? Guid.Parse(_currentUserService.UserId) : null;
 

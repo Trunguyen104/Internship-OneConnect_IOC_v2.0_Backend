@@ -1,3 +1,5 @@
+using IOCv2.Domain.Enums;
+
 namespace IOCv2.Domain.Entities
 {
     public class University : BaseEntity
@@ -9,7 +11,7 @@ namespace IOCv2.Domain.Entities
         public string? LogoUrl { get; private set; }
         public string? ContactEmail { get; private set; }
 
-        public short Status { get; private set; } = 1; // 0=Inactive, 1=Active, 2=Suspended
+        public UniversityStatus Status { get; private set; } = UniversityStatus.Active; // Inactive=1, Active=2
 
         public virtual ICollection<UniversityUser> UniversityUsers { get; set; } = new List<UniversityUser>();
         public virtual ICollection<Term> Terms { get; set; } = new List<Term>();
@@ -34,24 +36,25 @@ namespace IOCv2.Domain.Entities
                 Address = address,
                 LogoUrl = logoUrl,
                 ContactEmail = contactEmail,
-                Status = 1,
+                Status = UniversityStatus.Active,
                 CreatedAt = DateTime.UtcNow
             };
         }
 
-        public void UpdateInfo(string code, string name, string? address, string? logoUrl, string? contactEmail = null)
+        public void UpdateInfo(string code, string name, string? address, string? logoUrl, string? contactEmail = null, UniversityStatus status = UniversityStatus.Active)
         {
             Code = code;
             Name = name;
             Address = address;
             LogoUrl = logoUrl;
+            Status = status;
             ContactEmail = contactEmail;
             UpdatedAt = DateTime.UtcNow;
         }
 
         public void Deactive()
         {
-            Status = 0;
+            Status = UniversityStatus.Inactive;
             UpdatedAt = DateTime.UtcNow;
         }
         

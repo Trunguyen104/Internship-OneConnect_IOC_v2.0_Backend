@@ -37,6 +37,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                 .When(x => !string.IsNullOrEmpty(x.Website))
                 .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.WebsiteNotValid));
             RuleFor(x => x.ContactEmail)
+                .MaximumLength(255)
                 .EmailAddress()
                 .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.ContactEmailInvalid))
                 .When(x => !string.IsNullOrEmpty(x.ContactEmail));

@@ -51,6 +51,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidCredentials = "Auth.InvalidCredentials";
             public const string AccountInactive = "Auth.AccountInactive";
             public const string AccountBlocked = "Auth.AccountBlocked";
+            public const string UnitInactive = "Auth.UnitInactive";
             public const string InvalidToken = "Auth.InvalidToken";
             public const string RefreshTokenNotFound = "Auth.RefreshTokenNotFound";
             public const string RefreshTokenExpired = "Auth.RefreshTokenExpired";
@@ -723,12 +724,13 @@ namespace IOCv2.Application.Constants
             public const string NameMaxLength = "Validation.NameMaxLength";
             public const string DescriptionMaxLength = "Validation.DescriptionMaxLength";
             public const string IdRequired = "Validation.IdRequired";
-            public const string UserInvalidRole = "Validation.User.InvalidRole";
-            public const string UserUnitRequired = "Validation.User.UnitRequired";
-            public const string UserInvalidStatus = "Validation.User.InvalidStatus";
+            public const string UserInvalidRole = "Validation.UserInvalidRole";
+            public const string UserUnitRequired = "Validation.UserUnitRequired";
+            public const string UserInvalidStatus = "Validation.UserInvalidStatus";
             public const string UserInvalidPhone = "Validation.User.InvalidPhone";
             public const string UserInvalidGender = "Validation.User.InvalidGender";
             public const string UserInvalidDateFormat = "Validation.User.InvalidDateFormat";
+            public const string TermRequiredForStudent = "Validation.TermRequiredForStudent";
         }
 
         public static class Error
@@ -1291,6 +1293,12 @@ namespace IOCv2.Application.Constants
             public const string StatusBadgePending = "UniAdminInternship.StatusBadge.Pending";
             public const string StatusBadgeMissing = "UniAdminInternship.StatusBadge.Missing";
             public const string WeekTitle = "UniAdminInternship.WeekTitle";
+        }
+
+        public static class UserManagement
+        {
+            public const string CODE_REQ = "UserManagement.CodeRequired";
+            public const string CODE_MAX_LEN = "UserManagement.CodeMaxLength";
         }
     }
 }

@@ -47,9 +47,13 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
                 .When(x => !string.IsNullOrEmpty(x.BackgroundUrl))
                 .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.BackgroundUrlNotValid));
             RuleFor(x => x.ContactEmail)
+                .MaximumLength(255)
                 .EmailAddress()
                 .WithMessage(_messageService.GetMessage(MessageKeys.Enterprise.ContactEmailInvalid))
                 .When(x => !string.IsNullOrEmpty(x.ContactEmail));
+            RuleFor(x => x.Status)
+                .IsInEnum()
+                .WithMessage(_messageService.GetMessage(MessageKeys.Validation.UserInvalidStatus));
 
 
         }

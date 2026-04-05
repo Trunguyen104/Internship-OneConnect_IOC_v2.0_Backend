@@ -38,7 +38,9 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
             var user = await _unitOfWork.Repository<User>()
                 .Query()
                 .Include(u => u.UniversityUser)
+                    .ThenInclude(uu => uu.University)
                 .Include(u => u.EnterpriseUser)
+                    .ThenInclude(eu => eu.Enterprise)
                 .FirstOrDefaultAsync(e => e.Email == request.Email, cancellationToken);
 
             if (user == null)
@@ -62,7 +64,21 @@ namespace IOCv2.Application.Features.Authentication.Commands.Login
             // All good - reset failure count
             await _rateLimiter.ResetAsync(rateLimitKey, cancellationToken);
 
-            // Kiểm tra trạng thái account
+            // Kiểm tra trạng thái unit (University/Enterprise)
+            if (user.Role == UserRole.SuperAdmin)
+            {
+                // Super admins skip unit check or we check if they are in unit too
+            }
+            else if (user.UniversityUser != null && user.UniversityUser.University.Status == UniversityStatus.Inactive)
+            {
+                return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.UnitInactive));
+            }
+            else if (user.EnterpriseUser != null && user.EnterpriseUser.Enterprise.Status == EnterpriseStatus.Inactive)
+            {
+                return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.UnitInactive));
+            }
+
+            // Kiểm tra trạng thái account cá nhân
             if (user.Status == UserStatus.Inactive)
             {
                 return Result<LoginResponse>.Failure(_messageService.GetMessage(MessageKeys.Auth.AccountInactive));

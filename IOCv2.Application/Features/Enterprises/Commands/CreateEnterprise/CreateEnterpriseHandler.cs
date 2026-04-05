@@ -55,7 +55,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                     Address = request.Address,
                     Website = request.Website,
                     ContactEmail = request.ContactEmail,
-                    Status = (short)EnterpriseStatus.Active
+                    Status = EnterpriseStatus.Active
                 };
 
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().AddAsync(enterprise);

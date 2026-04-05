@@ -26,7 +26,12 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(e => e.LogoUrl).HasMaxLength(255).HasColumnName("logo_url");
             builder.Property(e => e.BackgroundUrl).HasMaxLength(255).HasColumnName("background_url");
             
-            builder.Property(e => e.Status).HasDefaultValue((short)EnterpriseStatus.Active).HasColumnName("status");
+            builder.Property(e => e.ContactEmail).HasMaxLength(255).HasColumnName("contact_email");
+            
+            builder.Property(e => e.Status)
+                .HasConversion<short>()
+                .HasDefaultValue(EnterpriseStatus.Active)
+                .HasColumnName("status");
 
             builder.Property(e => e.CreatedAt).HasColumnName("created_at");
             builder.Property(e => e.CreatedBy).HasColumnName("created_by");

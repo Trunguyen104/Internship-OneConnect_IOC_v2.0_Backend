@@ -109,8 +109,8 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 var universities = new List<University>
                 {
-                    University.Create("FPTU", "FPT University", "Hoa Lac Hi-Tech Park, Hanoi", null),
-                    University.Create("FPTU-CT", "FPT University Can Tho", "600 Nguyen Van Cu, Ninh Kieu, Can Tho", null)
+                    University.Create("FPTU", "FPT University", "Hoa Lac Hi-Tech Park, Hanoi", null, "fptu@fpt.edu.vn"),
+                    University.Create("FPTU-CT", "FPT University Can Tho", "600 Nguyen Van Cu, Ninh Kieu, Can Tho", null, "fptuct@fpt.edu.vn")
                 };
                 await _context.Universities.AddRangeAsync(universities);
                 await _context.SaveChangesAsync();
@@ -132,7 +132,8 @@ namespace IOCv2.Infrastructure.Persistence
                         Address = "Khu Công nghệ cao Hòa Lạc, Thạch Thất, Hà Nội",
                         Website = "https://www.fpt-software.com",
                         Description = "Tập đoàn công nghệ hàng đầu Việt Nam",
-                        Status = (short)EnterpriseStatus.Active
+                        ContactEmail = "contact@fpt-software.com",
+                        Status = EnterpriseStatus.Active
                     },
                     new Enterprise
                     {
@@ -143,7 +144,8 @@ namespace IOCv2.Infrastructure.Persistence
                         Address = "Tầng 21, Tòa nhà Handico, Phạm Hùng, Nam Từ Liêm, Hà Nội",
                         Website = "https://rikkeisoft.com",
                         Description = "Đối tác tin cậy về chuyển đổi số",
-                        Status = (short)EnterpriseStatus.Active
+                        ContactEmail = "contact@rikkeisoft.com",
+                        Status = EnterpriseStatus.Active
                     }
                 };
                 await _context.Enterprises.AddRangeAsync(enterprises);

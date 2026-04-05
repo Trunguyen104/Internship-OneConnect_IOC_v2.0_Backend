@@ -12,7 +12,12 @@ public class CreateUniversityValidator : AbstractValidator<CreateUniversityComma
 
         RuleFor(v => v.Name)
             .NotEmpty().WithMessage("Tên trường không được để trống")
-            .MaximumLength(200).WithMessage("Tên trường không được quá 200 ký tự");
+            .MaximumLength(255).WithMessage("Tên trường không được quá 255 ký tự");
+
+        RuleFor(v => v.ContactEmail)
+            .MaximumLength(255).WithMessage("Email liên hệ không được vượt quá 255 ký tự")
+            .EmailAddress().WithMessage("Email liên hệ không đúng định dạng")
+            .When(v => !string.IsNullOrEmpty(v.ContactEmail));
 
         RuleFor(v => v.Address)
             .MaximumLength(500).WithMessage("Địa chỉ không được quá 500 ký tự");

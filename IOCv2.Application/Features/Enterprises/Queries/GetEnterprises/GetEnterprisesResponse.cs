@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
@@ -21,12 +21,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
         public string? Website { get; set; }
         public string? LogoUrl { get; set; }
         public string? BackgroundUrl { get; set; }
-        public EnterpriseStatus Status { get; set; } = EnterpriseStatus.Active; // 1=Inactive, 2=Active, 3=Suspended
-        public void Mapping(Profile profile)
-        {
-            profile.CreateMap<Enterprise, GetEnterprisesResponse>()
-                .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => (EnterpriseStatus)src.Status));
-        }
+        public string? ContactEmail { get; set; }
+        public EnterpriseStatus Status { get; set; } = EnterpriseStatus.Active;
     }
 }

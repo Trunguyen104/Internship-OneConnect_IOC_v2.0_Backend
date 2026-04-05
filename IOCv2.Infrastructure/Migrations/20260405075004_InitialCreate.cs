@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IOCv2.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,7 +24,7 @@ namespace IOCv2.Infrastructure.Migrations
                     website = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     logo_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     background_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    contact_email = table.Column<string>(type: "text", nullable: true),
+                    contact_email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)2),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
@@ -65,7 +65,7 @@ namespace IOCv2.Infrastructure.Migrations
                     address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     logo_url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     contact_email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)1),
+                    status = table.Column<short>(type: "smallint", nullable: false, defaultValue: (short)2),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_by = table.Column<Guid>(type: "uuid", nullable: true),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

@@ -1,4 +1,5 @@
 using IOCv2.Application.Common.Models;
+using IOCv2.Domain.Enums;
 using MediatR;
 
 namespace IOCv2.Application.Features.Universities.Commands.UpdateUniversity;
@@ -11,4 +12,5 @@ public record UpdateUniversityCommand : IRequest<Result<bool>>
     public string? Address { get; init; }
     public string? LogoUrl { get; init; }
     public string? ContactEmail { get; init; }
+    public UniversityStatus Status { get; init; }
 }

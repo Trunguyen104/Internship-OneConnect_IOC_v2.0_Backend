@@ -1,4 +1,5 @@
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +21,10 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.Property(u => u.LogoUrl).HasMaxLength(255).HasColumnName("logo_url");
             builder.Property(u => u.ContactEmail).HasMaxLength(255).HasColumnName("contact_email");
 
-            builder.Property(u => u.Status).HasDefaultValue(1).HasColumnName("status");
+            builder.Property(u => u.Status)
+                .HasConversion<short>()
+                .HasDefaultValue(UniversityStatus.Active)
+                .HasColumnName("status");
 
             builder.Property(u => u.CreatedAt).HasColumnName("created_at");
             builder.Property(u => u.CreatedBy).HasColumnName("created_by");
