@@ -1,5 +1,6 @@
 using FluentAssertions;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Features.Projects.Commands.AssignGroup;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
@@ -200,6 +201,43 @@ namespace IOCv2.Tests.Features.Projects.Commands
             // Assert
             result.IsSuccess.Should().BeFalse();
             result.ErrorType.Should().Be(ResultErrorType.NotFound);
+        }
+
+        [Fact]
+        public async Task Handle_GroupWithoutMentor_ReturnsBadRequestWithNoMentorMessage()
+        {
+            // Arrange
+            var groupId = Guid.NewGuid();
+            var project = Project.Create(
+                "Test Project", "Desc", "PRJ-TEST004", "IT", "Req",
+                mentorId: _enterpriseUserId);
+
+            var group = InternshipGroup.Create(
+                phaseId: Guid.NewGuid(),
+                groupName: "No Mentor Group",
+                enterpriseId: _enterpriseId,
+                mentorId: null,
+                endDate: DateTime.UtcNow.AddDays(30));
+
+            typeof(InternshipGroup)
+                .GetProperty("InternshipId")!
+                .SetValue(group, groupId);
+
+            _mockProjectRepo.Setup(x => x.Query())
+                .Returns(new List<Project> { project }.AsQueryable().BuildMock());
+
+            _mockGroupRepo.Setup(x => x.Query())
+                .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
+
+            var command = new AssignGroupCommand { ProjectId = project.ProjectId, InternshipId = groupId };
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorType.Should().Be(ResultErrorType.BadRequest);
+            result.Error.Should().Be(MessageKeys.Projects.GroupHasNoMentor);
         }
 
         [Fact]

@@ -141,6 +141,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Định dạng email liên hệ không hợp lệ..
+        /// </summary>
+        internal static string Enterprise_ContactEmailInvalid {
+            get {
+                return ResourceManager.GetString("Enterprise.ContactEmailInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bạn không có quyền xóa doanh nghiệp này..
         /// </summary>
         internal static string Enterprise_DeletePermissionDenied {
@@ -155,6 +164,24 @@ namespace IOCv2.Application.Resources {
         internal static string Enterprise_GetByIDPermissionsNotAllowed {
             get {
                 return ResourceManager.GetString("Enterprise.GetByIDPermissionsNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể xóa doanh nghiệp: hiện đang có sinh viên đang thực tập tại đây..
+        /// </summary>
+        internal static string Enterprise_HasInterningStudents {
+            get {
+                return ResourceManager.GetString("Enterprise.HasInterningStudents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tên doanh nghiệp là bắt buộc..
+        /// </summary>
+        internal static string Enterprise_NameRequired {
+            get {
+                return ResourceManager.GetString("Enterprise.NameRequired", resourceCulture);
             }
         }
         
@@ -218,6 +245,24 @@ namespace IOCv2.Application.Resources {
         internal static string Enterprise_RestorePermissionDenied {
             get {
                 return ResourceManager.GetString("Enterprise.RestorePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Định dạng mã số thuế không hợp lệ (ví dụ: 10 chữ số hoặc 10 chữ số kèm hậu tố)..
+        /// </summary>
+        internal static string Enterprise_TaxCodeInvalid {
+            get {
+                return ResourceManager.GetString("Enterprise.TaxCodeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mã số thuế là bắt buộc..
+        /// </summary>
+        internal static string Enterprise_TaxCodeRequired {
+            get {
+                return ResourceManager.GetString("Enterprise.TaxCodeRequired", resourceCulture);
             }
         }
         
@@ -2392,6 +2437,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nhóm chưa có Mentor. Gán Mentor trước để gán dự án..
+        /// </summary>
+        internal static string Projects_GroupHasNoMentor {
+            get {
+                return ResourceManager.GetString("Projects.GroupHasNoMentor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lỗi khi archive project {0}..
         /// </summary>
         internal static string Projects_LogArchiveError {
@@ -3342,6 +3396,24 @@ namespace IOCv2.Application.Resources {
         internal static string UniAdminInternship_WeekTitle {
             get {
                 return ResourceManager.GetString("UniAdminInternship.WeekTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể xóa trường đại học: hiện đang có các học kỳ đang hoạt động..
+        /// </summary>
+        internal static string University_HasActiveTerms {
+            get {
+                return ResourceManager.GetString("University.HasActiveTerms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể xóa trường đại học: hiện đang có sinh viên đang trong quá trình thực tập..
+        /// </summary>
+        internal static string University_HasInterningStudents {
+            get {
+                return ResourceManager.GetString("University.HasInterningStudents", resourceCulture);
             }
         }
         
