@@ -67,7 +67,7 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
             Title = request.Title,
             Description = request.Description,
             Priority = request.Priority,
-            Status = WorkItemStatus.Todo,
+            Status = request.Status ?? WorkItemStatus.Todo,
             StoryPoint = request.StoryPoint,
             AssigneeId = request.AssigneeId,
             DueDate = request.DueDate,
