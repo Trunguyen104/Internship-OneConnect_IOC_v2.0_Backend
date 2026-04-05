@@ -125,15 +125,19 @@ public class GetMissingLogbookDatesHandler
         }
 
         // ── 3. Fetch the dates already submitted by this student in the window ──
-        var submittedDates = await _unitOfWork.Repository<Logbook>()
+        var rawDates = await _unitOfWork.Repository<Logbook>()
             .Query()
             .AsNoTracking()
             .Where(l => l.StudentId == studentId
                         && l.DateReport.Date >= startDate.ToDateTime(TimeOnly.MinValue)
                         && l.DateReport.Date <= today.ToDateTime(TimeOnly.MinValue))
-            .Select(l => DateOnly.FromDateTime(l.DateReport.Date))
-            .Distinct()
+            .Select(l => l.DateReport.Date)
             .ToListAsync(cancellationToken);
+
+        var submittedDates = rawDates
+            .Select(d => DateOnly.FromDateTime(d))
+            .Distinct()
+            .ToList();
 
         var submittedSet = new HashSet<DateOnly>(submittedDates);
 

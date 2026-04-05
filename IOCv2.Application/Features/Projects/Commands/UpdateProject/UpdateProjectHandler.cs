@@ -104,6 +104,10 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                     return Result<UpdateProjectResponse>.Failure(
                         _messageService.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
 
+                if (!targetGroup.MentorId.HasValue)
+                    return Result<UpdateProjectResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Projects.GroupHasNoMentor), ResultErrorType.BadRequest);
+
                 if (targetGroup.MentorId != enterpriseUser.EnterpriseUserId)
                     return Result<UpdateProjectResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 

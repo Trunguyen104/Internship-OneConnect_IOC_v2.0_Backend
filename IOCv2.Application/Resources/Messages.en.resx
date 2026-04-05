@@ -864,6 +864,9 @@
   <data name="Projects.AssignGroupSuccess" xml:space="preserve">
     <value>Project assigned to internship group successfully.</value>
   </data>
+  <data name="Projects.GroupHasNoMentor" xml:space="preserve">
+    <value>This group has no mentor yet. Assign a mentor before assigning a project.</value>
+  </data>
   <data name="Projects.LogAssignGroupSuccess" xml:space="preserve">
     <value>Project {0} assigned to group {1}.</value>
   </data>
@@ -1322,4 +1325,4 @@
   <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
     <value>Invalid Contact Email format.</value>
   </data>
-</root>
+</root>

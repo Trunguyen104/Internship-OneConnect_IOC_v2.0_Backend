@@ -513,6 +513,7 @@ namespace IOCv2.Application.Constants
             // AssignGroup
             public const string AssignGroupSuccess         = "Projects.AssignGroupSuccess";
             public const string AlreadyAssignedToGroup     = "Projects.AlreadyAssignedToGroup";
+            public const string GroupHasNoMentor           = "Projects.GroupHasNoMentor";
             public const string GroupNotActive             = "Projects.GroupNotActive";
             public const string CannotAssignArchivedGroup  = "Projects.CannotAssignArchivedGroup";
             public const string GroupPhaseEnded            = "Projects.GroupPhaseEnded";

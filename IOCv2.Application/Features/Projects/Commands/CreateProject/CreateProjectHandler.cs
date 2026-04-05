@@ -135,6 +135,10 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
 
+                if (!assignedGroup.MentorId.HasValue)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Projects.GroupHasNoMentor), ResultErrorType.BadRequest);
+
                 if (assignedGroup.MentorId != enterpriseUser.EnterpriseUserId)
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
