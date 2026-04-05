@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
 {
@@ -60,7 +61,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                 if (students.Count != requestedStudentIds.Count)
                 {
                     var missing = requestedStudentIds.Except(students.Select(s => s.StudentId));
-                    return Result<BulkEnterpriseAssignmentResponse>.Failure($"Students not found: {string.Join(", ", missing)}", ResultErrorType.NotFound);
+                    var message = string.Format(_messageService.GetMessage(MessageKeys.UniAssign.StudentsNotFound), string.Join(", ", missing));
+                    return Result<BulkEnterpriseAssignmentResponse>.Failure(message, ResultErrorType.NotFound);
                 }
 
                 // Force semantics: when Force == false we should block already placed students; when Force == true allow overriding placed students.
@@ -70,7 +72,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                     var placed = students.Where(s => s.InternshipStatus == StudentStatus.Placed).Select(s => s.StudentId).ToList();
                     if (placed.Any())
                     {
-                        return Result<BulkEnterpriseAssignmentResponse>.Failure($"Students already placed: {string.Join(", ", placed)}", ResultErrorType.BadRequest);
+                        var message = string.Format(_messageService.GetMessage(MessageKeys.UniAssign.StudentsAlreadyPlaced), string.Join(", ", placed));
+                        return Result<BulkEnterpriseAssignmentResponse>.Failure(message, ResultErrorType.BadRequest);
                     }
                 }
 
@@ -89,7 +92,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
 
                 if (unauthorized.Any())
                 {
-                    return Result<BulkEnterpriseAssignmentResponse>.Failure($"You are not allowed to assign these students: {string.Join(", ", unauthorized)}", ResultErrorType.Unauthorized);
+                    var message = string.Format(_messageService.GetMessage(MessageKeys.UniAssign.StudentsUnauthorized), string.Join(", ", unauthorized));
+                    return Result<BulkEnterpriseAssignmentResponse>.Failure(message, ResultErrorType.Unauthorized);
                 }
 
                 var term = await (
@@ -100,8 +104,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                     select t
                 ).FirstOrDefaultAsync(cancellationToken);
 
-                if (term == null) return Result<BulkEnterpriseAssignmentResponse>.Failure("Term not found.", ResultErrorType.NotFound);
-                if (term.Status != TermStatus.Open) return Result<BulkEnterpriseAssignmentResponse>.Failure("Term is not open for assignment.", ResultErrorType.BadRequest);
+                if (term == null) return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.Terms.NotFound), ResultErrorType.NotFound);
+                if (term.Status != TermStatus.Open) return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.TermNotOpenForAssignment), ResultErrorType.BadRequest);
 
                 // Initial read of internship phase (non-transactional read to validate existence and metadata)
                 var internshipPhase = await _unitOfWork.Repository<InternshipPhase>()
@@ -123,16 +127,16 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                     })
                     .FirstOrDefaultAsync(cancellationToken);
 
-                if (internshipPhase == null) return Result<BulkEnterpriseAssignmentResponse>.Failure("Internship phase not found.", ResultErrorType.NotFound);
+                if (internshipPhase == null) return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.InternshipPhaseNotFound), ResultErrorType.NotFound);
                 // Validate phase date ordering
                 if (internshipPhase.StartDate > internshipPhase.EndDate)
                 {
-                    return Result<BulkEnterpriseAssignmentResponse>.Failure("Internship phase start date is after its end date.", ResultErrorType.BadRequest);
+                    return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.InternshipPhaseStartDateAfterEndDate), ResultErrorType.BadRequest);
                 }
                 // Ensure the internship phase is within the term date range
                 if (internshipPhase.StartDate < term.StartDate || internshipPhase.EndDate > term.EndDate)
                 {
-                    return Result<BulkEnterpriseAssignmentResponse>.Failure("Internship phase must overlap with term dates.", ResultErrorType.BadRequest);
+                    return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.InternshipPhaseNotWithinTermDates), ResultErrorType.BadRequest);
                 }
                 // Ensure the internship phase has at least one job posting with status Published or Closed.
                 var hasJobPosting = await _unitOfWork.Repository<Job>().Query()
@@ -140,7 +144,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                     .AnyAsync(cancellationToken);
                 if (!hasJobPosting)
                 {
-                    return Result<BulkEnterpriseAssignmentResponse>.Failure("Internship phase must have at least one published or closed job posting.", ResultErrorType.BadRequest);
+                    return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.InternshipPhaseMustHaveAtLeastOnePublishedOrClosedJobPosting), ResultErrorType.BadRequest);
                 }
 
                 var selectedCount = requestedStudentIds.Count;
@@ -166,7 +170,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                         if (lockedPhase == null)
                         {
                             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                            return Result<BulkEnterpriseAssignmentResponse>.Failure("Internship phase not found.", ResultErrorType.NotFound);
+                            return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipPhase.NotFound), ResultErrorType.NotFound);
                         }
 
                         var remainingCapacity = lockedPhase.Capacity - lockedPhase.Jobs.SelectMany(j => j.InternshipApplications).Count(ia => ia.Status == InternshipApplicationStatus.Placed);
@@ -176,7 +180,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                         {
                             await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                             return Result<BulkEnterpriseAssignmentResponse>.Failure(
-                                $"Intern Phase {internshipPhase.PhaseName} của {internshipPhase.EnterpriseName} chỉ còn {availableSlots} slot. Bạn đang assign {selectedCount} sinh viên. Vui lòng giảm số lượng hoặc chọn phase/doanh nghiệp khác.",
+                                _messageService.GetMessage(MessageKeys.UniAssign.InternPhaseInsufficientSlots , internshipPhase.PhaseName, internshipPhase.EnterpriseName, availableSlots, selectedCount),
                                 ResultErrorType.BadRequest);
                         }
 
@@ -289,7 +293,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                                 if (hasInternshipData)
                                 {
                                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                                    return Result<BulkEnterpriseAssignmentResponse>.Failure("Không thể đổi enterprise. Sinh viên đã có dữ liệu thực tập.", ResultErrorType.BadRequest);
+                                    return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.CannotChangeEnterpriseStudentHasInternshipData), ResultErrorType.BadRequest);
                                 }
 
                                 // Reassign from placed: mark old placed app as Rejected (remove placement) and create a new pending application
@@ -415,10 +419,10 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                 }
 
                 // If we fall through, treat as failure to assign after retries.
-                return Result<BulkEnterpriseAssignmentResponse>.Failure("Failed to assign students due to concurrent operations. Please retry.", ResultErrorType.Conflict);
+                return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.FailedToAssignStudentsDueToConcurrentOperations), ResultErrorType.Conflict);
             }
 
-            return Result<BulkEnterpriseAssignmentResponse>.Failure("Unauthorized or invalid operation.", ResultErrorType.Unauthorized);
+            return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.UnauthorizedOrInvalidOperation), ResultErrorType.Unauthorized);
         }
     }
 }

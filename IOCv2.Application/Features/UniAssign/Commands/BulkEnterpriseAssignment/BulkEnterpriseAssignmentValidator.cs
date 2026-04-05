@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using IOCv2.Application.Constants;
+using IOCv2.Application.Interfaces;
 using System;
 using System.Linq;
 
@@ -6,11 +8,13 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
 {
     public class BulkEnterpriseAssignmentValidator : AbstractValidator<BulkEnterpriseAssignmentCommand>
     {
-        public BulkEnterpriseAssignmentValidator()
+        private readonly IMessageService _messageService;
+        public BulkEnterpriseAssignmentValidator(IMessageService messageService)
         {
+            _messageService = messageService;
             RuleFor(x => x.EnterpriseId)
                 .NotEmpty()
-                .WithMessage("EnterpriseId is required.");
+                .WithMessage(_messageService.GetMessage(MessageKeys.UniAssign.EnterpriseIdIsRequired));
 
             RuleFor(x => x.InternPhaseId)
                 .NotEmpty()

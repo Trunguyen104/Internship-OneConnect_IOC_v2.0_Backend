@@ -711,6 +711,9 @@
   <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
     <value>Rejected status transition of internship phase {0} from '{1}' to '{2}' — invalid transition.</value>
   </data>
+  <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
+    <value>Rejected deletion of internship phase '{0}' (ID: {1}) — phase is in InProgress status and cannot be deleted.</value>
+  </data>
   <data name="Terms.NameExists" xml:space="preserve">
     <value>Term name already exists. Please choose a different name.</value>
   </data>
@@ -1020,36 +1023,6 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>User {UserId} not found when fetching profile</value>
   </data>
-  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
-    <value>You have not uploaded a CV. Please upload your CV before applying.</value>
-  </data>
-  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
-    <value>You are in Placed status and are not allowed to apply.</value>
-  </data>
-  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
-    <value>This position is currently not open for application.</value>
-  </data>
-  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
-    <value>The application deadline has passed.</value>
-  </data>
-  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
-    <value>There is currently no active internship period to apply for.</value>
-  </data>
-  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
-    <value>You already have an active application and cannot submit another one.</value>
-  </data>
-  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
-    <value>You have reached the application limit for this position.</value>
-  </data>
-  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
-    <value>{0} has applied for the position at {1} — {2}. Please review.</value>
-  </data>
-  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
-    <value>Application successful! Your application is pending HR review.</value>
-  </data>
-  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
-    <value>You are currently doing an internship.</value>
-  </data>
   <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
     <value>Student internship list retrieved successfully.</value>
   </data>
@@ -1104,8 +1077,6 @@
   <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
     <value>No open internship term found for university {0}.</value>
   </data>
-
-  <!-- UniAdminInternship — Logbook weekly display badges -->
   <data name="UniAdminInternship.StatusBadge.Late" xml:space="preserve">
     <value>Late</value>
   </data>
@@ -1127,11 +1098,6 @@
   <data name="UniAdminInternship.WeekTitle" xml:space="preserve">
     <value>Week {0}: {1} - {2}</value>
   </data>
-
-  <!-- InternshipPhase — missing EN key -->
-  <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
-    <value>Rejected deletion of internship phase '{0}' (ID: {1}) — phase is in InProgress status and cannot be deleted.</value>
-    </data>
   <data name="InternshipPhase.InternshipPhaseIdRequired" xml:space="preserve">
     <value>Internship Phase ID is required.</value>
   </data>
@@ -1174,6 +1140,36 @@
   </data>
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Internship phase {0} detail loaded — {1} job posting(s), {2} placed student(s).</value>
+  </data>
+  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
+    <value>You have not uploaded a CV. Please upload your CV before applying.</value>
+  </data>
+  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
+    <value>You are in Placed status and are not allowed to apply.</value>
+  </data>
+  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
+    <value>This position is currently not open for application.</value>
+  </data>
+  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
+    <value>The application deadline has passed.</value>
+  </data>
+  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
+    <value>There is currently no active internship period to apply for.</value>
+  </data>
+  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
+    <value>You already have an active application and cannot submit another one.</value>
+  </data>
+  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
+    <value>You have reached the application limit for this position.</value>
+  </data>
+  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
+    <value>{0} has applied for the position at {1} — {2}. Please review.</value>
+  </data>
+  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
+    <value>Application successful! Your application is pending HR review.</value>
+  </data>
+  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
+    <value>You are currently doing an internship.</value>
   </data>
   <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
     <value>The internship phase has reached its maximum capacity.</value>
@@ -1225,5 +1221,47 @@
   </data>
   <data name="Validation.InvalidStatus" xml:space="preserve">
     <value>Status is invalid.</value>
+  </data>
+  <data name="UniAssign.StudentsNotFound" xml:space="preserve">
+    <value>Students not found: {0}</value>
+  </data>
+  <data name="UniAssign.StudentsAlreadyPlaced" xml:space="preserve">
+    <value>Students already placed: {0}</value>
+  </data>
+  <data name="UniAssign.StudentsUnauthorized" xml:space="preserve">
+    <value>You are not allowed to assign these students: {0}</value>
+  </data>
+  <data name="UniAssign.TermNotOpenForAssignment" xml:space="preserve">
+    <value>Term is not open for assignment.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseNotFound" xml:space="preserve">
+    <value>Internship phase not found.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseStartDateAfterEndDate" xml:space="preserve">
+    <value>Internship phase start date is after its end date.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseNotWithinTermDates" xml:space="preserve">
+    <value>Internship phase must overlap with term dates.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseMustHaveAtLeastOnePublishedOrClosedJobPosting" xml:space="preserve">
+    <value>Internship phase must have at least one published or closed job posting.</value>
+  </data>
+  <data name="UniAssign.InternPhaseInsufficientSlots" xml:space="preserve">
+    <value>Intern Phase {0} of {1} only has {2} slot(s) left. You are assigning {3} student(s). Please reduce the number or choose another phase/enterprise.</value>
+  </data>
+  <data name="UniAssign.AuditLogAssignMetadata" xml:space="preserve">
+    <value>{{\"studentId\":\"{0}\",\"enterpriseId\":\"{1}\",\"internPhaseId\":\"{2}\",\"termId\":\"{3}\",\"note\":\"bulk assign - created pending\"}}</value>
+  </data>
+  <data name="UniAssign.CannotChangeEnterpriseStudentHasInternshipData" xml:space="preserve">
+    <value>Cannot change enterprise. Student already has internship data.</value>
+  </data>
+  <data name="UniAssign.FailedToAssignStudentsDueToConcurrentOperations" xml:space="preserve">
+    <value>Failed to assign students due to concurrent operations. Please retry.</value>
+  </data>
+  <data name="UniAssign.UnauthorizedOrInvalidOperation" xml:space="preserve">
+    <value>Unauthorized or invalid operation.</value>
+  </data>
+  <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
+    <value>EnterpriseId is required.</value>
   </data>
 </root>
