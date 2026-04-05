@@ -125,17 +125,21 @@ public class GetMissingLogbookDatesHandler
         }
 
         // ── 3. Fetch the dates already submitted by this student in the window ──
+        // Convert boundaries to DateTime for EF Core / Npgsql translation compatibility
+        var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
+        var todayDateTime = today.ToDateTime(TimeOnly.MinValue).AddDays(1); // exclusive upper bound
+
         var rawDates = await _unitOfWork.Repository<Logbook>()
             .Query()
             .AsNoTracking()
             .Where(l => l.StudentId == studentId
-                        && l.DateReport.Date >= startDate.ToDateTime(TimeOnly.MinValue)
-                        && l.DateReport.Date <= today.ToDateTime(TimeOnly.MinValue))
-            .Select(l => l.DateReport.Date)
+                        && l.DateReport >= startDateTime
+                        && l.DateReport < todayDateTime)
+            .Select(l => l.DateReport)
             .ToListAsync(cancellationToken);
 
         var submittedDates = rawDates
-            .Select(d => DateOnly.FromDateTime(d))
+            .Select(d => DateOnly.FromDateTime(d.Date))
             .Distinct()
             .ToList();
 
