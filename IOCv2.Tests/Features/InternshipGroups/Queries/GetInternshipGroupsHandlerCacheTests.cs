@@ -77,6 +77,8 @@ public class GetInternshipGroupsHandlerCacheTests
         var result = await handler.Handle(new GetInternshipGroupsQuery { PageNumber = 1, PageSize = 10 }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
+        result.Data!.Items.Should().ContainSingle();
+        result.Data.Items[0].HasNoMentorWarning.Should().BeTrue();
         cache.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<IOCv2.Application.Common.Models.PaginatedResult<GetInternshipGroupsResponse>>(), It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

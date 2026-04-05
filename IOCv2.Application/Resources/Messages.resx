@@ -950,6 +950,9 @@
   <data name="Projects.AssignGroupSuccess" xml:space="preserve">
     <value>Dự án đã được gán vào nhóm thực tập thành công.</value>
   </data>
+  <data name="Projects.GroupHasNoMentor" xml:space="preserve">
+    <value>Nhóm chưa có Mentor. Gán Mentor trước để gán dự án.</value>
+  </data>
   <data name="Projects.LogAssignGroupSuccess" xml:space="preserve">
     <value>Project {0} đã được gán vào nhóm {1}.</value>
   </data>

@@ -23,6 +23,7 @@ public class GetMyInternshipGroupsResponse
     public MineProjectDto? Project { get; set; }
     public MineTermDto? Term { get; set; }
     public List<MineMentorDto> Mentors { get; set; } = new();
+    public bool HasNoMentorWarning { get; set; }
     public int StudentCount { get; set; }
     public int EvaluationCount { get; set; }
     public Guid? ProjectId { get; set; }
@@ -95,6 +96,7 @@ public class GetMyInternshipGroupsResponse
                         Email = group.Mentor.User.Email
                     }
                 },
+            HasNoMentorWarning = !group.MentorId.HasValue,
             StudentCount = group.Members.Count,
             EvaluationCount = 0, // Will be populated in the handler for efficiency if needed, or here if we have it
             ProjectId = project?.ProjectId,
