@@ -45,7 +45,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
             {
                 if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
                     return Result<ReAssignSingleResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Common.Unauthorized),
+                        "Unauthorized",
                         ResultErrorType.Unauthorized);
 
                 // Resolve UniversityUser (uni admin)

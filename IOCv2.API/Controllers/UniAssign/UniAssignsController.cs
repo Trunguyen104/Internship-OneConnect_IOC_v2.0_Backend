@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment;
+using IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise;
+using IOCv2.Application.Features.UniAssign.Commands.BulkUnassign;
 using IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignment;
 using IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle;
 using IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle;
-using IOCv2.Application.Features.UniAssign.Queries;
 using IOCv2.Application.Features.UniAssign.Queries.GetEnterpriseInterPhase;
-using IOCv2.Application.Features.HRApplications.UniAssign.Commands.ApproveUniAssign;
-using IOCv2.Application.Features.HRApplications.UniAssign.Commands.RemovePlacedUniAssign;
-using IOCv2.Application.Features.HRApplications.UniAssign.Queries.GetUniAssignApplications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,90 +29,89 @@ public class UniAssignsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Uni Admin quick assign: create a PendingAssignment for a single student (inline).
+    /// Bulk assign students to an enterprise intern phase (UniAssign).
     /// </summary>
-    [HttpPost("uni-assign")]
-    [Authorize(Roles = "SchoolAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<QuickEnterpriseAssignmentResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateUniAssign([FromBody] QuickEnterpriseAssignmentCommand command, CancellationToken cancellationToken)
+    [HttpPost("bulk-enterprise-assignment")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> BulkEnterpriseAssignment([FromBody] BulkEnterpriseAssignmentCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
 
     /// <summary>
-    /// Get Enterprise Inter-Phase data.
+    /// Bulk reassign students to a new enterprise intern phase (UniAssign reassign).
     /// </summary>
-    [HttpGet("enterprise-interphase")]
-    [Authorize(Roles = "SchoolAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<List<GetEnterpriseInterPhaseResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetEnterpriseInterPhase([FromQuery] GetEnterpriseInterPhaseQuery query, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(query, cancellationToken);
-        return HandleResult(result);
-    }
-
-    /// <summary>
-    /// Enterprise: list uni-assign applications (paginated, filters).
-    /// </summary>
-    [HttpGet("uni-assign-applications")]
-    [Authorize(Roles = "SchoolAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetUniAssignApplicationsResponse>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetUniAssignApplications([FromQuery] GetUniAssignApplicationsQuery query, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(query, cancellationToken);
-        return HandleResult(result);
-    }
-
-    /// <summary>
-    /// Enterprise approves a pending uni-assign (place student).
-    /// </summary>
-    [HttpPost("approve-uni-assign")]
-    [Authorize(Roles = "SchoolAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<ApproveUniAssignResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ApproveUniAssign([FromBody] ApproveUniAssignCommand command, CancellationToken cancellationToken)
+    [HttpPost("bulk-reassign-enterprise")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> BulkReassignEnterprise([FromBody] BulkReassignEnterpriseCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
 
     /// <summary>
-    /// Enterprise removes a placed uni-assign (HR remove placed student).
+    /// Bulk unassign students previously assigned via UniAssign.
     /// </summary>
-    [HttpPost("remove-placed-uni-assign")]
-    [Authorize(Roles = "SchoolAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<RemovePlacedUniAssignResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> RemovePlacedUniAssign([FromBody] RemovePlacedUniAssignCommand command, CancellationToken cancellationToken)
+    [HttpPost("bulk-unassign")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> BulkUnassign([FromBody] BulkUnassignCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
         return HandleResult(result);
     }
 
     /// <summary>
-    /// Uni Admin unassign: withdraw a pending or placed uni-assign.
+    /// Quickly assign a single student to an enterprise intern phase (UniAssign quick assign).
+    /// </summary>
+    [HttpPost("quick-enterprise-assignment")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> QuickEnterpriseAssignment([FromBody] QuickEnterpriseAssignmentCommand command, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Reassign a single student's application to a new enterprise/intern phase (UniAssign reassign single).
+    /// </summary>
+    [HttpPost("reassign-single")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ReAssignSingle([FromBody] ReAssignSingleCommand command, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Unassign a single student's application that was assigned via UniAssign.
     /// </summary>
     [HttpPost("unassign-single")]
-    [Authorize(Roles = "SchoolAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<UnAssignSingleResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UnAssignSingle([FromBody] UnAssignSingleCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
@@ -121,18 +119,16 @@ public class UniAssignsController : ApiControllerBase
     }
 
     /// <summary>
-    /// Uni Admin reassign: change enterprise for a student's uni-assign (supports pending -> update or placed -> withdraw+create pending).
+    /// Get enterprise intern phases.
     /// </summary>
-    [HttpPost("reassign-single")]
-    [Authorize(Roles = "SchoolAdmin")]
-    [ProducesResponseType(typeof(ApiResponse<ReAssignSingleResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> ReAssignSingle([FromBody] ReAssignSingleCommand command, CancellationToken cancellationToken)
+    [HttpGet("enterprise-interphases")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetEnterpriseInterPhases([FromQuery] string? searchTerm, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
+        var query = new GetEnterpriseInterPhaseQuery { SearchTerm = searchTerm };
+        var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
 }

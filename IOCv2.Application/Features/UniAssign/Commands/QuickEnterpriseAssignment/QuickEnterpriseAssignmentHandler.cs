@@ -38,10 +38,10 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
             {
                 var currentUserUniversityId = await _unitOfWork.Repository<UniversityUser>().Query().Where(x => x.UserId == currentUserId).Select(x => x.UniversityId).FirstOrDefaultAsync(cancellationToken);
                 var studentUser = await _unitOfWork.Repository<Student>().Query()
-    .Where(x => x.StudentId == request.StudentId)
-    .Include(x => x.User)
-    .Select(x => new { x.UserId, InternshipStatus = x.InternshipStatus, FullName = x.User.FullName })
-    .FirstOrDefaultAsync(cancellationToken);
+                    .Where(x => x.StudentId == request.StudentId)
+                    .Include(x => x.User)
+                    .Select(x => new { x.UserId, InternshipStatus = x.InternshipStatus, FullName = x.User.FullName })
+                    .FirstOrDefaultAsync(cancellationToken);
                 if (studentUser == null) return Result<QuickEnterpriseAssignmentResponse>.Failure("Student not found.", ResultErrorType.NotFound);
                 if (studentUser.InternshipStatus == StudentStatus.Placed) return Result<QuickEnterpriseAssignmentResponse>.Failure("Student has already been placed in an internship.", ResultErrorType.BadRequest);
                 var studentUniversityId = await _unitOfWork.Repository<UniversityUser>().Query().Where(x => x.UserId == studentUser.UserId).Select(x => x.UniversityId).FirstOrDefaultAsync(cancellationToken);
@@ -49,7 +49,13 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                     return Result<QuickEnterpriseAssignmentResponse>.Failure("You are not allowed to assign this student.", ResultErrorType.Unauthorized);
             }
 
-            var term = await _unitOfWork.Repository<Term>().GetByIdAsync(request.TermId, cancellationToken);
+            var term = await (
+                    from st in _unitOfWork.Repository<StudentTerm>().Query()
+                    join t in _unitOfWork.Repository<Term>().Query() on st.TermId equals t.TermId
+                    where st.StudentId == request.StudentId && t.Status == TermStatus.Open
+                    orderby t.StartDate descending
+                    select t
+                ).FirstOrDefaultAsync(cancellationToken);
             if (term == null) return Result<QuickEnterpriseAssignmentResponse>.Failure("Term not found.", ResultErrorType.NotFound);
             if (term.Status != TermStatus.Open) return Result<QuickEnterpriseAssignmentResponse>.Failure("Term is not open for assignment.", ResultErrorType.BadRequest);
 
@@ -90,7 +96,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                 .Where(a =>
                     a.StudentId == request.StudentId &&
                     a.EnterpriseId == request.EnterpriseId &&
-                    a.TermId == request.TermId &&
+                    a.TermId == term.TermId &&
                     a.Source == ApplicationSource.SelfApply &&
                     activeSelfApplyStatuses.Contains(a.Status))
                 .FirstOrDefaultAsync(cancellationToken);
@@ -141,7 +147,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
             {
                 ApplicationId = Guid.NewGuid(),
                 EnterpriseId = request.EnterpriseId,
-                TermId = request.TermId,
+                TermId = term.TermId,
                 StudentId = request.StudentId,
                 InternPhaseId = request.InternPhaseId,
                 Status = InternshipApplicationStatus.PendingAssignment,
@@ -164,7 +170,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                     EntityType = nameof(InternshipApplication),
                     EntityId = internshipApplication.ApplicationId,
                     PerformedById = currentUserId,
-                    Metadata = $"{{\"studentId\":\"{request.StudentId}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{request.TermId}\",\"note\":\"quick assign - created pending\"}}"
+                    Metadata = $"{{\"studentId\":\"{request.StudentId}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{term.TermId}\",\"note\":\"quick assign - created pending\"}}"
                 });
 
                 if (auditLogs.Any())
@@ -181,7 +187,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                 catch (DbUpdateConcurrencyException dbEx)
                 {
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                    _logger.LogWarning(dbEx, "Concurrency conflict while creating internship application for student {StudentId} in term {TermId} and enterprise {EnterpriseId}", request.StudentId, request.TermId, request.EnterpriseId);
+                    _logger.LogWarning(dbEx, "Concurrency conflict while creating internship application for student {StudentId} in term {TermId} and enterprise {EnterpriseId}", request.StudentId, term.TermId, request.EnterpriseId);
                     // Return a conflict so the UI can show a toast/warning to the user and prompt refresh
                     return Result<QuickEnterpriseAssignmentResponse>.Failure("Đã xảy ra xung đột đồng thời. Một người khác vừa gán sinh viên này. Vui lòng tải lại trang và thử lại.", ResultErrorType.Conflict);
                 }
@@ -191,7 +197,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                 {
                     var enterpriseName = internshipPhase.Name != null ? internshipPhase.Name : (await _unitOfWork.Repository<Enterprise>().Query().Where(e => e.EnterpriseId == request.EnterpriseId).Select(e => e.Name).FirstOrDefaultAsync(cancellationToken)) ?? string.Empty;
                     // Use term.Name for term label
-                    var termName = (await _unitOfWork.Repository<Term>().Query().Where(t => t.TermId == request.TermId).Select(t => t.Name).FirstOrDefaultAsync(cancellationToken)) ?? string.Empty;
+                    var termName = (await _unitOfWork.Repository<Term>().Query().Where(t => t.TermId == term.TermId).Select(t => t.Name).FirstOrDefaultAsync(cancellationToken)) ?? string.Empty;
 
                     await _publisher.Publish(new ApplicationAssignedUniAssignEvent(
                         student.UserId,
@@ -209,7 +215,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "Error occurred while creating internship application for student {StudentId} in term {TermId} and enterprise {EnterpriseId}", request.StudentId, request.TermId, request.EnterpriseId);
+                _logger.LogError(ex, "Error occurred while creating internship application for student {StudentId} in term {TermId} and enterprise {EnterpriseId}", request.StudentId, term.TermId, request.EnterpriseId);
                 return Result<QuickEnterpriseAssignmentResponse>.Failure("An error occurred while processing the assignment. Please try again later.", ResultErrorType.InternalServerError);
             }
         }

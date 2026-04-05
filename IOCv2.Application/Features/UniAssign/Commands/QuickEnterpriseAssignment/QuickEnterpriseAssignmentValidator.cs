@@ -21,10 +21,6 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                 .NotEmpty()
                 .WithMessage(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));
 
-            RuleFor(x => x.TermId)
-                .NotEmpty()
-                .WithMessage(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));
-
             RuleFor(x => x.EnterpriseId)
                 .NotEmpty()
                 .WithMessage(_messageService.GetMessage(MessageKeys.Common.InvalidRequest));

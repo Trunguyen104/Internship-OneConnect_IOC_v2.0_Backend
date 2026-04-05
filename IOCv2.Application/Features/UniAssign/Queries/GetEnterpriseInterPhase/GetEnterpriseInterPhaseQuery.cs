@@ -7,6 +7,6 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetEnterpriseInterPhase
 {
     public record GetEnterpriseInterPhaseQuery : IRequest<Result<List<GetEnterpriseInterPhaseResponse>>>
     {
-        public string SearchTerm { get; init; } = string.Empty;
+        public string? SearchTerm { get; init; }
     }
 }

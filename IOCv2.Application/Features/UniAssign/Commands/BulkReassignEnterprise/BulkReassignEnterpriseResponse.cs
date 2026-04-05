@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
+namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
 {
     public record BulkReassignEnterpriseResponse
     {

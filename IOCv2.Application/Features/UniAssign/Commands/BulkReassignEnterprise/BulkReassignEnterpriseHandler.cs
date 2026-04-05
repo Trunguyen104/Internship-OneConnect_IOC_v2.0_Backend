@@ -15,7 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
+namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
 {
     internal class BulkReassignEnterpriseHandler : IRequestHandler<BulkReassignEnterpriseCommand, Result<BulkReassignEnterpriseResponse>>
     {
@@ -45,7 +45,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
                     .FirstOrDefaultAsync(cancellationToken);
 
                 // Build requested student id list: prefer `StudentIds` list from request, otherwise use single `StudentId`.
-                var requestedStudentIds = (request.StudentIds != null && request.StudentIds.Any())
+                var requestedStudentIds = request.StudentIds != null && request.StudentIds.Any()
                     ? request.StudentIds.Distinct().ToList()
                     : new List<Guid>();
 
@@ -162,7 +162,14 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
                     return Result<BulkReassignEnterpriseResponse>.Failure("No students available to reassign after exclusions.", ResultErrorType.BadRequest);
                 }
 
-                var term = await _unitOfWork.Repository<Term>().GetByIdAsync(request.TermId, cancellationToken);
+                var term = await (
+                    from st in _unitOfWork.Repository<StudentTerm>().Query()
+                    join t in _unitOfWork.Repository<Term>().Query() on st.TermId equals t.TermId
+                    where requestedStudentIds.Contains(st.StudentId) && t.Status == TermStatus.Open
+                    orderby t.StartDate descending
+                    select t
+                ).FirstOrDefaultAsync(cancellationToken);
+
                 if (term == null) return Result<BulkReassignEnterpriseResponse>.Failure("Term not found.", ResultErrorType.NotFound);
 
                 // Optional: if request exposes a TermStatus, check it and short-circuit if ended/closed.
@@ -229,7 +236,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
 
                 var studentTerm = await _unitOfWork.Repository<StudentTerm>()
                     .Query()
-                    .Where(st => st.TermId == request.TermId && remainingStudentIds.Contains(st.StudentId))
+                    .Where(st => st.TermId == term.TermId && remainingStudentIds.Contains(st.StudentId))
                     .ToListAsync(cancellationToken);
 
                 // Prepare audit logs collector
@@ -267,7 +274,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
                         EntityType = nameof(InternshipApplication),
                         EntityId = app.ApplicationId,
                         PerformedById = currentUserId,
-                        Metadata = $"{{\"studentId\":\"{app.StudentId}\",\"enterpriseId\":\"{app.EnterpriseId}\",\"termId\":\"{request.TermId}\",\"note\":\"withdrawn due to reassignment\"}}"
+                        Metadata = $"{{\"studentId\":\"{app.StudentId}\",\"enterpriseId\":\"{app.EnterpriseId}\",\"termId\":\"{term.TermId}\",\"note\":\"withdrawn due to reassignment\"}}"
                     });
 
                     app.Status = InternshipApplicationStatus.Withdrawn;
@@ -326,7 +333,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
                         StudentId = sid,
                         EnterpriseId = request.NewEnterpriseId,
                         InternPhaseId = request.NewInternPhaseId,
-                        TermId = request.TermId,
+                        TermId = term.TermId,
                         Status = InternshipApplicationStatus.PendingAssignment,
                         Source = ApplicationSource.UniAssign,
                         CreatedBy = currentUserId,
@@ -342,7 +349,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
                         EntityType = nameof(InternshipApplication),
                         EntityId = newApp.ApplicationId,
                         PerformedById = currentUserId,
-                        Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.NewEnterpriseId}\",\"termId\":\"{request.TermId}\",\"note\":\"created pending due to reassignment\"}}"
+                        Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.NewEnterpriseId}\",\"termId\":\"{term.TermId}\",\"note\":\"created pending due to reassignment\"}}"
                     });
                 }
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);

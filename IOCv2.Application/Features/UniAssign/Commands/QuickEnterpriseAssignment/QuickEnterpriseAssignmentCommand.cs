@@ -11,7 +11,6 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
     public record QuickEnterpriseAssignmentCommand : IRequest<Result<QuickEnterpriseAssignmentResponse>>
     {
         public Guid StudentId { get; init; }
-        public Guid TermId { get; init; }
         public Guid EnterpriseId { get; init; }
         public Guid InternPhaseId { get; init; }
     }

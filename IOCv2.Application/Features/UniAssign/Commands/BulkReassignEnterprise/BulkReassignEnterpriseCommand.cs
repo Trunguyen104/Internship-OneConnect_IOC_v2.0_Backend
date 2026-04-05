@@ -3,15 +3,10 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 
-namespace IOCv2.Application.Features.UniAssign.Commands.BulkAssign
+namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
 {
-    internal class BulkReassignEnterpriseCommand : IRequest<Result<BulkReassignEnterpriseResponse>>
+    public record BulkReassignEnterpriseCommand : IRequest<Result<BulkReassignEnterpriseResponse>>
     {
-        /// <summary>
-        /// Term c?a k? ðang thao tác (dùng ð? validate term status)
-        /// </summary>
-        public Guid TermId { get; set; }
-
         /// <summary>
         /// Enterprise m?i s? reassign t?i
         /// </summary>

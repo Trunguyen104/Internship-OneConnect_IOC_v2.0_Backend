@@ -92,7 +92,14 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                     return Result<BulkEnterpriseAssignmentResponse>.Failure($"You are not allowed to assign these students: {string.Join(", ", unauthorized)}", ResultErrorType.Unauthorized);
                 }
 
-                var term = await _unitOfWork.Repository<Term>().GetByIdAsync(request.TermId, cancellationToken);
+                var term = await (
+                    from st in _unitOfWork.Repository<StudentTerm>().Query()
+                    join t in _unitOfWork.Repository<Term>().Query() on st.TermId equals t.TermId
+                    where requestedStudentIds.Contains(st.StudentId) && t.Status == TermStatus.Open
+                    orderby t.StartDate descending
+                    select t
+                ).FirstOrDefaultAsync(cancellationToken);
+
                 if (term == null) return Result<BulkEnterpriseAssignmentResponse>.Failure("Term not found.", ResultErrorType.NotFound);
                 if (term.Status != TermStatus.Open) return Result<BulkEnterpriseAssignmentResponse>.Failure("Term is not open for assignment.", ResultErrorType.BadRequest);
 
@@ -180,7 +187,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                             .Include(a => a.Student).ThenInclude(s => s.User)
                             .Include(a => a.Enterprise)
                             .Where(a => requestedStudentIds.Contains(a.StudentId)
-                                        && a.TermId == request.TermId
+                                        && a.TermId == term.TermId
                                         && (a.Status == InternshipApplicationStatus.PendingAssignment || a.Status == InternshipApplicationStatus.Placed)
                                         && a.Source == ApplicationSource.UniAssign)
                             .ToListAsync(cancellationToken);
@@ -205,7 +212,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                                 {
                                     ApplicationId = Guid.NewGuid(),
                                     EnterpriseId = request.EnterpriseId,
-                                    TermId = request.TermId,
+                                    TermId = term.TermId,
                                     StudentId = sid,
                                     InternPhaseId = request.InternPhaseId,
                                     Status = InternshipApplicationStatus.PendingAssignment,
@@ -222,7 +229,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                                     EntityType = nameof(InternshipApplication),
                                     EntityId = newApp.ApplicationId,
                                     PerformedById = currentUserId,
-                                    Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{request.TermId}\",\"note\":\"bulk assign - created pending\"}}"
+                                    Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{term.TermId}\",\"note\":\"bulk assign - created pending\"}}"
                                 });
 
                                 // prepare publish: Assigned
@@ -250,7 +257,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                                     EntityType = nameof(InternshipApplication),
                                     EntityId = existing.ApplicationId,
                                     PerformedById = currentUserId,
-                                    Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{request.TermId}\",\"wasDifferent\":{wasDifferent.ToString().ToLower()}}}"
+                                    Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{term.TermId}\",\"wasDifferent\":{wasDifferent.ToString().ToLower()}}}"
                                 });
 
                                 if (wasDifferent)
@@ -312,7 +319,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                                 {
                                     ApplicationId = Guid.NewGuid(),
                                     EnterpriseId = request.EnterpriseId,
-                                    TermId = request.TermId,
+                                    TermId = term.TermId,
                                     StudentId = sid,
                                     InternPhaseId = request.InternPhaseId,
                                     Status = InternshipApplicationStatus.PendingAssignment,
@@ -329,7 +336,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                                     EntityType = nameof(InternshipApplication),
                                     EntityId = newApp.ApplicationId,
                                     PerformedById = currentUserId,
-                                    Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{request.TermId}\",\"note\":\"reassigned from placed\"}}"
+                                    Metadata = $"{{\"studentId\":\"{sid}\",\"enterpriseId\":\"{request.EnterpriseId}\",\"internPhaseId\":\"{request.InternPhaseId}\",\"termId\":\"{term.TermId}\",\"note\":\"reassigned from placed\"}}"
                                 });
 
                                 // prepare publish: Reassigned from placed (provide old and new names)
@@ -360,7 +367,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                         var response = new BulkEnterpriseAssignmentResponse
                         {
                             InternPhaseId = internshipPhase.PhaseId,
-                            TermId = request.TermId,
+                            TermId = term.TermId,
                             EnterpriseId = request.EnterpriseId,
                             StudentIds = requestedStudentIds
                         };
