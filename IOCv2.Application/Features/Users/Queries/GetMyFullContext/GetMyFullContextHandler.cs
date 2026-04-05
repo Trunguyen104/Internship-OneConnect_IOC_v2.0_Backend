@@ -50,7 +50,7 @@ public class GetMyFullContextHandler : IRequestHandler<GetMyFullContextQuery, Re
             .Include(s => s.InternshipStudents)
                 .ThenInclude(ist => ist.InternshipGroup)
                     .ThenInclude(g => g.Mentor)
-                        .ThenInclude(m => m.User)
+                        .ThenInclude(m => m!.User)
             .Include(s => s.InternshipStudents)
                 .ThenInclude(ist => ist.InternshipGroup)
                     .ThenInclude(g => g.InternshipPhase)
@@ -98,8 +98,8 @@ public class GetMyFullContextHandler : IRequestHandler<GetMyFullContextQuery, Re
                 TermName = term.Name,
                 StartDate = term.StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = term.EndDate.ToDateTime(TimeOnly.MinValue),
-                Status = CalculateDisplayStatus(term, nowDateOnly).ToString(),
-                EnrollmentStatus = activeOrMostRecentTerm.EnrollmentStatus.ToString()
+                Status = CalculateDisplayStatus(term, nowDateOnly),
+                EnrollmentStatus = activeOrMostRecentTerm.EnrollmentStatus
             };
         }
 
@@ -128,7 +128,7 @@ public class GetMyFullContextHandler : IRequestHandler<GetMyFullContextQuery, Re
                 {
                     PhaseId = group.PhaseId,
                     Name = group.InternshipPhase.Name,
-                    Status = group.InternshipPhase.Status.ToString()
+                    Status = group.InternshipPhase.Status
                 };
             }
 
@@ -158,7 +158,7 @@ public class GetMyFullContextHandler : IRequestHandler<GetMyFullContextQuery, Re
                 {
                     ProjectId = project.ProjectId,
                     Name = project.ProjectName,
-                    Status = project.OperationalStatus.ToString()
+                    Status = project.OperationalStatus
                 };
             }
         }

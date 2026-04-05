@@ -1325,4 +1325,10 @@
   <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
     <value>Invalid Contact Email format.</value>
   </data>
+  <data name="University.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>This contact email is already registered by another University or Enterprise in the system.</value>
+  </data>
+  <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>This contact email is already registered by another Enterprise or University in the system.</value>
+  </data>
 </root>

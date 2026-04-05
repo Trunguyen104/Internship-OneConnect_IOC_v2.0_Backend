@@ -94,6 +94,7 @@ namespace IOCv2.Application.Constants
             public const string Inactive = "University.Inactive";
             public const string HasActiveTerms = "University.HasActiveTerms";
             public const string HasInterningStudents = "University.HasInterningStudents";
+            public const string ContactEmailAlreadyExists = "University.ContactEmailAlreadyExists";
         }
 
         public static class Enterprise
@@ -137,6 +138,7 @@ namespace IOCv2.Application.Constants
             public const string TaxCodeInvalid = "Enterprise.TaxCodeInvalid";
             public const string NameRequired = "Enterprise.NameRequired";
             public const string ContactEmailInvalid = "Enterprise.ContactEmailInvalid";
+            public const string ContactEmailAlreadyExists = "Enterprise.ContactEmailAlreadyExists";
         }
 
         public static class Profile

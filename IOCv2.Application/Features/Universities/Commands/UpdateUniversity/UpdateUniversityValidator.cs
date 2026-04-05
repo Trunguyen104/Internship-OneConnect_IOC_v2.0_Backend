@@ -6,10 +6,12 @@ namespace IOCv2.Application.Features.Universities.Commands.UpdateUniversity;
 
 public class UpdateUniversityValidator : AbstractValidator<UpdateUniversityCommand>
 {
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageService _messageService;
 
-    public UpdateUniversityValidator(IMessageService messageService)
+    public UpdateUniversityValidator(IUnitOfWork unitOfWork, IMessageService messageService)
     {
+        _unitOfWork = unitOfWork;
         _messageService = messageService;
 
         RuleFor(v => v.UniversityId).NotEmpty();
@@ -25,6 +27,8 @@ public class UpdateUniversityValidator : AbstractValidator<UpdateUniversityComma
         RuleFor(v => v.ContactEmail)
             .MaximumLength(255).WithMessage(_messageService.GetMessage(MessageKeys.Profile.EmailInvalid))
             .EmailAddress().WithMessage(_messageService.GetMessage(MessageKeys.Profile.EmailInvalid))
+            .MustAsync(BeUniqueContactEmail)
+                .WithMessage(_messageService.GetMessage(MessageKeys.University.ContactEmailAlreadyExists))
             .When(v => !string.IsNullOrEmpty(v.ContactEmail));
 
         RuleFor(v => v.Address)
@@ -32,5 +36,20 @@ public class UpdateUniversityValidator : AbstractValidator<UpdateUniversityComma
 
         RuleFor(v => v.Status)
             .IsInEnum().WithMessage(_messageService.GetMessage(MessageKeys.Validation.UserInvalidStatus));
+    }
+
+    private async Task<bool> BeUniqueContactEmail(UpdateUniversityCommand request, string? email, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(email)) return true;
+
+        var existsInUniversities = await _unitOfWork.Repository<Domain.Entities.University>()
+            .ExistsAsync(u => u.ContactEmail == email && u.UniversityId != request.UniversityId, cancellationToken);
+        
+        if (existsInUniversities) return false;
+
+        var existsInEnterprises = await _unitOfWork.Repository<Domain.Entities.Enterprise>()
+            .ExistsAsync(e => e.ContactEmail == email, cancellationToken);
+
+        return !existsInEnterprises;
     }
 }

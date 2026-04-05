@@ -15,16 +15,23 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
     private readonly ICurrentUserService _currentUserService;
     private readonly ICacheService _cacheService;
 
+    private readonly IEmailService _emailService;
+    private readonly IBackgroundEmailSender _emailSender;
+
     public CreateUniversityHandler(
         IUnitOfWork unitOfWork,
         ILogger<CreateUniversityHandler> logger,
         ICurrentUserService currentUserService,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        IEmailService emailService,
+        IBackgroundEmailSender emailSender)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _currentUserService = currentUserService;
         _cacheService = cacheService;
+        _emailService = emailService;
+        _emailSender = emailSender;
     }
 
     public async Task<Result<Guid>> Handle(CreateUniversityCommand request, CancellationToken cancellationToken)
@@ -59,6 +66,18 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
             await _cacheService.RemoveByPatternAsync(UniversityCacheKeys.UniversityListPattern(), cancellationToken);
 
             _logger.LogInformation("Successfully created university: {UniversityId}", university.UniversityId);
+
+            // Send notification email asynchronously via background channel
+            if (!string.IsNullOrWhiteSpace(university.ContactEmail))
+            {
+                await _emailSender.EnqueueUniversityCreationEmailAsync(
+                    university.ContactEmail,
+                    university.Name,
+                    university.Code,
+                    university.UniversityId,
+                    null,
+                    cancellationToken);
+            }
 
             return Result<Guid>.Success(university.UniversityId);
         }

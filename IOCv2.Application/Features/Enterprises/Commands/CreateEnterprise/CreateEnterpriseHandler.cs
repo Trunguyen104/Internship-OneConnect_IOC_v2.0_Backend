@@ -21,13 +21,25 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
         private readonly IMapper _mapper;
         private readonly ICacheService _cacheService;
 
-        public CreateEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<CreateEnterpriseHandler> logger, IMapper mapper, ICacheService cacheService)
+        private readonly IEmailService _emailService;
+        private readonly IBackgroundEmailSender _emailSender;
+
+        public CreateEnterpriseHandler(
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
+            ILogger<CreateEnterpriseHandler> logger,
+            IMapper mapper,
+            ICacheService cacheService,
+            IEmailService emailService,
+            IBackgroundEmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _logger = logger;
             _mapper = mapper;
             _cacheService = cacheService;
+            _emailService = emailService;
+            _emailSender = emailSender;
         }
 
         public async Task<Result<CreateEnterpriseResponse>> Handle(CreateEnterpriseCommand request, CancellationToken cancellationToken)
@@ -64,6 +76,21 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
 
                 // 3. Post-commit operations (Cache invalidation)
                 await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
+
+                // Send notification email asynchronously via background channel
+                if (!string.IsNullOrWhiteSpace(enterprise.ContactEmail))
+                {
+                    var enterpriseName = enterprise.Name ?? "Doanh nghiệp";
+                    var taxCode = enterprise.TaxCode ?? "";
+                    
+                    await _emailSender.EnqueueEnterpriseCreationEmailAsync(
+                        enterprise.ContactEmail,
+                        enterpriseName,
+                        taxCode,
+                        enterprise.EnterpriseId,
+                        null,
+                        cancellationToken);
+                }
 
                 return Result<CreateEnterpriseResponse>.Success(_mapper.Map<CreateEnterpriseResponse>(enterprise));
             }

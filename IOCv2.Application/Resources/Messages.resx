@@ -1329,4 +1329,10 @@
   <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
     <value>Định dạng email liên hệ không hợp lệ.</value>
   </data>
+  <data name="University.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>Email liên hệ này đã được đăng ký bởi một Trường học hoặc Doanh nghiệp khác trong hệ thống.</value>
+  </data>
+  <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>Email liên hệ này đã được đăng ký bởi một Doanh nghiệp hoặc Trường học khác trong hệ thống.</value>
+  </data>
 </root>

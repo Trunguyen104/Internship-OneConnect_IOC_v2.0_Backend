@@ -1,3 +1,6 @@
+using IOCv2.Domain.Enums;
+using MediatR;
+
 namespace IOCv2.Application.Features.Users.Queries.GetMyFullContext;
 
 public class GetMyFullContextResponse
@@ -28,8 +31,8 @@ public class TermContextInfo
     public string TermName { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public string Status { get; set; } = string.Empty;
-    public string EnrollmentStatus { get; set; } = string.Empty;
+    public TermDisplayStatus Status { get; set; }
+    public EnrollmentStatus EnrollmentStatus { get; set; }
 }
 
 public class InternshipContextInfo
@@ -45,7 +48,7 @@ public class InternshipPhaseContextInfo
 {
     public Guid PhaseId { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
+    public InternshipPhaseStatus Status { get; set; }
 }
 
 public class EnterpriseContextInfo
@@ -71,5 +74,5 @@ public class ProjectContextInfo
 {
     public Guid ProjectId { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
+    public OperationalStatus Status { get; set; }
 }

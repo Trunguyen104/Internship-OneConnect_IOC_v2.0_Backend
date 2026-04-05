@@ -54,6 +54,9 @@ namespace IOCv2.Infrastructure
             // Register Hosted Service to process emails
             services.AddHostedService<EmailHostedService>();
 
+            // Register Background Job to auto-close expired job postings
+            services.AddHostedService<JobExpiryHostedService>();
+
             // Register Background Job to auto-complete expired projects
             services.AddHostedService<AutoCompleteProjectsJob>();
 
