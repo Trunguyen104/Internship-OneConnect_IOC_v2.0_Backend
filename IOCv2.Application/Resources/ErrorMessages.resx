@@ -789,6 +789,9 @@
   <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
     <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
   </data>
+  <data name="Terms.EndDateMustBeAtLeastOneMonthAfterStart" xml:space="preserve">
+    <value>Ngày kết thúc phải cách ngày bắt đầu ít nhất 1 tháng.</value>
+  </data>
   <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Ngày bắt đầu không được là ngày trong quá khứ.</value>
   </data>

@@ -35,13 +35,13 @@ namespace IOCv2.API.Controllers.ViolationReports
 
         /// <summary>
         /// Retrieves a paginated list of violation reports.
-        /// Accessible to users in the Student and Mentor roles.
+        /// Accessible to users in the Student, Mentor and EnterpriseAdmin roles.
         /// </summary>
         /// <param name="query">Query parameters for paging, filtering and sorting.</param>
         /// <param name="cancellationToken">Cancellation token propagated to mediator.</param>
         /// <returns>Paginated result wrapped in ApiResponse on success.</returns>
         [HttpGet]
-        [Authorize(Roles = "Student,Mentor")]
+        [Authorize(Roles = "Student,Mentor,EnterpriseAdmin")]
         [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetViolationReportsResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
@@ -57,13 +57,13 @@ namespace IOCv2.API.Controllers.ViolationReports
 
         /// <summary>
         /// Retrieves detail for a specific violation report by id.
-        /// Accessible to users in the Student and Mentor roles.
+        /// Accessible to users in the Student, Mentor and EnterpriseAdmin roles.
         /// </summary>
         /// <param name="id">Violation report identifier (GUID).</param>
         /// <param name="cancellationToken">Cancellation token propagated to mediator.</param>
         /// <returns>Detailed violation report wrapped in ApiResponse on success.</returns>
         [HttpGet("{id:guid}")]
-        [Authorize(Roles = "Student,Mentor")]
+        [Authorize(Roles = "Student,Mentor,EnterpriseAdmin")]
         [ProducesResponseType(typeof(ApiResponse<GetViolationReportDetailResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]

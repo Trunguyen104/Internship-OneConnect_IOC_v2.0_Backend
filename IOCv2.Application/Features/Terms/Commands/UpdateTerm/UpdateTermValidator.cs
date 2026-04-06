@@ -33,7 +33,9 @@ public class UpdateTermValidator : AbstractValidator<UpdateTermCommand>
             .NotEmpty()
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.EndDateRequired))
             .GreaterThan(x => x.StartDate)
-            .WithMessage(messageService.GetMessage(MessageKeys.Terms.EndDateMustBeAfterStart));
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.EndDateMustBeAfterStart))
+            .Must((command, endDate) => BeAtLeastOneMonthAfterStart(command.StartDate, endDate))
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.EndDateMustBeAtLeastOneMonthAfterStart));
 
         RuleFor(x => x.Version)
             .GreaterThan(0)
@@ -46,5 +48,13 @@ public class UpdateTermValidator : AbstractValidator<UpdateTermCommand>
             return true;
 
         return !XssPattern.IsMatch(name);
+    }
+
+    private bool BeAtLeastOneMonthAfterStart(DateOnly startDate, DateOnly endDate)
+    {
+        if (startDate == default || endDate == default)
+            return true;
+
+        return endDate >= startDate.AddMonths(1);
     }
 }

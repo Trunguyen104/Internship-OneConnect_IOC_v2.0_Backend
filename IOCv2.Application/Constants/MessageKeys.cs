@@ -379,6 +379,7 @@ namespace IOCv2.Application.Constants
             public const string StartDateRequired = "Terms.StartDateRequired";
             public const string EndDateRequired = "Terms.EndDateRequired";
             public const string EndDateMustBeAfterStart = "Terms.EndDateMustBeAfterStart";
+            public const string EndDateMustBeAtLeastOneMonthAfterStart = "Terms.EndDateMustBeAtLeastOneMonthAfterStart";
             public const string StartDateInPast = "Terms.StartDateInPast";
             public const string StartDateMustBeOneWeekAhead = "Terms.StartDateMustBeOneWeekAhead";
             public const string InvalidDateFormat = "Terms.InvalidDateFormat";
