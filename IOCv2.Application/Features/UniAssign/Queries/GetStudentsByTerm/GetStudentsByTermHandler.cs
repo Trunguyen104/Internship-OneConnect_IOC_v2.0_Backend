@@ -87,6 +87,21 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm
                     StudentName = st.Student.User.FullName,
                     ClassName = st.Student.ClassName ?? string.Empty,
                     Major = st.Student.Major ?? string.Empty,
+                    PlacementStatus = _unitOfWork.Repository<StudentTerm>()
+                        .Query()
+                        .Where(a => a.TermId == request.TermId && a.StudentId == st.StudentId)
+                        .Select(a => a.PlacementStatus)
+                        .FirstOrDefault(),
+                    EnterpriseName = _unitOfWork.Repository<StudentTerm>()
+                        .Query()
+                        .Include(x => x.Enterprise)
+                        .Where(a => a.TermId == request.TermId && a.StudentId == st.StudentId)
+                        .Select(a => a.Enterprise!.Name)
+                        .FirstOrDefault(),
+                    InternPhaseName = _unitOfWork.Repository<InternshipPhase>().Query()
+                        .Where(p => p.PhaseId == _unitOfWork.Repository<InternshipApplication>().Query().Where(ia => ia.TermId == request.TermId && ia.StudentId == st.StudentId).Select(ia => ia.InternPhaseId).FirstOrDefault())
+                        .Select(p => p.Name)
+                        .FirstOrDefault(),
                     // correlated subquery: get the application status for this student in the requested term (or default 0 if none)
                     InternshipApplicationStatus = _unitOfWork.Repository<InternshipApplication>()
                         .Query()

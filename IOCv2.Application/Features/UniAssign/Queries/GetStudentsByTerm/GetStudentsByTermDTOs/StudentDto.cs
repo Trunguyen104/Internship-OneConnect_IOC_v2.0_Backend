@@ -14,5 +14,8 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm.GetStud
         public string ClassName { get; init; } = string.Empty;
         public string Major { get; init; } = string.Empty;
         public InternshipApplicationStatus InternshipApplicationStatus { get; init; }
+        public string? EnterpriseName { get; init; }
+        public string? InternPhaseName { get; init; }
+        public PlacementStatus PlacementStatus { get; init; }
     }
 }
