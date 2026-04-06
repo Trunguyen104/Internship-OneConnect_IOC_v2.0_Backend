@@ -35,7 +35,10 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
 
     public async Task<Result<BulkWithdrawStudentsResponse>> Handle(BulkWithdrawStudentsCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.Parse(_currentUserService.UserId!);
+        if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+            return Result<BulkWithdrawStudentsResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
         var isSuperAdmin = string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
 
         var term = await _unitOfWork.Repository<Term>()
@@ -138,23 +141,11 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
                 st.UpdatedAt = now;
 
                 var user = st.Student.User;
-                var suffix = $"_deleted_{now:yyyyMMddHHmmssfff}";
-                user.UpdateEmail($"{user.Email}{suffix}");
-                if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
-                {
-                    user.UpdateProfile(
-                        user.FullName,
-                        $"{user.PhoneNumber}{suffix}",
-                        user.AvatarUrl,
-                        user.Gender,
-                        user.DateOfBirth,
-                        user.Address);
-                }
 
                 st.DeletedBy = userId;
-                await _unitOfWork.Repository<StudentTerm>().DeleteAsync(st, cancellationToken);
-                await _unitOfWork.Repository<Student>().DeleteAsync(st.Student, cancellationToken);
-                await _unitOfWork.Repository<User>().DeleteAsync(user, cancellationToken);
+                await _unitOfWork.Repository<StudentTerm>().HardDeleteAsync(st, cancellationToken);
+                await _unitOfWork.Repository<Student>().HardDeleteAsync(st.Student, cancellationToken);
+                await _unitOfWork.Repository<User>().HardDeleteAsync(user, cancellationToken);
             }
 
             term.TotalEnrolled = Math.Max(0, term.TotalEnrolled - deletable.Count);

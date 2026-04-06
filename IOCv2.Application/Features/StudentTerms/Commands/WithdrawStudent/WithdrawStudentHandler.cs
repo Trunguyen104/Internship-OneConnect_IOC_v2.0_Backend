@@ -36,7 +36,10 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
 
     public async Task<Result<WithdrawStudentResponse>> Handle(WithdrawStudentCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.Parse(_currentUserService.UserId!);
+        if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+            return Result<WithdrawStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
         var isSuperAdmin = string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
 
         var studentTerm = await _unitOfWork.Repository<StudentTerm>()
@@ -92,20 +95,8 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             studentTerm.UpdatedAt = DateTime.UtcNow;
 
             var now = DateTime.UtcNow;
-            var suffix = $"_deleted_{now:yyyyMMddHHmmssfff}";
 
             var user = studentTerm.Student.User;
-            user.UpdateEmail($"{user.Email}{suffix}");
-            if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
-            {
-                user.UpdateProfile(
-                    user.FullName,
-                    $"{user.PhoneNumber}{suffix}",
-                    user.AvatarUrl,
-                    user.Gender,
-                    user.DateOfBirth,
-                    user.Address);
-            }
 
             var activeTokens = await _unitOfWork.Repository<RefreshToken>()
                 .Query()
@@ -120,9 +111,9 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             }
 
             studentTerm.DeletedBy = userId;
-            await _unitOfWork.Repository<StudentTerm>().DeleteAsync(studentTerm, cancellationToken);
-            await _unitOfWork.Repository<Student>().DeleteAsync(studentTerm.Student, cancellationToken);
-            await _unitOfWork.Repository<User>().DeleteAsync(user, cancellationToken);
+            await _unitOfWork.Repository<StudentTerm>().HardDeleteAsync(studentTerm, cancellationToken);
+            await _unitOfWork.Repository<Student>().HardDeleteAsync(studentTerm.Student, cancellationToken);
+            await _unitOfWork.Repository<User>().HardDeleteAsync(user, cancellationToken);
 
             term.TotalEnrolled = Math.Max(0, term.TotalEnrolled - 1);
             term.TotalUnplaced = Math.Max(0, term.TotalUnplaced - 1);
