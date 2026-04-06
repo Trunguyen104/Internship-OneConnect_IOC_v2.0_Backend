@@ -2844,8 +2844,6 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasOne("IOCv2.Domain.Entities.InternshipPhase", "InternshipPhase")
                         .WithMany("Jobs")
                         .HasForeignKey("InternshipPhaseId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_jobs_internship_phases_phase_id");
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_jobs_internship_phases_internship_phase_id");
 

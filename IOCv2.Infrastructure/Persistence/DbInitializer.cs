@@ -45,14 +45,14 @@ namespace IOCv2.Infrastructure.Persistence
             };
             _context.Students.Add(student);
 
-            // Ensure university link exists so uni-admin can operate on this student
-            _context.UniversityUsers.Add(new Domain.Entities.UniversityUser
+            var universityUser = new Domain.Entities.UniversityUser
             {
                 UniversityUserId = Guid.NewGuid(),
                 UserId = user.UserId,
-                UniversityId = fptUniversity.UniversityId,
-                Position = "Test Student"
-            });
+                UniversityId = fptUniversity.UniversityId
+            };
+            universityUser.UpdateMetadata("Test Student", null, null);
+            _context.UniversityUsers.Add(universityUser);
 
             // Create a UniAssign application in PendingAssignment (so BulkUnassign will find it)
             if (job != null && springTerm != null)
@@ -412,7 +412,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(adminEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Enterprise Administrator" });
+                    var entAdmin = new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId };
+                    entAdmin.UpdateMetadata("Enterprise Administrator", null, null);
+                    _context.EnterpriseUsers.Add(entAdmin);
+
                 }
 
                 var mentorEmail = $"mentor@{baseName}.com";
@@ -431,7 +434,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(mentorEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = mentorEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
+                    var mentorEu = new EnterpriseUser { EnterpriseUserId = mentorEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId };
+                    mentorEu.UpdateMetadata("Technical Mentor", null, null);
+                    _context.EnterpriseUsers.Add(mentorEu);
+
                 }
 
                 // Additional mentors make inline assign/reassign happy/unhappy paths reproducible.
@@ -456,13 +462,14 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(backupMentorEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    var backupMentorEu = new EnterpriseUser
                     {
                         EnterpriseUserId = backupMentorEuId,
                         UserId = user.UserId,
-                        EnterpriseId = ent.EnterpriseId,
-                        Position = "Senior Technical Mentor"
-                    });
+                        EnterpriseId = ent.EnterpriseId
+                    };
+                    backupMentorEu.UpdateMetadata("Senior Technical Mentor", null, null);
+                    _context.EnterpriseUsers.Add(backupMentorEu);
                 }
 
                 // HR account
@@ -475,7 +482,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(hrEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "HR" });
+                    var hrEu = new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId };
+                    hrEu.UpdateMetadata("HR", null, null);
+                    _context.EnterpriseUsers.Add(hrEu);
+
                 }
             }
 
@@ -518,13 +528,14 @@ namespace IOCv2.Infrastructure.Persistence
                     .AnyAsync(eu => eu.UserId == wrongEnterpriseMentorUser.UserId && eu.EnterpriseId == rikkeiEnterprise.EnterpriseId, cancellationToken);
                 if (!hasWrongEnterpriseEu)
                 {
-                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    var wrongEntEu = new EnterpriseUser
                     {
                         EnterpriseUserId = SeedIds.SwaggerWrongEnterpriseMentorEuId,
                         UserId = wrongEnterpriseMentorUser.UserId,
-                        EnterpriseId = rikkeiEnterprise.EnterpriseId,
-                        Position = "[SWAGGER-UNHAPPY] Mentor belongs to other enterprise"
-                    });
+                        EnterpriseId = rikkeiEnterprise.EnterpriseId
+                    };
+                    wrongEntEu.UpdateMetadata("[SWAGGER-UNHAPPY] Mentor belongs to other enterprise", null, null);
+                    _context.EnterpriseUsers.Add(wrongEntEu);
                 }
 
                 var notMentorEmail = "swagger.unhappy.not-mentor@fptsoftware.com";
@@ -558,13 +569,14 @@ namespace IOCv2.Infrastructure.Persistence
                     .AnyAsync(eu => eu.UserId == notMentorUser.UserId && eu.EnterpriseId == fptEnterprise.EnterpriseId, cancellationToken);
                 if (!hasNotMentorEu)
                 {
-                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    var notMentorEu = new EnterpriseUser
                     {
                         EnterpriseUserId = SeedIds.SwaggerNotMentorEuId,
                         UserId = notMentorUser.UserId,
-                        EnterpriseId = fptEnterprise.EnterpriseId,
-                        Position = "[SWAGGER-UNHAPPY] Role is HR, not Mentor"
-                    });
+                        EnterpriseId = fptEnterprise.EnterpriseId
+                    };
+                    notMentorEu.UpdateMetadata("[SWAGGER-UNHAPPY] Role is HR, not Mentor", null, null);
+                    _context.EnterpriseUsers.Add(notMentorEu);
                 }
             }
            
@@ -585,7 +597,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(uniAdminEmail);
-                    _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId, Position = "School Administrator" });
+                    var schoolAdminUu = new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId };
+                    schoolAdminUu.UpdateMetadata("School Administrator", null, null);
+                    _context.UniversityUsers.Add(schoolAdminUu);
+
                 }
             }
 

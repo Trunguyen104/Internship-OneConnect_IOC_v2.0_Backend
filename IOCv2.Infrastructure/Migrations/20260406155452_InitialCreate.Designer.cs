@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IOCv2.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260405075004_InitialCreate")]
+    [Migration("20260406155452_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -664,6 +664,10 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_id");
+
+                    b.Property<Guid?>("InternPhaseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("intern_phase_id");
 
                     b.Property<Guid?>("InternshipGroupInternshipId")
                         .HasColumnType("uuid")

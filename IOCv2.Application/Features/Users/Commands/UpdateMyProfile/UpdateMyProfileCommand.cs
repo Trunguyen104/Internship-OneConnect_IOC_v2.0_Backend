@@ -13,6 +13,8 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
         public string? Address { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public UserGender? Gender { get; set; }
+        public string? Position { get; set; }
+
         
         // Metadata
         public string? PortfolioUrl { get; set; }

@@ -121,6 +121,7 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
                     if (user.EnterpriseUser != null)
                     {
                         user.EnterpriseUser.UpdateMetadata(
+                            string.IsNullOrWhiteSpace(request.Position) ? null : request.Position,
                             string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio, 
                             string.IsNullOrWhiteSpace(request.Expertise) ? null : request.Expertise);
                     }
@@ -130,6 +131,7 @@ namespace IOCv2.Application.Features.Users.Commands.UpdateMyProfile
                     if (user.UniversityUser != null)
                     {
                         user.UniversityUser.UpdateMetadata(
+                            string.IsNullOrWhiteSpace(request.Position) ? null : request.Position,
                             string.IsNullOrWhiteSpace(request.Bio) ? null : request.Bio, 
                             string.IsNullOrWhiteSpace(request.Department) ? null : request.Department);
                     }

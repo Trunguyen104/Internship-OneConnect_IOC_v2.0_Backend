@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1339,7 +1339,7 @@
   <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
     <value>EnterpriseId là bắt buộc.</value>
   </data>
-</root>
+
   <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
     <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
   </data>
