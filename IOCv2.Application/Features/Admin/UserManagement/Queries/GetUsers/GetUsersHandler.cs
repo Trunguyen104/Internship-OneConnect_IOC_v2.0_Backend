@@ -78,14 +78,10 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUsers
             {
                 query = query.Where(u => (u.Role == UserRole.HR || u.Role == UserRole.Mentor) && u.EnterpriseUser != null && u.EnterpriseUser.EnterpriseId.ToString() == auditorUnitId);
             }
-            else if (auditorRole == UserRole.HR)
+            else if (auditorRole == UserRole.HR || auditorRole == UserRole.Mentor)
             {
-                if (request.Role.HasValue && request.Role.Value != UserRole.Mentor)
-                {
-                    return Result<PaginatedResult<GetUsersResponse>>.Failure("Access denied", ResultErrorType.Forbidden);
-                }
-
-                query = query.Where(u => u.Role == UserRole.Mentor && u.EnterpriseUser != null && u.EnterpriseUser.EnterpriseId.ToString() == auditorUnitId);
+                // Same unit scope as EnterpriseAdmin: only HR/Mentor accounts in this enterprise (not other enterprises).
+                query = query.Where(u => (u.Role == UserRole.HR || u.Role == UserRole.Mentor) && u.EnterpriseUser != null && u.EnterpriseUser.EnterpriseId.ToString() == auditorUnitId);
             }
             else if (auditorRole != UserRole.SuperAdmin && auditorRole != UserRole.Moderator)
             {

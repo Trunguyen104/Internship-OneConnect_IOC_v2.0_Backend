@@ -39,21 +39,16 @@ public class GetAdminDashboardStatsHandler
             a => (a.Status == InternshipApplicationStatus.Applied || a.Status == InternshipApplicationStatus.PendingAssignment) 
                  && a.DeletedAt == null, cancellationToken);
 
-        // 2. Fetch recent audit logs for activity feed
+        // 2. Recent audit trail (actor + human-readable summary)
         var auditLogs = await _unitOfWork.Repository<AuditLog>()
             .Query()
+            .Include(a => a.PerformedBy)
             .OrderByDescending(a => a.CreatedAt)
-            .Take(10) // Show up to 10 recent activities
+            .Take(15)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        var recentActivities = auditLogs.Select(a => new RecentActivityDto
-        {
-            Id = a.AuditLogId,
-            Action = $"{a.Action} {a.EntityType}", // Improved readability: "Create User" instead of "User Create"
-            Detail = a.Reason ?? $"Action performed on entity ID: {a.EntityId}",
-            Time = a.CreatedAt,
-            Type = a.EntityType
-        }).ToList();
+        var recentActivities = auditLogs.Select(AuditActivityMapper.Map).ToList();
 
         // 3. System Health Metrics (Dynamic checks)
         // If we reached here, DB queries succeeded, so DB is connected

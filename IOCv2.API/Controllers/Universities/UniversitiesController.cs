@@ -25,7 +25,7 @@ public class UniversitiesController : ApiControllerBase
     /// Get a paginated list of universities.
     /// </summary>
     [HttpGet]
-    [Authorize(Roles ="SuperAdmin,HR")]
+    [Authorize(Roles ="SuperAdmin,EnterpriseAdmin,HR")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetUniversitiesResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUniversities([FromQuery] GetUniversitiesQuery query)
     {

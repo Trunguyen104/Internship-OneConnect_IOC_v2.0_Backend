@@ -70,7 +70,7 @@ public class GetUsersHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ReturnsOnlyMentorsInSameEnterprise_WhenAuditorIsHr()
+    public async Task Handle_ReturnsHrAndMentorsInSameEnterprise_WhenAuditorIsHr()
     {
         var enterpriseId = Guid.NewGuid();
 
@@ -108,11 +108,13 @@ public class GetUsersHandlerTests
         var result = await handler.Handle(new GetUsersQuery { PageNumber = 1, PageSize = 10 }, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Data!.Items.Should().ContainSingle(x => x.UserId == sameEnterpriseMentor.UserId);
+        result.Data!.Items.Should().HaveCount(2);
+        result.Data.Items.Should().Contain(x => x.UserId == sameEnterpriseMentor.UserId);
+        result.Data.Items.Should().Contain(x => x.UserId == sameEnterpriseHr.UserId);
     }
 
     [Fact]
-    public async Task Handle_ReturnsForbidden_WhenHrFiltersNonMentorRole()
+    public async Task Handle_ReturnsSuccess_WhenHrFiltersByHrRole()
     {
         var repo = new Mock<IGenericRepository<User>>();
         repo.Setup(x => x.Query()).Returns(new List<User>().AsQueryable().BuildMock());
@@ -134,10 +136,9 @@ public class GetUsersHandlerTests
             cache.Object,
             GetMockCurrentUserService(role: "HR").Object);
 
-        var result = await handler.Handle(new GetUsersQuery { Role = UserRole.HR }, CancellationToken.None);
+        var result = await handler.Handle(new GetUsersQuery { Role = UserRole.HR, PageNumber = 1, PageSize = 10 }, CancellationToken.None);
 
-        result.IsSuccess.Should().BeFalse();
-        result.ErrorType.Should().Be(Application.Common.Models.ResultErrorType.Forbidden);
+        result.IsSuccess.Should().BeTrue();
     }
 
     private Mock<ICurrentUserService> GetMockCurrentUserService(string role = "SuperAdmin", string? unitId = null)

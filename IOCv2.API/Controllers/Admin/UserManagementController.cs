@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.Admin;
 /// </summary>
 [Tags("Admin - User Management")]
 [Route("api/v{version:apiVersion}/user-management")]
-[Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin,HR")]
+[Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin,HR,Mentor")]
 public class UserManagementController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -42,7 +42,7 @@ public class UserManagementController : ApiControllerBase
     /// Get a single account by ID (role-based access).
     /// </summary>
     [HttpGet("{id:guid}", Name = "GetUserById")]
-    [Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin")]
+    [Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin,HR,Mentor")]
     [ProducesResponseType(typeof(ApiResponse<GetUserByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserById(

@@ -36,10 +36,25 @@ public record AdminDashboardStatsResponse
 public record RecentActivityDto
 {
     public Guid Id { get; init; }
-    public string Action { get; init; } = null!;
+
+    /// <summary>One-line headline, e.g. "Created university".</summary>
+    public string Summary { get; init; } = null!;
+
+    /// <summary>Reason, entity id, or supporting context.</summary>
     public string Detail { get; init; } = null!;
+
     public DateTime Time { get; init; }
-    public string Type { get; init; } = null!; // Used by FE to determine icon
+
+    /// <summary>Normalized category for dashboard icons (university, enterprise, user, …).</summary>
+    public string Category { get; init; } = "other";
+
+    public string? ActorName { get; init; }
+    public string? ActorEmail { get; init; }
+
+    /// <summary>Audit action name: Create, Update, Delete, …</summary>
+    public string ActionKind { get; init; } = "";
+
+    public Guid EntityId { get; init; }
 }
 
 public record SystemHealthDto
