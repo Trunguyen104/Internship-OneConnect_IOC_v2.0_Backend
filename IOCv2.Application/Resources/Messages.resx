@@ -1335,4 +1335,40 @@
   <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
     <value>Email liên hệ này đã được đăng ký bởi một Doanh nghiệp hoặc Trường học khác trong hệ thống.</value>
   </data>
+  <data name="Landing.SendSuccess" xml:space="preserve">
+    <value>Yêu cầu của bạn đã được gửi thành công. Chúng tôi sẽ liên hệ lại sớm.</value>
+  </data>
+  <data name="Landing.SendError" xml:space="preserve">
+    <value>Không thể gửi yêu cầu lúc này. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Landing.OtpRequired" xml:space="preserve">
+    <value>Vui lòng xác thực email bằng mã OTP trước khi gửi yêu cầu.</value>
+  </data>
+  <data name="Landing.EmailInvalid" xml:space="preserve">
+    <value>Địa chỉ email không hợp lệ.</value>
+  </data>
+  <data name="Landing.OtpInvalidFormat" xml:space="preserve">
+    <value>Mã OTP phải gồm 6 chữ số.</value>
+  </data>
+  <data name="Landing.OtpExpired" xml:space="preserve">
+    <value>Mã không đúng hoặc đã hết hạn. Vui lòng gửi mã mới.</value>
+  </data>
+  <data name="Landing.OtpIncorrect" xml:space="preserve">
+    <value>Mã OTP không đúng.</value>
+  </data>
+  <data name="Landing.OtpSentLabel" xml:space="preserve">
+    <value>Đã gửi mã xác thực tới email của bạn.</value>
+  </data>
+  <data name="Landing.OtpVerifiedLabel" xml:space="preserve">
+    <value>Xác thực email thành công.</value>
+  </data>
+  <data name="Landing.DomainValidationFailed" xml:space="preserve">
+    <value>Không thể gửi mã tới tên miền email này. Vui lòng kiểm tra lại địa chỉ.</value>
+  </data>
+  <data name="Landing.EmailSentFailed" xml:space="preserve">
+    <value>Không thể gửi email xác thực. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Landing.AlreadyRegistered" xml:space="preserve">
+    <value>Email này đã có tài khoản trên hệ thống. Bạn có thể gửi yêu cầu trực tiếp mà không cần OTP.</value>
+  </data>
 </root>

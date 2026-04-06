@@ -53,5 +53,17 @@ namespace IOCv2.Infrastructure.Services
 
             return BaseLayout("🔐 Mật khẩu đã được reset", content);
         }
+
+        public static string GetVerificationOtpTemplate(string otpCode)
+        {
+            var content = $@"
+                <p>Xin chào,</p>
+                <p>Mã xác thực email của bạn trên <strong>Internship OneConnect</strong> là:</p>
+                <div class='info-box' style='text-align:center;font-size:28px;letter-spacing:8px;font-weight:bold;'>{otpCode}</div>
+                <p>Mã có hiệu lực trong <strong>5 phút</strong>. Không chia sẻ mã này với bất kỳ ai.</p>
+                <p>Nếu bạn không yêu cầu mã, vui lòng bỏ qua email này.</p>";
+
+            return BaseLayout("🔑 Mã xác thực email", content);
+        }
     }
 }

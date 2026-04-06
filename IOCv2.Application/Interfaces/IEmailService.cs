@@ -101,5 +101,33 @@ namespace IOCv2.Application.Interfaces
             string enterpriseName,
             string taxCode,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a reservation notification email to the system administrator when someone fills the form on the landing page.
+        /// </summary>
+        Task<bool> SendLandingReservationEmailAsync(
+            string partnerType,
+            string partnerName,
+            string email,
+            string phone,
+            string area,
+            string hiringCount,
+            string consultationDate,
+            string selectedTime,
+            string note,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a 6-digit OTP to the address for landing-page email verification.
+        /// </summary>
+        Task<bool> SendVerificationOtpEmailAsync(
+            string email,
+            string otpCode,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns true if the email domain has at least one MX record (mail exchanger).
+        /// </summary>
+        bool VerifyEmailMxRecordSync(string email);
     }
 }

@@ -1331,4 +1331,40 @@
   <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
     <value>This contact email is already registered by another Enterprise or University in the system.</value>
   </data>
+  <data name="Landing.SendSuccess" xml:space="preserve">
+    <value>Your consultation request has been sent successfully. We will contact you shortly.</value>
+  </data>
+  <data name="Landing.SendError" xml:space="preserve">
+    <value>Failed to send request at this time. Please try again later.</value>
+  </data>
+  <data name="Landing.OtpRequired" xml:space="preserve">
+    <value>Please verify your email with OTP before submitting.</value>
+  </data>
+  <data name="Landing.EmailInvalid" xml:space="preserve">
+    <value>Invalid email address.</value>
+  </data>
+  <data name="Landing.OtpInvalidFormat" xml:space="preserve">
+    <value>OTP code must be 6 digits.</value>
+  </data>
+  <data name="Landing.OtpExpired" xml:space="preserve">
+    <value>Invalid or expired OTP code. Please request a new one.</value>
+  </data>
+  <data name="Landing.OtpIncorrect" xml:space="preserve">
+    <value>Incorrect OTP code.</value>
+  </data>
+  <data name="Landing.OtpSentLabel" xml:space="preserve">
+    <value>Verification code has been sent to your email.</value>
+  </data>
+  <data name="Landing.OtpVerifiedLabel" xml:space="preserve">
+    <value>Email verified successfully.</value>
+  </data>
+  <data name="Landing.DomainValidationFailed" xml:space="preserve">
+    <value>Unable to send mail to this domain. Please check your address.</value>
+  </data>
+  <data name="Landing.EmailSentFailed" xml:space="preserve">
+    <value>Failed to send verification email. Please try again later.</value>
+  </data>
+  <data name="Landing.AlreadyRegistered" xml:space="preserve">
+    <value>This email already has an account. OTP is not required — you can submit your request directly.</value>
+  </data>
 </root>

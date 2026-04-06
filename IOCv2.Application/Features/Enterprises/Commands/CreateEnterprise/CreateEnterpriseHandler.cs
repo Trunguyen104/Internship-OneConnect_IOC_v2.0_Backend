@@ -22,7 +22,9 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
         private readonly ICacheService _cacheService;
 
         private readonly IEmailService _emailService;
-        private readonly IBackgroundEmailSender _emailSender;
+
+        private const string EmailDeliveryErrorMessage =
+            "Không thể tạo tài khoản do địa chỉ email không hợp lệ hoặc không thể nhận tin.";
 
         public CreateEnterpriseHandler(
             IUnitOfWork unitOfWork,
@@ -30,8 +32,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
             ILogger<CreateEnterpriseHandler> logger,
             IMapper mapper,
             ICacheService cacheService,
-            IEmailService emailService,
-            IBackgroundEmailSender emailSender)
+            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
@@ -39,7 +40,6 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
             _mapper = mapper;
             _cacheService = cacheService;
             _emailService = emailService;
-            _emailSender = emailSender;
         }
 
         public async Task<Result<CreateEnterpriseResponse>> Handle(CreateEnterpriseCommand request, CancellationToken cancellationToken)
@@ -72,25 +72,35 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
 
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().AddAsync(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
-                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                // 3. Post-commit operations (Cache invalidation)
-                await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
-
-                // Send notification email asynchronously via background channel
                 if (!string.IsNullOrWhiteSpace(enterprise.ContactEmail))
                 {
                     var enterpriseName = enterprise.Name ?? "Doanh nghiệp";
                     var taxCode = enterprise.TaxCode ?? "";
-                    
-                    await _emailSender.EnqueueEnterpriseCreationEmailAsync(
+
+                    if (!_emailService.VerifyEmailMxRecordSync(enterprise.ContactEmail))
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<CreateEnterpriseResponse>.Failure(EmailDeliveryErrorMessage);
+                    }
+
+                    var sent = await _emailService.SendEnterpriseCreationEmailAsync(
                         enterprise.ContactEmail,
                         enterpriseName,
                         taxCode,
-                        enterprise.EnterpriseId,
-                        null,
                         cancellationToken);
+
+                    if (!sent)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<CreateEnterpriseResponse>.Failure(EmailDeliveryErrorMessage);
+                    }
                 }
+
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                // 3. Post-commit operations (Cache invalidation)
+                await _cacheService.RemoveByPatternAsync(EnterpriseCacheKeys.EnterpriseListPattern(), cancellationToken);
 
                 return Result<CreateEnterpriseResponse>.Success(_mapper.Map<CreateEnterpriseResponse>(enterprise));
             }

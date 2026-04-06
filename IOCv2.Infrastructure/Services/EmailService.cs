@@ -1,3 +1,5 @@
+using DnsClient;
+using DnsClient.Protocol;
 using IOCv2.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -292,6 +294,121 @@ namespace IOCv2.Infrastructure.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send enterprise creation email to {Email}", email);
+                return false;
+            }
+        }
+
+        public async Task<bool> SendLandingReservationEmailAsync(
+            string partnerType,
+            string partnerName,
+            string email,
+            string phone,
+            string area,
+            string hiringCount,
+            string consultationDate,
+            string selectedTime,
+            string note,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var smtpClient = new SmtpClient(_emailSettings.SmtpHost, _emailSettings.SmtpPort)
+                {
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.AppPassword),
+                    Timeout = 30000
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(_emailSettings.SenderEmail, "IOCv2 Landing Page Notification"),
+                    Subject = $"📢 [Landing Page] Yêu cầu từ {(partnerType == "University" ? "Trường" : "Doanh nghiệp")}: {partnerName}",
+                    Body = EmailTemplates.GetLandingReservationTemplate(partnerType, partnerName, email, phone, area, hiringCount, consultationDate, selectedTime, note),
+                    IsBodyHtml = true
+                };
+
+                // Send TO the admin (sender email)
+                mailMessage.To.Add(_emailSettings.SenderEmail);
+
+                await smtpClient.SendMailAsync(mailMessage, cancellationToken);
+                _logger.LogInformation("Landing reservation email sent successfully to admin.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send landing reservation email for {PartnerName}", partnerName);
+                return false;
+            }
+        }
+
+        public async Task<bool> SendVerificationOtpEmailAsync(
+            string email,
+            string otpCode,
+            CancellationToken cancellationToken = default)
+        {
+            if (!IsValidEmail(email) || string.IsNullOrWhiteSpace(otpCode))
+            {
+                return false;
+            }
+
+            try
+            {
+                using var smtpClient = new SmtpClient(_emailSettings.SmtpHost, _emailSettings.SmtpPort)
+                {
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.AppPassword),
+                    Timeout = 30000
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                    Subject = "Mã xác thực email - Internship OneConnect",
+                    Body = EmailTemplates.GetVerificationOtpTemplate(otpCode),
+                    IsBodyHtml = true
+                };
+
+                mailMessage.To.Add(email);
+
+                await smtpClient.SendMailAsync(mailMessage, cancellationToken);
+                _logger.LogInformation("Verification OTP email sent successfully to {Email}", email);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send verification OTP email to {Email}", email);
+                return false;
+            }
+        }
+
+        public bool VerifyEmailMxRecordSync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email) || !email.Contains('@', StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            var at = email.LastIndexOf('@');
+            if (at <= 0 || at == email.Length - 1)
+            {
+                return false;
+            }
+
+            var domain = email[(at + 1)..].Trim();
+            if (string.IsNullOrEmpty(domain))
+            {
+                return false;
+            }
+
+            try
+            {
+                var lookup = new LookupClient();
+                var result = lookup.Query(domain, QueryType.MX);
+                return result.Answers.OfType<MxRecord>().Any();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "MX lookup failed for domain {Domain}", domain);
                 return false;
             }
         }

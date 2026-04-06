@@ -15,6 +15,7 @@ public class CreateUniversityHandlerTests
     private readonly Mock<ICurrentUserService> _mockCurrentUserService;
     private readonly Mock<IGenericRepository<University>> _mockUniversityRepository;
     private readonly Mock<ICacheService> _mockCacheService;
+    private readonly Mock<IEmailService> _mockEmailService;
     private readonly CreateUniversityHandler _handler;
 
     public CreateUniversityHandlerTests()
@@ -24,6 +25,7 @@ public class CreateUniversityHandlerTests
         _mockCurrentUserService = new Mock<ICurrentUserService>();
         _mockUniversityRepository = new Mock<IGenericRepository<University>>();
         _mockCacheService = new Mock<ICacheService>();
+        _mockEmailService = new Mock<IEmailService>();
 
         _mockUnitOfWork.Setup(u => u.Repository<University>()).Returns(_mockUniversityRepository.Object);
 
@@ -31,7 +33,8 @@ public class CreateUniversityHandlerTests
             _mockUnitOfWork.Object,
             _mockLogger.Object,
             _mockCurrentUserService.Object,
-            _mockCacheService.Object);
+            _mockCacheService.Object,
+            _mockEmailService.Object);
     }
 
     [Fact]

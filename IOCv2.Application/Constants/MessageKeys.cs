@@ -1303,6 +1303,25 @@ namespace IOCv2.Application.Constants
             public const string CODE_REQ = "UserManagement.CodeRequired";
             public const string CODE_MAX_LEN = "UserManagement.CodeMaxLength";
         }
+
+        public static class Landing
+        {
+            public const string SendSuccess = "Landing.SendSuccess";
+            public const string SendError = "Landing.SendError";
+            public const string OtpRequired = "Landing.OtpRequired";
+            public const string EmailInvalid = "Landing.EmailInvalid";
+            public const string OtpInvalidFormat = "Landing.OtpInvalidFormat";
+            public const string OtpExpired = "Landing.OtpExpired";
+            public const string OtpIncorrect = "Landing.OtpIncorrect";
+            public const string OtpSentLabel = "Landing.OtpSentLabel";
+            public const string OtpVerifiedLabel = "Landing.OtpVerifiedLabel";
+            public const string DomainValidationFailed = "Landing.DomainValidationFailed";
+            public const string EmailSentFailed = "Landing.EmailSentFailed";
+            public const string AlreadyRegistered = "Landing.AlreadyRegistered";
+            
+            // Log
+            public const string LogProcessing = "Landing.Log.Processing";
+        }
     }
 }
 
