@@ -102,12 +102,11 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                     .Distinct()
                     .ToListAsync(cancellationToken);
 
-                var hasSprintIds = await _unitOfWork.Repository<InternshipStudent>()
+                // Sửa lại query Sprint để lấy StudentId, không phải SprintId
+                var hasSprintStudentIds = await _unitOfWork.Repository<InternshipStudent>()
                     .Query()
                     .Where(x => studentIds.Contains(x.StudentId))
-                    .SelectMany(x => x.InternshipGroup.Projects)
-                    .SelectMany(p => p.Sprints)
-                    .Select(x => x.SprintId)
+                    .Select(x => x.StudentId)  // ← Lấy StudentId trực tiếp
                     .Distinct()
                     .ToListAsync(cancellationToken);
 
@@ -120,7 +119,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
 
                 // Convert nullable Guid lists to non-nullable for HashSet constructor
                 var excludedIds = new HashSet<Guid>(hasLogbookIds.Where(id => id.HasValue).Select(id => id!.Value));
-                foreach (var id in hasSprintIds) excludedIds.Add(id);
+                foreach (var id in hasSprintStudentIds) excludedIds.Add(id);
                 foreach (var id in hasEvaluationIds.Where(id => id.HasValue).Select(id => id!.Value)) excludedIds.Add(id);
 
                 // BR-07: If any student is both PendingAssignment and has internship data (logbook/sprint/evaluation),

@@ -113,7 +113,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
             var currentPhase = await _unitOfWork.Repository<InternshipPhase>()
                 .Query()
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Status == InternshipPhaseStatus.Open && p.StartDate <= todayDateOnly && p.EndDate >= todayDateOnly, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Status == InternshipPhaseStatus.Open, cancellationToken);
 
             if (currentPhase == null)
             {
