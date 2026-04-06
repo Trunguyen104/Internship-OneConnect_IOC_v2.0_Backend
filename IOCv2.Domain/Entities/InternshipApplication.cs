@@ -12,6 +12,9 @@ public class InternshipApplication : BaseEntity
     public Guid StudentId { get; set; }
     public Guid? JobId { get; set; }
 
+    // New: reference to selected intern phase for Uni-Assign flow
+    public Guid? InternPhaseId { get; set; }
+
     public InternshipApplicationStatus Status { get; set; }
     public ApplicationSource Source { get; set; }
 

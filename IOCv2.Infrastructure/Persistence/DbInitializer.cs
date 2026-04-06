@@ -11,6 +11,71 @@ namespace IOCv2.Infrastructure.Persistence
         private readonly IPasswordService _passwordService;
         private readonly IUserServices _userService;
 
+        private async Task SeedBulkUnassignTestStudent()
+        {
+            // Deterministic data for testing BulkUnassignHandler
+            const string testEmail = "bulkunassign.test@fptu.edu.vn";
+            if (await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Email == testEmail))
+                return;
+
+            var fptUniversity = await _context.Universities.FirstOrDefaultAsync(u => u.Code == "FPTU");
+            if (fptUniversity == null) return;
+
+            // Pick an existing job to attach the UniAssign application to
+            var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT QA Automation Intern");
+            var springTerm = await _context.Terms.FirstOrDefaultAsync(t => t.Name == "Spring 2026" && t.UniversityId == fptUniversity.UniversityId);
+
+            // Create user + student
+            var passHash = _passwordService.HashPassword("Test@1234");
+            var userId = Guid.NewGuid();
+            var userCode = await _userService.GenerateUserCodeAsync(Domain.Enums.UserRole.Student, CancellationToken.None);
+            var user = new Domain.Entities.User(userId, userCode, testEmail, "BulkUnassign Test Student", Domain.Enums.UserRole.Student, passHash);
+            user.UpdateProfile(user.FullName, "0987654321", null, Domain.Enums.UserGender.Male, new DateOnly(2003, 1, 1), "Hà Nội");
+            user.SetStatus(Domain.Enums.UserStatus.Active);
+            _context.Users.Add(user);
+
+            var studentId = Guid.NewGuid();
+            var student = new Domain.Entities.Student
+            {
+                StudentId = studentId,
+                UserId = user.UserId,
+                InternshipStatus = Domain.Enums.StudentStatus.APPLIED,
+                Major = "Software Engineering",
+                ClassName = "SE-TEST"
+            };
+            _context.Students.Add(student);
+
+            // Ensure university link exists so uni-admin can operate on this student
+            _context.UniversityUsers.Add(new Domain.Entities.UniversityUser
+            {
+                UniversityUserId = Guid.NewGuid(),
+                UserId = user.UserId,
+                UniversityId = fptUniversity.UniversityId,
+                Position = "Test Student"
+            });
+
+            // Create a UniAssign application in PendingAssignment (so BulkUnassign will find it)
+            if (job != null && springTerm != null)
+            {
+                var app = new Domain.Entities.InternshipApplication
+                {
+                    ApplicationId = Guid.NewGuid(),
+                    EnterpriseId = job.EnterpriseId,
+                    TermId = springTerm.TermId,
+                    StudentId = student.StudentId,
+                    JobId = job.JobId,
+                    Status = Domain.Enums.InternshipApplicationStatus.PendingAssignment,
+                    Source = Domain.Enums.ApplicationSource.UniAssign,
+                    AppliedAt = DateTime.UtcNow,
+                    UniversityId = fptUniversity.UniversityId,
+                    JobPostingTitle = job.Title
+                };
+                _context.InternshipApplications.Add(app);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         private static class SeedIds
         {
             public static readonly Guid SuperAdminId = new Guid("00000000-0000-0000-0000-000000000001");
@@ -81,7 +146,9 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedInternshipPhases();   // must be before SeedJobs and SeedInternshipGroups
             await SeedJobs();               // depends on InternshipPhases
             await SeedUsers();
-            await SeedTerms();
+            await SeedTerms(); 
+            await SeedBulkUnassignTestStudent();
+
             await SeedInternshipGroups();
             await SeedProjectsAndWorkItems();
             await SeedManageIGProjectData();

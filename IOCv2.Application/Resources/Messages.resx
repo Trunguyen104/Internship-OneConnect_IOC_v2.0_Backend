@@ -192,7 +192,7 @@
   <data name="SortOrder.AllowedValues" xml:space="preserve">
     <value>Sort order must be either 'asc' or 'desc'</value>
   </data>
-    <data name="Projects.DeleteSuccess" xml:space="preserve">
+  <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Xóa dự án thành công</value>
   </data>
   <data name="Projects.LogDelete" xml:space="preserve">
@@ -213,7 +213,7 @@
   <data name="Projects.UpdateSuccess" xml:space="preserve">
     <value>Dự án đã được cập nhật {ProjectId}</value>
   </data>
-    <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
+  <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
     <value>Lấy thành công {0} dự án cho nhóm thực tập {1}.</value>
   </data>
   <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
@@ -786,11 +786,9 @@
   <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
     <value>Từ chối chuyển trạng thái đợt thực tập {0} từ '{1}' sang '{2}' — không hợp lệ.</value>
   </data>
-  <!-- B-02 FIX: EndDate in past for active phase -->
   <data name="InternshipPhase.EndDateInPastForActivePhase" xml:space="preserve">
     <value>Không thể đặt ngày kết thúc trong quá khứ cho đợt thực tập '{0}' đang ở trạng thái Open hoặc InProgress.</value>
   </data>
-  <!-- B-05 FIX: Dedicated log key for InProgress phase deletion block -->
   <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
     <value>Từ chối xóa đợt thực tập '{0}' (ID: {1}) — đợt đang ở trạng thái InProgress và không thể xóa.</value>
   </data>
@@ -1181,8 +1179,6 @@
   <data name="Profile.LogGetProfileUserNotFound" xml:space="preserve">
     <value>Không tìm thấy User {UserId} khi lấy profile</value>
   </data>
-
-  <!-- UniAdminInternship — Success messages -->
   <data name="UniAdminInternship.StudentsRetrieved" xml:space="preserve">
     <value>Lấy danh sách sinh viên thực tập thành công.</value>
   </data>
@@ -1204,8 +1200,6 @@
   <data name="UniAdminInternship.NoOpenTermFound" xml:space="preserve">
     <value>Không có kỳ thực tập nào đang mở cho trường của bạn. Danh sách trống.</value>
   </data>
-
-  <!-- UniAdminInternship — Log messages -->
   <data name="UniAdminInternship.Log.GetStudentList" xml:space="preserve">
     <value>SchoolAdmin {0} lấy danh sách sinh viên thực tập kỳ {1}, tổng {2} bản ghi.</value>
   </data>
@@ -1239,8 +1233,6 @@
   <data name="UniAdminInternship.Log.NoOpenTerm" xml:space="preserve">
     <value>Không tìm thấy kỳ thực tập đang mở cho trường {0}.</value>
   </data>
-
-  <!-- UniAdminInternship — Logbook weekly display badges -->
   <data name="UniAdminInternship.StatusBadge.Late" xml:space="preserve">
     <value>Trễ hạn</value>
   </data>
@@ -1305,6 +1297,49 @@
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Đã lấy chi tiết nhóm thực tập {0} — {1} bài đăng tuyển dụng, {2} sinh viên đã được bố trí.</value>
   </data>
+  <data name="UniAssign.StudentsNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên: {0}</value>
+  </data>
+  <data name="UniAssign.StudentsAlreadyPlaced" xml:space="preserve">
+    <value>Sinh viên đã được tuyển dụng: {0}</value>
+  </data>
+  <data name="UniAssign.StudentsUnauthorized" xml:space="preserve">
+    <value>Bạn không được phép chỉ định những học sinh này: {0}</value>
+  </data>
+  <data name="UniAssign.TermNotOpenForAssignment" xml:space="preserve">
+    <value>Kỳ học chưa mở đăng ký.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseNotFound" xml:space="preserve">
+    <value>Không tìm thấy đợt thực tập.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseStartDateAfterEndDate" xml:space="preserve">
+    <value>Ngày bắt đầu của đợt thực tập sau ngày kết thúc.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseNotWithinTermDates" xml:space="preserve">
+    <value>Đợt thực tập phải trùng với thời gian của kỳ học.</value>
+  </data>
+  <data name="UniAssign.InternshipPhaseMustHaveAtLeastOnePublishedOrClosedJobPosting" xml:space="preserve">
+    <value>Đợt thực tập phải có ít nhất một tin tuyển dụng đã đăng hoặc đã đóng.</value>
+  </data>
+  <data name="UniAssign.InternPhaseInsufficientSlots" xml:space="preserve">
+    <value>Intern Phase {0} của {1} chỉ còn {2} slot. Bạn đang assign {3} sinh viên. Vui lòng giảm số lượng hoặc chọn phase/doanh nghiệp khác.</value>
+  </data>
+  <data name="UniAssign.AuditLogAssignMetadata" xml:space="preserve">
+    <value>{{\"studentId\":\"{0}\",\"enterpriseId\":\"{1}\",\"internPhaseId\":\"{2}\",\"termId\":\"{3}\",\"note\":\"phân công hàng loạt - đang chờ tạo\"}}</value>
+  </data>
+  <data name="UniAssign.CannotChangeEnterpriseStudentHasInternshipData" xml:space="preserve">
+    <value>Không thể đổi enterprise. Sinh viên đã có dữ liệu thực tập.</value>
+  </data>
+  <data name="UniAssign.FailedToAssignStudentsDueToConcurrentOperations" xml:space="preserve">
+    <value>Không thể gán sinh viên do có thao tác đồng thời. Vui lòng thử lại.</value>
+  </data>
+  <data name="UniAssign.UnauthorizedOrInvalidOperation" xml:space="preserve">
+    <value>Thao tác không được ủy quyền hoặc không hợp lệ.</value>
+  </data>
+  <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
+    <value>EnterpriseId là bắt buộc.</value>
+  </data>
+</root>
   <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
     <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
   </data>
