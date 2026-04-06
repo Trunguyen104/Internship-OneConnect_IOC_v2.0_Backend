@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1370,5 +1370,44 @@
   </data>
   <data name="Landing.AlreadyRegistered" xml:space="preserve">
     <value>Email này đã có tài khoản trên hệ thống. Bạn có thể gửi yêu cầu trực tiếp mà không cần OTP.</value>
+  </data>
+  <data name="EvaluationCycle.DatesOutOfBounds" xml:space="preserve">
+    <value>Thời gian đợt đánh giá phải nằm trong khoảng thời gian của Đợt thực tập ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="Sprint.DatesOutOfBounds" xml:space="preserve">
+    <value>Thời gian Sprint phải nằm trong khoảng thời gian của Đợt thực tập ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="WorkItem.DatesOutOfBounds" xml:space="preserve">
+    <value>Ngày hết hạn phải nằm trong khoảng thời gian của Đợt thực tập ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="HRApplications.Notify.Interviewing" xml:space="preserve">
+    <value>Chúc mừng! Bạn đã được chọn phỏng vấn tại {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Offered" xml:space="preserve">
+    <value>Chúc mừng! Bạn đã nhận được offer từ {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.SelfApply" xml:space="preserve">
+    <value>Chúc mừng! Hồ sơ ứng tuyển mở tự do của bạn đã được {Enterprise} tiếp nhận thực tập.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.UniAssign" xml:space="preserve">
+    <value>Chúc mừng! Kết quả phân công thực tập đã được {Enterprise} phê duyệt.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.SelfApply" xml:space="preserve">
+    <value>Rất tiếc. Đơn ứng tuyển của bạn đã bị từ chối bởi doanh nghiệp {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.UniAssign" xml:space="preserve">
+    <value>Rất tiếc. Đơn ứng tuyển phân công thực tập đã bị từ chối bởi doanh nghiệp {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Rejected" xml:space="preserve">
+    <value>Doanh nghiệp {Enterprise} đã từ chối sinh viên {StudentName}. Lý do: {Reason}</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Placed" xml:space="preserve">
+    <value>Doanh nghiệp {Enterprise} đã đồng ý tiếp nhận sinh viên {StudentName}.</value>
+  </data>
+  <data name="HRApplications.Notify.Enterprise.AutoWithdrawn" xml:space="preserve">
+    <value>Hệ thống tự động hủy đơn ứng tuyển vì giai đoạn tuyển dụng đã kết thúc.</value>
+  </data>
+  <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
+    <value>Hệ thống tự động hủy đơn ứng tuyển vì giai đoạn tuyển dụng đã kết thúc.</value>
   </data>
 </root>

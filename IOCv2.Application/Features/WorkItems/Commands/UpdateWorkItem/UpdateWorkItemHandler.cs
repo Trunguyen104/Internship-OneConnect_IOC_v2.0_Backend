@@ -43,6 +43,9 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var workItem = await _unitOfWork.Repository<WorkItem>()
                 .Query()
+                .Include(w => w.Project)
+                    .ThenInclude(p => p.InternshipGroup)
+                        .ThenInclude(g => g!.InternshipPhase)
                 .FirstOrDefaultAsync(w => w.WorkItemId == request.WorkItemId && w.ProjectId == request.ProjectId, cancellationToken);
 
             if (workItem is null)
@@ -68,7 +71,21 @@ public class UpdateWorkItemHandler : IRequestHandler<UpdateWorkItemCommand, Resu
                 workItem.Type = request.Type.Value;
 
             if (request.DueDate.HasValue)
+            {
+                var phase = workItem.Project?.InternshipGroup?.InternshipPhase;
+                if (phase != null)
+                {
+                    if (request.DueDate.Value < phase.StartDate || request.DueDate.Value > phase.EndDate)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        _logger.LogWarning("WorkItem due date {DueDate} is out of bounds for Phase {PhaseId}", request.DueDate, phase.PhaseId);
+                        return Result<UpdateWorkItemResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.WorkItem.DatesOutOfBounds, phase.StartDate, phase.EndDate),
+                            ResultErrorType.BadRequest);
+                    }
+                }
                 workItem.DueDate = request.DueDate;
+            }
 
             if (request.Priority.HasValue)
                 workItem.Priority = request.Priority.Value;

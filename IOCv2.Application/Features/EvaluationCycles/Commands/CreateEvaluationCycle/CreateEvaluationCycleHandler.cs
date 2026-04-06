@@ -65,7 +65,7 @@ public class CreateEvaluationCycleHandler
             _logger.LogWarning("EvaluationCycle dates {StartDate} to {EndDate} are out of bounds for Phase {PhaseId} ({PhaseStart} to {PhaseEnd})",
                 request.StartDate, request.EndDate, request.PhaseId, phase.StartDate, phase.EndDate);
             return Result<CreateEvaluationCycleResponse>.Failure(
-                $"Thời gian đợt đánh giá phải nằm trong khoảng thời gian của Đợt thực tập ({phase.StartDate:dd/MM/yyyy} - {phase.EndDate:dd/MM/yyyy}).",
+                _messageService.GetMessage(MessageKeys.EvaluationCycle.DatesOutOfBounds, phase.StartDate, phase.EndDate),
                 ResultErrorType.BadRequest);
         }
 

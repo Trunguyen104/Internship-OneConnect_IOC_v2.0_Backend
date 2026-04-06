@@ -111,20 +111,14 @@ public class GetMissingLogbookDatesHandler
                 ResultErrorType.NotFound);
         }
 
-        // Determine effective start date
-        // Priority: 1. Min(Project.StartDate), 2. Group.StartDate, 3. Phase.StartDate
-        DateOnly startDate;
-        var validProjectStartDates = group.Projects
-            .Where(p => p.StartDate.HasValue && p.StartDate.Value > DateTime.MinValue)
-            .Select(p => p.StartDate!.Value)
-            .ToList();
-
-        if (validProjectStartDates.Any())
-            startDate = DateOnly.FromDateTime(validProjectStartDates.Min());
-        else if (group.StartDate.HasValue && group.StartDate.Value > DateTime.MinValue)
-            startDate = DateOnly.FromDateTime(group.StartDate.Value);
-        else
+        // Determine effective start date: The date the student joined the group
+        var startDate = DateOnly.FromDateTime(internshipStudent.JoinedAt);
+        
+        // Cannot be earlier than the phase's official start date
+        if (startDate < phase.StartDate)
+        {
             startDate = phase.StartDate;
+        }
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 

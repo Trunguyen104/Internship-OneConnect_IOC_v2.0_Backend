@@ -658,6 +658,7 @@ namespace IOCv2.Application.Constants
             public const string TargetSprintNotFound = "Sprint.TargetSprintNotFound";
             public const string TargetSprintIdRequired = "Sprint.TargetSprintIdRequired";
             public const string NewSprintNameRequired = "Sprint.NewSprintNameRequired";
+            public const string DatesOutOfBounds = "Sprint.DatesOutOfBounds";
         }
 
         public static class Epic
@@ -681,6 +682,7 @@ namespace IOCv2.Application.Constants
             public const string StatusInvalid = "WorkItem.StatusInvalid";
             public const string StoryPointInvalid = "WorkItem.StoryPointInvalid";
             public const string NotFound = "WorkItem.NotFound";
+            public const string DatesOutOfBounds = "WorkItem.DatesOutOfBounds";
         }
 
         public static class Stakeholder
@@ -755,6 +757,7 @@ namespace IOCv2.Application.Constants
             public const string CannotUpdateCompleted = "EvaluationCycle.CannotUpdateCompleted";
             public const string AlreadyCompleted = "EvaluationCycle.AlreadyCompleted";
             public const string CannotCompleteWithoutCriteria = "EvaluationCycle.CannotCompleteWithoutCriteria";
+            public const string DatesOutOfBounds = "EvaluationCycle.DatesOutOfBounds";
         }
 
         public static class EvaluationCriteriaKey

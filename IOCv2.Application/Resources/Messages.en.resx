@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1366,5 +1366,44 @@
   </data>
   <data name="Landing.AlreadyRegistered" xml:space="preserve">
     <value>This email already has an account. OTP is not required — you can submit your request directly.</value>
+  </data>
+  <data name="EvaluationCycle.DatesOutOfBounds" xml:space="preserve">
+    <value>Evaluation cycle dates must fall within the internship phase timeframe ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="Sprint.DatesOutOfBounds" xml:space="preserve">
+    <value>Sprint dates must fall within the internship phase timeframe ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="WorkItem.DatesOutOfBounds" xml:space="preserve">
+    <value>Due date must fall within the internship phase timeframe ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="HRApplications.Notify.Interviewing" xml:space="preserve">
+    <value>Congratulations! You have been selected for an interview at {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Offered" xml:space="preserve">
+    <value>Congratulations! You have received an offer from {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.SelfApply" xml:space="preserve">
+    <value>Congratulations! Your open application has been accepted for internship by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.UniAssign" xml:space="preserve">
+    <value>Congratulations! Your internship assignment has been approved by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.SelfApply" xml:space="preserve">
+    <value>Unfortunately, your application has been rejected by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.UniAssign" xml:space="preserve">
+    <value>Unfortunately, your assigned internship application has been rejected by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Rejected" xml:space="preserve">
+    <value>{Enterprise} has rejected student {StudentName}. Reason: {Reason}</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Placed" xml:space="preserve">
+    <value>{Enterprise} has accepted student {StudentName} for internship.</value>
+  </data>
+  <data name="HRApplications.Notify.Enterprise.AutoWithdrawn" xml:space="preserve">
+    <value>The application has been automatically withdrawn because the recruitment phase ended.</value>
+  </data>
+  <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
+    <value>Your application has been automatically withdrawn because the recruitment phase ended.</value>
   </data>
 </root>
