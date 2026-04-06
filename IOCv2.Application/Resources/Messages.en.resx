@@ -1339,8 +1339,7 @@
   <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
     <value>EnterpriseId is required.</value>
   </data>
-</root>
-  <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
+<data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
     <value>ExpireDate {0} cannot be after internship phase start date {1}.</value>
   </data>
   <data name="University.HasActiveTerms" xml:space="preserve">
@@ -1445,4 +1444,5 @@
   <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
     <value>Your application has been automatically withdrawn because the recruitment phase ended.</value>
   </data>
+
 </root>
