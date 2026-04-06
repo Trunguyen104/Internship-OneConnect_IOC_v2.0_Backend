@@ -45,6 +45,7 @@ public class GetUniversityByIdHandler : IRequestHandler<GetUniversityByIdQuery, 
             Name = university.Name,
             Address = university.Address,
             LogoUrl = university.LogoUrl,
+            ContactEmail = university.ContactEmail,
             Status = university.Status
         };
 

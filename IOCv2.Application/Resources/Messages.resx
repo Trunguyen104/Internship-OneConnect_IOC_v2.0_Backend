@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -219,6 +219,9 @@
   <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
     <value>Project resource with ID {ResourceId} deleted successfully.</value>
   </data>
+  <data name="ProjectResources.StudentCannotModifyMentorResource" xml:space="preserve">
+    <value>Tài nguyên do mentor tải lên, sinh viên không được chỉnh sửa hoặc xóa.</value>
+  </data>
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Tạo Epic thành công.</value>
   </data>
@@ -311,12 +314,6 @@
   </data>
   <data name="StudentTerms.Email.BodyWithdraw" xml:space="preserve">
     <value>Bạn đã bị rút khỏi đợt thực tập '{0}'. Vui lòng liên hệ nhà trường nếu có thắc mắc.</value>
-  </data>
-  <data name="StudentTerms.Email.SubjectRestore" xml:space="preserve">
-    <value>Thông báo khôi phục ghi danh đợt thực tập</value>
-  </data>
-  <data name="StudentTerms.Email.BodyRestore" xml:space="preserve">
-    <value>Bạn đã được khôi phục vào đợt thực tập '{0}'.</value>
   </data>
   <data name="StudentTerms.Excel.HeaderStudentCode" xml:space="preserve">
     <value>Mã sinh viên</value>
@@ -951,6 +948,9 @@
   <data name="Projects.AssignGroupSuccess" xml:space="preserve">
     <value>Dự án đã được gán vào nhóm thực tập thành công.</value>
   </data>
+  <data name="Projects.GroupHasNoMentor" xml:space="preserve">
+    <value>Nhóm chưa có Mentor. Gán Mentor trước để gán dự án.</value>
+  </data>
   <data name="Projects.LogAssignGroupSuccess" xml:space="preserve">
     <value>Project {0} đã được gán vào nhóm {1}.</value>
   </data>
@@ -1079,6 +1079,81 @@
   </data>
   <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
     <value>Nộp nhật ký thực tập trễ</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSuccess" xml:space="preserve">
+    <value>Gán Mentor thành công.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorFirstAssignSuccess" xml:space="preserve">
+    <value>Đã gán Mentor {0} cho nhóm {1} thành công.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorChangeSuccess" xml:space="preserve">
+    <value>Đã đổi Mentor của nhóm {1} sang {0} thành công.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotFound" xml:space="preserve">
+    <value>Không tìm thấy nhóm thực tập.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotActive" xml:space="preserve">
+    <value>Chỉ có thể gán Mentor cho nhóm đang hoạt động.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupIdRequired" xml:space="preserve">
+    <value>Mã nhóm thực tập không được để trống.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorMentorRequired" xml:space="preserve">
+    <value>Vui lòng chọn Mentor để gán cho nhóm.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSameMentor" xml:space="preserve">
+    <value>Mentor này đã đang phụ trách nhóm thực tập, không thể gán trùng.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>Nhóm thực tập vừa được người khác cập nhật. Vui lòng tải lại và thử lại.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Gán Mentor {MentorName} cho nhóm {GroupId} thành công.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorFailed" xml:space="preserve">
+    <value>Gán Mentor cho nhóm {GroupId} thất bại do lỗi hệ thống.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorNotifyFailed" xml:space="preserve">
+    <value>Gửi thông báo sau khi gán Mentor cho nhóm {GroupId} thất bại, tiếp tục xử lý.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSameMentor" xml:space="preserve">
+    <value>Gán Mentor: Mentor {MentorUserId} đã là người hướng dẫn hiện tại của nhóm {GroupId}, bỏ qua thao tác.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>Gán Mentor bị xung đột đồng thời cho nhóm {GroupId}.</value>
+  </data>
+  <data name="InternshipGroup.AvailableMentorsRetrieved" xml:space="preserve">
+    <value>Lấy danh sách Mentor khả dụng thành công.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentors" xml:space="preserve">
+    <value>GetAvailableMentors: trả về {Count} Mentor khả dụng cho nhóm {GroupId}.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentorsAccessDenied" xml:space="preserve">
+    <value>GetAvailableMentors: Người dùng {UserId} không thuộc doanh nghiệp của nhóm {GroupId}, từ chối truy cập.</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiGetAvailableMentorsRequest" xml:space="preserve">
+    <value>Yêu cầu lấy danh sách Mentor khả dụng cho nhóm: {Id}</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiAssignOrChangeMentorRequest" xml:space="preserve">
+    <value>Yêu cầu gán/đổi Mentor cho nhóm: {Id}</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstTitle" xml:space="preserve">
+    <value>Bạn được phân công phụ trách nhóm mới</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstContent" xml:space="preserve">
+    <value>Bạn được phân công phụ trách nhóm {0} ({1} sinh viên). Kỳ thực tập: {2} → {3}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedTitle" xml:space="preserve">
+    <value>Nhóm của bạn vừa có Mentor</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedContent" xml:space="preserve">
+    <value>Nhóm {0} của bạn vừa có Mentor mới: {1}. Liên hệ: {2}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedTitle" xml:space="preserve">
+    <value>Mentor nhóm bạn vừa được thay đổi</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedContent" xml:space="preserve">
+    <value>Mentor của nhóm {0} vừa được thay đổi. Mentor mới: {1}. Liên hệ: {2}.</value>
   </data>
   <data name="Profile.LogUpdateStart" xml:space="preserve">
     <value>[START] UpdateMyProfile cho User: {UserId}</value>
@@ -1263,5 +1338,111 @@
   </data>
   <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
     <value>EnterpriseId là bắt buộc.</value>
+  </data>
+</root>
+  <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
+    <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
+  </data>
+  <data name="University.HasActiveTerms" xml:space="preserve">
+    <value>Không thể xóa trường đại học: hiện đang có các học kỳ đang hoạt động.</value>
+  </data>
+  <data name="University.HasInterningStudents" xml:space="preserve">
+    <value>Không thể xóa trường đại học: hiện đang có sinh viên đang trong quá trình thực tập.</value>
+  </data>
+  <data name="Enterprise.HasInterningStudents" xml:space="preserve">
+    <value>Không thể xóa doanh nghiệp: hiện đang có sinh viên đang thực tập tại đây.</value>
+  </data>
+  <data name="Enterprise.TaxCodeRequired" xml:space="preserve">
+    <value>Mã số thuế là bắt buộc.</value>
+  </data>
+  <data name="Enterprise.TaxCodeInvalid" xml:space="preserve">
+    <value>Định dạng mã số thuế không hợp lệ (ví dụ: 10 chữ số hoặc 10 chữ số kèm hậu tố).</value>
+  </data>
+  <data name="Enterprise.NameRequired" xml:space="preserve">
+    <value>Tên doanh nghiệp là bắt buộc.</value>
+  </data>
+  <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
+    <value>Định dạng email liên hệ không hợp lệ.</value>
+  </data>
+  <data name="University.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>Email liên hệ này đã được đăng ký bởi một Trường học hoặc Doanh nghiệp khác trong hệ thống.</value>
+  </data>
+  <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>Email liên hệ này đã được đăng ký bởi một Doanh nghiệp hoặc Trường học khác trong hệ thống.</value>
+  </data>
+  <data name="Landing.SendSuccess" xml:space="preserve">
+    <value>Yêu cầu của bạn đã được gửi thành công. Chúng tôi sẽ liên hệ lại sớm.</value>
+  </data>
+  <data name="Landing.SendError" xml:space="preserve">
+    <value>Không thể gửi yêu cầu lúc này. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Landing.OtpRequired" xml:space="preserve">
+    <value>Vui lòng xác thực email bằng mã OTP trước khi gửi yêu cầu.</value>
+  </data>
+  <data name="Landing.EmailInvalid" xml:space="preserve">
+    <value>Địa chỉ email không hợp lệ.</value>
+  </data>
+  <data name="Landing.OtpInvalidFormat" xml:space="preserve">
+    <value>Mã OTP phải gồm 6 chữ số.</value>
+  </data>
+  <data name="Landing.OtpExpired" xml:space="preserve">
+    <value>Mã không đúng hoặc đã hết hạn. Vui lòng gửi mã mới.</value>
+  </data>
+  <data name="Landing.OtpIncorrect" xml:space="preserve">
+    <value>Mã OTP không đúng.</value>
+  </data>
+  <data name="Landing.OtpSentLabel" xml:space="preserve">
+    <value>Đã gửi mã xác thực tới email của bạn.</value>
+  </data>
+  <data name="Landing.OtpVerifiedLabel" xml:space="preserve">
+    <value>Xác thực email thành công.</value>
+  </data>
+  <data name="Landing.DomainValidationFailed" xml:space="preserve">
+    <value>Không thể gửi mã tới tên miền email này. Vui lòng kiểm tra lại địa chỉ.</value>
+  </data>
+  <data name="Landing.EmailSentFailed" xml:space="preserve">
+    <value>Không thể gửi email xác thực. Vui lòng thử lại sau.</value>
+  </data>
+  <data name="Landing.AlreadyRegistered" xml:space="preserve">
+    <value>Email này đã có tài khoản trên hệ thống. Bạn có thể gửi yêu cầu trực tiếp mà không cần OTP.</value>
+  </data>
+  <data name="EvaluationCycle.DatesOutOfBounds" xml:space="preserve">
+    <value>Thời gian đợt đánh giá phải nằm trong khoảng thời gian của Đợt thực tập ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="Sprint.DatesOutOfBounds" xml:space="preserve">
+    <value>Thời gian Sprint phải nằm trong khoảng thời gian của Đợt thực tập ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="WorkItem.DatesOutOfBounds" xml:space="preserve">
+    <value>Ngày hết hạn phải nằm trong khoảng thời gian của Đợt thực tập ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="HRApplications.Notify.Interviewing" xml:space="preserve">
+    <value>Chúc mừng! Bạn đã được chọn phỏng vấn tại {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Offered" xml:space="preserve">
+    <value>Chúc mừng! Bạn đã nhận được offer từ {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.SelfApply" xml:space="preserve">
+    <value>Chúc mừng! Hồ sơ ứng tuyển mở tự do của bạn đã được {Enterprise} tiếp nhận thực tập.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.UniAssign" xml:space="preserve">
+    <value>Chúc mừng! Kết quả phân công thực tập đã được {Enterprise} phê duyệt.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.SelfApply" xml:space="preserve">
+    <value>Rất tiếc. Đơn ứng tuyển của bạn đã bị từ chối bởi doanh nghiệp {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.UniAssign" xml:space="preserve">
+    <value>Rất tiếc. Đơn ứng tuyển phân công thực tập đã bị từ chối bởi doanh nghiệp {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Rejected" xml:space="preserve">
+    <value>Doanh nghiệp {Enterprise} đã từ chối sinh viên {StudentName}. Lý do: {Reason}</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Placed" xml:space="preserve">
+    <value>Doanh nghiệp {Enterprise} đã đồng ý tiếp nhận sinh viên {StudentName}.</value>
+  </data>
+  <data name="HRApplications.Notify.Enterprise.AutoWithdrawn" xml:space="preserve">
+    <value>Hệ thống tự động hủy đơn ứng tuyển vì giai đoạn tuyển dụng đã kết thúc.</value>
+  </data>
+  <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
+    <value>Hệ thống tự động hủy đơn ứng tuyển vì giai đoạn tuyển dụng đã kết thúc.</value>
   </data>
 </root>

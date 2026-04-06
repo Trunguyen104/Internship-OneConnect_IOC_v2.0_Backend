@@ -12,7 +12,7 @@ namespace IOCv2.Domain.Entities
         public string MajorFields { get; private set; } = string.Empty;
         public int Capacity { get; private set; }
         public string? Description { get; private set; }
-        public InternshipPhaseStatus Status { get; private set; } = InternshipPhaseStatus.Draft;
+        public InternshipPhaseStatus Status { get; private set; }
 
         // Navigation properties
         public virtual Enterprise? Enterprise { get; set; }
@@ -38,7 +38,8 @@ namespace IOCv2.Domain.Entities
             DateOnly endDate,
             string majorFields,
             int capacity,
-            string? description)
+            string? description,
+            InternshipPhaseStatus? status)
         {
             return new InternshipPhase
             {
@@ -50,7 +51,7 @@ namespace IOCv2.Domain.Entities
                 MajorFields = majorFields,
                 Capacity = capacity,
                 Description = description,
-                Status = InternshipPhaseStatus.Draft
+                Status = status ?? InternshipPhaseStatus.Draft
             };
         }
 
@@ -66,7 +67,7 @@ namespace IOCv2.Domain.Entities
         /// </summary>
         public bool CanTransitionTo(InternshipPhaseStatus newStatus)
         {
-            if (Status == InternshipPhaseStatus.Closed) return false; // Closed is terminal — no further transitions (checked first)
+if (Status == InternshipPhaseStatus.Closed) return false; // Closed is terminal — no further transitions (checked first)
             if (Status == newStatus) return true; // no-op is allowed on non-Closed states
             return _allowedTransitions.TryGetValue(Status, out var allowed) && allowed.Contains(newStatus);
         }

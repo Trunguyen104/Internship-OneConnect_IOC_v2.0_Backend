@@ -30,7 +30,7 @@ public static class TestDbSeeder
             TaxCode = "0101248141",
             Industry = "IT Test",
             Address = "Test Address",
-            Status = (short)EnterpriseStatus.Active
+            Status = EnterpriseStatus.Active
         });
 
         context.SaveChanges();
@@ -146,7 +146,8 @@ public static class TestDbSeeder
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(90)),
             "CNTT",
             15,
-            "Test phase for integration tests");
+            "Test phase for integration tests",
+            null);
 
         context.InternshipPhases.Add(phase);
 

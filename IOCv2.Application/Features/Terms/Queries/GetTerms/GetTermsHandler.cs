@@ -129,9 +129,10 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
             {
                 // Mentor: only terms where they have an active group as mentor
                 var mid = mentorEnterpriseUserId.Value;
+                var eid = enterpriseId!.Value;
                 query = query.Where(t =>
                     _unitOfWork.Repository<InternshipGroup>().Query()
-                        .Any(ig => ig.EnterpriseId == enterpriseId.Value && ig.MentorId == mid));
+                        .Any(ig => ig.EnterpriseId == eid && ig.MentorId == mid));
             }
             else if (enterpriseId.HasValue)
             {
@@ -147,8 +148,8 @@ public class GetTermsHandler : IRequestHandler<GetTermsQuery, Result<PaginatedRe
             // Apply search filter
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                var searchTerm = request.SearchTerm.Trim().ToLower();
-                query = query.Where(t => t.Name.ToLower().Contains(searchTerm));
+                var term = request.SearchTerm.Trim().ToLower();
+                query = query.Where(t => t.Name.ToLower().Contains(term));
             }
 
             // Apply status filter

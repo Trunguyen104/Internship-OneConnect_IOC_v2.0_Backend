@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Extensions.Jobs;
@@ -8,11 +8,6 @@ using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
 {
@@ -123,10 +118,15 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobById
             // AC-11: compute Placed count and set banner when Placed == Quantity
             var placedCount = job.InternshipApplications.Count(a => a.Status == InternshipApplicationStatus.Placed);
             response.PlacedCount = placedCount;
+
             var maxStudents = job.InternshipPhase?.Capacity;
-            if (maxStudents is not null && placedCount >= maxStudents)
+            if (maxStudents.HasValue && placedCount >= maxStudents.Value)
             {
-                response.FilledBanner = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.JobPlacedMaxed, job.InternshipPhase.Name, placedCount, maxStudents);
+                response.FilledBanner = _messageService.GetMessage(
+                    MessageKeys.JobPostingMessageKey.JobPlacedMaxed,
+                    job.InternshipPhase?.Name ?? string.Empty,
+                    placedCount,
+                    maxStudents.Value);
             }
             return Result<GetJobByIdResponse>.Success(response);
         }

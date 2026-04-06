@@ -35,6 +35,10 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.UploadProjectReso
                     .Must(fileName => FileValidationHelper.IsFileExtensionAllowed(fileName))
                     .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType, FileValidationHelper.GetAllowedExtensionsString()));
 
+                RuleFor(x => x.File!)
+                    .Must(file => FileValidationHelper.IsFileContentValid(file))
+                    .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.InvalidFileType, FileValidationHelper.GetAllowedExtensionsString()));
+
                 RuleFor(x => x.File!.Length)
                     .Must((command, fileSize) => command.File != null && FileValidationHelper.IsFileSizeValid(command.File.FileName, fileSize))
                     .WithMessage(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.FileSizeExceeded));

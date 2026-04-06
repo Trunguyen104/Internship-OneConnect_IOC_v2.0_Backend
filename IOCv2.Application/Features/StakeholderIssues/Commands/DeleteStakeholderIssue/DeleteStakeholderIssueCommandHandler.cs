@@ -2,6 +2,7 @@ using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
 using IOCv2.Application.Features.StakeholderIssues.Common;
+using IOCv2.Application.Features.Stakeholders.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using MediatR;
@@ -39,8 +40,23 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
         {
             _logger.LogInformation("Deleting StakeholderIssue {Id}", request.Id);
 
+            var authError = StakeholderAccessGuard.EnsureAuthenticated<DeleteStakeholderIssueResponse>(_currentUserService, _messageService);
+            if (authError is not null)
+            {
+                return authError;
+            }
+
+            var managePermissionError = StakeholderAccessGuard.EnsureManagePermission<DeleteStakeholderIssueResponse>(_currentUserService, _messageService);
+            if (managePermissionError is not null)
+            {
+                _logger.LogWarning("User {UserId} with role {Role} attempted to delete stakeholder issue {IssueId}", _currentUserService.UserId, _currentUserService.Role, request.Id);
+                return managePermissionError;
+            }
+
+
             var issue = await _unitOfWork.Repository<StakeholderIssue>()
                 .Query()
+                .Include(si => si.Stakeholder)
                 .FirstOrDefaultAsync(si => si.Id == request.Id, cancellationToken);
 
             if (issue == null)
@@ -48,6 +64,35 @@ namespace IOCv2.Application.Features.StakeholderIssues.Commands.DeleteStakeholde
                 _logger.LogWarning("StakeholderIssue {Id} not found for deletion", request.Id);
                 return Result<DeleteStakeholderIssueResponse>.NotFound(
                     _messageService.GetMessage(MessageKeys.Issue.NotFound));
+            }
+
+            var internshipId = issue.Stakeholder?.InternshipId;
+            if (!internshipId.HasValue || internshipId.Value == Guid.Empty)
+            {
+                internshipId = await _unitOfWork.Repository<Stakeholder>()
+                    .Query()
+                    .AsNoTracking()
+                    .Where(s => s.Id == issue.StakeholderId)
+                    .Select(s => (Guid?)s.InternshipId)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
+
+            if (!internshipId.HasValue || internshipId.Value == Guid.Empty)
+            {
+                return Result<DeleteStakeholderIssueResponse>.NotFound(_messageService.GetMessage(MessageKeys.Issue.StakeholderNotFound));
+            }
+
+            var accessError = await StakeholderAccessGuard.EnsureInternshipAccessAsync<DeleteStakeholderIssueResponse>(
+                _unitOfWork,
+                _messageService,
+                _currentUserService,
+                internshipId.Value,
+                cancellationToken);
+
+            if (accessError is not null)
+            {
+                _logger.LogWarning("User {UserId} attempted to delete issue {IssueId} without permission in internship {InternshipId}", _currentUserService.UserId, request.Id, internshipId.Value);
+                return accessError;
             }
 
             try

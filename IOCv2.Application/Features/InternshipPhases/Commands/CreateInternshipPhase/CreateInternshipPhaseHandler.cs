@@ -3,6 +3,7 @@ using IOCv2.Application.Constants;
 using IOCv2.Application.Features.InternshipPhases.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,14 @@ public class CreateInternshipPhaseHandler
     public async Task<Result<CreateInternshipPhaseResponse>> Handle(
         CreateInternshipPhaseCommand request, CancellationToken cancellationToken)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        if (request.StartDate < today)
+        {
+            return Result<CreateInternshipPhaseResponse>.Failure(
+                $"{_messageService.GetMessage(MessageKeys.InternshipPhase.StartDateNotInPast)} (startDate: {request.StartDate:yyyy-MM-dd}, todayUtc: {today:yyyy-MM-dd})",
+                ResultErrorType.BadRequest);
+        }
+
         _logger.LogInformation(
             _messageService.GetMessage(MessageKeys.InternshipPhase.LogCreating),
             request.Name, request.EnterpriseId);
@@ -113,6 +122,10 @@ public class CreateInternshipPhaseHandler
             var majorFields = string.IsNullOrWhiteSpace(request.MajorFields)
                 ? DefaultMajorField
                 : request.MajorFields.Trim();
+            
+            var status = request.StartDate > today
+                ? InternshipPhaseStatus.Open
+                : InternshipPhaseStatus.InProgress;
 
             var phase = InternshipPhase.Create(
                 request.EnterpriseId,
@@ -121,7 +134,10 @@ public class CreateInternshipPhaseHandler
                 request.EndDate,
                 majorFields,
                 request.Capacity,
-                request.Description);
+                request.Description,
+                status
+            );
+           
 
             await _unitOfWork.Repository<InternshipPhase>().AddAsync(phase, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
@@ -133,7 +149,6 @@ public class CreateInternshipPhaseHandler
                 _messageService.GetMessage(MessageKeys.InternshipPhase.LogCreateSuccess),
                 phase.PhaseId, phase.Name, phase.EnterpriseId);
 
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var lifecycleStatus = phase.GetLifecycleStatus(today);
 
             return Result<CreateInternshipPhaseResponse>.Success(new CreateInternshipPhaseResponse

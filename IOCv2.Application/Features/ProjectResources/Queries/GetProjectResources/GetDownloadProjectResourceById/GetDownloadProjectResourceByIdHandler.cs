@@ -72,15 +72,20 @@ namespace IOCv2.Application.Features.ProjectResources.Queries.GetProjectResource
                     ResultErrorType.NotFound);
             }
 
-            var extension = Path.GetExtension(resource.ResourceUrl);
             var safeResourceName = string.IsNullOrWhiteSpace(resource.ResourceName)
                 ? request.ProjectResourceId.ToString("N")
                 : resource.ResourceName;
+
+            var baseFileName = Path.GetFileNameWithoutExtension(safeResourceName);
+            if (string.IsNullOrWhiteSpace(baseFileName))
+                baseFileName = request.ProjectResourceId.ToString("N");
+
+            var fileExtension = resource.ResourceType.GetExtension();
             var response = new GetDownloadProjectResourceByIdResponse
             {
                 Content = stream,
-                ContentType = FileValidationHelper.GetMimeType(safeResourceName),
-                FileName = $"{safeResourceName}{extension}"
+                ContentType = resource.ResourceType.GetMimeType(),
+                FileName = $"{baseFileName}{fileExtension}"
             };
 
             _logger.LogInformation(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.GetByIdSuccess), request.ProjectResourceId);

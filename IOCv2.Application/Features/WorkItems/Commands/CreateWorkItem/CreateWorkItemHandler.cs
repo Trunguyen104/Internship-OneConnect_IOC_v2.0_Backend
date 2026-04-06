@@ -41,14 +41,40 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
         try
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        if (request.DueDate.HasValue)
+        {
+            var project = await _unitOfWork.Repository<Project>().Query()
+                .Include(p => p.InternshipGroup)
+                    .ThenInclude(g => g!.InternshipPhase)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.ProjectId == request.ProjectId, cancellationToken);
+
+            var phase = project?.InternshipGroup?.InternshipPhase;
+            if (phase != null)
+            {
+                if (request.DueDate.Value < phase.StartDate || request.DueDate.Value > phase.EndDate)
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    _logger.LogWarning("WorkItem due date {DueDate} is out of bounds for Phase {PhaseId}", request.DueDate, phase.PhaseId);
+                    return Result<CreateWorkItemResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.WorkItem.DatesOutOfBounds, phase.StartDate, phase.EndDate),
+                        ResultErrorType.BadRequest);
+                }
+            }
+        }
+
         // Validate SprintId if provided
         if (request.SprintId.HasValue)
         {
             var sprintExists = await _unitOfWork.Repository<Sprint>()
                 .ExistsAsync(s => s.SprintId == request.SprintId.Value, cancellationToken);
+                
             if (!sprintExists)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 return Result<CreateWorkItemResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Sprint.NotFound), ResultErrorType.NotFound);
+            }
         }
 
         // Lấy BacklogOrder nhỏ nhất hiện tại (thẻ ở ngay vị trí đầu tiên)
@@ -67,7 +93,7 @@ public class CreateWorkItemHandler : IRequestHandler<CreateWorkItemCommand, Resu
             Title = request.Title,
             Description = request.Description,
             Priority = request.Priority,
-            Status = WorkItemStatus.Todo,
+            Status = request.Status ?? WorkItemStatus.Todo,
             StoryPoint = request.StoryPoint,
             AssigneeId = request.AssigneeId,
             DueDate = request.DueDate,

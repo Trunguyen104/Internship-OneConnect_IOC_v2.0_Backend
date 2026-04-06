@@ -36,6 +36,7 @@ public class UpdateEvaluationCycleHandler
         _logger.LogInformation("Updating EvaluationCycle {CycleId}", request.CycleId);
 
         var cycle = await _unitOfWork.Repository<EvaluationCycle>().Query()
+            .Include(c => c.InternshipPhase)
             .FirstOrDefaultAsync(c => c.CycleId == request.CycleId, cancellationToken);
 
         if (cycle is null)
@@ -56,6 +57,18 @@ public class UpdateEvaluationCycleHandler
 
         try
         {
+            var requestStartDate = DateOnly.FromDateTime(request.StartDate);
+            var requestEndDate = DateOnly.FromDateTime(request.EndDate);
+
+            if (requestStartDate < cycle.InternshipPhase.StartDate || requestEndDate > cycle.InternshipPhase.EndDate)
+            {
+                _logger.LogWarning("EvaluationCycle dates {StartDate} to {EndDate} are out of bounds for Phase {PhaseId} ({PhaseStart} to {PhaseEnd})",
+                    request.StartDate, request.EndDate, cycle.PhaseId, cycle.InternshipPhase.StartDate, cycle.InternshipPhase.EndDate);
+                return Result<UpdateEvaluationCycleResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.EvaluationCycle.DatesOutOfBounds, cycle.InternshipPhase.StartDate, cycle.InternshipPhase.EndDate),
+                    ResultErrorType.BadRequest);
+            }
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
 

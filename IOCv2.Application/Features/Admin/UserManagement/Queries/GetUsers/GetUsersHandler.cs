@@ -7,6 +7,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using IOCv2.Application.Features.Admin.UserManagement.Common;
 
 namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUsers
 {
@@ -45,7 +46,17 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUsers
                 return Result<PaginatedResult<GetUsersResponse>>.Failure("Invalid auditor role", ResultErrorType.Forbidden);
             }
 
-            var cacheKey = $"UserList:{auditorRole}:{auditorUnitId}:{request.SearchTerm}:{request.Role}:{request.Status}:{request.PageNumber}:{request.PageSize}:{request.SortColumn}:{request.SortOrder}";
+            var cacheKey = UserManagementCacheKeys.UserList(
+                auditorRoleStr,
+                auditorUnitId,
+                request.SearchTerm,
+                (int?)request.Role,
+                (int?)request.Status,
+                request.PageNumber,
+                request.PageSize,
+                request.SortColumn,
+                request.SortOrder
+            );
 
             var cached = await _cacheService.GetAsync<PaginatedResult<GetUsersResponse>>(cacheKey, cancellationToken);
             if (cached != null)
@@ -65,6 +76,11 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Queries.GetUsers
             }
             else if (auditorRole == UserRole.EnterpriseAdmin)
             {
+                query = query.Where(u => (u.Role == UserRole.HR || u.Role == UserRole.Mentor) && u.EnterpriseUser != null && u.EnterpriseUser.EnterpriseId.ToString() == auditorUnitId);
+            }
+            else if (auditorRole == UserRole.HR || auditorRole == UserRole.Mentor)
+            {
+                // Same unit scope as EnterpriseAdmin: only HR/Mentor accounts in this enterprise (not other enterprises).
                 query = query.Where(u => (u.Role == UserRole.HR || u.Role == UserRole.Mentor) && u.EnterpriseUser != null && u.EnterpriseUser.EnterpriseId.ToString() == auditorUnitId);
             }
             else if (auditorRole != UserRole.SuperAdmin && auditorRole != UserRole.Moderator)

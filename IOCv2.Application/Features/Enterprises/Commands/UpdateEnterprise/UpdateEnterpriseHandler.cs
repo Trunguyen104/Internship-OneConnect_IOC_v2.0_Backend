@@ -9,6 +9,7 @@ using IOCv2.Application.Services;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,10 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
                 return Result<UpdateEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Enterprise.NotFound), ResultErrorType.NotFound);
             }
 
+            var previousEnterpriseStatus = enterprise.Status;
+            var isSuperAdmin = _currentUserService.Role != null &&
+                               _currentUserService.Role.Equals(UserRole.SuperAdmin.ToString(), StringComparison.OrdinalIgnoreCase);
+
             if (!_currentUserService.Role!.Equals(UserRole.SuperAdmin.ToString()))
             {
                 bool canUpdate = await _unitOfWork.Repository<EnterpriseUser>().ExistsAsync(x => x.UserId == Guid.Parse(_currentUserService.UserId!) && x.EnterpriseId == request.EnterpriseId, cancellationToken);
@@ -80,6 +85,9 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
             try
             {
                 _mapper.Map(request, enterprise);
+
+                // BR-ENT-TG-01: Cascading suspend/block enterprise (Removed - Suspended status not used)
+
 
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);

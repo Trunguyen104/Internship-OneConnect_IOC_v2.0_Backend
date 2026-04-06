@@ -40,39 +40,38 @@ namespace IOCv2.Application.Features.Stakeholders.Commands.CreateStakeholder
             _logger.LogInformation("Creating stakeholder {Name} for internship {InternshipId}", request.Name, request.InternshipId);
 
             // Check internship group exists
-            var internshipGroup = await _unitOfWork.Repository<InternshipGroup>().Query()
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.InternshipId == request.InternshipId, cancellationToken);
+            var internshipExists = await _unitOfWork.Repository<InternshipGroup>()
+                .ExistsAsync(p => p.InternshipId == request.InternshipId, cancellationToken);
 
-            if (internshipGroup == null)
+            if (!internshipExists)
             {
                 _logger.LogWarning("InternshipGroup {InternshipId} not found", request.InternshipId);
                 return Result<CreateStakeholderResponse>.NotFound("InternshipGroup not found");
             }
 
-            // Security: Ownership check (FFA-SEC)
-            var currentUserIdStr = _currentUserService.UserId;
-            if (string.IsNullOrEmpty(currentUserIdStr) || !Guid.TryParse(currentUserIdStr, out var currentUserId))
+            var authError = StakeholderAccessGuard.EnsureAuthenticated<CreateStakeholderResponse>(_currentUserService, _messageService);
+            if (authError is not null)
             {
-                return Result<CreateStakeholderResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+                return authError;
             }
 
-            var userRole = _currentUserService.Role;
-            if (userRole != "SchoolAdmin" && userRole != "SuperAdmin" && userRole != "Moderator")
+            var managePermissionError = StakeholderAccessGuard.EnsureManagePermission<CreateStakeholderResponse>(_currentUserService, _messageService);
+            if (managePermissionError is not null)
             {
-                var isAuthorized = await _unitOfWork.Repository<InternshipGroup>()
-                    .Query()
-                    .AnyAsync(g => g.InternshipId == request.InternshipId &&
-                        (
-                            (g.Mentor != null && g.Mentor.UserId == currentUserId) ||
-                            g.Members.Any(m => m.Student.UserId == currentUserId)
-                        ), cancellationToken);
+                _logger.LogWarning("User {UserId} with role {Role} attempted to create stakeholder in internship {InternshipId}", _currentUserService.UserId, _currentUserService.Role, request.InternshipId);
+                return managePermissionError;
+            }
 
-                if (!isAuthorized)
-                {
-                    _logger.LogWarning("User {UserId} attempted to create stakeholder in internship {InternshipId} without permission", currentUserId, request.InternshipId);
-                    return Result<CreateStakeholderResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
-                }
+            var accessError = await StakeholderAccessGuard.EnsureInternshipAccessAsync<CreateStakeholderResponse>(
+                _unitOfWork,
+                _messageService,
+                _currentUserService,
+                request.InternshipId,
+                cancellationToken);
+
+            if (accessError is not null)
+            {
+                return accessError;
             }
 
             // Check email duplicate within same internship

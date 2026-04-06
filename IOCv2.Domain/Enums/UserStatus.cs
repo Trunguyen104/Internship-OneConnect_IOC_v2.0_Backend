@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,5 @@ namespace IOCv2.Domain.Enums
     {
         Inactive = 1,
         Active = 2,
-        Suspended = 3,
     }
 }

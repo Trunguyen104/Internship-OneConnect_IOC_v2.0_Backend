@@ -35,6 +35,7 @@ public partial class AppDbContext : DbContext
     public DbSet<InternshipPhase> InternshipPhases { get; set; } = null!;
     public DbSet<StudentTerm> StudentTerms { get; set; } = null!;
     public DbSet<InternshipGroup> InternshipGroups { get; set; } = null!;
+    public DbSet<GroupMentorHistory> GroupMentorHistories { get; set; } = null!;
     public DbSet<InternshipStudent> InternshipStudents { get; set; } = null!;
     public DbSet<InternshipApplication> InternshipApplications { get; set; } = null!;
     public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; } = null!;
@@ -59,6 +60,9 @@ public partial class AppDbContext : DbContext
     
     //Violation Reports
     public DbSet<ViolationReport> ViolationReports { get; set; } = null!;
+
+    // Public Holidays (used for missing logbook date calculations)
+    public DbSet<PublicHoliday> PublicHolidays { get; set; } = null!;
 
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

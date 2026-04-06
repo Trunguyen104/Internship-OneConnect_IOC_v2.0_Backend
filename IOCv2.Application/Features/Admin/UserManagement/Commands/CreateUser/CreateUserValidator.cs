@@ -39,6 +39,13 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser
                            x.Role == UserRole.Student;
                 })
                 .WithMessage(messageService.GetMessage(MessageKeys.Validation.UserUnitRequired));
+
+            // TermId is required when creating a Student
+            RuleFor(x => x.TermId)
+                .NotNull()
+                .NotEmpty()
+                .When(x => x.Role == UserRole.Student)
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.TermRequiredForStudent));
         }
     }
 }

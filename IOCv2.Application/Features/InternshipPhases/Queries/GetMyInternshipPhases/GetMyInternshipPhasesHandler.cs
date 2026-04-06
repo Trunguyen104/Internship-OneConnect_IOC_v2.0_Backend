@@ -140,6 +140,7 @@ public class GetMyInternshipPhasesHandler
     private async Task<List<GetMyInternshipPhasesResponse>> BuildResponseAsync(
         List<InternshipGroup> groups, CancellationToken cancellationToken)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var internshipIds = groups.Select(g => g.InternshipId).ToList();
 
         var projectLookup = internshipIds.Count == 0
@@ -162,21 +163,39 @@ public class GetMyInternshipPhasesHandler
         {
             var phase = group.InternshipPhase!;
             var project = projectLookup.GetValueOrDefault(group.InternshipId);
+            var effectivePhaseStatus = ResolveEffectivePhaseStatus(phase, today);
 
             return new GetMyInternshipPhasesResponse
             {
                 PhaseId        = phase.PhaseId,
                 PhaseName      = phase.Name,
-                PhaseStatus    = phase.Status,
+                PhaseStatus    = effectivePhaseStatus,
                 InternshipGroupId = group.InternshipId,
                 EnterpriseName = group.Enterprise?.Name,
                 MentorName     = group.Mentor?.User?.FullName,
                 ProjectName    = project?.ProjectName,
-                JourneyStep    = CalculateJourneyStep(phase.Status, group.Status),
+                JourneyStep    = CalculateJourneyStep(effectivePhaseStatus, group.Status),
                 StartDate      = phase.StartDate,
                 EndDate        = phase.EndDate
             };
         }).ToList();
+    }
+
+    private static InternshipPhaseStatus ResolveEffectivePhaseStatus(InternshipPhase phase, DateOnly today)
+    {
+        // Keep explicit manual states stable; infer operational state from dates for Open/InProgress.
+        if (phase.Status == InternshipPhaseStatus.Draft || phase.Status == InternshipPhaseStatus.Closed)
+        {
+            return phase.Status;
+        }
+
+        return phase.GetLifecycleStatus(today) switch
+        {
+            InternshipPhaseLifecycleStatus.Upcoming => InternshipPhaseStatus.Open,
+            InternshipPhaseLifecycleStatus.Active => InternshipPhaseStatus.InProgress,
+            InternshipPhaseLifecycleStatus.Ended => InternshipPhaseStatus.Closed,
+            _ => phase.Status
+        };
     }
 
     /// <summary>

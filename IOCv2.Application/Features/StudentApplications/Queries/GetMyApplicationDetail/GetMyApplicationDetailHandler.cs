@@ -39,7 +39,7 @@ public class GetMyApplicationDetailHandler : IRequestHandler<GetMyApplicationDet
 
         var application = await _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
             .Include(a => a.Enterprise)
-            .Include(a => a.Job)
+            .Include(a => a.Job).ThenInclude(j => j!.InternshipPhase)
             .Include(a => a.StatusHistories.OrderByDescending(h => h.CreatedAt))
             .FirstOrDefaultAsync(a => a.ApplicationId == request.ApplicationId && a.StudentId == student.StudentId, cancellationToken);
 
@@ -54,8 +54,13 @@ public class GetMyApplicationDetailHandler : IRequestHandler<GetMyApplicationDet
             Source = application.Source,
             JobTitle = application.Job?.Title,
             JobAudience = application.Job?.Audience.ToString(),
+            InternshipPhaseId = application.Job?.InternshipPhaseId,
+            InternPhaseName = application.Job?.InternshipPhase?.Name,
+            InternPhaseStartDate = application.Job?.InternshipPhase?.StartDate,
+            InternPhaseEndDate = application.Job?.InternshipPhase?.EndDate,
             EnterpriseName = application.Enterprise.Name,
             EnterpriseLogoUrl = application.Enterprise.LogoUrl,
+            CvSnapshotUrl = application.CvSnapshotUrl,
             Status = application.Status,
             RejectReason = application.RejectReason,
             AppliedAt = application.AppliedAt,
@@ -65,7 +70,7 @@ public class GetMyApplicationDetailHandler : IRequestHandler<GetMyApplicationDet
             {
                 Status = h.ToStatus,
                 ChangedAt = h.CreatedAt,
-                ChangedByName = h.ChangedByName,
+                ChangedByName = h.ChangedByName ?? "System",
                 Note = h.TriggerSource == "Student" ? h.Note : null // Do not leak HR notes in MVP, or only leak limited notes.
             }).ToList()
         };

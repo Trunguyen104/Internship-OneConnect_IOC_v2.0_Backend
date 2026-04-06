@@ -9,7 +9,7 @@ public class GetMyInternshipGroupsResponse
     public string Name { get; set; } = string.Empty;
     public Guid? EnterpriseId { get; set; }
     public Guid SchoolId { get; set; }
-    public Guid PhaseId { get; set; }
+    public Guid InternshipPhaseId { get; set; }
     public GroupStatus GroupStatus { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
@@ -19,9 +19,11 @@ public class GetMyInternshipGroupsResponse
     public DateTime? UpdatedAt { get; set; }
     public MineEnterpriseDto? Enterprise { get; set; }
     public MineSchoolDto? School { get; set; }
-    public MinePhaseDto? Phase { get; set; }
+    public MinePhaseDto? InternshipPhase { get; set; }
     public MineProjectDto? Project { get; set; }
+    public MineTermDto? Term { get; set; }
     public List<MineMentorDto> Mentors { get; set; } = new();
+    public bool HasNoMentorWarning { get; set; }
     public int StudentCount { get; set; }
     public int EvaluationCount { get; set; }
     public Guid? ProjectId { get; set; }
@@ -29,7 +31,7 @@ public class GetMyInternshipGroupsResponse
     public Guid? CreatedBy { get; set; }
     public Guid? UpdatedBy { get; set; }
 
-    public static GetMyInternshipGroupsResponse FromEntity(InternshipGroup group, Project? project, University? university = null)
+    public static GetMyInternshipGroupsResponse FromEntity(InternshipGroup group, Project? project, University? university = null, Term? term = null)
     {
         return new GetMyInternshipGroupsResponse
         {
@@ -37,7 +39,7 @@ public class GetMyInternshipGroupsResponse
             Name = group.GroupName,
             EnterpriseId = group.EnterpriseId,
             SchoolId = university?.UniversityId ?? Guid.Empty,
-            PhaseId = group.PhaseId,
+            InternshipPhaseId = group.PhaseId,
             GroupStatus = group.Status,
             StartDate = group.StartDate,
             EndDate = group.EndDate,
@@ -59,7 +61,7 @@ public class GetMyInternshipGroupsResponse
                     Id = university.UniversityId,
                     Name = university.Name
                 },
-            Phase = new MinePhaseDto
+            InternshipPhase = new MinePhaseDto
             {
                 Id = group.InternshipPhase?.PhaseId ?? Guid.Empty,
                 Name = group.InternshipPhase?.Name ?? string.Empty
@@ -71,8 +73,18 @@ public class GetMyInternshipGroupsResponse
                     Id = project.ProjectId,
                     Name = project.ProjectName,
                     Domain = project.InternshipId,
-                    SpaceTemplate = null
+                    SpaceTemplate = new MineSpaceTemplateDto 
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Scrum Workflow",
+                        BoardType = "SCRUM"
+                    }
                 },
+            Term = term == null ? null : new MineTermDto
+            {
+                Id = term.TermId,
+                Name = term.Name
+            },
             Mentors = group.Mentor == null || group.Mentor.User == null
                 ? new List<MineMentorDto>()
                 : new List<MineMentorDto>
@@ -84,6 +96,7 @@ public class GetMyInternshipGroupsResponse
                         Email = group.Mentor.User.Email
                     }
                 },
+            HasNoMentorWarning = !group.MentorId.HasValue,
             StudentCount = group.Members.Count,
             EvaluationCount = 0, // Will be populated in the handler for efficiency if needed, or here if we have it
             ProjectId = project?.ProjectId,

@@ -25,7 +25,7 @@ public class UniversitiesController : ApiControllerBase
     /// Get a paginated list of universities.
     /// </summary>
     [HttpGet]
-    [Authorize(Roles ="SuperAdmin,HR")]
+    [Authorize(Roles ="SuperAdmin,EnterpriseAdmin,HR")]
     [ProducesResponseType(typeof(ApiResponse<PaginatedResult<GetUniversitiesResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUniversities([FromQuery] GetUniversitiesQuery query)
     {
@@ -36,7 +36,7 @@ public class UniversitiesController : ApiControllerBase
     /// Get university by ID.
     /// </summary>
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize]
     [ProducesResponseType(typeof(ApiResponse<GetUniversityByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUniversity(Guid id)

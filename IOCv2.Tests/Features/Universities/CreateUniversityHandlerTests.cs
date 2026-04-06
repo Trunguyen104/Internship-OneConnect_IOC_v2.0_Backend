@@ -15,6 +15,7 @@ public class CreateUniversityHandlerTests
     private readonly Mock<ICurrentUserService> _mockCurrentUserService;
     private readonly Mock<IGenericRepository<University>> _mockUniversityRepository;
     private readonly Mock<ICacheService> _mockCacheService;
+    private readonly Mock<IEmailService> _mockEmailService;
     private readonly CreateUniversityHandler _handler;
 
     public CreateUniversityHandlerTests()
@@ -24,14 +25,23 @@ public class CreateUniversityHandlerTests
         _mockCurrentUserService = new Mock<ICurrentUserService>();
         _mockUniversityRepository = new Mock<IGenericRepository<University>>();
         _mockCacheService = new Mock<ICacheService>();
+        _mockEmailService = new Mock<IEmailService>();
 
         _mockUnitOfWork.Setup(u => u.Repository<University>()).Returns(_mockUniversityRepository.Object);
+        _mockUnitOfWork.Setup(u => u.BeginTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.CommitTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.RollbackTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.SaveChangeAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockUniversityRepository.Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<University, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _mockUniversityRepository.Setup(r => r.AddAsync(It.IsAny<University>(), It.IsAny<CancellationToken>())).ReturnsAsync((University u, CancellationToken _) => u);
+        _mockCacheService.Setup(c => c.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         _handler = new CreateUniversityHandler(
             _mockUnitOfWork.Object,
             _mockLogger.Object,
             _mockCurrentUserService.Object,
-            _mockCacheService.Object);
+            _mockCacheService.Object,
+            _mockEmailService.Object);
     }
 
     [Fact]

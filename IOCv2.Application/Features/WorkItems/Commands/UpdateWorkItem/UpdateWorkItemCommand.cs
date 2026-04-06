@@ -21,5 +21,7 @@ public record UpdateWorkItemCommand : IRequest<Result<UpdateWorkItemResponse>>
 
     public int? StoryPoint { get; init; }
     public Guid? AssigneeId { get; init; }
+    public Guid? ParentId { get; init; }
+    public WorkItemType? Type { get; init; }
     public DateOnly? DueDate { get; init; }
 }

@@ -141,6 +141,12 @@
   <data name="Common.NoPermission" xml:space="preserve">
     <value>You do not have permission to perform this action</value>
   </data>
+  <data name="Common.Forbidden" xml:space="preserve">
+    <value>You do not have permission to perform this action.</value>
+  </data>
+  <data name="Common.InternalError" xml:space="preserve">
+    <value>An internal error occurred. Please try again later.</value>
+  </data>
   <data name="Password.MinLength" xml:space="preserve">
     <value>Password must be at least 8 characters long.</value>
   </data>
@@ -580,8 +586,11 @@
   <data name="StudentTerms.WithdrawSuccess" xml:space="preserve">
     <value>Student has been successfully withdrawn from the term and their status has been updated to Withdrawn.</value>
   </data>
-  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
-    <value>Enrollment has been successfully restored. The student is now Active in the term again.</value>
+  <data name="StudentTerms.WithdrawDeleteWarning" xml:space="preserve">
+    <value>Warning: this action will delete the student from the system (system student delta: {0}).</value>
+  </data>
+  <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
+    <value>Cannot delete this student from the system because they are still enrolled in another term.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
     <value>Bulk withdrawal completed successfully. Students with an active placement (Placed) were automatically skipped and remain unaffected.</value>
@@ -592,6 +601,15 @@
   <data name="StudentTerms.ImportConfirmSuccess" xml:space="preserve">
     <value>Students imported into the term successfully. All valid students have been enrolled and are ready to begin their internship.</value>
   </data>
+  <data name="StudentTerms.GetStudentsSuccess" xml:space="preserve">
+    <value>Student list retrieved successfully for the term. Total matched records: {0}.</value>
+  </data>
+  <data name="StudentTerms.GetStudentTermDetailSuccess" xml:space="preserve">
+    <value>Student term detail retrieved successfully (StudentTermId: {0}).</value>
+  </data>
+  <data name="StudentTerms.DownloadTemplateSuccess" xml:space="preserve">
+    <value>Student import template downloaded successfully for the term (TermId: {0}).</value>
+  </data>
   <data name="StudentTerms.Log.Added" xml:space="preserve">
     <value>Student {0} added to term {1} by {2}.</value>
   </data>
@@ -601,14 +619,17 @@
   <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
     <value>Student {0} withdrawn from term by {1}.</value>
   </data>
-  <data name="StudentTerms.Log.Restored" xml:space="preserve">
-    <value>Student {0} restored to term by {1}.</value>
-  </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
     <value>{0} students withdrawn from term {1} by {2}.</value>
   </data>
   <data name="StudentTerms.Log.ImportConfirmed" xml:space="preserve">
     <value>{0} students imported into term {1} by {2}.</value>
+  </data>
+  <data name="StudentTerms.Log.AddManualError" xml:space="preserve">
+    <value>Error adding student manually to term {0}.</value>
+  </data>
+  <data name="StudentTerms.Log.ImportConfirmError" xml:space="preserve">
+    <value>Error confirming student import for term {0}.</value>
   </data>
   <data name="Terms.NotFound" xml:space="preserve">
     <value>Term not found. Please verify the ID or reload the page.</value>
@@ -636,6 +657,9 @@
   </data>
   <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
     <value>End date must be after start date.</value>
+  </data>
+  <data name="Terms.EndDateMustBeAtLeastOneMonthAfterStart" xml:space="preserve">
+    <value>End date must be at least 1 month after start date.</value>
   </data>
   <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Start date cannot be in the past.</value>
@@ -1205,26 +1229,26 @@
     <value>An error occurred while retrieving violation report details.</value>
   </data>
 
-  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
-  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+  <!-- ActivePhases (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Your session is invalid. Please sign out and sign in again.</value>
   </data>
-  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+  <data name="ActivePhases.EnterpriseUserNotFound" xml:space="preserve">
     <value>Your enterprise employee profile was not found. Please contact the administrator to verify your account.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForEnterprise" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForEnterprise" xml:space="preserve">
     <value>Your enterprise currently has no active internship groups in any ongoing term.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForMentor" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForMentor" xml:space="preserve">
     <value>You have not been assigned to any active internship group in the current term.</value>
   </data>
-  <data name="ActiveTerms.SystemError" xml:space="preserve">
+  <data name="ActivePhases.SystemError" xml:space="preserve">
     <value>An error occurred while loading the active internship terms. Please try again later.</value>
   </data>
-  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+  <data name="ActivePhases.Log.Retrieved" xml:space="preserve">
     <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
   </data>
-  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+  <data name="ActivePhases.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
   <data name="Projects.MentorNotFound" xml:space="preserve">

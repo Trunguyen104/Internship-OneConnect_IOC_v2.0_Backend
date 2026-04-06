@@ -18,10 +18,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
 
         // Number of applications for this job (Số application)
         public int ApplicationCount { get; set; }
-
-        // Internship term name to display as "Kỳ thực tập" (if available)
-        public string? TermName { get; set; }
-
+        public string InternshipPhaseName { get; set; } = null!;
         public short Status { get; set; }
 
         // Helper for UI: whether this job is Deleted (Status == DELETED)
@@ -34,12 +31,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
                 .ForMember(d => d.CompanyLogoUrl, opt => opt.MapFrom(s => s.Enterprise.LogoUrl))
                 .ForMember(d => d.Status, opt => opt.MapFrom(s => (short)(s.Status ?? JobStatus.DRAFT)))
                 .ForMember(d => d.ApplicationCount, opt => opt.MapFrom(s => s.InternshipApplications.Count))
-                // Map an enterprise active term name (first open term) if present
-                .ForMember(d => d.TermName, opt => opt.MapFrom(s =>
-                    s.Enterprise.InternshipApplications
-                        .Where(ia => ia.Term != null && ia.Term.Status == TermStatus.Open)
-                        .Select(ia => ia.Term.Name)
-                        .FirstOrDefault()))
+                .ForMember(d => d.InternshipPhaseName, opt => opt.MapFrom(s => s.InternshipPhase!.Name ?? string.Empty))
                 .ForMember(d => d.IsDeleted, opt => opt.MapFrom(s => s.Status == JobStatus.DELETED));
         }
     }

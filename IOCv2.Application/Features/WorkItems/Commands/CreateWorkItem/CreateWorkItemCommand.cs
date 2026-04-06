@@ -24,4 +24,6 @@ public record CreateWorkItemCommand : IRequest<Result<CreateWorkItemResponse>>
 
     /// <summary>Nếu có → tạo luôn vào Sprint Backlog</summary>
     public Guid? SprintId { get; init; }
+
+    public WorkItemStatus? Status { get; init; }
 }

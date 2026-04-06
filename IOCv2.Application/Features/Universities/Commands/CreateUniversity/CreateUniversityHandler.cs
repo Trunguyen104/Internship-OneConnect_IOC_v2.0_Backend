@@ -10,21 +10,28 @@ namespace IOCv2.Application.Features.Universities.Commands.CreateUniversity;
 
 public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, Result<Guid>>
 {
+    private const string EmailDeliveryErrorMessage =
+        "Không thể tạo tài khoản do địa chỉ email không hợp lệ hoặc không thể nhận tin.";
+
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreateUniversityHandler> _logger;
     private readonly ICurrentUserService _currentUserService;
     private readonly ICacheService _cacheService;
 
+    private readonly IEmailService _emailService;
+
     public CreateUniversityHandler(
         IUnitOfWork unitOfWork,
         ILogger<CreateUniversityHandler> logger,
         ICurrentUserService currentUserService,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        IEmailService emailService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _currentUserService = currentUserService;
         _cacheService = cacheService;
+        _emailService = emailService;
     }
 
     public async Task<Result<Guid>> Handle(CreateUniversityCommand request, CancellationToken cancellationToken)
@@ -48,10 +55,30 @@ public class CreateUniversityHandler : IRequestHandler<CreateUniversityCommand, 
                 request.Code.Trim(),
                 request.Name.Trim(),
                 request.Address?.Trim(),
-                null);
+                null,
+                request.ContactEmail?.Trim());
 
             await _unitOfWork.Repository<University>().AddAsync(university, cancellationToken);
             await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(university.ContactEmail))
+            {
+                if (!_emailService.VerifyEmailMxRecordSync(university.ContactEmail))
+                {
+                    throw new BusinessException(EmailDeliveryErrorMessage);
+                }
+
+                var sent = await _emailService.SendUniversityCreationEmailAsync(
+                    university.ContactEmail,
+                    university.Name,
+                    university.Code,
+                    cancellationToken);
+
+                if (!sent)
+                {
+                    throw new BusinessException(EmailDeliveryErrorMessage);
+                }
+            }
 
             await _unitOfWork.CommitTransactionAsync();
 

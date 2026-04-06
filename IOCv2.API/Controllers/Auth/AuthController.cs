@@ -98,15 +98,17 @@ public class AuthController : ApiControllerBase
     /// Logout the current user — revokes refresh token and clears authentication cookies.
     /// </summary>
     /// <param name="command">Optional refresh token for revocation</param>
-    /// <returns>NoContent success</returns>
+    /// <returns>Success result</returns>
     [HttpPost("logout")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Logout([FromBody] RevokeTokenCommand command)
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Logout([FromBody] RevokeTokenCommand? command)
     {
         _logger.LogInformation("Logout requested.");
 
         // Try to get token from Body or Cookie
-        var refreshToken = command.RefreshToken ?? Request.Cookies["refreshToken"];
+        var refreshToken = !string.IsNullOrWhiteSpace(command?.RefreshToken)
+            ? command!.RefreshToken
+            : Request.Cookies["refreshToken"];
 
         // Clear Cookies to ensure client-side logout
         Response.Cookies.Delete("accessToken");
@@ -115,15 +117,15 @@ public class AuthController : ApiControllerBase
         if (string.IsNullOrEmpty(refreshToken))
         {
             _logger.LogInformation("No refresh token to revoke. Local cookies cleared.");
-            return NoContent();
+            return HandleResult(Result<bool>.Success(true));
         }
 
         // Revoke token in DB
         var revokeCommand = new RevokeTokenCommand { RefreshToken = refreshToken };
-        await _mediator.Send(revokeCommand);
+        var result = await _mediator.Send(revokeCommand);
 
         _logger.LogInformation("Logout/Revocation completed.");
-        return NoContent();
+        return HandleResult(result);
     }
 
     /// <summary>

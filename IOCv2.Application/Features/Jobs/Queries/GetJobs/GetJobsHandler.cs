@@ -47,6 +47,7 @@ namespace IOCv2.Application.Features.Jobs.Queries.GetJobs
                 .Include(j => j.Enterprise)
                 .Include(j => j.Universities)
                 .Include(j => j.InternshipApplications)
+                .Include(j => j.InternshipPhase)
                 .AsQueryable();
 
             // Enterprise view (HR / EnterpriseAdmin)

@@ -54,6 +54,9 @@ namespace IOCv2.Infrastructure
             // Register Hosted Service to process emails
             services.AddHostedService<EmailHostedService>();
 
+            // Register Background Job to auto-close expired job postings
+            services.AddHostedService<JobExpiryHostedService>();
+
             // Register Background Job to auto-complete expired projects
             services.AddHostedService<AutoCompleteProjectsJob>();
 
@@ -66,6 +69,12 @@ namespace IOCv2.Infrastructure
 
             // Cache Service
             services.AddScoped<ICacheService, RedisCacheService>();
+
+            services.AddScoped<IOtpService, OtpService>();
+            services.AddScoped<ILandingEmailPolicy, LandingEmailPolicy>();
+
+            // Public Holiday External API
+            services.AddScoped<IPublicHolidayApiService, CalendarificService>();
 
             // File
             services.AddHttpClient();

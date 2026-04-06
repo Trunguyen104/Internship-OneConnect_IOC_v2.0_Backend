@@ -37,7 +37,9 @@ public class CreateTermValidator : AbstractValidator<CreateTermCommand>
             .Must(BeValidDate)
             .WithMessage(messageService.GetMessage(MessageKeys.Terms.InvalidDateFormat))
             .GreaterThan(x => x.StartDate)
-            .WithMessage(messageService.GetMessage(MessageKeys.Terms.EndDateMustBeAfterStart));
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.EndDateMustBeAfterStart))
+            .Must((command, endDate) => BeAtLeastOneMonthAfterStart(command.StartDate, endDate))
+            .WithMessage(messageService.GetMessage(MessageKeys.Terms.EndDateMustBeAtLeastOneMonthAfterStart));
     }
 
     private bool BeValidDate(DateOnly date)
@@ -57,6 +59,14 @@ public class CreateTermValidator : AbstractValidator<CreateTermCommand>
         // Already failed IsNotInPast if in the past — pass this rule to avoid duplicate messages
         if (startDate < today) return true;
         return startDate >= today.AddDays(7);
+    }
+
+    private bool BeAtLeastOneMonthAfterStart(DateOnly startDate, DateOnly endDate)
+    {
+        if (startDate == default || endDate == default)
+            return true;
+
+        return endDate >= startDate.AddMonths(1);
     }
 
     private bool NotContainXssCharacters(string name)

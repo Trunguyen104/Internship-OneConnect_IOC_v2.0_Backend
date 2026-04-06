@@ -74,6 +74,9 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
             if (group.EndDate.HasValue && group.EndDate.Value.Date < DateTime.UtcNow.Date)
                 return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
 
+            if (!group.MentorId.HasValue)
+                return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Projects.GroupHasNoMentor), ResultErrorType.BadRequest);
+
             // Mentor phải phụ trách group
             if (group.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);

@@ -135,6 +135,10 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Projects.GroupPhaseEnded), ResultErrorType.BadRequest);
 
+                if (!assignedGroup.MentorId.HasValue)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Projects.GroupHasNoMentor), ResultErrorType.BadRequest);
+
                 if (assignedGroup.MentorId != enterpriseUser.EnterpriseUserId)
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
@@ -173,7 +177,7 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                         var fileName = FileParams.GetFileName(file.FileName);
                         var fileUrl = await _fileStorage.UploadFileAsync(
                             file, FileParams.GetFolder(newProject.ProjectId), fileName, cancellationToken);
-                        uploadedFiles.Add((fileUrl, file.FileName, FileValidationHelper.GetFileType(fileUrl)!.Value));
+                        uploadedFiles.Add((fileUrl, file.FileName, FileValidationHelper.GetFileType(file.FileName)!.Value));
 
                         var resource = new IOCv2.Domain.Entities.ProjectResources(newProject.ProjectId, file.FileName, uploadedFiles[^1].type, fileUrl);
                         await _unitOfWork.Repository<IOCv2.Domain.Entities.ProjectResources>().AddAsync(resource, cancellationToken);

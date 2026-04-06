@@ -18,7 +18,7 @@ namespace IOCv2.API.Controllers.Admin;
 /// </summary>
 [Tags("Admin - User Management")]
 [Route("api/v{version:apiVersion}/user-management")]
-[Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin")]
+[Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin,HR,Mentor")]
 public class UserManagementController : ApiControllerBase
 {
     private readonly IMediator _mediator;
@@ -42,6 +42,7 @@ public class UserManagementController : ApiControllerBase
     /// Get a single account by ID (role-based access).
     /// </summary>
     [HttpGet("{id:guid}", Name = "GetUserById")]
+    [Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin,HR,Mentor")]
     [ProducesResponseType(typeof(ApiResponse<GetUserByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserById(
@@ -56,6 +57,7 @@ public class UserManagementController : ApiControllerBase
     /// Create a new account (SuperAdmin creates all, SchoolAdmin creates Students, EnterpriseAdmin creates HR/Mentors).
     /// </summary>
     [HttpPost]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateUser(
@@ -70,6 +72,7 @@ public class UserManagementController : ApiControllerBase
     /// Update an existing account with hierarchical validation.
     /// </summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<UpdateUserResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateUser(
         [FromRoute] Guid id,
@@ -84,6 +87,7 @@ public class UserManagementController : ApiControllerBase
     /// Soft delete an account with hierarchical validation.
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<DeleteUserResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteUser(
         [FromRoute] Guid id,
@@ -97,6 +101,7 @@ public class UserManagementController : ApiControllerBase
     /// Change the status of an account.
     /// </summary>
     [HttpPatch("{id:guid}/status")]
+    [Authorize(Roles = "SuperAdmin,Moderator,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<ToggleUserStatusResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ToggleUserStatus(
         [FromRoute] Guid id,
@@ -111,6 +116,7 @@ public class UserManagementController : ApiControllerBase
     /// Reset the password of an account.
     /// </summary>
     [HttpPost("{id:guid}/reset-password")]
+    [Authorize(Roles = "SuperAdmin,SchoolAdmin,EnterpriseAdmin")]
     [ProducesResponseType(typeof(ApiResponse<ResetUserPasswordResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ResetPassword(
         [FromRoute] Guid id,

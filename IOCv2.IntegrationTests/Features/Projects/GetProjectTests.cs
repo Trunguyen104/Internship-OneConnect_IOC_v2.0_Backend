@@ -54,7 +54,7 @@ public class GetProjectTests : BaseIntegrationTest
 
         // Get the mentor details
         var mentorUser = await db.Users.FirstOrDefaultAsync(u => u.Email == "mentor@fptsoftware.com");
-        var mentorEnterpriseUser = await db.EnterpriseUsers.FirstOrDefaultAsync(eu => eu.UserId == mentorUser.UserId);
+        var mentorEnterpriseUser = await db.EnterpriseUsers.FirstOrDefaultAsync(eu => eu.UserId == mentorUser!.UserId);
 
         // Create and save a new Project
         var project = IOCv2.Domain.Entities.Project.Create(

@@ -45,5 +45,10 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser
         /// (Optional) Home address.
         /// </summary>
         public string? Address { get; init; }
+
+        /// <summary>
+        /// (Required for Student role) ID of the Term the student belongs to.
+        /// </summary>
+        public Guid? TermId { get; init; }
     }
 }

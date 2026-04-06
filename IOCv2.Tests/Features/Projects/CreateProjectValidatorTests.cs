@@ -69,7 +69,7 @@ namespace IOCv2.Tests.Features.Projects
         [InlineData("")]
         [InlineData("   ")]
         [InlineData(null)]
-        public void Validate_InvalidProjectName_ShouldHaveRequiredError(string projectName)
+        public void Validate_InvalidProjectName_ShouldHaveRequiredError(string? projectName)
         {
             // Arrange
             var command = new CreateProjectCommand

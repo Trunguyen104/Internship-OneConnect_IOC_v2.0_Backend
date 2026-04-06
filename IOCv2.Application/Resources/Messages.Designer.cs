@@ -142,6 +142,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Định dạng email liên hệ không hợp lệ..
+        /// </summary>
+        internal static string Enterprise_ContactEmailInvalid {
+            get {
+                return ResourceManager.GetString("Enterprise.ContactEmailInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bạn không có quyền xóa doanh nghiệp này..
         /// </summary>
         internal static string Enterprise_DeletePermissionDenied {
@@ -156,6 +165,24 @@ namespace IOCv2.Application.Resources {
         internal static string Enterprise_GetByIDPermissionsNotAllowed {
             get {
                 return ResourceManager.GetString("Enterprise.GetByIDPermissionsNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể xóa doanh nghiệp: hiện đang có sinh viên đang thực tập tại đây..
+        /// </summary>
+        internal static string Enterprise_HasInterningStudents {
+            get {
+                return ResourceManager.GetString("Enterprise.HasInterningStudents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tên doanh nghiệp là bắt buộc..
+        /// </summary>
+        internal static string Enterprise_NameRequired {
+            get {
+                return ResourceManager.GetString("Enterprise.NameRequired", resourceCulture);
             }
         }
         
@@ -219,6 +246,24 @@ namespace IOCv2.Application.Resources {
         internal static string Enterprise_RestorePermissionDenied {
             get {
                 return ResourceManager.GetString("Enterprise.RestorePermissionDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Định dạng mã số thuế không hợp lệ (ví dụ: 10 chữ số hoặc 10 chữ số kèm hậu tố)..
+        /// </summary>
+        internal static string Enterprise_TaxCodeInvalid {
+            get {
+                return ResourceManager.GetString("Enterprise.TaxCodeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mã số thuế là bắt buộc..
+        /// </summary>
+        internal static string Enterprise_TaxCodeRequired {
+            get {
+                return ResourceManager.GetString("Enterprise.TaxCodeRequired", resourceCulture);
             }
         }
         
@@ -313,11 +358,182 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đã đổi Mentor của nhóm {1} sang {0} thành công..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorChangeSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorChangeSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhóm thực tập vừa được người khác cập nhật. Vui lòng tải lại và thử lại..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorConcurrencyConflict {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorConcurrencyConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã gán Mentor {0} cho nhóm {1} thành công..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorFirstAssignSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorFirstAssignSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mã nhóm thực tập không được để trống..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorGroupIdRequired {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorGroupIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chỉ có thể gán Mentor cho nhóm đang hoạt động..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorGroupNotActive {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorGroupNotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy nhóm thực tập..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorGroupNotFound {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorGroupNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vui lòng chọn Mentor để gán cho nhóm..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorMentorRequired {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorMentorRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mentor này đã đang phụ trách nhóm thực tập, không thể gán trùng..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorSameMentor {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorSameMentor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gán Mentor thành công..
+        /// </summary>
+        internal static string InternshipGroup_AssignMentorSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AssignMentorSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lấy danh sách Mentor khả dụng thành công..
+        /// </summary>
+        internal static string InternshipGroup_AvailableMentorsRetrieved {
+            get {
+                return ResourceManager.GetString("InternshipGroup.AvailableMentorsRetrieved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Nộp nhật ký thực tập trễ.
         /// </summary>
         internal static string InternshipGroup_LateLogbookSubmission {
             get {
                 return ResourceManager.GetString("InternshipGroup.LateLogbookSubmission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yêu cầu gán/đổi Mentor cho nhóm: {Id}.
+        /// </summary>
+        internal static string InternshipGroup_Log_ApiAssignOrChangeMentorRequest {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.ApiAssignOrChangeMentorRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yêu cầu lấy danh sách Mentor khả dụng cho nhóm: {Id}.
+        /// </summary>
+        internal static string InternshipGroup_Log_ApiGetAvailableMentorsRequest {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.ApiGetAvailableMentorsRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gán Mentor bị xung đột đồng thời cho nhóm {GroupId}..
+        /// </summary>
+        internal static string InternshipGroup_Log_AssignMentorConcurrencyConflict {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.AssignMentorConcurrencyConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gán Mentor cho nhóm {GroupId} thất bại do lỗi hệ thống..
+        /// </summary>
+        internal static string InternshipGroup_Log_AssignMentorFailed {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.AssignMentorFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gửi thông báo sau khi gán Mentor cho nhóm {GroupId} thất bại, tiếp tục xử lý..
+        /// </summary>
+        internal static string InternshipGroup_Log_AssignMentorNotifyFailed {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.AssignMentorNotifyFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gán Mentor: Mentor {MentorUserId} đã là người hướng dẫn hiện tại của nhóm {GroupId}, bỏ qua thao tác..
+        /// </summary>
+        internal static string InternshipGroup_Log_AssignMentorSameMentor {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.AssignMentorSameMentor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gán Mentor {MentorName} cho nhóm {GroupId} thành công..
+        /// </summary>
+        internal static string InternshipGroup_Log_AssignMentorSuccess {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.AssignMentorSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GetAvailableMentors: trả về {Count} Mentor khả dụng cho nhóm {GroupId}..
+        /// </summary>
+        internal static string InternshipGroup_Log_GetAvailableMentors {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.GetAvailableMentors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GetAvailableMentors: Người dùng {UserId} không thuộc doanh nghiệp của nhóm {GroupId}, từ chối truy cập..
+        /// </summary>
+        internal static string InternshipGroup_Log_GetAvailableMentorsAccessDenied {
+            get {
+                return ResourceManager.GetString("InternshipGroup.Log.GetAvailableMentorsAccessDenied", resourceCulture);
             }
         }
         
@@ -592,6 +808,24 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bạn được phân công phụ trách nhóm {0} ({1} sinh viên). Kỳ thực tập: {2} → {3}..
+        /// </summary>
+        internal static string InternshipGroup_NotificationMentorAssignedFirstContent {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationMentorAssignedFirstContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bạn được phân công phụ trách nhóm mới.
+        /// </summary>
+        internal static string InternshipGroup_NotificationMentorAssignedFirstTitle {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationMentorAssignedFirstTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} vừa được thêm vào [{1}] và đã tự động tham gia các dự án đang Published..
         /// </summary>
         internal static string InternshipGroup_NotificationMentorNewGroupContent {
@@ -678,6 +912,42 @@ namespace IOCv2.Application.Resources {
         internal static string InternshipGroup_NotificationProjectCleanupTitle {
             get {
                 return ResourceManager.GetString("InternshipGroup.NotificationProjectCleanupTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhóm {0} của bạn vừa có Mentor mới: {1}. Liên hệ: {2}..
+        /// </summary>
+        internal static string InternshipGroup_NotificationStudentMentorAssignedContent {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorAssignedContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhóm của bạn vừa có Mentor.
+        /// </summary>
+        internal static string InternshipGroup_NotificationStudentMentorAssignedTitle {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorAssignedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mentor của nhóm {0} vừa được thay đổi. Mentor mới: {1}. Liên hệ: {2}..
+        /// </summary>
+        internal static string InternshipGroup_NotificationStudentMentorChangedContent {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorChangedContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mentor nhóm bạn vừa được thay đổi.
+        /// </summary>
+        internal static string InternshipGroup_NotificationStudentMentorChangedTitle {
+            get {
+                return ResourceManager.GetString("InternshipGroup.NotificationStudentMentorChangedTitle", resourceCulture);
             }
         }
         
@@ -1627,6 +1897,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}..
+        /// </summary>
+        internal static string JobPosting_ExpireDateCanNotBeAfterPhaseStartDate {
+            get {
+                return ResourceManager.GetString("JobPosting.ExpireDateCanNotBeAfterPhaseStartDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ngày hết hạn không thể vượt quá ngày kết thúc của giai đoạn thực tập..
         /// </summary>
         internal static string JobPosting_ExpireDateExceedsPhaseEndDate {
@@ -2096,6 +2375,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tài nguyên do mentor tải lên, sinh viên không được chỉnh sửa hoặc xóa..
+        /// </summary>
+        internal static string ProjectResources_StudentCannotModifyMentorResource {
+            get {
+                return ResourceManager.GetString("ProjectResources.StudentCannotModifyMentorResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dự án đã được lưu trữ thành công..
         /// </summary>
         internal static string Projects_ArchiveSuccess {
@@ -2146,6 +2434,15 @@ namespace IOCv2.Application.Resources {
         internal static string Projects_GetStudentsSuccess {
             get {
                 return ResourceManager.GetString("Projects.GetStudentsSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhóm chưa có Mentor. Gán Mentor trước để gán dự án..
+        /// </summary>
+        internal static string Projects_GroupHasNoMentor {
+            get {
+                return ResourceManager.GetString("Projects.GroupHasNoMentor", resourceCulture);
             }
         }
         
@@ -2771,29 +3068,11 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bạn đã được khôi phục vào đợt thực tập &apos;{0}&apos;..
-        /// </summary>
-        internal static string StudentTerms_Email_BodyRestore {
-            get {
-                return ResourceManager.GetString("StudentTerms.Email.BodyRestore", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Bạn đã bị rút khỏi đợt thực tập &apos;{0}&apos;. Vui lòng liên hệ nhà trường nếu có thắc mắc..
         /// </summary>
         internal static string StudentTerms_Email_BodyWithdraw {
             get {
                 return ResourceManager.GetString("StudentTerms.Email.BodyWithdraw", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Thông báo khôi phục ghi danh đợt thực tập.
-        /// </summary>
-        internal static string StudentTerms_Email_SubjectRestore {
-            get {
-                return ResourceManager.GetString("StudentTerms.Email.SubjectRestore", resourceCulture);
             }
         }
         
@@ -3127,6 +3406,11 @@ namespace IOCv2.Application.Resources {
         internal static string UniAssign_AuditLogAssignMetadata {
             get {
                 return ResourceManager.GetString("UniAssign.AuditLogAssignMetadata", resourceCulture);
+        ///   Looks up a localized string similar to Không thể xóa trường đại học: hiện đang có các học kỳ đang hoạt động..
+        /// </summary>
+        internal static string University_HasActiveTerms {
+            get {
+                return ResourceManager.GetString("University.HasActiveTerms", resourceCulture);
             }
         }
         
@@ -3244,6 +3528,11 @@ namespace IOCv2.Application.Resources {
         internal static string UniAssign_UnauthorizedOrInvalidOperation {
             get {
                 return ResourceManager.GetString("UniAssign.UnauthorizedOrInvalidOperation", resourceCulture);
+        ///   Looks up a localized string similar to Không thể xóa trường đại học: hiện đang có sinh viên đang trong quá trình thực tập..
+        /// </summary>
+        internal static string University_HasInterningStudents {
+            get {
+                return ResourceManager.GetString("University.HasInterningStudents", resourceCulture);
             }
         }
         

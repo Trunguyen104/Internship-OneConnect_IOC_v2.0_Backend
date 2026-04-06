@@ -6,6 +6,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using IOCv2.Application.Features.Admin.UserManagement.Common;
 
 namespace IOCv2.Application.Features.Admin.UserManagement.Commands.ResetUserPassword
 {
@@ -84,14 +85,16 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.ResetUserPass
                     return Result<ResetUserPasswordResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied), ResultErrorType.Forbidden);
                 }
             }
-            else if (auditorRole != UserRole.SuperAdmin && auditorRole != UserRole.Moderator)
+            else if (auditorRole != UserRole.SuperAdmin)
             {
                 return Result<ResetUserPasswordResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.AccessDenied), ResultErrorType.Forbidden);
             }
 
             if (user.Status != UserStatus.Active)
             {
-                return Result<ResetUserPasswordResponse>.Failure(_messageService.GetMessage(MessageKeys.Users.NotActive));
+                return Result<ResetUserPasswordResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Users.NotActive),
+                    ResultErrorType.Forbidden);
             }
 
             // 4. Execution
@@ -145,8 +148,8 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.ResetUserPass
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                await _cacheService.RemoveByPatternAsync("UserList*", cancellationToken);
-                await _cacheService.RemoveAsync($"UserDetail:*{user.UserId}", cancellationToken);
+                await _cacheService.RemoveByPatternAsync(UserManagementCacheKeys.UserListPattern(), cancellationToken);
+                await _cacheService.RemoveAsync(UserManagementCacheKeys.User(user.UserId), cancellationToken);
 
                 _logger.LogInformation("Successfully reset password for User {UserCode} (ID: {UserId})", user.UserCode, user.UserId);
 

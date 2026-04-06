@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Extensions.Mappings;
 using IOCv2.Domain.Entities;
@@ -25,6 +25,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.UpdateEnterprise
         public string? Website { get; set; }
         public string? LogoUrl { get; set; }
         public string? BackgroundUrl { get; set; }
+        public string? ContactEmail { get; set; }
         public EnterpriseStatus Status { get; set; }
         public void Mapping(Profile profile)
         {

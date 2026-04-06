@@ -42,6 +42,9 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<Sta
         try
         {
             var sprint = await _unitOfWork.Repository<Sprint>().Query()
+                .Include(s => s.Project)
+                    .ThenInclude(p => p.InternshipGroup)
+                        .ThenInclude(g => g!.InternshipPhase)
                 .FirstOrDefaultAsync(s => s.SprintId == request.SprintId && s.ProjectId == request.ProjectId, cancellationToken);
 
             if (sprint is null)
@@ -66,6 +69,19 @@ public class StartSprintHandler : IRequestHandler<StartSprintCommand, Result<Sta
                 _logger.LogWarning("An active sprint already exists for project {ProjectId}", request.ProjectId);
                 return Result<StartSprintResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Sprint.ActiveSprintExists), ResultErrorType.BadRequest);
+            }
+
+            var phase = sprint.Project?.InternshipGroup?.InternshipPhase;
+            if (phase != null)
+            {
+                if (request.StartDate < phase.StartDate || request.EndDate > phase.EndDate)
+                {
+                    _logger.LogWarning("Sprint dates {StartDate} to {EndDate} are out of bounds for Phase {PhaseId}", 
+                        request.StartDate, request.EndDate, phase.PhaseId);
+                    return Result<StartSprintResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Sprint.DatesOutOfBounds, phase.StartDate, phase.EndDate),
+                        ResultErrorType.BadRequest);
+                }
             }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

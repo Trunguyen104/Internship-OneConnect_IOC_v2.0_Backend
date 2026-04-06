@@ -1,4 +1,5 @@
 ﻿using IOCv2.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,6 +123,45 @@ namespace IOCv2.Application.Common.Helpers
 
             result.IsValid = true;
             return result;
+        }
+
+        /// <summary>
+        /// Validate file bytes (magic number) against extension to prevent spoofed extensions.
+        /// </summary>
+        public static bool IsFileContentValid(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return false;
+
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            using var stream = file.OpenReadStream();
+            return IsFileContentValid(stream, ext);
+        }
+
+        public static bool IsFileContentValid(Stream stream, string extension)
+        {
+            if (!stream.CanRead)
+                return false;
+
+            Span<byte> header = stackalloc byte[16];
+            var read = stream.Read(header);
+            stream.Position = 0;
+
+            if (read <= 0)
+                return false;
+
+            return extension switch
+            {
+                ".jpg" or ".jpeg" => read >= 3 && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF,
+                ".png" => read >= 8 &&
+                          header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47 &&
+                          header[4] == 0x0D && header[5] == 0x0A && header[6] == 0x1A && header[7] == 0x0A,
+                ".pdf" => read >= 4 && header[0] == 0x25 && header[1] == 0x50 && header[2] == 0x44 && header[3] == 0x46,
+                ".zip" or ".docx" or ".xlsx" or ".pptx" => read >= 4 && header[0] == 0x50 && header[1] == 0x4B,
+                ".rar" => (read >= 7 && header[0] == 0x52 && header[1] == 0x61 && header[2] == 0x72 && header[3] == 0x21 &&
+                            header[4] == 0x1A && header[5] == 0x07 && (header[6] == 0x00 || header[6] == 0x01)),
+                _ => false
+            };
         }
 
         /// <summary>

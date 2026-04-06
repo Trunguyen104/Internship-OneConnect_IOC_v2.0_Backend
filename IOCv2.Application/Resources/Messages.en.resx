@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -174,6 +174,9 @@
   <data name="Projects.LogGetByInternshipIdSuccess" xml:space="preserve">
     <value>Successfully retrieved {0} project(s) for internship group {1}.</value>
   </data>
+  <data name="ProjectResources.StudentCannotModifyMentorResource" xml:space="preserve">
+    <value>This resource was uploaded by a mentor. Students are not allowed to edit or delete it.</value>
+  </data>
   <data name="Epic.CreatedSuccess" xml:space="preserve">
     <value>Epic created successfully.</value>
   </data>
@@ -251,12 +254,6 @@
   </data>
   <data name="StudentTerms.Email.BodyWithdraw" xml:space="preserve">
     <value>You have been withdrawn from internship term '{0}'. Please contact your university if you have any questions.</value>
-  </data>
-  <data name="StudentTerms.Email.SubjectRestore" xml:space="preserve">
-    <value>Notice: Enrollment Restored for Internship Term</value>
-  </data>
-  <data name="StudentTerms.Email.BodyRestore" xml:space="preserve">
-    <value>Your enrollment in internship term '{0}' has been restored.</value>
   </data>
   <data name="StudentTerms.Excel.HeaderStudentCode" xml:space="preserve">
     <value>Student Code</value>
@@ -870,6 +867,9 @@
   <data name="Projects.AssignGroupSuccess" xml:space="preserve">
     <value>Project assigned to internship group successfully.</value>
   </data>
+  <data name="Projects.GroupHasNoMentor" xml:space="preserve">
+    <value>This group has no mentor yet. Assign a mentor before assigning a project.</value>
+  </data>
   <data name="Projects.LogAssignGroupSuccess" xml:space="preserve">
     <value>Project {0} assigned to group {1}.</value>
   </data>
@@ -998,6 +998,81 @@
   </data>
   <data name="InternshipGroup.LateLogbookSubmission" xml:space="preserve">
     <value>Late logbook submission</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor assigned successfully.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorFirstAssignSuccess" xml:space="preserve">
+    <value>Mentor {0} was assigned to group {1} successfully.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorChangeSuccess" xml:space="preserve">
+    <value>The mentor of group {1} was changed to {0} successfully.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotFound" xml:space="preserve">
+    <value>Internship group not found.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupNotActive" xml:space="preserve">
+    <value>Can only assign mentor to active groups.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorGroupIdRequired" xml:space="preserve">
+    <value>Internship group ID must not be empty.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorMentorRequired" xml:space="preserve">
+    <value>Please select a mentor to assign.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorSameMentor" xml:space="preserve">
+    <value>This mentor is already assigned to the group and cannot be assigned again.</value>
+  </data>
+  <data name="InternshipGroup.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>This internship group was just updated by someone else. Please reload and try again.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSuccess" xml:space="preserve">
+    <value>Mentor {MentorName} assigned to group {GroupId} successfully.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorFailed" xml:space="preserve">
+    <value>Failed to assign mentor to group {GroupId} due to a system error.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorNotifyFailed" xml:space="preserve">
+    <value>Failed to send notifications after mentor assignment for group {GroupId}, continuing.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorSameMentor" xml:space="preserve">
+    <value>AssignMentor: Mentor {MentorUserId} is already the current mentor of group {GroupId}, skipping.</value>
+  </data>
+  <data name="InternshipGroup.Log.AssignMentorConcurrencyConflict" xml:space="preserve">
+    <value>Assign mentor concurrency conflict for group {GroupId}.</value>
+  </data>
+  <data name="InternshipGroup.AvailableMentorsRetrieved" xml:space="preserve">
+    <value>Available mentors retrieved successfully.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentors" xml:space="preserve">
+    <value>GetAvailableMentors: returned {Count} available mentor(s) for group {GroupId}.</value>
+  </data>
+  <data name="InternshipGroup.Log.GetAvailableMentorsAccessDenied" xml:space="preserve">
+    <value>GetAvailableMentors: User {UserId} does not belong to the enterprise of group {GroupId}, access denied.</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiGetAvailableMentorsRequest" xml:space="preserve">
+    <value>Request to get available mentors for group: {Id}</value>
+  </data>
+  <data name="InternshipGroup.Log.ApiAssignOrChangeMentorRequest" xml:space="preserve">
+    <value>Request to assign/change mentor for group: {Id}</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstTitle" xml:space="preserve">
+    <value>You have been assigned a new group</value>
+  </data>
+  <data name="InternshipGroup.NotificationMentorAssignedFirstContent" xml:space="preserve">
+    <value>You have been assigned to mentor group {0} ({1} students). Internship period: {2} → {3}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedTitle" xml:space="preserve">
+    <value>Your group now has a mentor</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorAssignedContent" xml:space="preserve">
+    <value>Your group {0} now has a mentor: {1}. Contact: {2}.</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedTitle" xml:space="preserve">
+    <value>Your group's mentor has changed</value>
+  </data>
+  <data name="InternshipGroup.NotificationStudentMentorChangedContent" xml:space="preserve">
+    <value>The mentor of group {0} has changed. New mentor: {1}. Contact: {2}.</value>
   </data>
   <data name="Profile.LogUpdateStart" xml:space="preserve">
     <value>[START] UpdateMyProfile for User: {UserId}</value>
@@ -1263,5 +1338,111 @@
   </data>
   <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
     <value>EnterpriseId is required.</value>
+  </data>
+</root>
+  <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
+    <value>ExpireDate {0} cannot be after internship phase start date {1}.</value>
+  </data>
+  <data name="University.HasActiveTerms" xml:space="preserve">
+    <value>Cannot delete university: active terms exist.</value>
+  </data>
+  <data name="University.HasInterningStudents" xml:space="preserve">
+    <value>Cannot delete university: students are currently interning.</value>
+  </data>
+  <data name="Enterprise.HasInterningStudents" xml:space="preserve">
+    <value>Cannot delete enterprise: students are currently interning.</value>
+  </data>
+  <data name="Enterprise.TaxCodeRequired" xml:space="preserve">
+    <value>Tax Code is required.</value>
+  </data>
+  <data name="Enterprise.TaxCodeInvalid" xml:space="preserve">
+    <value>Invalid Tax Code format (e.g. 10 digits or 10 digits followed by suffix).</value>
+  </data>
+  <data name="Enterprise.NameRequired" xml:space="preserve">
+    <value>Enterprise Name is required.</value>
+  </data>
+  <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
+    <value>Invalid Contact Email format.</value>
+  </data>
+  <data name="University.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>This contact email is already registered by another University or Enterprise in the system.</value>
+  </data>
+  <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>This contact email is already registered by another Enterprise or University in the system.</value>
+  </data>
+  <data name="Landing.SendSuccess" xml:space="preserve">
+    <value>Your consultation request has been sent successfully. We will contact you shortly.</value>
+  </data>
+  <data name="Landing.SendError" xml:space="preserve">
+    <value>Failed to send request at this time. Please try again later.</value>
+  </data>
+  <data name="Landing.OtpRequired" xml:space="preserve">
+    <value>Please verify your email with OTP before submitting.</value>
+  </data>
+  <data name="Landing.EmailInvalid" xml:space="preserve">
+    <value>Invalid email address.</value>
+  </data>
+  <data name="Landing.OtpInvalidFormat" xml:space="preserve">
+    <value>OTP code must be 6 digits.</value>
+  </data>
+  <data name="Landing.OtpExpired" xml:space="preserve">
+    <value>Invalid or expired OTP code. Please request a new one.</value>
+  </data>
+  <data name="Landing.OtpIncorrect" xml:space="preserve">
+    <value>Incorrect OTP code.</value>
+  </data>
+  <data name="Landing.OtpSentLabel" xml:space="preserve">
+    <value>Verification code has been sent to your email.</value>
+  </data>
+  <data name="Landing.OtpVerifiedLabel" xml:space="preserve">
+    <value>Email verified successfully.</value>
+  </data>
+  <data name="Landing.DomainValidationFailed" xml:space="preserve">
+    <value>Unable to send mail to this domain. Please check your address.</value>
+  </data>
+  <data name="Landing.EmailSentFailed" xml:space="preserve">
+    <value>Failed to send verification email. Please try again later.</value>
+  </data>
+  <data name="Landing.AlreadyRegistered" xml:space="preserve">
+    <value>This email already has an account. OTP is not required — you can submit your request directly.</value>
+  </data>
+  <data name="EvaluationCycle.DatesOutOfBounds" xml:space="preserve">
+    <value>Evaluation cycle dates must fall within the internship phase timeframe ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="Sprint.DatesOutOfBounds" xml:space="preserve">
+    <value>Sprint dates must fall within the internship phase timeframe ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="WorkItem.DatesOutOfBounds" xml:space="preserve">
+    <value>Due date must fall within the internship phase timeframe ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
+  </data>
+  <data name="HRApplications.Notify.Interviewing" xml:space="preserve">
+    <value>Congratulations! You have been selected for an interview at {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Offered" xml:space="preserve">
+    <value>Congratulations! You have received an offer from {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.SelfApply" xml:space="preserve">
+    <value>Congratulations! Your open application has been accepted for internship by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.UniAssign" xml:space="preserve">
+    <value>Congratulations! Your internship assignment has been approved by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.SelfApply" xml:space="preserve">
+    <value>Unfortunately, your application has been rejected by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.UniAssign" xml:space="preserve">
+    <value>Unfortunately, your assigned internship application has been rejected by {Enterprise}.</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Rejected" xml:space="preserve">
+    <value>{Enterprise} has rejected student {StudentName}. Reason: {Reason}</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Placed" xml:space="preserve">
+    <value>{Enterprise} has accepted student {StudentName} for internship.</value>
+  </data>
+  <data name="HRApplications.Notify.Enterprise.AutoWithdrawn" xml:space="preserve">
+    <value>The application has been automatically withdrawn because the recruitment phase ended.</value>
+  </data>
+  <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
+    <value>Your application has been automatically withdrawn because the recruitment phase ended.</value>
   </data>
 </root>

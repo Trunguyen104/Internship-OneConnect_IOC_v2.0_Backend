@@ -43,7 +43,7 @@ public class GetMyApplicationsHandler
         // Base query: own applications, not hidden
         var query = _unitOfWork.Repository<InternshipApplication>().Query().AsNoTracking()
             .Include(a => a.Enterprise)
-            .Include(a => a.Job)
+            .Include(a => a.Job).ThenInclude(j => j!.InternshipPhase)
             .Where(a => a.StudentId == student.StudentId && !a.IsHiddenByStudent);
 
         // Default: always show active + Placed. IncludeTerminal toggles visibility of Rejected/Withdrawn.
@@ -70,8 +70,8 @@ public class GetMyApplicationsHandler
         {
             var term = request.SearchTerm.Trim().ToLower();
             query = query.Where(a =>
-                a.Enterprise.Name.ToLower().Contains(term) ||
-                (a.Job != null && a.Job.Title.ToLower().Contains(term)));
+                (a.Enterprise != null && a.Enterprise.Name.ToLower().Contains(term)) ||
+                (a.Job != null && !string.IsNullOrEmpty(a.Job.Title) && a.Job.Title.ToLower().Contains(term)));
         }
 
         query = query.OrderByDescending(a => a.AppliedAt);
@@ -89,8 +89,12 @@ public class GetMyApplicationsHandler
             JobTitle = a.Job?.Title,
             IsJobClosed = a.Job != null ? a.Job.Status == JobStatus.CLOSED : null,
             IsJobDeleted = a.Job != null ? a.Job.DeletedAt != null : null,
-            EnterpriseName = a.Enterprise.Name,
-            EnterpriseLogoUrl = a.Enterprise.LogoUrl,
+            InternshipPhaseId = a.Job?.InternshipPhaseId,
+            InternPhaseName = a.Job?.InternshipPhase?.Name,
+            InternPhaseStartDate = a.Job?.InternshipPhase?.StartDate,
+            InternPhaseEndDate = a.Job?.InternshipPhase?.EndDate,
+            EnterpriseName = a.Enterprise?.Name ?? string.Empty,
+            EnterpriseLogoUrl = a.Enterprise?.LogoUrl,
             Status = a.Status,
             AppliedAt = a.AppliedAt,
             CanWithdraw = a.Source == ApplicationSource.SelfApply && a.Status == InternshipApplicationStatus.Applied,

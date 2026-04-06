@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using IOCv2.Infrastructure.Services;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,12 +68,21 @@ namespace IOCv2.Infrastructure.BackgroundJobs
 
             // Query for published jobs whose expire date is before today (UTC date)
             var jobRepo = unitOfWork.Repository<Job>();
-            var expiredJobsQuery = jobRepo.Query()
-                .Where(j => j.Status == JobStatus.PUBLISHED
-                            && j.ExpireDate.HasValue
-                            && j.ExpireDate.Value.Date < DateTime.UtcNow.Date);
+            var today = DateTime.UtcNow.Date;
+            
+            // Efficiently fetch expired jobs with necessary relations
+            var expiredJobs = await jobRepo.Query()
+                .Include(j => j.Enterprise)
+                    .ThenInclude(e => e.EnterpriseUsers)
+                        .ThenInclude(eu => eu.User)
+                .Include(j => j.InternshipApplications)
+                    .ThenInclude(ia => ia.Student)
+                        .ThenInclude(s => s.User)
+                .Where(j => j.Status == JobStatus.PUBLISHED 
+                            && j.ExpireDate.HasValue 
+                            && j.ExpireDate.Value.Date < today)
+                .ToListAsync(ct);
 
-            var expiredJobs = await expiredJobsQuery.ToListAsync(ct);
             if (expiredJobs.Count == 0)
             {
                 _logger.LogInformation("No expired published jobs found at {Time}.", DateTime.UtcNow);
@@ -99,27 +109,28 @@ namespace IOCv2.Infrastructure.BackgroundJobs
                     // Notify HR(s) for the enterprise
                     try
                     {
-                        var enterpriseUserEmails = await unitOfWork.Repository<EnterpriseUser>()
-                            .Query()
-                            .Where(eu => eu.EnterpriseId == job.EnterpriseId)
-                            .Select(eu => eu.User.Email)
+                        var enterpriseUserEmails = job.Enterprise?.EnterpriseUsers?
+                            .Select(eu => eu.User?.Email)
                             .Where(email => !string.IsNullOrWhiteSpace(email))
                             .Distinct()
-                            .ToListAsync(ct);
+                            .ToList() ?? new();
 
-                        var hrSubject = $"Job Posting [{job.Title}] đã tự động đóng do hết hạn.";
-                        var hrBody = $"Job Posting \"{job.Title}\" (ID: {job.JobId}) đã tự động chuyển sang trạng thái Closed vì hết hạn ({job.ExpireDate:yyyy-MM-dd}).";
-
-                        foreach (var hrEmail in enterpriseUserEmails)
+                        if (enterpriseUserEmails.Any())
                         {
-                            try
+                            var hrSubject = $"[IOC] Tuyển dụng [{job.Title}] đã tự động đóng do hết hạn";
+                            var hrBody = EmailTemplates.GetJobClosedNotificationTemplate(job.Title, job.Enterprise?.Name ?? "Doanh nghiệp", job.ExpireDate?.ToString("yyyy-MM-dd") ?? "-", false);
+
+                            foreach (var hrEmail in enterpriseUserEmails)
                             {
-                                await emailChannel.EnqueueEmailAsync(hrEmail!, hrSubject, hrBody, job.JobId, null, ct);
-                                _logger.LogInformation("Enqueued HR notification for {Email} about job {JobId}.", hrEmail, job.JobId);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogWarning(ex, "Failed to enqueue HR email for {Email} (job {JobId}).", hrEmail, job.JobId);
+                                try
+                                {
+                                    await emailChannel.EnqueueEmailAsync(hrEmail!, hrSubject, hrBody, job.JobId, null, ct);
+                                    _logger.LogInformation("Enqueued HR notification for {Email} about job {JobId}.", hrEmail, job.JobId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogWarning(ex, "Failed to enqueue HR email for {Email} (job {JobId}).", hrEmail, job.JobId);
+                                }
                             }
                         }
                     }
@@ -139,27 +150,29 @@ namespace IOCv2.Infrastructure.BackgroundJobs
                             InternshipApplicationStatus.PendingAssignment
                         };
 
-                        var studentEmails = await unitOfWork.Repository<InternshipApplication>()
-                            .Query()
-                            .Where(a => a.JobId == job.JobId && activeStatuses.Contains(a.Status))
-                            .Select(a => a.Student.User.Email)
+                        var studentEmails = job.InternshipApplications?
+                            .Where(a => activeStatuses.Contains(a.Status))
+                            .Select(a => a.Student?.User?.Email)
                             .Where(email => !string.IsNullOrWhiteSpace(email))
                             .Distinct()
-                            .ToListAsync(ct);
+                            .ToList() ?? new();
 
-                        var studentSubject = $"Job Posting [{job.Title}] đã tự động đóng do hết hạn.";
-                        var studentBody = $"Thông báo: Job Posting \"{job.Title}\" mà bạn đã ứng tuyển đã bị đóng do hết hạn ({job.ExpireDate:yyyy-MM-dd}). Vui lòng kiểm tra kết quả ứng tuyển hoặc tìm các cơ hội khác.";
-
-                        foreach (var studentEmail in studentEmails)
+                        if (studentEmails.Any())
                         {
-                            try
+                            var studentSubject = $"[IOC] Tuyển dụng [{job.Title}] đã đóng do hết hạn";
+                            var studentBody = EmailTemplates.GetJobClosedNotificationTemplate(job.Title, job.Enterprise?.Name ?? "Doanh nghiệp", job.ExpireDate?.ToString("yyyy-MM-dd") ?? "-", true);
+
+                            foreach (var studentEmail in studentEmails)
                             {
-                                await emailChannel.EnqueueEmailAsync(studentEmail!, studentSubject, studentBody, job.JobId, null, ct);
-                                _logger.LogInformation("Enqueued student notification for {Email} about job {JobId}.", studentEmail, job.JobId);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogWarning(ex, "Failed to enqueue student email for {Email} (job {JobId}).", studentEmail, job.JobId);
+                                try
+                                {
+                                    await emailChannel.EnqueueEmailAsync(studentEmail!, studentSubject, studentBody, job.JobId, null, ct);
+                                    _logger.LogInformation("Enqueued student notification for {Email} about job {JobId}.", studentEmail, job.JobId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogWarning(ex, "Failed to enqueue student email for {Email} (job {JobId}).", studentEmail, job.JobId);
+                                }
                             }
                         }
                     }

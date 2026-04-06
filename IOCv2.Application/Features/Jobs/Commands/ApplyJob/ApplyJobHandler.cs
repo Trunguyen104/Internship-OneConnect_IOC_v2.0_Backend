@@ -81,11 +81,13 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
                 return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.CannotApplyWhenPlaced), ResultErrorType.BadRequest);
             }
 
-            // 5. Load job and related enterprise
+            // 5. Load job and related enterprise + universities.
+            // Use IgnoreQueryFilters and include Universities so visibility rules match GetJobsHandler.
             var job = await _unitOfWork.Repository<Job>()
                 .Query()
                 .Include(j => j.Enterprise)
                 .Include(j => j.InternshipApplications)
+                .Include(j => j.Universities)
                 .FirstOrDefaultAsync(j => j.JobId == request.JobId, cancellationToken);
 
             if (job == null)
@@ -94,7 +96,30 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
                 return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.RecordNotFound), ResultErrorType.NotFound);
             }
 
-            // 6. Job must be open/published and before deadline
+            // 5.a Visibility check for non-enterprise users (mirror GetJobsHandler behavior)
+            if (!JobsPostingParam.GetJobPostings.EnterpriseRoles.Contains(_currentUserService.Role))
+            {
+                var uniUser = await _unitOfWork.Repository<UniversityUser>()
+                    .Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.UserId == currentUserId, cancellationToken);
+
+                if (uniUser == null)
+                {
+                    _logger.LogWarning("University user not found for user {UserId}", currentUserId);
+                    return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.NotAllowed), ResultErrorType.Forbidden);
+                }
+
+                var visibleToUniversity = job.Audience == JobAudience.Public || job.Universities.Any(u => u.UniversityId == uniUser.UniversityId);
+
+                if (job.Status != JobStatus.PUBLISHED || !visibleToUniversity)
+                {
+                    _logger.LogInformation("Job {JobId} is not visible/open to user {UserId}", job.JobId, currentUserId);
+                    return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.PositionNotOpenForApplication), ResultErrorType.BadRequest);
+                }
+            }
+
+            // 6. Job must be open/published and before deadline (enterprise users also validated here)
             var now = DateTime.UtcNow;
             if (job.Status != JobStatus.PUBLISHED)
             {
@@ -113,11 +138,11 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
             var currentPhase = await _unitOfWork.Repository<InternshipPhase>()
                 .Query()
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Status == InternshipPhaseStatus.Open, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Status == InternshipPhaseStatus.Open && p.PhaseId == job.InternshipPhaseId, cancellationToken);
 
             if (currentPhase == null)
             {
-                _logger.LogWarning("No active internship phase available for self-apply");
+                _logger.LogInformation("No active internship phase found for job {JobId}", job.JobId);
                 return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.JobPostingMessageKey.NoActiveInternshipPeriod), ResultErrorType.BadRequest);
             }
 
@@ -143,7 +168,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
             var reapplyCount = await _unitOfWork.Repository<InternshipApplication>()
                 .Query()
                 .AsNoTracking()
-                .CountAsync(a => a.StudentId == student.StudentId && a.JobId == job.JobId && a.TermId == currentPhase.PhaseId, cancellationToken);
+                .CountAsync(a => a.StudentId == student.StudentId && a.JobId == job.JobId, cancellationToken);
 
             if (reapplyCount >= _reapplyLimit)
             {
@@ -156,12 +181,23 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
+                var termId = await _unitOfWork.Repository<StudentTerm>().Query().Include(st => st.Term)
+                    .Where(st => st.StudentId == student.StudentId && st.Term.Status == TermStatus.Open)
+                    .Select(st => st.TermId)
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (termId == Guid.Empty)
+                {
+                    _logger.LogWarning("No active term found for student {StudentId}", student.StudentId);
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Terms.NotFound), ResultErrorType.BadRequest);
+                }
+
                 var app = new InternshipApplication
                 {
                     ApplicationId = Guid.NewGuid(),
                     EnterpriseId = job.EnterpriseId,
-                    TermId = currentPhase.PhaseId,
                     StudentId = student.StudentId,
+                    TermId = termId,
                     JobId = job.JobId,
                     Status = InternshipApplicationStatus.Applied,
                     Source = ApplicationSource.SelfApply,
@@ -218,7 +254,7 @@ namespace IOCv2.Application.Features.Jobs.Commands.ApplyJob
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Failed to create application for student {StudentId} and job {JobId}", student.StudentId, job.JobId);
-                return Result<ApplyJobResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.InternalError), ResultErrorType.InternalServerError);
+                return Result<ApplyJobResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
             }
         }
     }
