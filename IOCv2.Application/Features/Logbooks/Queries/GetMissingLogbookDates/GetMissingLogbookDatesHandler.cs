@@ -142,8 +142,10 @@ public class GetMissingLogbookDatesHandler
 
         // ── 3. Fetch the dates already submitted by this student in the window ──
         // Convert boundaries to UTC DateTime — Npgsql requires DateTimeKind.Utc for timestamptz columns
-        var startDateTime = DateTime.SpecifyKind(startDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
-        var todayDateTime = DateTime.SpecifyKind(today.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc).AddDays(1); // exclusive upper bound
+        // Account for GMT+7 timezone offset to prevent shifting local dates
+        var tzOffset = TimeSpan.FromHours(7);
+        var startDateTime = DateTime.SpecifyKind(startDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc).Subtract(tzOffset);
+        var todayDateTime = DateTime.SpecifyKind(today.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc).AddDays(1).Subtract(tzOffset); // exclusive upper bound
 
         var rawDates = await _unitOfWork.Repository<Logbook>()
             .Query()
@@ -155,7 +157,7 @@ public class GetMissingLogbookDatesHandler
             .ToListAsync(cancellationToken);
 
         var submittedDates = rawDates
-            .Select(d => DateOnly.FromDateTime(d.Date))
+            .Select(d => DateOnly.FromDateTime(d.Add(tzOffset).Date))
             .Distinct()
             .ToList();
 
