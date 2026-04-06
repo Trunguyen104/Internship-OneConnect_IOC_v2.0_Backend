@@ -35,15 +35,6 @@ public class CreateUniversityHandlerTests
         _mockUniversityRepository.Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<University, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
         _mockUniversityRepository.Setup(r => r.AddAsync(It.IsAny<University>(), It.IsAny<CancellationToken>())).ReturnsAsync((University u, CancellationToken _) => u);
         _mockCacheService.Setup(c => c.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        _mockBackgroundEmailSender
-            .Setup(s => s.EnqueueUniversityCreationEmailAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Guid?>(),
-                It.IsAny<Guid?>(),
-                It.IsAny<CancellationToken>()))
-            .Returns(ValueTask.CompletedTask);
 
         _handler = new CreateUniversityHandler(
             _mockUnitOfWork.Object,

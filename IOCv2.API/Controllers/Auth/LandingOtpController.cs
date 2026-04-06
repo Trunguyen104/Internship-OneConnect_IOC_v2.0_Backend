@@ -1,5 +1,6 @@
 using IOCv2.API.Attributes;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Constants;
 using IOCv2.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +54,9 @@ public class LandingOtpController : ResultHandlingControllerBase
     public async Task<IActionResult> CheckEmail([FromBody] SendLandingOtpRequest request, [FromServices] ILandingEmailPolicy landingEmailPolicy, [FromServices] IMessageService messageService, CancellationToken cancellationToken)
     {
         var isRegistered = await landingEmailPolicy.IsRegisteredEmailAsync(request.Email ?? string.Empty, cancellationToken);
-        var message = isRegistered ? messageService.GetMessage(MessageKeys.Landing.AlreadyRegistered) : null;
+        var message = isRegistered
+            ? messageService.GetMessage(MessageKeys.Landing.AlreadyRegistered)
+            : string.Empty;
         return Ok(new ApiResponse<bool>(true, message, isRegistered));
     }
 }
