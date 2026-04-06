@@ -10,6 +10,7 @@ using IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignment;
 using IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle;
 using IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle;
 using IOCv2.Application.Features.UniAssign.Queries.GetEnterpriseInterPhase;
+using IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +33,7 @@ public class UniAssignsController : ApiControllerBase
     /// Bulk assign students to an enterprise intern phase (UniAssign).
     /// </summary>
     [HttpPost("bulk-enterprise-assignment")]
+    [Authorize(Roles = "SchoolAdmin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -47,6 +49,7 @@ public class UniAssignsController : ApiControllerBase
     /// Bulk reassign students to a new enterprise intern phase (UniAssign reassign).
     /// </summary>
     [HttpPost("bulk-reassign-enterprise")]
+    [Authorize(Roles = "SchoolAdmin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -62,6 +65,7 @@ public class UniAssignsController : ApiControllerBase
     /// Bulk unassign students previously assigned via UniAssign.
     /// </summary>
     [HttpPost("bulk-unassign")]
+    [Authorize(Roles = "SchoolAdmin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -77,6 +81,7 @@ public class UniAssignsController : ApiControllerBase
     /// Quickly assign a single student to an enterprise intern phase (UniAssign quick assign).
     /// </summary>
     [HttpPost("quick-enterprise-assignment")]
+    [Authorize(Roles = "SchoolAdmin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -92,6 +97,7 @@ public class UniAssignsController : ApiControllerBase
     /// Reassign a single student's application to a new enterprise/intern phase (UniAssign reassign single).
     /// </summary>
     [HttpPost("reassign-single")]
+    [Authorize(Roles = "SchoolAdmin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -107,6 +113,7 @@ public class UniAssignsController : ApiControllerBase
     /// Unassign a single student's application that was assigned via UniAssign.
     /// </summary>
     [HttpPost("unassign-single")]
+    [Authorize(Roles = "SchoolAdmin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -122,12 +129,26 @@ public class UniAssignsController : ApiControllerBase
     /// Get enterprise intern phases.
     /// </summary>
     [HttpGet("enterprise-interphases")]
+    [Authorize(Roles = "SchoolAdmin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetEnterpriseInterPhases([FromQuery] string? searchTerm, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetEnterpriseInterPhases([FromQuery] GetEnterpriseInterPhaseQuery query, CancellationToken cancellationToken)
     {
-        var query = new GetEnterpriseInterPhaseQuery { SearchTerm = searchTerm };
+        var result = await _mediator.Send(query, cancellationToken);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Get students for a given term (paginated).
+    /// </summary>
+    [HttpGet("students-by-term")]
+    [Authorize(Roles = "SchoolAdmin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetStudentsByTerm([FromQuery] GetStudentsByTermQuery query, CancellationToken cancellationToken = default)
+    {
         var result = await _mediator.Send(query, cancellationToken);
         return HandleResult(result);
     }
