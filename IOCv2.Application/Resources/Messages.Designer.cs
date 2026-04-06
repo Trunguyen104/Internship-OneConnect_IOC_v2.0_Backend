@@ -3406,9 +3406,6 @@ namespace IOCv2.Application.Resources {
         internal static string UniAssign_AuditLogAssignMetadata {
             get {
                 return ResourceManager.GetString("UniAssign.AuditLogAssignMetadata", resourceCulture);
-            }
-        }
-
         ///   Looks up a localized string similar to Không thể xóa trường đại học: hiện đang có các học kỳ đang hoạt động..
         /// </summary>
         internal static string University_HasActiveTerms {
@@ -3531,9 +3528,6 @@ namespace IOCv2.Application.Resources {
         internal static string UniAssign_UnauthorizedOrInvalidOperation {
             get {
                 return ResourceManager.GetString("UniAssign.UnauthorizedOrInvalidOperation", resourceCulture);
-            }
-        }
-
         ///   Looks up a localized string similar to Không thể xóa trường đại học: hiện đang có sinh viên đang trong quá trình thực tập..
         /// </summary>
         internal static string University_HasInterningStudents {
