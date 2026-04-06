@@ -51,11 +51,25 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
             // Base query for the requested violation report id.
             var query = _unitOfWork.Repository<ViolationReport>().Query().AsNoTracking().Include(x=>x.InternshipGroup).ThenInclude(x=>x.Mentor).Where(x => x.ViolationReportId == request.ViolationReportId);
 
-            // If current user is Mentor, restrict to reports belonging to mentor's groups.
-            if (UserRole.Mentor.ToString().Equals(_currentUserService.Role!))
+            var currentRole = _currentUserService.Role ?? string.Empty;
+
+            // Role-based scope for read access.
+            if (UserRole.Mentor.ToString().Equals(currentRole, StringComparison.OrdinalIgnoreCase))
             {
                 var userId = Guid.Parse(_currentUserService.UserId!);
                 query = query.Where(x => x.InternshipGroup.Mentor!.UserId == userId);
+            }
+            else if (UserRole.EnterpriseAdmin.ToString().Equals(currentRole, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!Guid.TryParse(_currentUserService.UnitId, out var enterpriseId))
+                {
+                    _logger.LogWarning("Invalid enterprise scope for EnterpriseAdmin user {UserId}", _currentUserService.UserId);
+                    return Result<GetViolationReportDetailResponse>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
+
+                query = query.Where(x => x.InternshipGroup.EnterpriseId.HasValue && x.InternshipGroup.EnterpriseId.Value == enterpriseId);
             }
 
             // Project to DTO and execute.
