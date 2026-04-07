@@ -42,6 +42,9 @@ public class UpdateSprintHandler : IRequestHandler<UpdateSprintCommand, Result<U
         try
         {
             var sprint = await _unitOfWork.Repository<Sprint>().Query()
+                .Include(s => s.Project)
+                    .ThenInclude(p => p.InternshipGroup)
+                        .ThenInclude(g => g!.InternshipPhase)
                 .FirstOrDefaultAsync(s => s.SprintId == request.SprintId && s.ProjectId == request.ProjectId, cancellationToken);
 
             if (sprint is null)
@@ -56,6 +59,22 @@ public class UpdateSprintHandler : IRequestHandler<UpdateSprintCommand, Result<U
                 _logger.LogWarning("Attempted to update completed sprint {SprintId}", request.SprintId);
                 return Result<UpdateSprintResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Sprint.CannotEditCompleted), ResultErrorType.BadRequest);
+            }
+
+            if (request.StartDate.HasValue && request.EndDate.HasValue)
+            {
+                var phase = sprint.Project?.InternshipGroup?.InternshipPhase;
+                if (phase != null)
+                {
+                    if (request.StartDate.Value < phase.StartDate || request.EndDate.Value > phase.EndDate)
+                    {
+                        _logger.LogWarning("Sprint dates {StartDate} to {EndDate} are out of bounds for Phase {PhaseId}", 
+                            request.StartDate, request.EndDate, phase.PhaseId);
+                        return Result<UpdateSprintResponse>.Failure(
+                            _messageService.GetMessage(MessageKeys.Sprint.DatesOutOfBounds, phase.StartDate, phase.EndDate),
+                            ResultErrorType.BadRequest);
+                    }
+                }
             }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

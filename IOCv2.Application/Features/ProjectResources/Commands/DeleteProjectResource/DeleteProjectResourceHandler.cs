@@ -16,6 +16,14 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
 {
     public class DeleteProjectResourceHandler : IRequestHandler<DeleteProjectResourceCommand, Result<DeleteProjectResourceResponse>>
     {
+        private enum ProjectAccessLevel
+        {
+            None,
+            Student,
+            Mentor,
+            Admin
+        }
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<DeleteProjectResourceHandler> _logger;
         private readonly IMapper _mapper;
@@ -43,11 +51,18 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
                 return Result<DeleteProjectResourceResponse>.Failure(_messageService.GetMessage(MessageKeys.ProjectResourcesKey.NotFound), ResultErrorType.NotFound);
             }
 
-            var hasAccess = await HasProjectAccessAsync(resource.ProjectId, cancellationToken);
-            if (!hasAccess)
+            var accessLevel = await ResolveProjectAccessAsync(resource.ProjectId, cancellationToken);
+            if (accessLevel == ProjectAccessLevel.None)
             {
                 return Result<DeleteProjectResourceResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                    ResultErrorType.Forbidden);
+            }
+
+            if (accessLevel == ProjectAccessLevel.Student && resource.UploadedBy.HasValue)
+            {
+                return Result<DeleteProjectResourceResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.ProjectResourcesKey.StudentCannotModifyMentorResource),
                     ResultErrorType.Forbidden);
             }
 
@@ -77,17 +92,41 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
             }
         }
 
-        private async Task<bool> HasProjectAccessAsync(Guid projectId, CancellationToken cancellationToken)
+        private async Task<ProjectAccessLevel> ResolveProjectAccessAsync(Guid projectId, CancellationToken cancellationToken)
         {
             if (string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(_currentUserService.Role, "Admin", StringComparison.OrdinalIgnoreCase))
             {
-                return true;
+                return ProjectAccessLevel.Admin;
             }
 
             if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
             {
-                return false;
+                return ProjectAccessLevel.None;
+            }
+
+            if (string.Equals(_currentUserService.Role, "Mentor", StringComparison.OrdinalIgnoreCase))
+            {
+                var enterpriseUserId = await _unitOfWork.Repository<Domain.Entities.EnterpriseUser>().Query()
+                    .AsNoTracking()
+                    .Where(eu => eu.UserId == currentUserId)
+                    .Select(eu => eu.EnterpriseUserId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (enterpriseUserId == Guid.Empty)
+                {
+                    return ProjectAccessLevel.None;
+                }
+
+                var mentorHasAccess = await _unitOfWork.Repository<Domain.Entities.Project>().Query()
+                    .AsNoTracking()
+                    .AnyAsync(p => p.ProjectId == projectId &&
+                        (
+                            p.MentorId == enterpriseUserId ||
+                            (p.InternshipId.HasValue && p.InternshipGroup != null && p.InternshipGroup.MentorId == enterpriseUserId)
+                        ), cancellationToken);
+
+                return mentorHasAccess ? ProjectAccessLevel.Mentor : ProjectAccessLevel.None;
             }
 
             var studentId = await _unitOfWork.Repository<Domain.Entities.Student>().Query()
@@ -98,7 +137,7 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
 
             if (studentId == Guid.Empty)
             {
-                return false;
+                return ProjectAccessLevel.None;
             }
 
             var internshipId = await _unitOfWork.Repository<Domain.Entities.Project>().Query()
@@ -109,12 +148,14 @@ namespace IOCv2.Application.Features.ProjectResources.Commands.DeleteProjectReso
 
             if (internshipId == Guid.Empty)
             {
-                return false;
+                return ProjectAccessLevel.None;
             }
 
-            return await _unitOfWork.Repository<Domain.Entities.InternshipStudent>().Query()
+            var studentHasAccess = await _unitOfWork.Repository<Domain.Entities.InternshipStudent>().Query()
                 .AsNoTracking()
                 .AnyAsync(m => m.InternshipId == internshipId && m.StudentId == studentId, cancellationToken);
+
+            return studentHasAccess ? ProjectAccessLevel.Student : ProjectAccessLevel.None;
         }
     }
 }

@@ -72,7 +72,8 @@ public class GetMyInternshipGroupsHandlerTests
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(70)),
             "CNTT",
             20,
-            "Test phase");
+            "Test phase",
+            null);
         typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, termId);
         group.InternshipPhase = phase;
         group.Mentor = mentor;
@@ -123,6 +124,7 @@ public class GetMyInternshipGroupsHandlerTests
         result.Data[0].Project!.Name.Should().Be("IOC Version 2");
         result.Data[0].StudentCount.Should().Be(1);
         result.Data[0].GroupStatus.Should().Be(IOCv2.Domain.Enums.GroupStatus.Active);
+        result.Data[0].HasNoMentorWarning.Should().BeFalse();
     }
 
     [Fact]

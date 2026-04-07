@@ -3,7 +3,7 @@ using MediatR;
 
 namespace IOCv2.Application.Features.StudentTerms.Commands.WithdrawStudent;
 
-public record WithdrawStudentCommand(Guid StudentTermId, bool DeleteFromSystem = false)
+public record WithdrawStudentCommand(Guid StudentTermId)
     : IRequest<Result<WithdrawStudentResponse>>;
 
 public class WithdrawStudentResponse

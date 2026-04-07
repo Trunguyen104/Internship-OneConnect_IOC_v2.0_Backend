@@ -15,6 +15,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
         public string GroupName { get; set; } = string.Empty;
         public string? EnterpriseName { get; set; }
         public string? MentorName { get; set; }
+        public bool HasNoMentorWarning { get; set; }
 
         /// <summary>Group-specific override dates (may be null if not set).</summary>
         public DateTime? StartDate { get; set; }
@@ -37,6 +38,7 @@ namespace IOCv2.Application.Features.InternshipGroups.Queries.GetInternshipGroup
             profile.CreateMap<InternshipGroup, GetInternshipGroupsResponse>()
                 .ForMember(d => d.EnterpriseName,  opt => opt.MapFrom(s => s.Enterprise != null ? s.Enterprise.Name : null))
                 .ForMember(d => d.MentorName,      opt => opt.MapFrom(s => s.Mentor != null && s.Mentor.User != null ? s.Mentor.User.FullName : null))
+                .ForMember(d => d.HasNoMentorWarning, opt => opt.MapFrom(s => !s.MentorId.HasValue))
                 .ForMember(d => d.NumberOfMembers, opt => opt.MapFrom(s => s.Members.Count))
                 .ForMember(d => d.Status,          opt => opt.MapFrom(s => s.Status))
                 .ForMember(d => d.PhaseStartDate,  opt => opt.MapFrom(s => s.InternshipPhase != null ? (DateOnly?)s.InternshipPhase.StartDate : null))

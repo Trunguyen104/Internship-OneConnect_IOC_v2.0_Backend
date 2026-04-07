@@ -18,7 +18,7 @@ using IOCv2.Application.Extensions.Pagination;
 using IOCv2.Application.Extensions.Mappings;
 using Microsoft.EntityFrameworkCore.InMemory;
 
-namespace IOCv2.Tests.Features.Sprints.Queries.GetSprints
+namespace IOCv2.Tests.Features.Sprints
 {
     public class GetSprintsHandlerTests
     {

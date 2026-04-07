@@ -2,8 +2,8 @@
 
 public enum InternshipPhaseLifecycleStatus
 {
-    Upcoming = 0,
-    Active = 1,
-    Ended = 2
+    Upcoming = 1,
+    Active = 2,
+    Ended = 3
 }
 

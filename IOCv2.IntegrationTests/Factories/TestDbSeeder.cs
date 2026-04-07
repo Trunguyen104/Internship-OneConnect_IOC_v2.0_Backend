@@ -30,7 +30,7 @@ public static class TestDbSeeder
             TaxCode = "0101248141",
             Industry = "IT Test",
             Address = "Test Address",
-            Status = (short)EnterpriseStatus.Active
+            Status = EnterpriseStatus.Active
         });
 
         context.SaveChanges();
@@ -64,13 +64,14 @@ public static class TestDbSeeder
         enterpriseAdmin.SetStatus(UserStatus.Active);
         context.Users.Add(enterpriseAdmin);
 
-        context.EnterpriseUsers.Add(new EnterpriseUser
+        var entUser = new EnterpriseUser
         {
             EnterpriseUserId = Guid.NewGuid(),
             UserId = enterpriseAdminId,
-            EnterpriseId = fptSoftId,
-            Position = "Admin"
-        });
+            EnterpriseId = fptSoftId
+        };
+        entUser.UpdateMetadata("Admin", null, null);
+        context.EnterpriseUsers.Add(entUser);
 
         // Mentor
         var mentorUserId = Guid.NewGuid();
@@ -86,13 +87,14 @@ public static class TestDbSeeder
         context.Users.Add(mentor);
         
         var mentorEuId = Guid.NewGuid();
-        context.EnterpriseUsers.Add(new EnterpriseUser
+        var mentorEu = new EnterpriseUser
         {
             EnterpriseUserId = mentorEuId,
             UserId = mentorUserId,
-            EnterpriseId = fptSoftId,
-            Position = "Senior Dev"
-        });
+            EnterpriseId = fptSoftId
+        };
+        mentorEu.UpdateMetadata("Senior Dev", null, null);
+        context.EnterpriseUsers.Add(mentorEu);
 
         // Student
         var studentUserId = Guid.NewGuid();
@@ -146,7 +148,8 @@ public static class TestDbSeeder
             DateOnly.FromDateTime(DateTime.UtcNow.AddDays(90)),
             "CNTT",
             15,
-            "Test phase for integration tests");
+            "Test phase for integration tests",
+            null);
 
         context.InternshipPhases.Add(phase);
 

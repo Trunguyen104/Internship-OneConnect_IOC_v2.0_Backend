@@ -101,12 +101,14 @@ public class AuthController : ApiControllerBase
     /// <returns>Success result</returns>
     [HttpPost("logout")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Logout([FromBody] RevokeTokenCommand command)
+    public async Task<IActionResult> Logout([FromBody] RevokeTokenCommand? command)
     {
         _logger.LogInformation("Logout requested.");
 
         // Try to get token from Body or Cookie
-        var refreshToken = command.RefreshToken ?? Request.Cookies["refreshToken"];
+        var refreshToken = !string.IsNullOrWhiteSpace(command?.RefreshToken)
+            ? command!.RefreshToken
+            : Request.Cookies["refreshToken"];
 
         // Clear Cookies to ensure client-side logout
         Response.Cookies.Delete("accessToken");

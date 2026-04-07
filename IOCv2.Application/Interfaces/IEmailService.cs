@@ -1,4 +1,4 @@
-﻿namespace IOCv2.Application.Interfaces
+namespace IOCv2.Application.Interfaces
 {
     public interface IEmailService
     {
@@ -73,5 +73,61 @@
             string newPassword,
             string managerName,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a notification email to a university's contact email when the university is added to the system
+        /// </summary>
+        /// <param name="email">Contact email of the university</param>
+        /// <param name="universityName">Name of the university</param>
+        /// <param name="universityCode">Official code of the university</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>True if email sent successfully, false otherwise</returns>
+        Task<bool> SendUniversityCreationEmailAsync(
+            string email,
+            string universityName,
+            string universityCode,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a notification email to an enterprise's contact email when the enterprise is added to the system
+        /// </summary>
+        /// <param name="email">Contact email of the enterprise</param>
+        /// <param name="enterpriseName">Name of the enterprise</param>
+        /// <param name="taxCode">Tax code of the enterprise</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>True if email sent successfully, false otherwise</returns>
+        Task<bool> SendEnterpriseCreationEmailAsync(
+            string email,
+            string enterpriseName,
+            string taxCode,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a reservation notification email to the system administrator when someone fills the form on the landing page.
+        /// </summary>
+        Task<bool> SendLandingReservationEmailAsync(
+            string partnerType,
+            string partnerName,
+            string email,
+            string phone,
+            string area,
+            string hiringCount,
+            string consultationDate,
+            string selectedTime,
+            string note,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a 6-digit OTP to the address for landing-page email verification.
+        /// </summary>
+        Task<bool> SendVerificationOtpEmailAsync(
+            string email,
+            string otpCode,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns true if the email domain has at least one MX record (mail exchanger).
+        /// </summary>
+        bool VerifyEmailMxRecordSync(string email);
     }
 }

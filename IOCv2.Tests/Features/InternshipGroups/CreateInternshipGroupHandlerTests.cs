@@ -81,7 +81,8 @@ namespace IOCv2.Tests.Features.InternshipGroups
                 DateOnly.FromDateTime(DateTime.UtcNow.AddDays(70)),
                 "CNTT",
                 10,
-                "Test phase description");
+                "Test phase description",
+                null);
 
             typeof(InternshipPhase).GetProperty("PhaseId")!.SetValue(phase, phaseId);
             typeof(InternshipPhase).GetProperty("Status")!.SetValue(phase, InternshipPhaseStatus.Open);

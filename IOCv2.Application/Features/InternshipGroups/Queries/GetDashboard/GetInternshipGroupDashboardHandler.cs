@@ -63,10 +63,10 @@ public class GetInternshipGroupDashboardHandler : IRequestHandler<GetInternshipG
         // 1. Summary
         response.Summary = new DashboardSummaryDto
         {
-            TotalTasks = workItems.Count(w => w.Status != WorkItemStatus.Cancelled),
+            TotalTasks = workItems.Count,
             InProgress = workItems.Count(w => w.Status == WorkItemStatus.Todo || w.Status == WorkItemStatus.InProgress || w.Status == WorkItemStatus.Review),
             Done = workItems.Count(w => w.Status == WorkItemStatus.Done),
-            Overdue = workItems.Count(w => w.Status != WorkItemStatus.Done && w.Status != WorkItemStatus.Cancelled && w.DueDate.HasValue && w.DueDate.Value < today)
+            Overdue = workItems.Count(w => w.Status != WorkItemStatus.Done && w.DueDate.HasValue && w.DueDate.Value < today)
         };
 
         // 2. Burndown Calculation
@@ -79,7 +79,6 @@ public class GetInternshipGroupDashboardHandler : IRequestHandler<GetInternshipG
         for (var date = startDate; date <= endDate; date = date.AddDays(1))
         {
             var remaining = workItems
-                .Where(w => w.Status != WorkItemStatus.Cancelled)
                 .Count(w => 
                     (w.Status != WorkItemStatus.Done) || 
                     (w.Status == WorkItemStatus.Done && w.UpdatedAt.HasValue && DateOnly.FromDateTime(w.UpdatedAt.Value) > date));

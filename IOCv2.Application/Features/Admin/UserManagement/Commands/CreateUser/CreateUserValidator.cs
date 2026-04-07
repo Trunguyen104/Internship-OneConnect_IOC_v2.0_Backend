@@ -45,7 +45,7 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.CreateUser
                 .NotNull()
                 .NotEmpty()
                 .When(x => x.Role == UserRole.Student)
-                .WithMessage("A student must be linked to an internship term.");
+                .WithMessage(messageService.GetMessage(MessageKeys.Validation.TermRequiredForStudent));
         }
     }
 }

@@ -203,6 +203,53 @@ namespace IOCv2.Tests.Features.Projects
         }
 
         [Fact]
+        public async Task Handle_WithResourceUpdateChangingExtension_ShouldReturnBadRequest()
+        {
+            var userId = Guid.NewGuid();
+            var enterpriseUserId = Guid.NewGuid();
+            var project = Project.Create("Project", "Desc", "PRJ-TEST_TST_7", "IT", "Req", mentorId: enterpriseUserId);
+
+            var fileResource = new IOCv2.Domain.Entities.ProjectResources(project.ProjectId, "spec.pdf", FileType.PDF, "/Uploads/spec.pdf")
+            {
+                ProjectResourceId = Guid.NewGuid()
+            };
+            project.ProjectResources.Add(fileResource);
+
+            var command = new UpdateProjectCommand
+            {
+                ProjectId = project.ProjectId,
+                ProjectName = "Updated Project",
+                ResourceUpdates = new List<UpdateProjectResourceInput>
+                {
+                    new()
+                    {
+                        ProjectResourceId = fileResource.ProjectResourceId,
+                        ResourceName = "spec.jpg"
+                    }
+                }
+            };
+
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
+            }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project> { project }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Project, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+
+            _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("invalid file type");
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorType.Should().Be(ResultErrorType.BadRequest);
+            fileResource.ResourceName.Should().Be("spec.pdf");
+            _mockUnitOfWork.Verify(x => x.RollbackTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
         public async Task Handle_WithAddedFileAndLink_ShouldCreateResources()
         {
             // Arrange

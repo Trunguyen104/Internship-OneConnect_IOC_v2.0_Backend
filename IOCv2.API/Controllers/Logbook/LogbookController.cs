@@ -1,9 +1,10 @@
-﻿using IOCv2.Application.Common.Models;
+using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Logbooks.Commands.CreateLogbook;
 using IOCv2.Application.Features.Logbooks.Commands.DeleteLogbook;
 using IOCv2.Application.Features.Logbooks.Commands.UpdateLogbook;
 using IOCv2.Application.Features.Logbooks.Queries.GetLogbookById;
 using IOCv2.Application.Features.Logbooks.Queries.GetLogbooks;
+using IOCv2.Application.Features.Logbooks.Queries.GetMissingLogbookDates;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -98,5 +99,25 @@ public class LogbookController : ApiControllerBase
     {
         _logger.LogInformation("Request to delete logbook {LogbookId}", logbookId);
         return HandleResult(await _mediator.Send(new DeleteLogbookCommand { LogbookId = logbookId }));
+    }
+
+    /// <summary>
+    /// Get the list of working days (Mon–Fri, excluding public holidays) on which
+    /// a student has NOT submitted a logbook entry, from the start of their active
+    /// internship phase up to today (UTC).
+    /// </summary>
+    /// <param name="studentId">
+    /// Optional. The student to check. When omitted, the currently authenticated student is used.
+    /// </param>
+    /// <returns code="200">List of missing logbook dates and summary statistics.</returns>
+    /// <returns code="404">No active internship found for the student.</returns>
+    [HttpGet("missing-dates")]
+    [ProducesResponseType(typeof(ApiResponse<GetMissingLogbookDatesResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetMissingLogbookDates([FromQuery] Guid? studentId = null)
+    {
+        _logger.LogInformation("Request to get missing logbook dates for StudentId={StudentId}", studentId);
+        return HandleResult(await _mediator.Send(new GetMissingLogbookDatesQuery { StudentId = studentId }));
     }
 }

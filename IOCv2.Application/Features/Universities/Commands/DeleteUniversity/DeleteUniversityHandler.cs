@@ -1,3 +1,4 @@
+using IOCv2.Application.Constants;
 using IOCv2.Application.Common.Exceptions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Universities.Common;
@@ -16,17 +17,20 @@ public class DeleteUniversityHandler : IRequestHandler<DeleteUniversityCommand, 
     private readonly ILogger<DeleteUniversityHandler> _logger;
     private readonly ICurrentUserService _currentUserService;
     private readonly ICacheService _cacheService;
+    private readonly IMessageService _messageService;
 
     public DeleteUniversityHandler(
         IUnitOfWork unitOfWork,
         ILogger<DeleteUniversityHandler> logger,
         ICurrentUserService currentUserService,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        IMessageService messageService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _currentUserService = currentUserService;
         _cacheService = cacheService;
+        _messageService = messageService;
     }
 
     public async Task<Result<bool>> Handle(DeleteUniversityCommand request, CancellationToken cancellationToken)
@@ -49,7 +53,7 @@ public class DeleteUniversityHandler : IRequestHandler<DeleteUniversityCommand, 
 
         if (hasActiveTerms)
         {
-            return Result<bool>.Failure("Cannot delete university: active terms exist.", ResultErrorType.Forbidden);
+            return Result<bool>.Failure(_messageService.GetMessage(MessageKeys.University.HasActiveTerms), ResultErrorType.Forbidden);
         }
 
         // 2) Refuse delete if any student is currently interning under those terms
@@ -62,7 +66,7 @@ public class DeleteUniversityHandler : IRequestHandler<DeleteUniversityCommand, 
 
         if (hasInterningStudents)
         {
-            return Result<bool>.Failure("Cannot delete university: students are interning.", ResultErrorType.Forbidden);
+            return Result<bool>.Failure(_messageService.GetMessage(MessageKeys.University.HasInterningStudents), ResultErrorType.Forbidden);
         }
 
         await _unitOfWork.BeginTransactionAsync(cancellationToken);

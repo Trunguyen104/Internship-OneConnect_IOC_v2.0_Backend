@@ -19,7 +19,7 @@ public class ImportStudentsConfirmValidator : AbstractValidator<ImportStudentsCo
         {
             record.RuleFor(r => r.StudentCode)
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeRequired))
-                .Matches(@"^[a-zA-Z0-9\-_\.]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInvalid));
+                .Matches(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInvalid));
 
             record.RuleFor(r => r.FullName)
                 .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.FullNameRequired))

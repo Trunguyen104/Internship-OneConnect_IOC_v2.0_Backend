@@ -2,6 +2,7 @@ using IOCv2.Application.Common.Models;
 using IOCv2.Application.Features.Universities.Common;
 using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -58,6 +59,7 @@ public class GetUniversitiesHandler : IRequestHandler<GetUniversitiesQuery, Resu
                 Name = u.Name,
                 Address = u.Address,
                 LogoUrl = u.LogoUrl,
+                ContactEmail = u.ContactEmail,
                 Status = u.Status
             })
             .ToListAsync(cancellationToken);

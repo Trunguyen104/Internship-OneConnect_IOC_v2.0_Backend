@@ -8,7 +8,7 @@ namespace IOCv2.Application.Features.StudentTerms.Commands.UpdateStudentTerm;
 
 public class UpdateStudentTermValidator : AbstractValidator<UpdateStudentTermCommand>
 {
-    private static readonly Regex StudentCodeRegex = new(@"^[a-zA-Z0-9\-_\.]+$", RegexOptions.Compiled);
+    private static readonly Regex StudentCodeRegex = new(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$", RegexOptions.Compiled);
 
     public UpdateStudentTermValidator(IMessageService messageService)
     {

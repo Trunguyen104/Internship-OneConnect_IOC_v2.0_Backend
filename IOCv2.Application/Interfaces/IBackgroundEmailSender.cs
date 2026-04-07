@@ -1,4 +1,4 @@
-﻿namespace IOCv2.Application.Interfaces
+namespace IOCv2.Application.Interfaces
 {
     public interface IBackgroundEmailSender
     {
@@ -46,6 +46,22 @@
        Guid? auditTargetId = null,
        Guid? performedByEmployeeId = null,
        CancellationToken cancellationToken = default);
+
+        ValueTask EnqueueUniversityCreationEmailAsync(
+            string email,
+            string universityName,
+            string universityCode,
+            Guid? auditTargetId = null,
+            Guid? performedByEmployeeId = null,
+            CancellationToken cancellationToken = default);
+
+        ValueTask EnqueueEnterpriseCreationEmailAsync(
+            string email,
+            string enterpriseName,
+            string taxCode,
+            Guid? auditTargetId = null,
+            Guid? performedByEmployeeId = null,
+            CancellationToken cancellationToken = default);
     }
 
     public class EmailMessage

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using IOCv2.Application.Common.Models;
 using IOCv2.Application.Constants;
@@ -75,7 +75,7 @@ namespace IOCv2.Application.Features.Enterprises.Queries.GetEnterprises
             if (!string.IsNullOrWhiteSpace(request.TaxCode)) query = query.Where(e => e.TaxCode == request.TaxCode);
             if (!string.IsNullOrWhiteSpace(request.Name)) query = query.Where(e => e.Name.Contains(request.Name));
             if (!string.IsNullOrWhiteSpace(request.Industry)) query = query.Where(e => e.Industry == request.Industry);
-            if (request.Status.HasValue) query = query.Where(e => e.Status == (short)request.Status.Value);
+            if (request.Status.HasValue) query = query.Where(e => e.Status == request.Status.Value);
             query = ApplySorting(query, request.SortColumn, request.SortOrder);
             // Get total count before pagination
             var totalCount = await query.CountAsync(cancellationToken);

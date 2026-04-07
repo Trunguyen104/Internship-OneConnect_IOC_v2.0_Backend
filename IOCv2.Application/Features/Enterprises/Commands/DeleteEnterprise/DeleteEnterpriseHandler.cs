@@ -59,7 +59,7 @@ namespace IOCv2.Application.Features.Enterprises.Commands.DeleteEnterprise
             if (hasInterningStudents)
             {
                 return Result<DeleteEnterpriseResponse>.Failure(
-                    "Cannot delete enterprise: students are currently interning under active placements.",
+                    _messageService.GetMessage(MessageKeys.Enterprise.HasInterningStudents),
                     ResultErrorType.Forbidden);
             }
 

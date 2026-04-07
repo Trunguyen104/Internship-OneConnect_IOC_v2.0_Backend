@@ -17,7 +17,6 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly IMessageService _messageService;
-    private readonly IBackgroundEmailSender _emailSender;
     private readonly ICacheService _cacheService;
     private readonly ILogger<WithdrawStudentHandler> _logger;
 
@@ -25,21 +24,22 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
         IMessageService messageService,
-        IBackgroundEmailSender emailSender,
         ICacheService cacheService,
         ILogger<WithdrawStudentHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _messageService = messageService;
-        _emailSender = emailSender;
         _cacheService = cacheService;
         _logger = logger;
     }
 
     public async Task<Result<WithdrawStudentResponse>> Handle(WithdrawStudentCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.Parse(_currentUserService.UserId!);
+        if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+            return Result<WithdrawStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
         var isSuperAdmin = string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
 
         var studentTerm = await _unitOfWork.Repository<StudentTerm>()
@@ -77,17 +77,14 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             throw new DomainViolationException(
                 _messageService.GetMessage(MessageKeys.StudentTerms.CannotWithdrawPlaced));
 
-        if (request.DeleteFromSystem)
-        {
-            var hasOtherStudentTerms = await _unitOfWork.Repository<StudentTerm>()
-                .Query()
-                .AnyAsync(st => st.StudentId == studentTerm.StudentId && st.StudentTermId != studentTerm.StudentTermId, cancellationToken);
+        var hasOtherStudentTerms = await _unitOfWork.Repository<StudentTerm>()
+            .Query()
+            .AnyAsync(st => st.StudentId == studentTerm.StudentId && st.StudentTermId != studentTerm.StudentTermId, cancellationToken);
 
-            if (hasOtherStudentTerms)
-            {
-                return Result<WithdrawStudentResponse>.Failure(
-                    _messageService.GetMessage(MessageKeys.StudentTerms.CannotDeleteFromSystemHasOtherTerms));
-            }
+        if (hasOtherStudentTerms)
+        {
+            return Result<WithdrawStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.CannotDeleteFromSystemHasOtherTerms));
         }
 
         await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -97,45 +94,87 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             studentTerm.UpdatedBy = userId;
             studentTerm.UpdatedAt = DateTime.UtcNow;
 
-            if (request.DeleteFromSystem)
+            var now = DateTime.UtcNow;
+
+            var user = studentTerm.Student.User;
+            var student = studentTerm.Student;
+
+            var relatedApplications = await _unitOfWork.Repository<InternshipApplication>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var application in relatedApplications)
             {
-                var now = DateTime.UtcNow;
-                var suffix = $"_deleted_{now:yyyyMMddHHmmssfff}";
-
-                var user = studentTerm.Student.User;
-                user.UpdateEmail($"{user.Email}{suffix}");
-                if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
-                {
-                    user.UpdateProfile(
-                        user.FullName,
-                        $"{user.PhoneNumber}{suffix}",
-                        user.AvatarUrl,
-                        user.Gender,
-                        user.DateOfBirth,
-                        user.Address);
-                }
-
-                var activeTokens = await _unitOfWork.Repository<RefreshToken>()
-                    .Query()
-                    .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
-                    .ToListAsync(cancellationToken);
-
-                foreach (var token in activeTokens)
-                {
-                    token.IsRevoked = true;
-                    token.UpdatedAt = now;
-                    await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
-                }
-
-                studentTerm.DeletedBy = userId;
-                await _unitOfWork.Repository<StudentTerm>().DeleteAsync(studentTerm, cancellationToken);
-                await _unitOfWork.Repository<Student>().DeleteAsync(studentTerm.Student, cancellationToken);
-                await _unitOfWork.Repository<User>().DeleteAsync(user, cancellationToken);
+                await _unitOfWork.Repository<InternshipApplication>().HardDeleteAsync(application, cancellationToken);
             }
-            else
+
+            var relatedInternshipMembers = await _unitOfWork.Repository<InternshipStudent>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var member in relatedInternshipMembers)
             {
-                await _unitOfWork.Repository<StudentTerm>().UpdateAsync(studentTerm, cancellationToken);
+                await _unitOfWork.Repository<InternshipStudent>().HardDeleteAsync(member, cancellationToken);
             }
+
+            var relatedLogbooks = await _unitOfWork.Repository<Logbook>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var logbook in relatedLogbooks)
+            {
+                await _unitOfWork.Repository<Logbook>().HardDeleteAsync(logbook, cancellationToken);
+            }
+
+            var relatedEvaluations = await _unitOfWork.Repository<Evaluation>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var evaluation in relatedEvaluations)
+            {
+                await _unitOfWork.Repository<Evaluation>().HardDeleteAsync(evaluation, cancellationToken);
+            }
+
+            var relatedViolationReports = await _unitOfWork.Repository<ViolationReport>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var violationReport in relatedViolationReports)
+            {
+                await _unitOfWork.Repository<ViolationReport>().HardDeleteAsync(violationReport, cancellationToken);
+            }
+
+            await _unitOfWork.Repository<AuditLog>().ExecuteUpdateAsync(
+                x => x.PerformedById.HasValue && x.PerformedById.Value == user.UserId,
+                s => s.SetProperty(x => x.PerformedById, x => null),
+                cancellationToken);
+
+            var activeTokens = await _unitOfWork.Repository<RefreshToken>()
+                .Query()
+                .Where(rt => rt.UserId == user.UserId && !rt.IsRevoked)
+                .ToListAsync(cancellationToken);
+
+            foreach (var token in activeTokens)
+            {
+                token.IsRevoked = true;
+                token.UpdatedAt = now;
+                await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
+            }
+
+            studentTerm.DeletedBy = userId;
+            await _unitOfWork.Repository<StudentTerm>().HardDeleteAsync(studentTerm, cancellationToken);
+            await _unitOfWork.Repository<Student>().HardDeleteAsync(student, cancellationToken);
+            await _unitOfWork.Repository<User>().HardDeleteAsync(user, cancellationToken);
 
             term.TotalEnrolled = Math.Max(0, term.TotalEnrolled - 1);
             term.TotalUnplaced = Math.Max(0, term.TotalUnplaced - 1);
@@ -143,6 +182,14 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Failed to hard-delete student {StudentId} and user {UserId} in withdraw flow", studentTerm.StudentId, studentTerm.Student.UserId);
+
+            return Result<WithdrawStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.CannotDeleteFromSystemHasRelatedData));
         }
         catch
         {
@@ -153,17 +200,6 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
         await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermListPattern(), cancellationToken);
         await _cacheService.RemoveByPatternAsync(TermCacheKeys.TermDetailPattern(), cancellationToken);
 
-        if (!request.DeleteFromSystem)
-        {
-            _ = _emailSender.EnqueueEmailAsync(
-                studentTerm.Student.User.Email,
-                _messageService.GetMessage(MessageKeys.StudentTerms.EmailSubjectWithdraw),
-                _messageService.GetMessage(MessageKeys.StudentTerms.EmailBodyWithdraw, term.Name),
-                studentTerm.StudentTermId,
-                userId,
-                CancellationToken.None);
-        }
-
         _logger.LogInformation(
             _messageService.GetMessage(MessageKeys.StudentTerms.LogWithdrawn),
             request.StudentTermId,
@@ -173,12 +209,10 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             new WithdrawStudentResponse
             {
                 StudentTermId = request.StudentTermId,
-                StudentDeletedFromSystem = request.DeleteFromSystem,
-                SystemStudentDelta = request.DeleteFromSystem ? -1 : 0,
-                UiWarningMessageKey = request.DeleteFromSystem ? MessageKeys.StudentTerms.WithdrawDeleteWarning : null,
-                UiWarningMessage = request.DeleteFromSystem
-                    ? _messageService.GetMessage(MessageKeys.StudentTerms.WithdrawDeleteWarning, -1)
-                    : null
+                StudentDeletedFromSystem = true,
+                SystemStudentDelta = -1,
+                UiWarningMessageKey = MessageKeys.StudentTerms.WithdrawDeleteWarning,
+                UiWarningMessage = _messageService.GetMessage(MessageKeys.StudentTerms.WithdrawDeleteWarning, -1)
             },
             _messageService.GetMessage(MessageKeys.StudentTerms.WithdrawSuccess));
     }

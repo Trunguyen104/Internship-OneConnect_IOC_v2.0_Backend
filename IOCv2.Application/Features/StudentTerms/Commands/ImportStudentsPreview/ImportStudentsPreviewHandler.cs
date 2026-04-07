@@ -13,7 +13,7 @@ namespace IOCv2.Application.Features.StudentTerms.Commands.ImportStudentsPreview
 
 public class ImportStudentsPreviewHandler : IRequestHandler<ImportStudentsPreviewCommand, Result<ImportStudentsPreviewResponse>>
 {
-    private static readonly Regex StudentCodeRegex = new(@"^[a-zA-Z0-9\-_\.]+$", RegexOptions.Compiled);
+    private static readonly Regex StudentCodeRegex = new(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$", RegexOptions.Compiled);
     private static readonly Regex FullNameRegex = new(@"^[\p{L}\s]+$", RegexOptions.Compiled);
     private static readonly Regex PhoneRegex = new(@"^(\+84|0)[0-9]{9,10}$", RegexOptions.Compiled);
     private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5MB

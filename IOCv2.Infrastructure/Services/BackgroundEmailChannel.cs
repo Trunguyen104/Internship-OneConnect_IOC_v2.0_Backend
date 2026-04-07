@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
@@ -59,11 +59,22 @@ namespace IOCv2.Infrastructure.Services
             await EnqueueEmailAsync(email, "Mật khẩu của bạn đã được reset - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
         }
 
-        public async ValueTask EnqueuePasswordResetEmailAsync(string email, string resetLink, string fullname, Guid? auditTargetId, Guid? performedByEmployeeId, CancellationToken cancellationToken = default)
+        public async ValueTask EnqueuePasswordResetEmailAsync(string email, string resetLink, string fullname, Guid? auditTargetId = null, Guid? performedByEmployeeId = null, CancellationToken cancellationToken = default)
         {
             var body = EmailTemplates.GetPasswordResetTemplate(fullname, resetLink);
             await EnqueueEmailAsync(email, "Password Reset - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
-            await EnqueueEmailAsync(email, "Password Reset - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
+        }
+
+        public async ValueTask EnqueueUniversityCreationEmailAsync(string email, string universityName, string universityCode, Guid? auditTargetId = null, Guid? performedByEmployeeId = null, CancellationToken cancellationToken = default)
+        {
+            var body = EmailTemplates.GetUniversityCreationTemplate(universityName, universityCode);
+            await EnqueueEmailAsync(email, "Chào mừng đối tác Trường Đại học - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
+        }
+
+        public async ValueTask EnqueueEnterpriseCreationEmailAsync(string email, string enterpriseName, string taxCode, Guid? auditTargetId = null, Guid? performedByEmployeeId = null, CancellationToken cancellationToken = default)
+        {
+            var body = EmailTemplates.GetEnterpriseCreationTemplate(enterpriseName, taxCode);
+            await EnqueueEmailAsync(email, "Chào mừng đối tác Doanh nghiệp - Internship OneConnect", body, auditTargetId, performedByEmployeeId, cancellationToken);
         }
     }
 }

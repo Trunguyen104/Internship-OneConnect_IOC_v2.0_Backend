@@ -63,11 +63,24 @@ namespace IOCv2.Application.Features.ViolationReports.Queries.GetViolationReport
                 .Include(x => x.InternshipGroup!).ThenInclude(g => g!.Mentor!).ThenInclude(m => m!.User!)
                 .AsNoTracking();
 
-            // 2) Role-based access: Mentors only see reports for their groups.
-            if (UserRole.Mentor.ToString().Equals(_currentUserService.Role))
+            // 2) Role-based access.
+            var currentRole = _currentUserService.Role ?? string.Empty;
+            if (UserRole.Mentor.ToString().Equals(currentRole, StringComparison.OrdinalIgnoreCase))
             {
                 var currentUserId = Guid.Parse(_currentUserService.UserId!);
                 query = query.Where(x => x.InternshipGroup!.Mentor != null && x.InternshipGroup!.Mentor!.UserId == currentUserId);
+            }
+            else if (UserRole.EnterpriseAdmin.ToString().Equals(currentRole, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!Guid.TryParse(_currentUserService.UnitId, out var enterpriseId))
+                {
+                    _logger.LogWarning("Invalid enterprise scope for EnterpriseAdmin user {UserId}", _currentUserService.UserId);
+                    return Result<PaginatedResult<GetViolationReportsResponse>>.Failure(
+                        _messageService.GetMessage(MessageKeys.Common.Forbidden),
+                        ResultErrorType.Forbidden);
+                }
+
+                query = query.Where(x => x.InternshipGroup!.EnterpriseId.HasValue && x.InternshipGroup.EnterpriseId.Value == enterpriseId);
             }
 
             // 3) Search: match student full name or user code (case-insensitive).

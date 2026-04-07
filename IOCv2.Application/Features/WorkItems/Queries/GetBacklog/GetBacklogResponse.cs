@@ -40,6 +40,7 @@ public class BacklogWorkItemDto
     public int? StoryPoint { get; set; }
     public Guid? AssigneeId { get; set; }
     public string? AssigneeName { get; set; }
+    public string? AssigneeAvatarUrl { get; set; }
     public DateOnly? DueDate { get; set; }
     public float Order { get; set; }
     public DateTime CreatedAt { get; set; }

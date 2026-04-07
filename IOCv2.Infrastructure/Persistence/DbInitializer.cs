@@ -11,6 +11,71 @@ namespace IOCv2.Infrastructure.Persistence
         private readonly IPasswordService _passwordService;
         private readonly IUserServices _userService;
 
+        private async Task SeedBulkUnassignTestStudent()
+        {
+            // Deterministic data for testing BulkUnassignHandler
+            const string testEmail = "bulkunassign.test@fptu.edu.vn";
+            if (await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Email == testEmail))
+                return;
+
+            var fptUniversity = await _context.Universities.FirstOrDefaultAsync(u => u.Code == "FPTU");
+            if (fptUniversity == null) return;
+
+            // Pick an existing job to attach the UniAssign application to
+            var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT QA Automation Intern");
+            var springTerm = await _context.Terms.FirstOrDefaultAsync(t => t.Name == "Spring 2026" && t.UniversityId == fptUniversity.UniversityId);
+
+            // Create user + student
+            var passHash = _passwordService.HashPassword("Test@1234");
+            var userId = Guid.NewGuid();
+            var userCode = await _userService.GenerateUserCodeAsync(Domain.Enums.UserRole.Student, CancellationToken.None);
+            var user = new Domain.Entities.User(userId, userCode, testEmail, "BulkUnassign Test Student", Domain.Enums.UserRole.Student, passHash);
+            user.UpdateProfile(user.FullName, "0987654321", null, Domain.Enums.UserGender.Male, new DateOnly(2003, 1, 1), "Hà Nội");
+            user.SetStatus(Domain.Enums.UserStatus.Active);
+            _context.Users.Add(user);
+
+            var studentId = Guid.NewGuid();
+            var student = new Domain.Entities.Student
+            {
+                StudentId = studentId,
+                UserId = user.UserId,
+                InternshipStatus = Domain.Enums.StudentStatus.APPLIED,
+                Major = "Software Engineering",
+                ClassName = "SE-TEST"
+            };
+            _context.Students.Add(student);
+
+            var universityUser = new Domain.Entities.UniversityUser
+            {
+                UniversityUserId = Guid.NewGuid(),
+                UserId = user.UserId,
+                UniversityId = fptUniversity.UniversityId
+            };
+            universityUser.UpdateMetadata("Test Student", null, null);
+            _context.UniversityUsers.Add(universityUser);
+
+            // Create a UniAssign application in PendingAssignment (so BulkUnassign will find it)
+            if (job != null && springTerm != null)
+            {
+                var app = new Domain.Entities.InternshipApplication
+                {
+                    ApplicationId = Guid.NewGuid(),
+                    EnterpriseId = job.EnterpriseId,
+                    TermId = springTerm.TermId,
+                    StudentId = student.StudentId,
+                    JobId = job.JobId,
+                    Status = Domain.Enums.InternshipApplicationStatus.PendingAssignment,
+                    Source = Domain.Enums.ApplicationSource.UniAssign,
+                    AppliedAt = DateTime.UtcNow,
+                    UniversityId = fptUniversity.UniversityId,
+                    JobPostingTitle = job.Title
+                };
+                _context.InternshipApplications.Add(app);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         private static class SeedIds
         {
             public static readonly Guid SuperAdminId = new Guid("00000000-0000-0000-0000-000000000001");
@@ -57,6 +122,12 @@ namespace IOCv2.Infrastructure.Persistence
 
             // Deterministic id for the sixth seeded student (used for job-apply tests)
             public static readonly Guid Student6UserId = new Guid("66666666-6666-6666-6666-666666660006");
+
+            // Deterministic ids for student11 (UniAssign) and student12 (SelfApply) placement tests
+            public static readonly Guid Student11UserId = new Guid("66666666-6666-6666-6666-666666660011");
+            public static readonly Guid Student12UserId = new Guid("66666666-6666-6666-6666-666666660012");
+            public static readonly Guid Student13UserId = new Guid("66666666-6666-6666-6666-666666660013");
+            public static readonly Guid Student14UserId = new Guid("66666666-6666-6666-6666-666666660014");
         }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
@@ -75,7 +146,9 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedInternshipPhases();   // must be before SeedJobs and SeedInternshipGroups
             await SeedJobs();               // depends on InternshipPhases
             await SeedUsers();
-            await SeedTerms();
+            await SeedTerms(); 
+            await SeedBulkUnassignTestStudent();
+
             await SeedInternshipGroups();
             await SeedProjectsAndWorkItems();
             await SeedManageIGProjectData();
@@ -103,8 +176,8 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 var universities = new List<University>
                 {
-                    University.Create("FPTU", "FPT University", "Hoa Lac Hi-Tech Park, Hanoi", null),
-                    University.Create("FPTU-CT", "FPT University Can Tho", "600 Nguyen Van Cu, Ninh Kieu, Can Tho", null)
+                    University.Create("FPTU", "FPT University", "Hoa Lac Hi-Tech Park, Hanoi", null, "fptu@fpt.edu.vn"),
+                    University.Create("FPTU-CT", "FPT University Can Tho", "600 Nguyen Van Cu, Ninh Kieu, Can Tho", null, "fptuct@fpt.edu.vn")
                 };
                 await _context.Universities.AddRangeAsync(universities);
                 await _context.SaveChangesAsync();
@@ -126,7 +199,8 @@ namespace IOCv2.Infrastructure.Persistence
                         Address = "Khu Công nghệ cao Hòa Lạc, Thạch Thất, Hà Nội",
                         Website = "https://www.fpt-software.com",
                         Description = "Tập đoàn công nghệ hàng đầu Việt Nam",
-                        Status = (short)EnterpriseStatus.Active
+                        ContactEmail = "contact@fpt-software.com",
+                        Status = EnterpriseStatus.Active
                     },
                     new Enterprise
                     {
@@ -137,7 +211,8 @@ namespace IOCv2.Infrastructure.Persistence
                         Address = "Tầng 21, Tòa nhà Handico, Phạm Hùng, Nam Từ Liêm, Hà Nội",
                         Website = "https://rikkeisoft.com",
                         Description = "Đối tác tin cậy về chuyển đổi số",
-                        Status = (short)EnterpriseStatus.Active
+                        ContactEmail = "contact@rikkeisoft.com",
+                        Status = EnterpriseStatus.Active
                     }
                 };
                 await _context.Enterprises.AddRangeAsync(enterprises);
@@ -337,7 +412,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(adminEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Enterprise Administrator" });
+                    var entAdmin = new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId };
+                    entAdmin.UpdateMetadata("Enterprise Administrator", null, null);
+                    _context.EnterpriseUsers.Add(entAdmin);
+
                 }
 
                 var mentorEmail = $"mentor@{baseName}.com";
@@ -356,7 +434,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(mentorEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = mentorEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "Technical Mentor" });
+                    var mentorEu = new EnterpriseUser { EnterpriseUserId = mentorEuId, UserId = user.UserId, EnterpriseId = ent.EnterpriseId };
+                    mentorEu.UpdateMetadata("Technical Mentor", null, null);
+                    _context.EnterpriseUsers.Add(mentorEu);
+
                 }
 
                 // Additional mentors make inline assign/reassign happy/unhappy paths reproducible.
@@ -381,13 +462,14 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(backupMentorEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    var backupMentorEu = new EnterpriseUser
                     {
                         EnterpriseUserId = backupMentorEuId,
                         UserId = user.UserId,
-                        EnterpriseId = ent.EnterpriseId,
-                        Position = "Senior Technical Mentor"
-                    });
+                        EnterpriseId = ent.EnterpriseId
+                    };
+                    backupMentorEu.UpdateMetadata("Senior Technical Mentor", null, null);
+                    _context.EnterpriseUsers.Add(backupMentorEu);
                 }
 
                 // HR account
@@ -400,7 +482,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(hrEmail);
-                    _context.EnterpriseUsers.Add(new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId, Position = "HR" });
+                    var hrEu = new EnterpriseUser { EnterpriseUserId = Guid.NewGuid(), UserId = user.UserId, EnterpriseId = ent.EnterpriseId };
+                    hrEu.UpdateMetadata("HR", null, null);
+                    _context.EnterpriseUsers.Add(hrEu);
+
                 }
             }
 
@@ -443,13 +528,14 @@ namespace IOCv2.Infrastructure.Persistence
                     .AnyAsync(eu => eu.UserId == wrongEnterpriseMentorUser.UserId && eu.EnterpriseId == rikkeiEnterprise.EnterpriseId, cancellationToken);
                 if (!hasWrongEnterpriseEu)
                 {
-                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    var wrongEntEu = new EnterpriseUser
                     {
                         EnterpriseUserId = SeedIds.SwaggerWrongEnterpriseMentorEuId,
                         UserId = wrongEnterpriseMentorUser.UserId,
-                        EnterpriseId = rikkeiEnterprise.EnterpriseId,
-                        Position = "[SWAGGER-UNHAPPY] Mentor belongs to other enterprise"
-                    });
+                        EnterpriseId = rikkeiEnterprise.EnterpriseId
+                    };
+                    wrongEntEu.UpdateMetadata("[SWAGGER-UNHAPPY] Mentor belongs to other enterprise", null, null);
+                    _context.EnterpriseUsers.Add(wrongEntEu);
                 }
 
                 var notMentorEmail = "swagger.unhappy.not-mentor@fptsoftware.com";
@@ -483,13 +569,14 @@ namespace IOCv2.Infrastructure.Persistence
                     .AnyAsync(eu => eu.UserId == notMentorUser.UserId && eu.EnterpriseId == fptEnterprise.EnterpriseId, cancellationToken);
                 if (!hasNotMentorEu)
                 {
-                    _context.EnterpriseUsers.Add(new EnterpriseUser
+                    var notMentorEu = new EnterpriseUser
                     {
                         EnterpriseUserId = SeedIds.SwaggerNotMentorEuId,
                         UserId = notMentorUser.UserId,
-                        EnterpriseId = fptEnterprise.EnterpriseId,
-                        Position = "[SWAGGER-UNHAPPY] Role is HR, not Mentor"
-                    });
+                        EnterpriseId = fptEnterprise.EnterpriseId
+                    };
+                    notMentorEu.UpdateMetadata("[SWAGGER-UNHAPPY] Role is HR, not Mentor", null, null);
+                    _context.EnterpriseUsers.Add(notMentorEu);
                 }
             }
            
@@ -510,7 +597,10 @@ namespace IOCv2.Infrastructure.Persistence
                     user.SetStatus(UserStatus.Active);
                     _context.Users.Add(user);
                     existingEmails.Add(uniAdminEmail);
-                    _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId, Position = "School Administrator" });
+                    var schoolAdminUu = new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user.UserId, UniversityId = uni.UniversityId };
+                    schoolAdminUu.UpdateMetadata("School Administrator", null, null);
+                    _context.UniversityUsers.Add(schoolAdminUu);
+
                 }
             }
 
@@ -617,6 +707,102 @@ namespace IOCv2.Infrastructure.Persistence
                 student6.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student6_cv.pdf");
 
                 _context.Students.Add(student6);
+            }
+
+            // Student11 — seeded for UniAssign placement flow
+            var student11Email = "student11@fptu.edu.vn";
+            if (!existingEmails.Contains(student11Email))
+            {
+                var userId11 = SeedIds.Student11UserId;
+                var userCode11 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user11 = new User(userId11, userCode11, student11Email, "Lý Thị Mai", UserRole.Student, passHash);
+                user11.UpdateProfile(user11.FullName, $"098765{phoneCounter++}", null, UserGender.Female, new DateOnly(2003, 5, 15), "Hà Nội");
+                user11.SetStatus(UserStatus.Active);
+                _context.Users.Add(user11);
+                existingEmails.Add(student11Email);
+                var uni11 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user11.UserId, UniversityId = uni11.UniversityId });
+                _context.Students.Add(new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user11.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Information Technology",
+                    ClassName = "IT1620"
+                });
+            }
+
+            // Student12 — seeded for SelfApply placement flow (has CV)
+            var student12Email = "student12@fptu.edu.vn";
+            if (!existingEmails.Contains(student12Email))
+            {
+                var userId12 = SeedIds.Student12UserId;
+                var userCode12 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user12 = new User(userId12, userCode12, student12Email, "Phan Văn Khoa", UserRole.Student, passHash);
+                user12.UpdateProfile(user12.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(2003, 8, 20), "TP. Hồ Chí Minh");
+                user12.SetStatus(UserStatus.Active);
+                _context.Users.Add(user12);
+                existingEmails.Add(student12Email);
+                var uni12 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user12.UserId, UniversityId = uni12.UniversityId });
+                var student12Rec = new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user12.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Software Engineering",
+                    ClassName = "SE1621"
+                };
+                student12Rec.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf");
+                _context.Students.Add(student12Rec);
+            }
+
+            // Student13 — seeded for UniAssign placement flow
+            var student13Email = "student13@fptu.edu.vn";
+            if (!existingEmails.Contains(student13Email))
+            {
+                var userId13 = SeedIds.Student13UserId;
+                var userCode13 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user13 = new User(userId13, userCode13, student13Email, "Võ Thành Trung", UserRole.Student, passHash);
+                user13.UpdateProfile(user13.FullName, $"098765{phoneCounter++}", null, UserGender.Male, new DateOnly(2003, 11, 10), "Hà Nội");
+                user13.SetStatus(UserStatus.Active);
+                _context.Users.Add(user13);
+                existingEmails.Add(student13Email);
+                var uni13 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user13.UserId, UniversityId = uni13.UniversityId });
+                _context.Students.Add(new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user13.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Information Technology",
+                    ClassName = "IT1621"
+                });
+            }
+
+            // Student14 — seeded for SelfApply placement flow
+            var student14Email = "student14@fptu.edu.vn";
+            if (!existingEmails.Contains(student14Email))
+            {
+                var userId14 = SeedIds.Student14UserId;
+                var userCode14 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
+                var user14 = new User(userId14, userCode14, student14Email, "Nguyễn Thảo Ngân", UserRole.Student, passHash);
+                user14.UpdateProfile(user14.FullName, $"098765{phoneCounter++}", null, UserGender.Female, new DateOnly(2003, 12, 12), "TP. Hồ Chí Minh");
+                user14.SetStatus(UserStatus.Active);
+                _context.Users.Add(user14);
+                existingEmails.Add(student14Email);
+                var uni14 = universityList.First(u => u.Code == "FPTU");
+                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user14.UserId, UniversityId = uni14.UniversityId });
+                var student14Rec = new Student
+                {
+                    StudentId = Guid.NewGuid(),
+                    UserId = user14.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major = "Software Engineering",
+                    ClassName = "SE1622"
+                };
+                student14Rec.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf");
+                _context.Students.Add(student14Rec);
             }
 
             await _context.SaveChangesAsync();
@@ -730,7 +916,7 @@ namespace IOCv2.Infrastructure.Persistence
                         .AnyAsync(p => p.EnterpriseId == enterpriseId && p.Name == name))
                     return;
 
-                var phase = InternshipPhase.Create(enterpriseId, name, start, end, majorFields, capacity, description);
+                var phase = InternshipPhase.Create(enterpriseId, name, start, end, majorFields, capacity, description, targetStatus);
 
                 if (targetStatus != InternshipPhaseStatus.Draft)
                     phase.UpdateInfo(name, start, end, majorFields, capacity, description, targetStatus);
@@ -1010,6 +1196,11 @@ namespace IOCv2.Infrastructure.Persistence
             if (fptUniversity == null)
                 return;
 
+            students.TryGetValue("student11@fptu.edu.vn", out var s11);
+            students.TryGetValue("student12@fptu.edu.vn", out var s12);
+            students.TryGetValue("student13@fptu.edu.vn", out var s13);
+            students.TryGetValue("student14@fptu.edu.vn", out var s14);
+
             var hrFptEu = await _context.EnterpriseUsers
                 .Include(eu => eu.User)
                 .FirstOrDefaultAsync(eu => eu.EnterpriseId == fsoft.EnterpriseId && eu.User.Role == UserRole.HR);
@@ -1099,11 +1290,11 @@ namespace IOCv2.Infrastructure.Persistence
                 "https://iocv2-test-resources.s3.amazonaws.com/resumes/student4_cv.pdf", fptBackendJob.Title);
 
             await EnsureApplication(
-                fsoft.EnterpriseId, spring2026.TermId, s5.StudentId,
-                fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
-                DateTime.UtcNow.AddDays(-9), null, null,
+                rikkeisoft.EnterpriseId, spring2026.TermId, s5.StudentId,
+                rikkeiBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
+                DateTime.UtcNow.AddDays(-18), DateTime.UtcNow.AddDays(-15), hrRikkeiEu?.EnterpriseUserId,
                 fptUniversity.UniversityId, null,
-                null, fptQaJob.Title);
+                null, rikkeiBackendJob.Title);
 
             await EnsureApplication(
                 fsoft.EnterpriseId, spring2026.TermId, s8.StudentId,
@@ -1141,6 +1332,50 @@ namespace IOCv2.Infrastructure.Persistence
                 DateTime.UtcNow.AddDays(-5), null, null,
                 fptUniversity.UniversityId, null,
                 null, rikkeiMobileJob.Title);
+
+            // Student 11: UniAssign placement flow -> FPT Software Spring 2026 (Job: FPT QA Automation Intern)
+            if (s11 != null)
+            {
+                 await EnsureApplication(
+                    fsoft.EnterpriseId, spring2026.TermId, s11.StudentId,
+                    fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                    DateTime.UtcNow.AddDays(-4), null, null,
+                    fptUniversity.UniversityId, null,
+                    null, fptQaJob.Title);
+            }
+
+            // Student 12: SelfApply flow -> FPT Software Spring 2026 (Job: FPT Backend Platform Intern)
+            if (s12 != null)
+            {
+                 await EnsureApplication(
+                    fsoft.EnterpriseId, spring2026.TermId, s12.StudentId,
+                    fptBackendJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
+                    DateTime.UtcNow.AddDays(-2), null, null,
+                    null, null,
+                    "https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf", fptBackendJob.Title);
+            }
+
+            // Student 13: UniAssign placement flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Java Backend Intern)
+            if (s13 != null)
+            {
+                 await EnsureApplication(
+                    rikkeisoft.EnterpriseId, spring2026.TermId, s13.StudentId,
+                    rikkeiBackendJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                    DateTime.UtcNow.AddDays(-1), null, null,
+                    fptUniversity.UniversityId, null,
+                    null, rikkeiBackendJob.Title);
+            }
+
+            // Student 14: SelfApply flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Mobile Flutter Intern)
+            if (s14 != null)
+            {
+                 await EnsureApplication(
+                    rikkeisoft.EnterpriseId, spring2026.TermId, s14.StudentId,
+                    rikkeiMobileJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
+                    DateTime.UtcNow.AddDays(0), null, null,
+                    null, null,
+                    "https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf", rikkeiMobileJob.Title);
+            }
 
             // Historical record for old term.
             await EnsureApplication(
@@ -1219,7 +1454,7 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Sprints.Add(cancelledSprint);
 
                 _context.WorkItems.AddRange(
-                    new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = projPending.ProjectId, Title = "Gather Requirements", Type = WorkItemType.Task, Status = WorkItemStatus.Cancelled, AssigneeId = null, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15)) },
+                    new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = projPending.ProjectId, Title = "Gather Requirements", Type = WorkItemType.Task, Status = WorkItemStatus.Todo, AssigneeId = null, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15)) },
                     new WorkItem { WorkItemId = Guid.NewGuid(), ProjectId = projPending.ProjectId, Title = "Initial Design", Type = WorkItemType.Task, Status = WorkItemStatus.Todo, AssigneeId = null, DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20)) }
                 );
 
@@ -1406,6 +1641,8 @@ namespace IOCv2.Infrastructure.Persistence
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
             var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
             var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
+            var s11 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student11@fptu.edu.vn");
+            var s12 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student12@fptu.edu.vn");
 
             // FPT Software OJT Team Alpha: s1(Leader), s2(Member), s3(Member), s6(Member)
             bool fptHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == fptGroup.InternshipId);
@@ -1451,6 +1688,7 @@ namespace IOCv2.Infrastructure.Persistence
             var s2 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student2@fptu.edu.vn");
             var s3 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student3@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
+            var s12 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student12@fptu.edu.vn");
 
             if (proj3 == null || proj5 == null || s3 == null || s5 == null || !proj3.InternshipId.HasValue || !proj5.InternshipId.HasValue) return;
 

@@ -16,6 +16,76 @@ namespace IOCv2.Tests.Features.ProjectResources.Commands;
 public class UploadProjectResourceHandlerTests
 {
     [Fact]
+    public async Task Handle_MentorUpload_ShouldSetUploadedBy()
+    {
+        var internshipId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var mentorEnterpriseUserId = Guid.NewGuid();
+
+        var project = Project.Create("Demo", string.Empty, "PRJ-DEMO_DMO_MU", "IT", "Requirements", mentorId: mentorEnterpriseUserId);
+        project.AssignToGroup(internshipId, null, null);
+
+        var projectRepo = new Mock<IGenericRepository<Project>>();
+        projectRepo.Setup(x => x.ExistsAsync(It.IsAny<Expression<Func<Project, bool>>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        projectRepo.Setup(x => x.Query()).Returns(new List<Project> { project }.AsQueryable().BuildMock());
+
+        var enterpriseUserRepo = new Mock<IGenericRepository<EnterpriseUser>>();
+        enterpriseUserRepo.Setup(x => x.Query())
+            .Returns(new List<EnterpriseUser> { new() { EnterpriseUserId = mentorEnterpriseUserId, UserId = userId } }.AsQueryable().BuildMock());
+
+        IOCv2.Domain.Entities.ProjectResources? capturedResource = null;
+        var resourceRepo = new Mock<IGenericRepository<IOCv2.Domain.Entities.ProjectResources>>();
+        resourceRepo.Setup(x => x.AddAsync(It.IsAny<IOCv2.Domain.Entities.ProjectResources>(), It.IsAny<CancellationToken>()))
+            .Callback<IOCv2.Domain.Entities.ProjectResources, CancellationToken>((r, _) => capturedResource = r)
+            .ReturnsAsync((IOCv2.Domain.Entities.ProjectResources src, CancellationToken _) => src);
+
+        var uow = new Mock<IUnitOfWork>();
+        uow.Setup(x => x.Repository<Project>()).Returns(projectRepo.Object);
+        uow.Setup(x => x.Repository<EnterpriseUser>()).Returns(enterpriseUserRepo.Object);
+        uow.Setup(x => x.Repository<IOCv2.Domain.Entities.ProjectResources>()).Returns(resourceRepo.Object);
+        uow.Setup(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        uow.Setup(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        uow.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        var mapper = new Mock<IMapper>();
+        mapper.Setup(x => x.Map<UploadProjectResourceResponse>(It.IsAny<IOCv2.Domain.Entities.ProjectResources>()))
+            .Returns(new UploadProjectResourceResponse { ResourceType = FileType.LINK, ResourceUrl = "https://example.com" });
+
+        var currentUser = new Mock<ICurrentUserService>();
+        currentUser.Setup(x => x.UserId).Returns(userId.ToString());
+        currentUser.Setup(x => x.Role).Returns("Mentor");
+
+        var message = new Mock<IMessageService>();
+        message.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("ok");
+
+        var cache = new Mock<ICacheService>();
+        cache.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        cache.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        var handler = new UploadProjectResourceHandler(
+            uow.Object,
+            mapper.Object,
+            Mock.Of<ILogger<UploadProjectResourceHandler>>(),
+            Mock.Of<IFileStorageService>(),
+            currentUser.Object,
+            message.Object,
+            cache.Object);
+
+        var result = await handler.Handle(new UploadProjectResourceCommand
+        {
+            ProjectId = project.ProjectId,
+            ResourceName = "Docs",
+            ResourceType = FileType.LINK,
+            ExternalUrl = "https://example.com"
+        }, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        capturedResource.Should().NotBeNull();
+        capturedResource!.UploadedBy.Should().Be(mentorEnterpriseUserId);
+    }
+
+    [Fact]
     public async Task Handle_SavesExternalLink_WhenExternalUrlProvided()
     {
         var projectId = Guid.NewGuid();

@@ -61,6 +61,9 @@ public partial class AppDbContext : DbContext
     //Violation Reports
     public DbSet<ViolationReport> ViolationReports { get; set; } = null!;
 
+    // Public Holidays (used for missing logbook date calculations)
+    public DbSet<PublicHoliday> PublicHolidays { get; set; } = null!;
+
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

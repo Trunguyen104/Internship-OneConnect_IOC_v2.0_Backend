@@ -255,6 +255,9 @@
   <data name="Common.Forbidden" xml:space="preserve">
     <value>Bạn không có quyền thực hiện hành động này.</value>
   </data>
+  <data name="Common.InternalError" xml:space="preserve">
+    <value>Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.</value>
+  </data>
   <data name="Common.AccessDenied" xml:space="preserve">
     <value>Truy cập bị từ chối.</value>
   </data>
@@ -601,10 +604,10 @@
     <value>Mã sinh viên không được để trống.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
-    <value>Mã sinh viên không hợp lệ. Chỉ được dùng chữ cái thường (a-z), chữ số (0-9) và các ký tự -, _, .</value>
+    <value>Mã sinh viên không hợp lệ. Chỉ được dùng chữ cái và chữ số, phải có ít nhất 1 chữ cái và 1 chữ số (ví dụ: SV001), không chứa ký tự đặc biệt.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalidDetail" xml:space="preserve">
-    <value>Mã sinh viên không hợp lệ (chỉ cho phép a-z, 0-9, -, _, .).</value>
+    <value>Mã sinh viên không hợp lệ (phải gồm chữ cái + chữ số, không chứa ký tự đặc biệt).</value>
   </data>
   <data name="StudentTerms.StudentCodeDuplicateInFile" xml:space="preserve">
     <value>Mã sinh viên này xuất hiện nhiều hơn một lần trong file. Vui lòng xóa các dòng trùng lặp trước khi import.</value>
@@ -720,8 +723,8 @@
   <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
     <value>Không thể xóa sinh viên khỏi hệ thống vì sinh viên vẫn còn đăng ký ở kỳ thực tập khác.</value>
   </data>
-  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
-    <value>Đăng ký thực tập đã được khôi phục thành công. Sinh viên trở lại trạng thái Active trong kỳ thực tập.</value>
+  <data name="StudentTerms.CannotDeleteFromSystemHasRelatedData" xml:space="preserve">
+    <value>Không thể xóa cứng sinh viên vì vẫn còn dữ liệu liên quan ràng buộc trong hệ thống.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
     <value>Rút hàng loạt sinh viên thành công. Các sinh viên đang có vị trí thực tập (Placed) đã được bỏ qua tự động và không bị ảnh hưởng.</value>
@@ -749,9 +752,6 @@
   </data>
   <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
     <value>Sinh viên {0} đã bị rút khỏi kỳ thực tập bởi {1}.</value>
-  </data>
-  <data name="StudentTerms.Log.Restored" xml:space="preserve">
-    <value>Sinh viên {0} đã được khôi phục vào kỳ thực tập bởi {1}.</value>
   </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
     <value>Đã rút {0} sinh viên khỏi kỳ thực tập {1} bởi {2}.</value>
@@ -791,6 +791,9 @@
   </data>
   <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
     <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="Terms.EndDateMustBeAtLeastOneMonthAfterStart" xml:space="preserve">
+    <value>Ngày kết thúc phải cách ngày bắt đầu ít nhất 1 tháng.</value>
   </data>
   <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Ngày bắt đầu không được là ngày trong quá khứ.</value>
@@ -1282,26 +1285,26 @@
   <data name="JobPosting.CreateSuccess" xml:space="preserve">
     <value>Đã tạo thành công tin tuyển dụng.</value>
   </data>
-  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
-  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+  <!-- ActivePhases (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Phiên đăng nhập không hợp lệ. Vui lòng đăng xuất và đăng nhập lại.</value>
   </data>
-  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+  <data name="ActivePhases.EnterpriseUserNotFound" xml:space="preserve">
     <value>Không tìm thấy thông tin nhân viên doanh nghiệp của bạn. Vui lòng liên hệ quản trị viên để kiểm tra tài khoản.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForEnterprise" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForEnterprise" xml:space="preserve">
     <value>Doanh nghiệp của bạn hiện chưa có nhóm thực tập nào đang hoạt động trong kỳ thực tập nào.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForMentor" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForMentor" xml:space="preserve">
     <value>Bạn chưa được phân công nhóm thực tập nào đang hoạt động trong kỳ thực tập hiện tại.</value>
   </data>
-  <data name="ActiveTerms.SystemError" xml:space="preserve">
+  <data name="ActivePhases.SystemError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi tải danh sách kỳ thực tập đang hoạt động. Vui lòng thử lại sau.</value>
   </data>
-  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+  <data name="ActivePhases.Log.Retrieved" xml:space="preserve">
     <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
   </data>
-  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+  <data name="ActivePhases.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
   <data name="Projects.MentorNotFound" xml:space="preserve">

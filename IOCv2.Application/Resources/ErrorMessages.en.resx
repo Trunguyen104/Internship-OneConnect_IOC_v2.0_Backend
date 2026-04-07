@@ -141,6 +141,12 @@
   <data name="Common.NoPermission" xml:space="preserve">
     <value>You do not have permission to perform this action</value>
   </data>
+  <data name="Common.Forbidden" xml:space="preserve">
+    <value>You do not have permission to perform this action.</value>
+  </data>
+  <data name="Common.InternalError" xml:space="preserve">
+    <value>An internal error occurred. Please try again later.</value>
+  </data>
   <data name="Password.MinLength" xml:space="preserve">
     <value>Password must be at least 8 characters long.</value>
   </data>
@@ -467,10 +473,10 @@
     <value>Student code is required.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
-    <value>Student code is invalid. Only lowercase letters (a-z), digits (0-9), and the characters -, _, . are allowed.</value>
+    <value>Student code is invalid. Use letters and digits only, include at least one letter and one digit (e.g., SV001), and do not use special characters.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalidDetail" xml:space="preserve">
-    <value>Student code is invalid (only a-z, 0-9, -, _, . are allowed).</value>
+    <value>Student code is invalid (must contain letters and digits only, with no special characters).</value>
   </data>
   <data name="StudentTerms.StudentCodeDuplicateInFile" xml:space="preserve">
     <value>This student code appears more than once in the file. Please remove duplicate rows before importing.</value>
@@ -586,8 +592,8 @@
   <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
     <value>Cannot delete this student from the system because they are still enrolled in another term.</value>
   </data>
-  <data name="StudentTerms.RestoreSuccess" xml:space="preserve">
-    <value>Enrollment has been successfully restored. The student is now Active in the term again.</value>
+  <data name="StudentTerms.CannotDeleteFromSystemHasRelatedData" xml:space="preserve">
+    <value>Cannot hard-delete this student because related data still references this record.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
     <value>Bulk withdrawal completed successfully. Students with an active placement (Placed) were automatically skipped and remain unaffected.</value>
@@ -615,9 +621,6 @@
   </data>
   <data name="StudentTerms.Log.Withdrawn" xml:space="preserve">
     <value>Student {0} withdrawn from term by {1}.</value>
-  </data>
-  <data name="StudentTerms.Log.Restored" xml:space="preserve">
-    <value>Student {0} restored to term by {1}.</value>
   </data>
   <data name="StudentTerms.Log.BulkWithdrawn" xml:space="preserve">
     <value>{0} students withdrawn from term {1} by {2}.</value>
@@ -657,6 +660,9 @@
   </data>
   <data name="Terms.EndDateMustBeAfterStart" xml:space="preserve">
     <value>End date must be after start date.</value>
+  </data>
+  <data name="Terms.EndDateMustBeAtLeastOneMonthAfterStart" xml:space="preserve">
+    <value>End date must be at least 1 month after start date.</value>
   </data>
   <data name="Terms.StartDateInPast" xml:space="preserve">
     <value>Start date cannot be in the past.</value>
@@ -1226,26 +1232,26 @@
     <value>An error occurred while retrieving violation report details.</value>
   </data>
 
-  <!-- ActiveTerms (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
-  <data name="ActiveTerms.InvalidUserId" xml:space="preserve">
+  <!-- ActivePhases (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Your session is invalid. Please sign out and sign in again.</value>
   </data>
-  <data name="ActiveTerms.EnterpriseUserNotFound" xml:space="preserve">
+  <data name="ActivePhases.EnterpriseUserNotFound" xml:space="preserve">
     <value>Your enterprise employee profile was not found. Please contact the administrator to verify your account.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForEnterprise" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForEnterprise" xml:space="preserve">
     <value>Your enterprise currently has no active internship groups in any ongoing term.</value>
   </data>
-  <data name="ActiveTerms.NoActiveTermsFoundForMentor" xml:space="preserve">
+  <data name="ActivePhases.NoActivePhasesFoundForMentor" xml:space="preserve">
     <value>You have not been assigned to any active internship group in the current term.</value>
   </data>
-  <data name="ActiveTerms.SystemError" xml:space="preserve">
+  <data name="ActivePhases.SystemError" xml:space="preserve">
     <value>An error occurred while loading the active internship terms. Please try again later.</value>
   </data>
-  <data name="ActiveTerms.Log.Retrieved" xml:space="preserve">
+  <data name="ActivePhases.Log.Retrieved" xml:space="preserve">
     <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
   </data>
-  <data name="ActiveTerms.Log.Error" xml:space="preserve">
+  <data name="ActivePhases.Log.Error" xml:space="preserve">
     <value>Error retrieving active terms for enterprise user {0}</value>
   </data>
   <data name="Projects.MentorNotFound" xml:space="preserve">

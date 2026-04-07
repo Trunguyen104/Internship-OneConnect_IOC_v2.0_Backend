@@ -177,7 +177,8 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("background_url");
 
                     b.Property<string>("ContactEmail")
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("contact_email");
 
                     b.Property<DateTime>("CreatedAt")
@@ -660,6 +661,10 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("uuid")
                         .HasColumnName("enterprise_id");
+
+                    b.Property<Guid?>("InternPhaseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("intern_phase_id");
 
                     b.Property<Guid?>("InternshipGroupInternshipId")
                         .HasColumnType("uuid")
@@ -1461,6 +1466,53 @@ namespace IOCv2.Infrastructure.Migrations
                     b.ToTable("project_resources", (string)null);
                 });
 
+            modelBuilder.Entity("IOCv2.Domain.Entities.PublicHoliday", b =>
+                {
+                    b.Property<Guid>("PublicHolidayId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("public_holiday_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("PublicHolidayId")
+                        .HasName("pk_public_holidays");
+
+                    b.HasIndex("Date")
+                        .IsUnique()
+                        .HasDatabaseName("ix_public_holidays_date")
+                        .HasFilter("deleted_at IS NULL");
+
+                    b.ToTable("public_holidays", (string)null);
+                });
+
             modelBuilder.Entity("IOCv2.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("RefreshTokenId")
@@ -2050,7 +2102,8 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("code");
 
                     b.Property<string>("ContactEmail")
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("contact_email");
 
                     b.Property<DateTime>("CreatedAt")
@@ -2079,7 +2132,7 @@ namespace IOCv2.Infrastructure.Migrations
                     b.Property<short>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
+                        .HasDefaultValue((short)2)
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -2218,8 +2271,8 @@ namespace IOCv2.Infrastructure.Migrations
                         .HasColumnName("password_hash");
 
                     b.Property<string>("PhoneNumber")
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("phone_number");
 
                     b.Property<short>("Role")
@@ -2242,8 +2295,8 @@ namespace IOCv2.Infrastructure.Migrations
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
                         .HasColumnName("user_code");
 
                     b.HasKey("UserId")

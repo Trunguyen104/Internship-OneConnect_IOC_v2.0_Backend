@@ -16,6 +16,8 @@ namespace IOCv2.Domain.Enums
         Activate = 6,
         ResetPassword = 7,
         ChangeRole = 8,
-        EmailFailure = 9
+        EmailFailure = 9,
+        Assign = 10,
+        Unassign = 11
     }
 }

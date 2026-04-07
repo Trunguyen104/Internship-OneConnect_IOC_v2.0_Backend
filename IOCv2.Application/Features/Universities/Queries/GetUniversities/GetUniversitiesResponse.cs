@@ -1,4 +1,5 @@
 using IOCv2.Domain.Entities;
+using IOCv2.Domain.Enums;
 
 namespace IOCv2.Application.Features.Universities.Queries.GetUniversities;
 
@@ -28,11 +29,12 @@ public class GetUniversitiesResponse
     /// URL to the university logo thumbnail.
     /// </summary>
     public string? LogoUrl { get; set; }
+    public string? ContactEmail { get; set; }
 
     /// <summary>
-    /// Current status (1=Active, 0=Inactive, 2=Suspended).
+    /// Current status (1=Inactive, 2=Active).
     /// </summary>
-    public short Status { get; set; }
+    public UniversityStatus Status { get; set; }
 
     public static GetUniversitiesResponse FromEntity(University university)
     {
@@ -43,6 +45,7 @@ public class GetUniversitiesResponse
             Name = university.Name,
             Address = university.Address,
             LogoUrl = university.LogoUrl,
+            ContactEmail = university.ContactEmail,
             Status = university.Status
         };
     }

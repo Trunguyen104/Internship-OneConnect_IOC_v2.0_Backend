@@ -33,5 +33,10 @@ internal class CreateWorkItemValidator : AbstractValidator<CreateWorkItemCommand
             .GreaterThanOrEqualTo(0)
             .When(x => x.StoryPoint.HasValue)
             .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.StoryPointInvalid));
+
+        RuleFor(x => x.Status)
+            .IsInEnum()
+            .When(x => x.Status.HasValue)
+            .WithMessage(messageService.GetMessage(MessageKeys.WorkItem.StatusInvalid));
     }
 }

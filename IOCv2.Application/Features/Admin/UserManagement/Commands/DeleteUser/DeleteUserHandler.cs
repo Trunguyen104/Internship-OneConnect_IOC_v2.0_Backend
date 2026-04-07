@@ -131,23 +131,8 @@ namespace IOCv2.Application.Features.Admin.UserManagement.Commands.DeleteUser
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                // BR-USR-DL-04 & BR-USR-DL-05: revoke sessions + free unique constraints after soft delete
+                // BR-USR-DL-04 & BR-USR-DL-05: revoke sessions + mark soft delete
                 var now = DateTime.UtcNow;
-                var suffix = $"_deleted_{now:yyyyMMddHHmmssfff}";
-
-                // Update email/phone before soft-delete so unique indexes won't block future re-use
-                user.UpdateEmail($"{user.Email}{suffix}");
-                if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
-                {
-                    var newPhone = $"{user.PhoneNumber}{suffix}";
-                    user.UpdateProfile(
-                        user.FullName,
-                        newPhone,
-                        user.AvatarUrl,
-                        user.Gender,
-                        user.DateOfBirth,
-                        user.Address);
-                }
 
                 var activeTokens = await _unitOfWork.Repository<RefreshToken>()
                     .Query()

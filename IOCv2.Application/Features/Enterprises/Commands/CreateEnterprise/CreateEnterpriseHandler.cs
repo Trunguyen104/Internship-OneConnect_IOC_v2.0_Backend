@@ -21,13 +21,25 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
         private readonly IMapper _mapper;
         private readonly ICacheService _cacheService;
 
-        public CreateEnterpriseHandler(IUnitOfWork unitOfWork, IMessageService messageService, ILogger<CreateEnterpriseHandler> logger, IMapper mapper, ICacheService cacheService)
+        private readonly IEmailService _emailService;
+
+        private const string EmailDeliveryErrorMessage =
+            "Không thể tạo tài khoản do địa chỉ email không hợp lệ hoặc không thể nhận tin.";
+
+        public CreateEnterpriseHandler(
+            IUnitOfWork unitOfWork,
+            IMessageService messageService,
+            ILogger<CreateEnterpriseHandler> logger,
+            IMapper mapper,
+            ICacheService cacheService,
+            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _messageService = messageService;
             _logger = logger;
             _mapper = mapper;
             _cacheService = cacheService;
+            _emailService = emailService;
         }
 
         public async Task<Result<CreateEnterpriseResponse>> Handle(CreateEnterpriseCommand request, CancellationToken cancellationToken)
@@ -55,11 +67,36 @@ namespace IOCv2.Application.Features.Enterprises.Commands.CreateEnterprise
                     Address = request.Address,
                     Website = request.Website,
                     ContactEmail = request.ContactEmail,
-                    Status = (short)EnterpriseStatus.Active
+                    Status = EnterpriseStatus.Active
                 };
 
                 await _unitOfWork.Repository<Domain.Entities.Enterprise>().AddAsync(enterprise);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
+
+                if (!string.IsNullOrWhiteSpace(enterprise.ContactEmail))
+                {
+                    var enterpriseName = enterprise.Name ?? "Doanh nghiệp";
+                    var taxCode = enterprise.TaxCode ?? "";
+
+                    if (!_emailService.VerifyEmailMxRecordSync(enterprise.ContactEmail))
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<CreateEnterpriseResponse>.Failure(EmailDeliveryErrorMessage);
+                    }
+
+                    var sent = await _emailService.SendEnterpriseCreationEmailAsync(
+                        enterprise.ContactEmail,
+                        enterpriseName,
+                        taxCode,
+                        cancellationToken);
+
+                    if (!sent)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return Result<CreateEnterpriseResponse>.Failure(EmailDeliveryErrorMessage);
+                    }
+                }
+
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 // 3. Post-commit operations (Cache invalidation)
