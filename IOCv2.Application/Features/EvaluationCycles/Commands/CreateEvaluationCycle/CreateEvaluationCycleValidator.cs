@@ -20,7 +20,7 @@ public class CreateEvaluationCycleValidator : AbstractValidator<CreateEvaluation
 
         RuleFor(x => x.EndDate)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.EvaluationCycle.EndDateRequired))
-            .GreaterThan(x => x.StartDate)
+            .Must((cmd, endDate) => endDate.Date > cmd.StartDate.Date)
             .WithMessage(messageService.GetMessage(MessageKeys.EvaluationCycle.EndDateMustBeAfterStart));
     }
 }
