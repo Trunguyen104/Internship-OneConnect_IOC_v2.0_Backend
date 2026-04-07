@@ -865,6 +865,7 @@ namespace IOCv2.Application.Constants
             public const string InvalidExcelHeaderEmpty = "StudentTerms.InvalidExcelHeaderEmpty";
             public const string TooManyRows = "StudentTerms.TooManyRows";
             public const string CannotDeleteFromSystemHasOtherTerms = "StudentTerms.CannotDeleteFromSystemHasOtherTerms";
+            public const string CannotDeleteFromSystemHasRelatedData = "StudentTerms.CannotDeleteFromSystemHasRelatedData";
 
             // Validation — TermId / StudentTermId
             public const string TermIdRequired = "StudentTerms.TermIdRequired";

@@ -14,7 +14,7 @@ public class AddStudentManualValidator : AbstractValidator<AddStudentManualComma
 
         RuleFor(x => x.StudentCode)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeRequired))
-            .Matches(@"^[a-zA-Z0-9\-_\.]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInvalid));
+            .Matches(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$").WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.StudentCodeInvalid));
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage(messageService.GetMessage(MessageKeys.StudentTerms.EmailRequired))

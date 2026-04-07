@@ -473,10 +473,10 @@
     <value>Student code is required.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalid" xml:space="preserve">
-    <value>Student code is invalid. Only lowercase letters (a-z), digits (0-9), and the characters -, _, . are allowed.</value>
+    <value>Student code is invalid. Use letters and digits only, include at least one letter and one digit (e.g., SV001), and do not use special characters.</value>
   </data>
   <data name="StudentTerms.StudentCodeInvalidDetail" xml:space="preserve">
-    <value>Student code is invalid (only a-z, 0-9, -, _, . are allowed).</value>
+    <value>Student code is invalid (must contain letters and digits only, with no special characters).</value>
   </data>
   <data name="StudentTerms.StudentCodeDuplicateInFile" xml:space="preserve">
     <value>This student code appears more than once in the file. Please remove duplicate rows before importing.</value>
@@ -591,6 +591,9 @@
   </data>
   <data name="StudentTerms.CannotDeleteFromSystemHasOtherTerms" xml:space="preserve">
     <value>Cannot delete this student from the system because they are still enrolled in another term.</value>
+  </data>
+  <data name="StudentTerms.CannotDeleteFromSystemHasRelatedData" xml:space="preserve">
+    <value>Cannot hard-delete this student because related data still references this record.</value>
   </data>
   <data name="StudentTerms.BulkWithdrawSuccess" xml:space="preserve">
     <value>Bulk withdrawal completed successfully. Students with an active placement (Placed) were automatically skipped and remain unaffected.</value>

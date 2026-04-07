@@ -121,6 +121,7 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
         {
             var now = DateTime.UtcNow;
             var userIds = deletable.Select(st => st.Student.User.UserId).Distinct().ToList();
+            var studentIds = deletable.Select(st => st.StudentId).Distinct().ToList();
 
             var activeTokens = await _unitOfWork.Repository<RefreshToken>()
                 .Query()
@@ -133,6 +134,66 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
                 token.UpdatedAt = now;
                 await _unitOfWork.Repository<RefreshToken>().UpdateAsync(token, cancellationToken);
             }
+
+            var relatedApplications = await _unitOfWork.Repository<InternshipApplication>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => studentIds.Contains(x.StudentId))
+                .ToListAsync(cancellationToken);
+
+            foreach (var application in relatedApplications)
+            {
+                await _unitOfWork.Repository<InternshipApplication>().HardDeleteAsync(application, cancellationToken);
+            }
+
+            var relatedInternshipMembers = await _unitOfWork.Repository<InternshipStudent>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => studentIds.Contains(x.StudentId))
+                .ToListAsync(cancellationToken);
+
+            foreach (var member in relatedInternshipMembers)
+            {
+                await _unitOfWork.Repository<InternshipStudent>().HardDeleteAsync(member, cancellationToken);
+            }
+
+            var relatedLogbooks = await _unitOfWork.Repository<Logbook>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId.HasValue && studentIds.Contains(x.StudentId.Value))
+                .ToListAsync(cancellationToken);
+
+            foreach (var logbook in relatedLogbooks)
+            {
+                await _unitOfWork.Repository<Logbook>().HardDeleteAsync(logbook, cancellationToken);
+            }
+
+            var relatedEvaluations = await _unitOfWork.Repository<Evaluation>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId.HasValue && studentIds.Contains(x.StudentId.Value))
+                .ToListAsync(cancellationToken);
+
+            foreach (var evaluation in relatedEvaluations)
+            {
+                await _unitOfWork.Repository<Evaluation>().HardDeleteAsync(evaluation, cancellationToken);
+            }
+
+            var relatedViolationReports = await _unitOfWork.Repository<ViolationReport>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => studentIds.Contains(x.StudentId))
+                .ToListAsync(cancellationToken);
+
+            foreach (var violationReport in relatedViolationReports)
+            {
+                await _unitOfWork.Repository<ViolationReport>().HardDeleteAsync(violationReport, cancellationToken);
+            }
+
+            await _unitOfWork.Repository<AuditLog>().ExecuteUpdateAsync(
+                x => x.PerformedById.HasValue && userIds.Contains(x.PerformedById.Value),
+                s => s.SetProperty(x => x.PerformedById, x => null),
+                cancellationToken);
 
             foreach (var st in deletable)
             {
@@ -154,6 +215,14 @@ public class BulkWithdrawStudentsHandler : IRequestHandler<BulkWithdrawStudentsC
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Failed to hard-delete students in bulk withdraw flow for term {TermId}", request.TermId);
+
+            return Result<BulkWithdrawStudentsResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.CannotDeleteFromSystemHasRelatedData));
         }
         catch
         {
