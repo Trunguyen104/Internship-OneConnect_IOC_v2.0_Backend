@@ -69,11 +69,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
             {
                 return Result<QuickEnterpriseAssignmentResponse>.Failure("Internship phase start date is after its end date.", ResultErrorType.BadRequest);
             }
-            // Ensure the internship phase is within the term date range
-            if (internshipPhase.StartDate < term.StartDate || internshipPhase.EndDate > term.EndDate)
-            {
-                return Result<QuickEnterpriseAssignmentResponse>.Failure("Internship phase dates must be within the term start and end dates.", ResultErrorType.BadRequest);
-            }
+            
             // Ensure the internship phase has at least one job posting with status Published or Closed.
             var hasJobPosting = await _unitOfWork.Repository<Job>().Query()
                 .Where(j => j.InternshipPhaseId == internshipPhase.PhaseId && (j.Status == JobStatus.PUBLISHED || j.Status == JobStatus.CLOSED))
