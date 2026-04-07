@@ -133,11 +133,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkEnterpriseAssignment
                 {
                     return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.InternshipPhaseStartDateAfterEndDate), ResultErrorType.BadRequest);
                 }
-                // Ensure the internship phase is within the term date range
-                if (internshipPhase.StartDate < term.StartDate || internshipPhase.EndDate > term.EndDate)
-                {
-                    return Result<BulkEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.InternshipPhaseNotWithinTermDates), ResultErrorType.BadRequest);
-                }
+                
                 // Ensure the internship phase has at least one job posting with status Published or Closed.
                 var hasJobPosting = await _unitOfWork.Repository<Job>().Query()
                     .Where(j => j.InternshipPhaseId == internshipPhase.PhaseId && (j.Status == JobStatus.PUBLISHED || j.Status == JobStatus.CLOSED))
