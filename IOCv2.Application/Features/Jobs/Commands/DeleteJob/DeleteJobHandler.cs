@@ -83,7 +83,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
             {
                 InternshipApplicationStatus.Applied,
                 InternshipApplicationStatus.Interviewing,
-                InternshipApplicationStatus.Offered
+                InternshipApplicationStatus.Offered,
+                InternshipApplicationStatus.PendingAssignment
             };
 
             var activeApplications = job.InternshipApplications?
@@ -92,12 +93,12 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
 
             var activeCount = activeApplications.Count;
 
-            // If there are active applications and caller didn't confirm, return confirmation warning
-            if (activeCount > 0 && !request.ConfirmWhenHasActiveApplications)
+            // If there are active applications, block deletion and return message for frontend to confirm
+            if (activeCount > 0)
             {
-                var confirmMsg = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.DeleteConfirmHasActiveApplications, activeCount);
+                var message = _messageService.GetMessage(MessageKeys.JobPostingMessageKey.DeleteBlockedWhenAnyApplication, activeCount);
                 // Use Conflict so frontend can prompt user and call again with ConfirmWhenHasActiveApplications = true
-                return Result<DeleteJobResponse>.Failure(confirmMsg, ResultErrorType.Conflict);
+                return Result<DeleteJobResponse>.Failure(message, ResultErrorType.Conflict);
             }
 
             // Proceed to soft-delete (mark as Deleted)

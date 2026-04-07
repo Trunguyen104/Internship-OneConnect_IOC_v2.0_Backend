@@ -1216,87 +1216,6 @@
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Internship phase {0} detail loaded — {1} job posting(s), {2} placed student(s).</value>
   </data>
-  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
-    <value>You have not uploaded a CV. Please upload your CV before applying.</value>
-  </data>
-  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
-    <value>You are in Placed status and are not allowed to apply.</value>
-  </data>
-  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
-    <value>This position is currently not open for application.</value>
-  </data>
-  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
-    <value>The application deadline has passed.</value>
-  </data>
-  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
-    <value>There is currently no active internship period to apply for.</value>
-  </data>
-  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
-    <value>You already have an active application and cannot submit another one.</value>
-  </data>
-  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
-    <value>You have reached the application limit for this position.</value>
-  </data>
-  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
-    <value>{0} has applied for the position at {1} — {2}. Please review.</value>
-  </data>
-  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
-    <value>Application successful! Your application is pending HR review.</value>
-  </data>
-  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
-    <value>You are currently doing an internship.</value>
-  </data>
-  <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
-    <value>The internship phase has reached its maximum capacity.</value>
-  </data>
-  <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
-    <value>The application is not in Placed status.</value>
-  </data>
-  <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
-    <value>HR removed student from Placed list (ApplicationId: {0}, ByUserId: {1}).</value>
-  </data>
-  <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
-    <value>Dear student, enterprise {EnterpriseName} has removed you from their internship acceptance list.</value>
-  </data>
-  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
-    <value>Student {StudentName} has been removed from the internship acceptance list by enterprise {EnterpriseName}.</value>
-  </data>
-  <data name="StudentApplications.NotFound" xml:space="preserve">
-    <value>Application not found.</value>
-  </data>
-  <data name="StudentApplications.NotOwner" xml:space="preserve">
-    <value>You do not have permission to perform this action on this application.</value>
-  </data>
-  <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
-    <value>Only applications in Applied status can be withdrawn.</value>
-  </data>
-  <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
-    <value>Placed applications cannot be hidden.</value>
-  </data>
-  <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
-    <value>Only terminal applications (Rejected or Withdrawn) can be hidden.</value>
-  </data>
-  <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
-    <value>Application withdrawn successfully.</value>
-  </data>
-  <data name="StudentApplications.HideSuccess" xml:space="preserve">
-    <value>Application hidden from your list.</value>
-  </data>
-  <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
-    <value>{StudentName} has withdrawn their application for {JobTitle}.</value>
-  </data>
-  <data name="Validation.IdRequired" xml:space="preserve">
-    <value>Application ID is required.</value>
-  </data>
-  <data name="Validation.PageNumberInvalid" xml:space="preserve">
-    <value>PageNumber must be greater than or equal to 1.</value>
-  </data>
-  <data name="Validation.PageSizeInvalid" xml:space="preserve">
-    <value>PageSize must be greater than or equal to 1.</value>
-  </data>
-  <data name="Validation.InvalidStatus" xml:space="preserve">
-    <value>Status is invalid.</value>
-  </data>
   <data name="UniAssign.StudentsNotFound" xml:space="preserve">
     <value>Students not found: {0}</value>
   </data>
@@ -1339,7 +1258,6 @@
   <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
     <value>EnterpriseId is required.</value>
   </data>
-
   <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
     <value>ExpireDate {0} cannot be after internship phase start date {1}.</value>
   </data>
@@ -1445,5 +1363,88 @@
   <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
     <value>Your application has been automatically withdrawn because the recruitment phase ended.</value>
   </data>
-
+  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
+    <value>You have not uploaded a CV. Please upload your CV before applying.</value>
+  </data>
+  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
+    <value>You are in Placed status and are not allowed to apply.</value>
+  </data>
+  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
+    <value>This position is currently not open for application.</value>
+  </data>
+  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
+    <value>The application deadline has passed.</value>
+  </data>
+  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
+    <value>There is currently no active internship period to apply for.</value>
+  </data>
+  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
+    <value>You already have an active application and cannot submit another one.</value>
+  </data>
+  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
+    <value>You have reached the application limit for this position.</value>
+  </data>
+  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
+    <value>{0} has applied for the position at {1} — {2}. Please review.</value>
+  </data>
+  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
+    <value>Application successful! Your application is pending HR review.</value>
+  </data>
+  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
+    <value>You are currently doing an internship.</value>
+  </data>
+  <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
+    <value>The internship phase has reached its maximum capacity.</value>
+  </data>
+  <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
+    <value>The application is not in Placed status.</value>
+  </data>
+  <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
+    <value>HR removed student from Placed list (ApplicationId: {0}, ByUserId: {1}).</value>
+  </data>
+  <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
+    <value>Dear student, enterprise {EnterpriseName} has removed you from their internship acceptance list.</value>
+  </data>
+  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
+    <value>Student {StudentName} has been removed from the internship acceptance list by enterprise {EnterpriseName}.</value>
+  </data>
+  <data name="StudentApplications.NotFound" xml:space="preserve">
+    <value>Application not found.</value>
+  </data>
+  <data name="StudentApplications.NotOwner" xml:space="preserve">
+    <value>You do not have permission to perform this action on this application.</value>
+  </data>
+  <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
+    <value>Only applications in Applied status can be withdrawn.</value>
+  </data>
+  <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
+    <value>Placed applications cannot be hidden.</value>
+  </data>
+  <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
+    <value>Only terminal applications (Rejected or Withdrawn) can be hidden.</value>
+  </data>
+  <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
+    <value>Application withdrawn successfully.</value>
+  </data>
+  <data name="StudentApplications.HideSuccess" xml:space="preserve">
+    <value>Application hidden from your list.</value>
+  </data>
+  <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
+    <value>{StudentName} has withdrawn their application for {JobTitle}.</value>
+  </data>
+  <data name="Validation.IdRequired" xml:space="preserve">
+    <value>Application ID is required.</value>
+  </data>
+  <data name="Validation.PageNumberInvalid" xml:space="preserve">
+    <value>PageNumber must be greater than or equal to 1.</value>
+  </data>
+  <data name="Validation.PageSizeInvalid" xml:space="preserve">
+    <value>PageSize must be greater than or equal to 1.</value>
+  </data>
+  <data name="Validation.InvalidStatus" xml:space="preserve">
+    <value>Status is invalid.</value>
+  </data>
+  <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
+    <value>Cannot delete this job posting because it has {0} application.</value>
+  </data>
 </root>

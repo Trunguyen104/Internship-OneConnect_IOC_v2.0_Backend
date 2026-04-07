@@ -9,11 +9,5 @@ namespace IOCv2.Application.Features.Jobs.Commands.DeleteJob
     {
         [JsonIgnore]
         public Guid JobId { get; init; }
-
-        /// <summary>
-        /// If the job has active applications and this flag is true, proceed with delete.
-        /// If false and active applications exist, handler returns a warning (no DB change).
-        /// </summary>
-        public bool ConfirmWhenHasActiveApplications { get; init; } = false;
     }
 }
