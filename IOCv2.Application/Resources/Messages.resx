@@ -1339,7 +1339,6 @@
   <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
     <value>EnterpriseId là bắt buộc.</value>
   </data>
-
   <data name="JobPosting.ExpireDateCanNotBeAfterPhaseStartDate" xml:space="preserve">
     <value>Ngày hết hạn {0} không được sau ngày bắt đầu giai đoạn thực tập {1}.</value>
   </data>
@@ -1445,5 +1444,7 @@
   <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
     <value>Hệ thống tự động hủy đơn ứng tuyển vì giai đoạn tuyển dụng đã kết thúc.</value>
   </data>
-
+  <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
+    <value>Không thể xóa tin tuyển dụng này vì đã có {0} đơn ứng tuyển.</value>
+  </data>
 </root>
