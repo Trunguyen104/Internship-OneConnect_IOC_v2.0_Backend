@@ -352,6 +352,104 @@
   <data name="Epic.ProjectNotFound" xml:space="preserve">
     <value>Project not found.</value>
   </data>
+  <!-- Sprint -->
+  <data name="Sprint.ProjectIdRequired" xml:space="preserve">
+    <value>Project ID is required.</value>
+  </data>
+  <data name="Sprint.NameRequired" xml:space="preserve">
+    <value>Sprint name is required.</value>
+  </data>
+  <data name="Sprint.NameMaxLength" xml:space="preserve">
+    <value>Sprint name must not exceed 200 characters.</value>
+  </data>
+  <data name="Sprint.GoalMaxLength" xml:space="preserve">
+    <value>Sprint goal must not exceed 1000 characters.</value>
+  </data>
+  <data name="Sprint.StartDateRequired" xml:space="preserve">
+    <value>Start date is required.</value>
+  </data>
+  <data name="Sprint.EndDateRequired" xml:space="preserve">
+    <value>End date is required.</value>
+  </data>
+  <data name="Sprint.EndDateMustBeAfterStart" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="Sprint.DurationTooShort" xml:space="preserve">
+    <value>Sprint must last at least 7 days (1 week).</value>
+  </data>
+  <data name="Sprint.DurationTooLong" xml:space="preserve">
+    <value>Sprint must not exceed 28 days (4 weeks).</value>
+  </data>
+  <data name="Sprint.NotFound" xml:space="preserve">
+    <value>Sprint not found.</value>
+  </data>
+  <data name="Sprint.CannotDeleteActive" xml:space="preserve">
+    <value>Cannot delete an active or completed Sprint.</value>
+  </data>
+  <data name="Sprint.CannotDeleteWithItems" xml:space="preserve">
+    <value>Cannot delete Sprint that still has Work Items. Please move all items first.</value>
+  </data>
+  <data name="Sprint.AlreadyActive" xml:space="preserve">
+    <value>Sprint has already been started.</value>
+  </data>
+  <data name="Sprint.NotPlanned" xml:space="preserve">
+    <value>Sprint must be in Planned status before it can be started.</value>
+  </data>
+  <data name="Sprint.ActiveSprintExists" xml:space="preserve">
+    <value>The project already has an Active Sprint. Only one Sprint can be active at a time.</value>
+  </data>
+  <data name="Sprint.NotActive" xml:space="preserve">
+    <value>Sprint must be in Active status before it can be completed.</value>
+  </data>
+  <data name="Sprint.CannotEditCompleted" xml:space="preserve">
+    <value>Cannot edit a completed Sprint.</value>
+  </data>
+  <data name="Sprint.IdRequired" xml:space="preserve">
+    <value>Sprint ID is required.</value>
+  </data>
+  <data name="Sprint.CannotDeleteActiveSprint" xml:space="preserve">
+    <value>Cannot delete an Active or Completed Sprint. Only Planned Sprints can be deleted.</value>
+  </data>
+  <data name="Sprint.CannotDeleteWithWorkItems" xml:space="preserve">
+    <value>Cannot delete a Sprint that contains Work Items. Please move or remove all Work Items first.</value>
+  </data>
+  <data name="Sprint.DatesRequiredToStart" xml:space="preserve">
+    <value>Sprint must have a Start Date and End Date before it can be started. Please update the Sprint first.</value>
+  </data>
+  <data name="Sprint.TargetSprintNotFound" xml:space="preserve">
+    <value>The specified target Sprint was not found.</value>
+  </data>
+  <data name="Sprint.InvalidIncompleteItemsOption" xml:space="preserve">
+    <value>The option for handling incomplete items is invalid.</value>
+  </data>
+  <data name="Sprint.TargetSprintIdRequired" xml:space="preserve">
+    <value>Target Sprint is required when choosing to move items to an existing Sprint.</value>
+  </data>
+  <!-- WorkItem -->
+  <data name="WorkItem.TitleRequired" xml:space="preserve">
+    <value>Work item title is required.</value>
+  </data>
+  <data name="WorkItem.TitleMaxLength" xml:space="preserve">
+    <value>Title must not exceed 255 characters.</value>
+  </data>
+  <data name="WorkItem.TypeRequired" xml:space="preserve">
+    <value>Work item type is required.</value>
+  </data>
+  <data name="WorkItem.TypeInvalid" xml:space="preserve">
+    <value>Invalid work item type. Valid values: Epic, UserStory, Task, Subtask.</value>
+  </data>
+  <data name="WorkItem.PriorityInvalid" xml:space="preserve">
+    <value>Invalid priority. Valid values: Low, Medium, High, Critical.</value>
+  </data>
+  <data name="WorkItem.StatusInvalid" xml:space="preserve">
+    <value>Invalid status. Valid values: Todo, InProgress, Review, Done, Cancelled.</value>
+  </data>
+  <data name="WorkItem.StoryPointInvalid" xml:space="preserve">
+    <value>Story Point must be greater than or equal to 0.</value>
+  </data>
+  <data name="WorkItem.NotFound" xml:space="preserve">
+    <value>Work item not found.</value>
+  </data>
   <data name="Stakeholder.NotFound" xml:space="preserve">
     <value>Stakeholder not found.</value>
   </data>
