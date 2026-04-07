@@ -36,7 +36,10 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
 
     public async Task<Result<WithdrawStudentResponse>> Handle(WithdrawStudentCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.Parse(_currentUserService.UserId!);
+        if (!Guid.TryParse(_currentUserService.UserId, out var userId))
+            return Result<WithdrawStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
+
         var isSuperAdmin = string.Equals(_currentUserService.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase);
 
         var studentTerm = await _unitOfWork.Repository<StudentTerm>()
@@ -92,20 +95,69 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             studentTerm.UpdatedAt = DateTime.UtcNow;
 
             var now = DateTime.UtcNow;
-            var suffix = $"_deleted_{now:yyyyMMddHHmmssfff}";
 
             var user = studentTerm.Student.User;
-            user.UpdateEmail($"{user.Email}{suffix}");
-            if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
+            var student = studentTerm.Student;
+
+            var relatedApplications = await _unitOfWork.Repository<InternshipApplication>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var application in relatedApplications)
             {
-                user.UpdateProfile(
-                    user.FullName,
-                    $"{user.PhoneNumber}{suffix}",
-                    user.AvatarUrl,
-                    user.Gender,
-                    user.DateOfBirth,
-                    user.Address);
+                await _unitOfWork.Repository<InternshipApplication>().HardDeleteAsync(application, cancellationToken);
             }
+
+            var relatedInternshipMembers = await _unitOfWork.Repository<InternshipStudent>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var member in relatedInternshipMembers)
+            {
+                await _unitOfWork.Repository<InternshipStudent>().HardDeleteAsync(member, cancellationToken);
+            }
+
+            var relatedLogbooks = await _unitOfWork.Repository<Logbook>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var logbook in relatedLogbooks)
+            {
+                await _unitOfWork.Repository<Logbook>().HardDeleteAsync(logbook, cancellationToken);
+            }
+
+            var relatedEvaluations = await _unitOfWork.Repository<Evaluation>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var evaluation in relatedEvaluations)
+            {
+                await _unitOfWork.Repository<Evaluation>().HardDeleteAsync(evaluation, cancellationToken);
+            }
+
+            var relatedViolationReports = await _unitOfWork.Repository<ViolationReport>()
+                .Query()
+                .IgnoreQueryFilters()
+                .Where(x => x.StudentId == student.StudentId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var violationReport in relatedViolationReports)
+            {
+                await _unitOfWork.Repository<ViolationReport>().HardDeleteAsync(violationReport, cancellationToken);
+            }
+
+            await _unitOfWork.Repository<AuditLog>().ExecuteUpdateAsync(
+                x => x.PerformedById.HasValue && x.PerformedById.Value == user.UserId,
+                s => s.SetProperty(x => x.PerformedById, x => null),
+                cancellationToken);
 
             var activeTokens = await _unitOfWork.Repository<RefreshToken>()
                 .Query()
@@ -120,9 +172,9 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
             }
 
             studentTerm.DeletedBy = userId;
-            await _unitOfWork.Repository<StudentTerm>().DeleteAsync(studentTerm, cancellationToken);
-            await _unitOfWork.Repository<Student>().DeleteAsync(studentTerm.Student, cancellationToken);
-            await _unitOfWork.Repository<User>().DeleteAsync(user, cancellationToken);
+            await _unitOfWork.Repository<StudentTerm>().HardDeleteAsync(studentTerm, cancellationToken);
+            await _unitOfWork.Repository<Student>().HardDeleteAsync(student, cancellationToken);
+            await _unitOfWork.Repository<User>().HardDeleteAsync(user, cancellationToken);
 
             term.TotalEnrolled = Math.Max(0, term.TotalEnrolled - 1);
             term.TotalUnplaced = Math.Max(0, term.TotalUnplaced - 1);
@@ -130,6 +182,14 @@ public class WithdrawStudentHandler : IRequestHandler<WithdrawStudentCommand, Re
 
             await _unitOfWork.SaveChangeAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+            _logger.LogError(ex, "Failed to hard-delete student {StudentId} and user {UserId} in withdraw flow", studentTerm.StudentId, studentTerm.Student.UserId);
+
+            return Result<WithdrawStudentResponse>.Failure(
+                _messageService.GetMessage(MessageKeys.StudentTerms.CannotDeleteFromSystemHasRelatedData));
         }
         catch
         {
