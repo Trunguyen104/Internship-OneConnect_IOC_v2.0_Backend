@@ -128,6 +128,36 @@ namespace IOCv2.Infrastructure.Persistence
             public static readonly Guid Student12UserId = new Guid("66666666-6666-6666-6666-666666660012");
             public static readonly Guid Student13UserId = new Guid("66666666-6666-6666-6666-666666660013");
             public static readonly Guid Student14UserId = new Guid("66666666-6666-6666-6666-666666660014");
+
+            // ── Deterministic IDs cho demo flow: GROUP & ASSIGNMENT (HR) ──────────────
+            // Flow 5 bước: Tạo Group → Update → Add Student → Remove Student → Assign Mentor
+            // Phase target: "FPT Software Summer 2026" (Open) — không đụng data Spring 2026 hiện có
+            //
+            // Phân vai:
+            //   A + B  → thành viên ban đầu khi Tạo Group (bước 1)
+            //   A      → bị Remove ở bước 4 (xóa khỏi group)
+            //   C      → free, dùng cho Add Student (bước 3)
+            //   D–O    → pool dự phòng, xuất hiện trong dropdown để UI trông đầy đủ
+            //
+            // Pre-seeded group: "FPT Demo Presentation Group"
+            //   → Active, không có Mentor, KHÔNG có thành viên từ pool demo
+            //   → Tất cả 15 sv đều FREE (không bị StudentAlreadyInActiveGroup)
+            //   → Group tồn tại để UI có dữ liệu nền, không dùng trong demo flow chính
+            public static readonly Guid DemoGroupStudentAUserId = new Guid("DDDD0000-0000-0000-0000-000000000001");
+            public static readonly Guid DemoGroupStudentBUserId = new Guid("DDDD0000-0000-0000-0000-000000000002");
+            public static readonly Guid DemoGroupStudentCUserId = new Guid("DDDD0000-0000-0000-0000-000000000003");
+            public static readonly Guid DemoGroupStudentDUserId = new Guid("DDDD0000-0000-0000-0000-000000000004");
+            public static readonly Guid DemoGroupStudentEUserId = new Guid("DDDD0000-0000-0000-0000-000000000005");
+            public static readonly Guid DemoGroupStudentFUserId = new Guid("DDDD0000-0000-0000-0000-000000000006");
+            public static readonly Guid DemoGroupStudentGUserId = new Guid("DDDD0000-0000-0000-0000-000000000007");
+            public static readonly Guid DemoGroupStudentHUserId = new Guid("DDDD0000-0000-0000-0000-000000000008");
+            public static readonly Guid DemoGroupStudentIUserId = new Guid("DDDD0000-0000-0000-0000-000000000009");
+            public static readonly Guid DemoGroupStudentJUserId = new Guid("DDDD0000-0000-0000-0000-00000000000A");
+            public static readonly Guid DemoGroupStudentKUserId = new Guid("DDDD0000-0000-0000-0000-00000000000B");
+            public static readonly Guid DemoGroupStudentLUserId = new Guid("DDDD0000-0000-0000-0000-00000000000C");
+            public static readonly Guid DemoGroupStudentMUserId = new Guid("DDDD0000-0000-0000-0000-00000000000D");
+            public static readonly Guid DemoGroupStudentNUserId = new Guid("DDDD0000-0000-0000-0000-00000000000E");
+            public static readonly Guid DemoGroupStudentOUserId = new Guid("DDDD0000-0000-0000-0000-00000000000F");
         }
 
         public DbInitializer(AppDbContext context, IPasswordService passwordService, IUserServices userService)
@@ -150,6 +180,7 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedBulkUnassignTestStudent();
 
             await SeedInternshipGroups();
+            await SeedDemoGroupAssignmentStudents();
             await SeedProjectsAndWorkItems();
             await SeedManageIGProjectData();
             await SeedInternshipStudents();
@@ -1390,7 +1421,8 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedProjectsAndWorkItems()
         {
-            if (await _context.Projects.AnyAsync()) return;
+            // Guard by stable project codes — không dùng AnyAsync() thuần vì có thể bị soft-delete filter
+            if (await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_1")) return;
 
             var group3 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
             var group5 = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft CRM Legacy");
@@ -1445,7 +1477,7 @@ namespace IOCv2.Infrastructure.Persistence
 
             // Pending project example
             var projPending = Project.Create("FPT Future System", "Next phase architecture", "PRJ-FPTSOF_FPT_2", "CNTT", "Design next phase architecture.", mentorId: SeedIds.MentorFptEuId);
-            if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT Future System"))
+            if (!await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_2"))
             {
                 _context.Projects.Add(projPending);
 
@@ -1482,8 +1514,13 @@ namespace IOCv2.Infrastructure.Persistence
 
         private async Task SeedManageIGProjectData()
         {
+            // ⚠️ Guard bằng ProjectCode (stable key) thay vì InternshipId (thay đổi khi DB re-seed).
+            // Lý do: InternshipGroup.Create() sinh Guid mới mỗi lần insert → nếu groups bị xóa/tạo lại,
+            // InternshipId thay đổi → guard AnyAsync(p.InternshipId == group.InternshipId) miss →
+            // cố insert code đã tồn tại → vi phạm uix_projects_project_code_active.
+
             var mentorPendingGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
-            if (mentorPendingGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == mentorPendingGroup.InternshipId))
+            if (mentorPendingGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_6"))
             {
                 var pendingProj = Project.Create(
                     "FPT Mentor Pending Commerce",
@@ -1497,7 +1534,7 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             var zeroMemberGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Zero Member Team");
-            if (zeroMemberGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == zeroMemberGroup.InternshipId))
+            if (zeroMemberGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_7"))
             {
                 var zeroMemberProj = Project.Create(
                     "FPT Zero Member Automation",
@@ -1511,7 +1548,7 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             var multiProjectGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Multi Project Team");
-            if (multiProjectGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == multiProjectGroup.InternshipId))
+            if (multiProjectGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_8"))
             {
                 var multiProj1 = Project.Create(
                     "FPT Mentor Rotation Platform",
@@ -1523,7 +1560,10 @@ namespace IOCv2.Infrastructure.Persistence
                 multiProj1.AssignToGroup(multiProjectGroup.InternshipId, DateTime.UtcNow.AddDays(-16), DateTime.UtcNow.AddMonths(2));
                 multiProj1.Publish();
                 _context.Projects.Add(multiProj1);
+            }
 
+            if (!await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_9"))
+            {
                 var multiProj2 = Project.Create(
                     "FPT Mentor Rotation Analytics",
                     "Secondary analytics project in same group to verify bulk mentor update",
@@ -1536,7 +1576,7 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             var rikkeiGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
-            if (rikkeiGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == rikkeiGroup.InternshipId))
+            if (rikkeiGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-RIKKES_RIKK_2"))
             {
                 var rikkeiProj1 = Project.Create(
                     "Rikkeisoft Internal Portal",
@@ -1548,7 +1588,10 @@ namespace IOCv2.Infrastructure.Persistence
                 rikkeiProj1.AssignToGroup(rikkeiGroup.InternshipId, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddMonths(2));
                 rikkeiProj1.Publish();
                 _context.Projects.Add(rikkeiProj1);
+            }
 
+            if (!await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-RIKKES_RIKK_3"))
+            {
                 var rikkeiProj2 = Project.Create(
                     "Rikkeisoft Mobile App",
                     "Ứng dụng di động cho khách hàng của Rikkeisoft",
@@ -1560,7 +1603,7 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             var fptCtGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software CT OJT Team");
-            if (fptCtGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == fptCtGroup.InternshipId))
+            if (fptCtGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_3"))
             {
                 var fptCtProj = Project.Create(
                     "FPT CT Smart Campus",
@@ -1574,7 +1617,7 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             var archivedGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Archived Project");
-            if (archivedGroup != null && !await _context.Projects.AnyAsync(p => p.InternshipId == archivedGroup.InternshipId))
+            if (archivedGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_4"))
             {
                 var archivedProj = Project.Create(
                     "FPT Legacy HR System",
@@ -1589,7 +1632,7 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Projects.Add(archivedProj);
             }
 
-            if (!await _context.Projects.AnyAsync(p => p.ProjectName == "Orphan Research Project"))
+            if (!await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-ORPHAN_001"))
             {
                 var orphanProj = Project.Create(
                     "Orphan Research Project",
@@ -1603,7 +1646,7 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Projects.Add(orphanProj);
             }
 
-            if (!await _context.Projects.AnyAsync(p => p.ProjectName == "FPT AI Code Review Tool"))
+            if (!await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_5"))
             {
                 var draftUnassigned = Project.Create(
                     "FPT AI Code Review Tool",
@@ -2654,6 +2697,331 @@ namespace IOCv2.Infrastructure.Persistence
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Seed đầy đủ dữ liệu cho demo flow GROUP &amp; ASSIGNMENT (HR) — 5 bước.
+        ///
+        /// ── Sinh viên (7 người, tất cả Placed tại FPT Software, Summer 2026 term) ────
+        ///   A  Trần Minh Đức      SE1625  SelfApply   → thành viên ban đầu khi Tạo Group, bị Remove bước 4
+        ///   B  Nguyễn Thị Hương   IT1623  UniAssign   → thành viên ban đầu khi Tạo Group, ở lại đến cuối
+        ///   C  Lê Quốc Bảo        SE1626  SelfApply   → free, dùng cho Add Student bước 3
+        ///   D  Phạm Thị Lan       CS1624  UniAssign   → pool dự phòng, xuất hiện trong dropdown
+        ///   E  Hoàng Văn Minh     SE1627  SelfApply   → thành viên pre-seeded group (Leader)
+        ///   F  Võ Thị Ngọc        IT1626  UniAssign   → thành viên pre-seeded group (Member)
+        ///   G  Đặng Quang Hùng    SE1628  SelfApply   → pool dự phòng
+        ///
+        /// ── Pre-seeded group ──────────────────────────────────────────────────────────
+        ///   "FPT Demo Presentation Group"
+        ///   → Phase: Summer 2026 (Open), Status: Active, Mentor: null
+        ///   → Thành viên: E (Leader) + F (Member)
+        ///   → QUAN TRỌNG: Dùng E+F để A/B/C/D/G hoàn toàn free cho demo tạo group mới
+        ///   → Dùng trực tiếp cho bước 2–5 nếu không muốn demo Tạo Group từ đầu
+        ///
+        /// ── Điều kiện happy case đã được đảm bảo ─────────────────────────────────────
+        ///   ✓ Tất cả 15 sv có Application Status=Placed tại FPT Software, Summer 2026 term
+        ///   ✓ Tất cả 15 sv KHÔNG nằm trong bất kỳ nhóm Active nào → hoàn toàn free cho demo flow
+        ///   ✓ Pre-seeded group tồn tại nhưng KHÔNG có thành viên từ pool demo (không gây conflict)
+        ///   ✓ Phase "FPT Software Summer 2026" = Open (xem SeedInternshipPhases)
+        ///   ✓ Term "Summer 2026" = Open (xem SeedTerms) — khớp với phase
+        ///   ✓ mentor@fptsoftware.com + mentor.backup@fptsoftware.com = Mentor, Active, cùng enterprise
+        ///   ✓ hr@fptsoftware.com = HR, Active, cùng enterprise
+        ///
+        /// ── Tài khoản demo ────────────────────────────────────────────────────────────
+        ///   HR      : hr@fptsoftware.com               / Admin@123
+        ///   Mentor  : mentor@fptsoftware.com            / Admin@123  (Assign bước 5)
+        ///   Mentor 2: mentor.backup@fptsoftware.com     / Admin@123  (Reassign nếu cần)
+        ///
+        /// ── Hướng dẫn demo 5 bước ────────────────────────────────────────────────────
+        ///   Bước 1 — Tạo Group   : Phase=Summer 2026, chọn A (Leader) + B (Member)
+        ///   Bước 2 — Update Group: Đổi tên/mô tả group vừa tạo
+        ///   Bước 3 — Add Student : Thêm C vào group (C free, Placed, không ở group nào)
+        ///   Bước 4 — Remove      : Xóa A ra khỏi group
+        ///   Bước 5 — Assign Mentor: Chọn mentor@fptsoftware.com
+        /// </summary>
+        private async Task SeedDemoGroupAssignmentStudents()
+        {
+            const string seedMarker = "demo.student.a@fptu.edu.vn";
+            if (await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Email == seedMarker))
+                return;
+
+            var fptu = await _context.Universities.FirstOrDefaultAsync(u => u.Code == "FPTU");
+            if (fptu == null) return;
+
+            var fsoft = await _context.Enterprises.FirstOrDefaultAsync(e => e.Name == "FPT Software");
+            if (fsoft == null) return;
+
+            // Phase Summer 2026 (Open) — target phase cho demo group creation
+            var phaseSummer2026 = await _context.InternshipPhases.FirstOrDefaultAsync(
+                p => p.EnterpriseId == fsoft.EnterpriseId && p.Name == "FPT Software Summer 2026");
+            if (phaseSummer2026 == null) return;
+
+            // ⚠️ FIX: Dùng Summer 2026 term (khớp với Summer 2026 phase) thay vì Spring 2026
+            // InternshipPhase (đợt tuyển của enterprise) ≠ Term (học kỳ của university)
+            // nhưng cần khớp để data có nghĩa về mặt nghiệp vụ
+            var summer2026Term = await _context.Terms.FirstOrDefaultAsync(
+                t => t.UniversityId == fptu.UniversityId && t.Name == "Summer 2026");
+            // Fallback sang Spring 2026 nếu Summer term chưa tồn tại
+            var fallbackTerm = summer2026Term ?? await _context.Terms.FirstOrDefaultAsync(
+                t => t.UniversityId == fptu.UniversityId && t.Name == "Spring 2026");
+            if (fallbackTerm == null) return;
+
+            var fptBackendJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT Backend Platform Intern");
+            var fptQaJob      = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT QA Automation Intern");
+
+            var hrFptEu = await _context.EnterpriseUsers
+                .Include(eu => eu.User)
+                .FirstOrDefaultAsync(eu => eu.EnterpriseId == fsoft.EnterpriseId && eu.User.Role == UserRole.HR);
+
+            var passHash = _passwordService.HashPassword("Admin@123");
+            CancellationToken ct = default;
+
+            // ─────────────────────────────────────────────────────────────────────────
+            // Helper nội bộ: tạo 1 student hoàn chỉnh
+            //   User + Student + UniversityUser + StudentTerm + InternshipApplication(Placed)
+            // ─────────────────────────────────────────────────────────────────────────
+            async Task<Student> CreateDemoStudent(
+                Guid userId, string email, string fullName,
+                UserGender gender, DateOnly dob,
+                string major, string className,
+                ApplicationSource appSource,
+                Guid? jobId, string jobTitle,
+                int appliedDaysAgo)
+            {
+                var userCode = await _userService.GenerateUserCodeAsync(UserRole.Student, ct);
+                var user = new User(userId, userCode, email, fullName, UserRole.Student, passHash);
+                // Phone range 0912xxxxxx — tách biệt hoàn toàn với SeedUsers (098765xxxx)
+                user.UpdateProfile(fullName, $"0912{appliedDaysAgo:D6}", null, gender, dob, "Hà Nội");
+                user.SetStatus(UserStatus.Active);
+                _context.Users.Add(user);
+
+                var student = new Student
+                {
+                    StudentId        = Guid.NewGuid(),
+                    UserId           = user.UserId,
+                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
+                    Major            = major,
+                    ClassName        = className
+                };
+                _context.Students.Add(student);
+
+                _context.UniversityUsers.Add(new UniversityUser
+                {
+                    UniversityUserId = Guid.NewGuid(),
+                    UserId           = user.UserId,
+                    UniversityId     = fptu.UniversityId
+                });
+
+                // StudentTerm — dùng Summer 2026 để khớp với group phase
+                // SeedTerms() chỉ query email.StartsWith("student"), không đụng "demo.student.*"
+                // nên không có nguy cơ duplicate StudentTerm
+                _context.StudentTerms.Add(new StudentTerm
+                {
+                    StudentTermId    = Guid.NewGuid(),
+                    StudentId        = student.StudentId,
+                    TermId           = fallbackTerm.TermId,
+                    EnrollmentStatus = EnrollmentStatus.Active,
+                    PlacementStatus  = PlacementStatus.Placed,
+                    EnrollmentDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-appliedDaysAgo - 10))
+                });
+
+                // InternshipApplication — Status=Placed tại FPT Software
+                // Điều kiện cốt lõi: handler check EnterpriseId + Status=Placed (không check TermId/PhaseId)
+                _context.InternshipApplications.Add(new InternshipApplication
+                {
+                    ApplicationId   = Guid.NewGuid(),
+                    EnterpriseId    = fsoft.EnterpriseId,
+                    TermId          = fallbackTerm.TermId,
+                    StudentId       = student.StudentId,
+                    JobId           = jobId,
+                    Status          = InternshipApplicationStatus.Placed,
+                    Source          = appSource,
+                    AppliedAt       = DateTime.UtcNow.AddDays(-appliedDaysAgo),
+                    ReviewedAt      = DateTime.UtcNow.AddDays(-appliedDaysAgo + 5),
+                    ReviewedBy      = hrFptEu?.EnterpriseUserId,
+                    UniversityId    = appSource == ApplicationSource.UniAssign ? fptu.UniversityId : null,
+                    JobPostingTitle = jobTitle
+                });
+
+                return student;
+            }
+
+            // ── A: Trần Minh Đức — thành viên ban đầu bước 1, bị Remove ở bước 4 ─────
+            var studentA = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentAUserId,
+                "demo.student.a@fptu.edu.vn", "Trần Minh Đức",
+                UserGender.Male, new DateOnly(2003, 3, 15),
+                "Software Engineering", "SE1625",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 40);
+
+            // ── B: Nguyễn Thị Hương — thành viên ban đầu bước 1, ở lại đến cuối ───────
+            var studentB = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentBUserId,
+                "demo.student.b@fptu.edu.vn", "Nguyễn Thị Hương",
+                UserGender.Female, new DateOnly(2003, 7, 20),
+                "Information Technology", "IT1623",
+                ApplicationSource.UniAssign,
+                fptQaJob?.JobId, fptQaJob?.Title ?? "FPT QA Automation Intern",
+                appliedDaysAgo: 38);
+
+            // ── C: Lê Quốc Bảo — free pool, dùng cho Add Student bước 3 ───────────────
+            var studentC = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentCUserId,
+                "demo.student.c@fptu.edu.vn", "Lê Quốc Bảo",
+                UserGender.Male, new DateOnly(2003, 11, 5),
+                "Software Engineering", "SE1626",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 36);
+
+            // ── D: Phạm Thị Lan — pool dự phòng, xuất hiện trong dropdown ─────────────
+            var studentD = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentDUserId,
+                "demo.student.d@fptu.edu.vn", "Phạm Thị Lan",
+                UserGender.Female, new DateOnly(2003, 5, 10),
+                "Computer Science", "CS1624",
+                ApplicationSource.UniAssign,
+                fptQaJob?.JobId, fptQaJob?.Title ?? "FPT QA Automation Intern",
+                appliedDaysAgo: 34);
+
+            // ── E: Hoàng Văn Minh — pool dự phòng ───────────────────────────────────
+            var studentE = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentEUserId,
+                "demo.student.e@fptu.edu.vn", "Hoàng Văn Minh",
+                UserGender.Male, new DateOnly(2003, 1, 25),
+                "Software Engineering", "SE1627",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 32);
+
+            // ── F: Võ Thị Ngọc — pool dự phòng ──────────────────────────────────────
+            var studentF = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentFUserId,
+                "demo.student.f@fptu.edu.vn", "Võ Thị Ngọc",
+                UserGender.Female, new DateOnly(2003, 9, 3),
+                "Information Technology", "IT1626",
+                ApplicationSource.UniAssign,
+                fptQaJob?.JobId, fptQaJob?.Title ?? "FPT QA Automation Intern",
+                appliedDaysAgo: 30);
+
+            // ── G: Đặng Quang Hùng — pool dự phòng ───────────────────────────────────
+            var studentG = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentGUserId,
+                "demo.student.g@fptu.edu.vn", "Đặng Quang Hùng",
+                UserGender.Male, new DateOnly(2002, 12, 18),
+                "Software Engineering", "SE1628",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 28);
+
+            // ── H: Trương Thị Mai — pool dự phòng ────────────────────────────────────
+            var studentH = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentHUserId,
+                "demo.student.h@fptu.edu.vn", "Trương Thị Mai",
+                UserGender.Female, new DateOnly(2003, 4, 8),
+                "Computer Science", "CS1625",
+                ApplicationSource.UniAssign,
+                fptQaJob?.JobId, fptQaJob?.Title ?? "FPT QA Automation Intern",
+                appliedDaysAgo: 26);
+
+            // ── I: Bùi Văn Thành — pool dự phòng ─────────────────────────────────────
+            var studentI = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentIUserId,
+                "demo.student.i@fptu.edu.vn", "Bùi Văn Thành",
+                UserGender.Male, new DateOnly(2003, 6, 22),
+                "Software Engineering", "SE1629",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 24);
+
+            // ── J: Ngô Thị Hà — pool dự phòng ────────────────────────────────────────
+            var studentJ = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentJUserId,
+                "demo.student.j@fptu.edu.vn", "Ngô Thị Hà",
+                UserGender.Female, new DateOnly(2002, 10, 14),
+                "Information Technology", "IT1627",
+                ApplicationSource.UniAssign,
+                fptQaJob?.JobId, fptQaJob?.Title ?? "FPT QA Automation Intern",
+                appliedDaysAgo: 22);
+
+            // ── K: Đinh Quang Khải — pool dự phòng ───────────────────────────────────
+            var studentK = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentKUserId,
+                "demo.student.k@fptu.edu.vn", "Đinh Quang Khải",
+                UserGender.Male, new DateOnly(2003, 2, 27),
+                "Software Engineering", "SE1630",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 20);
+
+            // ── L: Lý Thị Thu — pool dự phòng ────────────────────────────────────────
+            var studentL = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentLUserId,
+                "demo.student.l@fptu.edu.vn", "Lý Thị Thu",
+                UserGender.Female, new DateOnly(2003, 8, 11),
+                "Computer Science", "CS1626",
+                ApplicationSource.UniAssign,
+                fptQaJob?.JobId, fptQaJob?.Title ?? "FPT QA Automation Intern",
+                appliedDaysAgo: 18);
+
+            // ── M: Vũ Minh Tuấn — pool dự phòng ──────────────────────────────────────
+            var studentM = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentMUserId,
+                "demo.student.m@fptu.edu.vn", "Vũ Minh Tuấn",
+                UserGender.Male, new DateOnly(2002, 11, 3),
+                "Software Engineering", "SE1631",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 16);
+
+            // ── N: Trịnh Thị Dung — pool dự phòng ───────────────────────────────────
+            var studentN = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentNUserId,
+                "demo.student.n@fptu.edu.vn", "Trịnh Thị Dung",
+                UserGender.Female, new DateOnly(2003, 1, 19),
+                "Information Technology", "IT1628",
+                ApplicationSource.UniAssign,
+                fptQaJob?.JobId, fptQaJob?.Title ?? "FPT QA Automation Intern",
+                appliedDaysAgo: 14);
+
+            // ── O: Phùng Văn Long — pool dự phòng ────────────────────────────────────
+            var studentO = await CreateDemoStudent(
+                SeedIds.DemoGroupStudentOUserId,
+                "demo.student.o@fptu.edu.vn", "Phùng Văn Long",
+                UserGender.Male, new DateOnly(2002, 7, 30),
+                "Software Engineering", "SE1632",
+                ApplicationSource.SelfApply,
+                fptBackendJob?.JobId, fptBackendJob?.Title ?? "FPT Backend Platform Intern",
+                appliedDaysAgo: 12);
+
+            await _context.SaveChangesAsync();
+
+            // ─────────────────────────────────────────────────────────────────────────
+            // Pre-seeded group: "FPT Demo Presentation Group"
+            //   Active, chưa có Mentor, KHÔNG có thành viên từ pool demo (A–O)
+            //   → Tất cả 15 sv hoàn toàn FREE cho demo flow
+            //   → Group tồn tại để UI có dữ liệu nền (hiển thị trong danh sách nhóm)
+            // ─────────────────────────────────────────────────────────────────────────
+            var demoGroupExists = await _context.InternshipGroups
+                .AnyAsync(g => g.GroupName == "FPT Demo Presentation Group");
+
+            if (!demoGroupExists)
+            {
+                var demoGroup = InternshipGroup.Create(
+                    phaseSummer2026.PhaseId,
+                    "FPT Demo Presentation Group",
+                    "Nhóm thực tập Summer 2026 — dành riêng cho demo báo cáo (Active, chưa có Mentor)",
+                    fsoft.EnterpriseId,
+                    mentorId: null,
+                    DateTime.UtcNow.AddDays(-5),
+                    DateTime.UtcNow.AddMonths(3));
+                demoGroup.UpdateStatus(GroupStatus.Active);
+
+                _context.InternshipGroups.Add(demoGroup);
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task SeedSecurityTokens()
