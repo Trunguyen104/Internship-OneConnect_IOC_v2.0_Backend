@@ -2059,7 +2059,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động)..
+        ///   Looks up a localized string similar to Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra).
         /// </summary>
         internal static string JobPosting_InternshipPhaseStatusAllowed {
             get {
@@ -2110,6 +2110,15 @@ namespace IOCv2.Application.Resources {
         internal static string JobPosting_LocationTooLong {
             get {
                 return ResourceManager.GetString("JobPosting.LocationTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy giai đoạn thực tập nào đang hoạt động cho công việc này..
+        /// </summary>
+        internal static string JobPosting_NoActiveInternshipPeriod {
+            get {
+                return ResourceManager.GetString("JobPosting.NoActiveInternshipPeriod", resourceCulture);
             }
         }
         
