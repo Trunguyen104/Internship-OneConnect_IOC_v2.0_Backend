@@ -175,22 +175,22 @@
     <value>Cập nhật thông tin thành công.</value>
   </data>
   <data name="PageNumber.MinValue" xml:space="preserve">
-    <value>Page number must be greater than or equal to 1</value>
+    <value>Số trang phải lớn hơn hoặc bằng 1.</value>
   </data>
   <data name="PageSize.MinValue" xml:space="preserve">
-    <value>Page size must be greater than or equal to 1</value>
+    <value>Kích thước trang phải lớn hơn hoặc bằng 1.</value>
   </data>
   <data name="PageSize.MaxValue" xml:space="preserve">
-    <value>Page size must not exceed 100</value>
+    <value>Kích thước trang không được vượt quá 100.</value>
   </data>
   <data name="SearchTerm.MaxLength" xml:space="preserve">
-    <value>Search term cannot exceed 200 characters</value>
+    <value>Từ khóa tìm kiếm không được vượt quá 200 ký tự.</value>
   </data>
   <data name="SortColumn.AllowedValues" xml:space="preserve">
-    <value>Sort column must be one of: projectname, startdate, enddate, status, createdat</value>
+    <value>Cột sắp xếp phải là một trong các giá trị: projectname, startdate, enddate, status, createdat.</value>
   </data>
   <data name="SortOrder.AllowedValues" xml:space="preserve">
-    <value>Sort order must be either 'asc' or 'desc'</value>
+    <value>Thứ tự sắp xếp chỉ được là 'asc' hoặc 'desc'.</value>
   </data>
   <data name="Projects.DeleteSuccess" xml:space="preserve">
     <value>Xóa dự án thành công</value>
@@ -217,7 +217,7 @@
     <value>Lấy thành công {0} dự án cho nhóm thực tập {1}.</value>
   </data>
   <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
-    <value>Project resource with ID {ResourceId} deleted successfully.</value>
+    <value>Đã xóa tài nguyên dự án có ID {ResourceId} thành công.</value>
   </data>
   <data name="ProjectResources.StudentCannotModifyMentorResource" xml:space="preserve">
     <value>Tài nguyên do mentor tải lên, sinh viên không được chỉnh sửa hoặc xóa.</value>
@@ -1325,7 +1325,7 @@
     <value>Intern Phase {0} của {1} chỉ còn {2} slot. Bạn đang assign {3} sinh viên. Vui lòng giảm số lượng hoặc chọn phase/doanh nghiệp khác.</value>
   </data>
   <data name="UniAssign.AuditLogAssignMetadata" xml:space="preserve">
-    <value>{{\"studentId\":\"{0}\",\"enterpriseId\":\"{1}\",\"internPhaseId\":\"{2}\",\"termId\":\"{3}\",\"note\":\"phân công hàng loạt - đang chờ tạo\"}}</value>
+    <value>{{"studentId":"{0}","enterpriseId":"{1}","internPhaseId":"{2}","termId":"{3}","note":"phân công hàng loạt - đang chờ tạo"}}</value>
   </data>
   <data name="UniAssign.CannotChangeEnterpriseStudentHasInternshipData" xml:space="preserve">
     <value>Không thể đổi enterprise. Sinh viên đã có dữ liệu thực tập.</value>
@@ -1452,7 +1452,7 @@
   </data>
   <data name="UniAssign.NoStudentsAvailableForReassignment" xml:space="preserve">
     <value>Không có sinh viên nào trong danh sách có thể đổi enterprise. Tất cả đã có dữ liệu thực tập.</value>
-</data>
+  </data>
   <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
     <value>Không tìm thấy giai đoạn thực tập nào đang hoạt động cho công việc này.</value>
   </data>
@@ -1518,5 +1518,83 @@
   </data>
   <data name="UniAssign.GetNotAllowed" xml:space="preserve">
     <value>Bạn chỉ có thể truy cập danh sách sinh viên của trường đại học của bạn.</value>
+    </data>
+  <data name="HRApplications.ApplicationNotPlaced" xml:space="preserve">
+    <value>Đơn ứng tuyển chưa ở trạng thái Đã tiếp nhận.</value>
+  </data>
+  <data name="HRApplications.InternPhaseAtCapacity" xml:space="preserve">
+    <value>Giai đoạn thực tập đã đạt số lượng tối đa.</value>
+  </data>
+  <data name="HRApplications.Log.RemovePlacedUniAssign" xml:space="preserve">
+    <value>HR đã xóa sinh viên khỏi danh sách Đã tiếp nhận (ApplicationId: {0}, ByUserId: {1}).</value>
+  </data>
+  <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
+    <value>Bạn đã có một đơn ứng tuyển đang hoạt động và không thể nộp thêm đơn mới.</value>
+  </data>
+  <data name="JobPosting.ApplicationDeadlinePassed" xml:space="preserve">
+    <value>Hạn nộp đơn đã hết.</value>
+  </data>
+  <data name="JobPosting.ApplicationLimitReached" xml:space="preserve">
+    <value>Bạn đã đạt giới hạn số lượng đơn ứng tuyển cho vị trí này.</value>
+  </data>
+  <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
+    <value>Ứng tuyển thành công! Đơn của bạn đang chờ HR xét duyệt.</value>
+  </data>
+  <data name="JobPosting.CannotApplyWhenPlaced" xml:space="preserve">
+    <value>Bạn đang ở trạng thái Đã tiếp nhận nên không được phép ứng tuyển.</value>
+  </data>
+  <data name="JobPosting.InternshipInProgress" xml:space="preserve">
+    <value>Bạn đang trong quá trình thực tập.</value>
+  </data>
+  <data name="JobPosting.PositionNotOpenForApplication" xml:space="preserve">
+    <value>Vị trí này hiện không mở để ứng tuyển.</value>
+  </data>
+  <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
+    <value>{0} đã ứng tuyển vào vị trí tại {1} - {2}. Vui lòng kiểm tra.</value>
+  </data>
+  <data name="JobPosting.UploadCVRequired" xml:space="preserve">
+    <value>Bạn chưa tải lên CV. Vui lòng tải CV trước khi ứng tuyển.</value>
+  </data>
+  <data name="StudentApplications.CannotHideActiveApplication" xml:space="preserve">
+    <value>Chỉ có thể ẩn các đơn đã kết thúc (Bị từ chối hoặc Đã rút).</value>
+  </data>
+  <data name="StudentApplications.CannotHidePlaced" xml:space="preserve">
+    <value>Không thể ẩn các đơn ở trạng thái Đã tiếp nhận.</value>
+  </data>
+  <data name="StudentApplications.CannotWithdrawNotApplied" xml:space="preserve">
+    <value>Chỉ có thể rút đơn ở trạng thái Đã nộp.</value>
+  </data>
+  <data name="StudentApplications.HideSuccess" xml:space="preserve">
+    <value>Đã ẩn đơn ứng tuyển khỏi danh sách của bạn.</value>
+  </data>
+  <data name="StudentApplications.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đơn ứng tuyển.</value>
+  </data>
+  <data name="StudentApplications.Notify.HR.Withdrawn" xml:space="preserve">
+    <value>{StudentName} đã rút đơn ứng tuyển cho vị trí {JobTitle}.</value>
+  </data>
+  <data name="StudentApplications.Notify.Student.RemovedPlaced" xml:space="preserve">
+    <value>Chào bạn, doanh nghiệp {EnterpriseName} đã gỡ bạn khỏi danh sách tiếp nhận thực tập.</value>
+  </data>
+  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced" xml:space="preserve">
+    <value>Sinh viên {StudentName} đã bị doanh nghiệp {EnterpriseName} gỡ khỏi danh sách tiếp nhận thực tập.</value>
+  </data>
+  <data name="StudentApplications.NotOwner" xml:space="preserve">
+    <value>Bạn không có quyền thực hiện thao tác này trên đơn ứng tuyển.</value>
+  </data>
+  <data name="StudentApplications.WithdrawSuccess" xml:space="preserve">
+    <value>Đã rút đơn ứng tuyển thành công.</value>
+  </data>
+  <data name="Validation.IdRequired" xml:space="preserve">
+    <value>Mã định danh không được để trống.</value>
+  </data>
+  <data name="Validation.InvalidStatus" xml:space="preserve">
+    <value>Trạng thái không hợp lệ.</value>
+  </data>
+  <data name="Validation.PageNumberInvalid" xml:space="preserve">
+    <value>PageNumber phải lớn hơn hoặc bằng 1.</value>
+  </data>
+  <data name="Validation.PageSizeInvalid" xml:space="preserve">
+    <value>PageSize phải lớn hơn hoặc bằng 1.</value>
   </data>
 </root>
