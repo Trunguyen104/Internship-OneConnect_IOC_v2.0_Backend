@@ -17,5 +17,6 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm.GetStud
         public string? EnterpriseName { get; init; }
         public string? InternPhaseName { get; init; }
         public PlacementStatus PlacementStatus { get; init; }
+        public Guid StudentTermId { get; init; }
     }
 }

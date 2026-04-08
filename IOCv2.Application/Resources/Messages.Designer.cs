@@ -3716,6 +3716,24 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Không có sinh viên nào trong danh sách có thể đổi enterprise. Tất cả đã có dữ liệu thực tập..
+        /// </summary>
+        internal static string UniAssign_NoStudentsAvailableForReassignment {
+            get {
+                return ResourceManager.GetString("UniAssign.NoStudentsAvailableForReassignment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể đổi enterprise cho những sinh viên sau vì họ đang ở trạng thái PendingAssignment nhưng đã có dữ liệu thực tập từ kỳ khác: {0}.
+        /// </summary>
+        internal static string UniAssign_PendingStudentsWithExistingData {
+            get {
+                return ResourceManager.GetString("UniAssign.PendingStudentsWithExistingData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sinh viên đã được tuyển dụng: {0}.
         /// </summary>
         internal static string UniAssign_StudentsAlreadyPlaced {

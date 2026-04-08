@@ -1363,6 +1363,9 @@
   <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
     <value>Your application has been automatically withdrawn because the recruitment phase ended.</value>
   </data>
+  <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
+    <value>Cannot delete this job posting because it has {0} application.</value>
+  </data>
   <data name="JobPosting.UploadCVRequired" xml:space="preserve">
     <value>You have not uploaded a CV. Please upload your CV before applying.</value>
   </data>
@@ -1444,7 +1447,10 @@
   <data name="Validation.InvalidStatus" xml:space="preserve">
     <value>Status is invalid.</value>
   </data>
-  <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
-    <value>Cannot delete this job posting because it has {0} application.</value>
+  <data name="UniAssign.PendingStudentsWithExistingData" xml:space="preserve">
+    <value>It is not possible to transfer enterprises for the following students because they are in a PendingAssignment state but already have internship data from another semester: {0}</value>
+  </data>
+  <data name="UniAssign.NoStudentsAvailableForReassignment" xml:space="preserve">
+    <value>None of the students on the list can change enterprises. All have internship data.</value>
   </data>
 </root>
