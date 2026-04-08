@@ -280,5 +280,47 @@ namespace IOCv2.Tests.Features.Projects.Commands
             _mockProjectRepo.Verify(x => x.UpdateAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Once);
             _mockUnitOfWork.Verify(x => x.CommitTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public async Task Handle_GroupAlreadyHasAnotherActiveProject_ReturnsConflict()
+        {
+            // Arrange
+            var groupId = Guid.NewGuid();
+            var projectToAssign = Project.Create(
+                "To Assign", "Desc", "PRJ-ASSIGN", "IT", "Req",
+                mentorId: _enterpriseUserId);
+
+            var existingActive = Project.Create(
+                "Existing", "Desc", "PRJ-EXIST", "IT", "Req",
+                mentorId: _enterpriseUserId);
+            existingActive.AssignToGroup(groupId, null, null);
+
+            var group = InternshipGroup.Create(
+                phaseId: Guid.NewGuid(),
+                groupName: "Test Group",
+                enterpriseId: _enterpriseId,
+                mentorId: _enterpriseUserId,
+                endDate: DateTime.UtcNow.AddDays(30));
+
+            typeof(InternshipGroup)
+                .GetProperty("InternshipId")!
+                .SetValue(group, groupId);
+
+            _mockProjectRepo.Setup(x => x.Query())
+                .Returns(new List<Project> { projectToAssign, existingActive }.AsQueryable().BuildMock());
+
+            _mockGroupRepo.Setup(x => x.Query())
+                .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
+
+            var command = new AssignGroupCommand { ProjectId = projectToAssign.ProjectId, InternshipId = groupId };
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorType.Should().Be(ResultErrorType.Conflict);
+            _mockProjectRepo.Verify(x => x.UpdateAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
     }
 }

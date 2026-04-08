@@ -199,6 +199,42 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 await _context.SaveChangesAsync();
             }
+
+            await EnsureActiveProjectGroupConstraintAsync();
+        }
+
+        private async Task EnsureActiveProjectGroupConstraintAsync()
+        {
+            if (!_context.Database.IsRelational())
+            {
+                return;
+            }
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                WITH ranked AS (
+                    SELECT project_id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY internship_id
+                               ORDER BY COALESCE(updated_at, created_at) DESC, created_at DESC, project_id
+                           ) AS rn
+                    FROM projects
+                    WHERE deleted_at IS NULL
+                      AND internship_id IS NOT NULL
+                      AND operational_status = 1
+                )
+                UPDATE projects p
+                SET operational_status = 0,
+                    updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+                FROM ranked r
+                WHERE p.project_id = r.project_id
+                  AND r.rn > 1;
+            ");
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                CREATE UNIQUE INDEX IF NOT EXISTS uix_projects_internship_id_active
+                ON projects (internship_id)
+                WHERE deleted_at IS NULL AND internship_id IS NOT NULL AND operational_status = 1;
+            ");
         }
 
         private async Task SeedUniversities()

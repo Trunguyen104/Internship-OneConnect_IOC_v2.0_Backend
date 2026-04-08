@@ -136,7 +136,7 @@ namespace IOCv2.Tests.Features.Projects
         }
 
         [Fact]
-        public async Task Handle_InternshipHasLogbookData_ShouldBlockDelete()
+        public async Task Handle_InternshipHasLogbookData_ShouldAllowDelete()
         {
             var userId = Guid.NewGuid();
             var enterpriseUserId = Guid.NewGuid();
@@ -157,14 +157,74 @@ namespace IOCv2.Tests.Features.Projects
             {
                 Logbook.Create(group.InternshipId, Guid.NewGuid(), "sum", null, "plan", DateTime.UtcNow.Date)
             }.AsQueryable().BuildMock());
+            _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+            _mockProjectRepo.Setup(x => x.UpdateAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
-            _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns("Has data");
+            _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns((string key) => key);
+
+            var result = await _handler.Handle(new DeleteProjectCommand { ProjectId = project.ProjectId }, CancellationToken.None);
+
+            result.IsSuccess.Should().BeTrue();
+            _mockProjectRepo.Verify(x => x.UpdateAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockProjectRepo.Verify(x => x.HardDeleteAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Handle_ProjectHasWorkItems_ShouldReturnBadRequest()
+        {
+            var userId = Guid.NewGuid();
+            var enterpriseUserId = Guid.NewGuid();
+            var project = Project.Create("Project for Deletion", "Description", "PRJ-TEST_TST_3", "IT", "Requirements", mentorId: enterpriseUserId);
+
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
+            }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project> { project }.AsQueryable().BuildMock());
+            _mockWorkItemRepo.Setup(x => x.Query()).Returns(new List<WorkItem>
+            {
+                new() { WorkItemId = Guid.NewGuid(), ProjectId = project.ProjectId, Title = "Task", Type = IOCv2.Domain.Enums.WorkItemType.Task }
+            }.AsQueryable().BuildMock());
+            _mockSprintRepo.Setup(x => x.Query()).Returns(new List<Sprint>().AsQueryable().BuildMock());
+            _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns((string key) => key);
 
             var result = await _handler.Handle(new DeleteProjectCommand { ProjectId = project.ProjectId }, CancellationToken.None);
 
             result.IsSuccess.Should().BeFalse();
             result.ErrorType.Should().Be(ResultErrorType.BadRequest);
-            _mockProjectRepo.Verify(x => x.HardDeleteAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Never);
+            result.Error.Should().Be(IOCv2.Application.Constants.MessageKeys.Projects.CannotDeleteWithWorkItems);
+        }
+
+        [Fact]
+        public async Task Handle_AssignedProjectWithMissingGroupNavigation_CreatorMentorCanDelete()
+        {
+            var userId = Guid.NewGuid();
+            var enterpriseUserId = Guid.NewGuid();
+            var project = Project.Create("Project", "Desc", "PRJ-TEST_TST_4", "IT", "Req", mentorId: enterpriseUserId);
+            project.AssignToGroup(Guid.NewGuid(), DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(30));
+            project.InternshipGroup = null;
+
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = enterpriseUserId, UserId = userId }
+            }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project> { project }.AsQueryable().BuildMock());
+            _mockWorkItemRepo.Setup(x => x.Query()).Returns(new List<WorkItem>().AsQueryable().BuildMock());
+            _mockSprintRepo.Setup(x => x.Query()).Returns(new List<Sprint>().AsQueryable().BuildMock());
+            _mockUnitOfWork.Setup(x => x.SaveChangeAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+            _mockProjectRepo.Setup(x => x.UpdateAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockCacheService.Setup(x => x.RemoveByPatternAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _mockMessageService.Setup(x => x.GetMessage(It.IsAny<string>())).Returns((string key) => key);
+
+            var result = await _handler.Handle(new DeleteProjectCommand { ProjectId = project.ProjectId }, CancellationToken.None);
+
+            result.IsSuccess.Should().BeTrue();
+            _mockProjectRepo.Verify(x => x.UpdateAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
