@@ -1447,6 +1447,12 @@
   <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
     <value>Không thể xóa tin tuyển dụng này vì đã có {0} đơn ứng tuyển.</value>
   </data>
+  <data name="UniAssign.PendingStudentsWithExistingData" xml:space="preserve">
+    <value>Không thể đổi enterprise cho những sinh viên sau vì họ đang ở trạng thái PendingAssignment nhưng đã có dữ liệu thực tập từ kỳ khác: {0}</value>
+  </data>
+  <data name="UniAssign.NoStudentsAvailableForReassignment" xml:space="preserve">
+    <value>Không có sinh viên nào trong danh sách có thể đổi enterprise. Tất cả đã có dữ liệu thực tập.</value>
+</data>
   <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
     <value>Không tìm thấy giai đoạn thực tập nào đang hoạt động cho công việc này.</value>
   </data>

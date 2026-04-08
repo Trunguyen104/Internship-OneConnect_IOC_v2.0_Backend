@@ -12,6 +12,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using IOCv2.Application.Extensions.UniAssigns;
 
 namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
 {
@@ -39,7 +40,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
 
         public async Task<Result<ReAssignSingleResponse>> Handle(ReAssignSingleCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("ReAssignSingle requested for ApplicationId {ApplicationId} to Enterprise {NewEnterpriseId}", request.ApplicationId, request.NewEnterpriseId);
+            _logger.LogInformation("ReAssignSingle requested for StudentId {StudentId} to Enterprise {NewEnterpriseId}", request.StudentId, request.NewEnterpriseId);
 
             try
             {
@@ -65,7 +66,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
                     .Include(a => a.Student).ThenInclude(s => s.User)
                     .Include(a => a.Enterprise)
                     .Include(a => a.Term)
-                    .FirstOrDefaultAsync(a => a.ApplicationId == request.ApplicationId, cancellationToken);
+                    .FirstOrDefaultAsync(a => a.StudentId == request.StudentId && UniAssignParam.CommonUniAssignParam.AllowedStatuses.Contains(a.Status), cancellationToken);
 
                 if (app == null)
                     return Result<ReAssignSingleResponse>.Failure(
@@ -421,7 +422,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error reassigning application {ApplicationId}", request.ApplicationId);
+                _logger.LogError(ex, "Error reassigning application for StudentId {StudentId}", request.StudentId);
                 return Result<ReAssignSingleResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.InternalError),
                     ResultErrorType.InternalServerError);

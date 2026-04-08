@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
 {
@@ -23,14 +24,15 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
         private readonly ICurrentUserService _currentUser;
         private readonly ILogger<BulkReassignEnterpriseHandler> _logger;
         private readonly IPublisher _publisher;
+        private readonly IMessageService _messageService;   
 
-
-        public BulkReassignEnterpriseHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUser, ILogger<BulkReassignEnterpriseHandler> logger, IPublisher publisher)
+        public BulkReassignEnterpriseHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUser, ILogger<BulkReassignEnterpriseHandler> logger, IPublisher publisher, IMessageService messageService)
         {
             _unitOfWork = unitOfWork;
             _currentUser = currentUser;
             _logger = logger;
             _publisher = publisher;
+            _messageService = messageService;
         }
 
         public async Task<Result<BulkReassignEnterpriseResponse>> Handle(BulkReassignEnterpriseCommand request, CancellationToken cancellationToken)
@@ -60,7 +62,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                 if (students.Count != requestedStudentIds.Count)
                 {
                     var missing = requestedStudentIds.Except(students.Select(s => s.StudentId));
-                    return Result<BulkReassignEnterpriseResponse>.Failure($"Students not found: {string.Join(", ", missing)}", ResultErrorType.NotFound);
+                    string message = _messageService.GetMessage(MessageKeys.UniAssign.StudentsNotFound, string.Join(", ", missing));
+                    return Result<BulkReassignEnterpriseResponse>.Failure(message, ResultErrorType.NotFound);
                 }
 
                 // Verify each student's university matches current user's university
@@ -78,7 +81,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
 
                 if (unauthorized.Any())
                 {
-                    return Result<BulkReassignEnterpriseResponse>.Failure($"You are not allowed to assign these students: {string.Join(", ", unauthorized)}", ResultErrorType.Unauthorized);
+                    var message = _messageService.GetMessage(MessageKeys.UniAssign.StudentsUnauthorized, string.Join(", ", unauthorized));
+                    return Result<BulkReassignEnterpriseResponse>.Failure(message, ResultErrorType.Unauthorized);
                 }
 
                 // --- New behavior: exclude students who already have logbook / sprint / evaluation ---
@@ -127,7 +131,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                 var pendingWithExistingData = initialPendingStudentIds.Intersect(excludedIds).ToList();
                 if (pendingWithExistingData.Any())
                 {
-                    var message = $"Không thể đổi enterprise cho những sinh viên sau vì họ đang ở trạng thái PendingAssignment nhưng đã có dữ liệu thực tập từ kỳ khác: {string.Join(", ", pendingWithExistingData)}";
+                    var message = _messageService.GetMessage(MessageKeys.UniAssign.PendingStudentsWithExistingData, string.Join(", ", pendingWithExistingData));
                     _logger.LogWarning("Bulk reassignment blocked. Pending students with prior internship data: {Ids}", string.Join(", ", pendingWithExistingData));
                     return Result<BulkReassignEnterpriseResponse>.Failure(message, ResultErrorType.BadRequest);
                 }
@@ -143,7 +147,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                     // If all students are excluded, return a response indicating UI should disable confirm and show message.
                     if (!students.Any())
                     {
-                        var message = "Không có sinh viên nào trong danh sách có thể đổi enterprise. Tất cả đã có dữ liệu thực tập.";
+                        var message = _messageService.GetMessage(MessageKeys.UniAssign.NoStudentsAvailableForReassignment);
                         var response = new BulkReassignEnterpriseResponse
                         {
                             Message = message
@@ -158,7 +162,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                 var remainingStudentIds = students.Select(s => s.StudentId).Distinct().ToList();
                 if (!remainingStudentIds.Any())
                 {
-                    return Result<BulkReassignEnterpriseResponse>.Failure("No students available to reassign after exclusions.", ResultErrorType.BadRequest);
+                    var message = _messageService.GetMessage(MessageKeys.UniAssign.NoStudentsAvailableForReassignment);
+                    return Result<BulkReassignEnterpriseResponse>.Failure(message, ResultErrorType.BadRequest);
                 }
 
                 var term = await (

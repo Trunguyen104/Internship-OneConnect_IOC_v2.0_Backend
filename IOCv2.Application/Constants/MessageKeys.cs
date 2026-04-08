@@ -1320,6 +1320,9 @@ namespace IOCv2.Application.Constants
             public const string FailedToAssignStudentsDueToConcurrentOperations = "UniAssign.FailedToAssignStudentsDueToConcurrentOperations";
             public const string UnauthorizedOrInvalidOperation = "UniAssign.UnauthorizedOrInvalidOperation";
             public const string EnterpriseIdIsRequired = "UniAssign.EnterpriseIdIsRequired";
+            // Bulk Reassign
+            public const string PendingStudentsWithExistingData = "UniAssign.PendingStudentsWithExistingData";
+            public const string NoStudentsAvailableForReassignment = "UniAssign.NoStudentsAvailableForReassignment";
         }
 
         public static class UserManagement
