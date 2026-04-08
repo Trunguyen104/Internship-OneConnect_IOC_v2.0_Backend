@@ -1865,228 +1865,228 @@
     <value>Password can only be reset for active accounts.</value>
   </data>
   <data name="Auth.UnitInactive" xml:space="preserve">
-    <value>System message: Auth.UnitInactive.</value>
+    <value>Your unit is currently inactive.</value>
   </data>
   <data name="Common.RecordNotFound" xml:space="preserve">
-    <value>System message: Common.RecordNotFound.</value>
+    <value>The requested record was not found.</value>
   </data>
   <data name="Enterprise.DuplicateTaxCode" xml:space="preserve">
-    <value>System message: Enterprise.DuplicateTaxCode.</value>
+    <value>This tax code already exists in the system.</value>
   </data>
   <data name="Enterprise.Inactive" xml:space="preserve">
-    <value>System message: Enterprise.Inactive.</value>
+    <value>This enterprise is currently inactive.</value>
   </data>
   <data name="Enterprise.Unverified" xml:space="preserve">
-    <value>System message: Enterprise.Unverified.</value>
+    <value>This enterprise has not been verified yet.</value>
   </data>
   <data name="Evaluation.AlreadyExists" xml:space="preserve">
-    <value>System message: Evaluation.AlreadyExists.</value>
+    <value>An evaluation for this student already exists.</value>
   </data>
   <data name="Evaluation.StudentNotFound" xml:space="preserve">
-    <value>System message: Evaluation.StudentNotFound.</value>
+    <value>The student to evaluate was not found.</value>
   </data>
   <data name="Evaluation.StudentNotInGroup" xml:space="preserve">
-    <value>System message: Evaluation.StudentNotInGroup.</value>
+    <value>The student does not belong to this internship group.</value>
   </data>
   <data name="EvaluationCriteria.MaxScoreInvalid" xml:space="preserve">
-    <value>System message: EvaluationCriteria.MaxScoreInvalid.</value>
+    <value>The maximum score is invalid.</value>
   </data>
   <data name="EvaluationCriteria.NameMaxLength" xml:space="preserve">
-    <value>System message: EvaluationCriteria.NameMaxLength.</value>
+    <value>The criteria name exceeds the maximum allowed length.</value>
   </data>
   <data name="EvaluationCriteria.NameRequired" xml:space="preserve">
-    <value>System message: EvaluationCriteria.NameRequired.</value>
+    <value>The criteria name is required.</value>
   </data>
   <data name="EvaluationCriteria.WeightInvalid" xml:space="preserve">
-    <value>System message: EvaluationCriteria.WeightInvalid.</value>
+    <value>The criteria weight is invalid.</value>
   </data>
   <data name="HRApplications.ApplicationNotActive" xml:space="preserve">
-    <value>System message: HRApplications.ApplicationNotActive.</value>
+    <value>The application is no longer in an actionable status.</value>
   </data>
   <data name="HRApplications.CannotRejectPlaced" xml:space="preserve">
-    <value>System message: HRApplications.CannotRejectPlaced.</value>
+    <value>Placed applications cannot be rejected.</value>
   </data>
   <data name="HRApplications.EnterpriseUserNotFound" xml:space="preserve">
-    <value>System message: HRApplications.EnterpriseUserNotFound.</value>
+    <value>Enterprise user information was not found.</value>
   </data>
   <data name="HRApplications.InvalidTransition" xml:space="preserve">
-    <value>System message: HRApplications.InvalidTransition.</value>
+    <value>This application status transition is not allowed.</value>
   </data>
   <data name="HRApplications.Log.ApproveUniAssign" xml:space="preserve">
-    <value>System message: HRApplications.Log.ApproveUniAssign.</value>
+    <value>Failed to log approval for university-assigned application.</value>
   </data>
   <data name="HRApplications.Log.CascadeWithdraw" xml:space="preserve">
-    <value>System message: HRApplications.Log.CascadeWithdraw.</value>
+    <value>Failed to process cascade withdrawal for related applications.</value>
   </data>
   <data name="HRApplications.Log.InvalidUserId" xml:space="preserve">
-    <value>System message: HRApplications.Log.InvalidUserId.</value>
+    <value>Could not identify the user performing this action.</value>
   </data>
   <data name="HRApplications.Log.MarkAsPlaced" xml:space="preserve">
-    <value>System message: HRApplications.Log.MarkAsPlaced.</value>
+    <value>Failed to update application status to Placed.</value>
   </data>
   <data name="HRApplications.Log.MoveToInterviewing" xml:space="preserve">
-    <value>System message: HRApplications.Log.MoveToInterviewing.</value>
+    <value>Failed to move the application to Interviewing.</value>
   </data>
   <data name="HRApplications.Log.Reject" xml:space="preserve">
-    <value>System message: HRApplications.Log.Reject.</value>
+    <value>Failed to reject the application.</value>
   </data>
   <data name="HRApplications.Log.RejectUniAssign" xml:space="preserve">
-    <value>System message: HRApplications.Log.RejectUniAssign.</value>
+    <value>Failed to reject university-assigned application.</value>
   </data>
   <data name="HRApplications.Log.SendOffer" xml:space="preserve">
-    <value>System message: HRApplications.Log.SendOffer.</value>
+    <value>Failed to send the offer to the applicant.</value>
   </data>
   <data name="HRApplications.NotFound" xml:space="preserve">
-    <value>System message: HRApplications.NotFound.</value>
+    <value>Application not found.</value>
   </data>
   <data name="HRApplications.NotSelfApplyApplication" xml:space="preserve">
-    <value>System message: HRApplications.NotSelfApplyApplication.</value>
+    <value>This application is not a self-applied application.</value>
   </data>
   <data name="HRApplications.NotUniAssignApplication" xml:space="preserve">
-    <value>System message: HRApplications.NotUniAssignApplication.</value>
+    <value>This application is not a university-assigned application.</value>
   </data>
   <data name="InternshipGroup.CannotArchiveNoData" xml:space="preserve">
-    <value>System message: InternshipGroup.CannotArchiveNoData.</value>
+    <value>This group cannot be archived because it has no activity data.</value>
   </data>
   <data name="Landing.Log.Processing" xml:space="preserve">
-    <value>System message: Landing.Log.Processing.</value>
+    <value>Your request is being processed.</value>
   </data>
   <data name="Logbooks.AlreadyReported" xml:space="preserve">
-    <value>System message: Logbooks.AlreadyReported.</value>
+    <value>You have already submitted a logbook for this period.</value>
   </data>
   <data name="Logbooks.CreationFailed" xml:space="preserve">
-    <value>System message: Logbooks.CreationFailed.</value>
+    <value>Failed to create logbook.</value>
   </data>
   <data name="Logbooks.DeleteFailed" xml:space="preserve">
-    <value>System message: Logbooks.DeleteFailed.</value>
+    <value>Failed to delete logbook.</value>
   </data>
   <data name="Logbooks.NoActiveInternship" xml:space="preserve">
-    <value>System message: Logbooks.NoActiveInternship.</value>
+    <value>You do not have any active internship at the moment.</value>
   </data>
   <data name="Logbooks.NotFound" xml:space="preserve">
-    <value>System message: Logbooks.NotFound.</value>
+    <value>Logbook not found.</value>
   </data>
   <data name="Logbooks.UpdateFailed" xml:space="preserve">
-    <value>System message: Logbooks.UpdateFailed.</value>
+    <value>Failed to update logbook.</value>
   </data>
   <data name="Notifications.AccessDenied" xml:space="preserve">
-    <value>System message: Notifications.AccessDenied.</value>
+    <value>You do not have permission to access this notification.</value>
   </data>
   <data name="Notifications.BulkDeleteSuccess" xml:space="preserve">
-    <value>System message: Notifications.BulkDeleteSuccess.</value>
+    <value>Selected notifications were deleted successfully.</value>
   </data>
   <data name="Notifications.DeleteError" xml:space="preserve">
-    <value>System message: Notifications.DeleteError.</value>
+    <value>Failed to delete notification.</value>
   </data>
   <data name="Notifications.DeleteNotOwner" xml:space="preserve">
-    <value>System message: Notifications.DeleteNotOwner.</value>
+    <value>You can only delete your own notifications.</value>
   </data>
   <data name="Notifications.DeleteSuccess" xml:space="preserve">
-    <value>System message: Notifications.DeleteSuccess.</value>
+    <value>Notification deleted successfully.</value>
   </data>
   <data name="Notifications.MarkAllReadSuccess" xml:space="preserve">
-    <value>System message: Notifications.MarkAllReadSuccess.</value>
+    <value>All notifications were marked as read.</value>
   </data>
   <data name="Notifications.MarkReadSuccess" xml:space="preserve">
-    <value>System message: Notifications.MarkReadSuccess.</value>
+    <value>Notification marked as read.</value>
   </data>
   <data name="Notifications.NotFound" xml:space="preserve">
-    <value>System message: Notifications.NotFound.</value>
+    <value>Notification not found.</value>
   </data>
   <data name="Profile.UserIdRequired" xml:space="preserve">
-    <value>System message: Profile.UserIdRequired.</value>
+    <value>User ID is required.</value>
   </data>
   <data name="ProjectResources.FileAndLinkMutuallyExclusive" xml:space="preserve">
-    <value>System message: ProjectResources.FileAndLinkMutuallyExclusive.</value>
+    <value>Please provide either a file or a link, not both.</value>
   </data>
   <data name="ProjectResources.FileOrLinkRequired" xml:space="preserve">
-    <value>System message: ProjectResources.FileOrLinkRequired.</value>
+    <value>Please provide a file or a link.</value>
   </data>
   <data name="ProjectResources.InvalidExternalUrl" xml:space="preserve">
-    <value>System message: ProjectResources.InvalidExternalUrl.</value>
+    <value>The external URL is invalid.</value>
   </data>
   <data name="ProjectResources.LinkDownloadNotSupported" xml:space="preserve">
-    <value>System message: ProjectResources.LinkDownloadNotSupported.</value>
+    <value>This link type does not support downloading.</value>
   </data>
   <data name="ProjectResources.LinkTypeRequired" xml:space="preserve">
-    <value>System message: ProjectResources.LinkTypeRequired.</value>
+    <value>Link type is required.</value>
   </data>
   <data name="ProjectResources.LogUploadAutoSetFileTypeError" xml:space="preserve">
-    <value>System message: ProjectResources.LogUploadAutoSetFileTypeError.</value>
+    <value>Failed to auto-detect file type during upload.</value>
   </data>
   <data name="ProjectResources.UpdateSuccess" xml:space="preserve">
-    <value>System message: ProjectResources.UpdateSuccess.</value>
+    <value>Project resource updated successfully.</value>
   </data>
   <data name="Projects.CannotDeleteActive" xml:space="preserve">
-    <value>System message: Projects.CannotDeleteActive.</value>
+    <value>Active projects cannot be deleted.</value>
   </data>
   <data name="Projects.CreateSuccess" xml:space="preserve">
-    <value>System message: Projects.CreateSuccess.</value>
+    <value>Project created successfully.</value>
   </data>
   <data name="Projects.InvalidStatus" xml:space="preserve">
-    <value>System message: Projects.InvalidStatus.</value>
+    <value>The project status is invalid.</value>
   </data>
   <data name="PublicHolidays.AlreadyExists" xml:space="preserve">
-    <value>System message: PublicHolidays.AlreadyExists.</value>
+    <value>This public holiday already exists.</value>
   </data>
   <data name="PublicHolidays.CreateSuccess" xml:space="preserve">
-    <value>System message: PublicHolidays.CreateSuccess.</value>
+    <value>Public holiday created successfully.</value>
   </data>
   <data name="PublicHolidays.DateRequired" xml:space="preserve">
-    <value>System message: PublicHolidays.DateRequired.</value>
+    <value>Public holiday date is required.</value>
   </data>
   <data name="PublicHolidays.DeleteSuccess" xml:space="preserve">
-    <value>System message: PublicHolidays.DeleteSuccess.</value>
+    <value>Public holiday deleted successfully.</value>
   </data>
   <data name="PublicHolidays.DescriptionMaxLength" xml:space="preserve">
-    <value>System message: PublicHolidays.DescriptionMaxLength.</value>
+    <value>Public holiday description exceeds the maximum length.</value>
   </data>
   <data name="PublicHolidays.NotFound" xml:space="preserve">
-    <value>System message: PublicHolidays.NotFound.</value>
+    <value>Public holiday not found.</value>
   </data>
   <data name="PublicHolidays.SyncApiError" xml:space="preserve">
-    <value>System message: PublicHolidays.SyncApiError.</value>
+    <value>Failed to sync public holidays from the external API.</value>
   </data>
   <data name="PublicHolidays.SyncApiKeyMissing" xml:space="preserve">
-    <value>System message: PublicHolidays.SyncApiKeyMissing.</value>
+    <value>API key for public holiday sync is missing.</value>
   </data>
   <data name="PublicHolidays.SyncSuccess" xml:space="preserve">
-    <value>System message: PublicHolidays.SyncSuccess.</value>
+    <value>Public holidays synced successfully.</value>
   </data>
   <data name="PublicHolidays.YearInvalid" xml:space="preserve">
-    <value>System message: PublicHolidays.YearInvalid.</value>
+    <value>The year value is invalid.</value>
   </data>
   <data name="Sprint.NewSprintNameRequired" xml:space="preserve">
-    <value>System message: Sprint.NewSprintNameRequired.</value>
+    <value>A new sprint name is required.</value>
   </data>
   <data name="Stakeholder.InvalidType" xml:space="preserve">
-    <value>System message: Stakeholder.InvalidType.</value>
+    <value>The stakeholder type is invalid.</value>
   </data>
   <data name="University.DuplicateCode" xml:space="preserve">
-    <value>System message: University.DuplicateCode.</value>
+    <value>This university code already exists.</value>
   </data>
   <data name="University.Inactive" xml:space="preserve">
-    <value>System message: University.Inactive.</value>
+    <value>This university is currently inactive.</value>
   </data>
   <data name="UserManagement.CodeMaxLength" xml:space="preserve">
-    <value>System message: UserManagement.CodeMaxLength.</value>
+    <value>User code exceeds the maximum length.</value>
   </data>
   <data name="UserManagement.CodeRequired" xml:space="preserve">
-    <value>System message: UserManagement.CodeRequired.</value>
+    <value>User code is required.</value>
   </data>
   <data name="Users.CodeConflict" xml:space="preserve">
-    <value>System message: Users.CodeConflict.</value>
+    <value>User code already exists.</value>
   </data>
   <data name="Users.CodeInvalidFormat" xml:space="preserve">
-    <value>System message: Users.CodeInvalidFormat.</value>
+    <value>User code format is invalid.</value>
   </data>
   <data name="Users.NewRoleMustBeDifferent" xml:space="preserve">
-    <value>System message: Users.NewRoleMustBeDifferent.</value>
+    <value>The new role must be different from the current role.</value>
   </data>
   <data name="Users.RoleChangedButEmailFailed" xml:space="preserve">
-    <value>System message: Users.RoleChangedButEmailFailed.</value>
+    <value>Role updated successfully, but notification email failed to send.</value>
   </data>
   <data name="Users.RoleMismatch" xml:space="preserve">
-    <value>System message: Users.RoleMismatch.</value>
+    <value>User role does not match the required role for this action.</value>
   </data>
 </root>
