@@ -1363,6 +1363,9 @@
   <data name="HRApplications.Notify.Student.AutoWithdrawn" xml:space="preserve">
     <value>Your application has been automatically withdrawn because the recruitment phase ended.</value>
   </data>
+  <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
+    <value>Cannot delete this job posting because it has {0} application.</value>
+  </data>
   <data name="JobPosting.UploadCVRequired" xml:space="preserve">
     <value>You have not uploaded a CV. Please upload your CV before applying.</value>
   </data>
@@ -1376,7 +1379,7 @@
     <value>The application deadline has passed.</value>
   </data>
   <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
-    <value>There is currently no active internship period to apply for.</value>
+    <value>No active internship phase found for job</value>
   </data>
   <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
     <value>You already have an active application and cannot submit another one.</value>
@@ -1443,8 +1446,5 @@
   </data>
   <data name="Validation.InvalidStatus" xml:space="preserve">
     <value>Status is invalid.</value>
-  </data>
-  <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
-    <value>Cannot delete this job posting because it has {0} application.</value>
   </data>
 </root>

@@ -2114,6 +2114,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy giai đoạn thực tập nào đang hoạt động cho công việc này..
+        /// </summary>
+        internal static string JobPosting_NoActiveInternshipPeriod {
+            get {
+                return ResourceManager.GetString("JobPosting.NoActiveInternshipPeriod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bạn không có quyền truy cập vào tài nguyên này..
         /// </summary>
         internal static string JobPosting_NotAllowed {
