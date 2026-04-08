@@ -176,5 +176,58 @@ namespace IOCv2.Tests.Features.Projects
             result.ErrorType.Should().Be(ResultErrorType.Conflict);
             _mockProjectRepo.Verify(x => x.AddAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Never);
         }
+
+        [Fact]
+        public async Task Handle_WithGroupAndPublish_ShouldSendNotifications()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var mentorId = Guid.NewGuid();
+            var studentUserId = Guid.NewGuid();
+            var group = InternshipGroup.Create(Guid.NewGuid(), "Group 06", mentorId: mentorId);
+            
+            var command = new CreateProjectCommand
+            {
+                ProjectName = "Notify Project",
+                InternshipGroupId = group.InternshipId,
+                PublishOnSave = true
+            };
+
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = mentorId, UserId = userId }
+            }.AsQueryable().BuildMock());
+
+            _mockInternshipRepo.Setup(x => x.Query())
+                .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
+            
+            _mockProjectRepo.Setup(x => x.Query()).Returns(new List<Project>().AsQueryable().BuildMock());
+
+            // Mock InternshipStudent for notifications
+            var studentRepo = new Mock<IGenericRepository<InternshipStudent>>();
+            studentRepo.Setup(x => x.Query()).Returns(new List<InternshipStudent>
+            {
+                new InternshipStudent { 
+                    InternshipId = group.InternshipId, 
+                    Student = new Student { UserId = studentUserId } 
+                }
+            }.AsQueryable().BuildMock());
+            _mockUnitOfWork.Setup(x => x.Repository<InternshipStudent>()).Returns(studentRepo.Object);
+
+            // Mock Notification
+            var notificationRepo = new Mock<IGenericRepository<Notification>>();
+            _mockUnitOfWork.Setup(x => x.Repository<Notification>()).Returns(notificationRepo.Object);
+
+            _mockMapper.Setup(x => x.Map<CreateProjectResponse>(It.IsAny<Project>()))
+                .Returns(new CreateProjectResponse { ProjectName = "Notify Project" });
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            notificationRepo.Verify(x => x.AddAsync(It.IsAny<Notification>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
     }
 }
