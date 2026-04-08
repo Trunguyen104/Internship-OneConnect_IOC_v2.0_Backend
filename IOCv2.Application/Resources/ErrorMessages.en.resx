@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -565,7 +565,7 @@
     <value>Full name is required.</value>
   </data>
   <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
-    <value>Full name is invalid. Only letters and spaces are allowed — no numbers or special characters.</value>
+    <value>Full name is invalid. Only letters and spaces are allowed â€” no numbers or special characters.</value>
   </data>
   <data name="StudentTerms.StudentCodeRequired" xml:space="preserve">
     <value>Student code is required.</value>
@@ -744,7 +744,7 @@
   <data name="Terms.NameMaxLength" xml:space="preserve">
     <value>Term name cannot exceed 255 characters.</value>
   </data>
-    <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
+  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
     <value>Term name contains disallowed characters. Please avoid using special characters such as &lt; &gt; &amp; " ' ; or script-like content.</value>
   </data>
   <data name="Terms.NameExists" xml:space="preserve">
@@ -774,7 +774,7 @@
   <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
     <value>This time period overlaps with term [{0}].</value>
   </data>
-    <data name="Terms.CreateSuccess" xml:space="preserve">
+  <data name="Terms.CreateSuccess" xml:space="preserve">
     <value>The term has been created successfully and is currently in Draft status. You can update details and open the term when ready.</value>
   </data>
   <data name="Terms.UpdateSuccess" xml:space="preserve">
@@ -804,10 +804,10 @@
   <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
     <value>There are {0} students without company assignments in this term. Are you sure you want to close it?</value>
   </data>
-    <data name="Terms.HasRelatedData" xml:space="preserve">
+  <data name="Terms.HasRelatedData" xml:space="preserve">
     <value>Warning: This term has related data (enrolled students, internship groups, or evaluation cycles). Please handle related data before deleting.</value>
   </data>
-    <data name="Terms.StartDateLocked" xml:space="preserve">
+  <data name="Terms.StartDateLocked" xml:space="preserve">
     <value>The start date cannot be changed because the term has already begun. Only the end date and other details can still be edited.</value>
   </data>
   <data name="Terms.YearInvalidRange" xml:space="preserve">
@@ -978,10 +978,10 @@
   <data name="InternshipGroup.TermNotFound" xml:space="preserve">
     <value>Term not found.</value>
   </data>
-    <data name="InternshipGroup.TermNotActive" xml:space="preserve">
+  <data name="InternshipGroup.TermNotActive" xml:space="preserve">
     <value>The term is not currently active. Internship groups can only be created in an active term.</value>
   </data>
-    <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
     <value>Enterprise not found.</value>
   </data>
   <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
@@ -1323,14 +1323,13 @@
   <data name="InternshipGroup.HasActivityData" xml:space="preserve">
     <value>The group has existing activity data (logbooks, evaluations, violations, or projects with content) and cannot be deleted. Please use the Archive function to preserve history.</value>
   </data>
-    <data name="ViolationReport.ErrorOccurredWhileDeletingViolationReport" xml:space="preserve">
+  <data name="ViolationReport.ErrorOccurredWhileDeletingViolationReport" xml:space="preserve">
     <value>An error occurred while deleting violation report {0}.</value>
   </data>
-    <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
+  <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
     <value>An error occurred while retrieving violation report details.</value>
   </data>
-
-  <!-- ActivePhases (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <!-- ActivePhases (ISSUE-68) â€” Enterprise HR/Mentor View Term Timeline -->
   <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Your session is invalid. Please sign out and sign in again.</value>
   </data>
@@ -1549,5 +1548,284 @@
   </data>
   <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
     <value>Student ID is required.</value>
+  </data>
+  <data name="Auth.EmailInvalidFormat" xml:space="preserve">
+    <value>Invalid email format.</value>
+  </data>
+  <data name="Auth.EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="Common.InvalidRequest" xml:space="preserve">
+    <value>Invalid request.</value>
+  </data>
+  <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>Contact email already exists.</value>
+  </data>
+  <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
+    <value>Contact email is invalid.</value>
+  </data>
+  <data name="Enterprise.NameRequired" xml:space="preserve">
+    <value>Enterprise name is required.</value>
+  </data>
+  <data name="Enterprise.TaxCodeInvalid" xml:space="preserve">
+    <value>Invalid tax code.</value>
+  </data>
+  <data name="Enterprise.TaxCodeRequired" xml:space="preserve">
+    <value>Tax code is required.</value>
+  </data>
+  <data name="Epic.EpicIdRequired" xml:space="preserve">
+    <value>Epic ID is required.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.MaxScoreInvalid" xml:space="preserve">
+    <value>Max score is invalid.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.NameMaxLength" xml:space="preserve">
+    <value>Criteria name exceeds maximum length.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.NameRequired" xml:space="preserve">
+    <value>Criteria name is required.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.WeightInvalid" xml:space="preserve">
+    <value>Weight is invalid.</value>
+  </data>
+  <data name="EvaluationCycle.NameMaxLength" xml:space="preserve">
+    <value>Evaluation cycle name exceeds maximum length.</value>
+  </data>
+  <data name="HRApplications.ApplicationIdRequired" xml:space="preserve">
+    <value>Application ID is required.</value>
+  </data>
+  <data name="HRApplications.RejectReasonMaxLength" xml:space="preserve">
+    <value>Reject reason exceeds maximum length.</value>
+  </data>
+  <data name="HRApplications.RejectReasonMinLength" xml:space="preserve">
+    <value>Reject reason is too short.</value>
+  </data>
+  <data name="HRApplications.RejectReasonRequired" xml:space="preserve">
+    <value>Reject reason is required.</value>
+  </data>
+  <data name="InternshipGroups.AssignMentorGroupIdRequired" xml:space="preserve">
+    <value>Group ID is required.</value>
+  </data>
+  <data name="InternshipGroups.AssignMentorMentorRequired" xml:space="preserve">
+    <value>Mentor is required.</value>
+  </data>
+  <data name="InternshipGroups.NameMaxLength" xml:space="preserve">
+    <value>Group name exceeds maximum length.</value>
+  </data>
+  <data name="InternshipGroups.NameRequired" xml:space="preserve">
+    <value>Group name is required.</value>
+  </data>
+  <data name="InternshipGroups.StartDateBeforeEndDate" xml:space="preserve">
+    <value>Start date must be before end date.</value>
+  </data>
+  <data name="InternshipGroups.StudentListRequired" xml:space="preserve">
+    <value>Student list is required.</value>
+  </data>
+  <data name="InternshipGroups.StudentListToRemoveRequired" xml:space="preserve">
+    <value>List of students to remove is required.</value>
+  </data>
+  <data name="InternshipPhase.DescriptionMaxLength" xml:space="preserve">
+    <value>Description exceeds maximum length.</value>
+  </data>
+  <data name="InternshipPhase.DurationMaxDays" xml:space="preserve">
+    <value>Maximum duration is invalid.</value>
+  </data>
+  <data name="InternshipPhase.DurationMinDays" xml:space="preserve">
+    <value>Minimum duration is invalid.</value>
+  </data>
+  <data name="InternshipPhase.EndDateAfterStartDate" xml:space="preserve">
+    <value>End date must be after start date.</value>
+  </data>
+  <data name="InternshipPhase.EndDateRequired" xml:space="preserve">
+    <value>End date is required.</value>
+  </data>
+  <data name="InternshipPhase.EnterpriseIdRequired" xml:space="preserve">
+    <value>Enterprise ID is required.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsMaxLength" xml:space="preserve">
+    <value>Major fields exceed maximum length.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsRequired" xml:space="preserve">
+    <value>Major fields are required.</value>
+  </data>
+  <data name="InternshipPhase.MaxStudentsGreaterThanZero" xml:space="preserve">
+    <value>Maximum students must be greater than zero.</value>
+  </data>
+  <data name="InternshipPhase.NameMaxLength" xml:space="preserve">
+    <value>Phase name exceeds maximum length.</value>
+  </data>
+  <data name="InternshipPhase.NameRequired" xml:space="preserve">
+    <value>Phase name is required.</value>
+  </data>
+  <data name="InternshipPhase.PageNumberMinValue" xml:space="preserve">
+    <value>Page number must be greater than 0.</value>
+  </data>
+  <data name="InternshipPhase.PageSizeRange" xml:space="preserve">
+    <value>Page size is invalid.</value>
+  </data>
+  <data name="InternshipPhase.PhaseIdRequired" xml:space="preserve">
+    <value>Phase ID is required.</value>
+  </data>
+  <data name="InternshipPhase.StartDateNotInPast" xml:space="preserve">
+    <value>Start date cannot be in the past.</value>
+  </data>
+  <data name="InternshipPhase.StartDateRequired" xml:space="preserve">
+    <value>Start date is required.</value>
+  </data>
+  <data name="InternshipPhase.StatusInvalid" xml:space="preserve">
+    <value>Invalid status.</value>
+  </data>
+  <data name="JobPostingMessageKey.AudienceInvalid" xml:space="preserve">
+    <value>Target audience is invalid.</value>
+  </data>
+  <data name="JobPostingMessageKey.BenefitTooLong" xml:space="preserve">
+    <value>Benefits text exceeds maximum length.</value>
+  </data>
+  <data name="JobPostingMessageKey.DescriptionTooLong" xml:space="preserve">
+    <value>Description exceeds maximum length.</value>
+  </data>
+  <data name="JobPostingMessageKey.ExpireDateMustBeTodayOrLater" xml:space="preserve">
+    <value>Expiration date must be today or later.</value>
+  </data>
+  <data name="JobPostingMessageKey.InvalidStatus" xml:space="preserve">
+    <value>Invalid status.</value>
+  </data>
+  <data name="JobPostingMessageKey.LocationRequired" xml:space="preserve">
+    <value>Location is required.</value>
+  </data>
+  <data name="JobPostingMessageKey.LocationTooLong" xml:space="preserve">
+    <value>Location exceeds maximum length.</value>
+  </data>
+  <data name="JobPostingMessageKey.RequirementsTooLong" xml:space="preserve">
+    <value>Requirements exceed maximum length.</value>
+  </data>
+  <data name="JobPostingMessageKey.TargetedRequiresSingleUniversity" xml:space="preserve">
+    <value>Targeted job posting requires exactly one university.</value>
+  </data>
+  <data name="JobPostingMessageKey.TitleRequired" xml:space="preserve">
+    <value>Job title is required.</value>
+  </data>
+  <data name="JobPostingMessageKey.TitleTooLong" xml:space="preserve">
+    <value>Job title exceeds maximum length.</value>
+  </data>
+  <data name="JobPostingMessageKey.UniversityRequiredForTargetAudience" xml:space="preserve">
+    <value>University is required for the target audience.</value>
+  </data>
+  <data name="Notifications.BulkDeleteEmptyIds" xml:space="preserve">
+    <value>Notification IDs list cannot be empty.</value>
+  </data>
+  <data name="Notifications.NotificationIdRequired" xml:space="preserve">
+    <value>Notification ID is required.</value>
+  </data>
+  <data name="Page.PageNumberMinValue" xml:space="preserve">
+    <value>Minimum page number is 1.</value>
+  </data>
+  <data name="Page.PageSizeMaxValue" xml:space="preserve">
+    <value>Page size exceeds maximum.</value>
+  </data>
+  <data name="Page.PageSizeMinValue" xml:space="preserve">
+    <value>Minimum page size is 1.</value>
+  </data>
+  <data name="Page.SearchTermMaxLength" xml:space="preserve">
+    <value>Search term exceeds maximum length.</value>
+  </data>
+  <data name="Page.SortColumnAllowedValues" xml:space="preserve">
+    <value>Invalid sort column.</value>
+  </data>
+  <data name="Page.SortOrderAllowedValues" xml:space="preserve">
+    <value>Invalid sort order.</value>
+  </data>
+  <data name="ProjectResourcesKey.FileAndLinkMutuallyExclusive" xml:space="preserve">
+    <value>File and link are mutually exclusive.</value>
+  </data>
+  <data name="ProjectResourcesKey.FileOrLinkRequired" xml:space="preserve">
+    <value>File or link is required.</value>
+  </data>
+  <data name="ProjectResourcesKey.FileSizeExceeded" xml:space="preserve">
+    <value>File size exceeds limit.</value>
+  </data>
+  <data name="ProjectResourcesKey.InvalidExternalUrl" xml:space="preserve">
+    <value>Invalid external URL.</value>
+  </data>
+  <data name="ProjectResourcesKey.InvalidFileType" xml:space="preserve">
+    <value>Invalid file type.</value>
+  </data>
+  <data name="ProjectResourcesKey.LinkTypeRequired" xml:space="preserve">
+    <value>Link type is required.</value>
+  </data>
+  <data name="ProjectResourcesKey.ProjectIdRequired" xml:space="preserve">
+    <value>Project ID is required.</value>
+  </data>
+  <data name="ProjectResourcesKey.ResourceNameMaxLength" xml:space="preserve">
+    <value>Resource name exceeds maximum length.</value>
+  </data>
+  <data name="Projects.ProjectsProjectNameRequired" xml:space="preserve">
+    <value>Project name is required.</value>
+  </data>
+  <data name="Stakeholder.InternshipIdRequired" xml:space="preserve">
+    <value>Internship ID is required.</value>
+  </data>
+  <data name="StudentMessageKey.StudentIdRequired" xml:space="preserve">
+    <value>Student ID is required.</value>
+  </data>
+  <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
+    <value>Enterprise ID is required.</value>
+  </data>
+  <data name="University.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>University contact email already exists.</value>
+  </data>
+  <data name="UserManagement.CODE_MAX_LEN" xml:space="preserve">
+    <value>User code exceeds maximum length.</value>
+  </data>
+  <data name="UserManagement.CODE_REQ" xml:space="preserve">
+    <value>User code is required.</value>
+  </data>
+  <data name="Validation.DescriptionMaxLength" xml:space="preserve">
+    <value>Description exceeds maximum length.</value>
+  </data>
+  <data name="Validation.IdRequired" xml:space="preserve">
+    <value>ID is required.</value>
+  </data>
+  <data name="Validation.NameMaxLength" xml:space="preserve">
+    <value>Name exceeds maximum length.</value>
+  </data>
+  <data name="Validation.TermRequiredForStudent" xml:space="preserve">
+    <value>Term is required for student.</value>
+  </data>
+  <data name="Validation.UserInvalidDateFormat" xml:space="preserve">
+    <value>Invalid date format.</value>
+  </data>
+  <data name="Validation.UserInvalidGender" xml:space="preserve">
+    <value>Invalid gender.</value>
+  </data>
+  <data name="Validation.UserInvalidPhone" xml:space="preserve">
+    <value>Invalid phone number.</value>
+  </data>
+  <data name="Validation.UserInvalidRole" xml:space="preserve">
+    <value>Invalid role.</value>
+  </data>
+  <data name="Validation.UserInvalidStatus" xml:space="preserve">
+    <value>Invalid status.</value>
+  </data>
+  <data name="Validation.UserUnitRequired" xml:space="preserve">
+    <value>Unit is required.</value>
+  </data>
+  <data name="ViolationReportKey.DescriptionIsRequired" xml:space="preserve">
+    <value>Violation description is required.</value>
+  </data>
+  <data name="ViolationReportKey.DescriptionMaxLength" xml:space="preserve">
+    <value>Violation description exceed maximum length.</value>
+  </data>
+  <data name="ViolationReportKey.DescriptionMinLength" xml:space="preserve">
+    <value>Violation description is too short.</value>
+  </data>
+  <data name="ViolationReportKey.OccurredDateInFuture" xml:space="preserve">
+    <value>Violation date cannot be in the future.</value>
+  </data>
+  <data name="ViolationReportKey.OccurredDateIsRequired" xml:space="preserve">
+    <value>Violation date is required.</value>
+  </data>
+  <data name="ViolationReportKey.ViolationReportIdIsRequired" xml:space="preserve">
+    <value>Violation report ID is required.</value>
   </data>
 </root>
