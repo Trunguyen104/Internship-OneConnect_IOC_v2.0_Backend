@@ -1770,6 +1770,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ngày bắt đầu giai đoạn thực tập là sau ngày kết thúc giai đoạn này..
+        /// </summary>
+        internal static string InternshipPhase_StartDateAfterEndDate {
+            get {
+                return ResourceManager.GetString("InternshipPhase.StartDateAfterEndDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ngày bắt đầu không được là ngày trong quá khứ..
         /// </summary>
         internal static string InternshipPhase_StartDateNotInPast {
@@ -3850,11 +3859,56 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Đã gửi chỉ định mới cho {0} sinh viên sang {1}. Đang chờ doanh nghiệp xác nhận..
+        /// </summary>
+        internal static string UniAssign_BulkReassignSuccess {
+            get {
+                return ResourceManager.GetString("UniAssign.BulkReassignSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã hủy chỉ định của {0} sinh viên..
+        /// </summary>
+        internal static string UniAssign_BulkUnassignSuccess {
+            get {
+                return ResourceManager.GetString("UniAssign.BulkUnassignSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Không thể đổi enterprise. Sinh viên đã có dữ liệu thực tập..
         /// </summary>
         internal static string UniAssign_CannotChangeEnterpriseStudentHasInternshipData {
             get {
                 return ResourceManager.GetString("UniAssign.CannotChangeEnterpriseStudentHasInternshipData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể đổi enterprise cho {0}. Sinh viên này đã có dữ liệu thực tập (logbook / sprint / đánh giá) tại {1}. Vui lòng liên hệ quản trị viên hệ thống nếu cần xử lý đặc biệt..
+        /// </summary>
+        internal static string UniAssign_CannotReassignStudentHasInternshipData {
+            get {
+                return ResourceManager.GetString("UniAssign.CannotReassignStudentHasInternshipData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể hủy phân bổ sinh viên khỏi các kỳ học đã đóng..
+        /// </summary>
+        internal static string UniAssign_CannotUnassignFromClosedTerms {
+            get {
+                return ResourceManager.GetString("UniAssign.CannotUnassignFromClosedTerms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã xảy ra xung đột đồng thời. Một người khác vừa gán sinh viên này. Vui lòng tải lại trang và thử lại..
+        /// </summary>
+        internal static string UniAssign_ConcurrencyConflict {
+            get {
+                return ResourceManager.GetString("UniAssign.ConcurrencyConflict", resourceCulture);
             }
         }
         
@@ -3877,11 +3931,38 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bạn chỉ có thể truy cập danh sách sinh viên của trường đại học của bạn..
+        /// </summary>
+        internal static string UniAssign_GetNotAllowed {
+            get {
+                return ResourceManager.GetString("UniAssign.GetNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Intern Phase này vừa đủ số lượng nhận. Vui lòng chọn phase hoặc doanh nghiệp khác..
+        /// </summary>
+        internal static string UniAssign_InternPhaseFull {
+            get {
+                return ResourceManager.GetString("UniAssign.InternPhaseFull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Intern Phase {0} của {1} chỉ còn {2} slot. Bạn đang assign {3} sinh viên. Vui lòng giảm số lượng hoặc chọn phase/doanh nghiệp khác..
         /// </summary>
         internal static string UniAssign_InternPhaseInsufficientSlots {
             get {
                 return ResourceManager.GetString("UniAssign.InternPhaseInsufficientSlots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể gửi chỉ định mới: intern phase đã hết chỗ..
+        /// </summary>
+        internal static string UniAssign_InternPhaseNoCapacity {
+            get {
+                return ResourceManager.GetString("UniAssign.InternPhaseNoCapacity", resourceCulture);
             }
         }
         
@@ -3922,6 +4003,15 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Giai đoạn thực tập phải có ít nhất một tin tuyển dụng đã đăng hoặc đã đóng..
+        /// </summary>
+        internal static string UniAssign_NoJobPosting {
+            get {
+                return ResourceManager.GetString("UniAssign.NoJobPosting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Không có sinh viên nào trong danh sách có thể đổi enterprise. Tất cả đã có dữ liệu thực tập..
         /// </summary>
         internal static string UniAssign_NoStudentsAvailableForReassignment {
@@ -3931,11 +4021,101 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Không có sinh viên nào có thể đổi enterprise vì một số sinh viên đang có đơn tự ứng tuyển đang xử lý tại doanh nghiệp đích..
+        /// </summary>
+        internal static string UniAssign_NoStudentsCanReassignDueToPendingApplications {
+            get {
+                return ResourceManager.GetString("UniAssign.NoStudentsCanReassignDueToPendingApplications", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Học kỳ này không được phép chuyển nhượng..
+        /// </summary>
+        internal static string UniAssign_NotOpenForAssignment {
+            get {
+                return ResourceManager.GetString("UniAssign.NotOpenForAssignment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy đơn đăng ký Uni-assign nào cho các sinh viên đã chọn..
+        /// </summary>
+        internal static string UniAssign_NoUniAssignApplicationsFound {
+            get {
+                return ResourceManager.GetString("UniAssign.NoUniAssignApplicationsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Không thể đổi enterprise cho những sinh viên sau vì họ đang ở trạng thái PendingAssignment nhưng đã có dữ liệu thực tập từ kỳ khác: {0}.
         /// </summary>
         internal static string UniAssign_PendingStudentsWithExistingData {
             get {
                 return ResourceManager.GetString("UniAssign.PendingStudentsWithExistingData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã gửi chỉ định [{0}] cho [{1}]. Đang chờ doanh nghiệp xác nhận..
+        /// </summary>
+        internal static string UniAssign_QuickAssignSuccess {
+            get {
+                return ResourceManager.GetString("UniAssign.QuickAssignSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chỉ định của {0} đã được cập nhật. Enterprise mới: {1}. Đang chờ doanh nghiệp xác nhận..
+        /// </summary>
+        internal static string UniAssign_ReassignPendingSuccess {
+            get {
+                return ResourceManager.GetString("UniAssign.ReassignPendingSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể thay đổi placement khi kỳ đã kết thúc..
+        /// </summary>
+        internal static string UniAssign_ReassignTermsClosed {
+            get {
+                return ResourceManager.GetString("UniAssign.ReassignTermsClosed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sinh viên đã được phân công hoặc đã có đơn ứng tuyển thành công..
+        /// </summary>
+        internal static string UniAssign_StudentAlreadyPlaced {
+            get {
+                return ResourceManager.GetString("UniAssign.StudentAlreadyPlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sinh viên {0} đang có đơn tự ứng tuyển đang xử lý tại {1} (trạng thái: {2}). Vui lòng chọn doanh nghiệp khác hoặc yêu cầu sinh viên rút đơn trước..
+        /// </summary>
+        internal static string UniAssign_StudentHasPendingApplicationAtEnterprise {
+            get {
+                return ResourceManager.GetString("UniAssign.StudentHasPendingApplicationAtEnterprise", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không thể assign. Sinh viên đã có dữ liệu thực tập từ kỳ trước..
+        /// </summary>
+        internal static string UniAssign_StudentHasPriorInternshipData {
+            get {
+                return ResourceManager.GetString("UniAssign.StudentHasPriorInternshipData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy sinh viên..
+        /// </summary>
+        internal static string UniAssign_StudentNotFound {
+            get {
+                return ResourceManager.GetString("UniAssign.StudentNotFound", resourceCulture);
             }
         }
         
@@ -3972,6 +4152,15 @@ namespace IOCv2.Application.Resources {
         internal static string UniAssign_TermNotOpenForAssignment {
             get {
                 return ResourceManager.GetString("UniAssign.TermNotOpenForAssignment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đã hủy placement của {0}..
+        /// </summary>
+        internal static string UniAssign_UnassignSuccess {
+            get {
+                return ResourceManager.GetString("UniAssign.UnassignSuccess", resourceCulture);
             }
         }
         

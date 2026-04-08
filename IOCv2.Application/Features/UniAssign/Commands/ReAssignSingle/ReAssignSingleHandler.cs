@@ -46,7 +46,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
             {
                 if (!Guid.TryParse(_currentUserService.UserId, out var currentUserId))
                     return Result<ReAssignSingleResponse>.Failure(
-                        "Unauthorized",
+                        _messageService.GetMessage(MessageKeys.Common.Unauthorized),
                         ResultErrorType.Unauthorized);
 
                 // Resolve UniversityUser (uni admin)
@@ -119,7 +119,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
                 {
                     var statusLabel = existingSelfApply.Status.ToString();
                     var enterpriseName = existingSelfApply.Enterprise?.Name ?? (await _unitOfWork.Repository<Enterprise>().Query().Where(e => e.EnterpriseId == request.NewEnterpriseId).Select(e => e.Name).FirstOrDefaultAsync(cancellationToken)) ?? string.Empty;
-                    var blockMsg = $"Sinh viên {studentName} đang có đơn tự ứng tuyển đang xử lý tại {enterpriseName} (trạng thái: {statusLabel}). Vui lòng chọn doanh nghiệp khác hoặc yêu cầu sinh viên rút đơn trước.";
+                    var blockMsg = _messageService.GetMessage(MessageKeys.UniAssign.StudentHasPendingApplicationAtEnterprise, studentName, enterpriseName, statusLabel);
                     _logger.LogInformation("Hard-block reassign for student {StudentId} due to existing self-apply application at enterprise {EnterpriseId}.", studentId, request.NewEnterpriseId);
                     return Result<ReAssignSingleResponse>.Failure(blockMsg, ResultErrorType.Conflict);
                 }
@@ -191,7 +191,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
 
                 if (hasLogbooks || hasSprints || hasEvaluations)
                 {
-                    var blockMsg = $"Không thể đổi enterprise cho {studentName}. Sinh viên này đã có dữ liệu thực tập (logbook / sprint / đánh giá) tại {oldEnterpriseName}. Vui lòng liên hệ quản trị viên hệ thống nếu cần xử lý đặc biệt.";
+                    var blockMsg = _messageService.GetMessage(MessageKeys.UniAssign.CannotReassignStudentHasInternshipData, studentName, oldEnterpriseName);
                     _logger.LogInformation("Hard-block reassign for student {StudentId} due to existing internship data.", studentId);
                     return Result<ReAssignSingleResponse>.Failure(blockMsg, ResultErrorType.Conflict);
                 }
@@ -259,7 +259,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
                             app.ApplicationId,
                             newEnterpriseName), cancellationToken);
                     }
-
+                    var enterpriseName = (await _unitOfWork.Repository<Enterprise>().Query().Where(e => e.EnterpriseId == request.NewEnterpriseId).Select(e => e.Name).FirstOrDefaultAsync(cancellationToken));
                     var respPending = new ReAssignSingleResponse
                     {
                         OldApplicationId = app.ApplicationId,
@@ -267,7 +267,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
                         Status = app.Status,
                         StatusLabel = app.Status.ToString(),
                         UpdatedAt = DateTime.UtcNow,
-                        Message = $"Chỉ định của {studentName} đã được cập nhật. Enterprise mới: {(await _unitOfWork.Repository<Enterprise>().Query().Where(e => e.EnterpriseId == request.NewEnterpriseId).Select(e => e.Name).FirstOrDefaultAsync(cancellationToken))}. Đang chờ doanh nghiệp xác nhận."
+                        Message = _messageService.GetMessage(MessageKeys.UniAssign.ReassignPendingSuccess, studentName, enterpriseName!)
                     };
 
                     _logger.LogInformation("ReAssignSingle (pending) completed for application {ApplicationId}", app.ApplicationId);

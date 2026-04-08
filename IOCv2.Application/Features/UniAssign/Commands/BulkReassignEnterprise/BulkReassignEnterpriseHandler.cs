@@ -174,13 +174,13 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                     select t
                 ).FirstOrDefaultAsync(cancellationToken);
 
-                if (term == null) return Result<BulkReassignEnterpriseResponse>.Failure("Term not found.", ResultErrorType.NotFound);
+                if (term == null) return Result<BulkReassignEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Terms.NotFound), ResultErrorType.NotFound);
 
                 // Optional: if request exposes a TermStatus, check it and short-circuit if ended/closed.
                 if (term.Status == TermStatus.Closed)
                 {
                     // UI: should disable the button; return a failure that the UI can map to a disabled tooltip.
-                    return Result<BulkReassignEnterpriseResponse>.Failure("Không thể thay đổi placement khi kỳ đã kết thúc.", ResultErrorType.BadRequest);
+                    return Result<BulkReassignEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.ReassignTermsClosed), ResultErrorType.BadRequest);
                 }
 
                 var now = DateTime.UtcNow;
@@ -229,7 +229,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                     // If all students excluded, return response so UI can disable confirm and show message.
                     if (!students.Any())
                     {
-                        var message = "Không có sinh viên nào có thể đổi enterprise vì một số sinh viên đang có đơn tự ứng tuyển đang xử lý tại doanh nghiệp đích.";
+                        var message = _messageService.GetMessage(MessageKeys.UniAssign.NoStudentsCanReassignDueToPendingApplications);
                         var response = new BulkReassignEnterpriseResponse
                         {
                             Message = message
@@ -289,7 +289,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                 // Validate target intern phase id
                 if (request.NewInternPhaseId == Guid.Empty)
                 {
-                    return Result<BulkReassignEnterpriseResponse>.Failure("Internship phase not found.", ResultErrorType.NotFound);
+                    return Result<BulkReassignEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipPhase.NotFound), ResultErrorType.NotFound);
                 }
 
                 // --- Capacity check: ensure target intern phase has remaining capacity > 0 before creating pending applications ---
@@ -303,7 +303,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                 // If phase is not found
                 if (phaseCapacity == 0 && !await _unitOfWork.Repository<InternshipPhase>().Query().AnyAsync(p => p.PhaseId == request.NewInternPhaseId && p.DeletedAt == null, cancellationToken))
                 {
-                    return Result<BulkReassignEnterpriseResponse>.Failure("Selected intern phase not found.", ResultErrorType.NotFound);
+                    return Result<BulkReassignEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipPhase.NotFound), ResultErrorType.NotFound);
                 }
 
                 var placedInPhaseCount = await _unitOfWork.Repository<InternshipApplication>()
@@ -318,7 +318,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                 if (remainingCapacity <= 0)
                 {
                     // No capacity in the chosen phase — abort and inform caller so UI can disable confirm
-                    var message = "Không thể gửi chỉ định mới: intern phase đã hết chỗ (remainingCapacity = 0).";
+                    var message = _messageService.GetMessage(MessageKeys.UniAssign.InternPhaseNoCapacity);
                     _logger.LogInformation("Bulk reassignment aborted: target intern phase {PhaseId} has remainingCapacity {RemainingCapacity}", request.NewInternPhaseId, remainingCapacity);
                     var response = new BulkReassignEnterpriseResponse
                     {
@@ -395,7 +395,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                         .FirstOrDefaultAsync(cancellationToken) ?? "đơn vị";
 
                     var assignedCount = remainingStudentIds.Count;
-                    var toast = $"Đã gửi chỉ định mới cho {assignedCount} sinh viên sang {enterpriseName}. Đang chờ doanh nghiệp xác nhận.";
+                    var toast = _messageService.GetMessage(MessageKeys.UniAssign.BulkReassignSuccess, assignedCount, enterpriseName);
 
                     _logger.LogInformation("Bulk reassigned {Count} students to enterprise {EnterpriseId} by user {UserId}", assignedCount, request.NewEnterpriseId, currentUserId);
 
@@ -452,10 +452,10 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkReassignEnterprise
                 {
                     _logger.LogError(ex, "Error during bulk reassignment of students to enterprise {EnterpriseId} by user {UserId}", request.NewEnterpriseId, currentUserId);
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                    return Result<BulkReassignEnterpriseResponse>.Failure("An error occurred while reassigning students. Please try again.", ResultErrorType.InternalServerError);
+                    return Result<BulkReassignEnterpriseResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
                 }
             }
-            return Result<BulkReassignEnterpriseResponse>.Failure("You do not have permission to perform this action.", ResultErrorType.Unauthorized);
+            return Result<BulkReassignEnterpriseResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.NoPermission), ResultErrorType.Unauthorized);
         }
     }
 }

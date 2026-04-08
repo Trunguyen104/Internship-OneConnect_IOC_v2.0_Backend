@@ -60,7 +60,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
                 if (students.Count != requestedStudentIds.Count)
                 {
                     var missing = requestedStudentIds.Except(students.Select(s => s.StudentId));
-                    return Result<BulkUnassignResponse>.Failure($"Students not found: {string.Join(", ", missing)}", ResultErrorType.NotFound);
+                    return Result<BulkUnassignResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.StudentsNotFound, string.Join(", ", missing)), ResultErrorType.NotFound);
                 }
 
                 // Verify each student's university matches current user's university
@@ -78,7 +78,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
 
                 if (unauthorized.Any())
                 {
-                    return Result<BulkUnassignResponse>.Failure($"You are not allowed to assign these students: {string.Join(", ", unauthorized)}", ResultErrorType.Unauthorized);
+                    return Result<BulkUnassignResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.StudentsUnauthorized, string.Join(", ", unauthorized)), ResultErrorType.Unauthorized);
                 }
 
                 // Check term status for the applications involved: cannot unassign from closed terms
@@ -89,7 +89,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
 
                 if (terms.Any(t => t.Status == TermStatus.Closed))
                 {
-                    return Result<BulkUnassignResponse>.Failure($"Cannot unassign students from closed terms.", ResultErrorType.BadRequest);
+                    return Result<BulkUnassignResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.CannotUnassignFromClosedTerms), ResultErrorType.BadRequest);
                 }
 
                 var studentIds = students.Select(s => s.StudentId).Distinct().ToList();
@@ -130,7 +130,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
 
                     if (!students.Any())
                     {
-                        var message = "Không có sinh viên nào trong danh sách có thể hủy. Tất cả đã có dữ liệu thực tập.";
+                        var message = _messageService.GetMessage(MessageKeys.UniAssign.PendingStudentsWithExistingData, string.Join(", ", excludedIds));
                         var response = new BulkUnassignResponse
                         {
                             Message = message
@@ -151,7 +151,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
 
                 if (!apps.Any())
                 {
-                    return Result<BulkUnassignResponse>.Failure("No Uni-assign applications found for selected students.", ResultErrorType.NotFound);
+                    return Result<BulkUnassignResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.NoUniAssignApplicationsFound), ResultErrorType.NotFound);
                 }
 
                 var now = DateTime.UtcNow;
@@ -303,7 +303,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
                     await _unitOfWork.SaveChangeAsync(cancellationToken);
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                    var toast = $"Đã hủy chỉ định của {processedStudentIds.Count} sinh viên.";
+                    var toast = _messageService.GetMessage(MessageKeys.UniAssign.BulkUnassignSuccess, processedStudentIds.Count);
                     _logger.LogInformation("Bulk unassign processed {Count} students by university user {UserId}", processedStudentIds.Count, currentUserId);
 
                     var response = new BulkUnassignResponse
@@ -317,10 +317,10 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
                 {
                     _logger.LogError(ex, "Error during bulk unassign by university user {UserId}", currentUserId);
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                    return Result<BulkUnassignResponse>.Failure("An error occurred while unassigning students. Please try again.", ResultErrorType.InternalServerError);
+                    return Result<BulkUnassignResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
                 }
             }
-            return Result<BulkUnassignResponse>.Failure("You are not authorized to perform this action.", ResultErrorType.Unauthorized);
+            return Result<BulkUnassignResponse>.Failure(_messageService.GetMessage(MessageKeys.Common.Unauthorized), ResultErrorType.Unauthorized);
         }
     }
 }

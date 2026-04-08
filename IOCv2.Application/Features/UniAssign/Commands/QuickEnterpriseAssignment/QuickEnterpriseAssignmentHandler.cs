@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using IOCv2.Application.Constants;
 
 namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignment
 {
@@ -42,11 +43,11 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                     .Include(x => x.User)
                     .Select(x => new { x.UserId, InternshipStatus = x.InternshipStatus, FullName = x.User.FullName })
                     .FirstOrDefaultAsync(cancellationToken);
-                if (studentUser == null) return Result<QuickEnterpriseAssignmentResponse>.Failure("Student not found.", ResultErrorType.NotFound);
-                if (studentUser.InternshipStatus == StudentStatus.Placed) return Result<QuickEnterpriseAssignmentResponse>.Failure("Student has already been placed in an internship.", ResultErrorType.BadRequest);
+                if (studentUser == null) return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.StudentNotFound), ResultErrorType.NotFound);
+                if (studentUser.InternshipStatus == StudentStatus.Placed) return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.StudentAlreadyPlaced), ResultErrorType.BadRequest);
                 var studentUniversityId = await _unitOfWork.Repository<UniversityUser>().Query().Where(x => x.UserId == studentUser.UserId).Select(x => x.UniversityId).FirstOrDefaultAsync(cancellationToken);
                 if (currentUserUniversityId != studentUniversityId)
-                    return Result<QuickEnterpriseAssignmentResponse>.Failure("You are not allowed to assign this student.", ResultErrorType.Unauthorized);
+                    return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.StudentsUnauthorized, studentUser.FullName), ResultErrorType.Unauthorized);
             }
 
             var term = await (
@@ -56,18 +57,18 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                     orderby t.StartDate descending
                     select t
                 ).FirstOrDefaultAsync(cancellationToken);
-            if (term == null) return Result<QuickEnterpriseAssignmentResponse>.Failure("Term not found.", ResultErrorType.NotFound);
-            if (term.Status != TermStatus.Open) return Result<QuickEnterpriseAssignmentResponse>.Failure("Term is not open for assignment.", ResultErrorType.BadRequest);
+            if (term == null) return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.Terms.NotFound), ResultErrorType.NotFound);
+            if (term.Status != TermStatus.Open) return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.NotOpenForAssignment), ResultErrorType.BadRequest);
 
             var internshipPhase = await _unitOfWork.Repository<InternshipPhase>().Query().Where(x => x.PhaseId == request.InternPhaseId).Include(ia => ia.Jobs)
                 .ThenInclude(j => j.InternshipApplications).Include(i => i.Enterprise).Select(x => new { x.PhaseId, x.EnterpriseId, x.StartDate, x.EndDate, x.Capacity, x.Enterprise!.Name, x.Jobs }).FirstOrDefaultAsync(cancellationToken);
             
-            if (internshipPhase == null) return Result<QuickEnterpriseAssignmentResponse>.Failure("Internship phase not found.", ResultErrorType.NotFound);
+            if (internshipPhase == null) return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipPhase.NotFound), ResultErrorType.NotFound);
 
             // Validate phase date ordering
             if (internshipPhase.StartDate > internshipPhase.EndDate)
             {
-                return Result<QuickEnterpriseAssignmentResponse>.Failure("Internship phase start date is after its end date.", ResultErrorType.BadRequest);
+                return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.InternshipPhase.StartDateAfterEndDate), ResultErrorType.BadRequest);
             }
             
             // Ensure the internship phase has at least one job posting with status Published or Closed.
@@ -76,13 +77,13 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                 .AnyAsync(cancellationToken);
             if (!hasJobPosting)
             {
-                return Result<QuickEnterpriseAssignmentResponse>.Failure("Internship phase must have at least one published or closed job posting.", ResultErrorType.BadRequest);
+                return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.NoJobPosting), ResultErrorType.BadRequest);
             }
 
             var remainingCapacity = internshipPhase.Capacity - internshipPhase.Jobs.SelectMany(j => j.InternshipApplications).Count(ia => ia.Status == InternshipApplicationStatus.Placed);
             if (remainingCapacity <= 0)
             {
-                return Result<QuickEnterpriseAssignmentResponse>.Failure("Intern Phase này vừa đủ số lượng nhận. Vui lòng chọn phase hoặc doanh nghiệp khác.", ResultErrorType.BadRequest);
+                return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.InternPhaseFull), ResultErrorType.BadRequest);
             }
 
             // AC-11: Hard-block if student already has an active self-apply application at this enterprise (Applied / Interviewing / Offered)
@@ -108,7 +109,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
             {
                 var statusLabel = existingSelfApply.Status.ToString();
                 var enterpriseName = existingSelfApply.Enterprise?.Name ?? (await _unitOfWork.Repository<Enterprise>().Query().Where(e => e.EnterpriseId == request.EnterpriseId).Select(e => e.Name).FirstOrDefaultAsync(cancellationToken)) ?? string.Empty;
-                var blockMsg = $"Sinh viên {studentName} đang có đơn tự ứng tuyển đang xử lý tại {enterpriseName} (trạng thái: {statusLabel}). Vui lòng chọn doanh nghiệp khác hoặc yêu cầu sinh viên rút đơn trước.";
+                var blockMsg = _messageService.GetMessage(MessageKeys.UniAssign.StudentHasPendingApplicationAtEnterprise, studentName!, enterpriseName, statusLabel);
                 _logger.LogInformation("Hard-block quick assign for student {StudentId} due to existing self-apply application at enterprise {EnterpriseId}.", request.StudentId, request.EnterpriseId);
                 return Result<QuickEnterpriseAssignmentResponse>.Failure(blockMsg, ResultErrorType.Conflict);
             }
@@ -136,7 +137,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
             if (hasLogbookFromPrevious || hasSprintWorkItemFromPrevious || hasEvaluationFromPrevious)
             {
                 _logger.LogInformation("Hard-block quick assign for student {StudentId} due to prior internship data (logbook/sprint/evaluation) from previous term.", request.StudentId);
-                return Result<QuickEnterpriseAssignmentResponse>.Failure("Không thể assign. Sinh viên đã có dữ liệu thực tập từ kỳ trước.", ResultErrorType.Conflict);
+                return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.StudentHasPriorInternshipData), ResultErrorType.Conflict);
             }
 
             var internshipApplication = new InternshipApplication
@@ -185,7 +186,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                     _logger.LogWarning(dbEx, "Concurrency conflict while creating internship application for student {StudentId} in term {TermId} and enterprise {EnterpriseId}", request.StudentId, term.TermId, request.EnterpriseId);
                     // Return a conflict so the UI can show a toast/warning to the user and prompt refresh
-                    return Result<QuickEnterpriseAssignmentResponse>.Failure("Đã xảy ra xung đột đồng thời. Một người khác vừa gán sinh viên này. Vui lòng tải lại trang và thử lại.", ResultErrorType.Conflict);
+                    return Result<QuickEnterpriseAssignmentResponse>.Failure(_messageService.GetMessage(MessageKeys.UniAssign.ConcurrencyConflict), ResultErrorType.Conflict);
                 }
 
                 // Notify student (AC-07) — send in-app notification about assignment (Pending)
@@ -204,7 +205,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
 
                 var response = new QuickEnterpriseAssignmentResponse
                 {
-                    Message = $"Đã gửi chỉ định [{internshipPhase.Name}] cho [{studentName}]. Đang chờ doanh nghiệp xác nhận."
+                    Message = _messageService.GetMessage(MessageKeys.UniAssign.QuickAssignSuccess, studentName ?? "Student", internshipPhase.Name ?? "Enterprise"),
                 };
                 return Result<QuickEnterpriseAssignmentResponse>.Success(response);
             }
@@ -212,7 +213,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.QuickEnterpriseAssignmen
             {
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 _logger.LogError(ex, "Error occurred while creating internship application for student {StudentId} in term {TermId} and enterprise {EnterpriseId}", request.StudentId, term.TermId, request.EnterpriseId);
-                return Result<QuickEnterpriseAssignmentResponse>.Failure("An error occurred while processing the assignment. Please try again later.", ResultErrorType.InternalServerError);
+                return Result<QuickEnterpriseAssignmentResponse>.Failure(ex.Message, ResultErrorType.InternalServerError);
             }
         }
     }
