@@ -2059,7 +2059,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động)..
+        ///   Looks up a localized string similar to Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra).
         /// </summary>
         internal static string JobPosting_InternshipPhaseStatusAllowed {
             get {
