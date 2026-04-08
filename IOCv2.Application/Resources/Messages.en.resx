@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -151,7 +151,7 @@
     <value>Search term cannot exceed 200 characters</value>
   </data>
   <data name="Projects.DeleteSuccess" xml:space="preserve">
-    <value>Project Delete successful</value>
+    <value>Project deleted successfully</value>
   </data>
   <data name="Projects.LogDelete" xml:space="preserve">
     <value>Deleted project {ProjectId}</value>
@@ -598,25 +598,25 @@
     <value>Internship phase named '{0}' already exists in enterprise {1}. Rejecting creation.</value>
   </data>
   <data name="InternshipPhase.Log.CreateSuccess" xml:space="preserve">
-    <value>Internship phase created successfully — PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
+    <value>Internship phase created successfully â€” PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
   </data>
   <data name="InternshipPhase.Log.CreateError" xml:space="preserve">
     <value>Error creating internship phase '{0}' for enterprise {1}. Transaction rolled back.</value>
   </data>
   <data name="InternshipPhase.Log.Updating" xml:space="preserve">
-    <value>Starting to update internship phase {0} — new name: '{1}', new status: {2}.</value>
+    <value>Starting to update internship phase {0} â€” new name: '{1}', new status: {2}.</value>
   </data>
   <data name="InternshipPhase.Log.UpdateNotFound" xml:space="preserve">
     <value>Internship phase with ID {0} not found. Update request rejected.</value>
   </data>
   <data name="InternshipPhase.Log.UpdateClosed" xml:space="preserve">
-    <value>Rejecting update of internship phase '{0}' (ID: {1}) — phase is in Closed status.</value>
+    <value>Rejecting update of internship phase '{0}' (ID: {1}) â€” phase is in Closed status.</value>
   </data>
   <data name="InternshipPhase.Log.UpdateDuplicateName" xml:space="preserve">
-    <value>Rejecting update of internship phase {0} — name '{1}' is already used by another phase in enterprise {2}.</value>
+    <value>Rejecting update of internship phase {0} â€” name '{1}' is already used by another phase in enterprise {2}.</value>
   </data>
   <data name="InternshipPhase.Log.UpdateSuccess" xml:space="preserve">
-    <value>Internship phase updated successfully — PhaseId: {0}, Name: '{1}'.</value>
+    <value>Internship phase updated successfully â€” PhaseId: {0}, Name: '{1}'.</value>
   </data>
   <data name="InternshipPhase.Log.UpdateNoChanges" xml:space="preserve">
     <value>No records saved when updating internship phase {0}. Transaction rolled back.</value>
@@ -631,10 +631,10 @@
     <value>Internship phase with ID {0} not found. Delete request rejected.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteHasActiveGroups" xml:space="preserve">
-    <value>Rejecting deletion of internship phase '{0}' (ID: {1}) — {2} active internship group(s) exist.</value>
+    <value>Rejecting deletion of internship phase '{0}' (ID: {1}) â€” {2} active internship group(s) exist.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteSuccess" xml:space="preserve">
-    <value>Internship phase deleted successfully — PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
+    <value>Internship phase deleted successfully â€” PhaseId: {0}, Name: '{1}', Enterprise: {2}.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteNoChanges" xml:space="preserve">
     <value>No records saved when deleting internship phase {0}. Transaction rolled back.</value>
@@ -643,13 +643,13 @@
     <value>Error deleting internship phase {0}. Transaction rolled back.</value>
   </data>
   <data name="InternshipPhase.Log.GettingList" xml:space="preserve">
-    <value>Getting internship phase list for enterprise {0} — status filter: {1}, page: {2}.</value>
+    <value>Getting internship phase list for enterprise {0} â€” status filter: {1}, page: {2}.</value>
   </data>
   <data name="InternshipPhase.Log.ListFromCache" xml:space="preserve">
     <value>Returning internship phase list from cache for enterprise {0}.</value>
   </data>
   <data name="InternshipPhase.Log.ListSuccess" xml:space="preserve">
-    <value>Successfully retrieved internship phase list for enterprise {0} — returning {1}/{2} records (page {3}).</value>
+    <value>Successfully retrieved internship phase list for enterprise {0} â€” returning {1}/{2} records (page {3}).</value>
   </data>
   <data name="InternshipPhase.Log.GettingById" xml:space="preserve">
     <value>Getting internship phase details for {0}.</value>
@@ -661,7 +661,7 @@
     <value>Internship phase with ID {0} not found.</value>
   </data>
   <data name="InternshipPhase.Log.ByIdSuccess" xml:space="preserve">
-    <value>Successfully retrieved internship phase — PhaseId: {0}, Name: '{1}', Enterprise: '{2}', Status: {3}, Groups: {4}.</value>
+    <value>Successfully retrieved internship phase â€” PhaseId: {0}, Name: '{1}', Enterprise: '{2}', Status: {3}, Groups: {4}.</value>
   </data>
   <data name="InternshipPhase.Log.GettingMyPhases" xml:space="preserve">
     <value>Getting internship phases for student (UserId: {0}).</value>
@@ -670,13 +670,13 @@
     <value>Student profile not found for UserId {0}. Request denied.</value>
   </data>
   <data name="InternshipPhase.Log.MyPhasesSuccess" xml:space="preserve">
-    <value>Successfully retrieved internship phases for student {0} (UserId: {1}) — found {2} phase(s).</value>
+    <value>Successfully retrieved internship phases for student {0} (UserId: {1}) â€” found {2} phase(s).</value>
   </data>
   <data name="InternshipPhase.Log.MentorUserNotFound" xml:space="preserve">
     <value>EnterpriseUser not found for Mentor userId={0} while retrieving internship phases.</value>
   </data>
   <data name="InternshipPhase.Log.MyMentorPhasesSuccess" xml:space="preserve">
-    <value>Successfully retrieved internship phases for Mentor enterpriseUserId={0} (userId={1}) — found {2} phase(s).</value>
+    <value>Successfully retrieved internship phases for Mentor enterpriseUserId={0} (userId={1}) â€” found {2} phase(s).</value>
   </data>
   <data name="InternshipPhase.MentorEnterpriseUserNotFound" xml:space="preserve">
     <value>Mentor profile not found in the system. Please contact your administrator.</value>
@@ -703,13 +703,13 @@
     <value>Enterprise user information not found for the current account.</value>
   </data>
   <data name="InternshipPhase.Log.OwnershipDenied" xml:space="preserve">
-    <value>Access denied — User {0} attempted to operate on enterprise {1} but belongs to enterprise {2}.</value>
+    <value>Access denied â€” User {0} attempted to operate on enterprise {1} but belongs to enterprise {2}.</value>
   </data>
   <data name="InternshipPhase.Log.InvalidStatusTransition" xml:space="preserve">
-    <value>Rejected status transition of internship phase {0} from '{1}' to '{2}' — invalid transition.</value>
+    <value>Rejected status transition of internship phase {0} from '{1}' to '{2}' â€” invalid transition.</value>
   </data>
   <data name="InternshipPhase.Log.DeleteInProgress" xml:space="preserve">
-    <value>Rejected deletion of internship phase '{0}' (ID: {1}) — phase is in InProgress status and cannot be deleted.</value>
+    <value>Rejected deletion of internship phase '{0}' (ID: {1}) â€” phase is in InProgress status and cannot be deleted.</value>
   </data>
   <data name="Terms.NameExists" xml:space="preserve">
     <value>Term name already exists. Please choose a different name.</value>
@@ -964,13 +964,13 @@
     <value>Querying internship group with ID: {InternshipId} by user {UserId} (role: {Role})</value>
   </data>
   <data name="InternshipGroup.LogScopedHrEnterprise" xml:space="preserve">
-    <value>HR/EnterpriseAdmin {UserId} → scoped to enterprise {EnterpriseId}</value>
+    <value>HR/EnterpriseAdmin {UserId} â†’ scoped to enterprise {EnterpriseId}</value>
   </data>
   <data name="InternshipGroup.LogScopedMentor" xml:space="preserve">
-    <value>Mentor {UserId} → scoped to MentorId {MentorId}</value>
+    <value>Mentor {UserId} â†’ scoped to MentorId {MentorId}</value>
   </data>
   <data name="InternshipGroup.LogScopedStudent" xml:space="preserve">
-    <value>Student {UserId} → scoped to StudentId {StudentId}</value>
+    <value>Student {UserId} â†’ scoped to StudentId {StudentId}</value>
   </data>
   <data name="InternshipGroup.LogRetrievedGroups" xml:space="preserve">
     <value>Retrieved {Count} internship groups for user {UserId} (role: {Role})</value>
@@ -1060,7 +1060,7 @@
     <value>You have been assigned a new group</value>
   </data>
   <data name="InternshipGroup.NotificationMentorAssignedFirstContent" xml:space="preserve">
-    <value>You have been assigned to mentor group {0} ({1} students). Internship period: {2} → {3}.</value>
+    <value>You have been assigned to mentor group {0} ({1} students). Internship period: {2} â†’ {3}.</value>
   </data>
   <data name="InternshipGroup.NotificationStudentMentorAssignedTitle" xml:space="preserve">
     <value>Your group now has a mentor</value>
@@ -1214,7 +1214,7 @@
     <value>Only allow selecting phases that are Open (Upcoming)</value>
   </data>
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
-    <value>Internship phase {0} detail loaded — {1} job posting(s), {2} placed student(s).</value>
+    <value>Internship phase {0} detail loaded â€” {1} job posting(s), {2} placed student(s).</value>
   </data>
   <data name="UniAssign.StudentsNotFound" xml:space="preserve">
     <value>Students not found: {0}</value>
@@ -1322,7 +1322,7 @@
     <value>Failed to send verification email. Please try again later.</value>
   </data>
   <data name="Landing.AlreadyRegistered" xml:space="preserve">
-    <value>This email already has an account. OTP is not required — you can submit your request directly.</value>
+    <value>This email already has an account. OTP is not required â€” you can submit your request directly.</value>
   </data>
   <data name="EvaluationCycle.DatesOutOfBounds" xml:space="preserve">
     <value>Evaluation cycle dates must fall within the internship phase timeframe ({0:dd/MM/yyyy} - {1:dd/MM/yyyy}).</value>
@@ -1364,7 +1364,7 @@
     <value>Your application has been automatically withdrawn because the recruitment phase ended.</value>
   </data>
   <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
-    <value>Cannot delete this job posting because it has {0} application.</value>
+    <value>Cannot delete this job posting because it has {0} applications.</value>
   </data>
   <data name="JobPosting.UploadCVRequired" xml:space="preserve">
     <value>You have not uploaded a CV. Please upload your CV before applying.</value>
@@ -1388,7 +1388,7 @@
     <value>You have reached the application limit for this position.</value>
   </data>
   <data name="JobPosting.StudentAppliedToEnterpriseJob" xml:space="preserve">
-    <value>{0} has applied for the position at {1} — {2}. Please review.</value>
+    <value>{0} has applied for the position at {1} â€” {2}. Please review.</value>
   </data>
   <data name="JobPosting.ApplySuccessPendingHR" xml:space="preserve">
     <value>Application successful! Your application is pending HR review.</value>
@@ -1452,5 +1452,86 @@
   </data>
   <data name="UniAssign.NoStudentsAvailableForReassignment" xml:space="preserve">
     <value>None of the students on the list can change enterprises. All have internship data.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateEnded" xml:space="preserve">
+    <value>Cannot update internship phase '{0}' because it has already ended.</value>
+  </data>
+  <data name="Auth.PasswordChangedSuccess" xml:space="preserve">
+    <value>Password changed successfully.</value>
+  </data>
+  <data name="InternshipPhase.EndDateInPastForActivePhase" xml:space="preserve">
+    <value>Cannot set an end date in the past for internship phase '{0}' in Open or InProgress status.</value>
+  </data>
+  <data name="ResetPassword.SuccessWithEmail" xml:space="preserve">
+    <value>Password reset successfully. A notification email has been sent to {0}.</value>
+  </data>
+  <data name="Auth.PasswordResetLinkSent" xml:space="preserve">
+    <value>A password reset link has been sent to your email.</value>
+  </data>
+  <data name="InternshipPhase.CannotUpdateLockedFields" xml:space="preserve">
+    <value>This internship phase already has accepted students or internship groups. Timeline and capacity cannot be changed.</value>
+  </data>
+  <data name="PageSize.MaxValue" xml:space="preserve">
+    <value>Page size must not exceed 100.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsMaxLength" xml:space="preserve">
+    <value>Accepted major fields must not exceed 1000 characters.</value>
+  </data>
+  <data name="InternshipPhase.DurationMaxDays" xml:space="preserve">
+    <value>Internship phase duration must not exceed 12 months.</value>
+  </data>
+  <data name="Sprint.StartedSuccess" xml:space="preserve">
+    <value>Sprint started successfully.</value>
+  </data>
+  <data name="PageSize.MinValue" xml:space="preserve">
+    <value>Page size must be greater than or equal to 1.</value>
+  </data>
+  <data name="ResetPassword.StatusNoEmail" xml:space="preserve">
+    <value>Notification email could not be sent. Please notify the user directly.</value>
+  </data>
+  <data name="Sprint.DeletedSuccess" xml:space="preserve">
+    <value>Sprint deleted successfully.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsRequired" xml:space="preserve">
+    <value>Accepted major fields are required.</value>
+  </data>
+  <data name="ResetPassword.SuccessNoEmail" xml:space="preserve">
+    <value>Password reset successfully, but notification email could not be sent. Please notify the user directly. New password: {0}.</value>
+  </data>
+  <data name="Sprint.UpdatedSuccess" xml:space="preserve">
+    <value>Sprint updated successfully.</value>
+  </data>
+  <data name="Auth.LogoutSuccess" xml:space="preserve">
+    <value>Logout successful.</value>
+  </data>
+  <data name="Auth.LoginSuccess" xml:space="preserve">
+    <value>Login successful.</value>
+  </data>
+  <data name="SortOrder.AllowedValues" xml:space="preserve">
+    <value>Sort order must be either 'asc' or 'desc'.</value>
+  </data>
+  <data name="InternshipPhase.DurationMinDays" xml:space="preserve">
+    <value>Internship phase duration must be at least 4 weeks.</value>
+  </data>
+  <data name="PageNumber.MinValue" xml:space="preserve">
+    <value>Page number must be greater than or equal to 1.</value>
+  </data>
+  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <value>If the account is valid, the system will send a password reset link via email.</value>
+  </data>
+  <data name="Sprint.CompletedSuccess" xml:space="preserve">
+    <value>Sprint completed successfully. {0} item(s) completed, {1} item(s) moved.</value>
+  </data>
+  <data name="Sprint.CreatedSuccess" xml:space="preserve">
+    <value>Sprint created successfully.</value>
+  </data>
+  <data name="Auth.PasswordResetSuccess" xml:space="preserve">
+    <value>Password reset successfully.</value>
+  </data>
+  <data name="SortColumn.AllowedValues" xml:space="preserve">
+    <value>Sort column must be one of: projectname, startdate, enddate, status, createdat.</value>
+  </data>
+  <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
+    <value>Project resource with ID {ResourceId} was deleted successfully.</value>
   </data>
 </root>

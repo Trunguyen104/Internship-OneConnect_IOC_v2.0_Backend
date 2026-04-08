@@ -565,7 +565,7 @@
     <value>Full name is required.</value>
   </data>
   <data name="StudentTerms.FullNameInvalid" xml:space="preserve">
-    <value>Full name is invalid. Only letters and spaces are allowed â€” no numbers or special characters.</value>
+    <value>Full name is invalid. Only letters and spaces are allowed - no numbers or special characters.</value>
   </data>
   <data name="StudentTerms.StudentCodeRequired" xml:space="preserve">
     <value>Student code is required.</value>
@@ -1814,7 +1814,7 @@
     <value>Violation description is required.</value>
   </data>
   <data name="ViolationReportKey.DescriptionMaxLength" xml:space="preserve">
-    <value>Violation description exceed maximum length.</value>
+    <value>Violation description exceeds maximum length.</value>
   </data>
   <data name="ViolationReportKey.DescriptionMinLength" xml:space="preserve">
     <value>Violation description is too short.</value>
@@ -1827,5 +1827,266 @@
   </data>
   <data name="ViolationReportKey.ViolationReportIdIsRequired" xml:space="preserve">
     <value>Violation report ID is required.</value>
+  </data>
+  <data name="Common.DatabaseUpdateError" xml:space="preserve">
+    <value>An error occurred while updating data. Please try again.</value>
+  </data>
+  <data name="University.NotFound" xml:space="preserve">
+    <value>University information was not found.</value>
+  </data>
+  <data name="InvalidUserId" xml:space="preserve">
+    <value>Current user identity is missing or invalid.</value>
+  </data>
+  <data name="Users.InvalidAuditor" xml:space="preserve">
+    <value>Cannot identify the manager performing this operation.</value>
+  </data>
+  <data name="Common.AccessDenied" xml:space="preserve">
+    <value>Access denied.</value>
+  </data>
+  <data name="Users.NotFound" xml:space="preserve">
+    <value>User not found.</value>
+  </data>
+  <data name="ResetPassword.OnlyManagerCanReset" xml:space="preserve">
+    <value>Only managers can reset passwords.</value>
+  </data>
+  <data name="Users.EmailConflict" xml:space="preserve">
+    <value>This email already exists in the system.</value>
+  </data>
+  <data name="Common.NotFound" xml:space="preserve">
+    <value>The requested record was not found.</value>
+  </data>
+  <data name="ResetPassword.UserIdRequired" xml:space="preserve">
+    <value>User ID is required.</value>
+  </data>
+  <data name="Users.CannotUpdateInactive" xml:space="preserve">
+    <value>Cannot update information for an inactive account.</value>
+  </data>
+  <data name="ResetPassword.OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Password can only be reset for active accounts.</value>
+  </data>
+  <data name="Auth.UnitInactive" xml:space="preserve">
+    <value>System message: Auth.UnitInactive.</value>
+  </data>
+  <data name="Common.RecordNotFound" xml:space="preserve">
+    <value>System message: Common.RecordNotFound.</value>
+  </data>
+  <data name="Enterprise.DuplicateTaxCode" xml:space="preserve">
+    <value>System message: Enterprise.DuplicateTaxCode.</value>
+  </data>
+  <data name="Enterprise.Inactive" xml:space="preserve">
+    <value>System message: Enterprise.Inactive.</value>
+  </data>
+  <data name="Enterprise.Unverified" xml:space="preserve">
+    <value>System message: Enterprise.Unverified.</value>
+  </data>
+  <data name="Evaluation.AlreadyExists" xml:space="preserve">
+    <value>System message: Evaluation.AlreadyExists.</value>
+  </data>
+  <data name="Evaluation.StudentNotFound" xml:space="preserve">
+    <value>System message: Evaluation.StudentNotFound.</value>
+  </data>
+  <data name="Evaluation.StudentNotInGroup" xml:space="preserve">
+    <value>System message: Evaluation.StudentNotInGroup.</value>
+  </data>
+  <data name="EvaluationCriteria.MaxScoreInvalid" xml:space="preserve">
+    <value>System message: EvaluationCriteria.MaxScoreInvalid.</value>
+  </data>
+  <data name="EvaluationCriteria.NameMaxLength" xml:space="preserve">
+    <value>System message: EvaluationCriteria.NameMaxLength.</value>
+  </data>
+  <data name="EvaluationCriteria.NameRequired" xml:space="preserve">
+    <value>System message: EvaluationCriteria.NameRequired.</value>
+  </data>
+  <data name="EvaluationCriteria.WeightInvalid" xml:space="preserve">
+    <value>System message: EvaluationCriteria.WeightInvalid.</value>
+  </data>
+  <data name="HRApplications.ApplicationNotActive" xml:space="preserve">
+    <value>System message: HRApplications.ApplicationNotActive.</value>
+  </data>
+  <data name="HRApplications.CannotRejectPlaced" xml:space="preserve">
+    <value>System message: HRApplications.CannotRejectPlaced.</value>
+  </data>
+  <data name="HRApplications.EnterpriseUserNotFound" xml:space="preserve">
+    <value>System message: HRApplications.EnterpriseUserNotFound.</value>
+  </data>
+  <data name="HRApplications.InvalidTransition" xml:space="preserve">
+    <value>System message: HRApplications.InvalidTransition.</value>
+  </data>
+  <data name="HRApplications.Log.ApproveUniAssign" xml:space="preserve">
+    <value>System message: HRApplications.Log.ApproveUniAssign.</value>
+  </data>
+  <data name="HRApplications.Log.CascadeWithdraw" xml:space="preserve">
+    <value>System message: HRApplications.Log.CascadeWithdraw.</value>
+  </data>
+  <data name="HRApplications.Log.InvalidUserId" xml:space="preserve">
+    <value>System message: HRApplications.Log.InvalidUserId.</value>
+  </data>
+  <data name="HRApplications.Log.MarkAsPlaced" xml:space="preserve">
+    <value>System message: HRApplications.Log.MarkAsPlaced.</value>
+  </data>
+  <data name="HRApplications.Log.MoveToInterviewing" xml:space="preserve">
+    <value>System message: HRApplications.Log.MoveToInterviewing.</value>
+  </data>
+  <data name="HRApplications.Log.Reject" xml:space="preserve">
+    <value>System message: HRApplications.Log.Reject.</value>
+  </data>
+  <data name="HRApplications.Log.RejectUniAssign" xml:space="preserve">
+    <value>System message: HRApplications.Log.RejectUniAssign.</value>
+  </data>
+  <data name="HRApplications.Log.SendOffer" xml:space="preserve">
+    <value>System message: HRApplications.Log.SendOffer.</value>
+  </data>
+  <data name="HRApplications.NotFound" xml:space="preserve">
+    <value>System message: HRApplications.NotFound.</value>
+  </data>
+  <data name="HRApplications.NotSelfApplyApplication" xml:space="preserve">
+    <value>System message: HRApplications.NotSelfApplyApplication.</value>
+  </data>
+  <data name="HRApplications.NotUniAssignApplication" xml:space="preserve">
+    <value>System message: HRApplications.NotUniAssignApplication.</value>
+  </data>
+  <data name="InternshipGroup.CannotArchiveNoData" xml:space="preserve">
+    <value>System message: InternshipGroup.CannotArchiveNoData.</value>
+  </data>
+  <data name="Landing.Log.Processing" xml:space="preserve">
+    <value>System message: Landing.Log.Processing.</value>
+  </data>
+  <data name="Logbooks.AlreadyReported" xml:space="preserve">
+    <value>System message: Logbooks.AlreadyReported.</value>
+  </data>
+  <data name="Logbooks.CreationFailed" xml:space="preserve">
+    <value>System message: Logbooks.CreationFailed.</value>
+  </data>
+  <data name="Logbooks.DeleteFailed" xml:space="preserve">
+    <value>System message: Logbooks.DeleteFailed.</value>
+  </data>
+  <data name="Logbooks.NoActiveInternship" xml:space="preserve">
+    <value>System message: Logbooks.NoActiveInternship.</value>
+  </data>
+  <data name="Logbooks.NotFound" xml:space="preserve">
+    <value>System message: Logbooks.NotFound.</value>
+  </data>
+  <data name="Logbooks.UpdateFailed" xml:space="preserve">
+    <value>System message: Logbooks.UpdateFailed.</value>
+  </data>
+  <data name="Notifications.AccessDenied" xml:space="preserve">
+    <value>System message: Notifications.AccessDenied.</value>
+  </data>
+  <data name="Notifications.BulkDeleteSuccess" xml:space="preserve">
+    <value>System message: Notifications.BulkDeleteSuccess.</value>
+  </data>
+  <data name="Notifications.DeleteError" xml:space="preserve">
+    <value>System message: Notifications.DeleteError.</value>
+  </data>
+  <data name="Notifications.DeleteNotOwner" xml:space="preserve">
+    <value>System message: Notifications.DeleteNotOwner.</value>
+  </data>
+  <data name="Notifications.DeleteSuccess" xml:space="preserve">
+    <value>System message: Notifications.DeleteSuccess.</value>
+  </data>
+  <data name="Notifications.MarkAllReadSuccess" xml:space="preserve">
+    <value>System message: Notifications.MarkAllReadSuccess.</value>
+  </data>
+  <data name="Notifications.MarkReadSuccess" xml:space="preserve">
+    <value>System message: Notifications.MarkReadSuccess.</value>
+  </data>
+  <data name="Notifications.NotFound" xml:space="preserve">
+    <value>System message: Notifications.NotFound.</value>
+  </data>
+  <data name="Profile.UserIdRequired" xml:space="preserve">
+    <value>System message: Profile.UserIdRequired.</value>
+  </data>
+  <data name="ProjectResources.FileAndLinkMutuallyExclusive" xml:space="preserve">
+    <value>System message: ProjectResources.FileAndLinkMutuallyExclusive.</value>
+  </data>
+  <data name="ProjectResources.FileOrLinkRequired" xml:space="preserve">
+    <value>System message: ProjectResources.FileOrLinkRequired.</value>
+  </data>
+  <data name="ProjectResources.InvalidExternalUrl" xml:space="preserve">
+    <value>System message: ProjectResources.InvalidExternalUrl.</value>
+  </data>
+  <data name="ProjectResources.LinkDownloadNotSupported" xml:space="preserve">
+    <value>System message: ProjectResources.LinkDownloadNotSupported.</value>
+  </data>
+  <data name="ProjectResources.LinkTypeRequired" xml:space="preserve">
+    <value>System message: ProjectResources.LinkTypeRequired.</value>
+  </data>
+  <data name="ProjectResources.LogUploadAutoSetFileTypeError" xml:space="preserve">
+    <value>System message: ProjectResources.LogUploadAutoSetFileTypeError.</value>
+  </data>
+  <data name="ProjectResources.UpdateSuccess" xml:space="preserve">
+    <value>System message: ProjectResources.UpdateSuccess.</value>
+  </data>
+  <data name="Projects.CannotDeleteActive" xml:space="preserve">
+    <value>System message: Projects.CannotDeleteActive.</value>
+  </data>
+  <data name="Projects.CreateSuccess" xml:space="preserve">
+    <value>System message: Projects.CreateSuccess.</value>
+  </data>
+  <data name="Projects.InvalidStatus" xml:space="preserve">
+    <value>System message: Projects.InvalidStatus.</value>
+  </data>
+  <data name="PublicHolidays.AlreadyExists" xml:space="preserve">
+    <value>System message: PublicHolidays.AlreadyExists.</value>
+  </data>
+  <data name="PublicHolidays.CreateSuccess" xml:space="preserve">
+    <value>System message: PublicHolidays.CreateSuccess.</value>
+  </data>
+  <data name="PublicHolidays.DateRequired" xml:space="preserve">
+    <value>System message: PublicHolidays.DateRequired.</value>
+  </data>
+  <data name="PublicHolidays.DeleteSuccess" xml:space="preserve">
+    <value>System message: PublicHolidays.DeleteSuccess.</value>
+  </data>
+  <data name="PublicHolidays.DescriptionMaxLength" xml:space="preserve">
+    <value>System message: PublicHolidays.DescriptionMaxLength.</value>
+  </data>
+  <data name="PublicHolidays.NotFound" xml:space="preserve">
+    <value>System message: PublicHolidays.NotFound.</value>
+  </data>
+  <data name="PublicHolidays.SyncApiError" xml:space="preserve">
+    <value>System message: PublicHolidays.SyncApiError.</value>
+  </data>
+  <data name="PublicHolidays.SyncApiKeyMissing" xml:space="preserve">
+    <value>System message: PublicHolidays.SyncApiKeyMissing.</value>
+  </data>
+  <data name="PublicHolidays.SyncSuccess" xml:space="preserve">
+    <value>System message: PublicHolidays.SyncSuccess.</value>
+  </data>
+  <data name="PublicHolidays.YearInvalid" xml:space="preserve">
+    <value>System message: PublicHolidays.YearInvalid.</value>
+  </data>
+  <data name="Sprint.NewSprintNameRequired" xml:space="preserve">
+    <value>System message: Sprint.NewSprintNameRequired.</value>
+  </data>
+  <data name="Stakeholder.InvalidType" xml:space="preserve">
+    <value>System message: Stakeholder.InvalidType.</value>
+  </data>
+  <data name="University.DuplicateCode" xml:space="preserve">
+    <value>System message: University.DuplicateCode.</value>
+  </data>
+  <data name="University.Inactive" xml:space="preserve">
+    <value>System message: University.Inactive.</value>
+  </data>
+  <data name="UserManagement.CodeMaxLength" xml:space="preserve">
+    <value>System message: UserManagement.CodeMaxLength.</value>
+  </data>
+  <data name="UserManagement.CodeRequired" xml:space="preserve">
+    <value>System message: UserManagement.CodeRequired.</value>
+  </data>
+  <data name="Users.CodeConflict" xml:space="preserve">
+    <value>System message: Users.CodeConflict.</value>
+  </data>
+  <data name="Users.CodeInvalidFormat" xml:space="preserve">
+    <value>System message: Users.CodeInvalidFormat.</value>
+  </data>
+  <data name="Users.NewRoleMustBeDifferent" xml:space="preserve">
+    <value>System message: Users.NewRoleMustBeDifferent.</value>
+  </data>
+  <data name="Users.RoleChangedButEmailFailed" xml:space="preserve">
+    <value>System message: Users.RoleChangedButEmailFailed.</value>
+  </data>
+  <data name="Users.RoleMismatch" xml:space="preserve">
+    <value>System message: Users.RoleMismatch.</value>
   </data>
 </root>
