@@ -1081,7 +1081,7 @@ namespace IOCv2.Infrastructure.Persistence
                 "Đợt thực tập quy tụ tất cả các chuyên ngành từ cơ bản đến nâng cao. " +
                 "Sinh viên sẽ được làm việc trong các lab nghiên cứu sâu về các công nghệ xu hướng mới nhất. " +
                 "Yêu cầu: Sinh viên có GPA cao, tiếng Anh tốt và đam mê mãnh liệt với công nghệ.",
-                InternshipPhaseStatus.InProgress);
+                InternshipPhaseStatus.Open);
 
             await _context.SaveChangesAsync();
         }

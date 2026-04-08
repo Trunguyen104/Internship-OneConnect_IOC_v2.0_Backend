@@ -1211,7 +1211,7 @@
 </value>
   </data>
   <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
-    <value>Only allow selecting phases that are Open (Upcoming) or InProgress (Active)</value>
+    <value>Only allow selecting phases that are Open (Upcoming)</value>
   </data>
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Internship phase {0} detail loaded — {1} job posting(s), {2} placed student(s).</value>
@@ -1379,7 +1379,7 @@
     <value>The application deadline has passed.</value>
   </data>
   <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
-    <value>There is currently no active internship period to apply for.</value>
+    <value>No active internship phase found for job</value>
   </data>
   <data name="JobPosting.AlreadyHaveActiveApplication" xml:space="preserve">
     <value>You already have an active application and cannot submit another one.</value>

@@ -1292,7 +1292,7 @@
 </value>
   </data>
   <data name="JobPosting.InternshipPhaseStatusAllowed" xml:space="preserve">
-    <value>Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra) hoặc Đang tiến hành (Đang hoạt động).</value>
+    <value>Chỉ cho phép chọn các giai đoạn đang Mở (Sắp diễn ra)</value>
   </data>
   <data name="InternshipPhase.Log.ByIdTabsLoaded" xml:space="preserve">
     <value>Đã lấy chi tiết nhóm thực tập {0} — {1} bài đăng tuyển dụng, {2} sinh viên đã được bố trí.</value>
@@ -1452,5 +1452,8 @@
   </data>
   <data name="UniAssign.NoStudentsAvailableForReassignment" xml:space="preserve">
     <value>Không có sinh viên nào trong danh sách có thể đổi enterprise. Tất cả đã có dữ liệu thực tập.</value>
+</data>
+  <data name="JobPosting.NoActiveInternshipPeriod" xml:space="preserve">
+    <value>Không tìm thấy giai đoạn thực tập nào đang hoạt động cho công việc này.</value>
   </data>
 </root>
