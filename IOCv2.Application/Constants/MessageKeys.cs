@@ -1044,7 +1044,7 @@ namespace IOCv2.Application.Constants
             public const string ExpireDateCanNotBeAfterPhaseStartDate = "JobPosting.ExpireDateCanNotBeAfterPhaseStartDate";
             // Delete
             public const string AlreadyDeleted = "JobPosting.AlreadyDeleted";
-            public const string DeleteConfirmHasActiveApplications = "JobPosting.DeleteConfirmHasActiveApplications";
+            public const string DeleteBlockedWhenAnyApplication = "JobPosting.DeleteBlockedWhenAnyApplication";
             public const string DeleteSuccess = "JobPosting.DeleteSuccess";
             public const string DeleteWithActiveApplications = "JobPosting.DeleteWithActiveApplications";
             public const string DleteVersionConflict = "JobPosting.DeleteVersionConflict";
