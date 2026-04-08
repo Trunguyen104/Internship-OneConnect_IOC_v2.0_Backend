@@ -1366,6 +1366,12 @@
   <data name="JobPosting.DeleteBlockedWhenAnyApplication" xml:space="preserve">
     <value>Cannot delete this job posting because it has {0} application.</value>
   </data>
+  <data name="UniAssign.PendingStudentsWithExistingData" xml:space="preserve">
+    <value>It is not possible to transfer enterprises for the following students because they are in a PendingAssignment state but already have internship data from another semester: {0}</value>
+  </data>
+  <data name="UniAssign.NoStudentsAvailableForReassignment" xml:space="preserve">
+    <value>None of the students on the list can change enterprises. All have internship data.</value>
+  </data>
   <data name="JobPosting.UploadCVRequired" xml:space="preserve">
     <value>You have not uploaded a CV. Please upload your CV before applying.</value>
   </data>
@@ -1447,10 +1453,67 @@
   <data name="Validation.InvalidStatus" xml:space="preserve">
     <value>Status is invalid.</value>
   </data>
-  <data name="UniAssign.PendingStudentsWithExistingData" xml:space="preserve">
-    <value>It is not possible to transfer enterprises for the following students because they are in a PendingAssignment state but already have internship data from another semester: {0}</value>
+  <data name="UniAssign.ReassignTermsClosed" xml:space="preserve">
+    <value>It is not possible to change the placement once the period has ended.</value>
   </data>
-  <data name="UniAssign.NoStudentsAvailableForReassignment" xml:space="preserve">
-    <value>None of the students on the list can change enterprises. All have internship data.</value>
+  <data name="UniAssign.NoStudentsCanReassignDueToPendingApplications" xml:space="preserve">
+    <value>No students were able to switch enterprises because some students had self-applications being processed at the target company.</value>
+  </data>
+  <data name="UniAssign.InternPhaseNoCapacity" xml:space="preserve">
+    <value>Cannot submit new assignment: intern phase space is full.</value>
+  </data>
+  <data name="UniAssign.BulkReassignSuccess" xml:space="preserve">
+    <value>New assignment sent for student {0} to {1}. Awaiting company confirmation.</value>
+  </data>
+  <data name="UniAssign.CannotUnassignFromClosedTerms" xml:space="preserve">
+    <value>Cannot unassign students from closed terms.</value>
+  </data>
+  <data name="UniAssign.NoUniAssignApplicationsFound" xml:space="preserve">
+    <value>No Uni-assign applications found for selected students.</value>
+  </data>
+  <data name="UniAssign.BulkUnassignSuccess" xml:space="preserve">
+    <value>The assignment of {0} students has been cancelled.</value>
+  </data>
+  <data name="UniAssign.StudentNotFound" xml:space="preserve">
+    <value>No student found.</value>
+  </data>
+  <data name="UniAssign.StudentAlreadyPlaced" xml:space="preserve">
+    <value>Students have been assigned or have submitted successful applications.</value>
+  </data>
+  <data name="UniAssign.NotOpenForAssignment" xml:space="preserve">
+    <value>Term is not open for assignment.</value>
+  </data>
+  <data name="InternshipPhase.StartDateAfterEndDate" xml:space="preserve">
+    <value>Internship phase start date is after its end date.</value>
+  </data>
+  <data name="UniAssign.NoJobPosting" xml:space="preserve">
+    <value>Internship phase must have at least one published or closed job posting.</value>
+  </data>
+  <data name="UniAssign.InternPhaseFull" xml:space="preserve">
+    <value>This internship phase has reached its capacity. Please choose a different phase or company.</value>
+  </data>
+  <data name="UniAssign.StudentHasPendingApplicationAtEnterprise" xml:space="preserve">
+    <value>Student {0} has a self-application being processed at {1} (status: {2}). Please select a different company or ask the student to withdraw their application.</value>
+  </data>
+  <data name="UniAssign.StudentHasPriorInternshipData" xml:space="preserve">
+    <value>Assignment is not possible. Students already have internship data from the previous semester.</value>
+  </data>
+  <data name="UniAssign.ConcurrencyConflict" xml:space="preserve">
+    <value>A simultaneous conflict has occurred. Another person has just assigned this student. Please reload the page and try again.</value>
+  </data>
+  <data name="UniAssign.QuickAssignSuccess" xml:space="preserve">
+    <value>Assignment [{0}] has been sent to [{1}]. Awaiting confirmation from the business.</value>
+  </data>
+  <data name="UniAssign.CannotReassignStudentHasInternshipData" xml:space="preserve">
+    <value>It is not possible to change enterprise for {0}. This student already has internship data (logbook/sprint/evaluation) at {1}. Please contact the system administrator if special handling is required.</value>
+  </data>
+  <data name="UniAssign.ReassignPendingSuccess" xml:space="preserve">
+    <value>The designation of {0} has been updated. New Enterprise: {1}. Awaiting enterprise confirmation.</value>
+  </data>
+  <data name="UniAssign.UnassignSuccess" xml:space="preserve">
+    <value>The placement of {0} has been removed.</value>
+  </data>
+  <data name="UniAssign.GetNotAllowed" xml:space="preserve">
+    <value>You can only access the student list for your university.</value>
   </data>
 </root>

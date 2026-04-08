@@ -63,7 +63,7 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm
             if (universityUser == null || universityUser.UniversityId != term.UniversityId)
             {
                 return Result<PaginatedResult<GetStudentsByTermResponse>>.Failure(
-                    "Bạn chỉ có thể truy cập danh sách sinh viên của trường đại học của bạn.",
+                    _messageService.GetMessage(MessageKeys.UniAssign.GetNotAllowed),
                     ResultErrorType.Forbidden);
             }
 
