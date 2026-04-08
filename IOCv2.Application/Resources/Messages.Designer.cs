@@ -4048,7 +4048,7 @@ namespace IOCv2.Application.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Không thể đổi enterprise cho những sinh viên sau vì họ đang ở trạng thái PendingAssignment nhưng đã có dữ liệu thực tập từ kỳ khác: {0}.
+        ///   Looks up a localized string similar to Không thể đổi enterprise cho những sinh viên sau vì họ đã có dữ liệu thực tập từ kỳ khác: {0}.
         /// </summary>
         internal static string UniAssign_PendingStudentsWithExistingData {
             get {

@@ -835,31 +835,6 @@ namespace IOCv2.Infrastructure.Persistence
                 });
             }
 
-            // Student12 — seeded for SelfApply placement flow (has CV)
-            var student12Email = "student12@fptu.edu.vn";
-            if (!existingEmails.Contains(student12Email))
-            {
-                var userId12 = SeedIds.Student12UserId;
-                var userCode12 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
-                var user12 = new User(userId12, userCode12, student12Email, "Phan Văn Khoa", UserRole.Student, passHash);
-                user12.UpdateProfile(user12.FullName, GetUniquePhone(), null, UserGender.Male, new DateOnly(2003, 8, 20), "TP. Hồ Chí Minh");
-                user12.SetStatus(UserStatus.Active);
-                _context.Users.Add(user12);
-                existingEmails.Add(student12Email);
-                var uni12 = universityList.First(u => u.Code == "FPTU");
-                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user12.UserId, UniversityId = uni12.UniversityId });
-                var student12Rec = new Student
-                {
-                    StudentId = Guid.NewGuid(),
-                    UserId = user12.UserId,
-                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
-                    Major = "Software Engineering",
-                    ClassName = "SE1621"
-                };
-                student12Rec.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf");
-                _context.Students.Add(student12Rec);
-            }
-
             // Student13 — seeded for UniAssign placement flow
             var student13Email = "student13@fptu.edu.vn";
             if (!existingEmails.Contains(student13Email))
@@ -881,31 +856,6 @@ namespace IOCv2.Infrastructure.Persistence
                     Major = "Information Technology",
                     ClassName = "IT1621"
                 });
-            }
-
-            // Student14 — seeded for SelfApply placement flow
-            var student14Email = "student14@fptu.edu.vn";
-            if (!existingEmails.Contains(student14Email))
-            {
-                var userId14 = SeedIds.Student14UserId;
-                var userCode14 = await _userService.GenerateUserCodeAsync(UserRole.Student, cancellationToken);
-                var user14 = new User(userId14, userCode14, student14Email, "Nguyễn Thảo Ngân", UserRole.Student, passHash);
-                user14.UpdateProfile(user14.FullName, GetUniquePhone(), null, UserGender.Female, new DateOnly(2003, 12, 12), "TP. Hồ Chí Minh");
-                user14.SetStatus(UserStatus.Active);
-                _context.Users.Add(user14);
-                existingEmails.Add(student14Email);
-                var uni14 = universityList.First(u => u.Code == "FPTU");
-                _context.UniversityUsers.Add(new UniversityUser { UniversityUserId = Guid.NewGuid(), UserId = user14.UserId, UniversityId = uni14.UniversityId });
-                var student14Rec = new Student
-                {
-                    StudentId = Guid.NewGuid(),
-                    UserId = user14.UserId,
-                    InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
-                    Major = "Software Engineering",
-                    ClassName = "SE1622"
-                };
-                student14Rec.UpdateCv("https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf");
-                _context.Students.Add(student14Rec);
             }
 
             await _context.SaveChangesAsync();
@@ -1309,6 +1259,7 @@ namespace IOCv2.Infrastructure.Persistence
                 string? rejectReason,
                 string? cvSnapshotUrl,
                 string? jobPostingTitle,
+                Guid internshipPhaseId,
                 bool isHiddenByStudent = false)
             {
                 var application = await _context.InternshipApplications.FirstOrDefaultAsync(a =>
@@ -1327,6 +1278,7 @@ namespace IOCv2.Infrastructure.Persistence
                 application.EnterpriseId = enterpriseId;
                 application.TermId = termId;
                 application.StudentId = studentId;
+                application.InternPhaseId = internshipPhaseId;
                 application.JobId = jobId;
                 application.Status = status;
                 application.Source = source;
@@ -1346,49 +1298,49 @@ namespace IOCv2.Infrastructure.Persistence
                 fptBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.SelfApply,
                 DateTime.UtcNow.AddDays(-35), DateTime.UtcNow.AddDays(-30), hrFptEu?.EnterpriseUserId,
                 null, null,
-                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student1_cv.pdf", fptBackendJob.Title);
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student1_cv.pdf", fptBackendJob.Title, fptBackendJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 fsoft.EnterpriseId, spring2026.TermId, s2.StudentId,
                 fptQaJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
                 DateTime.UtcNow.AddDays(-26), DateTime.UtcNow.AddDays(-24), hrFptEu?.EnterpriseUserId,
                 fptUniversity.UniversityId, null,
-                null, fptQaJob.Title);
+                null, fptQaJob.Title, fptBackendJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 fsoft.EnterpriseId, spring2026.TermId, s3.StudentId,
                 fptBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.SelfApply,
                 DateTime.UtcNow.AddDays(-22), DateTime.UtcNow.AddDays(-20), hrFptEu?.EnterpriseUserId,
                 null, null,
-                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student3_cv.pdf", fptBackendJob.Title);
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student3_cv.pdf", fptBackendJob.Title, fptBackendJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 fsoft.EnterpriseId, spring2026.TermId, s6.StudentId,
                 fptQaJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
                 DateTime.UtcNow.AddDays(-16), DateTime.UtcNow.AddDays(-15), hrFptEu?.EnterpriseUserId,
                 fptUniversity.UniversityId, null,
-                null, fptQaJob.Title);
+                null, fptQaJob.Title, fptQaJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 fsoft.EnterpriseId, spring2026.TermId, s4.StudentId,
                 fptBackendJob.JobId, InternshipApplicationStatus.Rejected, ApplicationSource.SelfApply,
                 DateTime.UtcNow.AddDays(-12), DateTime.UtcNow.AddDays(-10), hrFptEu?.EnterpriseUserId,
                 null, "Không phù hợp stack backend của đợt này.",
-                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student4_cv.pdf", fptBackendJob.Title);
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student4_cv.pdf", fptBackendJob.Title, fptBackendJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 rikkeisoft.EnterpriseId, spring2026.TermId, s5.StudentId,
                 rikkeiBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
                 DateTime.UtcNow.AddDays(-18), DateTime.UtcNow.AddDays(-15), hrRikkeiEu?.EnterpriseUserId,
                 fptUniversity.UniversityId, null,
-                null, rikkeiBackendJob.Title);
+                null, rikkeiBackendJob.Title, rikkeiBackendJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 fsoft.EnterpriseId, spring2026.TermId, s8.StudentId,
                 fptBackendJob.JobId, InternshipApplicationStatus.Withdrawn, ApplicationSource.SelfApply,
                 DateTime.UtcNow.AddDays(-14), DateTime.UtcNow.AddDays(-7), hrFptEu?.EnterpriseUserId,
                 null, "Sinh viên rút hồ sơ theo nguyện vọng cá nhân.",
-                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student8_cv.pdf", fptBackendJob.Title,
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student8_cv.pdf", fptBackendJob.Title, fptBackendJob.InternshipPhaseId.GetValueOrDefault(),
                 isHiddenByStudent: true);
 
             await EnsureApplication(
@@ -1396,7 +1348,7 @@ namespace IOCv2.Infrastructure.Persistence
                 fptQaJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
                 DateTime.UtcNow.AddDays(-3), null, null,
                 null, null,
-                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student9_cv.pdf", fptQaJob.Title);
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student9_cv.pdf", fptQaJob.Title, fptQaJob.InternshipPhaseId.GetValueOrDefault());
 
             // Rikkeisoft Spring 2026: mix of self-apply and uni-assign placements.
             await EnsureApplication(
@@ -1404,21 +1356,21 @@ namespace IOCv2.Infrastructure.Persistence
                 rikkeiBackendJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.SelfApply,
                 DateTime.UtcNow.AddDays(-18), DateTime.UtcNow.AddDays(-16), hrRikkeiEu?.EnterpriseUserId,
                 null, null,
-                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student7_cv.pdf", rikkeiBackendJob.Title);
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student7_cv.pdf", rikkeiBackendJob.Title, rikkeiBackendJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 rikkeisoft.EnterpriseId, spring2026.TermId, s10.StudentId,
                 rikkeiMobileJob.JobId, InternshipApplicationStatus.Placed, ApplicationSource.UniAssign,
                 DateTime.UtcNow.AddDays(-11), DateTime.UtcNow.AddDays(-8), hrRikkeiEu?.EnterpriseUserId,
                 fptUniversity.UniversityId, null,
-                null, rikkeiMobileJob.Title);
+                null, rikkeiMobileJob.Title, rikkeiMobileJob.InternshipPhaseId.GetValueOrDefault());
 
             await EnsureApplication(
                 rikkeisoft.EnterpriseId, spring2026.TermId, s2.StudentId,
                 rikkeiMobileJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
                 DateTime.UtcNow.AddDays(-5), null, null,
                 fptUniversity.UniversityId, null,
-                null, rikkeiMobileJob.Title);
+                null, rikkeiMobileJob.Title, rikkeiMobileJob.InternshipPhaseId.GetValueOrDefault());
 
             // Student 11: UniAssign placement flow -> FPT Software Spring 2026 (Job: FPT QA Automation Intern)
             if (s11 != null)
@@ -1428,7 +1380,7 @@ namespace IOCv2.Infrastructure.Persistence
                    fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
                    DateTime.UtcNow.AddDays(-4), null, null,
                    fptUniversity.UniversityId, null,
-                   null, fptQaJob.Title);
+                   null, fptQaJob.Title, fptQaJob.InternshipPhaseId.GetValueOrDefault());
             }
 
             // Student 12: SelfApply flow -> FPT Software Spring 2026 (Job: FPT Backend Platform Intern)
@@ -1439,7 +1391,7 @@ namespace IOCv2.Infrastructure.Persistence
                    fptBackendJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
                    DateTime.UtcNow.AddDays(-2), null, null,
                    null, null,
-                   "https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf", fptBackendJob.Title);
+                   "https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf", fptBackendJob.Title, fptBackendJob.InternshipPhaseId.GetValueOrDefault());
             }
 
             // Student 13: UniAssign placement flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Java Backend Intern)
@@ -1450,7 +1402,7 @@ namespace IOCv2.Infrastructure.Persistence
                    rikkeiBackendJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
                    DateTime.UtcNow.AddDays(-1), null, null,
                    fptUniversity.UniversityId, null,
-                   null, rikkeiBackendJob.Title);
+                   null, rikkeiBackendJob.Title, rikkeiBackendJob.InternshipPhaseId.GetValueOrDefault());
             }
 
             // Student 14: SelfApply flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Mobile Flutter Intern)
@@ -1461,7 +1413,7 @@ namespace IOCv2.Infrastructure.Persistence
                    rikkeiMobileJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
                    DateTime.UtcNow.AddDays(0), null, null,
                    null, null,
-                   "https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf", rikkeiMobileJob.Title);
+                   "https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf", rikkeiMobileJob.Title, rikkeiMobileJob.InternshipPhaseId.GetValueOrDefault());
             }
 
             // Historical record for old term.
@@ -1470,7 +1422,7 @@ namespace IOCv2.Infrastructure.Persistence
                 fptBackendJob.JobId, InternshipApplicationStatus.Rejected, ApplicationSource.SelfApply,
                 DateTime.UtcNow.AddDays(-100), DateTime.UtcNow.AddDays(-95), hrFptEu?.EnterpriseUserId,
                 null, "Not a good fit for this semester",
-                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student2_cv.pdf", fptBackendJob.Title);
+                "https://iocv2-test-resources.s3.amazonaws.com/resumes/student2_cv.pdf", fptBackendJob.Title, fptBackendJob.InternshipPhaseId.GetValueOrDefault());
 
             await _context.SaveChangesAsync();
         }

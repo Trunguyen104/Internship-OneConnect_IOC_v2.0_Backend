@@ -88,7 +88,10 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm
                     ClassName = st.Student.ClassName ?? string.Empty,
                     Major = st.Student.Major ?? string.Empty,
                     PlacementStatus = st.PlacementStatus,
-                    EnterpriseName = st.Enterprise!.Name,
+                    EnterpriseName = _unitOfWork.Repository<Enterprise>().Query()
+                        .Where(e => e.EnterpriseId == _unitOfWork.Repository<InternshipApplication>().Query().Where(ia => ia.TermId == request.TermId && ia.StudentId == st.StudentId).OrderByDescending(ia => ia.CreatedAt).Select(ia => ia.EnterpriseId).FirstOrDefault())
+                        .Select(e => e.Name)
+                        .FirstOrDefault(),
                     InternPhaseName = _unitOfWork.Repository<InternshipPhase>().Query()
                         .Where(p => p.PhaseId == _unitOfWork.Repository<InternshipApplication>().Query().Where(ia => ia.TermId == request.TermId && ia.StudentId == st.StudentId).OrderByDescending(ia => ia.CreatedAt).Select(ia => ia.InternPhaseId).FirstOrDefault())
                         .Select(p => p.Name)
