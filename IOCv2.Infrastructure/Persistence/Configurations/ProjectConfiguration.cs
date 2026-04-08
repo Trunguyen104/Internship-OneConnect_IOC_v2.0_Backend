@@ -81,6 +81,12 @@ namespace IOCv2.Infrastructure.Persistence.Configurations
             builder.HasIndex(x => x.InternshipId)
                 .HasDatabaseName("ix_projects_internship_id");
 
+            // Hard guard: only one active project per group (ignore soft-deleted rows)
+            builder.HasIndex(x => x.InternshipId)
+                .HasDatabaseName("uix_projects_internship_id_active")
+                .HasFilter("deleted_at IS NULL AND internship_id IS NOT NULL AND operational_status = 1")
+                .IsUnique();
+
             builder.HasIndex(x => x.VisibilityStatus)
                 .HasDatabaseName("ix_projects_visibility_status");
 

@@ -137,5 +137,44 @@ namespace IOCv2.Tests.Features.Projects
             result.IsSuccess.Should().BeFalse();
             result.Error.Should().Be("Unauthorized");
         }
+
+        [Fact]
+        public async Task Handle_CreateIntoGroupWithExistingActiveProject_ShouldReturnConflict()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var mentorId = Guid.NewGuid();
+            var group = InternshipGroup.Create(Guid.NewGuid(), "Group 06", mentorId: mentorId);
+
+            var existingActive = Project.Create("Existing", "Desc", "PRJ-EXISTING", "IT", "Req", mentorId: mentorId);
+            existingActive.AssignToGroup(group.InternshipId, group.StartDate, group.EndDate);
+
+            var command = new CreateProjectCommand
+            {
+                ProjectName = "New Project",
+                Field = "IT",
+                Requirements = "Requirements",
+                InternshipGroupId = group.InternshipId
+            };
+
+            _mockCurrentUser.Setup(x => x.UserId).Returns(userId.ToString());
+            _mockEnterpriseUserRepo.Setup(x => x.Query()).Returns(new List<EnterpriseUser>
+            {
+                new EnterpriseUser { EnterpriseUserId = mentorId, UserId = userId }
+            }.AsQueryable().BuildMock());
+
+            _mockInternshipRepo.Setup(x => x.Query())
+                .Returns(new List<InternshipGroup> { group }.AsQueryable().BuildMock());
+            _mockProjectRepo.Setup(x => x.Query())
+                .Returns(new List<Project> { existingActive }.AsQueryable().BuildMock());
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsSuccess.Should().BeFalse();
+            result.ErrorType.Should().Be(ResultErrorType.Conflict);
+            _mockProjectRepo.Verify(x => x.AddAsync(It.IsAny<Project>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
     }
 }

@@ -142,6 +142,16 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 if (assignedGroup.MentorId != enterpriseUser.EnterpriseUserId)
                     return Result<CreateProjectResponse>.Failure(
                         _message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
+
+                var hasActiveProjectInGroup = await _unitOfWork.Repository<Project>().Query()
+                    .AnyAsync(p => p.InternshipId == assignedGroup.InternshipId
+                                && p.OperationalStatus == OperationalStatus.Active,
+                        cancellationToken);
+
+                if (hasActiveProjectInGroup)
+                    return Result<CreateProjectResponse>.Failure(
+                        _message.GetMessage(MessageKeys.Projects.GroupAlreadyHasActiveProject),
+                        ResultErrorType.Conflict);
             }
 
             // 6. Create + Persist
@@ -270,6 +280,16 @@ namespace IOCv2.Application.Features.Projects.Commands.CreateProject
                 var response = _mapper.Map<CreateProjectResponse>(newProject);
                 ResolveResourceUrls(response.ProjectResources);
                 return Result<CreateProjectResponse>.Success(response);
+            }
+            catch (DbUpdateException dbEx) when (
+                dbEx.InnerException?.Message.Contains("uix_projects_internship_id_active") == true)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                foreach (var (url, _, _) in uploadedFiles)
+                    await _fileStorage.DeleteFileAsync(url, cancellationToken);
+                return Result<CreateProjectResponse>.Failure(
+                    _message.GetMessage(MessageKeys.Projects.GroupAlreadyHasActiveProject),
+                    ResultErrorType.Conflict);
             }
             catch (DbUpdateException dbEx) when (
                 dbEx.InnerException?.Message.Contains("uix_projects_project_code_active") == true ||

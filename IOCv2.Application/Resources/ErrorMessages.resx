@@ -1372,6 +1372,15 @@
   <data name="Projects.CannotDeleteHasData" xml:space="preserve">
     <value>Không thể xóa project đã có dữ liệu (work items hoặc sprints).</value>
   </data>
+  <data name="Projects.CannotDeleteCompletedOrArchived" xml:space="preserve">
+    <value>Không thể xóa dự án vì dự án đã hoàn thành hoặc đã lưu trữ. Vui lòng liên hệ quản trị viên nếu cần hỗ trợ.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithWorkItems" xml:space="preserve">
+    <value>Không thể xóa dự án vì dự án đã có công việc (work items). Vui lòng xóa hoặc chuyển các công việc trước.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithSprints" xml:space="preserve">
+    <value>Không thể xóa dự án vì dự án đã có sprint. Vui lòng xóa hoặc kết thúc sprint trước.</value>
+  </data>
   <data name="Projects.InvalidStatusForUnpublish" xml:space="preserve">
     <value>Chỉ có thể chuyển về Bản nháp dự án đang ở trạng thái Đã phát hành.</value>
   </data>
@@ -1383,6 +1392,9 @@
   </data>
   <data name="Projects.AlreadyAssignedToGroup" xml:space="preserve">
     <value>Dự án đã được gán cho một nhóm thực tập rồi.</value>
+  </data>
+  <data name="Projects.GroupAlreadyHasActiveProject" xml:space="preserve">
+    <value>Nhóm này đã có một dự án đang hoạt động. Mỗi nhóm chỉ được phép có một dự án active.</value>
   </data>
   <data name="Projects.GroupNotActive" xml:space="preserve">
     <value>Nhóm thực tập không còn hoạt động (đã kết thúc hoặc đã lưu trữ).</value>

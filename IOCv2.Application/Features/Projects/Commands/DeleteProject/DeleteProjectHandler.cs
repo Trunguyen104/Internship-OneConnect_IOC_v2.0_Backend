@@ -56,9 +56,10 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Projects.NotFound), ResultErrorType.NotFound);
             }
 
-            var canManageProject = project.InternshipId.HasValue
-                ? project.InternshipGroup?.MentorId == enterpriseUser.EnterpriseUserId
-                : project.MentorId == enterpriseUser.EnterpriseUserId;
+            // Allow delete when user is either the project creator mentor or the currently assigned group mentor.
+            var canManageProject = project.MentorId == enterpriseUser.EnterpriseUserId
+                                   || (project.InternshipId.HasValue
+                                       && project.InternshipGroup?.MentorId == enterpriseUser.EnterpriseUserId);
 
             if (!canManageProject)
                 return Result<string>.Failure(_messageService.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
@@ -67,7 +68,7 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
             if (project.OperationalStatus == OperationalStatus.Completed ||
                 project.OperationalStatus == OperationalStatus.Archived)
                 return Result<string>.Failure(
-                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
+                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteCompletedOrArchived),
                     ResultErrorType.BadRequest);
 
             // Data checks: block delete if project has associated WorkItems or Sprints
@@ -75,48 +76,15 @@ namespace IOCv2.Application.Features.Projects.Commands.DeleteProject
                 .AnyAsync(w => w.ProjectId == project.ProjectId, cancellationToken);
             if (hasWorkItems)
                 return Result<string>.Failure(
-                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
+                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteWithWorkItems),
                     ResultErrorType.BadRequest);
 
             var hasSprints = await _unitOfWork.Repository<Sprint>().Query()
                 .AnyAsync(s => s.ProjectId == project.ProjectId, cancellationToken);
             if (hasSprints)
                 return Result<string>.Failure(
-                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
+                    _messageService.GetMessage(MessageKeys.Projects.CannotDeleteWithSprints),
                     ResultErrorType.BadRequest);
-
-            if (project.InternshipId.HasValue)
-            {
-                var internshipId = project.InternshipId.Value;
-
-                var hasLogbooks = await _unitOfWork.Repository<Logbook>().Query()
-                    .AnyAsync(l => l.InternshipId == internshipId, cancellationToken);
-                if (hasLogbooks)
-                    return Result<string>.Failure(
-                        _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
-                        ResultErrorType.BadRequest);
-
-                var hasStakeholders = await _unitOfWork.Repository<Stakeholder>().Query()
-                    .AnyAsync(s => s.InternshipId == internshipId, cancellationToken);
-                if (hasStakeholders)
-                    return Result<string>.Failure(
-                        _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
-                        ResultErrorType.BadRequest);
-
-                var hasEvaluations = await _unitOfWork.Repository<Evaluation>().Query()
-                    .AnyAsync(e => e.InternshipId == internshipId, cancellationToken);
-                if (hasEvaluations)
-                    return Result<string>.Failure(
-                        _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
-                        ResultErrorType.BadRequest);
-
-                var hasViolations = await _unitOfWork.Repository<ViolationReport>().Query()
-                    .AnyAsync(v => v.InternshipGroupId == internshipId, cancellationToken);
-                if (hasViolations)
-                    return Result<string>.Failure(
-                        _messageService.GetMessage(MessageKeys.Projects.CannotDeleteHasData),
-                        ResultErrorType.BadRequest);
-            }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try

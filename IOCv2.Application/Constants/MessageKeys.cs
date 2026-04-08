@@ -516,12 +516,18 @@ namespace IOCv2.Application.Constants
             // AssignGroup
             public const string AssignGroupSuccess         = "Projects.AssignGroupSuccess";
             public const string AlreadyAssignedToGroup     = "Projects.AlreadyAssignedToGroup";
+            public const string GroupAlreadyHasActiveProject = "Projects.GroupAlreadyHasActiveProject";
             public const string GroupHasNoMentor           = "Projects.GroupHasNoMentor";
             public const string GroupNotActive             = "Projects.GroupNotActive";
             public const string CannotAssignArchivedGroup  = "Projects.CannotAssignArchivedGroup";
             public const string GroupPhaseEnded            = "Projects.GroupPhaseEnded";
             public const string LogAssignGroupSuccess      = "Projects.LogAssignGroupSuccess";
             public const string LogAssignGroupError        = "Projects.LogAssignGroupError";
+
+            // Delete
+            public const string CannotDeleteCompletedOrArchived = "Projects.CannotDeleteCompletedOrArchived";
+            public const string CannotDeleteWithWorkItems = "Projects.CannotDeleteWithWorkItems";
+            public const string CannotDeleteWithSprints = "Projects.CannotDeleteWithSprints";
 
             // SwapGroup
             public const string SwapGroupSuccess = "Projects.SwapGroupSuccess";

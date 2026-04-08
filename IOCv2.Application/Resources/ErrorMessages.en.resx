@@ -1417,6 +1417,15 @@
   <data name="Projects.CannotDeleteHasData" xml:space="preserve">
     <value>Cannot delete project that already has data (work items or sprints).</value>
   </data>
+  <data name="Projects.CannotDeleteCompletedOrArchived" xml:space="preserve">
+    <value>This project cannot be deleted because it is already completed or archived. Please contact an administrator if you need help.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithWorkItems" xml:space="preserve">
+    <value>This project cannot be deleted because it already has work items. Please remove or move those work items first.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithSprints" xml:space="preserve">
+    <value>This project cannot be deleted because it already has sprints. Please remove or close the sprints first.</value>
+  </data>
   <data name="Projects.InvalidStatusForUnpublish" xml:space="preserve">
     <value>Only Published projects can be unpublished.</value>
   </data>
@@ -1428,6 +1437,9 @@
   </data>
   <data name="Projects.AlreadyAssignedToGroup" xml:space="preserve">
     <value>Project is already assigned to a group.</value>
+  </data>
+  <data name="Projects.GroupAlreadyHasActiveProject" xml:space="preserve">
+    <value>This group already has an active project. Each group can only have one active project.</value>
   </data>
   <data name="Projects.GroupNotActive" xml:space="preserve">
     <value>Group is not active (Finished or Archived).</value>
