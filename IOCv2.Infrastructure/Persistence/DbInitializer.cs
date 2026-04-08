@@ -1162,22 +1162,6 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.InternshipGroups.Add(archivedGroup);
             }
 
-            // Inline assign/reassign mentor scenarios.
-            var mentorPendingGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
-            if (mentorPendingGroup == null)
-            {
-                mentorPendingGroup = InternshipGroup.Create(
-                    phaseInProgressFpt.PhaseId,
-                    "FPT Software Mentor Pending Team",
-                    "Active team intentionally seeded without mentor for first-assign tests",
-                    fsoft.EnterpriseId,
-                    null,
-                    DateTime.UtcNow.AddDays(-12),
-                    DateTime.UtcNow.AddMonths(2));
-                mentorPendingGroup.UpdateStatus(GroupStatus.Active);
-                _context.InternshipGroups.Add(mentorPendingGroup);
-            }
-
             var zeroMemberGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Zero Member Team");
             if (zeroMemberGroup == null)
             {
@@ -1533,20 +1517,6 @@ namespace IOCv2.Infrastructure.Persistence
             // InternshipId thay đổi → guard AnyAsync(p.InternshipId == group.InternshipId) miss →
             // cố insert code đã tồn tại → vi phạm uix_projects_project_code_active.
 
-            var mentorPendingGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
-            if (mentorPendingGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_6"))
-            {
-                var pendingProj = Project.Create(
-                    "FPT Mentor Pending Commerce",
-                    "Commerce mini-platform reserved for first mentor assignment flow",
-                    "PRJ-FPTSOF_FPT_6",
-                    "CNTT",
-                    "Seeded for AC-04 first assign mentor + project mentor sync.");
-                pendingProj.AssignToGroup(mentorPendingGroup.InternshipId, DateTime.UtcNow.AddDays(-10), DateTime.UtcNow.AddMonths(1));
-                pendingProj.Publish();
-                _context.Projects.Add(pendingProj);
-            }
-
             var zeroMemberGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Zero Member Team");
             if (zeroMemberGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_7"))
             {
@@ -1680,9 +1650,6 @@ namespace IOCv2.Infrastructure.Persistence
             var fptGroup = await _context.InternshipGroups
                 .Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
-            var mentorPendingGroup = await _context.InternshipGroups
-                .Include(g => g.Members)
-                .FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
             var rikkeiGroup = await _context.InternshipGroups
                 .Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
@@ -1696,8 +1663,6 @@ namespace IOCv2.Infrastructure.Persistence
             var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
             var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
-            var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
-            var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
             var s11 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student11@fptu.edu.vn");
             var s12 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student12@fptu.edu.vn");
 
@@ -1722,17 +1687,6 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.InternshipGroups.Update(rikkeiGroup);
             }
 
-            // Group without mentor but with members for first-assign and student-notify test path.
-            if (mentorPendingGroup != null)
-            {
-                bool pendingGroupHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == mentorPendingGroup.InternshipId);
-                if (!pendingGroupHasStudents)
-                {
-                    if (s8 != null) mentorPendingGroup.AddMember(s8.StudentId, InternshipRole.Leader);
-                    if (s9 != null) mentorPendingGroup.AddMember(s9.StudentId, InternshipRole.Member);
-                    _context.InternshipGroups.Update(mentorPendingGroup);
-                }
-            }
 
             await _context.SaveChangesAsync();
         }
