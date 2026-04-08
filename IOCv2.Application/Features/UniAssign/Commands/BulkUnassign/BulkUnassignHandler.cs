@@ -131,12 +131,8 @@ namespace IOCv2.Application.Features.UniAssign.Commands.BulkUnassign
                     if (!students.Any())
                     {
                         var message = _messageService.GetMessage(MessageKeys.UniAssign.PendingStudentsWithExistingData, string.Join(", ", excludedIds));
-                        var response = new BulkUnassignResponse
-                        {
-                            Message = message
-                        };
-
-                        return Result<BulkUnassignResponse>.Success(response, message);
+                      
+                        return Result<BulkUnassignResponse>.Failure(message, ResultErrorType.BadRequest);
                     }
                 }
 
