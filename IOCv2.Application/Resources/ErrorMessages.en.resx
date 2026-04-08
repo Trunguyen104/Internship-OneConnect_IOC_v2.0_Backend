@@ -1329,7 +1329,7 @@
   <data name="ViolationReport.ErrorWhileGettingViolationReportDetail" xml:space="preserve">
     <value>An error occurred while retrieving violation report details.</value>
   </data>
-  <!-- ActivePhases (ISSUE-68) â€” Enterprise HR/Mentor View Term Timeline -->
+  <!-- ActivePhases (ISSUE-68)” Enterprise HR/Mentor View Term Timeline -->
   <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Your session is invalid. Please sign out and sign in again.</value>
   </data>
