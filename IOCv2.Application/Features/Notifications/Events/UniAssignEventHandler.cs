@@ -1,4 +1,4 @@
-﻿using IOCv2.Application.Interfaces;
+using IOCv2.Application.Interfaces;
 using IOCv2.Domain.Entities;
 using IOCv2.Domain.Enums;
 using MediatR;
@@ -14,15 +14,18 @@ internal class UniAssignEventHandler :
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly INotificationPushService _pushService;
+    private readonly IMessageService _messageService;
     private readonly ILogger<UniAssignEventHandler> _logger;
 
     public UniAssignEventHandler(
         IUnitOfWork unitOfWork,
         INotificationPushService pushService,
+        IMessageService messageService,
         ILogger<UniAssignEventHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _pushService = pushService;
+        _messageService = messageService;
         _logger = logger;
     }
 
@@ -70,7 +73,7 @@ internal class UniAssignEventHandler :
 
     public async Task Handle(ApplicationAssignedUniAssignEvent notification, CancellationToken cancellationToken)
     {
-        var title = "Bạn đã được chỉ định thực tập";
+        var title = _messageService.GetMessage(IOCv2.Application.Constants.MessageKeys.UniAssign.NotifyAssignedTitle);
         var content = $"Bạn đã được chỉ định vào {notification.EnterpriseName} cho kỳ {notification.TermName}. Đang chờ doanh nghiệp xác nhận.";
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
@@ -83,7 +86,7 @@ internal class UniAssignEventHandler :
 
     public async Task Handle(ApplicationReassignedFromPendingEvent notification, CancellationToken cancellationToken)
     {
-        var title = "Cập nhật chỉ định thực tập";
+        var title = _messageService.GetMessage(IOCv2.Application.Constants.MessageKeys.UniAssign.NotifyReassignedFromPendingTitle);
         var content = $"Chỉ định thực tập của bạn đã được cập nhật. Enterprise mới: {notification.NewEnterpriseName}. Đang chờ doanh nghiệp xác nhận.";
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
@@ -96,7 +99,7 @@ internal class UniAssignEventHandler :
 
     public async Task Handle(ApplicationReassignedFromPlacedEvent notification, CancellationToken cancellationToken)
     {
-        var title = "Chỉ định thực tập đã thay đổi";
+        var title = _messageService.GetMessage(IOCv2.Application.Constants.MessageKeys.UniAssign.NotifyReassignedFromPlacedTitle);
         var content = $"Chỉ định thực tập của bạn tại {notification.OldEnterpriseName} đã bị hủy. Bạn vừa được chỉ định đến {notification.NewEnterpriseName} — đang chờ doanh nghiệp xác nhận.";
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
@@ -109,7 +112,7 @@ internal class UniAssignEventHandler :
 
     public async Task Handle(ApplicationUnassignedUniAssignEvent notification, CancellationToken cancellationToken)
     {
-        var title = "Thông báo hủy chỉ định thực tập";
+        var title = _messageService.GetMessage(IOCv2.Application.Constants.MessageKeys.UniAssign.NotifyUnassignedTitle);
         var content = $"Chỉ định thực tập của bạn trong kỳ {notification.TermName} đã bị hủy. Vui lòng liên hệ Uni Admin để được hỗ trợ.";
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,

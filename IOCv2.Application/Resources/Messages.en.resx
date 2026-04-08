@@ -1597,4 +1597,49 @@
   <data name="ProjectResources.LogDeleteSuccess" xml:space="preserve">
     <value>Project resource with ID {ResourceId} was deleted successfully.</value>
   </data>
+  <data name="HRApplications.Notify.UniAdmin.Placed.Title" xml:space="preserve">
+    <value>Student Placed for Internship</value>
+  </data>
+  <data name="StudentApplications.Notify.Student.RemovedPlaced.Title" xml:space="preserve">
+    <value>Internship Status Notification</value>
+  </data>
+  <data name="UniAssign.Notify.Assigned.Title" xml:space="preserve">
+    <value>You have been assigned an internship</value>
+  </data>
+  <data name="StudentApplications.Notify.HR.Withdrawn.Title" xml:space="preserve">
+    <value>Student Withdrew Application</value>
+  </data>
+  <data name="UniAssign.Notify.ReassignedFromPending.Title" xml:space="preserve">
+    <value>Internship Assignment Updated</value>
+  </data>
+  <data name="UniAssign.Notify.Unassigned.Title" xml:space="preserve">
+    <value>Internship Assignment Cancelled</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.UniAssign.Title" xml:space="preserve">
+    <value>Internship Result Approved</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Rejected.Title" xml:space="preserve">
+    <value>Enterprise Rejected Student</value>
+  </data>
+  <data name="HRApplications.Notify.Offered.Title" xml:space="preserve">
+    <value>Offer Received</value>
+  </data>
+  <data name="HRApplications.Notify.Interviewing.Title" xml:space="preserve">
+    <value>Application Status Updated</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.SelfApply.Title" xml:space="preserve">
+    <value>Congratulations, you are placed!</value>
+  </data>
+  <data name="UniAssign.Notify.ReassignedFromPlaced.Title" xml:space="preserve">
+    <value>Internship Assignment Changed</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.SelfApply.Title" xml:space="preserve">
+    <value>Application Status Updated</value>
+  </data>
+  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced.Title" xml:space="preserve">
+    <value>Student Removed from Internship</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.UniAssign.Title" xml:space="preserve">
+    <value>Internship Assignment Rejected</value>
+  </data>
 </root>

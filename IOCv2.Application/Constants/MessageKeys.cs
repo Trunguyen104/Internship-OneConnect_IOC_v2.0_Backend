@@ -1230,6 +1230,15 @@ namespace IOCv2.Application.Constants
             public const string NotifyEnterpriseAutoWithdrawn = "HRApplications.Notify.Enterprise.AutoWithdrawn";
             public const string NotifyStudentAutoWithdrawn = "HRApplications.Notify.Student.AutoWithdrawn";
 
+            public const string NotifyInterviewingTitle = "HRApplications.Notify.Interviewing.Title";
+            public const string NotifyOfferedTitle = "HRApplications.Notify.Offered.Title";
+            public const string NotifyPlacedSelfApplyTitle = "HRApplications.Notify.Placed.SelfApply.Title";
+            public const string NotifyPlacedUniAssignTitle = "HRApplications.Notify.Placed.UniAssign.Title";
+            public const string NotifyRejectedSelfApplyTitle = "HRApplications.Notify.Rejected.SelfApply.Title";
+            public const string NotifyRejectedUniAssignTitle = "HRApplications.Notify.Rejected.UniAssign.Title";
+            public const string NotifyUniAdminRejectedTitle = "HRApplications.Notify.UniAdmin.Rejected.Title";
+            public const string NotifyUniAdminPlacedTitle = "HRApplications.Notify.UniAdmin.Placed.Title";
+
             // Logging
             public const string LogMoveToInterviewing = "HRApplications.Log.MoveToInterviewing";
             public const string LogSendOffer = "HRApplications.Log.SendOffer";
@@ -1261,6 +1270,9 @@ namespace IOCv2.Application.Constants
             // Notify SV + Uni Admin when HR removes a Placed student (AC-C05)
             public const string NotifyStudentRemovedPlaced = "StudentApplications.Notify.Student.RemovedPlaced";
             public const string NotifyUniAdminRemovedPlaced = "StudentApplications.Notify.UniAdmin.RemovedPlaced";
+            public const string NotifyHRWithdrawnTitle = "StudentApplications.Notify.HR.Withdrawn.Title";
+            public const string NotifyStudentRemovedPlacedTitle = "StudentApplications.Notify.Student.RemovedPlaced.Title";
+            public const string NotifyUniAdminRemovedPlacedTitle = "StudentApplications.Notify.UniAdmin.RemovedPlaced.Title";
         }
 
         public static class UniAdminInternship
@@ -1355,6 +1367,12 @@ namespace IOCv2.Application.Constants
             public const string UnassignSuccess = "UniAssign.UnassignSuccess";
             // Get By Term
             public const string GetNotAllowed = "UniAssign.GetNotAllowed";
+
+            // Notification titles
+            public const string NotifyAssignedTitle = "UniAssign.Notify.Assigned.Title";
+            public const string NotifyReassignedFromPendingTitle = "UniAssign.Notify.ReassignedFromPending.Title";
+            public const string NotifyReassignedFromPlacedTitle = "UniAssign.Notify.ReassignedFromPlaced.Title";
+            public const string NotifyUnassignedTitle = "UniAssign.Notify.Unassigned.Title";
         }
 
         public static class UserManagement

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1596,5 +1596,50 @@
   </data>
   <data name="Validation.PageSizeInvalid" xml:space="preserve">
     <value>PageSize phải lớn hơn hoặc bằng 1.</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Placed.Title" xml:space="preserve">
+    <value>Sinh viên được tiếp nhận thực tập</value>
+  </data>
+  <data name="StudentApplications.Notify.Student.RemovedPlaced.Title" xml:space="preserve">
+    <value>Thông báo về trạng thái thực tập</value>
+  </data>
+  <data name="UniAssign.Notify.Assigned.Title" xml:space="preserve">
+    <value>Bạn đã được chỉ định thực tập</value>
+  </data>
+  <data name="StudentApplications.Notify.HR.Withdrawn.Title" xml:space="preserve">
+    <value>Sinh viên rút đơn ứng tuyển</value>
+  </data>
+  <data name="UniAssign.Notify.ReassignedFromPending.Title" xml:space="preserve">
+    <value>Cập nhật chỉ định thực tập</value>
+  </data>
+  <data name="UniAssign.Notify.Unassigned.Title" xml:space="preserve">
+    <value>Thông báo hủy chỉ định thực tập</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.UniAssign.Title" xml:space="preserve">
+    <value>Phê duyệt kết quả thực tập</value>
+  </data>
+  <data name="HRApplications.Notify.UniAdmin.Rejected.Title" xml:space="preserve">
+    <value>Doanh nghiệp từ chối sinh viên</value>
+  </data>
+  <data name="HRApplications.Notify.Offered.Title" xml:space="preserve">
+    <value>Bạn đã nhận được Offer</value>
+  </data>
+  <data name="HRApplications.Notify.Interviewing.Title" xml:space="preserve">
+    <value>Cập nhật trạng thái đơn ứng tuyển</value>
+  </data>
+  <data name="HRApplications.Notify.Placed.SelfApply.Title" xml:space="preserve">
+    <value>Chúc mừng bạn đã được nhận</value>
+  </data>
+  <data name="UniAssign.Notify.ReassignedFromPlaced.Title" xml:space="preserve">
+    <value>Chỉ định thực tập đã thay đổi</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.SelfApply.Title" xml:space="preserve">
+    <value>Cập nhật hồ sơ ứng tuyển</value>
+  </data>
+  <data name="StudentApplications.Notify.UniAdmin.RemovedPlaced.Title" xml:space="preserve">
+    <value>Sinh viên bị xóa khỏi danh sách thực tập</value>
+  </data>
+  <data name="HRApplications.Notify.Rejected.UniAssign.Title" xml:space="preserve">
+    <value>Từ chối phân công thực tập</value>
   </data>
 </root>

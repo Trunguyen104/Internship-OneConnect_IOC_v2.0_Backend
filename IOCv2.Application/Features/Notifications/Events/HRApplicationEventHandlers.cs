@@ -87,7 +87,7 @@ public class HRApplicationEventHandlers :
             .Replace("{Enterprise}", notification.EnterpriseName);
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
-            "Cập nhật trạng thái đơn ứng tuyển",
+            _messageService.GetMessage(MessageKeys.HRApplications.NotifyInterviewingTitle),
             content,
             NotificationType.ApplicationStatusChanged,
             notification.ApplicationId,
@@ -100,7 +100,7 @@ public class HRApplicationEventHandlers :
             .Replace("{Enterprise}", notification.EnterpriseName);
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
-            "Bạn đã nhận được Offer",
+            _messageService.GetMessage(MessageKeys.HRApplications.NotifyOfferedTitle),
             content,
             NotificationType.ApplicationStatusChanged,
             notification.ApplicationId,
@@ -113,7 +113,7 @@ public class HRApplicationEventHandlers :
             .Replace("{Enterprise}", notification.EnterpriseName);
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
-            "Chúc mừng bạn đã được nhận",
+            _messageService.GetMessage(MessageKeys.HRApplications.NotifyPlacedSelfApplyTitle),
             content,
             NotificationType.ApplicationStatusChanged,
             notification.ApplicationId,
@@ -126,7 +126,7 @@ public class HRApplicationEventHandlers :
             .Replace("{Enterprise}", notification.EnterpriseName);
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
-            "Cập nhật hồ sơ ứng tuyển",
+            _messageService.GetMessage(MessageKeys.HRApplications.NotifyRejectedSelfApplyTitle),
             content,
             NotificationType.ApplicationStatusChanged,
             notification.ApplicationId,
@@ -139,7 +139,7 @@ public class HRApplicationEventHandlers :
             .Replace("{Enterprise}", notification.EnterpriseName);
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
-            "Phê duyệt kết quả thực tập",
+            _messageService.GetMessage(MessageKeys.HRApplications.NotifyPlacedUniAssignTitle),
             content,
             NotificationType.ApplicationStatusChanged,
             notification.ApplicationId,
@@ -155,7 +155,7 @@ public class HRApplicationEventHandlers :
                 .Replace("{Enterprise}", notification.EnterpriseName);
             await CreateAndPushNotificationAsync(
                 notification.StudentUserId,
-                "Từ chối phân công thực tập",
+                _messageService.GetMessage(MessageKeys.HRApplications.NotifyRejectedUniAssignTitle),
                 contentStudent,
                 NotificationType.ApplicationStatusChanged,
                 notification.ApplicationId,
@@ -180,7 +180,7 @@ public class HRApplicationEventHandlers :
             {
                 await CreateAndPushNotificationAsync(
                     uniAdminUserId,
-                    "Doanh nghiệp từ chối sinh viên",
+                    _messageService.GetMessage(MessageKeys.HRApplications.NotifyUniAdminRejectedTitle),
                     contentUni,
                     NotificationType.ApplicationStatusChanged,
                     notification.ApplicationId,
@@ -207,7 +207,7 @@ public class HRApplicationEventHandlers :
             {
                 await CreateAndPushNotificationAsync(
                     uniAdminUserId,
-                    "Sinh viên được tiếp nhận thực tập",
+                    _messageService.GetMessage(MessageKeys.HRApplications.NotifyUniAdminPlacedTitle),
                     contentUni,
                     NotificationType.ApplicationStatusChanged,
                     notification.ApplicationId,
@@ -232,7 +232,7 @@ public class HRApplicationEventHandlers :
         {
             await CreateAndPushNotificationAsync(
                 hrUserId,
-                "Sinh viên rút đơn ứng tuyển",
+                _messageService.GetMessage(MessageKeys.StudentApplications.NotifyHRWithdrawnTitle),
                 content,
                 NotificationType.ApplicationStatusChanged,
                 notification.ApplicationId,
@@ -249,7 +249,7 @@ public class HRApplicationEventHandlers :
 
         await CreateAndPushNotificationAsync(
             notification.StudentUserId,
-            "Thông báo về trạng thái thực tập",
+            _messageService.GetMessage(MessageKeys.StudentApplications.NotifyStudentRemovedPlacedTitle),
             studentContent,
             NotificationType.ApplicationStatusChanged,
             notification.ApplicationId,
@@ -271,7 +271,7 @@ public class HRApplicationEventHandlers :
             {
                 await CreateAndPushNotificationAsync(
                     adminUserId,
-                    "Sinh viên bị xóa khỏi danh sách thực tập",
+                    _messageService.GetMessage(MessageKeys.StudentApplications.NotifyUniAdminRemovedPlacedTitle),
                     uniAdminContent,
                     NotificationType.ApplicationStatusChanged,
                     notification.ApplicationId,
