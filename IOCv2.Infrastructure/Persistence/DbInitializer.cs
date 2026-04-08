@@ -176,7 +176,8 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedInternshipPhases();   // must be before SeedJobs and SeedInternshipGroups
             await SeedJobs();               // depends on InternshipPhases
             await SeedUsers();
-            await SeedTerms(); 
+            await SeedTerms();
+            
             await SeedBulkUnassignTestStudent();
 
             await SeedInternshipGroups();
@@ -194,11 +195,48 @@ namespace IOCv2.Infrastructure.Persistence
             await SeedSprintWorkItems();
             await SeedAuditLogs();
             await SeedSecurityTokens();
+            await SeedStudentTermEnterpriseFromApplications();
 
             if (_context.ChangeTracker.HasChanges())
             {
                 await _context.SaveChangesAsync();
             }
+
+            await EnsureActiveProjectGroupConstraintAsync();
+        }
+
+        private async Task EnsureActiveProjectGroupConstraintAsync()
+        {
+            if (!_context.Database.IsRelational())
+            {
+                return;
+            }
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                WITH ranked AS (
+                    SELECT project_id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY internship_id
+                               ORDER BY COALESCE(updated_at, created_at) DESC, created_at DESC, project_id
+                           ) AS rn
+                    FROM projects
+                    WHERE deleted_at IS NULL
+                      AND internship_id IS NOT NULL
+                      AND operational_status = 1
+                )
+                UPDATE projects p
+                SET operational_status = 0,
+                    updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+                FROM ranked r
+                WHERE p.project_id = r.project_id
+                  AND r.rn > 1;
+            ");
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                CREATE UNIQUE INDEX IF NOT EXISTS uix_projects_internship_id_active
+                ON projects (internship_id)
+                WHERE deleted_at IS NULL AND internship_id IS NOT NULL AND operational_status = 1;
+            ");
         }
 
         private async Task SeedUniversities()
@@ -212,6 +250,26 @@ namespace IOCv2.Infrastructure.Persistence
                 };
                 await _context.Universities.AddRangeAsync(universities);
                 await _context.SaveChangesAsync();
+            }
+        }
+        // New helper: fill missing StudentTerm.EnterpriseId using each student's InternshipApplication.EnterpriseId (if present)
+        private async Task SeedStudentTermEnterpriseFromApplications()
+        {
+            // Find student-terms that are missing EnterpriseId
+            var termsMissingEnterprise = await _context.StudentTerms
+                .Include(st => st.Student).Include(st => st.Term)
+                .Where(st => st.EnterpriseId == null && st.PlacementStatus == PlacementStatus.Placed)
+                .ToListAsync();
+
+            if (!termsMissingEnterprise.Any())
+                return;
+            foreach (var st in termsMissingEnterprise)
+            {
+                var enterpriseId = await _context.InternshipApplications
+                    .Where(app => app.StudentId == st.StudentId && app.TermId == st.TermId)
+                    .Select(app => app.EnterpriseId)
+                    .FirstOrDefaultAsync();
+                st.EnterpriseId = enterpriseId;
             }
         }
 
@@ -624,7 +682,7 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.EnterpriseUsers.Add(notMentorEu);
                 }
             }
-           
+
             // 3. School Admin accounts
             foreach (var uni in universityList)
             {
@@ -1035,7 +1093,7 @@ namespace IOCv2.Infrastructure.Persistence
                 InternshipPhaseStatus.Open);
 
             // UNHAPPY/EDGE CASES
-            
+
             // 1. Minimum capacity (1) and very short duration (1 week)
             await EnsurePhase(
                 fsoft.EnterpriseId,
@@ -1081,7 +1139,7 @@ namespace IOCv2.Infrastructure.Persistence
                 "Đợt thực tập quy tụ tất cả các chuyên ngành từ cơ bản đến nâng cao. " +
                 "Sinh viên sẽ được làm việc trong các lab nghiên cứu sâu về các công nghệ xu hướng mới nhất. " +
                 "Yêu cầu: Sinh viên có GPA cao, tiếng Anh tốt và đam mê mãnh liệt với công nghệ.",
-                InternshipPhaseStatus.InProgress);
+                InternshipPhaseStatus.Open);
 
             await _context.SaveChangesAsync();
         }
@@ -1153,29 +1211,13 @@ namespace IOCv2.Infrastructure.Persistence
                     _context.InternshipGroups.Add(fptCtGroup);
                 }
             }
-            
+
             var archivedGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Archived Project");
             if (archivedGroup == null)
             {
                 archivedGroup = InternshipGroup.Create(phaseClosedFpt.PhaseId, "FPT Archived Project", "Old project idea", fsoft.EnterpriseId, mentorFptEuId, DateTime.UtcNow.AddMonths(-12), DateTime.UtcNow.AddMonths(-10));
                 archivedGroup.UpdateStatus(GroupStatus.Archived);
                 _context.InternshipGroups.Add(archivedGroup);
-            }
-
-            // Inline assign/reassign mentor scenarios.
-            var mentorPendingGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
-            if (mentorPendingGroup == null)
-            {
-                mentorPendingGroup = InternshipGroup.Create(
-                    phaseInProgressFpt.PhaseId,
-                    "FPT Software Mentor Pending Team",
-                    "Active team intentionally seeded without mentor for first-assign tests",
-                    fsoft.EnterpriseId,
-                    null,
-                    DateTime.UtcNow.AddDays(-12),
-                    DateTime.UtcNow.AddMonths(2));
-                mentorPendingGroup.UpdateStatus(GroupStatus.Active);
-                _context.InternshipGroups.Add(mentorPendingGroup);
             }
 
             var zeroMemberGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Zero Member Team");
@@ -1381,45 +1423,45 @@ namespace IOCv2.Infrastructure.Persistence
             // Student 11: UniAssign placement flow -> FPT Software Spring 2026 (Job: FPT QA Automation Intern)
             if (s11 != null)
             {
-                 await EnsureApplication(
-                    fsoft.EnterpriseId, spring2026.TermId, s11.StudentId,
-                    fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
-                    DateTime.UtcNow.AddDays(-4), null, null,
-                    fptUniversity.UniversityId, null,
-                    null, fptQaJob.Title);
+                await EnsureApplication(
+                   fsoft.EnterpriseId, spring2026.TermId, s11.StudentId,
+                   fptQaJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                   DateTime.UtcNow.AddDays(-4), null, null,
+                   fptUniversity.UniversityId, null,
+                   null, fptQaJob.Title);
             }
 
             // Student 12: SelfApply flow -> FPT Software Spring 2026 (Job: FPT Backend Platform Intern)
             if (s12 != null)
             {
-                 await EnsureApplication(
-                    fsoft.EnterpriseId, spring2026.TermId, s12.StudentId,
-                    fptBackendJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
-                    DateTime.UtcNow.AddDays(-2), null, null,
-                    null, null,
-                    "https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf", fptBackendJob.Title);
+                await EnsureApplication(
+                   fsoft.EnterpriseId, spring2026.TermId, s12.StudentId,
+                   fptBackendJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
+                   DateTime.UtcNow.AddDays(-2), null, null,
+                   null, null,
+                   "https://iocv2-test-resources.s3.amazonaws.com/resumes/student12_cv.pdf", fptBackendJob.Title);
             }
 
             // Student 13: UniAssign placement flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Java Backend Intern)
             if (s13 != null)
             {
-                 await EnsureApplication(
-                    rikkeisoft.EnterpriseId, spring2026.TermId, s13.StudentId,
-                    rikkeiBackendJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
-                    DateTime.UtcNow.AddDays(-1), null, null,
-                    fptUniversity.UniversityId, null,
-                    null, rikkeiBackendJob.Title);
+                await EnsureApplication(
+                   rikkeisoft.EnterpriseId, spring2026.TermId, s13.StudentId,
+                   rikkeiBackendJob.JobId, InternshipApplicationStatus.PendingAssignment, ApplicationSource.UniAssign,
+                   DateTime.UtcNow.AddDays(-1), null, null,
+                   fptUniversity.UniversityId, null,
+                   null, rikkeiBackendJob.Title);
             }
 
             // Student 14: SelfApply flow -> Rikkeisoft Spring 2026 (Job: Rikkeisoft Mobile Flutter Intern)
             if (s14 != null)
             {
-                 await EnsureApplication(
-                    rikkeisoft.EnterpriseId, spring2026.TermId, s14.StudentId,
-                    rikkeiMobileJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
-                    DateTime.UtcNow.AddDays(0), null, null,
-                    null, null,
-                    "https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf", rikkeiMobileJob.Title);
+                await EnsureApplication(
+                   rikkeisoft.EnterpriseId, spring2026.TermId, s14.StudentId,
+                   rikkeiMobileJob.JobId, InternshipApplicationStatus.Applied, ApplicationSource.SelfApply,
+                   DateTime.UtcNow.AddDays(0), null, null,
+                   null, null,
+                   "https://iocv2-test-resources.s3.amazonaws.com/resumes/student14_cv.pdf", rikkeiMobileJob.Title);
             }
 
             // Historical record for old term.
@@ -1532,20 +1574,6 @@ namespace IOCv2.Infrastructure.Persistence
             // Lý do: InternshipGroup.Create() sinh Guid mới mỗi lần insert → nếu groups bị xóa/tạo lại,
             // InternshipId thay đổi → guard AnyAsync(p.InternshipId == group.InternshipId) miss →
             // cố insert code đã tồn tại → vi phạm uix_projects_project_code_active.
-
-            var mentorPendingGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
-            if (mentorPendingGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_6"))
-            {
-                var pendingProj = Project.Create(
-                    "FPT Mentor Pending Commerce",
-                    "Commerce mini-platform reserved for first mentor assignment flow",
-                    "PRJ-FPTSOF_FPT_6",
-                    "CNTT",
-                    "Seeded for AC-04 first assign mentor + project mentor sync.");
-                pendingProj.AssignToGroup(mentorPendingGroup.InternshipId, DateTime.UtcNow.AddDays(-10), DateTime.UtcNow.AddMonths(1));
-                pendingProj.Publish();
-                _context.Projects.Add(pendingProj);
-            }
 
             var zeroMemberGroup = await _context.InternshipGroups.FirstOrDefaultAsync(g => g.GroupName == "FPT Software Zero Member Team");
             if (zeroMemberGroup != null && !await _context.Projects.IgnoreQueryFilters().AnyAsync(p => p.ProjectCode == "PRJ-FPTSOF_FPT_7"))
@@ -1680,9 +1708,6 @@ namespace IOCv2.Infrastructure.Persistence
             var fptGroup = await _context.InternshipGroups
                 .Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.GroupName == "FPT Software OJT Team Alpha");
-            var mentorPendingGroup = await _context.InternshipGroups
-                .Include(g => g.Members)
-                .FirstOrDefaultAsync(g => g.GroupName == "FPT Software Mentor Pending Team");
             var rikkeiGroup = await _context.InternshipGroups
                 .Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.GroupName == "Rikkeisoft Spring 2026 Team");
@@ -1696,8 +1721,6 @@ namespace IOCv2.Infrastructure.Persistence
             var s7 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student7@fptu.edu.vn");
             var s4 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student4@fptu.edu.vn");
             var s5 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student5@fptu.edu.vn");
-            var s8 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student8@fptu.edu.vn");
-            var s9 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student9@fptu.edu.vn");
             var s11 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student11@fptu.edu.vn");
             var s12 = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.Email == "student12@fptu.edu.vn");
 
@@ -1722,17 +1745,6 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.InternshipGroups.Update(rikkeiGroup);
             }
 
-            // Group without mentor but with members for first-assign and student-notify test path.
-            if (mentorPendingGroup != null)
-            {
-                bool pendingGroupHasStudents = await _context.InternshipStudents.AnyAsync(m => m.InternshipId == mentorPendingGroup.InternshipId);
-                if (!pendingGroupHasStudents)
-                {
-                    if (s8 != null) mentorPendingGroup.AddMember(s8.StudentId, InternshipRole.Leader);
-                    if (s9 != null) mentorPendingGroup.AddMember(s9.StudentId, InternshipRole.Member);
-                    _context.InternshipGroups.Update(mentorPendingGroup);
-                }
-            }
 
             await _context.SaveChangesAsync();
         }
@@ -1766,7 +1778,7 @@ namespace IOCv2.Infrastructure.Persistence
                 {
                     _context.Logbooks.Add(Logbook.Create(proj5InternshipId, s5.StudentId, $"Work report {i}", null, "Continue next task", DateTime.UtcNow.AddMonths(-6 + i)));
                 }
-                
+
                 await _context.SaveChangesAsync();
             }
 
@@ -1924,7 +1936,7 @@ namespace IOCv2.Infrastructure.Persistence
             await _context.SaveChangesAsync();
         }
 
-         /// <summary>
+        /// <summary>
         /// Seeds detailed test data for feat/uni-admin-monitor-internship-activities.
         /// Covers happy / unhappy / edge cases for logbook-total, logbook-weekly, evaluations.
         ///
@@ -1974,7 +1986,7 @@ namespace IOCv2.Infrastructure.Persistence
             if (spring2026 == null) return;
 
             // ── 1. Set StudentTerm.EnterpriseId so logbook/evaluation handlers can find internship groups ──
-            var fptStudentIds    = new[] { s1.StudentId, s2.StudentId, s3.StudentId, s6.StudentId };
+            var fptStudentIds = new[] { s1.StudentId, s2.StudentId, s3.StudentId, s6.StudentId };
             var rikkeiStudentIds = new[] { s4.StudentId, s5.StudentId, s7.StudentId };
 
             var termsToUpdate = await _context.StudentTerms
@@ -1994,7 +2006,7 @@ namespace IOCv2.Infrastructure.Persistence
             // ── 2. Update InternshipStudent.JoinedAt for realistic logbook periods ──
             //   FPT Alpha: s1/s2/s3 joined 28 days ago; s6 joined today (edge: very recent joiner)
             //   Rikkei:    s4/s5   joined 18 days ago; s7 joined today
-            var fptJoinedAt    = DateTime.UtcNow.AddDays(-28);
+            var fptJoinedAt = DateTime.UtcNow.AddDays(-28);
             var rikkeiJoinedAt = DateTime.UtcNow.AddDays(-18);
 
             var fptMembers = await _context.InternshipStudents
@@ -2028,7 +2040,7 @@ namespace IOCv2.Infrastructure.Persistence
                 // DateReport = today  → PUNCTUAL (same date as CreatedAt at seed time)
                 // DateReport = past   → LATE
 
-                var fptId    = fptGroup.InternshipId;
+                var fptId = fptGroup.InternshipId;
                 var rikkeiId = rikkeiGroup.InternshipId;
 
                 // ── s1 (Nguyễn Văn An) — HIGH COMPLETION ~81%, Leader FPT ──
@@ -2223,26 +2235,30 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 finalCycle = new EvaluationCycle
                 {
-                    CycleId   = Guid.NewGuid(),
-                    PhaseId   = phaseFptSpring.PhaseId,
-                    Name      = "Final Evaluation Spring 2026",
+                    CycleId = Guid.NewGuid(),
+                    PhaseId = phaseFptSpring.PhaseId,
+                    Name = "Final Evaluation Spring 2026",
                     StartDate = DateTime.UtcNow.AddDays(5),
-                    EndDate   = DateTime.UtcNow.AddDays(25),
-                    Status    = EvaluationCycleStatus.Grading
+                    EndDate = DateTime.UtcNow.AddDays(25),
+                    Status = EvaluationCycleStatus.Grading
                 };
                 finalCycle.Criteria.Add(new EvaluationCriteria
                 {
-                    CriteriaId  = Guid.NewGuid(), CycleId = finalCycle.CycleId,
-                    Name        = "Technical Skills",
+                    CriteriaId = Guid.NewGuid(),
+                    CycleId = finalCycle.CycleId,
+                    Name = "Technical Skills",
                     Description = "Code quality, architecture, and problem-solving",
-                    MaxScore    = 10m, Weight = 0.60m
+                    MaxScore = 10m,
+                    Weight = 0.60m
                 });
                 finalCycle.Criteria.Add(new EvaluationCriteria
                 {
-                    CriteriaId  = Guid.NewGuid(), CycleId = finalCycle.CycleId,
-                    Name        = "Soft Skills",
+                    CriteriaId = Guid.NewGuid(),
+                    CycleId = finalCycle.CycleId,
+                    Name = "Soft Skills",
                     Description = "Communication, teamwork, and attitude",
-                    MaxScore    = 10m, Weight = 0.40m
+                    MaxScore = 10m,
+                    Weight = 0.40m
                 });
                 _context.Set<EvaluationCycle>().Add(finalCycle);
                 await _context.SaveChangesAsync();
@@ -2261,26 +2277,30 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 rikkeiMidCycle = new EvaluationCycle
                 {
-                    CycleId   = Guid.NewGuid(),
-                    PhaseId   = phaseRikkeiSpring.PhaseId,
-                    Name      = "Mid-term Rikkeisoft Spring 2026",
+                    CycleId = Guid.NewGuid(),
+                    PhaseId = phaseRikkeiSpring.PhaseId,
+                    Name = "Mid-term Rikkeisoft Spring 2026",
                     StartDate = DateTime.UtcNow.AddDays(-8),
-                    EndDate   = DateTime.UtcNow.AddDays(12),
-                    Status    = EvaluationCycleStatus.Grading
+                    EndDate = DateTime.UtcNow.AddDays(12),
+                    Status = EvaluationCycleStatus.Grading
                 };
                 rikkeiMidCycle.Criteria.Add(new EvaluationCriteria
                 {
-                    CriteriaId  = Guid.NewGuid(), CycleId = rikkeiMidCycle.CycleId,
-                    Name        = "Technical Skills",
+                    CriteriaId = Guid.NewGuid(),
+                    CycleId = rikkeiMidCycle.CycleId,
+                    Name = "Technical Skills",
                     Description = "Backend development skills and code quality",
-                    MaxScore    = 10m, Weight = 0.60m
+                    MaxScore = 10m,
+                    Weight = 0.60m
                 });
                 rikkeiMidCycle.Criteria.Add(new EvaluationCriteria
                 {
-                    CriteriaId  = Guid.NewGuid(), CycleId = rikkeiMidCycle.CycleId,
-                    Name        = "Professional Skills",
+                    CriteriaId = Guid.NewGuid(),
+                    CycleId = rikkeiMidCycle.CycleId,
+                    Name = "Professional Skills",
                     Description = "Professionalism, punctuality, and collaboration",
-                    MaxScore    = 10m, Weight = 0.40m
+                    MaxScore = 10m,
+                    Weight = 0.40m
                 });
                 _context.Set<EvaluationCycle>().Add(rikkeiMidCycle);
                 await _context.SaveChangesAsync();
@@ -2294,7 +2314,7 @@ namespace IOCv2.Infrastructure.Persistence
             {
                 var existingEval = await _context.Set<Evaluation>().FirstOrDefaultAsync(
                     e => e.CycleId == cycleId && e.StudentId == studentId);
-                
+
                 if (existingEval != null)
                 {
                     // If it exists but is not published, we update it
@@ -2310,24 +2330,24 @@ namespace IOCv2.Infrastructure.Persistence
 
                 var eval = new Evaluation
                 {
-                    EvaluationId  = Guid.NewGuid(),
-                    CycleId       = cycleId,
-                    InternshipId  = internshipId,
-                    StudentId     = studentId,
-                    EvaluatorId   = evaluatorId,
-                    Status        = EvaluationStatus.Published,
-                    Note          = note
+                    EvaluationId = Guid.NewGuid(),
+                    CycleId = cycleId,
+                    InternshipId = internshipId,
+                    StudentId = studentId,
+                    EvaluatorId = evaluatorId,
+                    Status = EvaluationStatus.Published,
+                    Note = note
                 };
                 decimal total = 0;
                 foreach (var (criteriaId, score, weight, comment) in details)
                 {
                     eval.Details.Add(new EvaluationDetail
                     {
-                        DetailId     = Guid.NewGuid(),
+                        DetailId = Guid.NewGuid(),
                         EvaluationId = eval.EvaluationId,
-                        CriteriaId   = criteriaId,
-                        Score        = score,
-                        Comment      = comment
+                        CriteriaId = criteriaId,
+                        Score = score,
+                        Comment = comment
                     });
                     total += score * weight;
                 }
@@ -2335,13 +2355,13 @@ namespace IOCv2.Infrastructure.Persistence
                 _context.Set<Evaluation>().Add(eval);
             }
 
-            var midCriteria   = midTermCycle.Criteria.OrderBy(c => c.Name).ToList(); // Soft Skills, Technical Skills
+            var midCriteria = midTermCycle.Criteria.OrderBy(c => c.Name).ToList(); // Soft Skills, Technical Skills
             var finalCriteria = finalCycle.Criteria.OrderBy(c => c.Name).ToList();
             var rikkeiCriteria = rikkeiMidCycle.Criteria.OrderBy(c => c.Name).ToList();
 
             // Tìm Technical và Soft criteria cho từng cycle
-            var midTech   = midCriteria.FirstOrDefault(c => c.Name.Contains("Technical"));
-            var midSoft   = midCriteria.FirstOrDefault(c => c.Name.Contains("Soft") || c.Name.Contains("Soft"));
+            var midTech = midCriteria.FirstOrDefault(c => c.Name.Contains("Technical"));
+            var midSoft = midCriteria.FirstOrDefault(c => c.Name.Contains("Soft") || c.Name.Contains("Soft"));
             var finalTech = finalCriteria.FirstOrDefault(c => c.Name.Contains("Technical"));
             var finalSoft = finalCriteria.FirstOrDefault(c => c.Name.Contains("Soft"));
             var rikkeiTech = rikkeiCriteria.FirstOrDefault(c => c.Name.Contains("Technical"));
@@ -2408,13 +2428,13 @@ namespace IOCv2.Infrastructure.Persistence
                 var s5Draft = new Evaluation
                 {
                     EvaluationId = Guid.NewGuid(),
-                    CycleId      = rikkeiMidCycle.CycleId,
+                    CycleId = rikkeiMidCycle.CycleId,
                     InternshipId = rikkeiGroup.InternshipId,
-                    StudentId    = s5.StudentId,
-                    EvaluatorId  = mentorRikkei.UserId,
-                    Status       = EvaluationStatus.Draft,
-                    Note         = "Em cần cải thiện nhiều hơn về chuyên cần.",
-                    TotalScore   = null
+                    StudentId = s5.StudentId,
+                    EvaluatorId = mentorRikkei.UserId,
+                    Status = EvaluationStatus.Draft,
+                    Note = "Em cần cải thiện nhiều hơn về chuyên cần.",
+                    TotalScore = null
                 };
                 _context.Set<Evaluation>().Add(s5Draft);
             }
@@ -2567,22 +2587,22 @@ namespace IOCv2.Infrastructure.Persistence
                     new ViolationReport
                     {
                         ViolationReportId = Guid.NewGuid(),
-                        StudentId         = s5.StudentId,
+                        StudentId = s5.StudentId,
                         InternshipGroupId = rikkeiGroup.InternshipId,
-                        OccurredDate      = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-12)),
-                        Description       = "Vắng buổi weekly meeting không thông báo trước.",
-                        CreatedBy         = mentorRikkei.UserId,
-                        CreatedAt         = DateTime.UtcNow.AddDays(-11)
+                        OccurredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-12)),
+                        Description = "Vắng buổi weekly meeting không thông báo trước.",
+                        CreatedBy = mentorRikkei.UserId,
+                        CreatedAt = DateTime.UtcNow.AddDays(-11)
                     },
                     new ViolationReport
                     {
                         ViolationReportId = Guid.NewGuid(),
-                        StudentId         = s5.StudentId,
+                        StudentId = s5.StudentId,
                         InternshipGroupId = rikkeiGroup.InternshipId,
-                        OccurredDate      = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)),
-                        Description       = "Nộp task trễ deadline 2 ngày liên tiếp mà không có báo cáo.",
-                        CreatedBy         = mentorRikkei.UserId,
-                        CreatedAt         = DateTime.UtcNow.AddDays(-4)
+                        OccurredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-5)),
+                        Description = "Nộp task trễ deadline 2 ngày liên tiếp mà không có báo cáo.",
+                        CreatedBy = mentorRikkei.UserId,
+                        CreatedAt = DateTime.UtcNow.AddDays(-4)
                     }
                 );
                 await _context.SaveChangesAsync();
@@ -2781,7 +2801,7 @@ namespace IOCv2.Infrastructure.Persistence
             if (fallbackTerm == null) return;
 
             var fptBackendJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT Backend Platform Intern");
-            var fptQaJob      = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT QA Automation Intern");
+            var fptQaJob = await _context.Jobs.FirstOrDefaultAsync(j => j.Title == "FPT QA Automation Intern");
 
             var hrFptEu = await _context.EnterpriseUsers
                 .Include(eu => eu.User)
@@ -2811,19 +2831,19 @@ namespace IOCv2.Infrastructure.Persistence
 
                 var student = new Student
                 {
-                    StudentId        = Guid.NewGuid(),
-                    UserId           = user.UserId,
+                    StudentId = Guid.NewGuid(),
+                    UserId = user.UserId,
                     InternshipStatus = StudentStatus.INTERNSHIP_IN_PROGRESS,
-                    Major            = major,
-                    ClassName        = className
+                    Major = major,
+                    ClassName = className
                 };
                 _context.Students.Add(student);
 
                 _context.UniversityUsers.Add(new UniversityUser
                 {
                     UniversityUserId = Guid.NewGuid(),
-                    UserId           = user.UserId,
-                    UniversityId     = fptu.UniversityId
+                    UserId = user.UserId,
+                    UniversityId = fptu.UniversityId
                 });
 
                 // StudentTerm — dùng Summer 2026 để khớp với group phase
@@ -2831,29 +2851,29 @@ namespace IOCv2.Infrastructure.Persistence
                 // nên không có nguy cơ duplicate StudentTerm
                 _context.StudentTerms.Add(new StudentTerm
                 {
-                    StudentTermId    = Guid.NewGuid(),
-                    StudentId        = student.StudentId,
-                    TermId           = fallbackTerm.TermId,
+                    StudentTermId = Guid.NewGuid(),
+                    StudentId = student.StudentId,
+                    TermId = fallbackTerm.TermId,
                     EnrollmentStatus = EnrollmentStatus.Active,
-                    PlacementStatus  = PlacementStatus.Placed,
-                    EnrollmentDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-appliedDaysAgo - 10))
+                    PlacementStatus = PlacementStatus.Placed,
+                    EnrollmentDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-appliedDaysAgo - 10))
                 });
 
                 // InternshipApplication — Status=Placed tại FPT Software
                 // Điều kiện cốt lõi: handler check EnterpriseId + Status=Placed (không check TermId/PhaseId)
                 _context.InternshipApplications.Add(new InternshipApplication
                 {
-                    ApplicationId   = Guid.NewGuid(),
-                    EnterpriseId    = fsoft.EnterpriseId,
-                    TermId          = fallbackTerm.TermId,
-                    StudentId       = student.StudentId,
-                    JobId           = jobId,
-                    Status          = InternshipApplicationStatus.Placed,
-                    Source          = appSource,
-                    AppliedAt       = DateTime.UtcNow.AddDays(-appliedDaysAgo),
-                    ReviewedAt      = DateTime.UtcNow.AddDays(-appliedDaysAgo + 5),
-                    ReviewedBy      = hrFptEu?.EnterpriseUserId,
-                    UniversityId    = appSource == ApplicationSource.UniAssign ? fptu.UniversityId : null,
+                    ApplicationId = Guid.NewGuid(),
+                    EnterpriseId = fsoft.EnterpriseId,
+                    TermId = fallbackTerm.TermId,
+                    StudentId = student.StudentId,
+                    JobId = jobId,
+                    Status = InternshipApplicationStatus.Placed,
+                    Source = appSource,
+                    AppliedAt = DateTime.UtcNow.AddDays(-appliedDaysAgo),
+                    ReviewedAt = DateTime.UtcNow.AddDays(-appliedDaysAgo + 5),
+                    ReviewedBy = hrFptEu?.EnterpriseUserId,
+                    UniversityId = appSource == ApplicationSource.UniAssign ? fptu.UniversityId : null,
                     JobPostingTitle = jobTitle
                 });
 

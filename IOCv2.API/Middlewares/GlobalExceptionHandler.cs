@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using IOCv2.Application.Common.Models;
+using IOCv2.Application.Interfaces;
 
 namespace IOCv2.API.Middlewares
 {
@@ -21,6 +22,7 @@ namespace IOCv2.API.Middlewares
             Exception exception,
             CancellationToken cancellationToken)
         {
+            var _messageService = httpContext.RequestServices.GetRequiredService<IMessageService>();
             _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
             // ValidationException — trả về field-keyed errors
@@ -30,11 +32,11 @@ namespace IOCv2.API.Middlewares
                     .GroupBy(e => ToCamelCase(e.PropertyName))
                     .ToDictionary(
                         g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToList());
+                        g => g.Select(e => _messageService.GetMessage(e.ErrorMessage)).ToList());
 
                 var validationResponse = new ErrorResponse(
                     (int)HttpStatusCode.BadRequest,
-                    "Validation Error",
+                    _messageService.GetMessage("Validation Error") ?? "Validation Error",
                     validationErrors);
 
                 httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;

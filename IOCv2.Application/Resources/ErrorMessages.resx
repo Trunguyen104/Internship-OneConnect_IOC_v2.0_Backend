@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -139,7 +139,7 @@
     <value>ID trong URL không khớp với ID trong body.</value>
   </data>
   <data name="InvalidUserId" xml:space="preserve">
-    <value>Current user identity is missing or invalid.</value>
+    <value>Định danh người dùng hiện tại bị thiếu hoặc không hợp lệ.</value>
   </data>
   <data name="Common.Unauthorized" xml:space="preserve">
     <value>Bạn không có quyền thực hiện thao tác này.</value>
@@ -777,7 +777,7 @@
   <data name="Terms.NameMaxLength" xml:space="preserve">
     <value>Tên kỳ thực tập không được vượt quá 255 ký tự.</value>
   </data>
-    <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
+  <data name="Terms.NameContainsDangerousCharacters" xml:space="preserve">
     <value>Tên kỳ thực tập chứa ký tự không được phép. Vui lòng không sử dụng các ký tự đặc biệt như &lt; &gt; &amp; " ' ; hoặc script.</value>
   </data>
   <data name="Terms.NameExists" xml:space="preserve">
@@ -807,7 +807,7 @@
   <data name="Terms.OverlapWithActiveTerm" xml:space="preserve">
     <value>Khoảng thời gian này trùng với kỳ thực tập [{0}] đang diễn ra.</value>
   </data>
-    <data name="Terms.CreateSuccess" xml:space="preserve">
+  <data name="Terms.CreateSuccess" xml:space="preserve">
     <value>Kỳ thực tập đã được tạo thành công và đang ở trạng thái Draft. Bạn có thể cập nhật thông tin và mở kỳ thực tập khi sẵn sàng.</value>
   </data>
   <data name="Terms.UpdateSuccess" xml:space="preserve">
@@ -837,10 +837,10 @@
   <data name="Terms.UnplacedStudentsWarning" xml:space="preserve">
     <value>Kỳ thực tập hiện còn {0} sinh viên chưa được gán công ty. Bạn có chắc chắn muốn đóng kỳ?</value>
   </data>
-    <data name="Terms.HasRelatedData" xml:space="preserve">
+  <data name="Terms.HasRelatedData" xml:space="preserve">
     <value>Cảnh báo: Kỳ thực tập này đang có dữ liệu liên quan (sinh viên đăng ký, nhóm thực tập hoặc chu kỳ đánh giá). Vui lòng xử lý dữ liệu liên quan trước khi xóa.</value>
   </data>
-    <data name="Terms.StartDateLocked" xml:space="preserve">
+  <data name="Terms.StartDateLocked" xml:space="preserve">
     <value>Ngày bắt đầu không thể thay đổi vì kỳ thực tập đã bắt đầu diễn ra. Chỉ có thể chỉnh sửa ngày kết thúc và các thông tin khác.</value>
   </data>
   <data name="Terms.YearInvalidRange" xml:space="preserve">
@@ -856,61 +856,61 @@
     <value>Lý do đóng kỳ không được vượt quá 500 ký tự.</value>
   </data>
   <data name="Terms.Log.TermCreated" xml:space="preserve">
-    <value>Term {0} created successfully by user {1}</value>
+    <value>Kỳ thực tập {0} đã được tạo thành công bởi người dùng {1}.</value>
   </data>
   <data name="Terms.Log.TermUpdated" xml:space="preserve">
-    <value>Term {0} updated successfully by user {1}</value>
+    <value>Kỳ thực tập {0} đã được cập nhật thành công bởi người dùng {1}.</value>
   </data>
   <data name="Terms.Log.TermClosed" xml:space="preserve">
-    <value>Term {0} closed by user {1}</value>
+    <value>Kỳ thực tập {0} đã được đóng bởi người dùng {1}.</value>
   </data>
   <data name="Terms.Log.TermDeleted" xml:space="preserve">
-    <value>Term {0} soft-deleted by user {1}</value>
+    <value>Kỳ thực tập {0} đã được xóa mềm bởi người dùng {1}.</value>
   </data>
   <data name="Terms.Log.TermsRetrieved" xml:space="preserve">
-    <value>Retrieved {0} terms for university {1}</value>
+    <value>Đã truy xuất {0} kỳ thực tập cho trường đại học {1}.</value>
   </data>
   <data name="Terms.Log.UserNotAssociatedWithUniversity" xml:space="preserve">
-    <value>User {0} is not associated with any university</value>
+    <value>Người dùng {0} không liên kết với bất kỳ trường đại học nào.</value>
   </data>
   <data name="Terms.Log.TermNotFound" xml:space="preserve">
-    <value>Term {0} not found</value>
+    <value>Không tìm thấy kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.Log.TermNotFoundOrAccessDenied" xml:space="preserve">
-    <value>Term {0} not found or access denied for user {1}</value>
+    <value>Không tìm thấy kỳ thực tập {0} hoặc người dùng {1} không có quyền truy cập.</value>
   </data>
   <data name="Terms.Log.VersionConflict" xml:space="preserve">
-    <value>Version conflict for term {0}</value>
+    <value>Xung đột phiên bản đối với kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.Log.VersionConflictDetailed" xml:space="preserve">
-    <value>Version conflict for term {0}. Expected: {1}, Got: {2}</value>
+    <value>Xung đột phiên bản đối với kỳ thực tập {0}. Mong đợi: {1}, nhận được: {2}.</value>
   </data>
   <data name="Terms.Log.DuplicateTermName" xml:space="preserve">
-    <value>Duplicate term name detected: {0}</value>
+    <value>Phát hiện tên kỳ thực tập bị trùng: {0}.</value>
   </data>
   <data name="Terms.Log.ConcurrencyConflictUpdating" xml:space="preserve">
-    <value>Concurrency conflict updating term {0}</value>
+    <value>Xung đột đồng thời khi cập nhật kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.Log.ConcurrencyConflictClosing" xml:space="preserve">
-    <value>Concurrency conflict closing term {0}</value>
+    <value>Xung đột đồng thời khi đóng kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.Log.ErrorCreatingTerm" xml:space="preserve">
-    <value>Error creating term</value>
+    <value>Lỗi khi tạo kỳ thực tập.</value>
   </data>
   <data name="Terms.Log.ErrorUpdatingTerm" xml:space="preserve">
-    <value>Error updating term {0}</value>
+    <value>Lỗi khi cập nhật kỳ thực tập {0}.</value>
   </data>
-    <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
-    <value>Error closing term {0}</value>
+  <data name="Terms.Log.ErrorClosingTerm" xml:space="preserve">
+    <value>Lỗi khi đóng kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.Log.ErrorDeletingTerm" xml:space="preserve">
-    <value>Error deleting term {0}</value>
+    <value>Lỗi khi xóa kỳ thực tập {0}.</value>
   </data>
   <data name="Terms.Log.ErrorRetrievingTerms" xml:space="preserve">
-    <value>Error retrieving terms</value>
+    <value>Lỗi khi truy xuất danh sách kỳ thực tập.</value>
   </data>
   <data name="Terms.Log.ErrorRetrievingTerm" xml:space="preserve">
-    <value>Error retrieving term {0}</value>
+    <value>Lỗi khi truy xuất kỳ thực tập {0}.</value>
   </data>
   <data name="Enterprise.GetEnterprisesError" xml:space="preserve">
     <value>Lỗi khi truy xuất thông tin doanh nghiệp</value>
@@ -955,7 +955,7 @@
     <value>Không tìm thấy Enterprise {enterpriseId}</value>
   </data>
   <data name="Enterprise.LogUpdateEnterpriseError" xml:space="preserve">
-    <value>Unexpected error while updating enterprise.</value>
+    <value>Đã xảy ra lỗi không mong muốn khi cập nhật doanh nghiệp.</value>
   </data>
   <data name="Enterprise.UpdateTaxCodeNotAllowed" xml:space="preserve">
     <value>Không được phép cập nhật mã số thuế.</value>
@@ -1011,10 +1011,10 @@
   <data name="InternshipGroup.TermNotFound" xml:space="preserve">
     <value>Không tìm thấy học kỳ.</value>
   </data>
-    <data name="InternshipGroup.TermNotActive" xml:space="preserve">
+  <data name="InternshipGroup.TermNotActive" xml:space="preserve">
     <value>Học kỳ này không (đang) trong trạng thái Active. Chỉ có thể tạo nhóm thực tập trong kỳ đang diễn ra.</value>
   </data>
-    <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
+  <data name="InternshipGroup.EnterpriseNotFound" xml:space="preserve">
     <value>Không tìm thấy doanh nghiệp.</value>
   </data>
   <data name="InternshipGroup.MentorNotFound" xml:space="preserve">
@@ -1201,43 +1201,43 @@
     <value>Tên dự án đã tồn tại trong nhóm này.</value>
   </data>
   <data name="InternshipApplication.Log.Accepting" xml:space="preserve">
-    <value>Accepting application {0}</value>
+    <value>Đang chấp nhận đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.AcceptSuccess" xml:space="preserve">
-    <value>Application {0} accepted successfully</value>
+    <value>Đơn ứng tuyển {0} đã được chấp nhận thành công.</value>
   </data>
   <data name="InternshipApplication.Log.AcceptError" xml:space="preserve">
-    <value>Error accepting application {0}</value>
+    <value>Lỗi khi chấp nhận đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.Rejecting" xml:space="preserve">
-    <value>Rejecting application {0}</value>
+    <value>Đang từ chối đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.RejectSuccess" xml:space="preserve">
-    <value>Application {0} rejected successfully</value>
+    <value>Đơn ứng tuyển {0} đã được từ chối thành công.</value>
   </data>
   <data name="InternshipApplication.Log.RejectError" xml:space="preserve">
-    <value>Error rejecting application {0}</value>
+    <value>Lỗi khi từ chối đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.AssigningMentor" xml:space="preserve">
-    <value>Assigning mentor for application {0}</value>
+    <value>Đang gán mentor cho đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.AssignMentorSuccess" xml:space="preserve">
-    <value>Mentor assigned successfully for application {0}</value>
+    <value>Đã gán mentor thành công cho đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.AssignMentorError" xml:space="preserve">
-    <value>Error assigning mentor for application {0}</value>
+    <value>Lỗi khi gán mentor cho đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.AssigningProject" xml:space="preserve">
-    <value>Assigning project for application {0}</value>
+    <value>Đang gán dự án cho đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.AssignProjectSuccess" xml:space="preserve">
-    <value>Project assigned successfully for application {0}, project: {1}</value>
+    <value>Đã gán dự án thành công cho đơn ứng tuyển {0}, dự án: {1}.</value>
   </data>
   <data name="InternshipApplication.Log.AssignProjectError" xml:space="preserve">
-    <value>Error assigning project for application {0}</value>
+    <value>Lỗi khi gán dự án cho đơn ứng tuyển {0}.</value>
   </data>
   <data name="InternshipApplication.Log.InvalidUserId" xml:space="preserve">
-    <value>Current user identity is missing or invalid</value>
+    <value>Định danh người dùng hiện tại bị thiếu hoặc không hợp lệ.</value>
   </data>
   <data name="Enterprise.LogRestoreFailed" xml:space="preserve">
     <value>Khôi phục doanh nghiệp thất bại. EnterpriseId: {EnterpriseId}</value>
@@ -1266,8 +1266,7 @@
   <data name="InternshipGroup.HasActivityData" xml:space="preserve">
     <value>Nhóm đã có dữ liệu hoạt động (logbook, đánh giá, vi phạm hoặc project đã có nội dung), không thể xóa. Vui lòng dùng chức năng Archive để giữ lại lịch sử.</value>
   </data>
-
-    <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
+  <data name="ViolationReport.GetViolationReportsError" xml:space="preserve">
     <value>Đã xảy ra lỗi khi lấy danh sách báo cáo vi phạm.</value>
   </data>
   <data name="ViolationReport.CreateViolationReportError" xml:space="preserve">
@@ -1285,7 +1284,7 @@
   <data name="JobPosting.CreateSuccess" xml:space="preserve">
     <value>Đã tạo thành công tin tuyển dụng.</value>
   </data>
-  <!-- ActivePhases (ISSUE-68) — Enterprise HR/Mentor View Term Timeline -->
+  <!-- ActivePhases (ISSUE-68) - Enterprise HR/Mentor View Term Timeline -->
   <data name="ActivePhases.InvalidUserId" xml:space="preserve">
     <value>Phiên đăng nhập không hợp lệ. Vui lòng đăng xuất và đăng nhập lại.</value>
   </data>
@@ -1302,10 +1301,10 @@
     <value>Đã xảy ra lỗi khi tải danh sách kỳ thực tập đang hoạt động. Vui lòng thử lại sau.</value>
   </data>
   <data name="ActivePhases.Log.Retrieved" xml:space="preserve">
-    <value>Retrieved {0} active terms for enterprise {1} (isMentor={2})</value>
+    <value>Đã truy xuất {0} kỳ thực tập đang hoạt động cho doanh nghiệp {1} (isMentor={2}).</value>
   </data>
   <data name="ActivePhases.Log.Error" xml:space="preserve">
-    <value>Error retrieving active terms for enterprise user {0}</value>
+    <value>Lỗi khi truy xuất các kỳ thực tập đang hoạt động cho người dùng doanh nghiệp {0}.</value>
   </data>
   <data name="Projects.MentorNotFound" xml:space="preserve">
     <value>Không tìm thấy thông tin Mentor trong hệ thống.</value>
@@ -1373,6 +1372,15 @@
   <data name="Projects.CannotDeleteHasData" xml:space="preserve">
     <value>Không thể xóa project đã có dữ liệu (work items hoặc sprints).</value>
   </data>
+  <data name="Projects.CannotDeleteCompletedOrArchived" xml:space="preserve">
+    <value>Không thể xóa dự án vì dự án đã hoàn thành hoặc đã lưu trữ. Vui lòng liên hệ quản trị viên nếu cần hỗ trợ.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithWorkItems" xml:space="preserve">
+    <value>Không thể xóa dự án vì dự án đã có công việc (work items). Vui lòng xóa hoặc chuyển các công việc trước.</value>
+  </data>
+  <data name="Projects.CannotDeleteWithSprints" xml:space="preserve">
+    <value>Không thể xóa dự án vì dự án đã có sprint. Vui lòng xóa hoặc kết thúc sprint trước.</value>
+  </data>
   <data name="Projects.InvalidStatusForUnpublish" xml:space="preserve">
     <value>Chỉ có thể chuyển về Bản nháp dự án đang ở trạng thái Đã phát hành.</value>
   </data>
@@ -1384,6 +1392,9 @@
   </data>
   <data name="Projects.AlreadyAssignedToGroup" xml:space="preserve">
     <value>Dự án đã được gán cho một nhóm thực tập rồi.</value>
+  </data>
+  <data name="Projects.GroupAlreadyHasActiveProject" xml:space="preserve">
+    <value>Nhóm này đã có một dự án đang hoạt động. Mỗi nhóm chỉ được phép có một dự án active.</value>
   </data>
   <data name="Projects.GroupNotActive" xml:space="preserve">
     <value>Nhóm thực tập không còn hoạt động (đã kết thúc hoặc đã lưu trữ).</value>
@@ -1504,5 +1515,587 @@
   </data>
   <data name="UniAdminInternship.StudentIdRequired" xml:space="preserve">
     <value>Mã sinh viên không được để trống.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordMismatch" xml:space="preserve">
+    <value>Mật khẩu xác nhận không khớp.</value>
+  </data>
+  <data name="Auth.ConfirmPasswordRequired" xml:space="preserve">
+    <value>Vui lòng xác nhận mật khẩu.</value>
+  </data>
+  <data name="Auth.EmailInvalidFormat" xml:space="preserve">
+    <value>Định dạng email không hợp lệ.</value>
+  </data>
+  <data name="Auth.EmailRequired" xml:space="preserve">
+    <value>Email không được bỏ trống.</value>
+  </data>
+  <data name="Auth.NewPasswordRequired" xml:space="preserve">
+    <value>Mật khẩu mới không được bỏ trống.</value>
+  </data>
+  <data name="Auth.TokenRequired" xml:space="preserve">
+    <value>Token không được bỏ trống.</value>
+  </data>
+  <data name="Common.InvalidRequest" xml:space="preserve">
+    <value>Yêu cầu không hợp lệ.</value>
+  </data>
+  <data name="Enterprise.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>Email liên hệ đã tồn tại.</value>
+  </data>
+  <data name="Enterprise.ContactEmailInvalid" xml:space="preserve">
+    <value>Email liên hệ không hợp lệ.</value>
+  </data>
+  <data name="Enterprise.NameRequired" xml:space="preserve">
+    <value>Tên doanh nghiệp không được bỏ trống.</value>
+  </data>
+  <data name="Enterprise.TaxCodeInvalid" xml:space="preserve">
+    <value>Mã số thuế không hợp lệ.</value>
+  </data>
+  <data name="Enterprise.TaxCodeRequired" xml:space="preserve">
+    <value>Mã số thuế không được bỏ trống.</value>
+  </data>
+  <data name="Epic.EpicIdRequired" xml:space="preserve">
+    <value>Epic ID không được bỏ trống.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.MaxScoreInvalid" xml:space="preserve">
+    <value>Điểm tối đa không hợp lệ.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.NameMaxLength" xml:space="preserve">
+    <value>Tên tiêu chí vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.NameRequired" xml:space="preserve">
+    <value>Tên tiêu chí không được bỏ trống.</value>
+  </data>
+  <data name="EvaluationCriteriaKey.WeightInvalid" xml:space="preserve">
+    <value>Trọng số không hợp lệ.</value>
+  </data>
+  <data name="EvaluationCycle.NameMaxLength" xml:space="preserve">
+    <value>Tên kỳ đánh giá vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="HRApplications.ApplicationIdRequired" xml:space="preserve">
+    <value>Mã đơn ứng tuyển không được bỏ trống.</value>
+  </data>
+  <data name="HRApplications.RejectReasonMaxLength" xml:space="preserve">
+    <value>Lý do từ chối vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="HRApplications.RejectReasonMinLength" xml:space="preserve">
+    <value>Lý do từ chối quá ngắn.</value>
+  </data>
+  <data name="HRApplications.RejectReasonRequired" xml:space="preserve">
+    <value>Lý do từ chối không được bỏ trống.</value>
+  </data>
+  <data name="InternshipGroups.AssignMentorGroupIdRequired" xml:space="preserve">
+    <value>Mã nhóm không được bỏ trống.</value>
+  </data>
+  <data name="InternshipGroups.AssignMentorMentorRequired" xml:space="preserve">
+    <value>Người hướng dẫn không được bỏ trống.</value>
+  </data>
+  <data name="InternshipGroups.NameMaxLength" xml:space="preserve">
+    <value>Tên nhóm vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="InternshipGroups.NameRequired" xml:space="preserve">
+    <value>Tên nhóm không được bỏ trống.</value>
+  </data>
+  <data name="InternshipGroups.StartDateBeforeEndDate" xml:space="preserve">
+    <value>Ngày bắt đầu phải trước ngày kết thúc.</value>
+  </data>
+  <data name="InternshipGroups.StudentListRequired" xml:space="preserve">
+    <value>Danh sách sinh viên không được bỏ trống.</value>
+  </data>
+  <data name="InternshipGroups.StudentListToRemoveRequired" xml:space="preserve">
+    <value>Danh sách sinh viên cần xóa không được bỏ trống.</value>
+  </data>
+  <data name="InternshipPhase.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="InternshipPhase.DurationMaxDays" xml:space="preserve">
+    <value>Thời gian tối đa không hợp lệ.</value>
+  </data>
+  <data name="InternshipPhase.DurationMinDays" xml:space="preserve">
+    <value>Thời gian tối thiểu không hợp lệ.</value>
+  </data>
+  <data name="InternshipPhase.EndDateAfterStartDate" xml:space="preserve">
+    <value>Ngày kết thúc phải sau ngày bắt đầu.</value>
+  </data>
+  <data name="InternshipPhase.EndDateRequired" xml:space="preserve">
+    <value>Ngày kết thúc không được bỏ trống.</value>
+  </data>
+  <data name="InternshipPhase.EnterpriseIdRequired" xml:space="preserve">
+    <value>Mã doanh nghiệp không được bỏ trống.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsMaxLength" xml:space="preserve">
+    <value>Lĩnh vực chuyên môn vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="InternshipPhase.MajorFieldsRequired" xml:space="preserve">
+    <value>Lĩnh vực chuyên môn không được bỏ trống.</value>
+  </data>
+  <data name="InternshipPhase.MaxStudentsGreaterThanZero" xml:space="preserve">
+    <value>Số lượng sinh viên tối đa phải lớn hơn 0.</value>
+  </data>
+  <data name="InternshipPhase.NameMaxLength" xml:space="preserve">
+    <value>Tên giai đoạn vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="InternshipPhase.NameRequired" xml:space="preserve">
+    <value>Tên giai đoạn không được bỏ trống.</value>
+  </data>
+  <data name="InternshipPhase.PageNumberMinValue" xml:space="preserve">
+    <value>Số trang phải lớn hơn 0.</value>
+  </data>
+  <data name="InternshipPhase.PageSizeRange" xml:space="preserve">
+    <value>Kích thước trang không hợp lệ.</value>
+  </data>
+  <data name="InternshipPhase.PhaseIdRequired" xml:space="preserve">
+    <value>Mã giai đoạn không được bỏ trống.</value>
+  </data>
+  <data name="InternshipPhase.StartDateNotInPast" xml:space="preserve">
+    <value>Ngày bắt đầu không được trong quá khứ.</value>
+  </data>
+  <data name="InternshipPhase.StartDateRequired" xml:space="preserve">
+    <value>Ngày bắt đầu không được bỏ trống.</value>
+  </data>
+  <data name="InternshipPhase.StatusInvalid" xml:space="preserve">
+    <value>Trạng thái không hợp lệ.</value>
+  </data>
+  <data name="JobPostingMessageKey.AudienceInvalid" xml:space="preserve">
+    <value>Đối tượng mục tiêu không hợp lệ.</value>
+  </data>
+  <data name="JobPostingMessageKey.BenefitTooLong" xml:space="preserve">
+    <value>Nội dung quyền lợi vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="JobPostingMessageKey.DescriptionTooLong" xml:space="preserve">
+    <value>Nội dung mô tả vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="JobPostingMessageKey.ExpireDateMustBeTodayOrLater" xml:space="preserve">
+    <value>Ngày hết hạn phải từ hôm nay trở đi.</value>
+  </data>
+  <data name="JobPostingMessageKey.InvalidStatus" xml:space="preserve">
+    <value>Trạng thái không hợp lệ.</value>
+  </data>
+  <data name="JobPostingMessageKey.LocationRequired" xml:space="preserve">
+    <value>Địa điểm làm việc không được bỏ trống.</value>
+  </data>
+  <data name="JobPostingMessageKey.LocationTooLong" xml:space="preserve">
+    <value>Địa điểm làm việc vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="JobPostingMessageKey.RequirementsTooLong" xml:space="preserve">
+    <value>Nội dung yêu cầu vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="JobPostingMessageKey.TargetedRequiresSingleUniversity" xml:space="preserve">
+    <value>Công việc mục tiêu chỉ cho phép chọn một trường đại học.</value>
+  </data>
+  <data name="JobPostingMessageKey.TitleRequired" xml:space="preserve">
+    <value>Tiêu đề công việc không được bỏ trống.</value>
+  </data>
+  <data name="JobPostingMessageKey.TitleTooLong" xml:space="preserve">
+    <value>Tiêu đề công việc vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="JobPostingMessageKey.UniversityRequiredForTargetAudience" xml:space="preserve">
+    <value>Yêu cầu chọn trường đại học cho đối tượng mục tiêu.</value>
+  </data>
+  <data name="Notifications.BulkDeleteEmptyIds" xml:space="preserve">
+    <value>Danh sách mã thông báo không được bỏ trống.</value>
+  </data>
+  <data name="Notifications.NotificationIdRequired" xml:space="preserve">
+    <value>Mã thông báo không được bỏ trống.</value>
+  </data>
+  <data name="Page.PageNumberMinValue" xml:space="preserve">
+    <value>Số trang tối thiểu là 1.</value>
+  </data>
+  <data name="Page.PageSizeMaxValue" xml:space="preserve">
+    <value>Kích thước trang vượt quá mức tối đa.</value>
+  </data>
+  <data name="Page.PageSizeMinValue" xml:space="preserve">
+    <value>Kích thước trang tối thiểu là 1.</value>
+  </data>
+  <data name="Page.SearchTermMaxLength" xml:space="preserve">
+    <value>Từ khóa tìm kiếm vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="Page.SortColumnAllowedValues" xml:space="preserve">
+    <value>Cột sắp xếp không hợp lệ.</value>
+  </data>
+  <data name="Page.SortOrderAllowedValues" xml:space="preserve">
+    <value>Thứ tự sắp xếp không hợp lệ.</value>
+  </data>
+  <data name="Password.NotEmpty" xml:space="preserve">
+    <value>Mật khẩu không được bỏ trống.</value>
+  </data>
+  <data name="Profile.EmailInvalid" xml:space="preserve">
+    <value>Email cá nhân không hợp lệ.</value>
+  </data>
+  <data name="Profile.FullNameMaxLength" xml:space="preserve">
+    <value>Họ và tên vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="Profile.FullNameRequired" xml:space="preserve">
+    <value>Họ và tên không được bỏ trống.</value>
+  </data>
+  <data name="Profile.PhoneInvalid" xml:space="preserve">
+    <value>Số điện thoại cá nhân không hợp lệ.</value>
+  </data>
+  <data name="ProjectResourcesKey.FileAndLinkMutuallyExclusive" xml:space="preserve">
+    <value>Chỉ được phép chọn tệp hoặc liên kết, không được chọn cả hai.</value>
+  </data>
+  <data name="ProjectResourcesKey.FileOrLinkRequired" xml:space="preserve">
+    <value>Bắt buộc phải có tệp hoặc liên kết.</value>
+  </data>
+  <data name="ProjectResourcesKey.FileSizeExceeded" xml:space="preserve">
+    <value>Kích thước tệp vượt quá giới hạn.</value>
+  </data>
+  <data name="ProjectResourcesKey.InvalidExternalUrl" xml:space="preserve">
+    <value>Liên kết bên ngoài không hợp lệ.</value>
+  </data>
+  <data name="ProjectResourcesKey.InvalidFileType" xml:space="preserve">
+    <value>Loại tệp không hợp lệ.</value>
+  </data>
+  <data name="ProjectResourcesKey.LinkTypeRequired" xml:space="preserve">
+    <value>Loại liên kết không được bỏ trống.</value>
+  </data>
+  <data name="ProjectResourcesKey.ProjectIdRequired" xml:space="preserve">
+    <value>Mã dự án không được bỏ trống.</value>
+  </data>
+  <data name="ProjectResourcesKey.ResourceNameMaxLength" xml:space="preserve">
+    <value>Tên tài nguyên vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="Projects.ProjectsProjectNameRequired" xml:space="preserve">
+    <value>Tên dự án không được bỏ trống.</value>
+  </data>
+  <data name="Stakeholder.InternshipIdRequired" xml:space="preserve">
+    <value>Mã kỳ thực tập không được bỏ trống.</value>
+  </data>
+  <data name="StudentMessageKey.StudentIdRequired" xml:space="preserve">
+    <value>Mã sinh viên không được bỏ trống.</value>
+  </data>
+  <data name="UniAssign.EnterpriseIdIsRequired" xml:space="preserve">
+    <value>Mã doanh nghiệp không được bỏ trống.</value>
+  </data>
+  <data name="University.ContactEmailAlreadyExists" xml:space="preserve">
+    <value>Email liên hệ trường đại học đã tồn tại.</value>
+  </data>
+  <data name="UserManagement.CODE_MAX_LEN" xml:space="preserve">
+    <value>Mã người dùng vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="UserManagement.CODE_REQ" xml:space="preserve">
+    <value>Mã người dùng không được bỏ trống.</value>
+  </data>
+  <data name="Validation.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="Validation.IdRequired" xml:space="preserve">
+    <value>Mã định danh không được bỏ trống.</value>
+  </data>
+  <data name="Validation.NameMaxLength" xml:space="preserve">
+    <value>Tên vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="Validation.TermRequiredForStudent" xml:space="preserve">
+    <value>Cần nhập học kỳ cho sinh viên.</value>
+  </data>
+  <data name="Validation.UserInvalidDateFormat" xml:space="preserve">
+    <value>Định dạng ngày tháng không hợp lệ.</value>
+  </data>
+  <data name="Validation.UserInvalidGender" xml:space="preserve">
+    <value>Giới tính không hợp lệ.</value>
+  </data>
+  <data name="Validation.UserInvalidPhone" xml:space="preserve">
+    <value>Số điện thoại không hợp lệ.</value>
+  </data>
+  <data name="Validation.UserInvalidRole" xml:space="preserve">
+    <value>Quyền hạn không hợp lệ.</value>
+  </data>
+  <data name="Validation.UserInvalidStatus" xml:space="preserve">
+    <value>Trạng thái không hợp lệ.</value>
+  </data>
+  <data name="Validation.UserUnitRequired" xml:space="preserve">
+    <value>Đơn vị không được bỏ trống.</value>
+  </data>
+  <data name="ViolationReportKey.DescriptionIsRequired" xml:space="preserve">
+    <value>Mô tả vi phạm không được bỏ trống.</value>
+  </data>
+  <data name="ViolationReportKey.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả vi phạm vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="ViolationReportKey.DescriptionMinLength" xml:space="preserve">
+    <value>Mô tả vi phạm quá ngắn.</value>
+  </data>
+  <data name="ViolationReportKey.OccurredDateInFuture" xml:space="preserve">
+    <value>Ngày vi phạm không được trong tương lai.</value>
+  </data>
+  <data name="ViolationReportKey.OccurredDateIsRequired" xml:space="preserve">
+    <value>Ngày vi phạm không được bỏ trống.</value>
+  </data>
+  <data name="ViolationReportKey.ViolationReportIdIsRequired" xml:space="preserve">
+    <value>Mã báo cáo vi phạm không được bỏ trống.</value>
+  </data>
+  <data name="Auth.EmployeeCodeRequired" xml:space="preserve">
+    <value>Mã nhân viên không được để trống.</value>
+  </data>
+  <data name="Auth.PasswordResetGenericMessage" xml:space="preserve">
+    <value>Nếu tồn tại tài khoản với mã nhân viên này, hệ thống đã gửi email đặt lại mật khẩu.</value>
+  </data>
+  <data name="Auth.UnitInactive" xml:space="preserve">
+    <value>Đơn vị của bạn hiện đang ngừng hoạt động.</value>
+  </data>
+  <data name="CannotIdentifyManager" xml:space="preserve">
+    <value>Không thể xác định người quản lý đang thực hiện thao tác đặt lại mật khẩu.</value>
+  </data>
+  <data name="CannotPromoteToManager" xml:space="preserve">
+    <value>Không thể thăng cấp trực tiếp lên vai trò Quản lý.</value>
+  </data>
+  <data name="Common.RecordNotFound" xml:space="preserve">
+    <value>Không tìm thấy dữ liệu yêu cầu.</value>
+  </data>
+  <data name="DatabaseUpdateError" xml:space="preserve">
+    <value>Đã xảy ra lỗi khi cập nhật cơ sở dữ liệu.</value>
+  </data>
+  <data name="Employee.CannotUpdateInactive" xml:space="preserve">
+    <value>Không thể cập nhật thông tin của nhân viên không hoạt động.</value>
+  </data>
+  <data name="Employee.CodeInvalidFormat" xml:space="preserve">
+    <value>Mã nhân viên phải bắt đầu bằng W, C, B hoặc M, theo sau là 6 chữ số (ví dụ: M000001).</value>
+  </data>
+  <data name="EmployeeNotActive" xml:space="preserve">
+    <value>Nhân viên hiện không hoạt động.</value>
+  </data>
+  <data name="Enterprise.DuplicateTaxCode" xml:space="preserve">
+    <value>Mã số thuế đã tồn tại trong hệ thống.</value>
+  </data>
+  <data name="Enterprise.Inactive" xml:space="preserve">
+    <value>Doanh nghiệp hiện đang ngừng hoạt động.</value>
+  </data>
+  <data name="Enterprise.Unverified" xml:space="preserve">
+    <value>Doanh nghiệp chưa được xác minh.</value>
+  </data>
+  <data name="Evaluation.AlreadyExists" xml:space="preserve">
+    <value>Đánh giá cho sinh viên này đã tồn tại.</value>
+  </data>
+  <data name="Evaluation.StudentNotFound" xml:space="preserve">
+    <value>Không tìm thấy sinh viên cần đánh giá.</value>
+  </data>
+  <data name="Evaluation.StudentNotInGroup" xml:space="preserve">
+    <value>Sinh viên không thuộc nhóm thực tập này.</value>
+  </data>
+  <data name="EvaluationCriteria.MaxScoreInvalid" xml:space="preserve">
+    <value>Điểm tối đa không hợp lệ.</value>
+  </data>
+  <data name="EvaluationCriteria.NameMaxLength" xml:space="preserve">
+    <value>Tên tiêu chí vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="EvaluationCriteria.NameRequired" xml:space="preserve">
+    <value>Tên tiêu chí không được để trống.</value>
+  </data>
+  <data name="EvaluationCriteria.WeightInvalid" xml:space="preserve">
+    <value>Trọng số tiêu chí không hợp lệ.</value>
+  </data>
+  <data name="HRApplications.ApplicationNotActive" xml:space="preserve">
+    <value>Đơn ứng tuyển không còn ở trạng thái có thể xử lý.</value>
+  </data>
+  <data name="HRApplications.CannotRejectPlaced" xml:space="preserve">
+    <value>Không thể từ chối đơn đã ở trạng thái Đã tiếp nhận.</value>
+  </data>
+  <data name="HRApplications.EnterpriseUserNotFound" xml:space="preserve">
+    <value>Không tìm thấy thông tin nhân sự doanh nghiệp.</value>
+  </data>
+  <data name="HRApplications.InvalidTransition" xml:space="preserve">
+    <value>Không thể chuyển trạng thái đơn theo thao tác này.</value>
+  </data>
+  <data name="HRApplications.Log.ApproveUniAssign" xml:space="preserve">
+    <value>Có lỗi khi ghi nhận thao tác duyệt hồ sơ phân công từ nhà trường.</value>
+  </data>
+  <data name="HRApplications.Log.CascadeWithdraw" xml:space="preserve">
+    <value>Có lỗi khi thực hiện rút các đơn ứng tuyển liên quan.</value>
+  </data>
+  <data name="HRApplications.Log.InvalidUserId" xml:space="preserve">
+    <value>Không xác định được người dùng thực hiện thao tác.</value>
+  </data>
+  <data name="HRApplications.Log.MarkAsPlaced" xml:space="preserve">
+    <value>Có lỗi khi cập nhật đơn sang trạng thái Đã tiếp nhận.</value>
+  </data>
+  <data name="HRApplications.Log.MoveToInterviewing" xml:space="preserve">
+    <value>Có lỗi khi chuyển đơn sang trạng thái Phỏng vấn.</value>
+  </data>
+  <data name="HRApplications.Log.Reject" xml:space="preserve">
+    <value>Có lỗi khi từ chối đơn ứng tuyển.</value>
+  </data>
+  <data name="HRApplications.Log.RejectUniAssign" xml:space="preserve">
+    <value>Có lỗi khi từ chối hồ sơ phân công từ nhà trường.</value>
+  </data>
+  <data name="HRApplications.Log.SendOffer" xml:space="preserve">
+    <value>Có lỗi khi gửi offer cho ứng viên.</value>
+  </data>
+  <data name="HRApplications.NotFound" xml:space="preserve">
+    <value>Không tìm thấy đơn ứng tuyển.</value>
+  </data>
+  <data name="HRApplications.NotSelfApplyApplication" xml:space="preserve">
+    <value>Đơn này không thuộc nhóm tự ứng tuyển.</value>
+  </data>
+  <data name="HRApplications.NotUniAssignApplication" xml:space="preserve">
+    <value>Đơn này không thuộc nhóm phân công từ nhà trường.</value>
+  </data>
+  <data name="InternshipGroup.CannotArchiveNoData" xml:space="preserve">
+    <value>Không thể lưu trữ nhóm vì chưa có dữ liệu hoạt động.</value>
+  </data>
+  <data name="Landing.Log.Processing" xml:space="preserve">
+    <value>Yêu cầu của bạn đang được xử lý.</value>
+  </data>
+  <data name="Logbooks.AlreadyReported" xml:space="preserve">
+    <value>Bạn đã nộp nhật ký cho giai đoạn này.</value>
+  </data>
+  <data name="Logbooks.CreationFailed" xml:space="preserve">
+    <value>Tạo nhật ký thực tập thất bại.</value>
+  </data>
+  <data name="Logbooks.DeleteFailed" xml:space="preserve">
+    <value>Xóa nhật ký thực tập thất bại.</value>
+  </data>
+  <data name="Logbooks.NoActiveInternship" xml:space="preserve">
+    <value>Bạn chưa có đợt thực tập đang hoạt động.</value>
+  </data>
+  <data name="Logbooks.NotFound" xml:space="preserve">
+    <value>Không tìm thấy nhật ký thực tập.</value>
+  </data>
+  <data name="Logbooks.UpdateFailed" xml:space="preserve">
+    <value>Cập nhật nhật ký thực tập thất bại.</value>
+  </data>
+  <data name="NewRoleMustBeDifferent" xml:space="preserve">
+    <value>Vai trò mới phải khác vai trò hiện tại.</value>
+  </data>
+  <data name="Notifications.AccessDenied" xml:space="preserve">
+    <value>Bạn không có quyền truy cập thông báo này.</value>
+  </data>
+  <data name="Notifications.BulkDeleteSuccess" xml:space="preserve">
+    <value>Đã xóa các thông báo đã chọn thành công.</value>
+  </data>
+  <data name="Notifications.DeleteError" xml:space="preserve">
+    <value>Xóa thông báo thất bại.</value>
+  </data>
+  <data name="Notifications.DeleteNotOwner" xml:space="preserve">
+    <value>Bạn chỉ có thể xóa thông báo của chính mình.</value>
+  </data>
+  <data name="Notifications.DeleteSuccess" xml:space="preserve">
+    <value>Xóa thông báo thành công.</value>
+  </data>
+  <data name="Notifications.MarkAllReadSuccess" xml:space="preserve">
+    <value>Đã đánh dấu tất cả thông báo là đã đọc.</value>
+  </data>
+  <data name="Notifications.MarkReadSuccess" xml:space="preserve">
+    <value>Đã đánh dấu thông báo là đã đọc.</value>
+  </data>
+  <data name="Notifications.NotFound" xml:space="preserve">
+    <value>Không tìm thấy thông báo.</value>
+  </data>
+  <data name="OnlyActiveEmployeeCanReset" xml:space="preserve">
+    <value>Chỉ có thể đặt lại mật khẩu cho tài khoản đang hoạt động.</value>
+  </data>
+  <data name="OnlyManagerCanReset" xml:space="preserve">
+    <value>Chỉ quản lý mới được phép đặt lại mật khẩu.</value>
+  </data>
+  <data name="Profile.EmailRequired" xml:space="preserve">
+    <value>Email không được để trống.</value>
+  </data>
+  <data name="Profile.EmployeeIdRequired" xml:space="preserve">
+    <value>EmployeeId không được để trống.</value>
+  </data>
+  <data name="Profile.PhoneRequired" xml:space="preserve">
+    <value>Số điện thoại không được để trống.</value>
+  </data>
+  <data name="Profile.UserIdRequired" xml:space="preserve">
+    <value>Mã người dùng không được để trống.</value>
+  </data>
+  <data name="ProjectResources.FileAndLinkMutuallyExclusive" xml:space="preserve">
+    <value>Chỉ được chọn tệp hoặc liên kết, không được chọn đồng thời cả hai.</value>
+  </data>
+  <data name="ProjectResources.FileOrLinkRequired" xml:space="preserve">
+    <value>Vui lòng cung cấp tệp hoặc liên kết.</value>
+  </data>
+  <data name="ProjectResources.InvalidExternalUrl" xml:space="preserve">
+    <value>Liên kết ngoài không hợp lệ.</value>
+  </data>
+  <data name="ProjectResources.LinkDownloadNotSupported" xml:space="preserve">
+    <value>Liên kết này không hỗ trợ tải xuống.</value>
+  </data>
+  <data name="ProjectResources.LinkTypeRequired" xml:space="preserve">
+    <value>Loại liên kết không được để trống.</value>
+  </data>
+  <data name="ProjectResources.LogUploadAutoSetFileTypeError" xml:space="preserve">
+    <value>Không thể tự động xác định loại tệp khi tải lên.</value>
+  </data>
+  <data name="ProjectResources.UpdateSuccess" xml:space="preserve">
+    <value>Cập nhật tài nguyên dự án thành công.</value>
+  </data>
+  <data name="Projects.CannotDeleteActive" xml:space="preserve">
+    <value>Không thể xóa dự án đang hoạt động.</value>
+  </data>
+  <data name="Projects.CreateSuccess" xml:space="preserve">
+    <value>Tạo dự án thành công.</value>
+  </data>
+  <data name="Projects.InvalidStatus" xml:space="preserve">
+    <value>Trạng thái dự án không hợp lệ.</value>
+  </data>
+  <data name="PublicHolidays.AlreadyExists" xml:space="preserve">
+    <value>Ngày nghỉ lễ này đã tồn tại.</value>
+  </data>
+  <data name="PublicHolidays.CreateSuccess" xml:space="preserve">
+    <value>Tạo ngày nghỉ lễ thành công.</value>
+  </data>
+  <data name="PublicHolidays.DateRequired" xml:space="preserve">
+    <value>Ngày nghỉ lễ không được để trống.</value>
+  </data>
+  <data name="PublicHolidays.DeleteSuccess" xml:space="preserve">
+    <value>Xóa ngày nghỉ lễ thành công.</value>
+  </data>
+  <data name="PublicHolidays.DescriptionMaxLength" xml:space="preserve">
+    <value>Mô tả ngày nghỉ lễ vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="PublicHolidays.NotFound" xml:space="preserve">
+    <value>Không tìm thấy ngày nghỉ lễ.</value>
+  </data>
+  <data name="PublicHolidays.SyncApiError" xml:space="preserve">
+    <value>Đồng bộ dữ liệu ngày nghỉ lễ thất bại.</value>
+  </data>
+  <data name="PublicHolidays.SyncApiKeyMissing" xml:space="preserve">
+    <value>Thiếu khóa API để đồng bộ ngày nghỉ lễ.</value>
+  </data>
+  <data name="PublicHolidays.SyncSuccess" xml:space="preserve">
+    <value>Đồng bộ ngày nghỉ lễ thành công.</value>
+  </data>
+  <data name="PublicHolidays.YearInvalid" xml:space="preserve">
+    <value>Năm không hợp lệ.</value>
+  </data>
+  <data name="ResetPassword.EmployeeIdRequired" xml:space="preserve">
+    <value>Mã nhân viên không được để trống.</value>
+  </data>
+  <data name="ResetStatusNoEmail" xml:space="preserve">
+    <value>Đặt lại mật khẩu thành công, nhưng không gửi được email.</value>
+  </data>
+  <data name="RoleChangedButEmailFailed" xml:space="preserve">
+    <value>Đã đổi vai trò thành công cho {0}, nhưng gửi email thông báo thất bại.</value>
+  </data>
+  <data name="Sprint.NewSprintNameRequired" xml:space="preserve">
+    <value>Tên sprint mới không được để trống.</value>
+  </data>
+  <data name="Stakeholder.InvalidType" xml:space="preserve">
+    <value>Loại stakeholder không hợp lệ.</value>
+  </data>
+  <data name="University.DuplicateCode" xml:space="preserve">
+    <value>Mã trường đại học đã tồn tại.</value>
+  </data>
+  <data name="University.Inactive" xml:space="preserve">
+    <value>Trường đại học hiện đang ngừng hoạt động.</value>
+  </data>
+  <data name="UserManagement.CodeMaxLength" xml:space="preserve">
+    <value>Mã người dùng vượt quá độ dài cho phép.</value>
+  </data>
+  <data name="UserManagement.CodeRequired" xml:space="preserve">
+    <value>Mã người dùng không được để trống.</value>
+  </data>
+  <data name="Users.CodeConflict" xml:space="preserve">
+    <value>Mã người dùng đã tồn tại.</value>
+  </data>
+  <data name="Users.CodeInvalidFormat" xml:space="preserve">
+    <value>Mã người dùng không đúng định dạng.</value>
+  </data>
+  <data name="Users.NewRoleMustBeDifferent" xml:space="preserve">
+    <value>Vai trò mới phải khác vai trò hiện tại.</value>
+  </data>
+  <data name="Users.RoleChangedButEmailFailed" xml:space="preserve">
+    <value>Đổi vai trò thành công nhưng gửi email thông báo thất bại.</value>
+  </data>
+  <data name="Users.RoleMismatch" xml:space="preserve">
+    <value>Vai trò người dùng không khớp với yêu cầu thao tác.</value>
   </data>
 </root>

@@ -82,8 +82,8 @@ namespace IOCv2.Application.Features.Jobs.Commands.CreateJobPosting
                     ResultErrorType.NotFound);
             }
             var test = internshipPhase.Status.ToString();
-            // Only allow selecting phases that are Open (Upcoming) or InProgress (Active)
-            if (internshipPhase.Status != InternshipPhaseStatus.Open && internshipPhase.Status != InternshipPhaseStatus.InProgress)
+            // Only allow selecting phases that are Open (Upcoming)
+            if (internshipPhase.Status != InternshipPhaseStatus.Open)
             {
                 _logger.LogWarning("Internship phase {InternshipPhaseId} is not available for job postings (status {Status}).", request.InternshipPhaseId, internshipPhase.Status);
                 return Result<CreateJobPostingResponse>.Failure(

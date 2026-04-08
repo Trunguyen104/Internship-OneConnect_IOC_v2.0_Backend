@@ -13,7 +13,7 @@ public static class LocalizationConfig
     {
         var supportedCultures = new[] { "vi", "en" };
         var localizationOptions = new RequestLocalizationOptions()
-            .SetDefaultCulture("vi")
+            .SetDefaultCulture("en")
             .AddSupportedCultures(supportedCultures)
             .AddSupportedUICultures(supportedCultures);
 

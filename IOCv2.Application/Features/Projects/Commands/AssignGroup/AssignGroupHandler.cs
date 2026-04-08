@@ -81,6 +81,17 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
             if (group.MentorId != enterpriseUser.EnterpriseUserId)
                 return Result<AssignGroupResponse>.Failure(_message.GetMessage(MessageKeys.Common.Forbidden), ResultErrorType.Forbidden);
 
+            var hasActiveProjectInGroup = await _unitOfWork.Repository<Project>().Query()
+                .AnyAsync(p => p.InternshipId == group.InternshipId
+                            && p.ProjectId != project.ProjectId
+                            && p.OperationalStatus == OperationalStatus.Active,
+                    cancellationToken);
+
+            if (hasActiveProjectInGroup)
+                return Result<AssignGroupResponse>.Failure(
+                    _message.GetMessage(MessageKeys.Projects.GroupAlreadyHasActiveProject),
+                    ResultErrorType.Conflict);
+
             project.AssignToGroup(group.InternshipId, group.StartDate, group.EndDate);
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -89,6 +100,14 @@ namespace IOCv2.Application.Features.Projects.Commands.AssignGroup
                 await _unitOfWork.Repository<Project>().UpdateAsync(project, cancellationToken);
                 await _unitOfWork.SaveChangeAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            }
+            catch (DbUpdateException dbEx) when (
+                dbEx.InnerException?.Message.Contains("uix_projects_internship_id_active") == true)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                return Result<AssignGroupResponse>.Failure(
+                    _message.GetMessage(MessageKeys.Projects.GroupAlreadyHasActiveProject),
+                    ResultErrorType.Conflict);
             }
             catch (Exception ex)
             {

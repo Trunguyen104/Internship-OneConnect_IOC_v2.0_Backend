@@ -7,13 +7,13 @@ namespace IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle
     {
         public UnAssignSingleValidator()
         {
-            RuleFor(x => x.ApplicationId)
+            RuleFor(x => x.StudentId)
                 .NotEmpty()
-                .WithMessage("ApplicationId is required.");
+                .WithMessage("StudentId is required.");
 
-            RuleFor(x => x.ApplicationId)
+            RuleFor(x => x.StudentId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("ApplicationId must not be an empty GUID.");
+                .WithMessage("StudentId must not be an empty GUID.");
         }
     }
 }

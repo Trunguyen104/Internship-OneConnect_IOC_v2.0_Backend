@@ -516,12 +516,18 @@ namespace IOCv2.Application.Constants
             // AssignGroup
             public const string AssignGroupSuccess         = "Projects.AssignGroupSuccess";
             public const string AlreadyAssignedToGroup     = "Projects.AlreadyAssignedToGroup";
+            public const string GroupAlreadyHasActiveProject = "Projects.GroupAlreadyHasActiveProject";
             public const string GroupHasNoMentor           = "Projects.GroupHasNoMentor";
             public const string GroupNotActive             = "Projects.GroupNotActive";
             public const string CannotAssignArchivedGroup  = "Projects.CannotAssignArchivedGroup";
             public const string GroupPhaseEnded            = "Projects.GroupPhaseEnded";
             public const string LogAssignGroupSuccess      = "Projects.LogAssignGroupSuccess";
             public const string LogAssignGroupError        = "Projects.LogAssignGroupError";
+
+            // Delete
+            public const string CannotDeleteCompletedOrArchived = "Projects.CannotDeleteCompletedOrArchived";
+            public const string CannotDeleteWithWorkItems = "Projects.CannotDeleteWithWorkItems";
+            public const string CannotDeleteWithSprints = "Projects.CannotDeleteWithSprints";
 
             // SwapGroup
             public const string SwapGroupSuccess = "Projects.SwapGroupSuccess";
@@ -1106,6 +1112,7 @@ namespace IOCv2.Application.Constants
             public const string PageNumberMinValue = "InternshipPhase.PageNumberMinValue";
             public const string PageSizeRange = "InternshipPhase.PageSizeRange";
             public const string InternshipPhaseIdRequired = "InternshipPhase.InternshipPhaseIdRequired";
+            public const string StartDateAfterEndDate = "InternshipPhase.StartDateAfterEndDate";
 
             // Business errors
             public const string NotFound = "InternshipPhase.NotFound";
@@ -1320,6 +1327,34 @@ namespace IOCv2.Application.Constants
             public const string FailedToAssignStudentsDueToConcurrentOperations = "UniAssign.FailedToAssignStudentsDueToConcurrentOperations";
             public const string UnauthorizedOrInvalidOperation = "UniAssign.UnauthorizedOrInvalidOperation";
             public const string EnterpriseIdIsRequired = "UniAssign.EnterpriseIdIsRequired";
+            // Bulk Reassign
+            public const string PendingStudentsWithExistingData = "UniAssign.PendingStudentsWithExistingData";
+            public const string NoStudentsAvailableForReassignment = "UniAssign.NoStudentsAvailableForReassignment";
+            public const string ReassignTermsClosed = "UniAssign.ReassignTermsClosed";
+            public const string NoStudentsCanReassignDueToPendingApplications = "UniAssign.NoStudentsCanReassignDueToPendingApplications";
+            public const string InternPhaseNoCapacity = "UniAssign.InternPhaseNoCapacity";
+            public const string BulkReassignSuccess = "UniAssign.BulkReassignSuccess";
+            // Bulk Unassign
+            public const string CannotUnassignFromClosedTerms = "UniAssign.CannotUnassignFromClosedTerms";
+            public const string NoUniAssignApplicationsFound = "UniAssign.NoUniAssignApplicationsFound";
+            public const string BulkUnassignSuccess = "UniAssign.BulkUnassignSuccess";
+            // Quick Assign
+            public const string StudentNotFound = "UniAssign.StudentNotFound";
+            public const string StudentAlreadyPlaced = "UniAssign.StudentAlreadyPlaced";
+            public const string NotOpenForAssignment = "UniAssign.NotOpenForAssignment";
+            public const string NoJobPosting = "UniAssign.NoJobPosting";
+            public const string InternPhaseFull = "UniAssign.InternPhaseFull";
+            public const string StudentHasPendingApplicationAtEnterprise = "UniAssign.StudentHasPendingApplicationAtEnterprise";
+            public const string StudentHasPriorInternshipData = "UniAssign.StudentHasPriorInternshipData";
+            public const string ConcurrencyConflict = "UniAssign.ConcurrencyConflict";
+            public const string QuickAssignSuccess = "UniAssign.QuickAssignSuccess";
+            // Reassign
+            public const string CannotReassignStudentHasInternshipData = "UniAssign.CannotReassignStudentHasInternshipData";
+            public const string ReassignPendingSuccess = "UniAssign.ReassignPendingSuccess";
+            // Unassign
+            public const string UnassignSuccess = "UniAssign.UnassignSuccess";
+            // Get By Term
+            public const string GetNotAllowed = "UniAssign.GetNotAllowed";
         }
 
         public static class UserManagement

@@ -63,7 +63,7 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm
             if (universityUser == null || universityUser.UniversityId != term.UniversityId)
             {
                 return Result<PaginatedResult<GetStudentsByTermResponse>>.Failure(
-                    "Bạn chỉ có thể truy cập danh sách sinh viên của trường đại học của bạn.",
+                    _messageService.GetMessage(MessageKeys.UniAssign.GetNotAllowed),
                     ResultErrorType.Forbidden);
             }
 
@@ -90,15 +90,16 @@ namespace IOCv2.Application.Features.UniAssign.Queries.GetStudentsByTerm
                     PlacementStatus = st.PlacementStatus,
                     EnterpriseName = st.Enterprise!.Name,
                     InternPhaseName = _unitOfWork.Repository<InternshipPhase>().Query()
-                        .Where(p => p.PhaseId == _unitOfWork.Repository<InternshipApplication>().Query().Where(ia => ia.TermId == request.TermId && ia.StudentId == st.StudentId).Select(ia => ia.InternPhaseId).FirstOrDefault())
+                        .Where(p => p.PhaseId == _unitOfWork.Repository<InternshipApplication>().Query().Where(ia => ia.TermId == request.TermId && ia.StudentId == st.StudentId).OrderByDescending(ia => ia.CreatedAt).Select(ia => ia.InternPhaseId).FirstOrDefault())
                         .Select(p => p.Name)
                         .FirstOrDefault(),
                     // correlated subquery: get the application status for this student in the requested term (or default 0 if none)
                     InternshipApplicationStatus = _unitOfWork.Repository<InternshipApplication>()
                         .Query()
-                        .Where(a => a.TermId == request.TermId && a.StudentId == st.StudentId)
+                        .Where(a => a.TermId == request.TermId && a.StudentId == st.StudentId).OrderByDescending(a => a.CreatedAt)
                         .Select(a => a.Status)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    StudentTermId = st.StudentTermId
                 })
                 .ToListAsync(cancellationToken);
 

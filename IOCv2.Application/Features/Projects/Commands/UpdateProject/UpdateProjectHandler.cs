@@ -119,7 +119,7 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
 
                 if (hasActiveProjectInTargetGroup)
                     return Result<UpdateProjectResponse>.Failure(
-                        _messageService.GetMessage(MessageKeys.Projects.AlreadyAssignedToGroup),
+                        _messageService.GetMessage(MessageKeys.Projects.GroupAlreadyHasActiveProject),
                         ResultErrorType.Conflict);
             }
 
@@ -335,6 +335,29 @@ namespace IOCv2.Application.Features.Projects.Commands.UpdateProject
                     if (studentUserIds.Any())
                         await _unitOfWork.SaveChangeAsync(cancellationToken);
                 }
+            }
+            catch (DbUpdateException dbEx) when (
+                dbEx.InnerException?.Message.Contains("uix_projects_internship_id_active") == true)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                if (_fileStorageService != null && uploadedFiles.Count > 0)
+                {
+                    foreach (var uploadedFile in uploadedFiles)
+                    {
+                        try
+                        {
+                            await _fileStorageService.DeleteFileAsync(uploadedFile, cancellationToken);
+                        }
+                        catch (Exception cleanupEx)
+                        {
+                            _logger.LogWarning(cleanupEx, _messageService.GetMessage(MessageKeys.Projects.LogCleanupResourceFailed), uploadedFile);
+                        }
+                    }
+                }
+
+                return Result<UpdateProjectResponse>.Failure(
+                    _messageService.GetMessage(MessageKeys.Projects.GroupAlreadyHasActiveProject),
+                    ResultErrorType.Conflict);
             }
             catch (Exception ex)
             {

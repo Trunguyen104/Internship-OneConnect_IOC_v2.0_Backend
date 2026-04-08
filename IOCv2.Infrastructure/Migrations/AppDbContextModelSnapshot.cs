@@ -1371,6 +1371,11 @@ namespace IOCv2.Infrastructure.Migrations
                     b.HasIndex("InternshipId")
                         .HasDatabaseName("ix_projects_internship_id");
 
+                    b.HasIndex("InternshipId")
+                        .IsUnique()
+                        .HasDatabaseName("uix_projects_internship_id_active")
+                        .HasFilter("deleted_at IS NULL AND internship_id IS NOT NULL AND operational_status = 1");
+
                     b.HasIndex("MentorId")
                         .HasDatabaseName("ix_projects_mentor_id");
 

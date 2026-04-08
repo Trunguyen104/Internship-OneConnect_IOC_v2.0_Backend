@@ -7,9 +7,9 @@ namespace IOCv2.Application.Features.UniAssign.Commands.ReAssignSingle
     {
         public ReAssignSingleValidator()
         {
-            RuleFor(x => x.ApplicationId)
+            RuleFor(x => x.StudentId)
                 .Must(id => id != Guid.Empty)
-                .WithMessage("ApplicationId must be a non-empty GUID.");
+                .WithMessage("StudentId must be a non-empty GUID.");
 
             RuleFor(x => x.NewEnterpriseId)
                 .Must(id => id != Guid.Empty)

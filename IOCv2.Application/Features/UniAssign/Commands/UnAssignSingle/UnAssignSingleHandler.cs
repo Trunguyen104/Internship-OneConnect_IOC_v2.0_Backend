@@ -12,6 +12,7 @@ using IOCv2.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using IOCv2.Application.Extensions.UniAssigns;
 
 namespace IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle
 {
@@ -39,7 +40,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle
 
         public async Task<Result<UnAssignSingleResponse>> Handle(UnAssignSingleCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("UnAssignSingle requested for ApplicationId {ApplicationId}", request.ApplicationId);
+            _logger.LogInformation("UnAssignSingle requested for ApplicationId {StudentId}", request.StudentId);
 
             try
             {
@@ -64,7 +65,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle
                     .Include(a => a.Enterprise)
                     .Include(a => a.Term)
                     .Include(a => a.Job)
-                    .FirstOrDefaultAsync(a => a.ApplicationId == request.ApplicationId, cancellationToken);
+                    .FirstOrDefaultAsync(a => a.StudentId == request.StudentId && UniAssignParam.CommonUniAssignParam.AllowedStatuses.Contains(a.Status), cancellationToken);
 
                 if (app == null)
                     return Result<UnAssignSingleResponse>.Failure(
@@ -139,7 +140,7 @@ namespace IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle
 
                 if (hasLogbooks || hasSprints || hasEvaluations)
                 {
-                    var blockMsg = $"Không thể hủy placement của {studentName}. Sinh viên này đã có dữ liệu thực tập (logbook / sprint / đánh giá) tại {enterpriseName}. Vui lòng liên hệ quản trị viên hệ thống nếu cần xử lý đặc biệt.";
+                    var blockMsg = _messageService.GetMessage(MessageKeys.UniAssign.StudentHasPriorInternshipData);
                     _logger.LogInformation("Hard-block unassign for student {StudentId} due to existing internship data.", studentId);
                     return Result<UnAssignSingleResponse>.Failure(blockMsg, ResultErrorType.Conflict);
                 }
@@ -273,14 +274,14 @@ namespace IOCv2.Application.Features.UniAssign.Commands.UnAssignSingle
                     Status = app.Status,
                     StatusLabel = app.Status.ToString(),
                     UpdatedAt = DateTime.UtcNow,
-                    Message = $"Đã hủy placement của {studentName}."
+                    Message = _messageService.GetMessage(MessageKeys.UniAssign.UnassignSuccess, studentName)
                 };
 
                 return Result<UnAssignSingleResponse>.Success(resp, resp.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error unassigning application {ApplicationId}", request.ApplicationId);
+                _logger.LogError(ex, "Error unassigning application {StudentId}", request.StudentId);
                 return Result<UnAssignSingleResponse>.Failure(
                     _messageService.GetMessage(MessageKeys.Common.InternalError),
                     ResultErrorType.InternalServerError);
